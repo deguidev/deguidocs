@@ -1,0 +1,897 @@
+---
+title: 14. Transiciones y Animaciones
+description: <transition>, <transition-group>, hooks de animación y transiciones con clases de Tailwind
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Componente `<transition>`
+
+El componente `<transition>` en Vue 3 permite aplicar animaciones y transiciones a elementos cuando se insertan, actualizan o eliminan del DOM. Es especialmente útil para crear interfaces de usuario dinámicas y atractivas.
+
+### Uso básico
+
+<Code code={`<template>
+  <button @click="show = !show">Alternar</button>
+  
+  <transition name="fade">
+    <p v-if="show">Hola Vue 3!</p>
+  </transition>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+const show = ref(true)
+</script>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>`} lang="vue" title="Transición básica" />
+
+### Clases CSS aplicadas automáticamente
+
+Cuando usas el componente `<transition>`, Vue aplica automáticamente clases CSS en diferentes etapas de la transición:
+
+| Clase | Descripción |
+| --- | --- |
+| `v-enter-from` | Estado inicial antes de entrar |
+| `v-enter-active` | Estado activo durante la entrada |
+| `v-enter-to` | Estado final de la entrada |
+| `v-leave-from` | Estado inicial antes de salir |
+| `v-leave-active` | Estado activo durante la salida |
+| `v-leave-to` | Estado final de la salida |
+
+Si proporcionas un atributo `name` (por ejemplo, `name="fade"`), el prefijo `v-` se reemplaza por el nombre (por ejemplo, `fade-enter-from`).
+
+### Modos de transición
+
+El componente `<transition>` admite diferentes modos para controlar la secuencia de transiciones:
+
+<Tabs>
+<TabItem label="out-in">
+<Code code={`<template>
+  <button @click="toggleComponent">Cambiar componente</button>
+  
+  <transition name="fade" mode="out-in">
+    <component :is="currentComponent"></component>
+  </transition>
+</template>
+
+<script setup>
+import { ref, shallowRef } from 'vue'
+import ComponentA from './ComponentA.vue'
+import ComponentB from './ComponentB.vue'
+
+const currentComponent = shallowRef(ComponentA)
+
+function toggleComponent() {
+  currentComponent.value = currentComponent.value === ComponentA 
+    ? ComponentB 
+    : ComponentA
+}
+</script>`} lang="vue" title="Modo out-in" />
+</TabItem>
+<TabItem label="in-out">
+<Code code={`<template>
+  <button @click="toggleComponent">Cambiar componente</button>
+  
+  <transition name="fade" mode="in-out">
+    <component :is="currentComponent"></component>
+  </transition>
+</template>
+
+<script setup>
+import { ref, shallowRef } from 'vue'
+import ComponentA from './ComponentA.vue'
+import ComponentB from './ComponentB.vue'
+
+const currentComponent = shallowRef(ComponentA)
+
+function toggleComponent() {
+  currentComponent.value = currentComponent.value === ComponentA 
+    ? ComponentB 
+    : ComponentA
+}
+</script>`} lang="vue" title="Modo in-out" />
+</TabItem>
+</Tabs>
+
+### Transiciones personalizadas con CSS
+
+Puedes personalizar completamente las transiciones usando CSS:
+
+<Code code={`<template>
+  <button @click="show = !show">Mostrar/Ocultar</button>
+  
+  <transition name="bounce">
+    <p v-if="show">Texto con rebote</p>
+  </transition>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+const show = ref(true)
+</script>
+
+<style>
+.bounce-enter-active {
+  animation: bounce-in 0.5s;
+}
+.bounce-leave-active {
+  animation: bounce-in 0.5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+</style>`} lang="vue" title="Transición con animación CSS" />
+
+### Transiciones entre elementos
+
+Puedes usar `<transition>` para animar entre diferentes elementos usando la directiva `v-if`/`v-else`:
+
+<Code code={`<template>
+  <button @click="error = !error">Cambiar estado</button>
+  
+  <transition name="slide-fade">
+    <p v-if="error" key="error" class="error">
+      Error: Algo salió mal
+    </p>
+    <p v-else key="success" class="success">
+      Éxito: Operación completada
+    </p>
+  </transition>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+const error = ref(false)
+</script>
+
+<style>
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}
+</style>`} lang="vue" title="Transición entre elementos" />
+
+## Componente `<transition-group>`
+
+El componente `<transition-group>` permite animar listas de elementos cuando se insertan, eliminan o reordenan. A diferencia de `<transition>`, `<transition-group>` se renderiza como un elemento real en el DOM (por defecto un `<span>`, pero puede cambiarse con el atributo `tag`).
+
+### Características principales
+
+- Renderiza un elemento contenedor real (por defecto `<span>`)
+- Cada elemento hijo **debe** tener una `key` única
+- Las transiciones CSS se aplican de la misma manera que con `<transition>`
+- Soporta animaciones de movimiento con la clase `v-move`
+
+### Ejemplo básico con lista
+
+<Code code={`<template>
+  <button @click="add">Agregar</button>
+  <button @click="remove">Eliminar</button>
+  <button @click="shuffle">Mezclar</button>
+  
+  <transition-group name="list" tag="ul">
+    <li v-for="item in items" :key="item" class="list-item">
+      {{ item }}
+    </li>
+  </transition-group>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import _ from 'lodash'
+
+const items = ref([1, 2, 3, 4, 5])
+let nextNum = 6
+
+function add() {
+  items.value.push(nextNum++)
+}
+
+function remove() {
+  items.value.pop()
+}
+
+function shuffle() {
+  items.value = _.shuffle(items.value)
+}
+</script>
+
+<style>
+.list-item {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 10px 20px;
+  background-color: #f3f3f3;
+  border-radius: 4px;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* Asegura que los elementos que se mueven tengan una transición suave */
+.list-move {
+  transition: transform 0.5s ease;
+}
+</style>`} lang="vue" title="Transición de grupo básica" />
+
+### Animación de reordenamiento
+
+Una de las características más potentes de `<transition-group>` es la capacidad de animar el reordenamiento de elementos mediante la clase `v-move`:
+
+<Code code={`<template>
+  <div>
+    <button @click="shuffle">Mezclar tarjetas</button>
+    
+    <transition-group name="flip-list" tag="div" class="card-container">
+      <div v-for="card in cards" :key="card" class="card">
+        {{ card }}
+      </div>
+    </transition-group>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import _ from 'lodash'
+
+const cards = ref(['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'])
+
+function shuffle() {
+  cards.value = _.shuffle(cards.value)
+}
+</script>
+
+<style>
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.card {
+  width: 40px;
+  height: 60px;
+  margin: 5px;
+  background-color: #42b883;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.flip-list-enter-active,
+.flip-list-leave-active {
+  transition: all 0.5s;
+}
+
+.flip-list-enter-from,
+.flip-list-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.flip-list-move {
+  transition: transform 0.5s;
+}
+</style>`} lang="vue" title="Animación de reordenamiento" />
+
+### Animación de filtrado
+
+Puedes combinar `<transition-group>` con filtrado de listas:
+
+<Code code={`<template>
+  <div>
+    <input v-model="query" placeholder="Filtrar tareas..." />
+    
+    <transition-group name="list" tag="ul" class="task-list">
+      <li v-for="task in filteredTasks" :key="task.id" class="task-item">
+        {{ task.text }}
+      </li>
+    </transition-group>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue'
+
+const query = ref('')
+const tasks = ref([
+  { id: 1, text: 'Aprender Vue 3' },
+  { id: 2, text: 'Dominar Composition API' },
+  { id: 3, text: 'Crear componentes reutilizables' },
+  { id: 4, text: 'Implementar enrutamiento' },
+  { id: 5, text: 'Configurar estado global' },
+  { id: 6, text: 'Optimizar rendimiento' }
+])
+
+const filteredTasks = computed(() => {
+  return tasks.value.filter(task =>
+    task.text.toLowerCase().includes(query.value.toLowerCase())
+  )
+})
+</script>
+
+<style>
+.task-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.task-item {
+  padding: 10px 20px;
+  margin: 5px 0;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+  border-left: 3px solid #42b883;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.list-move {
+  transition: transform 0.5s ease;
+}
+</style>`} lang="vue" title="Animación de filtrado" />
+
+## Hooks de animación
+
+Vue 3 proporciona hooks JavaScript para un control más preciso sobre las transiciones. Estos hooks te permiten ejecutar código en momentos específicos durante el proceso de transición.
+
+### Hooks disponibles
+
+Los hooks de transición disponibles son:
+
+| Hook | Descripción |
+| --- | --- |
+| `before-enter` | Llamado antes de que el elemento se inserte en el DOM |
+| `enter` | Llamado un cuadro después de que el elemento se inserte |
+| `after-enter` | Llamado cuando la transición de entrada termina |
+| `enter-cancelled` | Llamado cuando la transición de entrada se cancela |
+| `before-leave` | Llamado antes de que comience la transición de salida |
+| `leave` | Llamado un cuadro después de que comience la transición de salida |
+| `after-leave` | Llamado cuando la transición de salida termina |
+| `leave-cancelled` | Llamado cuando la transición de salida se cancela |
+
+<Aside type="tip">
+Cuando uses solo hooks JavaScript para las transiciones, es importante añadir el atributo `:css="false"` para que Vue sepa que debe omitir la detección automática de transiciones CSS.
+</Aside>
+
+### Ejemplo con hooks de animación
+
+<Code code={`<template>
+  <button @click="show = !show">Alternar</button>
+  
+  <transition
+    :css="false"
+    @before-enter="beforeEnter"
+    @enter="enter"
+    @after-enter="afterEnter"
+    @before-leave="beforeLeave"
+    @leave="leave"
+    @after-leave="afterLeave"
+  >
+    <div v-if="show" class="animated-block"></div>
+  </transition>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import gsap from 'gsap' // Usando GSAP como ejemplo, pero puedes usar cualquier biblioteca
+
+const show = ref(true)
+
+// Hooks de entrada
+function beforeEnter(el) {
+  // Establecer estado inicial
+  el.style.opacity = 0
+  el.style.transform = 'scale(0.8)'
+}
+
+function enter(el, done) {
+  // Llamar a done cuando la animación termine
+  gsap.to(el, {
+    duration: 0.8,
+    opacity: 1,
+    scale: 1,
+    onComplete: done
+  })
+}
+
+function afterEnter(el) {
+  // Limpiar o añadir clases/estilos adicionales
+  console.log('Transición de entrada completada')
+}
+
+// Hooks de salida
+function beforeLeave(el) {
+  // Preparar para la animación de salida
+  el.style.opacity = 1
+}
+
+function leave(el, done) {
+  gsap.to(el, {
+    duration: 0.6,
+    opacity: 0,
+    scale: 0.8,
+    onComplete: done
+  })
+}
+
+function afterLeave(el) {
+  console.log('Transición de salida completada')
+}
+</script>
+
+<style>
+.animated-block {
+  width: 100px;
+  height: 100px;
+  background-color: #42b883;
+  margin: 20px 0;
+  border-radius: 4px;
+}
+</style>`} lang="vue" title="Hooks de animación" />
+
+### Transiciones entre componentes con hooks
+
+Puedes usar hooks de animación para crear transiciones complejas entre componentes:
+
+<Code code={`<template>
+  <div>
+    <button
+      v-for="tab in tabs"
+      :key="tab"
+      @click="currentTab = tab"
+      :class="{ active: currentTab === tab }"
+      class="tab-button"
+    >
+      {{ tab }}
+    </button>
+    
+    <transition
+      :css="false"
+      @before-enter="beforeEnter"
+      @enter="enter"
+      @before-leave="beforeLeave"
+      @leave="leave"
+      mode="out-in"
+    >
+      <component :is="currentTabComponent" :key="currentTab" class="tab-content" />
+    </transition>
+  </div>
+</template>
+
+<script setup>
+import { ref, shallowRef, computed } from 'vue'
+import gsap from 'gsap'
+import TabHome from './TabHome.vue'
+import TabPosts from './TabPosts.vue'
+import TabArchive from './TabArchive.vue'
+
+const tabs = ['Home', 'Posts', 'Archive']
+const currentTab = ref('Home')
+
+// Mapeo de componentes
+const tabComponents = {
+  Home: TabHome,
+  Posts: TabPosts,
+  Archive: TabArchive
+}
+
+const currentTabComponent = computed(() => {
+  return tabComponents[currentTab.value]
+})
+
+// Hooks de animación
+function beforeEnter(el) {
+  el.style.opacity = 0
+  el.style.transform = 'translateY(20px)'
+}
+
+function enter(el, done) {
+  gsap.to(el, {
+    duration: 0.3,
+    opacity: 1,
+    y: 0,
+    onComplete: done,
+    delay: 0.1 // Pequeño retraso para asegurar que la salida termine primero
+  })
+}
+
+function beforeLeave(el) {
+  el.style.opacity = 1
+  el.style.transform = 'translateY(0)'
+}
+
+function leave(el, done) {
+  gsap.to(el, {
+    duration: 0.2,
+    opacity: 0,
+    y: -20,
+    onComplete: done
+  })
+}
+</script>
+
+<style scoped>
+.tab-button {
+  padding: 8px 16px;
+  margin-right: 6px;
+  border: none;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+.tab-button.active {
+  background-color: #42b883;
+  color: white;
+}
+
+.tab-content {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  min-height: 100px;
+}
+</style>`} lang="vue" title="Transiciones entre componentes con hooks" />
+
+## Transiciones con clases de Tailwind
+
+Tailwind CSS proporciona utilidades para animaciones y transiciones que se pueden integrar perfectamente con los componentes de transición de Vue 3.
+
+### Configuración básica
+
+Para usar las clases de transición de Tailwind con Vue, primero asegúrate de que las animaciones y transiciones estén habilitadas en tu archivo `tailwind.config.js`:
+
+<Code code={`// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      // Personalizar duraciones de transición si es necesario
+      transitionDuration: {
+        '2000': '2000ms',
+      },
+      // Personalizar funciones de timing si es necesario
+      transitionTimingFunction: {
+        'bounce': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+      },
+    },
+  },
+  // Asegurarse de que estos plugins estén habilitados
+  plugins: [],
+}`} lang="javascript" title="Configuración de Tailwind" />
+
+### Transiciones con clases de Tailwind
+
+Puedes combinar las clases de utilidad de Tailwind con los componentes de transición de Vue:
+
+<Code code={`<template>
+  <div class="p-4">
+    <button 
+      @click="show = !show"
+      class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+    >
+      Alternar
+    </button>
+    
+    <transition
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="opacity-0 transform -translate-y-4"
+      enter-to-class="opacity-100 transform translate-y-0"
+      leave-active-class="transition-all duration-200 ease-in"
+      leave-from-class="opacity-100 transform translate-y-0"
+      leave-to-class="opacity-0 transform -translate-y-4"
+    >
+      <div v-if="show" class="mt-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700">
+        Este elemento tiene una transición usando clases de Tailwind CSS.
+      </div>
+    </transition>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+const show = ref(true)
+</script>`} lang="vue" title="Transición básica con Tailwind" />
+
+### Animaciones personalizadas con Tailwind
+
+Puedes definir animaciones personalizadas en tu configuración de Tailwind y usarlas con Vue:
+
+<Code code={`// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      animation: {
+        'bounce-slow': 'bounce 2s infinite',
+        'spin-slow': 'spin 3s linear infinite',
+        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'fade-in': 'fadeIn 0.5s ease-out',
+        'slide-in': 'slideIn 0.5s ease-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideIn: {
+          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+      },
+    },
+  },
+  plugins: [],
+}`} lang="javascript" title="Animaciones personalizadas en Tailwind" />
+
+<Code code={`<template>
+  <div class="p-4">
+    <button 
+      @click="show = !show"
+      class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+    >
+      Mostrar/Ocultar
+    </button>
+    
+    <transition
+      enter-active-class="animate-fade-in"
+      leave-active-class="transition-all duration-300 ease-in"
+      leave-to-class="opacity-0 transform scale-95"
+    >
+      <div v-if="show" class="mt-4 p-6 bg-white shadow-lg rounded-lg">
+        <h3 class="text-lg font-medium text-gray-900">Notificación importante</h3>
+        <p class="mt-2 text-gray-600">Este mensaje usa animaciones personalizadas de Tailwind.</p>
+      </div>
+    </transition>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+const show = ref(true)
+</script>`} lang="vue" title="Usando animaciones personalizadas" />
+
+### Transiciones de grupo con Tailwind
+
+También puedes usar Tailwind con `<transition-group>`:
+
+<Code code={`<template>
+  <div class="p-4">
+    <div class="mb-4 flex space-x-2">
+      <button 
+        @click="addItem"
+        class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+      >
+        Agregar
+      </button>
+      <button 
+        @click="removeItem"
+        class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+      >
+        Eliminar
+      </button>
+      <button 
+        @click="shuffleItems"
+        class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+      >
+        Mezclar
+      </button>
+    </div>
+    
+    <transition-group 
+      tag="ul"
+      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="opacity-0 transform scale-75"
+      enter-to-class="opacity-100 transform scale-100"
+      leave-active-class="absolute transition-all duration-300 ease-in"
+      leave-from-class="opacity-100 transform scale-100"
+      leave-to-class="opacity-0 transform scale-75"
+      move-class="transition-all duration-300"
+    >
+      <li 
+        v-for="item in items" 
+        :key="item.id"
+        class="bg-white p-4 rounded-lg shadow flex items-center justify-center h-24"
+      >
+        <span class="text-2xl font-bold text-gray-700">{{ item.text }}</span>
+      </li>
+    </transition-group>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import _ from 'lodash'
+
+let nextId = 1
+const items = ref([
+  { id: nextId++, text: 'A' },
+  { id: nextId++, text: 'B' },
+  { id: nextId++, text: 'C' },
+  { id: nextId++, text: 'D' }
+])
+
+function addItem() {
+  const letters = 'EFGHIJKLMNOPQRSTUVWXYZ'
+  const randomLetter = letters[Math.floor(Math.random() * letters.length)]
+  items.value.push({ id: nextId++, text: randomLetter })
+}
+
+function removeItem() {
+  if (items.value.length > 0) {
+    items.value.pop()
+  }
+}
+
+function shuffleItems() {
+  items.value = _.shuffle(items.value)
+}
+</script>`} lang="vue" title="Transition Group con Tailwind" />
+
+### Combinando Tailwind con hooks de JavaScript
+
+Para transiciones más complejas, puedes combinar las clases de Tailwind con hooks de JavaScript:
+
+<Code code={`<template>
+  <div class="p-4">
+    <button 
+      @click="show = !show"
+      class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-colors"
+    >
+      Alternar modal
+    </button>
+    
+    <transition
+      :css="false"
+      @before-enter="beforeEnter"
+      @enter="enter"
+      @leave="leave"
+    >
+      <div v-if="show" class="fixed inset-0 flex items-center justify-center z-50">
+        <div class="absolute inset-0 bg-black bg-opacity-50" @click="show = false"></div>
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md z-10">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Modal con Tailwind y GSAP</h3>
+          <p class="text-gray-600 mb-4">
+            Este modal combina clases de Tailwind para el estilo y GSAP para las animaciones.
+          </p>
+          <div class="flex justify-end">
+            <button 
+              @click="show = false"
+              class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import gsap from 'gsap'
+
+const show = ref(false)
+
+function beforeEnter(el) {
+  const modal = el.querySelector('.bg-white')
+  const overlay = el.querySelector('.bg-black')
+  
+  gsap.set(overlay, { opacity: 0 })
+  gsap.set(modal, { 
+    opacity: 0,
+    scale: 0.8,
+    y: 20
+  })
+}
+
+function enter(el, done) {
+  const modal = el.querySelector('.bg-white')
+  const overlay = el.querySelector('.bg-black')
+  
+  const tl = gsap.timeline({
+    onComplete: done
+  })
+  
+  tl.to(overlay, {
+    opacity: 1,
+    duration: 0.3
+  })
+  
+  tl.to(modal, {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    duration: 0.5,
+    ease: 'back.out(1.7)'
+  }, '-=0.1')
+}
+
+function leave(el, done) {
+  const modal = el.querySelector('.bg-white')
+  const overlay = el.querySelector('.bg-black')
+  
+  const tl = gsap.timeline({
+    onComplete: done
+  })
+  
+  tl.to(modal, {
+    opacity: 0,
+    scale: 0.8,
+    y: 20,
+    duration: 0.3,
+    ease: 'power1.in'
+  })
+  
+  tl.to(overlay, {
+    opacity: 0,
+    duration: 0.3
+  }, '-=0.1')
+}
+</script>`} lang="vue" title="Tailwind con hooks de JavaScript" />

@@ -1,0 +1,899 @@
+---
+title: 2. Fundamentos de SQL (DDL)
+description: Aprende sobre la sintaxis básica, tipos de datos y operaciones de definición de datos en SQL
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Fundamentos de SQL (DDL – Data Definition Language)
+
+El Lenguaje de Definición de Datos (DDL) es un subconjunto de SQL que permite definir y gestionar las estructuras de bases de datos como tablas, índices, vistas y esquemas. En esta sección, exploraremos los comandos fundamentales de DDL y cómo se utilizan para crear y administrar objetos de base de datos.
+
+## 2.1. Sintaxis básica de SQL
+
+SQL (Structured Query Language) sigue una sintaxis que se asemeja al lenguaje natural en inglés, lo que facilita su aprendizaje y uso. Antes de profundizar en los comandos específicos, es importante entender algunas reglas básicas de sintaxis:
+
+### Reglas generales de sintaxis
+
+- **Palabras clave**: Las palabras clave de SQL como SELECT, INSERT, CREATE, etc., no distinguen entre mayúsculas y minúsculas, aunque por convención se suelen escribir en mayúsculas para distinguirlas del resto del código.
+- **Identificadores**: Los nombres de tablas, columnas y otros objetos pueden estar en mayúsculas o minúsculas según la configuración del servidor.
+- **Terminación de sentencias**: Cada instrucción SQL termina con punto y coma (;).
+- **Espacios en blanco**: SQL ignora los espacios en blanco adicionales entre palabras y líneas.
+- **Comentarios**: Se pueden incluir comentarios de una línea con `--` o comentarios de varias líneas con `/* */`.
+
+### Estructura básica de una consulta SQL
+
+```sql
+SELECT columna1, columna2
+FROM tabla
+WHERE condición;
+```
+
+### Categorías principales de comandos SQL
+
+SQL se divide en varias categorías de comandos:
+
+<Tabs>
+  <TabItem label="DDL">
+    **Data Definition Language**: Comandos para definir y modificar estructuras de datos.
+    - CREATE: Crear objetos como tablas, vistas, índices
+    - ALTER: Modificar objetos existentes
+    - DROP: Eliminar objetos
+    - TRUNCATE: Vaciar el contenido de una tabla
+  </TabItem>
+  <TabItem label="DML">
+    **Data Manipulation Language**: Comandos para manipular los datos.
+    - SELECT: Consultar datos
+    - INSERT: Insertar nuevos registros
+    - UPDATE: Actualizar registros existentes
+    - DELETE: Eliminar registros
+  </TabItem>
+  <TabItem label="DCL">
+    **Data Control Language**: Comandos para controlar el acceso a los datos.
+    - GRANT: Otorgar permisos
+    - REVOKE: Revocar permisos
+  </TabItem>
+  <TabItem label="TCL">
+    **Transaction Control Language**: Comandos para gestionar transacciones.
+    - COMMIT: Confirmar cambios
+    - ROLLBACK: Deshacer cambios
+    - SAVEPOINT: Establecer puntos de guardado
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  En esta sección nos centraremos exclusivamente en los comandos DDL, que son fundamentales para crear y gestionar la estructura de una base de datos.
+</Aside>
+
+## 2.2. Tipos de datos en MySQL y Oracle
+
+Los tipos de datos definen qué tipo de información puede almacenarse en una columna específica. MySQL y Oracle tienen diferentes conjuntos de tipos de datos, aunque comparten muchas similitudes.
+
+<Tabs>
+  <TabItem label="MySQL">
+    ### Tipos de datos numéricos
+    
+    | Tipo | Descripción | Rango |
+    |------|-------------|-------|
+    | `INT` | Entero de tamaño estándar | -2,147,483,648 a 2,147,483,647 |
+    | `TINYINT` | Entero muy pequeño | -128 a 127 |
+    | `SMALLINT` | Entero pequeño | -32,768 a 32,767 |
+    | `MEDIUMINT` | Entero de tamaño medio | -8,388,608 a 8,388,607 |
+    | `BIGINT` | Entero grande | -9,223,372,036,854,775,808 a 9,223,372,036,854,775,807 |
+    | `FLOAT` | Número de punto flotante de precisión simple | |
+    | `DOUBLE` | Número de punto flotante de doble precisión | |
+    | `DECIMAL(M,D)` | Número decimal exacto | |
+    
+    ### Tipos de datos de cadena
+    
+    | Tipo | Descripción | Tamaño máximo |
+    |------|-------------|---------------|
+    | `CHAR(N)` | Cadena de longitud fija | 255 caracteres |
+    | `VARCHAR(N)` | Cadena de longitud variable | 65,535 caracteres |
+    | `TINYTEXT` | Texto muy pequeño | 255 caracteres |
+    | `TEXT` | Texto de tamaño estándar | 65,535 caracteres |
+    | `MEDIUMTEXT` | Texto de tamaño medio | 16,777,215 caracteres |
+    | `LONGTEXT` | Texto largo | 4,294,967,295 caracteres |
+    
+    ### Tipos de datos de fecha y hora
+    
+    | Tipo | Descripción | Formato |
+    |------|-------------|--------|
+    | `DATE` | Fecha | 'YYYY-MM-DD' |
+    | `TIME` | Hora | 'HH:MM:SS' |
+    | `DATETIME` | Fecha y hora | 'YYYY-MM-DD HH:MM:SS' |
+    | `TIMESTAMP` | Marca temporal | 'YYYY-MM-DD HH:MM:SS' |
+    | `YEAR` | Año | YYYY |
+    
+    ### Otros tipos de datos
+    
+    | Tipo | Descripción |
+    |------|-------------|
+    | `BLOB` | Datos binarios |
+    | `ENUM` | Enumeración (lista de valores posibles) |
+    | `SET` | Conjunto (múltiples valores de una lista) |
+    | `JSON` | Datos en formato JSON (MySQL 5.7+) |
+  </TabItem>
+  <TabItem label="Oracle">
+    ### Tipos de datos numéricos
+    
+    | Tipo | Descripción | Rango |
+    |------|-------------|-------|
+    | `NUMBER(p,s)` | Número con precisión p y escala s | Hasta 38 dígitos de precisión |
+    | `FLOAT` | Número de punto flotante | |
+    | `BINARY_FLOAT` | Punto flotante de precisión simple | |
+    | `BINARY_DOUBLE` | Punto flotante de doble precisión | |
+    
+    ### Tipos de datos de cadena
+    
+    | Tipo | Descripción | Tamaño máximo |
+    |------|-------------|---------------|
+    | `CHAR(n)` | Cadena de longitud fija | 2000 bytes |
+    | `VARCHAR2(n)` | Cadena de longitud variable | 4000 bytes |
+    | `NCHAR(n)` | Cadena Unicode de longitud fija | 2000 bytes |
+    | `NVARCHAR2(n)` | Cadena Unicode de longitud variable | 4000 bytes |
+    | `CLOB` | Character Large Object | Hasta 4GB |
+    | `NCLOB` | National Character Large Object | Hasta 4GB |
+    
+    ### Tipos de datos de fecha y hora
+    
+    | Tipo | Descripción | Formato |
+    |------|-------------|--------|
+    | `DATE` | Fecha y hora | 'DD-MON-YY HH:MI:SS' |
+    | `TIMESTAMP` | Fecha y hora con fracción de segundo | 'DD-MON-YY HH:MI:SS.FF' |
+    | `TIMESTAMP WITH TIME ZONE` | Timestamp con zona horaria | |
+    | `TIMESTAMP WITH LOCAL TIME ZONE` | Timestamp con zona horaria local | |
+    | `INTERVAL YEAR TO MONTH` | Intervalo de años y meses | |
+    | `INTERVAL DAY TO SECOND` | Intervalo de días a segundos | |
+    
+    ### Otros tipos de datos
+    
+    | Tipo | Descripción |
+    |------|-------------|
+    | `BLOB` | Binary Large Object |
+    | `RAW` | Datos binarios de longitud variable |
+    | `LONG RAW` | Datos binarios de longitud variable (obsoleto) |
+    | `ROWID` | Identificador único de fila |
+    | `XMLTYPE` | Datos XML |
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Al diseñar una base de datos, es crucial elegir los tipos de datos adecuados para optimizar el almacenamiento y el rendimiento. Un tipo de dato demasiado grande desperdicia espacio, mientras que uno demasiado pequeño puede truncar los datos.
+</Aside>
+
+## 2.3. Crear y eliminar bases de datos (CREATE DATABASE, DROP DATABASE) (MySQL)
+
+En MySQL, una base de datos es un contenedor que almacena tablas, vistas, procedimientos almacenados y otros objetos. Crear y eliminar bases de datos son operaciones fundamentales en la administración de MySQL.
+
+### Crear una base de datos
+
+La sintaxis básica para crear una base de datos en MySQL es:
+
+```sql
+CREATE DATABASE [IF NOT EXISTS] nombre_base_datos
+[CHARACTER SET charset_name]
+[COLLATE collation_name];
+```
+
+#### Parámetros:
+
+- `IF NOT EXISTS`: Opcional. Evita que se produzca un error si la base de datos ya existe.
+- `CHARACTER SET`: Opcional. Especifica el conjunto de caracteres predeterminado para la base de datos.
+- `COLLATE`: Opcional. Especifica la colación predeterminada para la base de datos.
+
+#### Ejemplos:
+
+```sql
+--- Crear una base de datos simple
+CREATE DATABASE empresa;
+
+--- Crear una base de datos si no existe
+CREATE DATABASE IF NOT EXISTS tienda;
+
+--- Crear una base de datos con conjunto de caracteres y colación específicos
+CREATE DATABASE biblioteca
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_spanish_ci;
+```
+
+<Aside type="tip">
+  Es una buena práctica utilizar la cláusula `IF NOT EXISTS` para evitar errores cuando se ejecutan scripts de creación de bases de datos múltiples veces.
+</Aside>
+
+### Eliminar una base de datos
+
+La sintaxis para eliminar una base de datos en MySQL es:
+
+```sql
+DROP DATABASE [IF EXISTS] nombre_base_datos;
+```
+
+#### Parámetros:
+
+- `IF EXISTS`: Opcional. Evita que se produzca un error si la base de datos no existe.
+
+#### Ejemplos:
+
+```sql
+--- Eliminar una base de datos
+DROP DATABASE empresa;
+
+--- Eliminar una base de datos si existe
+DROP DATABASE IF EXISTS tienda;
+```
+
+<Aside type="caution">
+  El comando DROP DATABASE elimina permanentemente la base de datos y todos sus objetos (tablas, vistas, procedimientos, etc.). Esta operación no se puede deshacer, por lo que debe utilizarse con extrema precaución.
+</Aside>
+
+### Ver bases de datos existentes
+
+Para ver todas las bases de datos disponibles en el servidor MySQL:
+
+```sql
+SHOW DATABASES;
+```
+
+### Seleccionar una base de datos para trabajar
+
+Antes de trabajar con tablas y otros objetos, debes seleccionar la base de datos activa:
+
+```sql
+USE nombre_base_datos;
+```
+
+<Steps>
+<ol>
+  <li>
+    **Crear la base de datos**
+    ```sql
+    CREATE DATABASE empresa CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci;
+    ```
+  </li>
+  <li>
+    **Seleccionar la base de datos**
+    ```sql
+    USE empresa;
+    ```
+  </li>
+  <li>
+    **Verificar la base de datos seleccionada**
+    ```sql
+    SELECT DATABASE();
+    ```
+  </li>
+</ol>
+</Steps>
+
+## 2.4. Crear y modificar esquemas (Oracle)
+
+En Oracle, un esquema está asociado a un usuario de la base de datos y contiene los objetos de la base de datos que pertenecen a ese usuario. A diferencia de MySQL, en Oracle no se crea un esquema directamente, sino que se crea al crear un usuario.
+
+### Crear un esquema (usuario) en Oracle
+
+```sql
+CREATE USER nombre_usuario IDENTIFIED BY contraseña
+[DEFAULT TABLESPACE nombre_tablespace]
+[TEMPORARY TABLESPACE nombre_tablespace_temp]
+[QUOTA {tamaño | UNLIMITED} ON nombre_tablespace]
+[PROFILE nombre_perfil];
+```
+
+#### Parámetros:
+
+- `IDENTIFIED BY`: Especifica la contraseña del usuario.
+- `DEFAULT TABLESPACE`: Opcional. Especifica el tablespace predeterminado para los objetos creados por el usuario.
+- `TEMPORARY TABLESPACE`: Opcional. Especifica el tablespace temporal para operaciones de ordenación y agrupación.
+- `QUOTA`: Opcional. Establece la cantidad máxima de espacio que el usuario puede utilizar en el tablespace.
+- `PROFILE`: Opcional. Asigna un perfil de recursos al usuario.
+
+#### Ejemplos:
+
+```sql
+--- Crear un usuario/esquema básico
+CREATE USER empresa IDENTIFIED BY "password123";
+
+--- Crear un usuario con tablespace específico y cuota
+CREATE USER ventas IDENTIFIED BY "secure456"
+DEFAULT TABLESPACE users
+TEMPORARY TABLESPACE temp
+QUOTA 100M ON users;
+```
+
+### Otorgar privilegios al esquema
+
+Después de crear un usuario/esquema, es necesario otorgarle privilegios para que pueda conectarse y crear objetos:
+
+```sql
+--- Privilegio para conectarse a la base de datos
+GRANT CONNECT TO nombre_usuario;
+
+--- Privilegio para crear objetos en su propio esquema
+GRANT RESOURCE TO nombre_usuario;
+
+--- Privilegios específicos
+GRANT CREATE TABLE, CREATE VIEW, CREATE PROCEDURE TO nombre_usuario;
+
+--- Para administradores (con precaución)
+GRANT DBA TO nombre_usuario;
+```
+
+### Modificar un esquema (usuario) en Oracle
+
+```sql
+--- Cambiar la contraseña
+ALTER USER nombre_usuario IDENTIFIED BY nueva_contraseña;
+
+--- Cambiar el tablespace predeterminado
+ALTER USER nombre_usuario DEFAULT TABLESPACE nuevo_tablespace;
+
+--- Modificar la cuota
+ALTER USER nombre_usuario QUOTA 200M ON users;
+
+--- Bloquear una cuenta
+ALTER USER nombre_usuario ACCOUNT LOCK;
+
+--- Desbloquear una cuenta
+ALTER USER nombre_usuario ACCOUNT UNLOCK;
+```
+
+### Eliminar un esquema (usuario) en Oracle
+
+```sql
+--- Eliminar un usuario y todos sus objetos
+DROP USER nombre_usuario CASCADE;
+
+--- Eliminar solo el usuario (debe estar vacío)
+DROP USER nombre_usuario;
+```
+
+<Aside type="note">
+  En Oracle, la opción `CASCADE` elimina todos los objetos del esquema junto con el usuario. Sin esta opción, el usuario solo puede eliminarse si no tiene objetos.
+</Aside>
+
+### Ejemplo práctico: Crear una base de datos MATRICULA en Oracle
+
+A continuación se muestra un ejemplo paso a paso para crear un esquema (usuario) llamado MATRICULA en Oracle:
+
+```sql
+---CREAR UNA BASE DE DATOS MATRICULA EN ORACLE
+---Nombre:DEGUIDEV--PASO 01
+ALTER SESSION SET "_ORACLE_SCRIPT"=TRUE;
+---PASO 02
+CREATE USER MATRICULA IDENTIFIED BY "matricula"
+DEFAULT TABLESPACE "USERS"
+TEMPORARY TABLESPACE "TEMP";
+---PASO 03
+ALTER USER MATRICULA QUOTA UNLIMITED ON USERS;
+---PASO 04
+GRANT CREATE SESSION TO MATRICULA;
+---PASO 05
+GRANT "RESOURCE" TO MATRICULA;
+---PASO 06
+ALTER USER MATRICULA DEFAULT ROLE "RESOURCE";
+```
+
+<Aside type="note">
+  El parámetro `_ORACLE_SCRIPT=TRUE` permite crear usuarios sin el prefijo C## que Oracle requiere desde la versión 12c para usuarios comunes. Este parámetro debe usarse con precaución y solo en entornos de desarrollo o aprendizaje.
+</Aside>
+
+### Ver esquemas existentes en Oracle
+
+```sql
+--- Ver todos los usuarios/esquemas
+SELECT username FROM dba_users;
+
+--- Ver objetos en un esquema específico
+SELECT object_name, object_type FROM dba_objects WHERE owner = 'NOMBRE_ESQUEMA';
+```
+
+<Tabs>
+  <TabItem label="MySQL vs Oracle">
+    | Concepto | MySQL | Oracle |
+    |---------|-------|--------|
+    | Contenedor principal | Base de datos | Instancia |
+    | Agrupación de objetos | Base de datos | Esquema (Usuario) |
+    | Creación de contenedor | CREATE DATABASE | CREATE USER |
+    | Eliminación de contenedor | DROP DATABASE | DROP USER |
+    | Selección de contexto | USE database_name | ALTER SESSION SET CURRENT_SCHEMA = schema_name |
+  </TabItem>
+</Tabs>
+
+## 2.5. Crear y modificar tablas (CREATE TABLE, ALTER TABLE)
+
+Las tablas son los objetos fundamentales para almacenar datos en una base de datos relacional. El comando CREATE TABLE se utiliza para crear nuevas tablas, mientras que ALTER TABLE permite modificar la estructura de tablas existentes.
+
+### Crear tablas
+
+La sintaxis básica para crear una tabla es:
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    CREATE TABLE [IF NOT EXISTS] nombre_tabla (
+      columna1 tipo_dato [restricciones],
+      columna2 tipo_dato [restricciones],
+      ...
+      [restricciones_tabla]
+    ) [opciones_tabla];
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    CREATE TABLE [esquema.]nombre_tabla (
+      columna1 tipo_dato [restricciones],
+      columna2 tipo_dato [restricciones],
+      ...
+      [restricciones_tabla]
+    ) [opciones_tabla];
+    ```
+  </TabItem>
+</Tabs>
+
+#### Ejemplos:
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Tabla simple
+    CREATE TABLE clientes (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nombre VARCHAR(50) NOT NULL,
+      apellido VARCHAR(50) NOT NULL,
+      email VARCHAR(100) UNIQUE,
+      fecha_registro DATE DEFAULT CURRENT_DATE
+    );
+    
+    -- Tabla con clave foránea
+    CREATE TABLE pedidos (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      cliente_id INT NOT NULL,
+      fecha_pedido DATETIME DEFAULT CURRENT_TIMESTAMP,
+      total DECIMAL(10,2) NOT NULL,
+      FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+    );
+    
+    -- Tabla con opciones específicas
+    CREATE TABLE productos (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nombre VARCHAR(100) NOT NULL,
+      precio DECIMAL(10,2) NOT NULL,
+      stock INT DEFAULT 0,
+      categoria ENUM('Electrónica', 'Ropa', 'Hogar', 'Alimentos') NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Tabla simple
+    CREATE TABLE clientes (
+      id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+      nombre VARCHAR2(50) NOT NULL,
+      apellido VARCHAR2(50) NOT NULL,
+      email VARCHAR2(100) UNIQUE,
+      fecha_registro DATE DEFAULT SYSDATE
+    );
+    
+    -- Tabla con clave foránea
+    CREATE TABLE pedidos (
+      id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+      cliente_id NUMBER NOT NULL,
+      fecha_pedido TIMESTAMP DEFAULT SYSTIMESTAMP,
+      total NUMBER(10,2) NOT NULL,
+      CONSTRAINT fk_cliente FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+    );
+    
+    -- Tabla con opciones específicas
+    CREATE TABLE productos (
+      id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+      nombre VARCHAR2(100) NOT NULL,
+      precio NUMBER(10,2) NOT NULL,
+      stock NUMBER DEFAULT 0,
+      categoria VARCHAR2(20) NOT NULL,
+      CONSTRAINT chk_categoria CHECK (categoria IN ('Electrónica', 'Ropa', 'Hogar', 'Alimentos'))
+    ) TABLESPACE users;
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  <strong>Diferencias clave entre MySQL y Oracle:</strong>
+  <ul>
+    <li>MySQL utiliza AUTO_INCREMENT para columnas de incremento automático, mientras que Oracle usa GENERATED ALWAYS AS IDENTITY.</li>
+    <li>MySQL tiene el tipo ENUM para valores predefinidos, mientras que Oracle utiliza restricciones CHECK.</li>
+    <li>MySQL usa CURRENT_DATE y CURRENT_TIMESTAMP como valores predeterminados, mientras que Oracle usa SYSDATE y SYSTIMESTAMP.</li>
+    <li>Oracle permite especificar el tablespace donde se almacenará la tabla.</li>
+  </ul>
+</Aside>
+
+### Modificar tablas
+
+El comando ALTER TABLE permite realizar diversos cambios en la estructura de una tabla existente:
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Añadir una columna
+    ALTER TABLE clientes ADD telefono VARCHAR(15);
+    
+    -- Añadir una columna con posición específica
+    ALTER TABLE clientes ADD direccion VARCHAR(200) AFTER apellido;
+    
+    -- Modificar una columna
+    ALTER TABLE clientes MODIFY email VARCHAR(150) NOT NULL;
+    
+    -- Renombrar una columna
+    ALTER TABLE clientes CHANGE apellido apellidos VARCHAR(50) NOT NULL;
+    
+    -- Eliminar una columna
+    ALTER TABLE clientes DROP COLUMN telefono;
+    
+    -- Añadir una restricción
+    ALTER TABLE clientes ADD CONSTRAINT uk_email UNIQUE (email);
+    
+    -- Eliminar una restricción
+    ALTER TABLE clientes DROP CONSTRAINT uk_email;
+    
+    -- Renombrar una tabla
+    ALTER TABLE clientes RENAME TO clientes_activos;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Añadir una columna
+    ALTER TABLE clientes ADD telefono VARCHAR2(15);
+    
+    -- Modificar una columna
+    ALTER TABLE clientes MODIFY email VARCHAR2(150) NOT NULL;
+    
+    -- Renombrar una columna
+    ALTER TABLE clientes RENAME COLUMN apellido TO apellidos;
+    
+    -- Eliminar una columna
+    ALTER TABLE clientes DROP COLUMN telefono;
+    
+    -- Añadir una restricción
+    ALTER TABLE clientes ADD CONSTRAINT uk_email UNIQUE (email);
+    
+    -- Eliminar una restricción
+    ALTER TABLE clientes DROP CONSTRAINT uk_email;
+    
+    -- Renombrar una tabla
+    ALTER TABLE clientes RENAME TO clientes_activos;
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+  <strong>Precauciones al modificar tablas:</strong>
+  <ul>
+    <li>Modificar o eliminar columnas puede provocar pérdida de datos.</li>
+    <li>Añadir restricciones NOT NULL a columnas existentes puede fallar si hay valores NULL.</li>
+    <li>Cambiar el tipo de datos de una columna puede causar truncamiento o conversión de datos.</li>
+    <li>Las operaciones ALTER TABLE pueden bloquear la tabla durante su ejecución.</li>
+  </ul>
+</Aside>
+
+## 2.6. Eliminar tablas (DROP TABLE)
+
+El comando DROP TABLE elimina una tabla y todos sus datos de la base de datos.
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Eliminar una tabla
+    DROP TABLE nombre_tabla;
+    
+    -- Eliminar una tabla si existe
+    DROP TABLE IF EXISTS nombre_tabla;
+    
+    -- Eliminar múltiples tablas
+    DROP TABLE tabla1, tabla2, tabla3;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Eliminar una tabla
+    DROP TABLE nombre_tabla;
+    
+    -- Eliminar una tabla si existe
+    DROP TABLE nombre_tabla PURGE;
+    
+    -- Eliminar una tabla y moverla a la papelera de reciclaje
+    DROP TABLE nombre_tabla;
+    
+    -- Eliminar una tabla y omitir la papelera de reciclaje
+    DROP TABLE nombre_tabla PURGE;
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+  <strong>Advertencia:</strong> El comando DROP TABLE elimina permanentemente la tabla y todos sus datos. Esta operación no se puede deshacer fácilmente, excepto en Oracle donde las tablas eliminadas pueden recuperarse de la papelera de reciclaje si no se usa la opción PURGE.
+</Aside>
+
+### Restricciones de clave foránea y eliminación de tablas
+
+Cuando una tabla tiene restricciones de clave foránea que la referencian desde otras tablas, puede ser necesario eliminar primero esas restricciones o utilizar opciones especiales:
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Desactivar temporalmente la verificación de claves foráneas
+    SET FOREIGN_KEY_CHECKS = 0;
+    DROP TABLE clientes;
+    SET FOREIGN_KEY_CHECKS = 1;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Eliminar una tabla y todas las restricciones que la referencian
+    DROP TABLE clientes CASCADE CONSTRAINTS;
+    ```
+  </TabItem>
+</Tabs>
+
+## 2.7. Vaciar tablas (TRUNCATE TABLE)
+
+El comando TRUNCATE TABLE elimina todos los datos de una tabla pero mantiene su estructura intacta. Es más rápido que DELETE porque no registra cada eliminación de fila individualmente.
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Vaciar una tabla
+    TRUNCATE TABLE nombre_tabla;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Vaciar una tabla
+    TRUNCATE TABLE nombre_tabla;
+    
+    -- Vaciar una tabla y liberar espacio
+    TRUNCATE TABLE nombre_tabla DROP STORAGE;
+    
+    -- Vaciar una tabla y mantener el espacio asignado
+    TRUNCATE TABLE nombre_tabla REUSE STORAGE;
+    ```
+  </TabItem>
+</Tabs>
+
+### Diferencias entre TRUNCATE y DELETE
+
+| Característica | TRUNCATE | DELETE |
+|---------------|----------|--------|
+| Velocidad | Más rápido | Más lento |
+| Registro en log | Mínimo | Cada fila |
+| Transacciones | No se puede deshacer | Se puede deshacer con ROLLBACK |
+| WHERE | No permite condiciones | Permite filtrar con WHERE |
+| Disparadores (triggers) | No activa disparadores | Activa disparadores |
+| Reinicio de contadores | Reinicia AUTO_INCREMENT/secuencias | No reinicia contadores |
+| Restricciones | Problemas con claves foráneas | Respeta claves foráneas |
+
+<Aside type="tip">
+  <strong>Cuándo usar cada uno:</strong>
+  <ul>
+    <li>Use TRUNCATE cuando necesite eliminar todas las filas y reiniciar contadores, y el rendimiento sea crítico.</li>
+    <li>Use DELETE cuando necesite eliminar filas selectivamente, mantener la capacidad de deshacer, o cuando haya restricciones de clave foránea.</li>
+  </ul>
+</Aside>
+
+## 2.8. Restricciones (PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, CHECK)
+
+Las restricciones son reglas que se aplican a las columnas de una tabla para mantener la integridad de los datos.
+
+### Tipos de restricciones
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- PRIMARY KEY: Identifica de forma única cada registro
+    CREATE TABLE empleados (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nif VARCHAR(9) UNIQUE,
+      nombre VARCHAR(50) NOT NULL
+    );
+    
+    -- También se puede definir como restricción de tabla
+    CREATE TABLE productos (
+      id INT,
+      codigo VARCHAR(10),
+      nombre VARCHAR(100) NOT NULL,
+      PRIMARY KEY (id)
+    );
+    
+    -- FOREIGN KEY: Establece relación con otra tabla
+    CREATE TABLE pedidos (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      empleado_id INT,
+      FOREIGN KEY (empleado_id) REFERENCES empleados(id)
+    );
+    
+    -- Con opciones de actualización y eliminación
+    CREATE TABLE detalles_pedido (
+      pedido_id INT,
+      producto_id INT,
+      cantidad INT NOT NULL,
+      PRIMARY KEY (pedido_id, producto_id),
+      FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE ON UPDATE CASCADE,
+      FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE RESTRICT
+    );
+    
+    -- UNIQUE: Garantiza valores únicos
+    CREATE TABLE departamentos (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      codigo VARCHAR(5) UNIQUE,
+      nombre VARCHAR(50) UNIQUE
+    );
+    
+    -- NOT NULL: Prohíbe valores nulos
+    CREATE TABLE clientes (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nombre VARCHAR(50) NOT NULL,
+      apellido VARCHAR(50) NOT NULL,
+      email VARCHAR(100)
+    );
+    
+    -- CHECK: Valida condiciones
+    CREATE TABLE productos (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nombre VARCHAR(100) NOT NULL,
+      precio DECIMAL(10,2) CHECK (precio > 0),
+      stock INT CHECK (stock >= 0)
+    );
+    
+    -- DEFAULT: Establece valor predeterminado
+    CREATE TABLE usuarios (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      nombre VARCHAR(50) NOT NULL,
+      activo BOOLEAN DEFAULT TRUE,
+      fecha_registro DATE DEFAULT CURRENT_DATE
+    );
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- PRIMARY KEY: Identifica de forma única cada registro
+    CREATE TABLE empleados (
+      id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+      nif VARCHAR2(9) CONSTRAINT uk_nif UNIQUE,
+      nombre VARCHAR2(50) CONSTRAINT nn_nombre NOT NULL
+    );
+    
+    -- También se puede definir como restricción de tabla
+    CREATE TABLE productos (
+      id NUMBER,
+      codigo VARCHAR2(10),
+      nombre VARCHAR2(100) NOT NULL,
+      CONSTRAINT pk_productos PRIMARY KEY (id)
+    );
+    
+    -- FOREIGN KEY: Establece relación con otra tabla
+    CREATE TABLE pedidos (
+      id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+      empleado_id NUMBER,
+      CONSTRAINT fk_empleado FOREIGN KEY (empleado_id) REFERENCES empleados(id)
+    );
+    
+    -- Con opciones de actualización y eliminación
+    CREATE TABLE detalles_pedido (
+      pedido_id NUMBER,
+      producto_id NUMBER,
+      cantidad NUMBER NOT NULL,
+      CONSTRAINT pk_detalles PRIMARY KEY (pedido_id, producto_id),
+      CONSTRAINT fk_pedido FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
+      CONSTRAINT fk_producto FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE RESTRICT
+    );
+    
+    -- UNIQUE: Garantiza valores únicos
+    CREATE TABLE departamentos (
+      id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+      codigo VARCHAR2(5) CONSTRAINT uk_codigo UNIQUE,
+      nombre VARCHAR2(50) CONSTRAINT uk_nombre UNIQUE
+    );
+    
+    -- NOT NULL: Prohíbe valores nulos
+    CREATE TABLE clientes (
+      id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+      nombre VARCHAR2(50) CONSTRAINT nn_nombre NOT NULL,
+      apellido VARCHAR2(50) CONSTRAINT nn_apellido NOT NULL,
+      email VARCHAR2(100)
+    );
+    
+    -- CHECK: Valida condiciones
+    CREATE TABLE productos (
+      id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+      nombre VARCHAR2(100) NOT NULL,
+      precio NUMBER(10,2) CONSTRAINT chk_precio CHECK (precio > 0),
+      stock NUMBER CONSTRAINT chk_stock CHECK (stock >= 0)
+    );
+    
+    -- DEFAULT: Establece valor predeterminado
+    CREATE TABLE usuarios (
+      id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+      nombre VARCHAR2(50) NOT NULL,
+      activo NUMBER(1) DEFAULT 1,
+      fecha_registro DATE DEFAULT SYSDATE
+    );
+    ```
+  </TabItem>
+</Tabs>
+
+### Opciones para claves foráneas
+
+Las claves foráneas pueden incluir acciones que se ejecutan cuando se actualiza o elimina un registro referenciado:
+
+- **ON DELETE CASCADE**: Cuando se elimina un registro en la tabla principal, se eliminan automáticamente los registros relacionados en la tabla secundaria.
+- **ON DELETE SET NULL**: Cuando se elimina un registro en la tabla principal, se establecen como NULL los valores de la clave foránea en la tabla secundaria.
+- **ON DELETE RESTRICT/NO ACTION**: Impide la eliminación de un registro en la tabla principal si existen registros relacionados en la tabla secundaria.
+- **ON UPDATE CASCADE**: Cuando se actualiza la clave primaria en la tabla principal, se actualizan automáticamente los valores correspondientes en la tabla secundaria.
+
+<Aside type="note">
+  <strong>Nota:</strong> Oracle no admite la cláusula ON UPDATE. Los cambios en las claves primarias deben gestionarse mediante disparadores (triggers) o procedimientos almacenados.
+</Aside>
+
+### Añadir y eliminar restricciones en tablas existentes
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Añadir clave primaria
+    ALTER TABLE productos ADD PRIMARY KEY (id);
+    
+    -- Añadir clave foránea
+    ALTER TABLE pedidos ADD CONSTRAINT fk_cliente 
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id);
+    
+    -- Añadir restricción única
+    ALTER TABLE empleados ADD CONSTRAINT uk_email UNIQUE (email);
+    
+    -- Añadir restricción CHECK
+    ALTER TABLE productos ADD CONSTRAINT chk_precio CHECK (precio > 0);
+    
+    -- Eliminar restricción
+    ALTER TABLE pedidos DROP FOREIGN KEY fk_cliente;
+    ALTER TABLE empleados DROP INDEX uk_email;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Añadir clave primaria
+    ALTER TABLE productos ADD CONSTRAINT pk_productos PRIMARY KEY (id);
+    
+    -- Añadir clave foránea
+    ALTER TABLE pedidos ADD CONSTRAINT fk_cliente 
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id);
+    
+    -- Añadir restricción única
+    ALTER TABLE empleados ADD CONSTRAINT uk_email UNIQUE (email);
+    
+    -- Añadir restricción CHECK
+    ALTER TABLE productos ADD CONSTRAINT chk_precio CHECK (precio > 0);
+    
+    -- Eliminar restricción
+    ALTER TABLE pedidos DROP CONSTRAINT fk_cliente;
+    ALTER TABLE empleados DROP CONSTRAINT uk_email;
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  <strong>Buenas prácticas para restricciones:</strong>
+  <ul>
+    <li>Nombre todas las restricciones explícitamente para facilitar su gestión.</li>
+    <li>Utilice prefijos como pk_, fk_, uk_, chk_ para identificar el tipo de restricción.</li>
+    <li>Considere el impacto en el rendimiento al añadir restricciones a tablas con muchos datos.</li>
+    <li>Planifique cuidadosamente las acciones ON DELETE y ON UPDATE para mantener la integridad referencial.</li>
+  </ul>
+</Aside>
+
+## Conclusión
+
+El Lenguaje de Definición de Datos (DDL) proporciona las herramientas necesarias para crear y gestionar la estructura de una base de datos. Aunque MySQL y Oracle comparten muchos conceptos fundamentales, presentan diferencias significativas en su sintaxis y características específicas. Comprender estos comandos DDL es esencial para diseñar bases de datos eficientes y mantener la integridad de los datos.
+
+En las siguientes secciones, exploraremos cómo manipular los datos almacenados en estas estructuras utilizando el Lenguaje de Manipulación de Datos (DML).

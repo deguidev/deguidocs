@@ -1,0 +1,191 @@
+---
+title: Estilos de Texto
+description: Cómo dar formato y estilo al texto en HTML.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Estilos de Texto en HTML
+
+## Formato básico de texto <Badge text="Esencial" variant="success" />
+
+HTML ofrece varias etiquetas para dar formato al texto y destacar partes importantes del contenido.
+
+### Negrita
+
+Hay dos formas principales de poner texto en negrita:
+
+#### <Code code={`<strong>`} lang="html" />
+
+Se utiliza para texto con importancia semántica (recomendado):
+
+<Code code={`<p>Este es un texto con <strong>contenido importante</strong> destacado.</p>`} lang="html" />
+
+Resultado:
+
+Este es un texto con **contenido importante** destacado.
+
+#### <Code code={`<b>`} lang="html" />
+
+Se utiliza para texto en negrita sin importancia semántica especial:
+
+<Code code={`<p>Según el manual, <b>presione el botón rojo</b> para continuar.</p>`} lang="html" />
+
+Resultado:
+
+Según el manual, **presione el botón rojo** para continuar.
+
+<Aside type="tip">
+  Desde el punto de vista de la accesibilidad y SEO, es preferible usar <Code code={`<strong>`} lang="html" /> cuando el texto tiene mayor importancia semántica.
+</Aside>
+
+### Cursiva
+
+También hay dos formas principales de aplicar cursiva al texto:
+
+#### <Code code={`<em>`} lang="html" />
+
+Se utiliza para texto con énfasis semántico (recomendado):
+
+<Code code={`<p>Es <em>extremadamente importante</em> seguir estas instrucciones.</p>`} lang="html" />
+
+Resultado:
+
+Es *extremadamente importante* seguir estas instrucciones.
+
+#### <Code code={`<i>`} lang="html" />
+
+Se utiliza para texto en cursiva sin énfasis semántico especial:
+
+<Code code={`<p>El término <i>Homo sapiens</i> se refiere a los humanos modernos.</p>`} lang="html" />
+
+Resultado:
+
+El término *Homo sapiens* se refiere a los humanos modernos.
+
+### Subrayado: <Code code={`<u>`} lang="html" />
+
+Se utiliza para subrayar texto, aunque su uso es menos recomendado en diseño web moderno porque puede confundirse con enlaces:
+
+<Code code={`<p>Este es un <u>texto subrayado</u> en HTML.</p>`} lang="html" />
+
+Resultado:
+
+Este es un <u>texto subrayado</u> en HTML.
+
+<Aside type="caution">
+  Evita usar el subrayado para texto que no sea un enlace, ya que puede confundir a los usuarios que esperan que el texto subrayado sea clickeable.
+</Aside>
+
+### Otras etiquetas de formato de texto
+
+#### Texto resaltado `<mark>`
+
+<Code code={`<p>Asegúrese de <mark>revisar esta sección</mark> antes de continuar.</p>`} lang="html" />
+
+Resultado:
+
+Asegúrese de <mark>revisar esta sección</mark> antes de continuar.
+
+#### Texto eliminado `<del>`
+
+<Code code={`<p>El precio era <del>$100</del> ahora $75.</p>`} lang="html" />
+
+Resultado:
+
+El precio era <del>$100</del> ahora $75.
+
+#### Texto insertado `<ins>`
+
+<Code code={`<p>Este documento fue actualizado <ins>el 9 de junio de 2025</ins>.</p>`} lang="html" />
+
+Resultado:
+
+Este documento fue actualizado <ins>el 9 de junio de 2025</ins>.
+
+#### Texto pequeño `<small>`
+
+<Code code={`<p>Términos y condiciones <small>(aplican restricciones)</small>.</p>`} lang="html" />
+
+Resultado:
+
+Términos y condiciones <small>(aplican restricciones)</small>.
+
+#### Subíndice y superíndice `<sub>` y `<sup>`
+
+<Code code={`<p>La fórmula del agua es H<sub>2</sub>O.</p>
+<p>El área de un cuadrado es a<sup>2</sup>.</p>`} lang="html" />
+
+Resultado:
+
+La fórmula del agua es H<sub>2</sub>O.
+
+El área de un cuadrado es a<sup>2</sup>.
+
+## Estilo con el atributo style <Badge text="CSS en línea" variant="note" />
+
+Aunque generalmente se recomienda separar el contenido (HTML) de la presentación (CSS), puedes aplicar estilos directamente a elementos de texto usando el atributo `style`.
+
+### Tamaño de texto
+
+<Code code={`<p style="font-size: 20px;">Este texto tiene un tamaño de 20 píxeles.</p>
+<p style="font-size: 1.5em;">Este texto es 1.5 veces el tamaño normal.</p>`} lang="html" />
+
+### Color de texto
+
+<Code code={`<p style="color: red;">Este texto es rojo.</p>
+<p style="color: #0000FF;">Este texto es azul usando código hexadecimal.</p>
+<p style="color: rgb(0, 128, 0);">Este texto es verde usando valores RGB.</p>`} lang="html" />
+
+### Alineación de texto
+
+<Code code={`<p style="text-align: left;">Este texto está alineado a la izquierda (predeterminado).</p>
+<p style="text-align: center;">Este texto está centrado.</p>
+<p style="text-align: right;">Este texto está alineado a la derecha.</p>
+<p style="text-align: justify;">Este texto está justificado, lo que significa que se ajusta para ocupar todo el ancho disponible, creando márgenes rectos tanto a la izquierda como a la derecha.</p>`} lang="html" />
+
+<Aside>
+  Aunque el atributo style es útil para aplicaciones rápidas, es mejor práctica usar hojas de estilo CSS externas para sitios web completos.
+</Aside>
+
+### Combinando estilos
+
+Puedes combinar múltiples propiedades de estilo en un solo atributo `style`:
+
+<Code code={`<p style="color: purple; font-size: 18px; text-align: center; font-weight: bold;">
+  Este texto tiene múltiples estilos aplicados.
+</p>`} lang="html" />
+
+## Atributo title para información emergente <Badge text="Accesibilidad" variant="success" />
+
+El atributo `title` proporciona información adicional sobre un elemento cuando el usuario coloca el cursor sobre él. Es útil para mejorar la accesibilidad y proporcionar contexto adicional.
+
+<Code code={`<p>Pase el cursor sobre <span title="Esta es una información emergente">este texto</span> para ver la información emergente.</p>`} lang="html" />
+
+### Uso con abreviaturas
+
+Es especialmente útil cuando se combina con la etiqueta `<abbr>` para explicar abreviaturas:
+
+<Code code={`<p>La <abbr title="Organización de las Naciones Unidas">ONU</abbr> fue fundada en 1945.</p>`} lang="html" />
+
+Resultado:
+
+La <abbr title="Organización de las Naciones Unidas">ONU</abbr> fue fundada en 1945.
+
+<Aside type="tip">
+  El atributo title mejora la accesibilidad, pero no debe ser la única forma de proporcionar información importante, ya que no es accesible para usuarios de lectores de pantalla o dispositivos táctiles.
+</Aside>
+
+## Mejores prácticas para el formato de texto
+
+1. **Usa etiquetas semánticas**: Prefiere `<strong>` sobre `<b>` y `<em>` sobre `<i>` cuando el significado es importante.
+
+2. **Separa contenido y presentación**: Usa CSS externo en lugar de atributos `style` cuando sea posible.
+
+3. **Mantén la consistencia**: Usa estilos consistentes en todo tu sitio web.
+
+4. **Considera la accesibilidad**: Asegúrate de que el contraste de color sea suficiente y que el texto sea legible.
+
+5. **No abuses del formato**: Demasiados estilos diferentes pueden hacer que el texto sea difícil de leer.

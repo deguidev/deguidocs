@@ -1,0 +1,364 @@
+---
+title: 04. Props y Eventos
+description: defineProps(), defineEmits(), tipado de props, eventos personalizados, validación y valores por defecto
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Comunicación entre Componentes en Vue 3
+
+En Vue 3 con la Composition API, la comunicación entre componentes se realiza principalmente mediante props (de padre a hijo) y eventos (de hijo a padre). El script setup introduce macros de compilador como `defineProps` y `defineEmits` que simplifican esta comunicación.
+
+## defineProps()
+
+La macro `defineProps()` permite declarar las propiedades que un componente puede recibir de su componente padre. Esta macro está disponible automáticamente dentro de `<script setup>` sin necesidad de importarla.
+
+<Code code={`<script setup>
+// Declaración simple de props
+const props = defineProps(['title', 'message'])
+
+// Acceso a las props
+console.log(props.title)
+console.log(props.message)
+</script>`} lang="vue" title="Declaración básica de props" />
+
+### Características clave de defineProps()
+
+- Es una macro de compilador disponible solo en `<script setup>`
+- No necesita ser importada
+- Devuelve un objeto reactivo con las propiedades recibidas
+- Se puede usar con sintaxis de array o de objeto para validación
+- Tiene soporte completo para TypeScript
+
+<Aside type="tip">
+Las props son de solo lectura. Si necesitas modificar una prop localmente, debes crear una variable reactiva local basada en ella.
+</Aside>
+
+## defineEmits()
+
+La macro `defineEmits()` permite declarar los eventos que un componente puede emitir hacia su componente padre. Al igual que `defineProps()`, está disponible automáticamente dentro de `<script setup>`.
+
+<Code code={`<script setup>
+// Declaración simple de eventos
+const emit = defineEmits(['update', 'delete'])
+
+// Emitir eventos
+function updateItem() {
+  emit('update', { id: 1, name: 'Updated Item' })
+}
+
+function deleteItem() {
+  emit('delete', 1) // Emitir con el ID como payload
+}
+</script>`} lang="vue" title="Declaración básica de eventos" />
+
+### Características clave de defineEmits()
+
+- Es una macro de compilador disponible solo en `<script setup>`
+- No necesita ser importada
+- Devuelve una función para emitir eventos
+- Se puede usar con sintaxis de array o de objeto para validación
+- Tiene soporte completo para TypeScript
+
+## Tipado de Props con TypeScript
+
+Vue 3 ofrece un excelente soporte para TypeScript, especialmente en la definición y validación de props. Hay dos formas principales de tipar props en Vue 3 con TypeScript:
+
+### 1. Usando la sintaxis de tipo genérico
+
+<Code code={`<script setup lang="ts">
+// Definición de tipos
+interface User {
+  id: number
+  name: string
+  email: string
+  active?: boolean
+}
+
+// Uso de genéricos para tipar props
+const props = defineProps<{
+  user: User
+  items: string[]
+  count: number
+  isAdmin?: boolean // prop opcional
+}>()
+
+// TypeScript conoce los tipos
+console.log(props.user.name) // ✓ OK
+console.log(props.user.age)  // ✗ Error: la propiedad 'age' no existe
+</script>`} lang="vue" title="Tipado con genéricos" />
+
+### 2. Usando withDefaults para valores por defecto tipados
+
+La función de utilidad `withDefaults` permite definir valores por defecto para props tipadas con TypeScript:
+
+<Code code={`<script setup lang="ts">
+interface Props {
+  title?: string
+  likes?: number
+  isPublished?: boolean
+  tags?: string[]
+  author?: { name: string, id: number }
+}
+
+// withDefaults combina tipos con valores por defecto
+const props = withDefaults(defineProps<Props>(), {
+  title: 'Sin título',
+  likes: 0,
+  isPublished: false,
+  tags: () => ['general'],  // Para arrays y objetos, usar funciones
+  author: () => ({ name: 'Anónimo', id: -1 })
+})
+</script>`} lang="vue" title="Uso de withDefaults" />
+
+<Aside type="note">
+Para arrays y objetos como valores por defecto, siempre usa funciones que devuelvan el valor. Esto evita que se compartan las mismas referencias entre diferentes instancias de componentes.
+</Aside>
+
+### 3. Definición de tipos en archivos separados
+
+Para proyectos grandes, es recomendable definir los tipos en archivos separados:
+
+<Tabs>
+  <TabItem label="types.ts">
+    ```ts
+    export interface User {
+      id: number
+      name: string
+      email: string
+    }
+    
+    export interface UserComponentProps {
+      user: User
+      showDetails: boolean
+      role?: 'admin' | 'editor' | 'viewer'
+    }
+    ```
+  </TabItem>
+  <TabItem label="UserComponent.vue">
+    ```vue
+    <script setup lang="ts">
+    import { UserComponentProps } from './types'
+    
+    const props = defineProps<UserComponentProps>()
+    </script>
+    ```
+  </TabItem>
+</Tabs>
+
+## Eventos Personalizados
+
+Los eventos personalizados permiten la comunicación de hijo a padre. En Vue 3 con la Composition API, se definen y emiten usando `defineEmits()`.
+
+### Definición de eventos con TypeScript
+
+<Code code={`<script setup lang="ts">
+// Definición tipada de eventos
+const emit = defineEmits<{
+  (e: 'update', payload: { id: number, data: any }): void
+  (e: 'delete', id: number): void
+  (e: 'select'): void  // Evento sin payload
+}>()
+
+// Uso con verificación de tipos
+emit('update', { id: 1, data: { name: 'Nuevo nombre' } }) // ✓ OK
+emit('delete', 1) // ✓ OK
+emit('select') // ✓ OK
+
+// Errores detectados por TypeScript:
+// emit('update') // ✗ Error: falta el payload
+// emit('delete', '1') // ✗ Error: el payload debe ser un número
+// emit('unknown') // ✗ Error: evento no definido
+</script>`} lang="vue" title="Eventos tipados" />
+
+### Validación de eventos
+
+Al igual que con las props, puedes definir validadores para los eventos usando la sintaxis de objeto:
+
+<Code code={`<script setup>
+const emit = defineEmits({
+  // Debe pasar la validación para emitir
+  submit: (payload) => {
+    // Retorna true o false
+    if (!payload.email || !payload.password) {
+      console.warn('Datos incompletos')
+      return false
+    }
+    return true
+  },
+  // Sin validación
+  cancel: null
+})
+
+// Solo se emite si pasa la validación
+emit('submit', { email: 'user@example.com', password: '12345' }) // ✓ OK
+emit('submit', {}) // ✗ No se emite y muestra advertencia
+</script>`} lang="vue" title="Validación de eventos" />
+
+### v-model con Composition API
+
+Vue 3 simplifica el uso de `v-model` con componentes personalizados:
+
+<Tabs>
+  <TabItem label="Componente Padre">
+    ```vue
+    <template>
+      <!-- v-model:modelValue es equivalente a v-model -->
+      <CustomInput v-model="searchText" />
+      
+      <!-- v-model con nombre personalizado -->
+      <CustomInput v-model:search="searchText" />
+      
+      <!-- Múltiples v-model en un mismo componente -->
+      <UserForm 
+        v-model:name="userName" 
+        v-model:email="userEmail" 
+      />
+    </template>
+    
+    <script setup>
+    import { ref } from 'vue'
+    import CustomInput from './CustomInput.vue'
+    import UserForm from './UserForm.vue'
+    
+    const searchText = ref('')
+    const userName = ref('')
+    const userEmail = ref('')
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Componente Hijo (CustomInput.vue)">
+    ```vue
+    <template>
+      <input 
+        :value="modelValue" 
+        @input="$emit('update:modelValue', $event.target.value)" 
+      />
+    </template>
+    
+    <script setup>
+    // Para v-model estándar
+    defineProps(['modelValue'])
+    defineEmits(['update:modelValue'])
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Con nombre personalizado">
+    ```vue
+    <template>
+      <input 
+        :value="search" 
+        @input="$emit('update:search', $event.target.value)" 
+      />
+    </template>
+    
+    <script setup>
+    // Para v-model:search
+    defineProps(['search'])
+    defineEmits(['update:search'])
+    </script>
+    ```
+  </TabItem>
+</Tabs>
+
+## Validación y Valores por Defecto
+
+Vue 3 ofrece varias formas de validar props y establecer valores por defecto.
+
+### Validación de props con sintaxis de objeto
+
+<Code code={`<script setup>
+const props = defineProps({
+  // Tipo básico
+  title: String,
+  
+  // Múltiples tipos permitidos
+  id: [String, Number],
+  
+  // Requerido
+  author: {
+    type: Object,
+    required: true
+  },
+  
+  // Con valor por defecto
+  status: {
+    type: String,
+    default: 'draft'
+  },
+  
+  // Valor por defecto para objetos/arrays (usar función)
+  tags: {
+    type: Array,
+    default: () => ['general']
+  },
+  
+  // Función de validación personalizada
+  price: {
+    type: Number,
+    validator: (value) => value >= 0
+  },
+  
+  // Función como tipo (verificación en tiempo de ejecución)
+  user: Function,
+  
+  // Valores permitidos (enum)
+  category: {
+    type: String,
+    validator: (value) => ['news', 'blog', 'tutorial'].includes(value)
+  }
+})
+</script>`} lang="vue" title="Validación de props" />
+
+### Combinando TypeScript con validación en tiempo de ejecución
+
+Para tener tanto la verificación de tipos en tiempo de compilación (TypeScript) como la validación en tiempo de ejecución, puedes usar la sintaxis de runtime props:
+
+<Code code={`<script setup lang="ts">
+// Importar tipos de runtime de Vue
+import { PropType } from 'vue'
+
+// Definir tipo complejo
+interface User {
+  id: number
+  name: string
+  role: 'admin' | 'user'
+}
+
+// Combinar TypeScript con validación en runtime
+const props = defineProps({
+  user: {
+    type: Object as PropType<User>,
+    required: true,
+    validator: (user: User) => Boolean(user.id && user.name && user.role)
+  },
+  items: {
+    type: Array as PropType<string[]>,
+    default: () => []
+  },
+  callback: {
+    type: Function as PropType<(id: number) => void>,
+    required: false
+  }
+})
+</script>`} lang="vue" title="TypeScript con validación runtime" />
+
+<Aside type="tip">
+La validación de props se realiza antes de crear la instancia del componente. Por tanto, las propiedades de instancia como `data` o `computed` no están disponibles en las funciones `default` o `validator`.
+</Aside>
+
+### Mejores prácticas para props y eventos
+
+1. **Nombres descriptivos**: Usa nombres claros y descriptivos para props y eventos
+2. **Validación completa**: Siempre valida tus props, especialmente en componentes reutilizables
+3. **Documentación**: Documenta el propósito de cada prop y evento
+4. **Props inmutables**: Trata las props como inmutables, no las modifiques directamente
+5. **Eventos específicos**: Emite eventos específicos con nombres claros y payloads bien definidos
+6. **TypeScript**: Aprovecha TypeScript para mejorar la seguridad de tipos
+
+<Aside type="caution">
+Evita usar el evento `input` directamente en componentes personalizados. En su lugar, usa el patrón `update:propName` para mantener la consistencia con el sistema de reactividad de Vue.
+</Aside>

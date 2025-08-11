@@ -1,0 +1,1169 @@
+---
+title: 9. Programación Orientada a Objetos
+description: Aprende sobre clases, objetos, herencia, interfaces y traits en PHP
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Programación Orientada a Objetos (POO) en PHP
+
+La Programación Orientada a Objetos (POO) es un paradigma de programación que utiliza "objetos" para modelar datos y comportamientos. PHP incorpora un modelo de objetos completo desde la versión 5, con características como clases, abstracción, encapsulamiento, herencia, polimorfismo y otras funcionalidades avanzadas.
+
+## Clases y Objetos
+
+Las clases son plantillas o "planos" que definen las características y comportamientos de un tipo de objeto. Los objetos son instancias de estas clases.
+
+### Definición de una Clase
+
+<Code code={`<?php
+class Persona {
+    // Propiedades (atributos)
+    public $nombre;
+    public $edad;
+    public $email;
+    
+    // Método constructor
+    public function __construct($nombre, $edad, $email) {
+        $this->nombre = $nombre;
+        $this->edad = $edad;
+        $this->email = $email;
+    }
+    
+    // Métodos
+    public function saludar() {
+        return "Hola, mi nombre es {$this->nombre} y tengo {$this->edad} años.";
+    }
+    
+    public function enviarEmail($mensaje) {
+        return "Enviando mensaje a {$this->email}: $mensaje";
+    }
+}
+?>`} lang="php" />
+
+### Creación de Objetos (Instanciación)
+
+<Code code={`<?php
+// Crear un objeto de la clase Persona
+$persona1 = new Persona("María López", 28, "maria@ejemplo.com");
+
+// Acceder a propiedades
+echo $persona1->nombre;  // Muestra: María López
+echo $persona1->edad;    // Muestra: 28
+
+// Llamar a métodos
+echo $persona1->saludar();  // Muestra: Hola, mi nombre es María López y tengo 28 años.
+echo $persona1->enviarEmail("Hola, ¿cómo estás?");  // Muestra: Enviando mensaje a maria@ejemplo.com: Hola, ¿cómo estás?
+
+// Crear otro objeto de la misma clase
+$persona2 = new Persona("Carlos Rodríguez", 35, "carlos@ejemplo.com");
+echo $persona2->saludar();  // Muestra: Hola, mi nombre es Carlos Rodríguez y tengo 35 años.
+?>`} lang="php" />
+
+### El Constructor y Destructor
+
+El constructor (`__construct()`) es un método especial que se ejecuta automáticamente cuando se crea un objeto. El destructor (`__destruct()`) se ejecuta cuando el objeto se destruye o al final del script.
+
+<Code code={`<?php
+class Archivo {
+    private $manejador;
+    private $nombre;
+    
+    public function __construct($nombre) {
+        $this->nombre = $nombre;
+        $this->manejador = fopen($nombre, 'w');
+        echo "Archivo {$nombre} abierto.<br>";
+    }
+    
+    public function escribir($contenido) {
+        fwrite($this->manejador, $contenido);
+    }
+    
+    public function __destruct() {
+        fclose($this->manejador);
+        echo "Archivo {$this->nombre} cerrado.<br>";
+    }
+}
+
+// Uso
+$archivo = new Archivo('ejemplo.txt');
+$archivo->escribir('Hola Mundo');
+// Al finalizar el script, se llama automáticamente al destructor
+?>`} lang="php" />
+
+### La Palabra Clave `$this`
+
+La palabra clave `$this` hace referencia al objeto actual y se utiliza para acceder a las propiedades y métodos del objeto desde dentro de la clase.
+
+<Code code={`<?php
+class Contador {
+    private $valor = 0;
+    
+    public function incrementar() {
+        $this->valor++;
+        return $this;  // Devuelve el objeto actual para encadenamiento de métodos
+    }
+    
+    public function decrementar() {
+        $this->valor--;
+        return $this;  // Devuelve el objeto actual para encadenamiento de métodos
+    }
+    
+    public function obtenerValor() {
+        return $this->valor;
+    }
+}
+
+$contador = new Contador();
+
+// Encadenamiento de métodos (method chaining)
+echo $contador->incrementar()->incrementar()->decrementar()->obtenerValor();  // Muestra: 1
+?>`} lang="php" />
+
+### Métodos Estáticos
+
+Los métodos estáticos pertenecen a la clase, no a una instancia específica, y pueden ser llamados sin crear un objeto.
+
+<Code code={`<?php
+class Matematicas {
+    // Método estático
+    public static function sumar($a, $b) {
+        return $a + $b;
+    }
+    
+    public static function restar($a, $b) {
+        return $a - $b;
+    }
+}
+
+// Llamar a métodos estáticos sin crear un objeto
+echo Matematicas::sumar(5, 3);  // Muestra: 8
+echo Matematicas::restar(10, 4);  // Muestra: 6
+?>`} lang="php" />
+
+### Constantes de Clase
+
+Las constantes de clase mantienen valores que no cambian durante la ejecución del script.
+
+<Code code={`<?php
+class Config {
+    // Definir constantes de clase
+    const VERSION = '1.0';
+    const DB_HOST = 'localhost';
+    const DB_NAME = 'mi_base_datos';
+    
+    public static function getVersion() {
+        // Acceder a una constante dentro de la clase
+        return self::VERSION;
+    }
+}
+
+// Acceder a constantes de clase sin crear un objeto
+echo Config::VERSION;  // Muestra: 1.0
+echo Config::DB_HOST;  // Muestra: localhost
+echo Config::getVersion();  // Muestra: 1.0
+?>`} lang="php" />
+
+<Aside type="tip">
+  <strong>Diferencia entre self y $this:</strong>
+  <ul>
+    <li><code>$this</code> hace referencia a la instancia actual del objeto.</li>
+    <li><code>self</code> hace referencia a la clase actual (para acceder a elementos estáticos y constantes).</li>
+  </ul>
+</Aside>
+
+## Propiedades y Métodos
+
+Las clases en PHP contienen propiedades (variables) y métodos (funciones). Estos elementos definen el estado y comportamiento de los objetos.
+
+### Propiedades
+
+Las propiedades son variables que pertenecen a una clase. Pueden tener diferentes niveles de visibilidad (public, protected, private) y pueden ser inicializadas con valores por defecto.
+
+<Code code={`<?php
+class Producto {
+    // Propiedades con diferentes niveles de visibilidad
+    public $nombre;            // Accesible desde cualquier lugar
+    protected $precio;         // Accesible desde la clase y sus subclases
+    private $codigo;           // Accesible solo desde esta clase
+    
+    // Propiedades con valores por defecto
+    public $disponible = true;
+    public $stock = 0;
+    
+    // Propiedades tipadas (PHP 7.4+)
+    public string $categoria = 'General';
+    public float $impuesto = 0.21;
+    
+    // Propiedades estáticas (pertenecen a la clase, no a instancias)
+    public static $contador = 0;
+    
+    public function __construct($nombre, $precio, $codigo) {
+        $this->nombre = $nombre;
+        $this->precio = $precio;
+        $this->codigo = $codigo;
+        
+        // Incrementar el contador estático
+        self::$contador++;
+    }
+    
+    // Getter para acceder a una propiedad privada
+    public function getCodigo() {
+        return $this->codigo;
+    }
+    
+    // Setter para modificar una propiedad protegida
+    public function setPrecio($precio) {
+        if ($precio > 0) {
+            $this->precio = $precio;
+            return true;
+        }
+        return false;
+    }
+    
+    // Método para acceder a una propiedad protegida
+    public function getPrecio() {
+        return $this->precio;
+    }
+    
+    // Método estático para obtener el contador
+    public static function getContador() {
+        return self::$contador;
+    }
+}
+
+// Uso
+$producto1 = new Producto('Laptop', 1200, 'LP001');
+$producto2 = new Producto('Teléfono', 800, 'TF002');
+
+echo $producto1->nombre;  // Acceso directo a propiedad pública
+// echo $producto1->precio;  // Error: No se puede acceder a una propiedad protegida
+// echo $producto1->codigo;  // Error: No se puede acceder a una propiedad privada
+
+echo $producto1->getPrecio();  // Acceso a través de método getter
+echo $producto1->getCodigo();   // Acceso a través de método getter
+
+$producto1->setPrecio(1300);    // Modificación a través de método setter
+
+// Acceso a propiedad estática
+echo Producto::$contador;       // Muestra: 2
+echo Producto::getContador();   // Muestra: 2
+?>`} lang="php" />
+
+### Propiedades Tipadas (PHP 7.4+)
+
+Desde PHP 7.4, se pueden declarar propiedades con tipos específicos:
+
+<Code code={`<?php
+class Usuario {
+    public int $id;
+    public string $nombre;
+    public ?string $email;  // El signo ? permite que sea null
+    public array $roles = [];
+    public bool $activo = true;
+    public float $saldo = 0.0;
+    
+    public function __construct(int $id, string $nombre) {
+        $this->id = $id;
+        $this->nombre = $nombre;
+    }
+}
+
+$usuario = new Usuario(1, "Ana");
+$usuario->email = "ana@ejemplo.com";
+$usuario->roles = ["editor", "admin"];
+
+// $usuario->id = "uno";  // Error: Debe ser un entero
+// $usuario->nombre = 123;  // Error: Debe ser una cadena
+?>`} lang="php" />
+
+### Métodos
+
+Los métodos son funciones que pertenecen a una clase y definen su comportamiento.
+
+<Code code={`<?php
+class Calculadora {
+    // Método simple
+    public function sumar($a, $b) {
+        return $a + $b;
+    }
+    
+    // Método con parámetros por defecto
+    public function multiplicar($a, $b = 2) {
+        return $a * $b;
+    }
+    
+    // Método con parámetros tipados y valor de retorno tipado (PHP 7+)
+    public function dividir(float $a, float $b): float {
+        if ($b == 0) {
+            throw new Exception("No se puede dividir por cero");
+        }
+        return $a / $b;
+    }
+    
+    // Método privado (solo accesible dentro de la clase)
+    private function validar($numero) {
+        return is_numeric($numero);
+    }
+    
+    // Método que usa un método privado
+    public function calcular($a, $b, $operacion) {
+        if (!$this->validar($a) || !$this->validar($b)) {
+            return "Error: Los valores deben ser números";
+        }
+        
+        switch ($operacion) {
+            case 'suma':
+                return $this->sumar($a, $b);
+            case 'multiplicacion':
+                return $this->multiplicar($a, $b);
+            case 'division':
+                try {
+                    return $this->dividir($a, $b);
+                } catch (Exception $e) {
+                    return "Error: " . $e->getMessage();
+                }
+            default:
+                return "Operación no válida";
+        }
+    }
+    
+    // Método estático
+    public static function potencia($base, $exponente) {
+        return pow($base, $exponente);
+    }
+}
+
+// Uso
+$calc = new Calculadora();
+echo $calc->sumar(5, 3);           // Muestra: 8
+echo $calc->multiplicar(4);        // Muestra: 8 (usa el valor por defecto b=2)
+echo $calc->dividir(10, 2);        // Muestra: 5
+// echo $calc->validar(5);         // Error: Método privado no accesible
+
+echo $calc->calcular(6, 3, 'suma');          // Muestra: 9
+echo $calc->calcular(6, 0, 'division');      // Muestra: Error: No se puede dividir por cero
+
+// Llamada a método estático
+echo Calculadora::potencia(2, 3);  // Muestra: 8
+?>`} lang="php" />
+
+### Métodos Mágicos
+
+PHP proporciona métodos mágicos que se ejecutan automáticamente en respuesta a ciertos eventos:
+
+<Code code={`<?php
+class Articulo {
+    private $datos = [];
+    
+    // Constructor
+    public function __construct($titulo, $contenido) {
+        $this->datos['titulo'] = $titulo;
+        $this->datos['contenido'] = $contenido;
+        $this->datos['fecha'] = date('Y-m-d');
+    }
+    
+    // Se llama al intentar acceder a propiedades no accesibles o inexistentes
+    public function __get($nombre) {
+        if (array_key_exists($nombre, $this->datos)) {
+            return $this->datos[$nombre];
+        }
+        return null;
+    }
+    
+    // Se llama al intentar asignar un valor a propiedades no accesibles o inexistentes
+    public function __set($nombre, $valor) {
+        $this->datos[$nombre] = $valor;
+    }
+    
+    // Se llama al usar isset() o empty() en propiedades no accesibles o inexistentes
+    public function __isset($nombre) {
+        return isset($this->datos[$nombre]);
+    }
+    
+    // Se llama al usar unset() en propiedades no accesibles o inexistentes
+    public function __unset($nombre) {
+        unset($this->datos[$nombre]);
+    }
+    
+    // Se llama cuando se intenta convertir el objeto a string
+    public function __toString() {
+        return "Artículo: {$this->datos['titulo']} ({$this->datos['fecha']})";
+    }
+    
+    // Se llama cuando se intenta llamar al objeto como una función
+    public function __invoke($param) {
+        return "Invocando artículo con parámetro: $param";
+    }
+    
+    // Se llama al serializar el objeto
+    public function __sleep() {
+        // Devuelve un array con los nombres de las propiedades a serializar
+        return ['datos'];
+    }
+    
+    // Se llama al deserializar el objeto
+    public function __wakeup() {
+        // Código de inicialización después de deserializar
+        if (!isset($this->datos['fecha'])) {
+            $this->datos['fecha'] = date('Y-m-d');
+        }
+    }
+    
+    // Se llama al clonar el objeto
+    public function __clone() {
+        $this->datos['titulo'] = "Copia de " . $this->datos['titulo'];
+        $this->datos['fecha'] = date('Y-m-d');
+    }
+}
+
+// Uso
+$articulo = new Articulo("Introducción a PHP", "PHP es un lenguaje de programación...");
+
+// __get y __set
+echo $articulo->titulo;      // Accede mediante __get
+$articulo->autor = "María";  // Asigna mediante __set
+echo $articulo->autor;       // Accede mediante __get
+
+// __isset y __unset
+var_dump(isset($articulo->titulo));  // true
+unset($articulo->autor);
+var_dump(isset($articulo->autor));   // false
+
+// __toString
+echo $articulo;  // Muestra: Artículo: Introducción a PHP (2023-08-06)
+
+// __invoke
+echo $articulo("parámetro");  // Muestra: Invocando artículo con parámetro: parámetro
+
+// __clone
+$copia = clone $articulo;
+echo $copia->titulo;  // Muestra: Copia de Introducción a PHP
+?>`} lang="php" />
+
+<Aside type="note">
+  <strong>Métodos mágicos comunes en PHP:</strong>
+  <ul>
+    <li><code>__construct()</code>: Constructor, se llama al crear un objeto</li>
+    <li><code>__destruct()</code>: Destructor, se llama al destruir un objeto</li>
+    <li><code>__get($nombre)</code>: Se llama al leer propiedades inaccesibles</li>
+    <li><code>__set($nombre, $valor)</code>: Se llama al escribir propiedades inaccesibles</li>
+    <li><code>__isset($nombre)</code>: Se llama con isset() o empty() en propiedades inaccesibles</li>
+    <li><code>__unset($nombre)</code>: Se llama con unset() en propiedades inaccesibles</li>
+    <li><code>__toString()</code>: Se llama al convertir el objeto a string</li>
+    <li><code>__invoke()</code>: Se llama al usar el objeto como función</li>
+    <li><code>__clone()</code>: Se llama al clonar el objeto</li>
+    <li><code>__sleep()</code> y <code>__wakeup()</code>: Para serializar y deserializar objetos</li>
+  </ul>
+</Aside>
+
+## Encapsulamiento, Herencia y Polimorfismo
+
+Estos tres conceptos son pilares fundamentales de la programación orientada a objetos y PHP los implementa de manera completa.
+
+### Encapsulamiento
+
+El encapsulamiento es el principio de ocultar los detalles internos de una clase y exponer solo lo necesario. Se implementa mediante los modificadores de acceso: `public`, `protected` y `private`.
+
+<Code code={`<?php
+class CuentaBancaria {
+    // Propiedades encapsuladas (privadas)
+    private $numeroCuenta;
+    private $saldo;
+    private $propietario;
+    private $tipo;
+    
+    // Constructor
+    public function __construct($propietario, $tipo = 'Ahorro') {
+        $this->propietario = $propietario;
+        $this->tipo = $tipo;
+        $this->saldo = 0;
+        $this->numeroCuenta = $this->generarNumeroCuenta();
+    }
+    
+    // Método privado - solo accesible dentro de la clase
+    private function generarNumeroCuenta() {
+        // En una aplicación real, esto sería más complejo
+        return 'CTA-' . rand(10000, 99999);
+    }
+    
+    // Métodos públicos para interactuar con las propiedades privadas
+    public function depositar($cantidad) {
+        if ($cantidad > 0) {
+            $this->saldo += $cantidad;
+            return true;
+        }
+        return false;
+    }
+    
+    public function retirar($cantidad) {
+        if ($cantidad > 0 && $cantidad <= $this->saldo) {
+            $this->saldo -= $cantidad;
+            return true;
+        }
+        return false;
+    }
+    
+    // Getters - permiten acceso de solo lectura a propiedades privadas
+    public function getNumeroCuenta() {
+        return $this->numeroCuenta;
+    }
+    
+    public function getSaldo() {
+        return $this->saldo;
+    }
+    
+    public function getPropietario() {
+        return $this->propietario;
+    }
+    
+    public function getTipo() {
+        return $this->tipo;
+    }
+    
+    // Setter - permite modificar una propiedad privada con validación
+    public function setPropietario($propietario) {
+        if (strlen($propietario) > 0) {
+            $this->propietario = $propietario;
+            return true;
+        }
+        return false;
+    }
+}
+
+// Uso
+$cuenta = new CuentaBancaria("Ana Martínez");
+
+// Interacción a través de métodos públicos
+echo $cuenta->getNumeroCuenta();  // Acceso a propiedad privada mediante getter
+echo $cuenta->getSaldo();         // Muestra: 0
+
+$cuenta->depositar(1000);         // Modifica el saldo mediante método público
+echo $cuenta->getSaldo();         // Muestra: 1000
+
+$cuenta->retirar(300);            // Modifica el saldo mediante método público
+echo $cuenta->getSaldo();         // Muestra: 700
+
+// No se puede acceder directamente a las propiedades privadas
+// echo $cuenta->saldo;           // Error: Cannot access private property
+// $cuenta->numeroCuenta = "ABC"; // Error: Cannot access private property
+
+// Modificación controlada mediante setter
+$cuenta->setPropietario("Ana López Martínez");
+echo $cuenta->getPropietario();   // Muestra: Ana López Martínez
+?>`} lang="php" />
+
+<Aside type="tip">
+  <strong>Beneficios del encapsulamiento:</strong>
+  <ul>
+    <li>Control sobre cómo y cuándo se accede o modifica una propiedad</li>
+    <li>Validación de datos antes de modificar propiedades</li>
+    <li>Capacidad para cambiar la implementación interna sin afectar el código que usa la clase</li>
+    <li>Protección contra modificaciones accidentales o mal intencionadas</li>
+  </ul>
+</Aside>
+
+### Herencia
+
+La herencia permite que una clase (subclase o clase hija) herede propiedades y métodos de otra clase (superclase o clase padre). PHP solo admite herencia simple (una clase solo puede heredar de una clase padre).
+
+<Code code={`<?php
+// Clase base o padre
+class Vehiculo {
+    protected $marca;
+    protected $modelo;
+    protected $color;
+    protected $anio;
+    
+    public function __construct($marca, $modelo, $color, $anio) {
+        $this->marca = $marca;
+        $this->modelo = $modelo;
+        $this->color = $color;
+        $this->anio = $anio;
+    }
+    
+    public function getInfo() {
+        return "Vehículo: {$this->marca} {$this->modelo} ({$this->anio}) - Color: {$this->color}";
+    }
+    
+    public function arrancar() {
+        return "El vehículo ha arrancado";
+    }
+    
+    public function detener() {
+        return "El vehículo se ha detenido";
+    }
+}
+
+// Clase derivada o hija
+class Automovil extends Vehiculo {
+    private $puertas;
+    private $transmision;
+    
+    public function __construct($marca, $modelo, $color, $anio, $puertas, $transmision) {
+        // Llamar al constructor de la clase padre
+        parent::__construct($marca, $modelo, $color, $anio);
+        
+        // Inicializar propiedades específicas de esta clase
+        $this->puertas = $puertas;
+        $this->transmision = $transmision;
+    }
+    
+    // Sobrescribir un método de la clase padre
+    public function getInfo() {
+        // Llamar al método de la clase padre
+        $infoBase = parent::getInfo();
+        
+        // Añadir información específica
+        return $infoBase . ", Puertas: {$this->puertas}, Transmisión: {$this->transmision}";
+    }
+    
+    // Método específico de esta clase
+    public function abrirMaletero() {
+        return "Maletero abierto";
+    }
+}
+
+// Otra clase derivada
+class Motocicleta extends Vehiculo {
+    private $cilindrada;
+    
+    public function __construct($marca, $modelo, $color, $anio, $cilindrada) {
+        parent::__construct($marca, $modelo, $color, $anio);
+        $this->cilindrada = $cilindrada;
+    }
+    
+    public function getInfo() {
+        return parent::getInfo() . ", Cilindrada: {$this->cilindrada}cc";
+    }
+    
+    public function hacerCaballito() {
+        return "La moto está haciendo un caballito";
+    }
+}
+
+// Uso
+$auto = new Automovil("Toyota", "Corolla", "Rojo", 2022, 4, "Automática");
+echo $auto->getInfo();  // Muestra: Vehículo: Toyota Corolla (2022) - Color: Rojo, Puertas: 4, Transmisión: Automática
+echo $auto->arrancar();  // Método heredado: El vehículo ha arrancado
+echo $auto->abrirMaletero();  // Método propio: Maletero abierto
+
+$moto = new Motocicleta("Honda", "CBR", "Negro", 2021, 600);
+echo $moto->getInfo();  // Muestra: Vehículo: Honda CBR (2021) - Color: Negro, Cilindrada: 600cc
+echo $moto->hacerCaballito();  // Método propio: La moto está haciendo un caballito
+?>`} lang="php" />
+
+### Polimorfismo
+
+El polimorfismo permite que objetos de diferentes clases respondan de manera diferente al mismo método. En PHP, se implementa principalmente a través de la herencia y las interfaces.
+
+<Code code={`<?php
+// Clase abstracta - No se puede instanciar directamente
+abstract class Forma {
+    protected $color;
+    
+    public function __construct($color) {
+        $this->color = $color;
+    }
+    
+    // Método abstracto - debe ser implementado por las clases hijas
+    abstract public function calcularArea();
+    
+    // Método concreto - común para todas las formas
+    public function getColor() {
+        return $this->color;
+    }
+}
+
+// Implementaciones concretas
+class Circulo extends Forma {
+    private $radio;
+    
+    public function __construct($color, $radio) {
+        parent::__construct($color);
+        $this->radio = $radio;
+    }
+    
+    public function calcularArea() {
+        return pi() * pow($this->radio, 2);
+    }
+    
+    public function getRadio() {
+        return $this->radio;
+    }
+}
+
+class Rectangulo extends Forma {
+    private $ancho;
+    private $alto;
+    
+    public function __construct($color, $ancho, $alto) {
+        parent::__construct($color);
+        $this->ancho = $ancho;
+        $this->alto = $alto;
+    }
+    
+    public function calcularArea() {
+        return $this->ancho * $this->alto;
+    }
+}
+
+class Triangulo extends Forma {
+    private $base;
+    private $altura;
+    
+    public function __construct($color, $base, $altura) {
+        parent::__construct($color);
+        $this->base = $base;
+        $this->altura = $altura;
+    }
+    
+    public function calcularArea() {
+        return ($this->base * $this->altura) / 2;
+    }
+}
+
+// Función que trabaja con cualquier objeto que sea una Forma
+function imprimirAreaForma(Forma $forma) {
+    echo "Esta forma de color {$forma->getColor()} tiene un área de: {$forma->calcularArea()} unidades cuadradas.<br>";
+}
+
+// Uso - Polimorfismo en acción
+$circulo = new Circulo("Rojo", 5);
+$rectangulo = new Rectangulo("Azul", 4, 6);
+$triangulo = new Triangulo("Verde", 3, 8);
+
+// La misma función trabaja con diferentes tipos de formas
+imprimirAreaForma($circulo);     // Muestra: Esta forma de color Rojo tiene un área de: 78.539816339745 unidades cuadradas.
+imprimirAreaForma($rectangulo);  // Muestra: Esta forma de color Azul tiene un área de: 24 unidades cuadradas.
+imprimirAreaForma($triangulo);   // Muestra: Esta forma de color Verde tiene un área de: 12 unidades cuadradas.
+
+// Array de diferentes formas
+$formas = [$circulo, $rectangulo, $triangulo];
+
+// Iterar y calcular el área de cada forma
+foreach ($formas as $forma) {
+    echo "El área es: " . $forma->calcularArea() . "<br>";
+}
+?>`} lang="php" />
+
+### Clases Abstractas e Interfaces
+
+Las clases abstractas y las interfaces son herramientas fundamentales para implementar polimorfismo en PHP.
+
+<Tabs>
+  <TabItem label="Clases Abstractas">
+    <Code code={`<?php
+// Clase abstracta
+abstract class Animal {
+    protected $nombre;
+    
+    public function __construct($nombre) {
+        $this->nombre = $nombre;
+    }
+    
+    // Método concreto
+    public function getNombre() {
+        return $this->nombre;
+    }
+    
+    // Métodos abstractos - deben ser implementados por las clases hijas
+    abstract public function hacerSonido();
+    abstract public function moverse();
+}
+
+class Perro extends Animal {
+    private $raza;
+    
+    public function __construct($nombre, $raza) {
+        parent::__construct($nombre);
+        $this->raza = $raza;
+    }
+    
+    public function hacerSonido() {
+        return "¡Guau guau!";
+    }
+    
+    public function moverse() {
+        return "Corriendo en cuatro patas";
+    }
+    
+    public function getRaza() {
+        return $this->raza;
+    }
+}
+
+class Pajaro extends Animal {
+    private $puedeVolar;
+    
+    public function __construct($nombre, $puedeVolar = true) {
+        parent::__construct($nombre);
+        $this->puedeVolar = $puedeVolar;
+    }
+    
+    public function hacerSonido() {
+        return "¡Pío pío!";
+    }
+    
+    public function moverse() {
+        if ($this->puedeVolar) {
+            return "Volando por el aire";
+        }
+        return "Saltando en el suelo";
+    }
+}
+
+// Uso
+$perro = new Perro("Rex", "Pastor Alemán");
+echo $perro->getNombre() . " dice: " . $perro->hacerSonido() . "<br>";
+echo $perro->getNombre() . " se mueve: " . $perro->moverse() . "<br>";
+
+$pajaro = new Pajaro("Piolin");
+echo $pajaro->getNombre() . " dice: " . $pajaro->hacerSonido() . "<br>";
+echo $pajaro->getNombre() . " se mueve: " . $pajaro->moverse() . "<br>";
+
+// No se puede instanciar una clase abstracta
+// $animal = new Animal("Generico");  // Error
+?>`} lang="php" />
+  </TabItem>
+  
+  <TabItem label="Interfaces">
+    <Code code={`<?php
+// Definición de interfaces
+interface Reproducible {
+    public function reproducir();
+    public function pausar();
+    public function detener();
+}
+
+interface Grabable {
+    public function grabar();
+    public function detenerGrabacion();
+}
+
+// Clase que implementa una interfaz
+class ReproductorAudio implements Reproducible {
+    private $archivo;
+    private $formato;
+    
+    public function __construct($archivo, $formato) {
+        $this->archivo = $archivo;
+        $this->formato = $formato;
+    }
+    
+    public function reproducir() {
+        return "Reproduciendo audio: {$this->archivo}";
+    }
+    
+    public function pausar() {
+        return "Audio pausado";
+    }
+    
+    public function detener() {
+        return "Audio detenido";
+    }
+    
+    public function getFormato() {
+        return $this->formato;
+    }
+}
+
+// Clase que implementa múltiples interfaces
+class GrabadoraVoz implements Reproducible, Grabable {
+    private $archivo;
+    private $estaGrabando = false;
+    
+    public function __construct($archivo) {
+        $this->archivo = $archivo;
+    }
+    
+    // Métodos de Reproducible
+    public function reproducir() {
+        return "Reproduciendo grabación: {$this->archivo}";
+    }
+    
+    public function pausar() {
+        return "Grabación pausada";
+    }
+    
+    public function detener() {
+        return "Grabación detenida";
+    }
+    
+    // Métodos de Grabable
+    public function grabar() {
+        $this->estaGrabando = true;
+        return "Iniciando grabación en {$this->archivo}";
+    }
+    
+    public function detenerGrabacion() {
+        if ($this->estaGrabando) {
+            $this->estaGrabando = false;
+            return "Grabación finalizada";
+        }
+        return "No hay grabación en curso";
+    }
+    
+    public function estaGrabando() {
+        return $this->estaGrabando;
+    }
+}
+
+// Función que acepta cualquier objeto que implemente Reproducible
+function reproducirContenido(Reproducible $media) {
+    echo $media->reproducir() . "<br>";
+    echo "Después de un tiempo..." . "<br>";
+    echo $media->pausar() . "<br>";
+    echo "Continuando..." . "<br>";
+    echo $media->detener() . "<br>";
+}
+
+// Uso
+$mp3 = new ReproductorAudio("cancion.mp3", "MP3");
+reproducirContenido($mp3);
+
+$grabadora = new GrabadoraVoz("nota_voz.wav");
+echo $grabadora->grabar() . "<br>";
+echo $grabadora->detenerGrabacion() . "<br>";
+reproducirContenido($grabadora);
+?>`} lang="php" />
+  </TabItem>
+  
+  <TabItem label="Diferencias">
+    <h4>Clases Abstractas:</h4>
+    <ul>
+      <li>Pueden contener métodos concretos (con implementación) y abstractos (sin implementación)</li>
+      <li>Pueden tener propiedades</li>
+      <li>Una clase solo puede heredar de una clase abstracta (herencia simple)</li>
+      <li>Pueden tener modificadores de acceso (public, protected, private)</li>
+      <li>Se usan cuando hay una relación "es un" entre clases</li>
+    </ul>
+    
+    <h4>Interfaces:</h4>
+    <ul>
+      <li>Solo pueden contener declaraciones de métodos (sin implementación)</li>
+      <li>No pueden contener propiedades (solo constantes)</li>
+      <li>Una clase puede implementar múltiples interfaces</li>
+      <li>Todos los métodos son implícitamente públicos</li>
+      <li>Se usan cuando varias clases no relacionadas necesitan compartir funcionalidad</li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+## Autoload y Namespaces
+
+PHP proporciona mecanismos para cargar clases automáticamente y organizar el código en espacios de nombres, lo que facilita la creación de aplicaciones grandes y bien estructuradas.
+
+### Autoload
+
+El autoload permite cargar clases automáticamente cuando se necesitan, sin tener que incluir manualmente cada archivo de clase con `require` o `include`.
+
+<Code code={`<?php
+// Función de autoload personalizada
+spl_autoload_register(function ($nombreClase) {
+    // Convertir el nombre de la clase a una ruta de archivo
+    $archivo = __DIR__ . '/clases/' . $nombreClase . '.php';
+    
+    // Verificar si el archivo existe
+    if (file_exists($archivo)) {
+        require_once $archivo;
+        return true;
+    }
+    return false;
+});
+
+// Ahora podemos usar clases sin incluir manualmente sus archivos
+$producto = new Producto('Laptop', 1200);
+$usuario = new Usuario('Juan', 'juan@ejemplo.com');
+?>`} lang="php" />
+
+### Autoload con Composer
+
+En proyectos modernos de PHP, se suele utilizar Composer para gestionar dependencias y autoload:
+
+<Tabs>
+  <TabItem label="Estructura de directorios">
+    ```
+    mi_proyecto/
+    ├── composer.json
+    ├── vendor/          (generado por Composer)
+    ├── src/
+    │   ├── MiNamespace/
+    │   │   ├── Modelo/
+    │   │   │   ├── Usuario.php
+    │   │   │   └── Producto.php
+    │   │   └── Servicio/
+    │   │       └── Autenticacion.php
+    │   └── Utilidades/
+    │       └── Validador.php
+    └── public/
+        └── index.php
+    ```
+  </TabItem>
+  
+  <TabItem label="composer.json">
+    <Code code={`{
+    "name": "miempresa/miproyecto",
+    "description": "Descripción de mi proyecto",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "MiNamespace\\": "src/MiNamespace/",
+            "Utilidades\\": "src/Utilidades/"
+        }
+    },
+    "require": {
+        "php": ">=7.4"
+    }
+}`} lang="json" />
+  </TabItem>
+  
+  <TabItem label="Ejemplo de clase">
+    <Code code={`<?php
+// Archivo: src/MiNamespace/Modelo/Usuario.php
+namespace MiNamespace\Modelo;
+
+class Usuario {
+    private $id;
+    private $nombre;
+    private $email;
+    
+    public function __construct($nombre, $email) {
+        $this->nombre = $nombre;
+        $this->email = $email;
+    }
+    
+    public function getNombre() {
+        return $this->nombre;
+    }
+    
+    public function getEmail() {
+        return $this->email;
+    }
+}
+?>`} lang="php" />
+  </TabItem>
+  
+  <TabItem label="Uso">
+    <Code code={`<?php
+// Archivo: public/index.php
+
+// Cargar el autoloader de Composer
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Usar clases con sus namespaces
+use MiNamespace\Modelo\Usuario;
+use MiNamespace\Servicio\Autenticacion;
+use Utilidades\Validador;
+
+$usuario = new Usuario('María', 'maria@ejemplo.com');
+echo $usuario->getNombre(); // Muestra: María
+
+$auth = new Autenticacion();
+$validador = new Validador();
+?>`} lang="php" />
+  </TabItem>
+</Tabs>
+
+### Namespaces
+
+Los namespaces (espacios de nombres) permiten organizar el código y evitar conflictos de nombres entre clases, funciones y constantes.
+
+<Code code={`<?php
+// Archivo: Producto.php
+namespace Tienda\Inventario;
+
+class Producto {
+    private $nombre;
+    private $precio;
+    
+    public function __construct($nombre, $precio) {
+        $this->nombre = $nombre;
+        $this->precio = $precio;
+    }
+    
+    public function getPrecio() {
+        return $this->precio;
+    }
+}
+
+// Archivo: Cliente.php
+namespace Tienda\Usuarios;
+
+class Cliente {
+    private $nombre;
+    private $email;
+    
+    public function __construct($nombre, $email) {
+        $this->nombre = $nombre;
+        $this->email = $email;
+    }
+}
+
+// Archivo: index.php
+// Incluir los archivos (en un proyecto real usaríamos autoload)
+require_once 'Producto.php';
+require_once 'Cliente.php';
+
+// Usar clases con namespace completo
+$producto = new \Tienda\Inventario\Producto('Laptop', 1200);
+
+// O con la declaración use
+use Tienda\Usuarios\Cliente;
+$cliente = new Cliente('Juan', 'juan@ejemplo.com');
+
+// Usar alias para evitar conflictos
+use Tienda\Inventario\Producto as ProductoInventario;
+use OtroNamespace\Producto as OtroProducto;
+
+$prod1 = new ProductoInventario('Teclado', 50);
+$prod2 = new OtroProducto();
+?>`} lang="php" />
+
+<Aside type="tip">
+  <strong>Beneficios de usar namespaces:</strong>
+  <ul>
+    <li>Evita conflictos de nombres entre diferentes bibliotecas o partes de la aplicación</li>
+    <li>Organiza el código de manera lógica y jerárquica</li>
+    <li>Facilita la autocarga de clases siguiendo estándares como PSR-4</li>
+    <li>Mejora la legibilidad y mantenibilidad del código</li>
+  </ul>
+</Aside>
+
+## Resumen y Mejores Prácticas
+
+La Programación Orientada a Objetos en PHP proporciona herramientas poderosas para crear código modular, reutilizable y mantenible. Aquí hay algunas mejores prácticas a seguir:
+
+1. **Encapsulamiento**
+   - Usa modificadores de acceso (`private`, `protected`, `public`) adecuadamente
+   - Implementa getters y setters para controlar el acceso a propiedades
+   - Valida los datos antes de asignarlos a propiedades
+
+2. **Herencia**
+   - Usa herencia solo cuando exista una relación "es un" entre clases
+   - Evita jerarquías de herencia profundas (más de 2-3 niveles)
+   - Prefiere la composición sobre la herencia cuando sea posible
+
+3. **Interfaces y Clases Abstractas**
+   - Usa interfaces para definir contratos que varias clases deben implementar
+   - Usa clases abstractas para compartir código entre clases relacionadas
+   - Diseña interfaces cohesivas y con un propósito único (principio de segregación de interfaces)
+
+4. **Organización del Código**
+   - Usa namespaces para organizar las clases lógicamente
+   - Sigue estándares como PSR-4 para la estructura de directorios y autoload
+   - Una clase por archivo, con el nombre del archivo igual al nombre de la clase
+
+5. **Principios SOLID**
+   - **S**ingle Responsibility: Una clase debe tener una sola responsabilidad
+   - **O**pen/Closed: Las clases deben estar abiertas para extensión pero cerradas para modificación
+   - **L**iskov Substitution: Los objetos de una subclase deben poder sustituir a los de la superclase sin afectar la funcionalidad
+   - **I**nterface Segregation: Muchas interfaces específicas son mejores que una interfaz general
+   - **D**ependency Inversion: Depender de abstracciones, no de implementaciones concretas
+
+<Aside type="note">
+  La Programación Orientada a Objetos es un paradigma poderoso que, cuando se aplica correctamente, puede mejorar significativamente la calidad, mantenibilidad y escalabilidad de tus aplicaciones PHP. Dominar estos conceptos te permitirá crear código más robusto y profesional.
+</Aside>

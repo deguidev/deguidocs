@@ -1,0 +1,212 @@
+---
+title: Expresiones Regulares
+description: Aprende a trabajar con expresiones regulares en JavaScript para buscar y manipular texto.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Expresiones Regulares <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Las expresiones regulares son patrones utilizados para hacer coincidir combinaciones de caracteres en cadenas.
+</Aside>
+
+## Creación de RegExp <Badge text="Básico" variant="note" />
+<Code code={`// Usando constructor
+const regex1 = new RegExp('patron', 'flags');
+
+// Usando literal
+const regex2 = /patron/flags;
+
+// Ejemplos
+const regexEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+const regexTelefono = /^\\d{9}$/;`} lang="javascript" />
+
+### Flags comunes
+<Code code={`// i - Insensible a mayúsculas/minúsculas
+const regexNombre = /juan/i;  // Coincide con "Juan", "JUAN", "juan"
+
+// g - Global (todas las coincidencias)
+const regexPalabra = /palabra/g;
+
+// m - Multilínea
+const regexLineas = /^inicio/m;
+
+// s - Dot all (el punto coincide con cualquier carácter)
+const regexTodo = /./s;
+
+// u - Unicode
+const regexUnicode = /\u{1F600}/u;  // Emoji sonriente`} lang="javascript" />
+
+## Metacaracteres <Badge text="Importante" variant="caution" />
+
+### Caracteres básicos
+<Code code={`// . - Cualquier carácter excepto nueva línea
+const regex1 = /h.la/;  // "hola", "hala", "h3la"
+
+// ^ - Inicio de línea
+const regex2 = /^Hola/;
+
+// $ - Fin de línea
+const regex3 = /mundo$/;
+
+// \\w - Carácter de palabra [a-zA-Z0-9_]
+const regex4 = /\\w+/;
+
+// \\d - Dígito [0-9]
+const regex5 = /\\d{3}/;  // Tres dígitos
+
+// \\s - Espacio en blanco
+const regex6 = /\\s+/;`} lang="javascript" />
+
+### Cuantificadores
+<Code code={`// * - Cero o más
+const regex1 = /ab*c/;  // "ac", "abc", "abbc"
+
+// + - Uno o más
+const regex2 = /ab+c/;  // "abc", "abbc"
+
+// ? - Cero o uno
+const regex3 = /colou?r/;  // "color", "colour"
+
+// {n} - Exactamente n
+const regex4 = /\d{4}/;  // "1234"
+
+// {n,} - n o más
+const regex5 = /\w{2,}/;  // Dos o más caracteres
+
+// {n,m} - Entre n y m
+const regex6 = /\d{2,4}/;  // Entre 2 y 4 dígitos`} lang="javascript" />
+
+## Métodos de RegExp <Badge text="Importante" variant="caution" />
+
+### test() y exec()
+<Code code={`const texto = "Mi número es 123-456-789";
+const regex = /\d{3}-\d{3}-\d{3}/;
+
+// test() - Devuelve true/false
+console.log(regex.test(texto));  // true
+
+// exec() - Devuelve array con detalles
+const resultado = regex.exec(texto);
+console.log(resultado[0]);  // "123-456-789"
+console.log(resultado.index);  // Posición donde se encontró`} lang="javascript" />
+
+### Métodos de String
+<Code code={`const texto = "La casa es roja y la puerta también es roja";
+
+// match() - Encuentra coincidencias
+console.log(texto.match(/roja/g));  // ["roja", "roja"]
+
+// search() - Encuentra posición
+console.log(texto.search(/roja/));  // Índice de primera coincidencia
+
+// replace() - Reemplaza coincidencias
+console.log(texto.replace(/roja/g, "azul"));
+
+// split() - Divide usando regex
+console.log(texto.split(/\s+/));  // Divide por espacios`} lang="javascript" />
+
+## Grupos y referencias <Badge text="Avanzado" variant="caution" />
+
+### Grupos de captura
+<Code code={`const regex = /(\w+)\s+(\w+)/;
+const texto = "Juan Pérez";
+
+const resultado = regex.exec(texto);
+console.log(resultado[1]);  // "Juan"
+console.log(resultado[2]);  // "Pérez"
+
+// Grupos nombrados
+const regexNombrado = /(?<nombre>\w+)\s+(?<apellido>\w+)/;
+const { groups } = texto.match(regexNombrado);
+console.log(groups.nombre);  // "Juan"
+console.log(groups.apellido);  // "Pérez"`} lang="javascript" />
+
+### Referencias hacia atrás
+<Code code={`// Referencia al primer grupo capturado
+const regex = /(\\w+)\\s+\\1/;
+console.log(regex.test("hola hola"));  // true
+console.log(regex.test("hola adios"));  // false
+
+// Con grupos nombrados
+const regexNombrado = /(?<palabra>\\w+)\\s+\\k<palabra>/;
+console.log(regexNombrado.test("hola hola"));  // true`} lang="javascript" />
+
+## Patrones comunes <Badge text="Referencia" variant="note" />
+
+### Validación de formatos
+<Code code={`// Email
+const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+console.log(regexEmail.test('usuario@dominio.com')); // true
+
+// URL
+const regexURL = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
+console.log(regexURL.test('https://ejemplo.com')); // true
+
+// Teléfono español
+const regexTelefono = /^(?:(?:\+|00)34)?[6789]\d{8}$/;
+console.log(regexTelefono.test('+34612345678')); // true
+
+// Código postal español
+const regexCP = /^\d{5}$/;
+console.log(regexCP.test('28001')); // true
+
+// DNI español
+const regexDNI = /^\d{8}[A-Z]$/;
+console.log(regexDNI.test('12345678X')); // true
+
+// Contraseña fuerte
+const regexPassword = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+console.log(regexPassword.test('MiContraseña123')); // true
+
+// Fecha (DD/MM/YYYY)
+const regexFecha = /^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/;`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="success" />
+
+### Optimización
+<Code code={`// ❌ Malo - Recreando regex en bucle
+for (let i = 0; i < items.length; i++) {
+    const regex = /patrón/;
+    if (regex.test(items[i])) {
+        // ...
+    }
+}
+
+// ✅ Bueno - Regex fuera del bucle
+const regex = /patrón/;
+for (let i = 0; i < items.length; i++) {
+    if (regex.test(items[i])) {
+        // ...
+    }
+}`} lang="javascript" />
+
+### Legibilidad
+<Code code={`// ❌ Malo - Regex complejo sin comentarios
+const regex = /^(?:(?:\+|00)34)?[6789]\d{8}$/;
+
+// ✅ Bueno - Regex documentado
+const PHONE_REGEX = /^(?:(?:\+|00)34)?[6789]\d{8}$/;
+/* Valida números de teléfono españoles:
+   - Prefijo internacional opcional (+34 o 0034)
+   - Primer dígito debe ser 6, 7, 8 o 9
+   - Seguido de 8 dígitos
+*/`} lang="javascript" />
+
+### Validación segura
+<Code code={`function validarEntrada(texto, patron) {
+    try {
+        if (typeof texto !== 'string') {
+            throw new Error('El texto debe ser una cadena');
+        }
+        
+        const regex = new RegExp(patron);
+        return regex.test(texto);
+    } catch (error) {
+        console.error('Error en validación:', error);
+        return false;
+    }
+}`} lang="javascript" />

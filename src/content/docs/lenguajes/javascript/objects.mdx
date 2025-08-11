@@ -1,0 +1,202 @@
+---
+title: Objetos
+description: Aprende a trabajar con objetos en JavaScript, sus propiedades, métodos y características avanzadas.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Objetos <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Los objetos son estructuras de datos fundamentales en JavaScript que permiten almacenar colecciones de datos relacionados.
+</Aside>
+
+## Declaración y acceso <Badge text="Básico" variant="note" />
+
+### Crear objetos
+<Code code={`// Objeto literal
+const persona = {
+    nombre: "Juan",
+    edad: 25,
+    ciudad: "Madrid"
+};
+
+// Constructor Object
+const usuario = new Object();
+usuario.nombre = "María";
+usuario.edad = 30;
+
+// Factory function
+function crearPersona(nombre, edad) {
+    return {
+        nombre,
+        edad
+    };
+}`} lang="javascript" />
+
+### Acceso a propiedades
+<Code code={`const persona = {
+    nombre: "Juan",
+    edad: 25
+};
+
+// Notación de punto
+console.log(persona.nombre);  // "Juan"
+
+// Notación de corchetes
+console.log(persona["edad"]); // 25
+
+// Propiedad que no existe
+console.log(persona.apellido); // undefined`} lang="javascript" />
+
+## Métodos y propiedades <Badge text="Importante" variant="danger" />
+
+### Definir métodos
+<Code code={`const persona = {
+    nombre: "Juan",
+    saludar() {
+        return \`Hola, soy \${this.nombre}\`;
+    },
+    // Método con arrow function
+    obtenerEdad: () => 25
+};
+
+console.log(persona.saludar()); // "Hola, soy Juan"`} lang="javascript" />
+
+### Propiedades computadas
+<Code code={`const clave = "edad";
+const persona = {
+    nombre: "Juan",
+    [clave]: 25  // Propiedad computada
+};
+
+console.log(persona.edad); // 25`} lang="javascript" />
+
+## Iteración con for...in y Object.keys() <Badge text="Importante" variant="note" />
+
+### for...in
+<Code code={`const persona = {
+    nombre: "Juan",
+    edad: 25,
+    ciudad: "Madrid"
+};
+
+for (let propiedad in persona) {
+    console.log(\`\${propiedad}: \${persona[propiedad]}\`);
+}`} lang="javascript" />
+
+### Object.keys()
+<Code code={`const persona = {
+    nombre: "Juan",
+    edad: 25
+};
+
+// Obtener array de claves
+const claves = Object.keys(persona);
+// ["nombre", "edad"]
+
+// Obtener array de valores
+const valores = Object.values(persona);
+// ["Juan", 25]
+
+// Obtener array de pares [clave, valor]
+const entradas = Object.entries(persona);
+// [["nombre", "Juan"], ["edad", 25]]`} lang="javascript" />
+
+## Desestructuración de objetos <Badge text="Moderno" variant="success" />
+
+<Aside type="tip">
+  La desestructuración permite extraer propiedades de objetos de forma más elegante.
+</Aside>
+
+<Code code={`const persona = {
+    nombre: "Juan",
+    edad: 25,
+    ciudad: "Madrid"
+};
+
+// Desestructuración básica
+const { nombre, edad } = persona;
+console.log(nombre); // "Juan"
+
+// Renombrar variables
+const { nombre: nombrePersona } = persona;
+console.log(nombrePersona); // "Juan"
+
+// Valores por defecto
+const { apellido = "Pérez" } = persona;
+console.log(apellido); // "Pérez"
+
+// Desestructuración anidada
+const usuario = {
+    nombre: "Juan",
+    direccion: {
+        calle: "Principal",
+        ciudad: "Madrid"
+    }
+};
+
+const { direccion: { ciudad } } = usuario;
+console.log(ciudad); // "Madrid"`} lang="javascript" />
+
+## Métodos de Object <Badge text="Avanzado" variant="note" />
+
+### Object.assign()
+<Code code={`const objetivo = { a: 1 };
+const fuente = { b: 2 };
+const resultado = Object.assign(objetivo, fuente);
+// { a: 1, b: 2 }`} lang="javascript" />
+
+### Object.freeze() y Object.seal()
+<Code code={`// Congelar objeto (no se puede modificar)
+const configuracion = Object.freeze({
+    api: "https://api.ejemplo.com"
+});
+
+// Sellar objeto (se pueden modificar propiedades existentes)
+const usuario = Object.seal({
+    nombre: "Juan",
+    edad: 25
+});`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+### Usar nombres descriptivos
+<Code code={`// ❌ Malo
+const obj = { n: "Juan", e: 25 };
+
+// ✅ Bueno
+const persona = { 
+    nombre: "Juan", 
+    edad: 25 
+};`} lang="javascript" />
+
+### Usar shorthand properties
+<Code code={`const nombre = "Juan";
+const edad = 25;
+
+// ❌ Malo
+const persona = {
+    nombre: nombre,
+    edad: edad
+};
+
+// ✅ Bueno
+const persona = { nombre, edad };`} lang="javascript" />
+
+### Usar métodos concisos
+<Code code={`// ❌ Malo
+const persona = {
+    saludar: function() {
+        return "Hola";
+    }
+};
+
+// ✅ Bueno
+const persona = {
+    saludar() {
+        return "Hola";
+    }
+};`} lang="javascript" />

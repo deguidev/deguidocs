@@ -1,0 +1,151 @@
+---
+title: Plugin de Animaciones para Tailwind CSS
+description: Guía del plugin de animaciones @midudev/tailwind-animations
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Plugin de Animaciones para Tailwind CSS <Badge text="Plugin" variant="success" />
+
+## Instalación <Badge text="Paso 1" variant="note" />
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install @midudev/tailwind-animations
+    ```
+  </TabItem>
+  <TabItem label="CDN">
+    ```html
+    <!-- Próximamente disponible via CDN -->
+    ```
+  </TabItem>
+</Tabs>
+
+## Configuración <Badge text="Paso 2" variant="note" />
+
+### tailwind.config.js
+```javascript
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  // ...resto de tu configuración
+  plugins: [
+    require('@midudev/tailwind-animations')
+  ],
+}
+```
+
+### styles.css
+```css
+@import 'tailwindcss';
+@plugin "@midudev/tailwind-animations";
+```
+
+## Uso Básico <Badge text="Paso 3" variant="note" />
+
+### Animaciones Predefinidas
+```html
+<!-- Fade In -->
+<div class="animate-fade-in">
+  Aparece suavemente
+</div>
+
+<!-- Slide In -->
+<div class="animate-slide-in">
+  Desliza desde la izquierda
+</div>
+
+<!-- Bounce -->
+<div class="animate-bounce-in">
+  Rebota al entrar
+</div>
+```
+
+### Modificadores
+```html
+<!-- Duración -->
+<div class="animate-fade-in duration-300">
+  Rápido
+</div>
+
+<!-- Retraso -->
+<div class="animate-slide-in delay-300">
+  Espera antes de animar
+</div>
+
+<!-- Dirección -->
+<div class="animate-slide-in-left">
+  Desde la izquierda
+</div>
+<div class="animate-slide-in-right">
+  Desde la derecha
+</div>
+```
+
+## Animaciones Avanzadas <Badge text="Paso 4" variant="note" />
+
+### Combinando Animaciones
+```html
+<div class="
+  animate-fade-in
+  hover:animate-bounce
+  group-hover:animate-shake
+">
+  Múltiples estados
+</div>
+```
+
+### Animaciones Encadenadas
+```html
+<div class="group">
+  <div class="animate-fade-in">Primero</div>
+  <div class="animate-fade-in delay-200">Segundo</div>
+  <div class="animate-fade-in delay-400">Tercero</div>
+</div>
+```
+
+## Mejores Prácticas <Badge text="Recomendado" variant="success" />
+
+### 1. Rendimiento
+```html
+<!-- Usar animaciones ligeras para elementos frecuentes -->
+<div class="animate-fade-in">
+  Contenido frecuente
+</div>
+
+<!-- Reservar animaciones complejas para eventos importantes -->
+<div class="animate-bounce-in-scale">
+  Contenido destacado
+</div>
+```
+
+### 2. Accesibilidad
+```html
+<!-- Respetar preferencias de movimiento reducido -->
+<div class="
+  motion-safe:animate-slide-in
+  motion-reduce:opacity-100
+">
+  Contenido accesible
+</div>
+```
+
+### 3. Responsive
+```html
+<div class="
+  animate-fade-in
+  sm:animate-slide-in
+  md:animate-bounce-in
+">
+  Adaptativo
+</div>
+```
+
+<Aside type="tip">
+  Para más detalles y ejemplos, visita:
+  - [Documentación oficial del plugin](https://tailwindcss-animations.vercel.app/)
+  - [GitHub del proyecto](https://github.com/midudev/tailwindcss-animations)
+</Aside>

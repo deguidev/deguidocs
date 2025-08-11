@@ -1,0 +1,239 @@
+---
+title: Font Awesome
+description: Guía de integración y configuración de Font Awesome en tu proyecto
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Font Awesome <Badge text="Configuración" variant="success" />
+
+## Instalación <Badge text="Paso 1" variant="note" />
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install @fortawesome/fontawesome-free
+    ```
+  </TabItem>
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    ```
+  </TabItem>
+</Tabs>
+
+## Integración <Badge text="Paso 2" variant="note" />
+
+### JavaScript Vanilla
+```html
+<!-- Usando clases CSS -->
+<i class="fas fa-user"></i>
+
+<script>
+  // Importar desde node_modules
+  import '@fortawesome/fontawesome-free/css/all.min.css';
+</script>
+```
+
+### Vue.js
+```vue
+<!-- App.vue -->
+<template>
+  <i class="fas fa-user"></i>
+</template>
+
+<script>
+import '@fortawesome/fontawesome-free/css/all.min.css'
+
+export default {
+  name: 'App'
+}
+</script>
+```
+
+### Angular
+```typescript
+// styles.css
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+// app.component.html
+<i class="fas fa-user"></i>
+
+// angular.json
+{
+  "projects": {
+    "your-app": {
+      "architect": {
+        "build": {
+          "options": {
+            "styles": [
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## Configuración Avanzada <Badge text="Paso 3" variant="note" />
+
+### Importación Selectiva
+<Code code={`// Importar solo los iconos necesarios
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faUser, faHeart } from '@fortawesome/free-solid-svg-icons'
+import { faGithub } from '@fortawesome/free-brands-svg-icons'
+
+library.add(faUser, faHeart, faGithub)
+
+// Uso
+<FontAwesomeIcon icon="user" />`} lang="javascript" />
+
+### Estilos y Animaciones
+<Code code={`// Tamaños
+<FontAwesomeIcon icon="user" size="xs" />
+<FontAwesomeIcon icon="user" size="lg" />
+<FontAwesomeIcon icon="user" size="2x" />
+
+// Rotación
+<FontAwesomeIcon icon="user" rotation={90} />
+
+// Animaciones
+<FontAwesomeIcon icon="spinner" spin />
+<FontAwesomeIcon icon="circle-notch" pulse />
+
+// Transformaciones
+<FontAwesomeIcon icon="user" flip="horizontal" />
+<FontAwesomeIcon icon="user" transform="shrink-6 left-4" />`} lang="jsx" />
+
+## Personalización <Badge text="Paso 4" variant="note" />
+
+### CSS Custom Properties
+<Code code={`/* styles/icons.css */
+.custom-icon {
+  --fa-primary-color: #1a365d;
+  --fa-secondary-color: #2d3748;
+  --fa-primary-opacity: 1;
+  --fa-secondary-opacity: 0.6;
+}
+
+.fa-custom-size {
+  font-size: 2em;
+}`} lang="css" />
+
+### Capas y Duotono
+<Code code={`// Capas
+<span class="fa-layers fa-fw">
+  <FontAwesomeIcon icon="square" />
+  <FontAwesomeIcon icon="check" transform="shrink-6" inverse />
+</span>
+
+// Duotono
+<FontAwesomeIcon icon={['fad', 'user']} 
+  style={{
+    '--fa-primary-color': '#1a365d',
+    '--fa-secondary-color': '#2d3748',
+  }}
+/>`} lang="jsx" />
+
+## Optimización <Badge text="Paso 5" variant="caution" />
+
+### Subconjunto de Iconos
+<Code code={`// config/icons.js
+import { library } from '@fortawesome/fontawesome-svg-core'
+import {
+  faUser,
+  faHeart,
+  faSearch
+} from '@fortawesome/free-solid-svg-icons'
+
+// Solo importar los iconos necesarios
+library.add(
+  faUser,
+  faHeart,
+  faSearch
+)
+
+export const ICONS = {
+  USER: 'user',
+  HEART: 'heart',
+  SEARCH: 'search'
+}`} lang="javascript" />
+
+### Precargar Iconos
+<Code code={`// Agregar en el head del HTML
+<link rel="preload" href="path/to/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+// O en CSS
+@font-face {
+  font-family: 'Font Awesome 6 Free';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("path/to/fa-solid-900.woff2") format("woff2");
+}`} lang="html" />
+
+## Mejores Prácticas <Badge text="Recomendado" variant="success" />
+
+### Componente Reutilizable
+<Code code={`// components/Icon.jsx
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
+export function Icon({ 
+  name, 
+  type = 'fas',
+  size = '1x',
+  className = '',
+  ...props 
+}) {
+  return (
+    <FontAwesomeIcon
+      icon={[type, name]}
+      size={size}
+      className={className}
+      {...props}
+    />
+  )
+}
+
+// Uso
+<Icon name="user" type="far" size="2x" className="text-primary" />`} lang="javascript" />
+
+### Accesibilidad
+```jsx
+// ✅ Bueno: Usar title y aria-label
+<FontAwesomeIcon
+  icon="user"
+  title="Perfil de usuario"
+  aria-label="Ver perfil de usuario"
+/>
+
+// ✅ Bueno: Icono decorativo
+<FontAwesomeIcon
+  icon="user"
+  aria-hidden="true"
+/>
+```
+
+### Organización de Iconos
+<Code code={`// constants/icons.js
+export const ICONS = {
+  COMMON: {
+    SEARCH: ['fas', 'search'],
+    USER: ['far', 'user'],
+    SETTINGS: ['fas', 'cog']
+  },
+  SOCIAL: {
+    GITHUB: ['fab', 'github'],
+    TWITTER: ['fab', 'twitter'],
+    LINKEDIN: ['fab', 'linkedin']
+  }
+}`} lang="javascript" />
+
+<Aside type="tip">
+  Para más detalles y la lista completa de iconos, visita la [documentación oficial de Font Awesome](https://fontawesome.com/docs).
+</Aside>

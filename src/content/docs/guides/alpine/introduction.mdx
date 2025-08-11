@@ -1,0 +1,50 @@
+---
+title: Introducción a Alpine.js
+description: Breve introducción a Alpine.js y sus características principales.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Introducción a Alpine.js
+
+Alpine.js es una librería JavaScript ligera para agregar interactividad a tus páginas web de manera sencilla y reactiva, similar a Vue o React pero con una sintaxis mucho más simple y enfocada en el HTML.
+
+<Aside type="note">
+Alpine.js es ideal para proyectos donde necesitas agregar pequeñas funcionalidades interactivas sin la complejidad de frameworks grandes.
+</Aside>
+
+## ¿Por qué usar Alpine.js?
+
+- **Ligero:** El tamaño del archivo es muy pequeño (~10kB comprimido), lo que lo hace ideal para sitios donde el rendimiento es importante.
+- **Sintaxis declarativa:** Utiliza atributos personalizados en el HTML, lo que permite escribir menos JavaScript y mantener el código más limpio.
+- **Aprendizaje rápido:** Si ya conoces HTML y un poco de JavaScript, aprender Alpine.js es muy sencillo.
+- **No requiere build tools:** Puedes usarlo directamente desde un CDN sin necesidad de herramientas de compilación.
+
+## Filosofía
+
+Alpine.js sigue la filosofía de "Sprinkle of JavaScript", es decir, añadir solo la cantidad necesaria de JavaScript para mejorar la experiencia del usuario, sin sobrecargar la aplicación.
+
+## ¿Cuándo usar Alpine.js?
+
+- Cuando necesitas interactividad básica como menús, tabs, modales, acordeones, etc.
+- En proyectos donde ya usas Blade, Laravel, o cualquier backend que genere HTML.
+- Cuando no quieres la sobrecarga de frameworks como React, Vue o Angular.
+
+## Ejemplo básico
+
+<Code code={`<div x-data="{ open: false }">
+  <button @click="open = !open">Mostrar/Ocultar</button>
+  <div x-show="open">
+    ¡Hola desde Alpine.js!
+  </div>
+</div>`} lang="html" title="Ejemplo básico de Alpine.js" />
+
+Este ejemplo muestra cómo Alpine.js permite manejar el estado y la interactividad directamente en el HTML.
+
+## Recursos oficiales
+
+- [Sitio oficial de Alpine.js](https://alpinejs.dev/)
+- [Repositorio en GitHub](https://github.com/alpinejs/alpine)

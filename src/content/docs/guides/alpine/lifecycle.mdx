@@ -1,0 +1,91 @@
+---
+title: Ciclo de vida
+description: Hooks y ciclo de vida de los componentes en Alpine.js.
+---
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+
+# Ciclo de vida
+
+Alpine.js proporciona hooks como `x-init` para ejecutar código cuando el componente se inicializa.
+
+## Hooks y ciclo de vida en Alpine.js
+
+Alpine.js permite ejecutar código en diferentes momentos del ciclo de vida de un componente usando directivas y métodos especiales.
+
+### 1. <code>x-init</code>
+Ejecuta código cuando el componente se inicializa. Útil para inicializar datos, hacer peticiones o configurar listeners.
+<Code code={`<div x-data x-init="console.log('Componente listo')">
+  ...
+</div>`} lang="html" title="Ejemplo x-init" />
+
+### 2. <code>@alpine:init</code>
+Escucha el evento global que se dispara cuando Alpine se inicializa en la página.
+<Code code={`<script @alpine:init="console.log('Alpine inicializado')"></script>`} lang="html" title="Evento global alpine:init" />
+
+### 3. <code>x-effect</code>
+Ejecuta una expresión cada vez que cambian las dependencias reactivas usadas dentro de ella (efecto secundario reactivo).
+<Code code={`<div x-data="{ count: 0 }">
+  <button @click="count++">Incrementar</button>
+  <span x-effect="console.log(count)"></span>
+</div>`} lang="html" title="Ejemplo x-effect" />
+
+### 4. <code>x-ignore</code>
+Evita que Alpine.js procese un elemento y sus hijos, útil para integrar con otros frameworks o scripts.
+<Code code={`<div x-ignore>
+  <script>/* Este bloque no será procesado por Alpine */</script>
+</div>`} lang="html" title="Ejemplo x-ignore" />
+
+### 5. <code>x-ref</code> y <code>$refs</code>
+Permite referenciar elementos del DOM para manipularlos desde el código Alpine.
+<Code code={`<div x-data="{ focusInput() { this.$refs.input.focus() } }">
+  <input x-ref="input" type="text" />
+  <button @click="focusInput()">Foco</button>
+</div>`} lang="html" title="Ejemplo x-ref y $refs" />
+
+## 6. <code>x-cloak</code>
+Oculta elementos hasta que Alpine.js haya terminado de inicializarlos, evitando parpadeos de contenido.
+<Code code={`<div x-data x-cloak>
+  <p>Este contenido se muestra solo cuando Alpine está listo.</p>
+</div>
+<style>
+  [x-cloak] { display: none; }
+</style>`} lang="html" title="Ejemplo x-cloak" />
+
+## 7. <code>x-teleport</code>
+Permite renderizar un elemento en otra parte del DOM, útil para modales, tooltips, etc.
+<Code code={`<div x-data="{ open: false }">
+  <button @click="open = true">Abrir modal</button>
+  <div x-teleport="#modales" x-show="open">
+    <p>¡Soy un modal!</p>
+    <button @click="open = false">Cerrar</button>
+  </div>
+</div>
+<div id="modales"></div>`} lang="html" title="Ejemplo x-teleport" />
+
+## 8. <code>x-id</code>
+Genera identificadores únicos para elementos, útil para accesibilidad y relaciones entre elementos.
+<Code code={`<div x-data="{ id: $id('input') }">
+  <label :for="id">Nombre</label>
+  <input :id="id" type="text" />
+</div>`} lang="html" title="Ejemplo x-id" />
+
+## 9. <code>x-effect</code> avanzado
+Puedes usar <code>x-effect</code> para ejecutar efectos secundarios complejos:
+<Code code={`<div x-data="{ count: 0 }">
+  <button @click="count++">Sumar</button>
+  <span x-effect="if(count > 5) alert('¡Más de 5!')"></span>
+</div>`} lang="html" title="x-effect avanzado" />
+
+## 10. <code>$nextTick</code>
+Permite ejecutar código después de que Alpine haya actualizado el DOM.
+<Code code={`<div x-data="{ mensaje: '' }">
+  <input x-model="mensaje" @input="$nextTick(() => console.log('DOM actualizado'))" />
+</div>`} lang="html" title="Uso de $nextTick" />
+
+<Aside type="tip">
+Consulta la <a href="https://alpinejs.dev/directives/init" target="_blank">documentación oficial</a> para más detalles sobre hooks y ciclo de vida en Alpine.js.
+</Aside>

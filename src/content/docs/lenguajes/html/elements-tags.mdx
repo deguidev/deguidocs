@@ -1,0 +1,393 @@
+---
+title: Elementos y etiquetas
+description: Guía completa sobre los elementos y etiquetas HTML.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Elementos y etiquetas HTML
+
+## ¿Qué son las etiquetas HTML? <Badge text="Fundamentos" variant="success" />
+
+Las etiquetas HTML son los bloques de construcción básicos de una página web. Definen la estructura y el contenido de un documento HTML.
+
+<Aside>
+  Las etiquetas HTML están rodeadas por corchetes angulares `< >` y generalmente vienen en pares: una etiqueta de apertura y una de cierre.
+</Aside>
+
+### Anatomía de una etiqueta HTML
+
+<Code code={`<nombre-etiqueta atributo="valor">Contenido</nombre-etiqueta>`} lang="html" title="Estructura básica de una etiqueta HTML" />
+
+Donde:
+- `nombre-etiqueta`: Es el tipo de elemento HTML (p, div, h1, etc.)
+- `atributo="valor"`: Son propiedades adicionales que modifican el comportamiento o apariencia del elemento
+- `Contenido`: Es el contenido visible o los elementos anidados dentro de la etiqueta
+
+### Etiquetas de cierre automático
+
+Algunas etiquetas no requieren una etiqueta de cierre porque no contienen contenido. Estas se conocen como etiquetas de cierre automático o etiquetas vacías:
+
+<Code code={`<img src="imagen.jpg" alt="Descripción de la imagen">
+<input type="text" name="nombre">
+<br>
+<hr>`} lang="html" />
+
+En HTML5, no es necesario incluir la barra diagonal de cierre (`/>`) en estas etiquetas, aunque es una práctica común en XHTML.
+
+## Diferencia entre elementos y etiquetas <Badge text="Conceptos" variant="note" />
+
+Aunque a menudo se usan indistintamente, hay una diferencia técnica:
+
+- **Etiqueta**: Es el código que se escribe entre corchetes angulares `< >` para marcar el inicio y fin de un elemento.
+- **Elemento**: Es la combinación de la etiqueta de apertura, el contenido y la etiqueta de cierre.
+
+<Code code={`<p>Este es un párrafo</p>`} lang="html" title="Ejemplo de elemento HTML" />
+
+En este ejemplo:
+- `<p>` y `</p>` son etiquetas
+- Todo el conjunto `<p>Este es un párrafo</p>` es un elemento
+
+## Categorías de elementos HTML
+
+### Elementos de raíz
+
+<Code code={`<!DOCTYPE html>
+<html lang="es">
+  <!-- Contenido del documento -->
+</html>`} lang="html" />
+
+- `<!DOCTYPE html>`: Declara el tipo de documento
+- `<html>`: Elemento raíz que contiene todo el documento HTML
+
+### Elementos de metadatos
+
+<Code code={`<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Título de la página</title>
+  <link rel="stylesheet" href="estilos.css">
+  <style>
+    /* Estilos CSS internos */
+  </style>
+</head>`} lang="html" />
+
+- `<head>`: Contiene metadatos y enlaces a recursos externos
+- `<meta>`: Proporciona metadatos sobre el documento
+- `<title>`: Define el título del documento
+- `<link>`: Enlaza a recursos externos como hojas de estilo
+- `<style>`: Contiene estilos CSS internos
+
+### Elementos de sección
+
+<Code code={`<body>
+  <header>Encabezado</header>
+  <nav>Navegación</nav>
+  <main>
+    <section>Sección de contenido</section>
+    <article>Artículo independiente</article>
+    <aside>Contenido relacionado</aside>
+  </main>
+  <footer>Pie de página</footer>
+</body>`} lang="html" />
+
+- `<body>`: Contiene todo el contenido visible del documento
+- `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<aside>`, `<footer>`: Elementos semánticos que definen diferentes secciones de la página
+
+### Elementos de contenido de texto
+
+<Code code={`<h1>Título principal</h1>
+<p>Párrafo de texto</p>
+<ul>
+  <li>Elemento de lista</li>
+</ul>
+<ol>
+  <li>Elemento de lista numerada</li>
+</ol>
+<blockquote>Cita en bloque</blockquote>
+<pre><code>Bloque de código preformateado</code></pre>`} lang="html" />
+
+- `<h1>` a `<h6>`: Encabezados de diferentes niveles
+- `<p>`: Párrafo
+- `<ul>`, `<ol>`, `<li>`: Listas no ordenadas, ordenadas y elementos de lista
+- `<blockquote>`: Cita en bloque
+- `<pre>`: Texto preformateado
+- `<code>`: Código informático
+
+### Elementos de texto en línea
+
+<Code code={`<p>Texto <a href="enlace.html">enlace</a> con <strong>negrita</strong> y <em>énfasis</em>.</p>
+<p>También <span class="destacado">texto destacado</span> y <br> salto de línea.</p>`} lang="html" />
+
+- `<a>`: Enlace
+- `<strong>`, `<em>`: Texto con énfasis
+- `<span>`: Contenedor genérico en línea
+- `<br>`: Salto de línea
+
+### Elementos multimedia
+
+<Code code={`<img src="imagen.jpg" alt="Descripción">
+<audio src="audio.mp3" controls></audio>
+<video src="video.mp4" controls></video>
+<canvas>Gráficos dinámicos</canvas>
+<svg>Gráficos vectoriales</svg>`} lang="html" />
+
+- `<img>`: Imagen
+- `<audio>`, `<video>`: Contenido multimedia
+- `<canvas>`: Área de dibujo para gráficos dinámicos
+- `<svg>`: Gráficos vectoriales escalables
+
+### Elementos de formulario
+
+<Code code={`<form action="/procesar" method="post">
+  <label for="nombre">Nombre:</label>
+  <input type="text" id="nombre" name="nombre">
+  
+  <select name="opciones">
+    <option value="1">Opción 1</option>
+  </select>
+  
+  <textarea name="comentario"></textarea>
+  
+  <button type="submit">Enviar</button>
+</form>`} lang="html" />
+
+- `<form>`: Formulario
+- `<label>`: Etiqueta para un control de formulario
+- `<input>`: Control de entrada
+- `<select>`, `<option>`: Lista desplegable
+- `<textarea>`: Área de texto multilínea
+- `<button>`: Botón
+
+## Atributos HTML <Badge text="Propiedades" variant="success" />
+
+Los atributos proporcionan información adicional o modifican el comportamiento de los elementos HTML.
+
+### Atributos globales
+
+Se pueden aplicar a cualquier elemento HTML:
+
+<Code code={`<div id="identificador" class="clase" style="color: blue;" title="Información adicional">
+  Contenido con atributos globales
+</div>`} lang="html" />
+
+- `id`: Identificador único para el elemento
+- `class`: Clase(s) CSS para el elemento
+- `style`: Estilos CSS en línea
+- `title`: Información adicional (aparece como tooltip)
+- `lang`: Idioma del contenido
+- `data-*`: Atributos de datos personalizados
+- `hidden`: Oculta el elemento
+- `tabindex`: Orden de tabulación para navegación con teclado
+
+### Atributos específicos <Badge text="Referencia" variant="success" />
+
+Cada elemento HTML tiene atributos específicos que controlan su comportamiento y apariencia. A continuación se detallan los atributos más importantes de las etiquetas más comunes:
+
+#### Enlaces `<a>`
+
+<Code code={`<a href="https://ejemplo.com" target="_blank" rel="noopener" download title="Descargar archivo">Enlace externo</a>`} lang="html" />
+
+| Atributo | Descripción |
+|----------|-------------|
+| `href` | Define la URL de destino del enlace |
+| `target` | Especifica dónde abrir el enlace (`_blank` para nueva pestaña, `_self` para misma ventana) |
+| `rel` | Define la relación entre la página actual y la enlazada (`noopener`, `noreferrer` para seguridad) |
+| `download` | Indica que el recurso debe descargarse en lugar de navegarse |
+| `hreflang` | Especifica el idioma del documento enlazado |
+
+#### Imágenes `<img>`
+
+<Code code={`<img src="imagen.jpg" alt="Descripción de la imagen" width="300" height="200" loading="lazy">`} lang="html" />
+
+| Atributo | Descripción |
+|----------|-------------|
+| `src` | URL de la imagen (obligatorio) |
+| `alt` | Texto alternativo para accesibilidad y SEO (obligatorio) |
+| `width` | Ancho de la imagen en píxeles |
+| `height` | Alto de la imagen en píxeles |
+| `loading` | Controla cómo se carga la imagen (`lazy` para carga diferida) |
+| `srcset` | Lista de imágenes alternativas para diferentes resoluciones |
+
+<Aside type="tip">
+  Siempre incluye el atributo `alt` en las imágenes. Es esencial para la accesibilidad y el SEO.
+</Aside>
+
+#### Formularios `<form>`
+
+<Code code={`<form action="/procesar" method="post" enctype="multipart/form-data" autocomplete="on">
+  <!-- Elementos del formulario -->
+</form>`} lang="html" />
+
+| Atributo | Descripción |
+|----------|-------------|
+| `action` | URL donde se envían los datos del formulario |
+| `method` | Método HTTP para enviar datos (`get` o `post`) |
+| `enctype` | Cómo se codifican los datos (importante para subida de archivos) |
+| `autocomplete` | Activa/desactiva el autocompletado del navegador |
+| `novalidate` | Desactiva la validación automática del navegador |
+
+#### Campos de entrada `<input>`
+
+<Code code={`<input type="text" name="usuario" id="usuario" value="" placeholder="Ingrese su nombre" required minlength="3" maxlength="50" autocomplete="name">`} lang="html" />
+
+| Atributo | Descripción |
+|----------|-------------|
+| `type` | Tipo de entrada (`text`, `password`, `email`, `number`, `date`, `checkbox`, `radio`, etc.) |
+| `name` | Nombre del campo para identificarlo al enviar el formulario |
+| `id` | Identificador único (para asociarlo con `<label>`) |
+| `value` | Valor predeterminado del campo |
+| `placeholder` | Texto de ejemplo que aparece cuando el campo está vacío |
+| `required` | Hace que el campo sea obligatorio |
+| `disabled` | Desactiva el campo |
+| `readonly` | Hace que el campo sea de solo lectura |
+| `min`/`max` | Valores mínimo/máximo (para tipos numéricos y fechas) |
+| `minlength`/`maxlength` | Longitud mínima/máxima para texto |
+| `pattern` | Expresión regular para validación |
+
+#### Áreas de texto `<textarea>`
+
+<Code code={`<textarea name="comentario" rows="5" cols="30" placeholder="Escribe tu comentario" maxlength="500"></textarea>`} lang="html" />
+
+| Atributo | Descripción |
+|----------|-------------|
+| `rows` | Número de líneas visibles |
+| `cols` | Ancho visible en caracteres |
+| `wrap` | Cómo se envían los saltos de línea (`soft`, `hard`) |
+| `maxlength` | Número máximo de caracteres permitidos |
+
+#### Listas desplegables `<select>`
+
+<Code code={`<select name="pais" multiple size="3">
+  <option value="es">España</option>
+  <option value="mx" selected>México</option>
+  <option value="ar">Argentina</option>
+</select>`} lang="html" />
+
+| Atributo | Descripción |
+|----------|-------------|
+| `multiple` | Permite selección múltiple |
+| `size` | Número de opciones visibles |
+| `selected` | (en `<option>`) Marca una opción como seleccionada |
+
+#### Botones `<button>`
+
+<Code code={`<button type="submit" disabled>Enviar</button>
+<button type="reset">Restablecer</button>
+<button type="button" onclick="miFuncion()">Hacer algo</button>`} lang="html" />
+
+| Atributo | Descripción |
+|----------|-------------|
+| `type` | Tipo de botón (`submit`, `reset`, `button`) |
+| `disabled` | Desactiva el botón |
+| `form` | ID del formulario al que pertenece (si está fuera del formulario) |
+| `formaction` | Sobreescribe el atributo `action` del formulario |
+| `formmethod` | Sobreescribe el atributo `method` del formulario |
+
+#### Audio y video `<audio>` y `<video>`
+
+<Code code={`<audio src="audio.mp3" controls autoplay loop muted preload="auto">
+  Tu navegador no soporta el elemento de audio.
+</audio>
+
+<video src="video.mp4" controls width="640" height="360" poster="imagen.jpg">
+  Tu navegador no soporta el elemento de video.
+</video>`} lang="html" />
+
+| Atributo | Descripción |
+|----------|-------------|
+| `controls` | Muestra los controles de reproducción |
+| `autoplay` | Reproduce automáticamente al cargar |
+| `loop` | Repite el contenido cuando termina |
+| `muted` | Silencia el audio |
+| `preload` | Cómo debe precargarse el contenido (`auto`, `metadata`, `none`) |
+| `poster` | (solo `<video>`) Imagen de vista previa |
+
+#### Tablas `<table>`, `<tr>`, `<td>`
+
+<Code code={`<table border="1">
+  <tr>
+    <th colspan="2">Encabezado</th>
+  </tr>
+  <tr>
+    <td rowspan="2">Celda 1</td>
+    <td>Celda 2</td>
+  </tr>
+</table>`} lang="html" />
+
+| Atributo | Descripción |
+|----------|-------------|
+| `colspan` | Número de columnas que ocupa una celda |
+| `rowspan` | Número de filas que ocupa una celda |
+| `headers` | Asocia celdas de datos con encabezados para accesibilidad |
+
+#### Iframes `<iframe>`
+
+<Code code={`<iframe src="https://ejemplo.com" width="600" height="400" frameborder="0" allow="fullscreen" sandbox="allow-scripts"></iframe>`} lang="html" />
+
+| Atributo | Descripción |
+|----------|-------------|
+| `src` | URL del contenido a mostrar |
+| `srcdoc` | Contenido HTML para mostrar en el iframe |
+| `sandbox` | Restricciones de seguridad para el contenido |
+| `allow` | Características permitidas (`fullscreen`, `camera`, etc.) |
+| `loading` | Estrategia de carga (`lazy`, `eager`) |
+
+<Aside type="caution">
+  Los iframes pueden presentar riesgos de seguridad. Usa el atributo `sandbox` para limitar lo que puede hacer el contenido incrustado.
+</Aside>
+
+<Aside type="tip">
+  Los atributos booleanos (como `required`, `disabled`, `checked`) pueden escribirse sin valor. Su presencia indica "verdadero" y su ausencia "falso".
+</Aside>
+
+## Anidamiento de elementos <Badge text="Estructura" variant="note" />
+
+Los elementos HTML pueden contener otros elementos, creando una estructura jerárquica:
+
+<Code code={`<div class="contenedor">
+  <h2>Título de sección</h2>
+  <p>Este párrafo contiene <strong>texto importante</strong> y un <a href="#">enlace</a>.</p>
+  <ul>
+    <li>Primer elemento</li>
+    <li>Segundo elemento</li>
+  </ul>
+</div>`} lang="html" />
+
+### Reglas de anidamiento
+
+<Aside type="caution">
+  No todos los elementos pueden contener cualquier otro elemento. Hay reglas específicas sobre qué elementos pueden ser anidados dentro de otros.
+</Aside>
+
+- Los elementos en bloque pueden contener elementos en bloque y en línea
+- Los elementos en línea generalmente solo pueden contener otros elementos en línea o texto
+- Algunos elementos tienen restricciones específicas (por ejemplo, `<ul>` solo debe contener elementos `<li>`)
+
+## Comentarios en HTML
+
+Los comentarios son útiles para documentar el código y no se muestran en el navegador:
+
+<Code code={`<!-- Este es un comentario en HTML -->
+<!-- 
+  Los comentarios pueden abarcar
+  múltiples líneas 
+-->`} lang="html" />
+
+## Mejores prácticas
+
+1. **Usar HTML semántico**: Utilizar las etiquetas adecuadas para cada tipo de contenido.
+
+2. **Mantener una estructura clara**: Indentar correctamente el código para mostrar la jerarquía.
+
+3. **Validar el código**: Asegurarse de que el HTML cumple con los estándares del W3C.
+
+4. **Accesibilidad**: Incluir atributos como `alt` en imágenes y usar etiquetas semánticas para mejorar la accesibilidad.
+
+5. **Compatibilidad**: Verificar la compatibilidad de las etiquetas y atributos con diferentes navegadores.
+
+<Aside>
+  Recuerda que HTML define la estructura y el contenido, mientras que CSS se encarga del diseño y JavaScript de la interactividad.
+</Aside>

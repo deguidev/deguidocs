@@ -1,0 +1,266 @@
+---
+title: 2. Instalación y configuración inicial
+description: Aprende a instalar y configurar Inertia.js con Laravel y Vue 3
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Instalación y configuración inicial
+
+En esta guía, aprenderemos a configurar Inertia.js con Laravel y Vue 3 desde cero. Seguiremos un proceso paso a paso para asegurarnos de que todos los componentes estén correctamente integrados.
+
+## Requisitos previos: Laravel y Vue 3
+
+Antes de comenzar con la instalación de Inertia.js, necesitamos asegurarnos de tener los siguientes requisitos:
+
+### Laravel
+
+Necesitas tener instalado Laravel 8.x o superior. Puedes crear un nuevo proyecto de Laravel con:
+
+<Code code={`composer create-project laravel/laravel nombre-proyecto
+cd nombre-proyecto`} lang="bash" />
+
+<Aside type="tip">
+Si prefieres usar Laravel Breeze o Jetstream, estos ya incluyen opciones para instalar Inertia.js directamente.
+</Aside>
+
+### Node.js y NPM
+
+Asegúrate de tener Node.js (v14 o superior) y npm instalados en tu sistema:
+
+<Code code={`node -v
+npm -v`} lang="bash" />
+
+### Vue 3
+
+Inertia.js funciona con varios frameworks frontend, pero en esta guía nos centraremos en Vue 3. Para instalar Vue 3 en tu proyecto Laravel:
+
+<Code code={`npm install vue@next`} lang="bash" />
+
+## Instalación de paquetes de Inertia (Laravel Adapter y Vue Adapter)
+
+Inertia.js requiere dos componentes principales: un adaptador para el servidor (Laravel) y otro para el cliente (Vue).
+
+### 1. Instalación del adaptador para Laravel
+
+Primero, instala el paquete de Inertia para Laravel usando Composer:
+
+<Code code={`composer require inertiajs/inertia-laravel`} lang="bash" />
+
+### 2. Instalación del adaptador para Vue 3
+
+A continuación, instala el paquete de Inertia para Vue 3:
+
+<Code code={`npm install @inertiajs/vue3`} lang="bash" />
+
+### 3. Instalación de dependencias adicionales
+
+También necesitamos algunas dependencias adicionales para el desarrollo:
+
+<Code code={`npm install laravel-vite-plugin @vitejs/plugin-vue -D`} lang="bash" />
+
+## Configuración del middleware HandleInertiaRequests
+
+Inertia.js requiere un middleware para gestionar las solicitudes y respuestas. Este middleware se encarga de determinar si una solicitud es una solicitud Inertia y de proporcionar datos compartidos a todas las vistas.
+
+### 1. Crear el middleware
+
+Puedes publicar el middleware predeterminado con:
+
+<Code code={`php artisan inertia:middleware`} lang="bash" />
+
+Esto creará un nuevo archivo en `app/Http/Middleware/HandleInertiaRequests.php`.
+
+### 2. Registrar el middleware
+
+Ahora, registra el middleware en tu archivo `app/Http/Kernel.php` añadiéndolo al grupo `web`:
+
+<Code code={`// app/Http/Kernel.php
+protected $middlewareGroups = [
+    'web' => [
+        // ... otros middlewares
+        \App\Http\Middleware\HandleInertiaRequests::class,
+    ],
+];`} lang="php" />
+
+### 3. Configurar props compartidas
+
+El middleware `HandleInertiaRequests` incluye un método `share()` que te permite definir datos que estarán disponibles en todas las páginas de tu aplicación:
+
+<Code code={`// app/Http/Middleware/HandleInertiaRequests.php
+public function share(Request $request): array
+{
+    return [
+        'auth' => [
+            'user' => $request->user() ? [
+                'id' => $request->user()->id,
+                'name' => $request->user()->name,
+                'email' => $request->user()->email,
+            ] : null,
+        ],
+        'flash' => [
+            'message' => fn () => $request->session()->get('message'),
+            'error' => fn () => $request->session()->get('error'),
+        ],
+        // Agrega aquí más datos compartidos
+    ];
+}`} lang="php" />
+
+## Configuración de app.js en Vue y Laravel
+
+Ahora necesitamos configurar el punto de entrada de nuestra aplicación JavaScript para inicializar Inertia.js con Vue 3.
+
+### 1. Configurar Vite
+
+Primero, actualiza tu archivo `vite.config.js` para incluir el plugin de Vue:
+
+<Code code={`// vite.config.js
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+import vue from '@vitejs/plugin-vue';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+            refresh: true,
+        }),
+        vue({
+            template: {
+                transformAssetUrls: {
+                    base: null,
+                    includeAbsolute: false,
+                },
+            },
+        }),
+    ],
+    resolve: {
+        alias: {
+            '@': '/resources/js',
+        },
+    },
+});`} lang="javascript" />
+
+### 2. Crear el archivo app.js
+
+Crea o actualiza tu archivo `resources/js/app.js` para inicializar Inertia.js con Vue 3:
+
+<Code code={`// resources/js/app.js
+import { createApp, h } from 'vue';
+import { createInertiaApp } from '@inertiajs/vue3';
+import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+
+createInertiaApp({
+    // La función resolve indica cómo cargar los componentes de página
+    resolve: (name) => resolvePageComponent(\`./Pages/\${name}.vue\`, import.meta.glob('./Pages/**/*.vue')),
+    
+    // Configura el elemento raíz donde se montará la aplicación
+    setup({ el, App, props, plugin }) {
+        createApp({ render: () => h(App, props) })
+            .use(plugin)
+            .mount(el);
+    },
+});
+`} lang="javascript" />
+
+### 3. Crear una plantilla base
+
+Crea un archivo de plantilla Blade que servirá como punto de entrada para tu aplicación Inertia:
+
+<Code code={`<!-- resources/views/app.blade.php -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ config('app.name', 'Laravel') }}</title>
+    
+    <!-- Estilos y scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @inertiaHead
+</head>
+<body>
+    @inertia
+</body>
+</html>`} lang="html" />
+
+### 4. Configurar una ruta de prueba
+
+Para verificar que todo funciona correctamente, configura una ruta de prueba en `routes/web.php`:
+
+<Code code={`// routes/web.php
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+Route::get('/', function () {
+    return Inertia::render('Welcome', [
+        'title' => 'Mi aplicación con Inertia',
+    ]);
+});`} lang="php" />
+
+### 5. Crear un componente de página
+
+Crea un directorio `resources/js/Pages` y dentro un archivo `Welcome.vue`:
+
+<Code code={`<!-- resources/js/Pages/Welcome.vue -->
+<template>
+    <div class="container">
+        <h1>{{ title }}</h1>
+        <p>Bienvenido a tu aplicación con Inertia.js y Vue 3</p>
+    </div>
+</template>
+
+<script setup>
+defineProps({
+    title: String,
+});
+</script>`} lang="vue" />
+
+## Compilar y probar
+
+Finalmente, compila los assets y ejecuta el servidor de desarrollo:
+
+<Tabs>
+<TabItem label="Desarrollo">
+
+```bash
+npm run dev
+php artisan serve
+```
+
+</TabItem>
+<TabItem label="Producción">
+
+```bash
+npm run build
+php artisan serve
+```
+
+</TabItem>
+</Tabs>
+
+Visita `http://localhost:8000` en tu navegador y deberías ver tu primera página con Inertia.js funcionando.
+
+<Aside type="note">
+Si encuentras algún problema durante la instalación, asegúrate de revisar la documentación oficial de Inertia.js o los requisitos específicos de versión para Laravel y Vue.
+</Aside>
+
+## Estructura de directorios recomendada
+
+Para mantener tu proyecto organizado, te recomendamos seguir esta estructura de directorios para los componentes de Vue:
+
+```
+resources/js/
+├── Components/       # Componentes reutilizables
+├── Layouts/          # Layouts de página
+├── Pages/            # Componentes de página (rutas)
+│   ├── Auth/         # Páginas de autenticación
+│   ├── Users/        # Páginas relacionadas con usuarios
+│   └── Welcome.vue   # Página de inicio
+└── app.js           # Punto de entrada
+```
+
+Esta estructura te ayudará a mantener tu código organizado a medida que tu aplicación crece.

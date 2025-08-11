@@ -1,0 +1,398 @@
+---
+title: 7. Gestión de Transacciones (TCL)
+description: Aprende a gestionar transacciones, commits y rollbacks en bases de datos SQL
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## Introducción
+
+El Lenguaje de Control de Transacciones (TCL - Transaction Control Language) es un componente fundamental de SQL que permite gestionar transacciones en bases de datos. Las transacciones garantizan la integridad de los datos al asegurar que las operaciones relacionadas se ejecuten como una unidad atómica, manteniendo la base de datos en un estado consistente incluso en caso de fallos.
+
+## 7.1. Concepto de transacción
+
+Una transacción es una secuencia de operaciones que se ejecutan como una única unidad lógica de trabajo. Las transacciones deben cumplir con las propiedades ACID:
+
+- **Atomicidad**: Una transacción se ejecuta por completo o no se ejecuta en absoluto.
+- **Consistencia**: Una transacción lleva la base de datos de un estado válido a otro estado válido.
+- **Aislamiento**: Las transacciones se ejecutan de forma aislada, sin interferir entre sí.
+- **Durabilidad**: Una vez confirmada una transacción, sus cambios persisten incluso ante fallos del sistema.
+
+<Aside type="note">
+  <strong>Ejemplo de transacción:</strong> Una transferencia bancaria implica al menos dos operaciones: debitar una cuenta y acreditar otra. Estas operaciones deben ejecutarse como una transacción para garantizar que el dinero no desaparezca ni se duplique.
+</Aside>
+
+## 7.2. Iniciar transacciones (BEGIN, START TRANSACTION)
+
+Para iniciar una transacción explícitamente, se utilizan los comandos BEGIN o START TRANSACTION.
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Iniciar una transacción
+    START TRANSACTION;
+    -- o
+    BEGIN;
+    
+    -- Operaciones dentro de la transacción
+    UPDATE cuentas SET saldo = saldo - 1000 WHERE id_cuenta = 1;
+    UPDATE cuentas SET saldo = saldo + 1000 WHERE id_cuenta = 2;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- En Oracle, las transacciones comienzan implícitamente con la primera instrucción DML
+    -- No es necesario un comando explícito, pero se puede usar:
+    SET TRANSACTION NAME 'transferencia_fondos';
+    
+    -- Operaciones dentro de la transacción
+    UPDATE cuentas SET saldo = saldo - 1000 WHERE id_cuenta = 1;
+    UPDATE cuentas SET saldo = saldo + 1000 WHERE id_cuenta = 2;
+    ```
+  </TabItem>
+</Tabs>
+
+### Modos de transacción
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Iniciar transacción de solo lectura
+    START TRANSACTION READ ONLY;
+    
+    -- Iniciar transacción con escritura
+    START TRANSACTION READ WRITE;
+    
+    -- Iniciar transacción con un nivel de aislamiento específico
+    START TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Iniciar transacción de solo lectura
+    SET TRANSACTION READ ONLY;
+    
+    -- Iniciar transacción con escritura (predeterminado)
+    SET TRANSACTION READ WRITE;
+    
+    -- Iniciar transacción con un nivel de aislamiento específico
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    ```
+  </TabItem>
+</Tabs>
+
+## 7.3. Confirmar cambios (COMMIT)
+
+El comando COMMIT finaliza la transacción actual y hace permanentes todos los cambios realizados durante la transacción.
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Iniciar transacción
+    START TRANSACTION;
+    
+    -- Operaciones
+    UPDATE productos SET stock = stock - 5 WHERE id_producto = 101;
+    INSERT INTO ventas (id_producto, cantidad, fecha) VALUES (101, 5, NOW());
+    
+    -- Confirmar cambios
+    COMMIT;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Las transacciones comienzan implícitamente
+    UPDATE productos SET stock = stock - 5 WHERE id_producto = 101;
+    INSERT INTO ventas (id_producto, cantidad, fecha) VALUES (101, 5, SYSDATE);
+    
+    -- Confirmar cambios
+    COMMIT;
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  <strong>Buena práctica:</strong> Confirma las transacciones tan pronto como sea posible para liberar bloqueos y recursos del sistema.
+</Aside>
+
+## 7.4. Deshacer cambios (ROLLBACK)
+
+El comando ROLLBACK deshace todos los cambios realizados durante la transacción actual y finaliza la transacción.
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Iniciar transacción
+    START TRANSACTION;
+    
+    -- Operaciones
+    UPDATE cuentas SET saldo = saldo - 5000 WHERE id_cuenta = 1;
+    
+    -- Verificar saldo resultante
+    SELECT saldo FROM cuentas WHERE id_cuenta = 1;
+    
+    -- Si el saldo es negativo, deshacer la transacción
+    ROLLBACK;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Las transacciones comienzan implícitamente
+    UPDATE cuentas SET saldo = saldo - 5000 WHERE id_cuenta = 1;
+    
+    -- Verificar saldo resultante
+    SELECT saldo FROM cuentas WHERE id_cuenta = 1;
+    
+    -- Si el saldo es negativo, deshacer la transacción
+    ROLLBACK;
+    ```
+  </TabItem>
+</Tabs>
+
+### Manejo de errores y ROLLBACK automático
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Establecer que los errores provoquen un rollback automático
+    SET autocommit = 0;
+    
+    START TRANSACTION;
+    
+    -- Si esta operación falla, toda la transacción se revertirá
+    UPDATE cuentas SET saldo = saldo - 1000 WHERE id_cuenta = 1;
+    
+    -- Esta operación provocaría un error si la cuenta 999 no existe
+    UPDATE cuentas SET saldo = saldo + 1000 WHERE id_cuenta = 999;
+    
+    -- Si llegamos aquí sin errores, confirmamos
+    COMMIT;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Manejo de errores con bloques PL/SQL
+    DECLARE
+      v_saldo_insuficiente EXCEPTION;
+    BEGIN
+      -- Verificar saldo
+      UPDATE cuentas SET saldo = saldo - 1000 WHERE id_cuenta = 1;
+      
+      -- Verificar si el saldo es negativo
+      IF (SELECT saldo FROM cuentas WHERE id_cuenta = 1) < 0 THEN
+        RAISE v_saldo_insuficiente;
+      END IF;
+      
+      -- Completar la transferencia
+      UPDATE cuentas SET saldo = saldo + 1000 WHERE id_cuenta = 2;
+      
+      -- Confirmar si todo está bien
+      COMMIT;
+    EXCEPTION
+      WHEN v_saldo_insuficiente THEN
+        DBMS_OUTPUT.PUT_LINE('Error: Saldo insuficiente');
+        ROLLBACK;
+      WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+        ROLLBACK;
+    END;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+## 7.5. Puntos de guardado (SAVEPOINT, RELEASE SAVEPOINT)
+
+Los puntos de guardado (savepoints) permiten dividir una transacción en partes más pequeñas, lo que posibilita revertir la transacción hasta un punto específico sin deshacer toda la transacción.
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Iniciar transacción
+    START TRANSACTION;
+    
+    -- Primera operación
+    INSERT INTO pedidos (cliente_id, fecha) VALUES (101, NOW());
+    SET @id_pedido = LAST_INSERT_ID();
+    
+    -- Crear un punto de guardado después de insertar el pedido
+    SAVEPOINT pedido_creado;
+    
+    -- Añadir productos al pedido
+    INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad) VALUES (@id_pedido, 1, 2);
+    INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad) VALUES (@id_pedido, 2, 1);
+    
+    -- Crear otro punto de guardado
+    SAVEPOINT productos_agregados;
+    
+    -- Actualizar inventario
+    UPDATE productos SET stock = stock - 2 WHERE id = 1;
+    
+    -- Si hay un problema con el inventario, volver al punto anterior
+    -- ROLLBACK TO productos_agregados;
+    
+    -- Si todo está bien, confirmar
+    COMMIT;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Las transacciones comienzan implícitamente
+    INSERT INTO pedidos (cliente_id, fecha) VALUES (101, SYSDATE);
+    
+    -- Obtener el ID del pedido insertado
+    DECLARE
+      v_id_pedido pedidos.id%TYPE;
+    BEGIN
+      SELECT pedidos_seq.CURRVAL INTO v_id_pedido FROM DUAL;
+      
+      -- Crear un punto de guardado después de insertar el pedido
+      SAVEPOINT pedido_creado;
+      
+      -- Añadir productos al pedido
+      INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad) VALUES (v_id_pedido, 1, 2);
+      INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad) VALUES (v_id_pedido, 2, 1);
+      
+      -- Crear otro punto de guardado
+      SAVEPOINT productos_agregados;
+      
+      -- Actualizar inventario
+      UPDATE productos SET stock = stock - 2 WHERE id = 1;
+      
+      -- Si hay un problema con el inventario, volver al punto anterior
+      -- ROLLBACK TO productos_agregados;
+      
+      -- Eliminar un punto de guardado (ya no se puede volver a él)
+      -- RELEASE SAVEPOINT pedido_creado;
+      
+      -- Si todo está bien, confirmar
+      COMMIT;
+    END;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+### Eliminar puntos de guardado
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Eliminar un punto de guardado
+    RELEASE SAVEPOINT pedido_creado;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Eliminar un punto de guardado
+    RELEASE SAVEPOINT pedido_creado;
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+  <strong>Importante:</strong> Cuando se elimina un punto de guardado, ya no es posible hacer ROLLBACK a ese punto. Además, en muchos sistemas, un COMMIT elimina automáticamente todos los puntos de guardado de la transacción.
+</Aside>
+
+## 7.6. Control de concurrencia y bloqueos
+
+El control de concurrencia garantiza que múltiples transacciones puedan ejecutarse simultáneamente sin comprometer la integridad de los datos.
+
+### Niveles de aislamiento
+
+Los niveles de aislamiento definen cómo las transacciones interactúan entre sí:
+
+1. **READ UNCOMMITTED**: Permite leer cambios no confirmados (dirty reads).
+2. **READ COMMITTED**: Solo permite leer cambios confirmados.
+3. **REPEATABLE READ**: Garantiza que las lecturas repetidas dentro de una transacción devuelvan los mismos resultados.
+4. **SERIALIZABLE**: El nivel más estricto, las transacciones se ejecutan como si fueran secuenciales.
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Establecer nivel de aislamiento para la sesión
+    SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
+    
+    -- Establecer nivel de aislamiento para una transacción específica
+    START TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Establecer nivel de aislamiento para la sesión
+    ALTER SESSION SET ISOLATION_LEVEL = SERIALIZABLE;
+    
+    -- Establecer nivel de aislamiento para una transacción específica
+    SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+    ```
+  </TabItem>
+</Tabs>
+
+### Bloqueos explícitos
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Bloquear tablas para lectura
+    LOCK TABLES empleados READ;
+    
+    -- Bloquear tablas para escritura
+    LOCK TABLES empleados WRITE;
+    
+    -- Liberar todos los bloqueos
+    UNLOCK TABLES;
+    
+    -- Bloquear filas para actualización
+    SELECT * FROM empleados WHERE departamento_id = 10 FOR UPDATE;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Bloquear filas para actualización
+    SELECT * FROM empleados WHERE departamento_id = 10 FOR UPDATE;
+    
+    -- Bloquear filas para actualización sin esperar (falla si están bloqueadas)
+    SELECT * FROM empleados WHERE departamento_id = 10 FOR UPDATE NOWAIT;
+    
+    -- Bloquear filas con tiempo de espera
+    SELECT * FROM empleados WHERE departamento_id = 10 FOR UPDATE WAIT 5;
+    ```
+  </TabItem>
+</Tabs>
+
+### Problemas comunes de concurrencia
+
+1. **Lecturas sucias (Dirty Reads)**: Una transacción lee datos que otra transacción ha modificado pero aún no ha confirmado.
+
+2. **Lecturas no repetibles (Non-repeatable Reads)**: Una transacción lee el mismo registro dos veces y obtiene valores diferentes porque otra transacción modificó el registro entre las lecturas.
+
+3. **Lecturas fantasma (Phantom Reads)**: Una transacción ejecuta una consulta dos veces y la segunda vez aparecen registros adicionales porque otra transacción insertó nuevos registros que cumplen con los criterios de la consulta.
+
+4. **Bloqueos muertos (Deadlocks)**: Dos transacciones se bloquean mutuamente, cada una esperando recursos que la otra tiene bloqueados.
+
+<Aside type="tip">
+  <strong>Resolución de bloqueos muertos:</strong>
+  <ul>
+    <li>MySQL y Oracle detectan automáticamente los bloqueos muertos y terminan una de las transacciones.</li>
+    <li>Para evitar bloqueos muertos, accede a las tablas siempre en el mismo orden en diferentes transacciones.</li>
+    <li>Mantén las transacciones lo más cortas posible.</li>
+    <li>Utiliza el nivel de aislamiento adecuado para tus necesidades.</li>
+  </ul>
+</Aside>
+
+### Comparación de niveles de aislamiento y problemas de concurrencia
+
+| Nivel de aislamiento | Lecturas sucias | Lecturas no repetibles | Lecturas fantasma |
+|---------------------|-----------------|------------------------|--------------------|
+| READ UNCOMMITTED    | Posible         | Posible                | Posible            |
+| READ COMMITTED      | No              | Posible                | Posible            |
+| REPEATABLE READ     | No              | No                     | Posible (MySQL: No)|
+| SERIALIZABLE        | No              | No                     | No                 |
+
+## Conclusión
+
+La gestión adecuada de transacciones es fundamental para mantener la integridad de los datos en sistemas de bases de datos. Las transacciones garantizan que las operaciones relacionadas se ejecuten como una unidad atómica, permitiendo deshacer cambios en caso de errores y asegurando que la base de datos permanezca en un estado consistente incluso en entornos multiusuario con acceso concurrente.

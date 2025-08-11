@@ -1,0 +1,325 @@
+---
+title: Tablas
+description: Cómo crear y estructurar tablas en HTML.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Tablas en HTML
+
+Las tablas en HTML permiten organizar datos en filas y columnas, facilitando la presentación de información estructurada como datos tabulares, horarios, resultados o comparativas.
+
+## Estructura básica de una tabla <Badge text="Fundamentos" variant="success" />
+
+Una tabla HTML se compone de varios elementos anidados:
+
+<Code code={`<table>
+  <tr>
+    <th>Encabezado 1</th>
+    <th>Encabezado 2</th>
+  </tr>
+  <tr>
+    <td>Dato 1</td>
+    <td>Dato 2</td>
+  </tr>
+  <tr>
+    <td>Dato 3</td>
+    <td>Dato 4</td>
+  </tr>
+</table>`} lang="html" />
+
+### Elementos principales de una tabla
+
+| Elemento | Descripción |
+|----------|-------------|
+| `<table>` | Define una tabla |
+| `<tr>` | Define una fila (table row) |
+| `<th>` | Define una celda de encabezado (table header) |
+| `<td>` | Define una celda de datos (table data) |
+
+## Estructura semántica de tablas <Badge text="Accesibilidad" variant="note" />
+
+HTML5 proporciona elementos para mejorar la semántica y accesibilidad de las tablas:
+
+<Code code={`<table>
+  <caption>Lista de estudiantes</caption>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Edad</th>
+      <th>País</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Ana</td>
+      <td>24</td>
+      <td>España</td>
+    </tr>
+    <tr>
+      <td>Carlos</td>
+      <td>28</td>
+      <td>México</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="3">Total: 2 estudiantes</td>
+    </tr>
+  </tfoot>
+</table>`} lang="html" />
+
+### Elementos semánticos para tablas
+
+| Elemento | Descripción |
+|----------|-------------|
+| `<caption>` | Título o leyenda de la tabla |
+| `<thead>` | Agrupa las filas de encabezado |
+| `<tbody>` | Agrupa las filas de contenido principal |
+| `<tfoot>` | Agrupa las filas de pie de tabla (resumen, totales) |
+
+<Aside type="tip">
+  Usar `<thead>`, `<tbody>` y `<tfoot>` mejora la accesibilidad y permite aplicar estilos y comportamientos específicos a cada sección de la tabla.
+</Aside>
+
+## Combinación de celdas <Badge text="Estructura" variant="success" />
+
+### Atributo `colspan`
+
+Permite que una celda se extienda por múltiples columnas:
+
+<Code code={`<table>
+  <tr>
+    <th colspan="2">Información de contacto</th>
+  </tr>
+  <tr>
+    <td>Email</td>
+    <td>Teléfono</td>
+  </tr>
+  <tr>
+    <td>ejemplo@correo.com</td>
+    <td>123-456-789</td>
+  </tr>
+</table>`} lang="html" />
+
+### Atributo `rowspan`
+
+Permite que una celda se extienda por múltiples filas:
+
+<Code code={`<table>
+  <tr>
+    <th>Categoría</th>
+    <th>Productos</th>
+  </tr>
+  <tr>
+    <td rowspan="2">Frutas</td>
+    <td>Manzanas</td>
+  </tr>
+  <tr>
+    <td>Naranjas</td>
+  </tr>
+  <tr>
+    <td rowspan="2">Verduras</td>
+    <td>Zanahorias</td>
+  </tr>
+  <tr>
+    <td>Brócoli</td>
+  </tr>
+</table>`} lang="html" />
+
+## Atributos para accesibilidad <Badge text="Accesibilidad" variant="success" />
+
+### Atributo `scope`
+
+El atributo `scope` mejora la accesibilidad al indicar si una celda de encabezado (`<th>`) se aplica a una fila o columna:
+
+<Code code={`<table>
+  <tr>
+    <th scope="col">Nombre</th>
+    <th scope="col">Edad</th>
+  </tr>
+  <tr>
+    <th scope="row">Ana</th>
+    <td>24</td>
+  </tr>
+  <tr>
+    <th scope="row">Carlos</th>
+    <td>28</td>
+  </tr>
+</table>`} lang="html" />
+
+Valores del atributo `scope`:
+- `col`: La celda es un encabezado para una columna
+- `row`: La celda es un encabezado para una fila
+- `colgroup`: La celda es un encabezado para un grupo de columnas
+- `rowgroup`: La celda es un encabezado para un grupo de filas
+
+<Aside type="caution">
+  El uso correcto de `scope` es fundamental para que los lectores de pantalla interpreten correctamente la estructura de la tabla.
+</Aside>
+
+### Atributo `headers`
+
+Para tablas complejas, el atributo `headers` asocia celdas de datos con sus encabezados correspondientes:
+
+<Code code={`<table>
+  <tr>
+    <th id="nombre">Nombre</th>
+    <th id="edad">Edad</th>
+    <th id="pais">País</th>
+  </tr>
+  <tr>
+    <td headers="nombre">Ana</td>
+    <td headers="edad">24</td>
+    <td headers="pais">España</td>
+  </tr>
+</table>`} lang="html" />
+
+## Agrupación de columnas <Badge text="Estructura" variant="note" />
+
+Los elementos `<colgroup>` y `<col>` permiten seleccionar y aplicar estilos a columnas enteras:
+
+<Code code={`<table>
+  <colgroup>
+    <col style="background-color: #f2f2f2">
+    <col span="2" style="background-color: #e6f7ff">
+  </colgroup>
+  <tr>
+    <th>Producto</th>
+    <th>Precio</th>
+    <th>Disponibilidad</th>
+  </tr>
+  <tr>
+    <td>Laptop</td>
+    <td>999€</td>
+    <td>En stock</td>
+  </tr>
+  <tr>
+    <td>Smartphone</td>
+    <td>599€</td>
+    <td>Agotado</td>
+  </tr>
+</table>`} lang="html" />
+
+## Tablas responsivas <Badge text="Diseño" variant="success" />
+
+Para hacer que las tablas se adapten a dispositivos móviles, puedes envolverlas en un contenedor con desplazamiento horizontal:
+
+<Code code={`<div style="overflow-x: auto;">
+  <table>
+    <!-- Contenido de la tabla -->
+  </table>
+</div>`} lang="html" />
+
+<Aside type="tip">
+  En proyectos reales, es mejor definir estos estilos en una hoja CSS externa en lugar de usar atributos de estilo en línea.
+</Aside>
+
+## Ejemplo de tabla compleja
+
+<Code code={`<table>
+  <caption>Resultados trimestrales por departamento</caption>
+  <colgroup>
+    <col style="width: 20%">
+    <col span="4" style="width: 20%">
+  </colgroup>
+  <thead>
+    <tr>
+      <th scope="col">Departamento</th>
+      <th scope="col">Q1</th>
+      <th scope="col">Q2</th>
+      <th scope="col">Q3</th>
+      <th scope="col">Q4</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Marketing</th>
+      <td>10.000€</td>
+      <td>15.000€</td>
+      <td>13.000€</td>
+      <td>18.000€</td>
+    </tr>
+    <tr>
+      <th scope="row">Ventas</th>
+      <td>45.000€</td>
+      <td>51.000€</td>
+      <td>40.000€</td>
+      <td>62.000€</td>
+    </tr>
+    <tr>
+      <th scope="row">Desarrollo</th>
+      <td>30.000€</td>
+      <td>28.000€</td>
+      <td>35.000€</td>
+      <td>29.000€</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <th scope="row">Total</th>
+      <td>85.000€</td>
+      <td>94.000€</td>
+      <td>88.000€</td>
+      <td>109.000€</td>
+    </tr>
+  </tfoot>
+</table>`} lang="html" title="Tabla compleja con todos los elementos semánticos" />
+
+## Mejores prácticas para tablas
+
+1. **Usa tablas solo para datos tabulares**, no para diseño de páginas.
+
+2. **Incluye siempre un `<caption>`** para describir el contenido de la tabla.
+
+3. **Utiliza elementos semánticos** como `<thead>`, `<tbody>` y `<tfoot>` para estructurar la tabla.
+
+4. **Aplica atributos de accesibilidad** como `scope` y `headers` para mejorar la experiencia de usuarios con lectores de pantalla.
+
+5. **Haz las tablas responsivas** para que se vean bien en dispositivos móviles.
+
+6. **Evita tablas excesivamente complejas**. Si es necesario, divide la información en múltiples tablas más simples.
+
+7. **Mantén la consistencia** en el formato y estilo de las celdas.
+
+<Aside type="caution">
+  Las tablas muy anchas pueden crear problemas de usabilidad en dispositivos móviles. Considera alternativas como dividir la información o presentarla de manera diferente en pantallas pequeñas.
+</Aside>
+
+## Estilizando tablas con CSS
+
+Aunque el estilo debe definirse principalmente en hojas CSS externas, aquí hay algunos ejemplos de propiedades CSS comunes para tablas:
+
+<Code code={`<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  th, td {
+    padding: 0.75rem;
+    text-align: left;
+    border: 1px solid #dee2e6;
+  }
+  
+  thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+  }
+  
+  tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+  }
+  
+  tfoot {
+    font-weight: bold;
+    background-color: #f8f9fa;
+  }
+</style>
+
+<table>
+  <!-- Contenido de la tabla -->
+</table>`} lang="html" title="Ejemplo de estilización básica de tablas con CSS" />

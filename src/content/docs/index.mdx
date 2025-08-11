@@ -1,0 +1,45 @@
+---
+title: deguidocs | Biblioteca de Conocimiento
+description: Centro integral de documentación técnica, guías de programación y recursos especializados para desarrolladores.
+template: splash
+hero:
+  tagline: Tu centro integral de recursos técnicos, guías de programación y documentación especializada para el desarrollo profesional
+  image:
+    file: ../../assets/degui.png
+    alt: deguidocs Logo
+  actions:
+    - text: Explorar Guías
+      link: /guides/example/
+      icon: rocket
+      variant: primary
+
+    - text: Lenguajes de Programación
+      link: /lenguajes/example/
+      icon: document
+      variant: secondary
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import Colaborators from '@components/Colaborators.astro';
+
+## Recursos Destacados
+
+<CardGrid stagger>
+  <Card title="HTML & CSS" icon="pencil">
+    Fundamentos del desarrollo web moderno con ejemplos prácticos y técnicas avanzadas de diseño responsivo.
+  </Card>
+  <Card title="JavaScript" icon="codepen">
+    Domina el lenguaje de programación más versátil de la web, desde conceptos básicos hasta características avanzadas.
+  </Card>
+  <Card title="Vue.js" icon="forward-slash">
+    Aprende a construir interfaces de usuario reactivas y componentes reutilizables con el framework progresivo Vue 3.
+  </Card>
+  <Card title="Laravel" icon="setting">
+    Desarrollo backend robusto con el framework PHP más elegante del mercado, incluyendo ORM, migraciones y más.
+  </Card>
+</CardGrid>
+
+## Colaboradores
+
+<Colaborators/>
+

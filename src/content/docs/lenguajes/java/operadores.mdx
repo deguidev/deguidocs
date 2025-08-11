@@ -1,0 +1,616 @@
+---
+title: 3. Operadores en Java
+description: Aprende sobre operadores aritméticos, relacionales, lógicos, de asignación y unarios en Java
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Operadores en Java
+
+Los operadores son símbolos especiales que realizan operaciones específicas sobre uno, dos o tres operandos y luego devuelven un resultado. Java proporciona una amplia variedad de operadores que se pueden clasificar en varias categorías según su funcionalidad.
+
+## 2.2.1 Operadores aritméticos
+
+Los operadores aritméticos se utilizan para realizar operaciones matemáticas básicas.
+
+<table>
+  <thead>
+    <tr>
+      <th>Operador</th>
+      <th>Descripción</th>
+      <th>Ejemplo</th>
+      <th>Resultado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><Code code="+" lang="java" /></td>
+      <td>Suma</td>
+      <td><Code code={`int a = 10 + 5;`} lang="java" /></td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <td><Code code="-" lang="java" /></td>
+      <td>Resta</td>
+      <td><Code code={`int b = 10 - 5;`} lang="java" /></td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td><Code code="*" lang="java" /></td>
+      <td>Multiplicación</td>
+      <td><Code code={`int c = 10 * 5;`} lang="java" /></td>
+      <td>50</td>
+    </tr>
+    <tr>
+      <td><Code code="/" lang="java" /></td>
+      <td>División</td>
+      <td><Code code={`int d = 10 / 5;`} lang="java" /></td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td><Code code="%" lang="java" /></td>
+      <td>Módulo (resto de la división)</td>
+      <td><Code code={`int e = 10 % 3;`} lang="java" /></td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+
+<Aside type="note">
+  Cuando se realiza una división entre enteros, el resultado será un entero (se trunca la parte decimal). Para obtener un resultado con decimales, al menos uno de los operandos debe ser de tipo flotante.
+  <Code code={`double resultado = 10.0 / 3; // resultado = 3.3333333333333335`} lang="java" />
+</Aside>
+
+### Precedencia de operadores aritméticos
+
+Los operadores aritméticos siguen las reglas matemáticas estándar de precedencia:
+
+1. Paréntesis `()`
+2. Multiplicación `*`, división `/` y módulo `%` (de izquierda a derecha)
+3. Suma `+` y resta `-` (de izquierda a derecha)
+
+<Code code={`int resultado = 10 + 5 * 2; // resultado = 20, no 30`} lang="java" />
+
+### Operador de concatenación de cadenas
+
+El operador `+` también se utiliza para concatenar cadenas:
+
+<Code code={`String nombre = "Juan";
+String saludo = "Hola, " + nombre + "!"; // saludo = "Hola, Juan!"`} lang="java" />
+
+<Aside type="tip">
+  Cuando se utiliza el operador `+` con un String y otro tipo de dato, el otro tipo se convierte automáticamente a String.
+  <Code code={`String mensaje = "El resultado es: " + 42; // mensaje = "El resultado es: 42"`} lang="java" />
+</Aside>
+
+## 2.2.2 Operadores relacionales
+
+Los operadores relacionales comparan dos valores y devuelven un resultado booleano (`true` o `false`).
+
+<table>
+  <thead>
+    <tr>
+      <th>Operador</th>
+      <th>Descripción</th>
+      <th>Ejemplo</th>
+      <th>Resultado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><Code code="==" lang="java" /></td>
+      <td>Igual a</td>
+      <td><Code code={`5 == 5`} lang="java" /></td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td><Code code="!=" lang="java" /></td>
+      <td>Diferente de</td>
+      <td><Code code={`5 != 8`} lang="java" /></td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td><Code code=">" lang="java" /></td>
+      <td>Mayor que</td>
+      <td><Code code={`8 > 5`} lang="java" /></td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td><Code code="<" lang="java" /></td>
+      <td>Menor que</td>
+      <td><Code code={`5 < 8`} lang="java" /></td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td><Code code=">=" lang="java" /></td>
+      <td>Mayor o igual que</td>
+      <td><Code code={`5 >= 5`} lang="java" /></td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td><Code code="<=" lang="java" /></td>
+      <td>Menor o igual que</td>
+      <td><Code code={`5 <= 8`} lang="java" /></td>
+      <td>true</td>
+    </tr>
+  </tbody>
+</table>
+
+<Aside type="caution">
+  Para comparar objetos como Strings, no use el operador `==` ya que compara referencias de memoria, no contenido. En su lugar, use el método `equals()`.
+  <Code code={`String a = "Hola";
+String b = "Hola";
+boolean sonIguales = a.equals(b); // true`} lang="java" />
+</Aside>
+
+### Operador instanceof
+
+El operador `instanceof` verifica si un objeto es una instancia de un tipo específico (clase, subclase o interfaz):
+
+<Code code={`String texto = "Hola";
+boolean esString = texto instanceof String; // true
+boolean esObject = texto instanceof Object; // true (String es subclase de Object)`} lang="java" />
+
+## 2.2.3 Operadores lógicos
+
+Los operadores lógicos realizan operaciones booleanas y devuelven un resultado booleano (`true` o `false`).
+
+<table>
+  <thead>
+    <tr>
+      <th>Operador</th>
+      <th>Descripción</th>
+      <th>Ejemplo</th>
+      <th>Resultado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><Code code="&&" lang="java" /></td>
+      <td>AND lógico</td>
+      <td><Code code={`true && true`} lang="java" /></td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td><Code code="||" lang="java" /></td>
+      <td>OR lógico</td>
+      <td><Code code={`true || false`} lang="java" /></td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td><Code code="!" lang="java" /></td>
+      <td>NOT lógico</td>
+      <td><Code code={`!true`} lang="java" /></td>
+      <td>false</td>
+    </tr>
+  </tbody>
+</table>
+
+### Tabla de verdad para operadores lógicos
+
+<Tabs>
+  <TabItem label="AND (&&)">
+    <table>
+      <thead>
+        <tr>
+          <th>A</th>
+          <th>B</th>
+          <th>A && B</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>true</td>
+          <td>true</td>
+          <td>true</td>
+        </tr>
+        <tr>
+          <td>true</td>
+          <td>false</td>
+          <td>false</td>
+        </tr>
+        <tr>
+          <td>false</td>
+          <td>true</td>
+          <td>false</td>
+        </tr>
+        <tr>
+          <td>false</td>
+          <td>false</td>
+          <td>false</td>
+        </tr>
+      </tbody>
+    </table>
+  </TabItem>
+  <TabItem label="OR (||)">
+    <table>
+      <thead>
+        <tr>
+          <th>A</th>
+          <th>B</th>
+          <th>A || B</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>true</td>
+          <td>true</td>
+          <td>true</td>
+        </tr>
+        <tr>
+          <td>true</td>
+          <td>false</td>
+          <td>true</td>
+        </tr>
+        <tr>
+          <td>false</td>
+          <td>true</td>
+          <td>true</td>
+        </tr>
+        <tr>
+          <td>false</td>
+          <td>false</td>
+          <td>false</td>
+        </tr>
+      </tbody>
+    </table>
+  </TabItem>
+  <TabItem label="NOT (!)">
+    <table>
+      <thead>
+        <tr>
+          <th>A</th>
+          <th>!A</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>true</td>
+          <td>false</td>
+        </tr>
+        <tr>
+          <td>false</td>
+          <td>true</td>
+        </tr>
+      </tbody>
+    </table>
+  </TabItem>
+</Tabs>
+
+### Evaluación de cortocircuito
+
+Java utiliza evaluación de cortocircuito para los operadores lógicos:
+
+- Para `&&`: Si el primer operando es `false`, el segundo operando no se evalúa porque el resultado ya será `false`.
+- Para `||`: Si el primer operando es `true`, el segundo operando no se evalúa porque el resultado ya será `true`.
+
+<Code code={`// Ejemplo de cortocircuito con &&
+int x = 5;
+if (x > 0 && 10 / x > 1) { // No hay división por cero cuando x es 0
+    System.out.println("Condición cumplida");
+}`} lang="java" />
+
+### Operadores lógicos a nivel de bits
+
+Java también proporciona operadores lógicos a nivel de bits que operan sobre representaciones binarias de valores enteros:
+
+<table>
+  <thead>
+    <tr>
+      <th>Operador</th>
+      <th>Descripción</th>
+      <th>Ejemplo</th>
+      <th>Resultado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><Code code="&" lang="java" /></td>
+      <td>AND a nivel de bits</td>
+      <td><Code code={`5 & 3`} lang="java" /></td>
+      <td>1 (0101 & 0011 = 0001)</td>
+    </tr>
+    <tr>
+      <td><Code code="|" lang="java" /></td>
+      <td>OR a nivel de bits</td>
+      <td><Code code={`5 | 3`} lang="java" /></td>
+      <td>7 (0101 | 0011 = 0111)</td>
+    </tr>
+    <tr>
+      <td><Code code="^" lang="java" /></td>
+      <td>XOR a nivel de bits</td>
+      <td><Code code={`5 ^ 3`} lang="java" /></td>
+      <td>6 (0101 ^ 0011 = 0110)</td>
+    </tr>
+    <tr>
+      <td><Code code="~" lang="java" /></td>
+      <td>Complemento a nivel de bits</td>
+      <td><Code code={`~5`} lang="java" /></td>
+      <td>-6 (para un int de 32 bits)</td>
+    </tr>
+    <tr>
+      <td><Code code="<<" lang="java" /></td>
+      <td>Desplazamiento a la izquierda</td>
+      <td><Code code={`5 << 1`} lang="java" /></td>
+      <td>10 (`0101 << 1 = 1010`)</td>
+    </tr>
+    <tr>
+      <td><Code code={`>>`} lang="java" /></td>
+      <td>Desplazamiento a la derecha con signo</td>
+      <td><Code code={`5 >> 1`} lang="java" /></td>
+      <td>2 (0101 >> 1 = 0010)</td>
+    </tr>
+    <tr>
+      <td><Code code={`>>>`} lang="java" /></td>
+      <td>Desplazamiento a la derecha sin signo</td>
+      <td><Code code={`-5 >>> 1`} lang="java" /></td>
+      <td>Valor positivo grande</td>
+    </tr>
+  </tbody>
+</table>
+
+## 2.2.4 Operadores de asignación
+
+Los operadores de asignación se utilizan para asignar valores a variables. El operador básico de asignación es `=`, pero Java también proporciona operadores compuestos que combinan una operación aritmética o de bits con la asignación.
+
+<table>
+  <thead>
+    <tr>
+      <th>Operador</th>
+      <th>Descripción</th>
+      <th>Ejemplo</th>
+      <th>Equivalente a</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><Code code="=" lang="java" /></td>
+      <td>Asignación simple</td>
+      <td><Code code={`x = 5;`} lang="java" /></td>
+      <td><Code code={`x = 5;`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="+=" lang="java" /></td>
+      <td>Suma y asignación</td>
+      <td><Code code={`x += 5;`} lang="java" /></td>
+      <td><Code code={`x = x + 5;`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="-=" lang="java" /></td>
+      <td>Resta y asignación</td>
+      <td><Code code={`x -= 5;`} lang="java" /></td>
+      <td><Code code={`x = x - 5;`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="*=" lang="java" /></td>
+      <td>Multiplicación y asignación</td>
+      <td><Code code={`x *= 5;`} lang="java" /></td>
+      <td><Code code={`x = x * 5;`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="/=" lang="java" /></td>
+      <td>División y asignación</td>
+      <td><Code code={`x /= 5;`} lang="java" /></td>
+      <td><Code code={`x = x / 5;`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="%=" lang="java" /></td>
+      <td>Módulo y asignación</td>
+      <td><Code code={`x %= 5;`} lang="java" /></td>
+      <td><Code code={`x = x % 5;`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="&=" lang="java" /></td>
+      <td>AND a nivel de bits y asignación</td>
+      <td><Code code={`x &= 5;`} lang="java" /></td>
+      <td><Code code={`x = x & 5;`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="|=" lang="java" /></td>
+      <td>OR a nivel de bits y asignación</td>
+      <td><Code code={`x |= 5;`} lang="java" /></td>
+      <td><Code code={`x = x | 5;`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="^=" lang="java" /></td>
+      <td>XOR a nivel de bits y asignación</td>
+      <td><Code code={`x ^= 5;`} lang="java" /></td>
+      <td><Code code={`x = x ^ 5;`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="<<=" lang="java" /></td>
+      <td>Desplazamiento a la izquierda y asignación</td>
+      <td><Code code={`x <<= 2;`} lang="java" /></td>
+      <td><Code code={`x = x << 2;`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code={`>>=`} lang="java" /></td>
+      <td>Desplazamiento a la derecha con signo y asignación</td>
+      <td><Code code={`x >>= 2;`} lang="java" /></td>
+      <td><Code code={`x = x >> 2;`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code={`>>>=`} lang="java" /></td>
+      <td>Desplazamiento a la derecha sin signo y asignación</td>
+      <td><Code code={`x >>>= 2;`} lang="java" /></td>
+      <td><Code code={`x = x >>> 2;`} lang="java" /></td>
+    </tr>
+  </tbody>
+</table>
+
+<Aside type="tip">
+  Los operadores de asignación compuestos no solo hacen que el código sea más conciso, sino que también pueden mejorar el rendimiento, ya que la variable solo se evalúa una vez.
+</Aside>
+
+### Asignación en cadena
+
+Java permite asignar el mismo valor a múltiples variables en una sola instrucción:
+
+<Code code={`int a, b, c;
+a = b = c = 10; // Todas las variables tienen el valor 10`} lang="java" />
+
+## 2.2.5 Operadores unarios y de incremento/decremento
+
+Los operadores unarios realizan operaciones sobre un solo operando.
+
+<table>
+  <thead>
+    <tr>
+      <th>Operador</th>
+      <th>Descripción</th>
+      <th>Ejemplo</th>
+      <th>Resultado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><Code code="+" lang="java" /></td>
+      <td>Operador unario positivo (opcional)</td>
+      <td><Code code={`int a = +5;`} lang="java" /></td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td><Code code="-" lang="java" /></td>
+      <td>Operador unario negativo (cambia el signo)</td>
+      <td><Code code={`int a = -5;`} lang="java" /></td>
+      <td>-5</td>
+    </tr>
+    <tr>
+      <td><Code code="++" lang="java" /></td>
+      <td>Incremento (aumenta en 1)</td>
+      <td><Code code={`int a = 5; a++;`} lang="java" /></td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td><Code code="--" lang="java" /></td>
+      <td>Decremento (disminuye en 1)</td>
+      <td><Code code={`int a = 5; a--;`} lang="java" /></td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td><Code code="!" lang="java" /></td>
+      <td>Negación lógica (invierte un valor booleano)</td>
+      <td><Code code={`boolean b = !true;`} lang="java" /></td>
+      <td>false</td>
+    </tr>
+  </tbody>
+</table>
+
+### Operadores de incremento y decremento
+
+Los operadores `++` y `--` pueden usarse como prefijo (antes de la variable) o como sufijo (después de la variable), con comportamientos ligeramente diferentes:
+
+<Tabs>
+  <TabItem label="Prefijo (++x, --x)">
+    <p>Cuando se usa como prefijo, el incremento o decremento se realiza antes de evaluar la expresión.</p>
+    <Code code={`int a = 5;
+int b = ++a; // a se incrementa a 6, luego b se establece en 6
+// Ahora a = 6, b = 6`} lang="java" />
+  </TabItem>
+  <TabItem label="Sufijo (x++, x--)">
+    <p>Cuando se usa como sufijo, el incremento o decremento se realiza después de evaluar la expresión.</p>
+    <Code code={`int a = 5;
+int b = a++; // b se establece en 5, luego a se incrementa a 6
+// Ahora a = 6, b = 5`} lang="java" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+  El uso de operadores de incremento/decremento en expresiones complejas puede hacer que el código sea difícil de leer y mantener. Es mejor usarlos en instrucciones separadas para mayor claridad.
+</Aside>
+
+### Ejemplo práctico
+
+<Code code={`public class OperadoresDemo {
+    public static void main(String[] args) {
+        // Operadores aritméticos
+        int suma = 5 + 3;      // 8
+        int resta = 5 - 3;     // 2
+        int mult = 5 * 3;      // 15
+        int div = 5 / 3;       // 1 (división entera)
+        double divExacta = 5.0 / 3.0; // 1.6666666666666667
+        int modulo = 5 % 3;    // 2
+        
+        // Operadores relacionales
+        boolean igual = (5 == 3);      // false
+        boolean noIgual = (5 != 3);    // true
+        boolean mayor = (5 > 3);       // true
+        boolean menor = (5 < 3);       // false
+        boolean mayorIgual = (5 >= 5); // true
+        boolean menorIgual = (5 <= 3); // false
+        
+        // Operadores lógicos
+        boolean and = true && false;   // false
+        boolean or = true || false;    // true
+        boolean not = !true;           // false
+        
+        // Operadores de asignación
+        int x = 10;
+        x += 5;  // x = 15
+        x -= 3;  // x = 12
+        x *= 2;  // x = 24
+        x /= 4;  // x = 6
+        x %= 4;  // x = 2
+        
+        // Operadores unarios y de incremento/decremento
+        int a = 5;
+        int b = ++a;  // a = 6, b = 6
+        int c = a++;  // c = 6, a = 7
+        int d = --a;  // a = 6, d = 6
+        int e = a--;  // e = 6, a = 5
+        
+        // Operadores a nivel de bits
+        int bits1 = 5 & 3;   // 1 (0101 & 0011 = 0001)
+        int bits2 = 5 | 3;   // 7 (0101 | 0011 = 0111)
+        int bits3 = 5 ^ 3;   // 6 (0101 ^ 0011 = 0110)
+        int bits4 = ~5;      // -6 (complemento a uno)
+        int bits5 = 5 << 1;  // 10 (0101 << 1 = 1010)
+        int bits6 = 5 >> 1;  // 2 (0101 >> 1 = 0010)
+        
+        System.out.println("Operadores aritméticos:");
+        System.out.println("Suma: " + suma);
+        System.out.println("Resta: " + resta);
+        System.out.println("Multiplicación: " + mult);
+        System.out.println("División entera: " + div);
+        System.out.println("División exacta: " + divExacta);
+        System.out.println("Módulo: " + modulo);
+        
+        System.out.println("\nOperadores de incremento/decremento:");
+        System.out.println("Valores finales: a = " + a + ", b = " + b + ", c = " + c + ", d = " + d + ", e = " + e);
+        
+        System.out.println("\nOperadores a nivel de bits:");
+        System.out.println("AND: " + bits1);
+        System.out.println("OR: " + bits2);
+        System.out.println("XOR: " + bits3);
+        System.out.println("NOT: " + bits4);
+        System.out.println("Desplazamiento izquierda: " + bits5);
+        System.out.println("Desplazamiento derecha: " + bits6);
+    }
+}`} lang="java" />
+
+### Precedencia de operadores en Java
+
+La precedencia de operadores determina el orden en que se evalúan las expresiones. Aquí está la lista de precedencia de operadores en Java, de mayor a menor:
+
+1. Operadores postfijos: `expr++`, `expr--`
+2. Operadores unarios: `++expr`, `--expr`, `+expr`, `-expr`, `~`, `!`
+3. Multiplicación, división, módulo: `*`, `/`, `%`
+4. Suma, resta: `+`, `-`
+5. Desplazamiento de bits: `<<`, `>>`, `>>>`
+6. Relacionales: `<`, `>`, `<=`, `>=`, `instanceof`
+7. Igualdad: `==`, `!=`
+8. AND a nivel de bits: `&`
+9. XOR a nivel de bits: `^`
+10. OR a nivel de bits: `|`
+11. AND lógico: `&&`
+12. OR lógico: `||`
+13. Operador ternario: `? :`
+14. Asignación: `=`, `+=`, `-=`, `*=`, `/=`, `%=`, `&=`, `^=`, `|=`, `<<=`, `>>=`, `>>>=`
+
+<Aside type="tip">
+  Cuando tengas dudas sobre la precedencia de operadores, usa paréntesis para hacer que el código sea más legible y evitar errores.
+</Aside>

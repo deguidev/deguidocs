@@ -1,0 +1,441 @@
+---
+title: 🗂 05. Configuración avanzada
+description: Aprende a personalizar y configurar Ziggy.js de manera avanzada
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Personalización del archivo ziggy.php
+
+El archivo de configuración `ziggy.php` es el corazón de la personalización de Ziggy. Este archivo se publica en tu directorio `config` cuando ejecutas el comando `php artisan ziggy:generate`. Veamos cómo puedes personalizarlo para adaptarlo a tus necesidades.
+
+### Estructura básica del archivo de configuración
+
+<Code code={`<?php
+// config/ziggy.php
+
+return [
+    // Rutas que se deben incluir en el objeto JavaScript
+    'only' => [
+        'login',
+        'logout',
+        'home',
+        'api.*',
+    ],
+
+    // Rutas que se deben excluir del objeto JavaScript
+    'except' => [
+        'admin.*',
+        'debug.*',
+    ],
+
+    // Grupos de rutas según el entorno
+    'groups' => [
+        'admin' => [
+            'admin.*',
+        ],
+        'api' => [
+            'api.*',
+        ],
+    ],
+
+    // URL base para generar las rutas
+    'url' => env('APP_URL'),
+
+    // Configuración para entornos multilingües
+    'locale' => true,
+];
+`} lang="php" title="Archivo de configuración ziggy.php" />
+
+### Opciones de configuración principales
+
+<Tabs>
+  <TabItem label="only">
+    La opción `only` te permite especificar qué rutas deben incluirse en el objeto JavaScript. Esto es útil para reducir el tamaño del objeto Ziggy y mejorar el rendimiento.
+
+    ```php
+    'only' => [
+        'login',
+        'logout',
+        'home',
+        'api.*',  // Incluye todas las rutas que comienzan con 'api.'
+    ],
+    ```
+
+    <Aside type="tip">
+      Puedes usar patrones con comodines como `'api.*'` para incluir grupos completos de rutas.
+    </Aside>
+  </TabItem>
+  
+  <TabItem label="except">
+    La opción `except` te permite especificar qué rutas deben excluirse del objeto JavaScript. Esto es útil cuando quieres incluir la mayoría de las rutas pero excluir algunas específicas.
+
+    ```php
+    'except' => [
+        'admin.*',  // Excluye todas las rutas administrativas
+        'debug.*',  // Excluye rutas de depuración
+    ],
+    ```
+
+    <Aside type="caution">
+      Si especificas tanto `only` como `except`, `only` tiene prioridad y `except` se ignorará.
+    </Aside>
+  </TabItem>
+  
+  <TabItem label="groups">
+    La opción `groups` te permite definir grupos de rutas que pueden ser cargados de forma independiente.
+
+    ```php
+    'groups' => [
+        'admin' => [
+            'admin.*',
+            'users.*',
+        ],
+        'api' => [
+            'api.*',
+        ],
+    ],
+    ```
+  </TabItem>
+  
+  <TabItem label="url">
+    La opción `url` te permite especificar la URL base para generar las rutas.
+
+    ```php
+    'url' => env('APP_URL'),
+    ```
+
+    <Aside>
+      Por defecto, Ziggy usa `url()` para determinar la URL base, pero puedes sobrescribirla aquí.
+    </Aside>
+  </TabItem>
+</Tabs>
+
+## Selección de rutas específicas para exportar
+
+Una de las características más potentes de Ziggy es la capacidad de controlar qué rutas se exportan al frontend. Esto es crucial para:
+
+1. **Seguridad**: Evitar exponer rutas sensibles al frontend
+2. **Rendimiento**: Reducir el tamaño del objeto JavaScript
+3. **Organización**: Mantener separadas las rutas según su propósito
+
+### Filtrado de rutas con only y except
+
+<Code code={`<?php
+// config/ziggy.php
+
+return [
+    'only' => [
+        // Rutas específicas por nombre
+        'users.index',
+        'users.show',
+        'products.*',  // Todas las rutas de productos
+        
+        // Rutas con patrones
+        'api.v1.*',    // Todas las rutas de API v1
+    ],
+];
+`} lang="php" title="Filtrado de rutas con only" />
+
+### Ejemplo práctico: Separar rutas públicas y administrativas
+
+<Code code={`<?php
+// config/ziggy.php
+
+return [
+    'groups' => [
+        'public' => [
+            'login',
+            'register',
+            'password.*',
+            'products.*',
+            'cart.*',
+            'checkout.*',
+        ],
+        'admin' => [
+            'admin.*',
+            'users.*',
+            'roles.*',
+            'permissions.*',
+        ],
+    ],
+];
+`} lang="php" title="Separación de rutas por grupos" />
+
+Para usar un grupo específico en tu frontend:
+
+<Tabs>
+  <TabItem label="Blade">
+    ```php
+    @routes('public')
+    ```
+  </TabItem>
+  
+  <TabItem label="JavaScript">
+    ```js
+    // Generar el archivo para un grupo específico
+    // php artisan ziggy:generate --group=public
+    
+    import route from './ziggy-public';
+    ```
+  </TabItem>
+</Tabs>
+
+## Añadir middleware o grupos de rutas según el entorno
+
+Ziggy te permite configurar diferentes comportamientos según el entorno de ejecución de tu aplicación. Esto es especialmente útil cuando necesitas diferentes conjuntos de rutas para desarrollo, pruebas y producción.
+
+### Configuración específica por entorno
+
+<Code code={`<?php
+// config/ziggy.php
+
+return [
+    // Configuración base para todos los entornos
+    'only' => [
+        'login',
+        'home',
+        'products.*',
+    ],
+    
+    // Configuraciones específicas por entorno
+    'production' => [
+        'except' => [
+            'debug.*',
+            'telescope.*',
+        ],
+    ],
+    
+    'local' => [
+        'only' => [
+            'login',
+            'home',
+            'products.*',
+            'debug.*',  // Incluir rutas de depuración solo en local
+            'telescope.*',
+        ],
+    ],
+];
+`} lang="php" title="Configuración por entorno" />
+
+### Uso con middleware
+
+Puedes combinar Ziggy con middleware para controlar qué rutas se exponen según el usuario autenticado:
+
+<Code code={`<?php
+// app/Http/Middleware/ZiggyRoutesMiddleware.php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Tightenco\Ziggy\Ziggy;
+
+class ZiggyRoutesMiddleware
+{
+    public function handle(Request $request, Closure $next)
+    {
+        // Determinar qué grupo de rutas usar según el usuario
+        $group = $request->user() && $request->user()->isAdmin()
+            ? 'admin'
+            : 'public';
+            
+        // Compartir las rutas con la vista
+        view()->share('ziggy', new Ziggy($group));
+        
+        return $next($request);
+    }
+}
+`} lang="php" title="Middleware para Ziggy" />
+
+Registra el middleware en `app/Http/Kernel.php`:
+
+```php
+protected $middlewareGroups = [
+    'web' => [
+        // Otros middleware...
+        \App\Http\Middleware\ZiggyRoutesMiddleware::class,
+    ],
+];
+```
+
+## Configuración para entornos multilingües
+
+Ziggy ofrece soporte para aplicaciones multilingües, permitiéndote generar URLs que respeten el idioma actual de la aplicación.
+
+### Habilitar soporte multilingüe
+
+<Code code={`<?php
+// config/ziggy.php
+
+return [
+    // Habilitar soporte para localización
+    'locale' => true,
+    
+    // O especificar un locale por defecto
+    'locale' => 'es',
+];
+`} lang="php" title="Configuración multilingüe" />
+
+### Uso con prefijos de idioma en las rutas
+
+Si tu aplicación utiliza prefijos de idioma en las URLs (como `/es/productos` o `/en/products`), Ziggy puede manejar esto automáticamente:
+
+<Tabs>
+  <TabItem label="Configuración de rutas">
+    ```php
+    // routes/web.php
+    Route::prefix('{locale}')
+        ->middleware('locale')
+        ->group(function () {
+            Route::get('products', 'ProductController@index')
+                ->name('products.index');
+        });
+    ```
+  </TabItem>
+  
+  <TabItem label="Middleware de localización">
+    ```php
+    // app/Http/Middleware/LocaleMiddleware.php
+    namespace App\Http\Middleware;
+    
+    use Closure;
+    use Illuminate\Support\Facades\App;
+    
+    class LocaleMiddleware
+    {
+        public function handle($request, Closure $next)
+        {
+            $locale = $request->route('locale');
+            App::setLocale($locale);
+            
+            return $next($request);
+        }
+    }
+    ```
+  </TabItem>
+  
+  <TabItem label="Uso en JavaScript">
+    ```js
+    // Ziggy generará la URL con el locale actual
+    const url = route('products.index'); // /es/products (si el locale es 'es')
+    
+    // O puedes especificar un locale diferente
+    const url = route('products.index', {}, {}, 'en'); // /en/products
+    ```
+  </TabItem>
+</Tabs>
+
+### Cambio dinámico de idioma
+
+<Code code={`// Componente de selector de idioma
+import { ref, watch } from 'vue';
+import route from 'ziggy-js';
+
+export default {
+  setup() {
+    const currentLocale = ref('es');
+    
+    const changeLocale = (newLocale) => {
+      currentLocale.value = newLocale;
+      
+      // Redirigir a la misma página pero con el nuevo idioma
+      const currentRouteName = route().current();
+      const currentParams = route().params;
+      
+      if (currentRouteName) {
+        window.location.href = route(currentRouteName, currentParams, {}, newLocale);
+      }
+    };
+    
+    return {
+      currentLocale,
+      changeLocale
+    };
+  }
+};
+`} lang="js" title="Selector de idioma con Ziggy" />
+
+<Aside type="note">
+  <p>Ziggy respeta la configuración de localización de Laravel. Si cambias el idioma con <code>App::setLocale('en')</code>, Ziggy generará las URLs con ese idioma.</p>
+</Aside>
+
+## Personalización avanzada del objeto Ziggy
+
+Puedes extender o modificar el objeto Ziggy antes de pasarlo al frontend para casos de uso específicos:
+
+<Code code={`<?php
+// En un Service Provider o middleware
+
+use Tightenco\Ziggy\Ziggy;
+
+$ziggy = new Ziggy;
+
+// Añadir datos personalizados al objeto Ziggy
+$ziggy->customData = [
+    'user' => auth()->user() ? [
+        'id' => auth()->user()->id,
+        'permissions' => auth()->user()->permissions->pluck('name'),
+    ] : null,
+    'settings' => [
+        'enableFeatureX' => config('features.x_enabled'),
+        'apiTimeout' => config('api.timeout'),
+    ],
+];
+
+// Compartir con la vista
+view()->share('ziggy', $ziggy);
+`} lang="php" title="Personalización del objeto Ziggy" />
+
+Luego, en JavaScript:
+
+```js
+// Acceder a los datos personalizados
+console.log(Ziggy.customData.settings.enableFeatureX);
+
+// Comprobar permisos del usuario
+const hasPermission = (permission) => {
+  return Ziggy.customData.user && 
+         Ziggy.customData.user.permissions.includes(permission);
+};
+
+if (hasPermission('edit-users')) {
+  // Mostrar opciones de edición
+}
+```
+
+<Aside type="caution">
+  <p>Ten cuidado con los datos que añades al objeto Ziggy, ya que estarán disponibles públicamente en el frontend. Nunca incluyas información sensible como tokens o credenciales.</p>
+</Aside>
+
+## Resumen de configuración avanzada
+
+<Tabs>
+  <TabItem label="Seguridad">
+    <Badge text="Importante" variant="danger" />
+    
+    - Usa `only` para limitar las rutas expuestas al frontend
+    - Nunca expongas rutas administrativas o sensibles a usuarios no autorizados
+    - Considera usar middleware para filtrar rutas según el usuario
+    - No añadas información sensible al objeto Ziggy
+  </TabItem>
+  
+  <TabItem label="Rendimiento">
+    <Badge text="Optimización" variant="success" />
+    
+    - Limita el número de rutas exportadas para reducir el tamaño del objeto JavaScript
+    - Usa grupos para cargar solo las rutas necesarias en cada parte de la aplicación
+    - Considera generar archivos JavaScript separados para diferentes secciones
+  </TabItem>
+  
+  <TabItem label="Organización">
+    <Badge text="Buenas prácticas" variant="note" />
+    
+    - Agrupa las rutas según su propósito (públicas, admin, API)
+    - Usa configuraciones específicas por entorno
+    - Documenta la estructura de tus rutas para facilitar el mantenimiento
+  </TabItem>
+</Tabs>

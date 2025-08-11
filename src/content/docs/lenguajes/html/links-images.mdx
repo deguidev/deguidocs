@@ -1,0 +1,282 @@
+---
+title: Vínculos e imágenes
+description: Cómo crear enlaces e insertar imágenes en documentos HTML.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Vínculos e imágenes en HTML
+
+## Enlaces (Vínculos) <Badge text="Navegación" variant="success" />
+
+Los enlaces son fundamentales para la web, permitiendo la navegación entre páginas y recursos.
+
+### Elemento `<a>` (anchor)
+
+El elemento `<a>` se utiliza para crear enlaces:
+
+<Code code={`<a href="https://www.ejemplo.com">Visitar Ejemplo.com</a>`} lang="html" />
+
+#### Atributos principales de enlaces
+
+| Atributo | Descripción |
+|----------|-------------|
+| `href` | URL o ruta de destino del enlace |
+| `target` | Dónde abrir el enlace (`_blank`, `_self`, `_parent`, `_top`) |
+| `rel` | Relación entre la página actual y la enlazada |
+| `download` | Indica que el recurso debe descargarse |
+| `title` | Información adicional (aparece como tooltip) |
+
+### Tipos de enlaces
+
+#### Enlaces externos
+
+<Code code={`<a href="https://www.ejemplo.com" target="_blank" rel="noopener noreferrer">Sitio externo</a>`} lang="html" />
+
+<Aside type="tip">
+  Usa `target="_blank"` para abrir enlaces en una nueva pestaña. Siempre incluye `rel="noopener noreferrer"` por seguridad cuando uses `target="_blank"`.
+</Aside>
+
+#### Enlaces internos
+
+<Code code={`<a href="contacto.html">Página de contacto</a>`} lang="html" />
+
+#### Enlaces a secciones de la misma página
+
+<Code code={`<!-- Enlace a un ID en la misma página -->
+<a href="#seccion1">Ir a la Sección 1</a>
+
+<!-- La sección de destino -->
+<h2 id="seccion1">Sección 1</h2>`} lang="html" />
+
+#### Enlaces de correo electrónico
+
+<Code code={`<a href="mailto:info@ejemplo.com?subject=Consulta&body=Hola,%20tengo%20una%20pregunta">Envíanos un email</a>`} lang="html" />
+
+#### Enlaces de teléfono
+
+<Code code={`<a href="tel:+34600000000">Llamar al +34 600 000 000</a>`} lang="html" />
+
+#### Enlaces de descarga
+
+<Code code={`<a href="documento.pdf" download="mi-documento.pdf">Descargar PDF</a>`} lang="html" />
+
+## Imágenes <Badge text="Multimedia" variant="note" />
+
+### Elemento `<img>`
+
+El elemento `<img>` se utiliza para insertar imágenes en una página web:
+
+<Code code={`<img src="imagen.jpg" alt="Descripción de la imagen" width="300" height="200">`} lang="html" />
+
+#### Atributos principales de imágenes
+
+| Atributo | Descripción |
+|----------|-------------|
+| `src` | URL o ruta de la imagen (obligatorio) |
+| `alt` | Texto alternativo para accesibilidad y SEO (obligatorio) |
+| `width` | Ancho de la imagen en píxeles |
+| `height` | Alto de la imagen en píxeles |
+| `loading` | Cómo cargar la imagen (`eager`, `lazy`) |
+| `srcset` | Lista de imágenes alternativas para diferentes resoluciones |
+| `sizes` | Tamaños de imagen para diferentes condiciones de pantalla |
+
+<Aside type="caution">
+  Siempre incluye el atributo `alt` en las imágenes. Es esencial para la accesibilidad y el SEO. Para imágenes decorativas, usa `alt=""` (no lo omitas).
+</Aside>
+
+### Imágenes responsivas
+
+<Code code={`<img srcset="imagen-small.jpg 500w,
+             imagen-medium.jpg 1000w,
+             imagen-large.jpg 1500w"
+     sizes="(max-width: 600px) 500px,
+            (max-width: 1200px) 1000px,
+            1500px"
+     src="imagen-medium.jpg"
+     alt="Imagen responsiva">`} lang="html" />
+
+### Formatos de imagen comunes
+
+| Formato | Uso recomendado |
+|---------|----------------|
+| JPEG/JPG | Fotografías e imágenes con muchos colores |
+| PNG | Imágenes que requieren transparencia o con pocos colores |
+| WebP | Formato moderno con mejor compresión (reemplazo para JPEG y PNG) |
+| SVG | Gráficos vectoriales, iconos y logotipos |
+| GIF | Animaciones simples |
+
+### Mapas de imagen
+
+Los mapas de imagen permiten definir áreas clickeables dentro de una imagen:
+
+<Code code={`<img src="mapa.jpg" alt="Mapa" usemap="#mapa-ejemplo">
+
+<map name="mapa-ejemplo">
+  <area shape="rect" coords="0,0,100,100" href="pagina1.html" alt="Área 1">
+  <area shape="circle" coords="200,200,50" href="pagina2.html" alt="Área 2">
+  <area shape="poly" coords="300,100,400,200,300,300" href="pagina3.html" alt="Área 3">
+</map>`} lang="html" />
+
+## Elementos de audio <Badge text="Multimedia" variant="success" />
+
+### Elemento `<audio>`
+
+El elemento `<audio>` permite reproducir contenido de audio en una página web:
+
+<Code code={`<audio controls>
+  <source src="audio.mp3" type="audio/mpeg">
+  <source src="audio.ogg" type="audio/ogg">
+  Tu navegador no soporta el elemento de audio.
+</audio>`} lang="html" />
+
+#### Atributos principales de audio
+
+| Atributo | Descripción |
+|----------|-------------|
+| `controls` | Muestra los controles de reproducción |
+| `autoplay` | Reproduce automáticamente al cargar (no recomendado) |
+| `loop` | Repite el audio cuando termina |
+| `muted` | Silencia el audio |
+| `preload` | Cómo precargar el audio (`auto`, `metadata`, `none`) |
+
+<Aside>
+  El elemento `<source>` dentro de `<audio>` permite proporcionar múltiples formatos para compatibilidad con diferentes navegadores.
+</Aside>
+
+### Formatos de audio comunes
+
+| Formato | Extensión | Tipo MIME |
+|---------|-----------|----------|
+| MP3 | .mp3 | audio/mpeg |
+| OGG | .ogg | audio/ogg |
+| WAV | .wav | audio/wav |
+
+## Elementos de video <Badge text="Multimedia" variant="success" />
+
+### Elemento `<video>`
+
+El elemento `<video>` permite reproducir videos en una página web:
+
+<Code code={`<video width="640" height="360" controls poster="imagen-previa.jpg">
+  <source src="video.mp4" type="video/mp4">
+  <source src="video.webm" type="video/webm">
+  Tu navegador no soporta el elemento de video.
+</video>`} lang="html" />
+
+#### Atributos principales de video
+
+| Atributo | Descripción |
+|----------|-------------|
+| `controls` | Muestra los controles de reproducción |
+| `width` y `height` | Dimensiones del reproductor de video |
+| `autoplay` | Reproduce automáticamente al cargar (usar con precaución) |
+| `loop` | Repite el video cuando termina |
+| `muted` | Silencia el audio del video |
+| `poster` | Imagen de vista previa antes de reproducir el video |
+| `preload` | Cómo precargar el video (`auto`, `metadata`, `none`) |
+
+<Aside type="caution">
+  El atributo `autoplay` solo funciona en la mayoría de navegadores cuando también se incluye `muted`. Esto es parte de las políticas para mejorar la experiencia del usuario.
+</Aside>
+
+### Formatos de video comunes
+
+| Formato | Extensión | Tipo MIME |
+|---------|-----------|----------|
+| MP4 | .mp4 | video/mp4 |
+| WebM | .webm | video/webm |
+| OGG | .ogv | video/ogg |
+
+## Contenido embebido <Badge text="Integración" variant="note" />
+
+### Elemento `<iframe>`
+
+El elemento `<iframe>` permite incrustar contenido de otros sitios web:
+
+<Code code={`<iframe src="https://www.youtube.com/embed/VIDEO_ID" width="560" height="315" frameborder="0" allowfullscreen></iframe>`} lang="html" title="Incrustando un video de YouTube" />
+
+#### Atributos principales de iframe
+
+| Atributo | Descripción |
+|----------|-------------|
+| `src` | URL del contenido a mostrar |
+| `width` y `height` | Dimensiones del iframe |
+| `frameborder` | Borde alrededor del iframe |
+| `allowfullscreen` | Permite el modo de pantalla completa |
+| `sandbox` | Restricciones de seguridad para el contenido |
+| `loading` | Cómo cargar el iframe (`eager`, `lazy`) |
+
+<Aside type="caution">
+  Los iframes pueden presentar riesgos de seguridad. Usa el atributo `sandbox` para limitar lo que puede hacer el contenido incrustado y solo incrusta contenido de fuentes confiables.
+</Aside>
+
+### Elemento `<embed>`
+
+El elemento `<embed>` es una forma más antigua de incrustar contenido externo:
+
+<Code code={`<embed src="archivo.pdf" type="application/pdf" width="600" height="400">`} lang="html" />
+
+### Elemento `<object>`
+
+El elemento `<object>` también se utiliza para incrustar contenido externo, especialmente para contenido que requiere plugins:
+
+<Code code={`<object data="archivo.pdf" type="application/pdf" width="600" height="400">
+  <p>Tu navegador no puede mostrar PDFs. <a href="archivo.pdf">Descarga el PDF</a> en su lugar.</p>
+</object>`} lang="html" />
+
+## Gráficos vectoriales y dibujo <Badge text="Gráficos" variant="success" />
+
+### SVG (Scalable Vector Graphics)
+
+SVG permite crear gráficos vectoriales escalables directamente en HTML:
+
+<Code code={`<svg width="100" height="100">
+  <circle cx="50" cy="50" r="40" stroke="black" stroke-width="2" fill="red" />
+</svg>`} lang="html" title="Círculo rojo con borde negro" />
+
+Ventajas de SVG:
+- Escalable sin pérdida de calidad
+- Editable con CSS y JavaScript
+- Tamaño de archivo pequeño para gráficos simples
+- Ideal para iconos, logotipos e ilustraciones
+
+### Elemento `<canvas>`
+
+El elemento `<canvas>` proporciona un lienzo para dibujar gráficos mediante JavaScript:
+
+<Code code={`<canvas id="miCanvas" width="200" height="100"></canvas>
+
+<script>
+  const canvas = document.getElementById('miCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'blue';
+  ctx.fillRect(10, 10, 150, 80);
+</script>`} lang="html" title="Rectángulo azul dibujado con Canvas" />
+
+Ventajas de Canvas:
+- Rendimiento rápido para gráficos complejos o animaciones
+- Manipulación a nivel de píxel
+- Ideal para juegos, visualizaciones de datos y aplicaciones gráficas
+
+<Aside>
+  SVG es mejor para gráficos estáticos o con poca interactividad, mientras que Canvas es preferible para gráficos dinámicos con muchos elementos o animaciones complejas.
+</Aside>
+
+## Mejores prácticas
+
+1. **Accesibilidad**: Siempre proporciona texto alternativo para imágenes y controles para elementos multimedia.
+
+2. **Rendimiento**: Optimiza las imágenes y videos para web, usa formatos modernos como WebP y considera la carga diferida.
+
+3. **Responsividad**: Utiliza atributos como `srcset` y `sizes` para imágenes responsivas.
+
+4. **Seguridad**: Ten cuidado con los iframes y contenido embebido, usa `sandbox` y `rel="noopener noreferrer"` cuando sea apropiado.
+
+5. **Compatibilidad**: Proporciona múltiples formatos para audio y video usando el elemento `<source>`.
+
+6. **Experiencia del usuario**: Evita el autoplay de audio y video a menos que esté silenciado.
+
+7. **Derechos de autor**: Asegúrate de tener los derechos para usar imágenes, audio y video en tu sitio web.

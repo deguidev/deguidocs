@@ -1,0 +1,80 @@
+---
+title: Casos de uso y ejemplos
+description: Ejemplos prácticos de Alpine.js en acción.
+---
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+
+# Casos de uso y ejemplos
+
+Aquí encontrarás ejemplos prácticos de cómo usar Alpine.js para resolver problemas comunes de interactividad en la web.
+
+## Ejemplo 1: Menú desplegable
+
+<Code code={`<div x-data="{ abierto: false }" class="relative">
+  <button @click="abierto = !abierto" class="px-4 py-2 bg-blue-500 text-white">Menú</button>
+  <ul x-show="abierto" @click.away="abierto = false" class="absolute bg-white border mt-2 w-40">
+    <li class="px-4 py-2 hover:bg-gray-100">Opción 1</li>
+    <li class="px-4 py-2 hover:bg-gray-100">Opción 2</li>
+    <li class="px-4 py-2 hover:bg-gray-100">Opción 3</li>
+  </ul>
+</div>`} lang="html" title="Menú desplegable" />
+
+## Ejemplo 2: Modal simple
+
+<Code code={`<div x-data="{ abierto: false }">
+  <button @click="abierto = true" class="bg-green-500 text-white px-4 py-2">Abrir modal</button>
+  <div x-show="abierto" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded shadow">
+      <h2 class="text-lg font-bold mb-4">Modal</h2>
+      <p>Contenido del modal.</p>
+      <button @click="abierto = false" class="mt-4 bg-red-500 text-white px-4 py-2">Cerrar</button>
+    </div>
+  </div>
+</div>`} lang="html" title="Modal simple" />
+
+## Ejemplo 3: Tabs dinámicas
+
+<Code code={`<div x-data="{ tab: 'uno' }">
+  <nav class="flex gap-2 mb-4">
+    <button @click="tab = 'uno'" :class="tab === 'uno' ? 'bg-blue-500 text-white' : 'bg-gray-200'">Tab 1</button>
+    <button @click="tab = 'dos'" :class="tab === 'dos' ? 'bg-blue-500 text-white' : 'bg-gray-200'">Tab 2</button>
+  </nav>
+  <div x-show="tab === 'uno'">Contenido de la pestaña 1</div>
+  <div x-show="tab === 'dos'">Contenido de la pestaña 2</div>
+</div>`} lang="html" title="Tabs dinámicas" />
+
+## Ejemplo 4: Acordeón
+
+<Code code={`<div x-data="{ abierto: null }">
+  <template x-for="(item, i) in ['Sección 1', 'Sección 2', 'Sección 3']" :key="i">
+    <div class="mb-2">
+      <button @click="abierto === i ? abierto = null : abierto = i" class="w-full text-left bg-gray-200 px-4 py-2">{{ item }}</button>
+      <div x-show="abierto === i" class="p-4 border">Contenido de {{ item }}</div>
+    </div>
+  </template>
+</div>`} lang="html" title="Acordeón" />
+
+## Ejemplo 5: To-do list interactiva
+
+<Code code={`<div x-data="{ nueva: '', tareas: [] }">
+  <form @submit.prevent="if(nueva) { tareas.push(nueva); nueva = '' }" class="flex gap-2 mb-4">
+    <input x-model="nueva" placeholder="Nueva tarea" class="border px-2 py-1" />
+    <button type="submit" class="bg-blue-500 text-white px-4 py-1">Agregar</button>
+  </form>
+  <ul>
+    <template x-for="(tarea, i) in tareas" :key="i">
+      <li class="flex items-center gap-2 mb-2">
+        <span x-text="tarea"></span>
+        <button @click="tareas.splice(i, 1)" class="text-red-500">Eliminar</button>
+      </li>
+    </template>
+  </ul>
+</div>`} lang="html" title="To-do list interactiva" />
+
+<Aside type="tip">
+Consulta la <a href="https://alpinejs.dev" target="_blank">documentación oficial</a> para más ejemplos y patrones avanzados con Alpine.js.
+</Aside>

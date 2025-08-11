@@ -1,0 +1,376 @@
+---
+title: SweetAlert2
+description: Guía de integración y configuración de SweetAlert2 en tu proyecto
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# SweetAlert2 <Badge text="Configuración" variant="success" />
+
+## Instalación <Badge text="Paso 1" variant="note" />
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install sweetalert2
+    ```
+  </TabItem>
+  <TabItem label="CDN">
+    ```html
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    ```
+  </TabItem>
+</Tabs>
+
+## Integración Básica <Badge text="Paso 2" variant="note" />
+
+### HTML y JavaScript
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <button onclick="mostrarAlerta()">Mostrar Alerta</button>
+
+  <script>
+    function mostrarAlerta() {
+      Swal.fire({
+        title: '¡Hola!',
+        text: 'Esto es SweetAlert2',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      })
+    }
+  </script>
+</body>
+</html>
+```
+
+### Vue.js
+```vue
+<!-- App.vue -->
+<template>
+  <button @click="mostrarAlerta">Mostrar Alerta</button>
+</template>
+
+<script>
+import Swal from 'sweetalert2'
+
+export default {
+  name: 'App',
+  methods: {
+    mostrarAlerta() {
+      Swal.fire({
+        title: '¡Hola Vue!',
+        text: 'Esto es SweetAlert2',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      })
+    }
+  }
+}
+</script>
+```
+
+### Angular
+
+Primero, importa las dependencias:
+```typescript
+// app.component.ts
+import { Component } from '@angular/core';
+import Swal from 'sweetalert2';
+```
+
+Luego, define el componente:
+```typescript
+@Component({
+  selector: 'app-root',
+  template: `
+    <button (click)="mostrarAlerta()">Mostrar Alerta</button>
+  `
+})
+```
+
+Finalmente, implementa la lógica:
+```typescript
+export class AppComponent {
+  mostrarAlerta() {
+    Swal.fire({
+      title: '¡Hola Angular!',
+      text: 'Esto es SweetAlert2',
+      icon: 'success',
+      confirmButtonText: 'OK'
+    });
+  }
+}
+```
+
+## Tipos de Alertas <Badge text="Paso 3" variant="note" />
+
+### Alertas Básicas
+<Code code={`// Éxito
+Swal.fire({
+  title: '¡Éxito!',
+  text: 'Operación completada',
+  icon: 'success'
+})
+
+// Error
+Swal.fire({
+  title: '¡Error!',
+  text: 'Algo salió mal',
+  icon: 'error'
+})
+
+// Advertencia
+Swal.fire({
+  title: '¡Cuidado!',
+  text: '¿Estás seguro?',
+  icon: 'warning'
+})
+
+// Información
+Swal.fire({
+  title: 'Info',
+  text: 'Información importante',
+  icon: 'info'
+})
+
+// Pregunta
+Swal.fire({
+  title: '¿Continuar?',
+  text: '¿Deseas proceder?',
+  icon: 'question'
+})`} lang="javascript" />
+
+### Alertas con Confirmación
+<Code code={`Swal.fire({
+  title: '¿Estás seguro?',
+  text: "¡No podrás revertir esto!",
+  icon: 'warning',
+  showCancelButton: true,
+  confirmButtonColor: '#3085d6',
+  cancelButtonColor: '#d33',
+  confirmButtonText: 'Sí, eliminar',
+  cancelButtonText: 'Cancelar'
+}).then((result) => {
+  if (result.isConfirmed) {
+    Swal.fire(
+      '¡Eliminado!',
+      'El archivo ha sido eliminado.',
+      'success'
+    )
+  }
+})`} lang="javascript" />
+
+## Personalización <Badge text="Paso 4" variant="note" />
+
+### Estilos y Temas
+<Code code={`// Personalizar colores y estilos
+Swal.fire({
+  title: 'Alerta personalizada',
+  text: 'Con estilos personalizados',
+  background: '#fff',
+  backdrop: 'rgba(0,0,123,0.4)',
+  customClass: {
+    container: 'mi-contenedor',
+    popup: 'mi-popup',
+    header: 'mi-header',
+    title: 'mi-titulo',
+    closeButton: 'mi-boton-cerrar',
+    icon: 'mi-icono',
+    image: 'mi-imagen',
+    content: 'mi-contenido',
+    input: 'mi-input',
+    actions: 'mi-acciones',
+    confirmButton: 'mi-boton-confirmar',
+    cancelButton: 'mi-boton-cancelar',
+    footer: 'mi-footer'
+  }
+})
+
+// CSS personalizado
+.mi-popup {
+  border-radius: 15px;
+  font-family: 'Arial', sans-serif;
+}
+
+.mi-titulo {
+  color: #1a365d;
+}`} lang="javascript" />
+
+### Inputs y Formularios
+<Code code={`// Input de texto
+Swal.fire({
+  title: 'Ingresa tu nombre',
+  input: 'text',
+  inputPlaceholder: 'Nombre',
+  showCancelButton: true
+})
+
+// Email
+Swal.fire({
+  title: 'Ingresa tu email',
+  input: 'email',
+  inputPlaceholder: 'email@ejemplo.com'
+})
+
+// Selección
+Swal.fire({
+  title: 'Selecciona una opción',
+  input: 'select',
+  inputOptions: {
+    'opcion1': 'Opción 1',
+    'opcion2': 'Opción 2',
+    'opcion3': 'Opción 3'
+  }
+})`} lang="javascript" />
+
+## Funciones Avanzadas <Badge text="Paso 5" variant="note" />
+
+### Promesas y Async/Await
+<Code code={`async function confirmarEliminacion() {
+  try {
+    const result = await Swal.fire({
+      title: '¿Eliminar?',
+      text: '¿Estás seguro?',
+      icon: 'warning',
+      showCancelButton: true
+    })
+
+    if (result.isConfirmed) {
+      // Realizar operación asíncrona
+      await eliminarRegistro()
+      
+      Swal.fire(
+        '¡Eliminado!',
+        'Registro eliminado con éxito',
+        'success'
+      )
+    }
+  } catch (error) {
+    Swal.fire(
+      'Error',
+      'No se pudo eliminar el registro',
+      'error'
+    )
+  }
+}`} lang="javascript" />
+
+### Alertas Encadenadas
+<Code code={`Swal.mixin({
+  input: 'text',
+  confirmButtonText: 'Siguiente &rarr;',
+  showCancelButton: true,
+  progressSteps: ['1', '2', '3']
+}).queue([
+  {
+    title: 'Pregunta 1',
+    text: '¿Cuál es tu nombre?'
+  },
+  {
+    title: 'Pregunta 2',
+    text: '¿Cuál es tu email?'
+  },
+  {
+    title: 'Pregunta 3',
+    text: '¿Cuál es tu edad?'
+  }
+]).then((result) => {
+  if (result.value) {
+    const respuestas = result.value
+    Swal.fire({
+      title: '¡Completado!',
+      html: \`
+        Tus respuestas:
+        <pre>
+          \${JSON.stringify(respuestas, null, 2)}
+        </pre>
+      \`,
+      confirmButtonText: 'OK'
+    })
+  }
+})`} lang="javascript" />
+
+## Mejores Prácticas <Badge text="Recomendado" variant="success" />
+
+### 1. Configuración Global
+<Code code={`// config/sweetalert.js
+import Swal from 'sweetalert2'
+
+export const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000
+})
+
+export const ConfirmDialog = Swal.mixin({
+  showCancelButton: true,
+  confirmButtonColor: '#3085d6',
+  cancelButtonColor: '#d33'
+})`} lang="javascript" />
+
+### 2. Componente Reutilizable
+<Code code={`// components/Alert.js
+import Swal from 'sweetalert2'
+
+export const showAlert = ({
+  title = '',
+  text = '',
+  icon = 'info',
+  ...props
+}) => {
+  return Swal.fire({
+    title,
+    text,
+    icon,
+    ...props
+  })
+}
+
+// Uso
+showAlert({
+  title: '¡Éxito!',
+  text: 'Operación completada',
+  icon: 'success'
+})`} lang="javascript" />
+
+### 3. Manejo de Errores
+<Code code={`async function handleSubmit() {
+  try {
+    // Mostrar loading
+    Swal.fire({
+      title: 'Procesando...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading()
+      }
+    })
+
+    await submitForm()
+
+    // Éxito
+    Swal.fire({
+      icon: 'success',
+      title: '¡Enviado!',
+      timer: 2000
+    })
+  } catch (error) {
+    // Error
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: error.message
+    })
+  }
+}`} lang="javascript" />
+
+<Aside type="tip">
+  Para más detalles y opciones avanzadas, visita la [documentación oficial de SweetAlert2](https://sweetalert2.github.io/).
+</Aside>

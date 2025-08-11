@@ -1,0 +1,143 @@
+---
+title: Estructuras de control
+description: Aprende sobre las diferentes estructuras de control en JavaScript, incluyendo condicionales, bucles y manejo de errores.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Estructuras de control <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Las estructuras de control son fundamentales para dirigir el flujo de ejecución de tu programa.
+</Aside>
+
+## Condicionales
+
+### if...else
+<Code code={`let edad = 18;
+
+if (edad >= 18) {
+    console.log("Eres mayor de edad");
+} else if (edad >= 13) {
+    console.log("Eres adolescente");
+} else {
+    console.log("Eres menor de edad");
+}`} lang="javascript" />
+
+### switch
+<Code code={`let dia = "Lunes";
+
+switch (dia) {
+    case "Lunes":
+        console.log("Inicio de semana");
+        break;
+    case "Viernes":
+        console.log("¡Fin de semana!");
+        break;
+    default:
+        console.log("Día entre semana");
+}`} lang="javascript" />
+
+## Bucles <Badge text="Importante" variant="danger" />
+
+<Aside type="caution">
+  Es importante tener cuidado con los bucles infinitos, siempre asegúrate de tener una condición de salida.
+</Aside>
+
+### for
+<Code code={`// Bucle tradicional
+for (let i = 0; i < 5; i++) {
+    console.log(i);
+}
+
+// for...of (para iterables)
+const array = [1, 2, 3];
+for (const elemento of array) {
+    console.log(elemento);
+}
+
+// for...in (para objetos)
+const persona = { nombre: "Juan", edad: 25 };
+for (const propiedad in persona) {
+    console.log(\`\${propiedad}: \${persona[propiedad]}\`);
+}`} lang="javascript" />
+
+### while y do...while
+<Code code={`// while
+let contador = 0;
+while (contador < 5) {
+    console.log(contador);
+    contador++;
+}
+
+// do...while
+let numero = 0;
+do {
+    console.log(numero);
+    numero++;
+} while (numero < 5);`} lang="javascript" />
+
+## Control de flujo <Badge text="Intermedio" variant="note" />
+
+### break y continue
+<Code code={`// break
+for (let i = 0; i < 10; i++) {
+    if (i === 5) {
+        break; // Sale del bucle
+    }
+    console.log(i);
+}
+
+// continue
+for (let i = 0; i < 5; i++) {
+    if (i === 2) {
+        continue; // Salta a la siguiente iteración
+    }
+    console.log(i);
+}`} lang="javascript" />
+
+## Manejo de errores <Badge text="Avanzado" variant="danger" />
+
+<Aside type="caution">
+  El manejo de errores es crucial para crear aplicaciones robustas.
+</Aside>
+
+### try...catch
+<Code code={`try {
+    // Código que puede lanzar un error
+    throw new Error("¡Algo salió mal!");
+} catch (error) {
+    console.error(error.message);
+} finally {
+    // Se ejecuta siempre
+    console.log("Limpieza final");
+}`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+<Aside type="tip">
+  Siguiendo estas prácticas, tu código será más mantenible y menos propenso a errores.
+</Aside>
+
+### Guard Clauses
+<Code code={`function procesarUsuario(usuario) {
+    if (!usuario) return;
+    if (!usuario.activo) return;
+    // Procesar usuario...
+}`} lang="javascript" />
+
+### Evitar anidación excesiva
+<Code code={`// ❌ Malo
+if (a) {
+    if (b) {
+        if (c) {
+            // ...
+        }
+    }
+}
+
+// ✅ Bueno
+if (!a || !b || !c) return;
+// Código principal aquí`} lang="javascript" />

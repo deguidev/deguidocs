@@ -1,0 +1,292 @@
+---
+title: Tailwind CSS Animations
+description: Guía de animaciones y transiciones con Tailwind CSS
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Animaciones Tailwind CSS <Badge text="Configuración" variant="success" />
+
+## Configuración Inicial <Badge text="Paso 1" variant="note" />
+
+### tailwind.config.js
+<Code code={`/** @type {import('tailwindcss').Config} */
+module.exports = {
+  theme: {
+    extend: {
+      animation: {
+        'spin-slow': 'spin 3s linear infinite',
+        'bounce-slow': 'bounce 3s infinite',
+        'fade-in': 'fadeIn 0.5s ease-out',
+        'slide-in': 'slideIn 0.5s ease-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideIn: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+      },
+    },
+  },
+  plugins: [],
+}`} lang="javascript" />
+
+## Transiciones Básicas <Badge text="Paso 2" variant="note" />
+
+### Duración
+```html
+<button class="transition duration-150 ...">Rápido</button>
+<button class="transition duration-300 ...">Normal</button>
+<button class="transition duration-700 ...">Lento</button>
+```
+
+### Timing
+```html
+<button class="transition ease-linear ...">Linear</button>
+<button class="transition ease-in ...">Ease-in</button>
+<button class="transition ease-out ...">Ease-out</button>
+<button class="transition ease-in-out ...">Ease-in-out</button>
+```
+
+### Propiedades
+```html
+<button class="transition-all ...">Todo</button>
+<button class="transition-colors ...">Colores</button>
+<button class="transition-opacity ...">Opacidad</button>
+<button class="transition-transform ...">Transformación</button>
+```
+
+## Animaciones Predefinidas <Badge text="Paso 3" variant="note" />
+
+### Animaciones Básicas
+```html
+<!-- Spin -->
+<div class="animate-spin">
+  <!-- Contenido giratorio -->
+</div>
+
+<!-- Ping -->
+<div class="animate-ping">
+  <!-- Efecto de ping -->
+</div>
+
+<!-- Pulse -->
+<div class="animate-pulse">
+  <!-- Efecto de pulso -->
+</div>
+
+<!-- Bounce -->
+<div class="animate-bounce">
+  <!-- Efecto de rebote -->
+</div>
+```
+
+### Combinando Animaciones
+<Code code={`<div class="
+  animate-bounce
+  hover:animate-spin
+  transition-all
+  duration-300
+  ease-in-out
+">
+  Contenido Animado
+</div>`} lang="html" />
+
+## Animaciones Personalizadas <Badge text="Paso 4" variant="note" />
+
+### Definiendo Nuevas Animaciones
+<Code code={`// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      animation: {
+        'wiggle': 'wiggle 1s ease-in-out infinite',
+        'fade-in-down': 'fadeInDown 0.5s ease-out',
+        'slide-in-right': 'slideInRight 0.5s ease-out',
+      },
+      keyframes: {
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-3deg)' },
+          '50%': { transform: 'rotate(3deg)' },
+        },
+        fadeInDown: {
+          '0%': { 
+            opacity: '0',
+            transform: 'translateY(-10px)'
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          },
+        },
+        slideInRight: {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+      },
+    },
+  },
+}`} lang="javascript" />
+
+### Uso de Animaciones Personalizadas
+```html
+<div class="animate-wiggle">
+  Elemento que se mueve
+</div>
+
+<div class="animate-fade-in-down">
+  Elemento que aparece desde arriba
+</div>
+
+<div class="animate-slide-in-right">
+  Elemento que entra desde la derecha
+</div>
+```
+
+## Interacciones y Estados <Badge text="Paso 5" variant="note" />
+
+### Hover
+```html
+<button class="
+  transform
+  transition-all
+  duration-300
+  hover:scale-110
+  hover:rotate-3
+  hover:bg-blue-600
+">
+  Botón con Hover
+</button>
+```
+
+### Focus
+```html
+<input class="
+  transition-all
+  duration-300
+  focus:outline-none
+  focus:ring-2
+  focus:ring-blue-500
+  focus:scale-105
+">
+```
+
+### Active
+```html
+<button class="
+  transform
+  transition-all
+  duration-150
+  active:scale-95
+">
+  Botón con Efecto Click
+</button>
+```
+
+## Optimización y Rendimiento <Badge text="Paso 6" variant="caution" />
+
+### CSS Personalizado con @layer
+<Code code={`@layer utilities {
+  .animate-once {
+    animation-iteration-count: 1;
+  }
+  
+  .animate-twice {
+    animation-iteration-count: 2;
+  }
+  
+  .animate-thrice {
+    animation-iteration-count: 3;
+  }
+}
+
+/* Uso */
+<div class="animate-bounce animate-once">
+  Solo rebota una vez
+</div>`} lang="css" />
+
+### Reducción de Movimiento
+<Code code={`// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      screens: {
+        'motion-safe': { 'raw': '(prefers-reduced-motion: no-preference)' },
+        'motion-reduce': { 'raw': '(prefers-reduced-motion: reduce)' },
+      },
+    },
+  },
+}
+
+// Uso
+<div class="
+  motion-safe:animate-bounce
+  motion-reduce:transition-none
+">
+  Respeta preferencias de movimiento
+</div>`} lang="javascript" />
+
+## Mejores Prácticas <Badge text="Recomendado" variant="success" />
+
+### 1. Componentes Reutilizables
+<Code code={`// Button.jsx
+function Button({ children, animated = true }) {
+  return (
+    <button className={\`
+      px-4 py-2
+      bg-blue-500
+      text-white
+      rounded
+      \${animated ? \`
+        transform
+        transition-all
+        duration-300
+        hover:scale-105
+        hover:bg-blue-600
+        active:scale-95
+      \` : ''}
+    \`}>
+      {children}
+    </button>
+  )
+}`} lang="javascript" />
+
+### 2. Grupos de Animación
+```html
+<div class="group">
+  <div class="
+    transform
+    transition-all
+    duration-300
+    group-hover:scale-110
+    group-hover:rotate-3
+  ">
+    Animación en grupo
+  </div>
+</div>
+```
+
+### 3. Animaciones Responsivas
+```html
+<div class="
+  animate-none
+  sm:animate-fade-in
+  md:animate-slide-in
+  lg:animate-bounce
+">
+  Animaciones responsivas
+</div>
+```
+
+<Aside type="tip">
+  Para más detalles sobre animaciones en Tailwind CSS, consulta:
+  - [Documentación oficial de Tailwind CSS - Animations](https://tailwindcss.com/docs/animation)
+  - [Documentación oficial de Tailwind CSS - Transitions](https://tailwindcss.com/docs/transition-property)
+</Aside>

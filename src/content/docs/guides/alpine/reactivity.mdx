@@ -1,0 +1,53 @@
+---
+title: Reactividad y estado
+description: Cómo funciona la reactividad y el manejo de estado en Alpine.js.
+---
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+
+# Reactividad y estado
+
+Alpine.js permite definir y manipular el estado reactivo directamente en el HTML usando `x-data` y otras directivas.
+
+## ¿Cómo funciona la reactividad en Alpine.js?
+
+Alpine.js utiliza un sistema reactivo similar al de frameworks modernos, pero directamente en el HTML. Cuando defines datos con <code>x-data</code>, cualquier cambio en esos datos se refleja automáticamente en la interfaz.
+
+### Definiendo estado reactivo
+
+<Code code={`<div x-data="{ contador: 0 }">
+  <button @click="contador++">Incrementar</button>
+  <span x-text="contador"></span>
+</div>`} lang="html" title="Contador reactivo" />
+
+En este ejemplo, <code>contador</code> es reactivo: cada vez que haces clic en el botón, el valor mostrado se actualiza automáticamente.
+
+### Reactividad con <code>x-model</code>
+
+<Code code={`<div x-data="{ nombre: '' }">
+  <input x-model="nombre" placeholder="Escribe tu nombre" />
+  <p>Hola, <span x-text="nombre"></span>!</p>
+</div>`} lang="html" title="Enlace bidireccional con x-model" />
+
+El input y el texto están sincronizados: cualquier cambio en el input se refleja en el estado y viceversa.
+
+### Computed properties (propiedades derivadas)
+
+Puedes usar funciones dentro de <code>x-data</code> para crear propiedades derivadas:
+<Code code={`<div x-data="{ a: 2, b: 3, get suma() { return this.a + this.b } }">
+  <span x-text="suma"></span>
+</div>`} lang="html" title="Propiedad computada" />
+
+### Observando cambios con <code>$watch</code>
+
+Alpine.js permite observar cambios en propiedades usando <code>$watch</code>:
+<Code code={`<div x-data="{ mensaje: '' }" x-init="$watch('mensaje', value => console.log(value))">
+  <input x-model="mensaje" placeholder="Escribe algo" />
+</div>`} lang="html" title="Uso de $watch" />
+
+<Aside type="tip">
+Consulta la <a href="https://alpinejs.dev/globals/alpine-data" target="_blank">documentación oficial</a> para más detalles sobre la reactividad y el manejo de estado en Alpine.js.
+</Aside>

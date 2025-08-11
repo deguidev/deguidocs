@@ -1,0 +1,1530 @@
+---
+title: 9. Entrada y Salida de Archivos
+description: Aprende sobre lectura y escritura de archivos de texto, archivos binarios y serialización de objetos en Java
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## Introducción
+
+La entrada y salida de archivos (I/O, Input/Output) es una parte fundamental de la programación en Java que permite a las aplicaciones interactuar con el sistema de archivos para almacenar y recuperar datos de forma persistente. Java proporciona un conjunto completo de clases y métodos en los paquetes `java.io` y `java.nio` para manejar diferentes tipos de archivos y operaciones.
+
+## 9.1 Lectura y escritura de archivos de texto
+
+Los archivos de texto contienen caracteres legibles por humanos y son uno de los formatos más comunes para almacenar datos.
+
+### 9.1.1 Clases principales para manejo de archivos de texto
+
+<table>
+  <thead>
+    <tr>
+      <th>Clase</th>
+      <th>Descripción</th>
+      <th>Uso principal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>File</td>
+      <td>Representa un archivo o directorio en el sistema de archivos</td>
+      <td>Manipulación de rutas, verificación de existencia, creación de archivos/directorios</td>
+    </tr>
+    <tr>
+      <td>FileReader</td>
+      <td>Lee caracteres de archivos de texto</td>
+      <td>Lectura básica de caracteres</td>
+    </tr>
+    <tr>
+      <td>FileWriter</td>
+      <td>Escribe caracteres en archivos de texto</td>
+      <td>Escritura básica de caracteres</td>
+    </tr>
+    <tr>
+      <td>BufferedReader</td>
+      <td>Agrega buffer a FileReader para mejorar rendimiento</td>
+      <td>Lectura eficiente de líneas de texto</td>
+    </tr>
+    <tr>
+      <td>BufferedWriter</td>
+      <td>Agrega buffer a FileWriter para mejorar rendimiento</td>
+      <td>Escritura eficiente de líneas de texto</td>
+    </tr>
+    <tr>
+      <td>PrintWriter</td>
+      <td>Escribe representaciones formateadas de objetos</td>
+      <td>Escritura de texto con métodos print/println</td>
+    </tr>
+  </tbody>
+</table>
+
+### 9.1.2 La clase File
+
+La clase `File` es fundamental para trabajar con archivos y directorios en Java. Representa una ruta en el sistema de archivos, pero no necesariamente un archivo existente.
+
+<Code code={`import java.io.File;
+
+public class ManejoArchivos {
+    public static void main(String[] args) {
+        // Crear un objeto File
+        File archivo = new File("datos.txt");
+        File directorio = new File("carpeta/subcarpeta");
+        
+        // Verificar si existe
+        boolean existeArchivo = archivo.exists(); // false si no existe
+        
+        // Crear un directorio (y directorios padres si es necesario)
+        boolean directorioCreado = directorio.mkdirs();
+        
+        // Obtener información del archivo
+        String nombre = archivo.getName();          // "datos.txt"
+        String ruta = archivo.getPath();            // "datos.txt" (ruta relativa)
+        String rutaAbsoluta = archivo.getAbsolutePath(); // Ruta completa en el sistema
+        long tamaño = archivo.length();           // Tamaño en bytes
+        boolean esDirectorio = archivo.isDirectory(); // false
+        boolean esArchivo = archivo.isFile();      // true si existe y es un archivo
+        
+        // Listar archivos en un directorio
+        if (directorio.exists() && directorio.isDirectory()) {
+            File[] archivos = directorio.listFiles();
+            for (File f : archivos) {
+                System.out.println(f.getName());
+            }
+        }
+        
+        // Crear un archivo vacío
+        try {
+            boolean archivoCreado = archivo.createNewFile(); // true si se crea correctamente
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        // Eliminar un archivo o directorio
+        boolean eliminado = archivo.delete();
+    }
+}`} lang="java" />
+
+<Aside type="note">
+  La clase `File` solo maneja metadatos y operaciones sobre archivos y directorios, pero no su contenido. Para leer o escribir contenido, necesitas usar clases como `FileReader`, `FileWriter`, etc.
+</Aside>
+
+### 9.1.3 Lectura de archivos de texto
+
+Existen varias formas de leer archivos de texto en Java, desde las más básicas hasta las más modernas y eficientes.
+
+#### Usando FileReader y BufferedReader (forma tradicional)
+
+<Code code={`import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class LecturaArchivo {
+    public static void main(String[] args) {
+        // Forma tradicional (pre-Java 7)
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader("archivo.txt"));
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                System.out.println(linea);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}`} lang="java" />
+
+#### Usando try-with-resources (Java 7+)
+
+<Code code={`import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class LecturaArchivoModerna {
+    public static void main(String[] args) {
+        // Usando try-with-resources (Java 7+)
+        try (BufferedReader br = new BufferedReader(new FileReader("archivo.txt"))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                System.out.println(linea);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+#### Usando Files y Path (Java 7+ con NIO.2)
+
+<Code code={`import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+public class LecturaArchivoNIO {
+    public static void main(String[] args) {
+        try {
+            // Leer todas las líneas de una vez
+            Path ruta = Paths.get("archivo.txt");
+            List<String> lineas = Files.readAllLines(ruta);
+            for (String linea : lineas) {
+                System.out.println(linea);
+            }
+            
+            // Alternativa: leer todo el contenido como una cadena
+            String contenido = Files.readString(ruta); // Java 11+
+            System.out.println(contenido);
+            
+            // Para archivos grandes, usar un Stream para procesar línea por línea
+            Files.lines(ruta).forEach(System.out::println);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+<Aside type="tip">
+  Para archivos grandes, es recomendable usar `Files.lines()` que devuelve un Stream y procesa el archivo línea por línea sin cargarlo completamente en memoria.
+</Aside>
+
+### 9.1.4 Escritura de archivos de texto
+
+Al igual que con la lectura, existen varias formas de escribir en archivos de texto.
+
+#### Usando FileWriter y BufferedWriter
+
+<Code code={`import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class EscrituraArchivo {
+    public static void main(String[] args) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("salida.txt"))) {
+            // El segundo parámetro true en FileWriter indica modo append
+            // Si se omite o es false, sobrescribe el archivo
+            // Ejemplo: new FileWriter("salida.txt", true) para añadir al final
+            
+            bw.write("Primera línea de texto");
+            bw.newLine(); // Añade un salto de línea
+            bw.write("Segunda línea de texto");
+            bw.newLine();
+            
+            // También puedes escribir caracteres individuales
+            bw.write('A');
+            
+            // O arrays de caracteres
+            char[] caracteres = {'H', 'o', 'l', 'a'};
+            bw.write(caracteres);
+            
+            // El buffer se vacía automáticamente al cerrar
+            // pero puedes forzarlo con flush()
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+#### Usando PrintWriter
+
+<Code code={`import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+public class EscrituraConPrintWriter {
+    public static void main(String[] args) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter("salida.txt"))) {
+            // PrintWriter ofrece métodos similares a System.out
+            pw.println("Primera línea"); // Añade automáticamente salto de línea
+            pw.println("Segunda línea");
+            
+            // Puedes usar print para escribir sin salto de línea
+            pw.print("Texto sin salto");
+            pw.print(" continuación");
+            
+            // También soporta formato como printf
+            pw.printf("%nEl valor es: %.2f%n", 3.14159);
+            
+            // Puedes escribir diferentes tipos de datos
+            pw.println(42); // entero
+            pw.println(true); // booleano
+            pw.println(new char[] {'a', 'b', 'c'}); // array de caracteres
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+#### Usando Files (Java 7+ con NIO.2)
+
+<Code code={`import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+import java.util.List;
+
+public class EscrituraArchivoNIO {
+    public static void main(String[] args) {
+        try {
+            Path ruta = Paths.get("salida.txt");
+            
+            // Escribir una cadena
+            Files.writeString(ruta, "Contenido del archivo\nSegunda línea"); // Java 11+
+            
+            // Escribir una lista de líneas
+            List<String> lineas = Arrays.asList("Línea 1", "Línea 2", "Línea 3");
+            Files.write(ruta, lineas);
+            
+            // Añadir al final del archivo
+            Files.write(ruta, Arrays.asList("Línea adicional"), StandardOpenOption.APPEND);
+            
+            // Otras opciones útiles
+            // StandardOpenOption.CREATE - Crea el archivo si no existe
+            // StandardOpenOption.CREATE_NEW - Crea un archivo nuevo, falla si ya existe
+            // StandardOpenOption.TRUNCATE_EXISTING - Elimina el contenido existente
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+### 9.1.5 Manejo de caracteres y codificación
+
+Al trabajar con archivos de texto, es importante considerar la codificación de caracteres, especialmente para textos con caracteres no ASCII como acentos o caracteres de otros idiomas.
+
+<Code code={`import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class ManejoDeCharsets {
+    public static void main(String[] args) {
+        // Lectura con codificación específica
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(
+                    new FileInputStream("archivo.txt"), StandardCharsets.UTF_8))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                System.out.println(linea);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        // Escritura con codificación específica
+        try (BufferedWriter bw = new BufferedWriter(
+                new OutputStreamWriter(
+                    new FileOutputStream("salida.txt"), StandardCharsets.UTF_8))) {
+            bw.write("Texto con caracteres especiales: áéíóúñ");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        // Con NIO (más simple)
+        try {
+            Path ruta = Paths.get("archivo.txt");
+            // Lectura
+            List<String> lineas = Files.readAllLines(ruta, StandardCharsets.UTF_8);
+            
+            // Escritura
+            Files.write(Paths.get("salida.txt"), lineas, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+<Aside type="caution">
+  Si no especificas una codificación, Java usará la codificación predeterminada del sistema, lo que puede causar problemas de portabilidad. Es recomendable especificar siempre la codificación, preferiblemente UTF-8.
+</Aside>
+
+## 9.2 Archivos binarios
+
+Los archivos binarios almacenan datos en formato binario (secuencias de bytes) en lugar de texto legible por humanos. Son útiles para almacenar datos estructurados, imágenes, audio, vídeo y otros tipos de información no textual.
+
+### 9.2.1 Clases principales para manejo de archivos binarios
+
+<table>
+  <thead>
+    <tr>
+      <th>Clase</th>
+      <th>Descripción</th>
+      <th>Uso principal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>FileInputStream</td>
+      <td>Lee bytes de archivos</td>
+      <td>Lectura básica de bytes</td>
+    </tr>
+    <tr>
+      <td>FileOutputStream</td>
+      <td>Escribe bytes en archivos</td>
+      <td>Escritura básica de bytes</td>
+    </tr>
+    <tr>
+      <td>BufferedInputStream</td>
+      <td>Agrega buffer a FileInputStream</td>
+      <td>Lectura eficiente de bytes</td>
+    </tr>
+    <tr>
+      <td>BufferedOutputStream</td>
+      <td>Agrega buffer a FileOutputStream</td>
+      <td>Escritura eficiente de bytes</td>
+    </tr>
+    <tr>
+      <td>DataInputStream</td>
+      <td>Lee tipos de datos primitivos</td>
+      <td>Lectura de tipos como int, double, boolean</td>
+    </tr>
+    <tr>
+      <td>DataOutputStream</td>
+      <td>Escribe tipos de datos primitivos</td>
+      <td>Escritura de tipos como int, double, boolean</td>
+    </tr>
+    <tr>
+      <td>ObjectInputStream</td>
+      <td>Lee objetos Java serializados</td>
+      <td>Deserialización de objetos</td>
+    </tr>
+    <tr>
+      <td>ObjectOutputStream</td>
+      <td>Escribe objetos Java serializados</td>
+      <td>Serialización de objetos</td>
+    </tr>
+  </tbody>
+</table>
+
+### 9.2.2 Lectura de archivos binarios
+
+#### Lectura básica de bytes
+
+<Code code={`import java.io.FileInputStream;
+import java.io.IOException;
+
+public class LecturaBinaria {
+    public static void main(String[] args) {
+        try (FileInputStream fis = new FileInputStream("archivo.bin")) {
+            // Leer byte a byte
+            int byteLeido;
+            while ((byteLeido = fis.read()) != -1) {
+                // byteLeido contiene un valor entre 0 y 255
+                System.out.printf("%02X ", byteLeido); // Imprimir en hexadecimal
+            }
+            
+            // Alternativa: leer en un buffer
+            // byte[] buffer = new byte[1024];
+            // int bytesLeidos;
+            // while ((bytesLeidos = fis.read(buffer)) != -1) {
+            //     // Procesar los bytes en buffer (0 hasta bytesLeidos-1)
+            // }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+#### Lectura de tipos de datos primitivos
+
+<Code code={`import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class LecturaDatosPrimitivos {
+    public static void main(String[] args) {
+        try (DataInputStream dis = new DataInputStream(new FileInputStream("datos.bin"))) {
+            // Leer diferentes tipos de datos
+            boolean valorBoolean = dis.readBoolean();
+            byte valorByte = dis.readByte();
+            short valorShort = dis.readShort();
+            int valorInt = dis.readInt();
+            long valorLong = dis.readLong();
+            float valorFloat = dis.readFloat();
+            double valorDouble = dis.readDouble();
+            String valorUTF = dis.readUTF(); // String codificado en UTF-8
+            
+            // Mostrar los valores leídos
+            System.out.println("Boolean: " + valorBoolean);
+            System.out.println("Byte: " + valorByte);
+            System.out.println("Short: " + valorShort);
+            System.out.println("Int: " + valorInt);
+            System.out.println("Long: " + valorLong);
+            System.out.println("Float: " + valorFloat);
+            System.out.println("Double: " + valorDouble);
+            System.out.println("String: " + valorUTF);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+#### Usando NIO para archivos binarios
+
+<Code code={`import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
+public class LecturaBinariaNIO {
+    public static void main(String[] args) {
+        Path ruta = Paths.get("archivo.bin");
+        
+        try (FileChannel canal = FileChannel.open(ruta, StandardOpenOption.READ)) {
+            // Crear un buffer para leer datos
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            
+            // Leer datos en el buffer
+            int bytesLeidos;
+            while ((bytesLeidos = canal.read(buffer)) != -1) {
+                // Preparar el buffer para lectura
+                buffer.flip();
+                
+                // Leer datos del buffer
+                while (buffer.hasRemaining()) {
+                    byte b = buffer.get();
+                    System.out.printf("%02X ", b);
+                }
+                
+                // Limpiar el buffer para la siguiente lectura
+                buffer.clear();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+### 9.2.3 Escritura de archivos binarios
+
+#### Escritura básica de bytes
+
+<Code code={`import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class EscrituraBinaria {
+    public static void main(String[] args) {
+        try (FileOutputStream fos = new FileOutputStream("salida.bin")) {
+            // Escribir bytes individuales
+            fos.write(65);  // ASCII 'A'
+            fos.write(66);  // ASCII 'B'
+            
+            // Escribir un array de bytes
+            byte[] datos = {67, 68, 69, 70}; // ASCII 'C', 'D', 'E', 'F'
+            fos.write(datos);
+            
+            // Escribir parte de un array
+            fos.write(datos, 1, 2); // Solo 'D' y 'E'
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+#### Escritura de tipos de datos primitivos
+
+<Code code={`import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class EscrituraDatosPrimitivos {
+    public static void main(String[] args) {
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream("datos.bin"))) {
+            // Escribir diferentes tipos de datos
+            dos.writeBoolean(true);
+            dos.writeByte(127);
+            dos.writeShort(32767);
+            dos.writeInt(2147483647);
+            dos.writeLong(9223372036854775807L);
+            dos.writeFloat(3.14159f);
+            dos.writeDouble(2.71828);
+            dos.writeUTF("Hola Mundo"); // String codificado en UTF-8
+            
+            // Verificar cuántos bytes se han escrito
+            System.out.println("Bytes escritos: " + dos.size());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+#### Usando NIO para escritura binaria
+
+<Code code={`import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
+public class EscrituraBinariaNIO {
+    public static void main(String[] args) {
+        Path ruta = Paths.get("salida.bin");
+        
+        try (FileChannel canal = FileChannel.open(ruta, 
+                StandardOpenOption.CREATE, 
+                StandardOpenOption.WRITE)) {
+            
+            // Crear un buffer y poner datos en él
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            buffer.putInt(42);
+            buffer.putDouble(3.14159);
+            buffer.put((byte) 65); // ASCII 'A'
+            
+            // Preparar el buffer para escritura
+            buffer.flip();
+            
+            // Escribir el contenido del buffer en el canal
+            canal.write(buffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+### 9.2.4 Copiado de archivos
+
+Java ofrece varias formas de copiar archivos, desde las más básicas hasta las más eficientes.
+
+#### Copia básica con streams
+
+<Code code={`import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class CopiaArchivo {
+    public static void main(String[] args) {
+        try (FileInputStream fis = new FileInputStream("origen.dat");
+             FileOutputStream fos = new FileOutputStream("destino.dat")) {
+            
+            byte[] buffer = new byte[8192]; // Buffer de 8KB
+            int bytesLeidos;
+            
+            while ((bytesLeidos = fis.read(buffer)) != -1) {
+                fos.write(buffer, 0, bytesLeidos);
+            }
+            
+            System.out.println("Archivo copiado exitosamente");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+#### Copia con NIO (más eficiente)
+
+<Code code={`import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
+public class CopiaArchivoNIO {
+    public static void main(String[] args) {
+        try {
+            Path origen = Paths.get("origen.dat");
+            Path destino = Paths.get("destino.dat");
+            
+            // Copiar archivo (sobrescribir si existe)
+            Files.copy(origen, destino, StandardCopyOption.REPLACE_EXISTING);
+            
+            System.out.println("Archivo copiado exitosamente");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+<Aside type="tip">
+  Para archivos muy grandes, la API NIO suele ser más eficiente que los streams tradicionales, ya que puede aprovechar características del sistema operativo como la transferencia directa entre canales.
+</Aside>
+
+## 9.3 Manejo de BufferedReader y FileWriter
+
+En esta sección profundizaremos en el uso de `BufferedReader` y `FileWriter`, dos clases fundamentales para el manejo eficiente de archivos de texto en Java.
+
+### 9.3.1 BufferedReader en detalle
+
+`BufferedReader` es una clase que agrega un buffer a la lectura de caracteres, mejorando significativamente el rendimiento al reducir las llamadas al sistema operativo.
+
+#### Características principales
+
+- Lee texto de un flujo de caracteres de entrada, almacenando caracteres en un buffer para una lectura eficiente
+- Proporciona métodos convenientes como `readLine()` para leer líneas completas
+- Mejora el rendimiento al reducir las llamadas al sistema operativo
+- Puede envolver cualquier `Reader` (como `FileReader`, `InputStreamReader`, etc.)
+
+#### Constructores comunes
+
+<Code code={`// Crear un BufferedReader a partir de un FileReader
+BufferedReader br1 = new BufferedReader(new FileReader("archivo.txt"));
+
+// Especificar el tamaño del buffer (en caracteres)
+BufferedReader br2 = new BufferedReader(new FileReader("archivo.txt"), 8192);
+
+// Crear un BufferedReader con codificación específica
+BufferedReader br3 = new BufferedReader(
+    new InputStreamReader(new FileInputStream("archivo.txt"), StandardCharsets.UTF_8));
+`} lang="java" />
+
+#### Métodos principales
+
+<table>
+  <thead>
+    <tr>
+      <th>Método</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>read()</td>
+      <td>Lee un solo carácter</td>
+    </tr>
+    <tr>
+      <td>read(char[] cbuf, int off, int len)</td>
+      <td>Lee caracteres en una parte del array</td>
+    </tr>
+    <tr>
+      <td>readLine()</td>
+      <td>Lee una línea de texto</td>
+    </tr>
+    <tr>
+      <td>skip(long n)</td>
+      <td>Salta caracteres</td>
+    </tr>
+    <tr>
+      <td>ready()</td>
+      <td>Indica si el stream está listo para ser leído</td>
+    </tr>
+    <tr>
+      <td>mark(int readAheadLimit)</td>
+      <td>Marca la posición actual en el stream</td>
+    </tr>
+    <tr>
+      <td>reset()</td>
+      <td>Reposiciona el stream en la marca</td>
+    </tr>
+    <tr>
+      <td>close()</td>
+      <td>Cierra el stream</td>
+    </tr>
+  </tbody>
+</table>
+
+#### Ejemplo completo de BufferedReader
+
+<Code code={`import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class EjemploBufferedReader {
+    public static void main(String[] args) {
+        try (BufferedReader br = new BufferedReader(new FileReader("datos.txt"))) {
+            // 1. Leer línea por línea (uso más común)
+            String linea;
+            System.out.println("Leyendo línea por línea:");
+            while ((linea = br.readLine()) != null) {
+                System.out.println(linea);
+            }
+            
+            // Para leer el archivo nuevamente, necesitamos crear un nuevo BufferedReader
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        // Ejemplo de otras operaciones con BufferedReader
+        try (BufferedReader br = new BufferedReader(new FileReader("datos.txt"))) {
+            // 2. Leer carácter por carácter
+            System.out.println("\nLeyendo carácter por carácter:");
+            int c;
+            while ((c = br.read()) != -1) {
+                System.out.print((char) c);
+            }
+            
+            // Necesitamos un nuevo BufferedReader para leer de nuevo
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        // Ejemplo con mark y reset
+        try (BufferedReader br = new BufferedReader(new FileReader("datos.txt"))) {
+            System.out.println("\n\nUsando mark y reset:");
+            
+            // Leer los primeros 5 caracteres
+            char[] buffer = new char[5];
+            br.read(buffer, 0, 5);
+            System.out.println("Primeros 5 caracteres: " + new String(buffer));
+            
+            // Marcar la posición actual
+            br.mark(100); // Permitir leer hasta 100 caracteres después de la marca
+            
+            // Leer los siguientes 10 caracteres
+            buffer = new char[10];
+            br.read(buffer, 0, 10);
+            System.out.println("Siguientes 10 caracteres: " + new String(buffer));
+            
+            // Volver a la posición marcada
+            br.reset();
+            
+            // Leer desde la marca nuevamente
+            buffer = new char[10];
+            br.read(buffer, 0, 10);
+            System.out.println("Después de reset, 10 caracteres: " + new String(buffer));
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+<Aside type="note">
+  El método `readLine()` no incluye los caracteres de fin de línea (\n o \r\n) en la cadena devuelta.
+</Aside>
+
+### 9.3.2 FileWriter en detalle
+
+`FileWriter` es una clase conveniente para escribir caracteres en archivos. Es una subclase de `OutputStreamWriter` que simplifica la escritura de texto.
+
+#### Características principales
+
+- Escribe caracteres en archivos
+- Puede crear nuevos archivos o sobrescribir/anexar a archivos existentes
+- Maneja automáticamente la conversión de caracteres a bytes usando la codificación predeterminada
+
+#### Constructores comunes
+
+<Code code={`// Crear un FileWriter (sobrescribe el archivo si existe)
+FileWriter fw1 = new FileWriter("archivo.txt");
+
+// Crear un FileWriter en modo append (añadir al final)
+FileWriter fw2 = new FileWriter("archivo.txt", true);
+
+// Crear un FileWriter a partir de un objeto File
+File archivo = new File("ruta/archivo.txt");
+FileWriter fw3 = new FileWriter(archivo);
+
+// Con charset específico (Java 11+)
+FileWriter fw4 = new FileWriter("archivo.txt", StandardCharsets.UTF_8);
+`} lang="java" />
+
+#### Métodos principales
+
+<table>
+  <thead>
+    <tr>
+      <th>Método</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>write(int c)</td>
+      <td>Escribe un solo carácter</td>
+    </tr>
+    <tr>
+      <td>write(char[] cbuf)</td>
+      <td>Escribe un array de caracteres</td>
+    </tr>
+    <tr>
+      <td>write(char[] cbuf, int off, int len)</td>
+      <td>Escribe una parte de un array de caracteres</td>
+    </tr>
+    <tr>
+      <td>write(String str)</td>
+      <td>Escribe una cadena</td>
+    </tr>
+    <tr>
+      <td>write(String str, int off, int len)</td>
+      <td>Escribe una parte de una cadena</td>
+    </tr>
+    <tr>
+      <td>append(CharSequence csq)</td>
+      <td>Añade una secuencia de caracteres</td>
+    </tr>
+    <tr>
+      <td>flush()</td>
+      <td>Vacía el buffer, asegurando que todos los datos se escriban</td>
+    </tr>
+    <tr>
+      <td>close()</td>
+      <td>Cierra el writer, liberando recursos</td>
+    </tr>
+  </tbody>
+</table>
+
+#### Ejemplo completo de FileWriter
+
+<Code code={`import java.io.FileWriter;
+import java.io.IOException;
+
+public class EjemploFileWriter {
+    public static void main(String[] args) {
+        // Ejemplo básico de FileWriter
+        try (FileWriter fw = new FileWriter("salida.txt")) {
+            // Escribir una cadena
+            fw.write("Hola Mundo desde FileWriter\n");
+            
+            // Escribir un carácter
+            fw.write('A');
+            fw.write('\n');
+            
+            // Escribir un array de caracteres
+            char[] chars = {'J', 'a', 'v', 'a', ' ', 'I', 'O'};
+            fw.write(chars);
+            fw.write('\n');
+            
+            // Escribir parte de un array
+            fw.write(chars, 0, 4); // Solo "Java"
+            fw.write('\n');
+            
+            // Usar el método append (devuelve el propio writer para encadenar llamadas)
+            fw.append("Texto añadido con append\n")
+              .append('X')
+              .append('\n');
+              
+            // flush() se llama automáticamente al cerrar el writer
+            // pero puedes llamarlo explícitamente para forzar la escritura
+            fw.flush();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        // Ejemplo de FileWriter en modo append
+        try (FileWriter fw = new FileWriter("salida.txt", true)) {
+            // Esto añadirá al final del archivo existente
+            fw.write("\nEsta línea se añade al final del archivo existente\n");
+            fw.write("Sin sobrescribir el contenido anterior\n");
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+<Aside type="caution">
+  `FileWriter` por sí solo no está almacenado en búfer, lo que puede resultar en operaciones de escritura ineficientes. Para mejorar el rendimiento, es recomendable envolverlo en un `BufferedWriter`.
+</Aside>
+
+### 9.3.3 Combinando BufferedWriter y FileWriter
+
+La combinación de `BufferedWriter` y `FileWriter` proporciona una forma eficiente de escribir texto en archivos.
+
+<Code code={`import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class BufferedFileWriter {
+    public static void main(String[] args) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("salida.txt"))) {
+            // BufferedWriter añade métodos útiles como newLine()
+            bw.write("Primera línea");
+            bw.newLine(); // Añade un salto de línea dependiente de la plataforma
+            
+            bw.write("Segunda línea");
+            bw.newLine();
+            
+            // Escribir muchas líneas es más eficiente con buffer
+            for (int i = 1; i <= 1000; i++) {
+                bw.write("Línea " + i);
+                bw.newLine();
+            }
+            
+            // El buffer se vacía automáticamente al cerrar
+            // pero puedes forzarlo con flush()
+            bw.flush();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+### 9.3.4 Ejemplo práctico: Procesador de archivos CSV
+
+A continuación se muestra un ejemplo práctico que utiliza `BufferedReader` y `FileWriter` para leer un archivo CSV, procesarlo y escribir los resultados en un nuevo archivo.
+
+<Code code={`import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ProcesadorCSV {
+    public static void main(String[] args) {
+        String archivoEntrada = "datos.csv";
+        String archivoSalida = "resultados.csv";
+        
+        List<String[]> datos = new ArrayList<>();
+        
+        // Leer el archivo CSV
+        try (BufferedReader br = new BufferedReader(new FileReader(archivoEntrada))) {
+            String linea;
+            // Saltamos la cabecera
+            boolean primeraLinea = true;
+            
+            while ((linea = br.readLine()) != null) {
+                if (primeraLinea) {
+                    primeraLinea = false;
+                    continue; // Saltar la primera línea (cabecera)
+                }
+                
+                // Dividir la línea por comas
+                String[] campos = linea.split(",");
+                datos.add(campos);
+            }
+        } catch (IOException e) {
+            System.err.println("Error al leer el archivo: " + e.getMessage());
+            return;
+        }
+        
+        // Procesar los datos (ejemplo: calcular el promedio de la columna 2)
+        double suma = 0;
+        for (String[] fila : datos) {
+            if (fila.length > 1) {
+                try {
+                    suma += Double.parseDouble(fila[1]);
+                } catch (NumberFormatException e) {
+                    // Ignorar valores no numéricos
+                }
+            }
+        }
+        double promedio = datos.isEmpty() ? 0 : suma / datos.size();
+        
+        // Escribir resultados en un nuevo archivo
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(archivoSalida))) {
+            // Escribir cabecera
+            bw.write("Nombre,Valor,Diferencia del Promedio");
+            bw.newLine();
+            
+            // Escribir datos procesados
+            for (String[] fila : datos) {
+                if (fila.length > 1) {
+                    String nombre = fila[0];
+                    double valor = 0;
+                    
+                    try {
+                        valor = Double.parseDouble(fila[1]);
+                    } catch (NumberFormatException e) {
+                        // Usar 0 para valores no numéricos
+                    }
+                    
+                    double diferencia = valor - promedio;
+                    
+                    bw.write(String.format("%s,%.2f,%.2f", nombre, valor, diferencia));
+                    bw.newLine();
+                }
+            }
+            
+            // Añadir línea con el promedio
+            bw.newLine();
+            bw.write(String.format("Promedio,%.2f,0.00", promedio));
+            
+        } catch (IOException e) {
+            System.err.println("Error al escribir el archivo: " + e.getMessage());
+        }
+        
+        System.out.println("Procesamiento completado. Promedio calculado: " + promedio);
+    }
+}`} lang="java" />
+
+<Aside type="tip">
+  Para aplicaciones reales que trabajan con CSV, considera usar bibliotecas como Apache Commons CSV o OpenCSV, que manejan casos complejos como comillas, escapes y diferentes formatos de CSV.
+</Aside>
+
+## 9.4 Serialización de objetos
+
+La serialización es el proceso de convertir un objeto en una secuencia de bytes para almacenarlo o transmitirlo. La deserialización es el proceso inverso: reconstruir el objeto original a partir de la secuencia de bytes.
+
+### 9.4.1 Conceptos básicos de serialización
+
+<table>
+  <thead>
+    <tr>
+      <th>Concepto</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Serialización</td>
+      <td>Proceso de convertir un objeto en una secuencia de bytes</td>
+    </tr>
+    <tr>
+      <td>Deserialización</td>
+      <td>Proceso de reconstruir un objeto a partir de una secuencia de bytes</td>
+    </tr>
+    <tr>
+      <td>Serializable</td>
+      <td>Interfaz que deben implementar las clases para poder ser serializadas</td>
+    </tr>
+    <tr>
+      <td>serialVersionUID</td>
+      <td>Identificador que ayuda a asegurar que la clase cargada corresponde a los objetos serializados</td>
+    </tr>
+    <tr>
+      <td>transient</td>
+      <td>Modificador que indica que un campo no debe ser serializado</td>
+    </tr>
+  </tbody>
+</table>
+
+### 9.4.2 Haciendo una clase serializable
+
+Para que una clase sea serializable, debe implementar la interfaz `Serializable` y todos sus atributos no transitorios deben ser serializables o primitivos.
+
+<Code code={`import java.io.Serializable;
+
+public class Persona implements Serializable {
+    // Se recomienda definir serialVersionUID para control de versiones
+    private static final long serialVersionUID = 1L;
+    
+    private String nombre;
+    private int edad;
+    private String email;
+    
+    // Los campos marcados como transient no se serializan
+    private transient String contraseña;
+    
+    // Constructor
+    public Persona(String nombre, int edad, String email, String contraseña) {
+        this.nombre = nombre;
+        this.edad = edad;
+        this.email = email;
+        this.contraseña = contraseña;
+    }
+    
+    // Getters y setters
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    
+    public int getEdad() { return edad; }
+    public void setEdad(int edad) { this.edad = edad; }
+    
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    
+    public String getContraseña() { return contraseña; }
+    public void setContraseña(String contraseña) { this.contraseña = contraseña; }
+    
+    @Override
+    public String toString() {
+        return "Persona{" +
+               "nombre='" + nombre + '\'' +
+               ", edad=" + edad +
+               ", email='" + email + '\'' +
+               ", contraseña='" + (contraseña != null ? "[PROTEGIDA]" : "null") + '\'' +
+               '}';
+    }
+}`} lang="java" />
+
+<Aside type="note">
+  La interfaz `Serializable` es una interfaz de marcado (no tiene métodos), pero indica al mecanismo de serialización de Java que la clase puede ser serializada.
+</Aside>
+
+### 9.4.3 Serialización y deserialización de objetos
+
+#### Serialización de objetos a un archivo
+
+<Code code={`import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+public class SerializarObjeto {
+    public static void main(String[] args) {
+        // Crear objetos para serializar
+        Persona persona1 = new Persona("Ana García", 28, "ana@ejemplo.com", "clave123");
+        Persona persona2 = new Persona("Carlos López", 35, "carlos@ejemplo.com", "secreta456");
+        
+        try (FileOutputStream fileOut = new FileOutputStream("personas.ser");
+             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut)) {
+            
+            // Serializar los objetos
+            objectOut.writeObject(persona1);
+            objectOut.writeObject(persona2);
+            
+            System.out.println("Objetos serializados correctamente en personas.ser");
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+#### Deserialización de objetos desde un archivo
+
+<Code code={`import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
+public class DeserializarObjeto {
+    public static void main(String[] args) {
+        try (FileInputStream fileIn = new FileInputStream("personas.ser");
+             ObjectInputStream objectIn = new ObjectInputStream(fileIn)) {
+            
+            // Deserializar los objetos en el mismo orden en que fueron serializados
+            Persona persona1 = (Persona) objectIn.readObject();
+            Persona persona2 = (Persona) objectIn.readObject();
+            
+            System.out.println("Objetos deserializados correctamente:");
+            System.out.println(persona1);
+            System.out.println(persona2);
+            
+            // Nota: el campo contraseña será null porque es transient
+            System.out.println("Contraseña de persona1: " + persona1.getContraseña());
+            
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+### 9.4.4 Serialización de colecciones
+
+Las colecciones de Java como `ArrayList`, `HashMap`, etc., implementan `Serializable`, por lo que pueden serializarse directamente.
+
+<Code code={`import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class SerializarColecciones {
+    public static void main(String[] args) {
+        // Crear una lista de personas
+        List<Persona> listaPersonas = new ArrayList<>();
+        listaPersonas.add(new Persona("Ana García", 28, "ana@ejemplo.com", "clave123"));
+        listaPersonas.add(new Persona("Carlos López", 35, "carlos@ejemplo.com", "secreta456"));
+        listaPersonas.add(new Persona("Elena Martínez", 42, "elena@ejemplo.com", "pass789"));
+        
+        // Crear un mapa de personas (ID -> Persona)
+        Map<Integer, Persona> mapaPersonas = new HashMap<>();
+        mapaPersonas.put(1001, new Persona("Juan Pérez", 31, "juan@ejemplo.com", "abc123"));
+        mapaPersonas.put(1002, new Persona("María Sánchez", 27, "maria@ejemplo.com", "xyz456"));
+        
+        try (FileOutputStream fileOut = new FileOutputStream("colecciones.ser");
+             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut)) {
+            
+            // Serializar las colecciones
+            objectOut.writeObject(listaPersonas);
+            objectOut.writeObject(mapaPersonas);
+            
+            System.out.println("Colecciones serializadas correctamente");
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+#### Deserialización de colecciones
+
+<Code code={`import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.List;
+import java.util.Map;
+
+public class DeserializarColecciones {
+    public static void main(String[] args) {
+        try (FileInputStream fileIn = new FileInputStream("colecciones.ser");
+             ObjectInputStream objectIn = new ObjectInputStream(fileIn)) {
+            
+            // Deserializar las colecciones
+            @SuppressWarnings("unchecked")
+            List<Persona> listaPersonas = (List<Persona>) objectIn.readObject();
+            
+            @SuppressWarnings("unchecked")
+            Map<Integer, Persona> mapaPersonas = (Map<Integer, Persona>) objectIn.readObject();
+            
+            System.out.println("Colecciones deserializadas correctamente:");
+            
+            // Mostrar la lista
+            System.out.println("\nLista de personas:");
+            for (Persona p : listaPersonas) {
+                System.out.println(p);
+            }
+            
+            // Mostrar el mapa
+            System.out.println("\nMapa de personas:");
+            for (Map.Entry<Integer, Persona> entry : mapaPersonas.entrySet()) {
+                System.out.println("ID: " + entry.getKey() + ", Persona: " + entry.getValue());
+            }
+            
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+### 9.4.5 Personalizando la serialización
+
+Java permite personalizar el proceso de serialización y deserialización implementando los métodos `writeObject` y `readObject`.
+
+<Code code={`import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+public class PersonaAvanzada implements Serializable {
+    private static final long serialVersionUID = 2L;
+    
+    private String nombre;
+    private int edad;
+    private String email;
+    private transient String contraseña;
+    
+    // Campo calculado que no necesita ser serializado
+    private transient String nombreCompleto;
+    
+    public PersonaAvanzada(String nombre, int edad, String email, String contraseña) {
+        this.nombre = nombre;
+        this.edad = edad;
+        this.email = email;
+        this.contraseña = contraseña;
+        calcularNombreCompleto();
+    }
+    
+    // Método para calcular el campo derivado
+    private void calcularNombreCompleto() {
+        this.nombreCompleto = nombre + " (" + edad + " años)";
+    }
+    
+    // Método personalizado de serialización
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject(); // Serializa los campos no transient normalmente
+        
+        // Podemos escribir datos adicionales o transformados
+        // Por ejemplo, podemos cifrar la contraseña antes de guardarla
+        if (contraseña != null) {
+            // Cifrado simple (en producción usaríamos algo más seguro)
+            String contraseñaCifrada = new StringBuilder(contraseña).reverse().toString();
+            out.writeObject(contraseñaCifrada);
+        } else {
+            out.writeObject(null);
+        }
+    }
+    
+    // Método personalizado de deserialización
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject(); // Deserializa los campos no transient normalmente
+        
+        // Leer datos adicionales en el mismo orden en que se escribieron
+        String contraseñaCifrada = (String) in.readObject();
+        
+        // Descifrar la contraseña
+        if (contraseñaCifrada != null) {
+            this.contraseña = new StringBuilder(contraseñaCifrada).reverse().toString();
+        }
+        
+        // Recalcular campos derivados
+        calcularNombreCompleto();
+    }
+    
+    // Getters y setters
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { 
+        this.nombre = nombre;
+        calcularNombreCompleto();
+    }
+    
+    public int getEdad() { return edad; }
+    public void setEdad(int edad) { 
+        this.edad = edad;
+        calcularNombreCompleto();
+    }
+    
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    
+    public String getContraseña() { return contraseña; }
+    public void setContraseña(String contraseña) { this.contraseña = contraseña; }
+    
+    public String getNombreCompleto() { return nombreCompleto; }
+    
+    @Override
+    public String toString() {
+        return "PersonaAvanzada{" +
+               "nombre='" + nombre + '\'' +
+               ", edad=" + edad +
+               ", email='" + email + '\'' +
+               ", contraseña='" + (contraseña != null ? "[PRESENTE]" : "null") + '\'' +
+               ", nombreCompleto='" + nombreCompleto + '\'' +
+               '}';
+    }
+}`} lang="java" />
+
+### 9.4.6 Mejores prácticas y consideraciones
+
+<Steps>
+<ol>
+  <li>
+    <strong>Siempre define serialVersionUID</strong>: Ayuda a controlar la compatibilidad entre versiones de la clase.
+    <Code code={`private static final long serialVersionUID = 1L;`} lang="java" />
+  </li>
+  
+  <li>
+    <strong>Marca como transient los campos sensibles o no serializables</strong>: Evita exponer información sensible o serializar campos innecesarios.
+    <Code code={`private transient String contraseña; // No se serializará`} lang="java" />
+  </li>
+  
+  <li>
+    <strong>Considera alternativas para datos complejos</strong>: Para objetos grandes o complejos, considera formatos como JSON o XML.
+  </li>
+  
+  <li>
+    <strong>Maneja las excepciones adecuadamente</strong>: La serialización puede lanzar `IOException` y la deserialización puede lanzar `ClassNotFoundException`.
+  </li>
+  
+  <li>
+    <strong>Ten cuidado con la herencia</strong>: Si una clase serializable extiende una clase no serializable, la subclase debe manejar los campos de la superclase manualmente.
+  </li>
+</ol>
+</Steps>
+
+<Aside type="caution">
+  La serialización estándar de Java tiene limitaciones de seguridad y rendimiento. Para aplicaciones críticas, considera bibliotecas alternativas como Jackson, Gson, Protocol Buffers o Kryo.
+</Aside>
+
+### 9.4.7 Ejemplo completo de serialización
+
+A continuación se muestra un ejemplo completo que demuestra la serialización y deserialización de objetos con herencia y campos personalizados.
+
+<Code code={`import java.io.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+// Clase base
+class Empleado implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    private String nombre;
+    private int id;
+    private Date fechaContratacion;
+    
+    public Empleado(String nombre, int id) {
+        this.nombre = nombre;
+        this.id = id;
+        this.fechaContratacion = new Date();
+    }
+    
+    @Override
+    public String toString() {
+        return "Empleado{" +
+               "nombre='" + nombre + '\'' +
+               ", id=" + id +
+               ", fechaContratacion=" + fechaContratacion +
+               '}';
+    }
+}
+
+// Subclase
+class Gerente extends Empleado implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    private String departamento;
+    private List<Empleado> subordinados;
+    private transient double bonusConfidencial;
+    
+    public Gerente(String nombre, int id, String departamento) {
+        super(nombre, id);
+        this.departamento = departamento;
+        this.subordinados = new ArrayList<>();
+        this.bonusConfidencial = 5000.0;
+    }
+    
+    public void agregarSubordinado(Empleado empleado) {
+        subordinados.add(empleado);
+    }
+    
+    @Override
+    public String toString() {
+        return super.toString().replace("}", "") +
+               ", departamento='" + departamento + '\'' +
+               ", subordinados=" + subordinados.size() +
+               ", bonusConfidencial=" + bonusConfidencial +
+               '}';
+    }
+}
+
+public class EjemploSerializacionCompleto {
+    public static void main(String[] args) {
+        // Crear objetos
+        Empleado emp1 = new Empleado("Juan Pérez", 101);
+        Empleado emp2 = new Empleado("Ana Gómez", 102);
+        
+        Gerente gerente = new Gerente("Carlos Rodríguez", 501, "Ventas");
+        gerente.agregarSubordinado(emp1);
+        gerente.agregarSubordinado(emp2);
+        
+        // Serializar
+        try (ObjectOutputStream out = new ObjectOutputStream(
+                new FileOutputStream("empresa.ser"))) {
+            
+            out.writeObject(gerente);
+            System.out.println("Objetos serializados correctamente");
+            
+        } catch (IOException e) {
+            System.err.println("Error al serializar: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        // Deserializar
+        try (ObjectInputStream in = new ObjectInputStream(
+                new FileInputStream("empresa.ser"))) {
+            
+            Gerente gerenteRecuperado = (Gerente) in.readObject();
+            System.out.println("\nObjeto deserializado:");
+            System.out.println(gerenteRecuperado);
+            
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error al deserializar: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}`} lang="java" />
+
+## Conclusión
+
+En este capítulo, hemos explorado en detalle las capacidades de entrada y salida de archivos en Java, desde la lectura y escritura de archivos de texto y binarios, hasta el manejo eficiente de streams con buffer y la serialización de objetos.
+
+Las operaciones de E/S son fundamentales en muchas aplicaciones Java, permitiendo la persistencia de datos, la comunicación entre sistemas y el procesamiento de información. Java proporciona un conjunto rico y flexible de clases para manejar estas operaciones, desde las API tradicionales en `java.io` hasta las más modernas y eficientes en `java.nio`.
+
+Algunas consideraciones finales a tener en cuenta:
+
+- Siempre cierra los recursos de E/S utilizando try-with-resources o bloques finally
+- Considera el rendimiento al elegir entre las diferentes clases y métodos
+- Maneja adecuadamente las excepciones que pueden ocurrir durante las operaciones de E/S
+- Para aplicaciones de alto rendimiento o con requisitos especiales, explora las capacidades avanzadas de `java.nio`
+- Cuando trabajes con serialización, considera las implicaciones de seguridad y compatibilidad
+
+Dominar estas APIs te permitirá desarrollar aplicaciones Java robustas que interactúan eficientemente con el sistema de archivos y manejan datos de manera efectiva.

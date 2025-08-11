@@ -1,0 +1,328 @@
+---
+/**
+ * Colaborators.astro - Componente que muestra los colaboradores del proyecto
+ * 
+ * Este componente obtiene y muestra los colaboradores del repositorio
+ * con sus roles y contribuciones de forma profesional.
+ */
+
+// Definición de tipos
+interface Colaborator {
+  login: string;
+  html_url: string;
+  avatar_url: string;
+  contributions?: number;
+}
+
+interface TeamMember {
+  login: string;
+  roles: string[];
+  bio?: string;
+}
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+// Datos de roles específicos para miembros del equipo
+const teamMembers: Record<string, TeamMember> = {
+  "Nelson-5553": {
+    login: "Nelson-5553",
+    roles: ["Developer", "Documentation"],
+    bio: "Core developer and documentation specialist"
+  },
+  "serg1l": {
+    login: "serg1l",
+    roles: ["Developer", "Translator"],
+    bio: "Developer and multilingual support"
+  }
+};
+
+// Obtener colaboradores desde la API de GitHub con manejo de errores
+let contributors: Colaborator[] = [];
+try {
+  const response = await fetch('https://api.github.com/repos/degidev/degidocs/contributors');
+  
+  if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.status}`);
+  }
+  
+  contributors = await response.json();
+  
+  // Ordenar por número de contribuciones (si está disponible)
+  contributors.sort((a, b) => (b.contributions || 0) - (a.contributions || 0));
+} catch (error) {
+  console.error('Error fetching contributors:', error);
+}
+---
+
+<style>
+  /* Contenedor principal de colaboradores */
+  .contributors-section {
+    margin: 2rem 0;
+  }
+  
+  .contributors-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  /* Tarjeta de colaborador */
+  .colab-flex {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  :is(.card:hover) .colab-flex {
+    transform: translateY(-5px);
+  }
+  
+  /* Imagen de perfil */
+  .colab-img-container {
+    position: relative;
+  }
+  
+  .colab-img {
+    border-radius: 50%;
+    border: 3px solid #306998;
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  :is(.card:hover) .colab-img {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .contribution-count {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #306998;
+    color: white;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border: 2px solid white;
+  }
+  
+  /* Información del colaborador */
+  .colab-content {
+    flex: 1;
+  }
+  
+  .colab-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #306998;
+  }
+  
+  .colab-bio {
+    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+    color: var(--sl-color-gray-5);
+  }
+  
+  .colab-role {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #306998;
+  }
+  
+  /* Badges de roles */
+  .colab-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 0.8rem;
+  }
+  
+  .colab-badge {
+    display: inline-block;
+    background: #306998;
+    color: #fff;
+    border-radius: 20px;
+    padding: 0.25em 0.8em;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .colab-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Enlaces */
+  .colab-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.8rem;
+  }
+  
+  .colab-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: #306998;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+  }
+  
+  .colab-link:hover {
+    background: rgba(48, 105, 152, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .colab-link svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  /* Modo oscuro */
+  :root[data-theme="dark"] .colab-img {
+    border-color: #FFD43B;
+  }
+  
+  :root[data-theme="dark"] .colab-name,
+  :root[data-theme="dark"] .colab-role,
+  :root[data-theme="dark"] .colab-link {
+    color: #FFD43B;
+  }
+  
+  :root[data-theme="dark"] .colab-badge,
+  :root[data-theme="dark"] .contribution-count {
+    background: #FFD43B;
+    color: #22223b;
+  }
+  
+  :root[data-theme="dark"] .colab-link:hover {
+    background: rgba(255, 212, 59, 0.1);
+  }
+  
+  /* Responsividad */
+  @media (max-width: 768px) {
+    .colab-flex {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1.2rem;
+    }
+    
+    .colab-info {
+      justify-content: center;
+    }
+    
+    .colab-links {
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .colab-img {
+      width: 90px;
+      height: 90px;
+    }
+    
+    .contribution-count {
+      width: 28px;
+      height: 28px;
+      font-size: 0.7rem;
+    }
+  }
+</style>
+
+<div class="contributors-section">
+  <h2 class="contributors-title">Nuestro Equipo de Colaboradores</h2>
+  
+  {contributors.length === 0 && (
+    <Card title="Error de carga">
+      <p>No se pudieron cargar los colaboradores. Por favor, inténtalo de nuevo más tarde.</p>
+    </Card>
+  )}
+  
+  <CardGrid>
+    {contributors
+      .filter((contributor: Colaborator) => contributor.login !== 'astrobot-houston')
+      .map((contributor: Colaborator) => {
+        const isTeamMember = teamMembers[contributor.login];
+        const roles = isTeamMember ? teamMembers[contributor.login].roles : ["Developer"];
+        const bio = isTeamMember?.bio;
+        
+        return (
+          <Card title={contributor.login}>
+            <div class="colab-flex">
+              <div class="colab-img-container">
+                <img 
+                  src={contributor.avatar_url} 
+                  alt={`Avatar de ${contributor.login}`} 
+                  class="colab-img" 
+                  loading="lazy" 
+                />
+                {contributor.contributions && (
+                  <div class="contribution-count" title="Número de contribuciones">
+                    {contributor.contributions}
+                  </div>
+                )}
+              </div>
+              
+              <div class="colab-content">
+                <div class="colab-name">{contributor.login}</div>
+                
+                {bio && <div class="colab-bio">{bio}</div>}
+                
+                <div class="colab-role">Contribuciones:</div>
+                
+                <div class="colab-info">
+                  {roles.map(role => (
+                    <span class="colab-badge">{role}</span>
+                  ))}
+                </div>
+                
+                <div class="colab-links">
+                  <a href={contributor.html_url} target="_blank" rel="noopener noreferrer" class="colab-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                    </svg>
+                    GitHub
+                  </a>
+                  
+                  {/* Enlace condicional a perfil personal si existe en datos de equipo */}
+                  {isTeamMember && (
+                    <a href="#" class="colab-link">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                        <rect x="2" y="9" width="4" height="12"></rect>
+                        <circle cx="4" cy="4" r="2"></circle>
+                      </svg>
+                      Perfil
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </Card>
+        );
+      })
+    }
+  </CardGrid>
+</div>

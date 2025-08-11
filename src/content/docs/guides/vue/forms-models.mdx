@@ -1,0 +1,546 @@
+---
+title: 08. Formularios y Modelos
+description: v-model con Composition API, v-model personalizado con modelValue y validación básica
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## v-model con Composition API
+
+En Vue 3 con Composition API, `v-model` sigue siendo la directiva principal para crear enlaces bidireccionales entre formularios y datos reactivos. A diferencia de la Options API, los datos reactivos se definen usando `ref()` o `reactive()`.
+
+### Uso básico de v-model
+
+```vue
+<script setup>
+import { ref } from 'vue'
+
+// Valores individuales
+const username = ref('')
+const password = ref('')
+const rememberMe = ref(false)
+
+// Objeto reactivo para agrupar campos relacionados
+const form = reactive({
+  username: '',
+  password: '',
+  rememberMe: false
+})
+
+function handleSubmit() {
+  console.log('Formulario enviado:', {
+    username: username.value,
+    password: password.value,
+    rememberMe: rememberMe.value
+  })
+  
+  // O si usas el objeto reactivo
+  console.log('Formulario enviado:', form)
+}
+</script>
+
+<template>
+  <form @submit.prevent="handleSubmit">
+    <!-- Usando refs individuales -->
+    <div>
+      <label for="username">Usuario:</label>
+      <input id="username" v-model="username" type="text" />
+    </div>
+    
+    <div>
+      <label for="password">Contraseña:</label>
+      <input id="password" v-model="password" type="password" />
+    </div>
+    
+    <div>
+      <label>
+        <input type="checkbox" v-model="rememberMe" />
+        Recordarme
+      </label>
+    </div>
+    
+    <!-- O usando un objeto reactivo -->
+    <!--
+    <div>
+      <label for="username">Usuario:</label>
+      <input id="username" v-model="form.username" type="text" />
+    </div>
+    
+    <div>
+      <label for="password">Contraseña:</label>
+      <input id="password" v-model="form.password" type="password" />
+    </div>
+    
+    <div>
+      <label>
+        <input type="checkbox" v-model="form.rememberMe" />
+        Recordarme
+      </label>
+    </div>
+    -->
+    
+    <button type="submit">Iniciar sesión</button>
+  </form>
+</template>
+```
+
+### Modificadores de v-model
+
+Vue proporciona varios modificadores para `v-model` que facilitan la manipulación de la entrada del usuario:
+
+```vue
+<script setup>
+import { ref } from 'vue'
+
+const message = ref('')
+const age = ref(0)
+const trimmedInput = ref('')
+const lazyInput = ref('')
+</script>
+
+<template>
+  <div>
+    <!-- .number: convierte la entrada a número -->
+    <input v-model.number="age" type="text" />
+    <p>Edad + 1 = {{ age + 1 }}</p>
+    
+    <!-- .trim: elimina espacios en blanco al inicio y final -->
+    <input v-model.trim="trimmedInput" placeholder="Se eliminarán espacios" />
+    
+    <!-- .lazy: actualiza después de cambiar el foco (no en cada pulsación) -->
+    <input v-model.lazy="lazyInput" placeholder="Actualiza al perder foco" />
+  </div>
+</template>
+```
+
+## v-model personalizado con modelValue
+
+En Vue 3, puedes crear componentes con su propio `v-model` personalizado. Esto permite crear componentes de formulario reutilizables que mantienen la misma experiencia de enlace bidireccional que los elementos nativos.
+
+### Implementación básica de v-model personalizado
+
+<Tabs>
+  <TabItem label="Componente hijo">
+    ```vue
+    <!-- CustomInput.vue -->
+    <script setup>
+    // Define las props y eventos
+    const props = defineProps({
+      modelValue: String // Nombre especial para v-model
+    })
+    
+    const emit = defineEmits(['update:modelValue'])
+    
+    // Función para emitir el evento de actualización
+    function updateValue(event) {
+      emit('update:modelValue', event.target.value)
+    }
+    </script>
+    
+    <template>
+      <input 
+        :value="modelValue" 
+        @input="updateValue"
+        class="custom-input" 
+      />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Componente padre">
+    ```vue
+    <script setup>
+    import { ref } from 'vue'
+    import CustomInput from './CustomInput.vue'
+    
+    const username = ref('')
+    </script>
+    
+    <template>
+      <div>
+        <label>Nombre de usuario:</label>
+        <CustomInput v-model="username" />
+        <p>Valor actual: {{ username }}</p>
+      </div>
+    </template>
+    ```
+  </TabItem>
+</Tabs>
+
+### Componente con v-model usando computed
+
+Una forma más elegante de implementar un v-model personalizado es usando una propiedad computada con getter y setter:
+
+```vue
+<!-- CustomInput.vue -->
+<script setup>
+import { computed } from 'vue'
+
+const props = defineProps({
+  modelValue: String
+})
+
+const emit = defineEmits(['update:modelValue'])
+
+// Propiedad computada con getter y setter
+const value = computed({
+  get() {
+    return props.modelValue
+  },
+  set(value) {
+    emit('update:modelValue', value)
+  }
+})
+</script>
+
+<template>
+  <input v-model="value" class="custom-input" />
+</template>
+```
+
+### Múltiples v-model en un componente
+
+En Vue 3, puedes tener múltiples v-model en un mismo componente, especificando nombres personalizados:
+
+<Tabs>
+  <TabItem label="Componente hijo">
+    ```vue
+    <!-- UserForm.vue -->
+    <script setup>
+    const props = defineProps({
+      firstName: String,
+      lastName: String
+    })
+    
+    const emit = defineEmits(['update:firstName', 'update:lastName'])
+    
+    // Computadas para cada v-model
+    const firstNameModel = computed({
+      get: () => props.firstName,
+      set: (value) => emit('update:firstName', value)
+    })
+    
+    const lastNameModel = computed({
+      get: () => props.lastName,
+      set: (value) => emit('update:lastName', value)
+    })
+    </script>
+    
+    <template>
+      <div>
+        <input v-model="firstNameModel" placeholder="Nombre" />
+        <input v-model="lastNameModel" placeholder="Apellido" />
+      </div>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Componente padre">
+    ```vue
+    <script setup>
+    import { ref } from 'vue'
+    import UserForm from './UserForm.vue'
+    
+    const firstName = ref('')
+    const lastName = ref('')
+    </script>
+    
+    <template>
+      <UserForm
+        v-model:firstName="firstName"
+        v-model:lastName="lastName"
+      />
+      
+      <p>Nombre completo: {{ firstName }} {{ lastName }}</p>
+    </template>
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+Cuando creas un componente con v-model personalizado, asegúrate de seguir estas reglas:
+
+1. Para un v-model estándar, usa `modelValue` como nombre de prop y emite `update:modelValue`
+2. Para múltiples v-model, usa nombres descriptivos como props y emite `update:nombreProp`
+3. Considera usar computadas con getter/setter para simplificar la implementación
+</Aside>
+
+## Validación básica
+
+La validación de formularios es una parte esencial de cualquier aplicación. Con la Composition API, puedes implementar validaciones de forma limpia y reutilizable.
+
+### Validación simple con refs y computed
+
+```vue
+<script setup>
+import { ref, computed } from 'vue'
+
+const email = ref('')
+const password = ref('')
+const submitted = ref(false)
+
+// Validaciones computadas
+const emailError = computed(() => {
+  if (!email.value) return submitted.value ? 'El email es obligatorio' : ''
+  if (!/^\S+@\S+\.\S+$/.test(email.value)) return 'Email inválido'
+  return ''
+})
+
+const passwordError = computed(() => {
+  if (!password.value) return submitted.value ? 'La contraseña es obligatoria' : ''
+  if (password.value.length < 6) return 'La contraseña debe tener al menos 6 caracteres'
+  return ''
+})
+
+const isFormValid = computed(() => {
+  return !emailError.value && !passwordError.value && email.value && password.value
+})
+
+function handleSubmit() {
+  submitted.value = true
+  
+  if (isFormValid.value) {
+    console.log('Formulario válido, enviando datos...')
+    // Enviar datos al servidor
+  } else {
+    console.log('Formulario inválido')
+  }
+}
+</script>
+
+<template>
+  <form @submit.prevent="handleSubmit">
+    <div>
+      <label for="email">Email:</label>
+      <input 
+        id="email" 
+        v-model="email" 
+        type="email" 
+        :class="{ 'error': emailError && submitted }" 
+      />
+      <p v-if="emailError && submitted" class="error-message">{{ emailError }}</p>
+    </div>
+    
+    <div>
+      <label for="password">Contraseña:</label>
+      <input 
+        id="password" 
+        v-model="password" 
+        type="password" 
+        :class="{ 'error': passwordError && submitted }" 
+      />
+      <p v-if="passwordError && submitted" class="error-message">{{ passwordError }}</p>
+    </div>
+    
+    <button type="submit">Registrarse</button>
+  </form>
+</template>
+
+<style scoped>
+.error {
+  border-color: red;
+}
+.error-message {
+  color: red;
+  font-size: 0.8em;
+  margin-top: 0.2em;
+}
+</style>
+```
+
+### Validación con composables reutilizables
+
+Para formularios más complejos, es recomendable extraer la lógica de validación a composables reutilizables:
+
+<Tabs>
+  <TabItem label="Composable de validación">
+    ```js
+    // useValidation.js
+    import { ref, computed } from 'vue'
+    
+    export function useField(initialValue = '', validations) {
+      const value = ref(initialValue)
+      const errors = ref([])
+      const dirty = ref(false)
+      
+      const validate = () => {
+        errors.value = []
+        
+        for (const validation of validations) {
+          const error = validation(value.value)
+          if (error) {
+            errors.value.push(error)
+          }
+        }
+        
+        return errors.value.length === 0
+      }
+      
+      const onBlur = () => {
+        dirty.value = true
+        validate()
+      }
+      
+      const isValid = computed(() => errors.value.length === 0)
+      
+      return {
+        value,
+        errors,
+        dirty,
+        isValid,
+        validate,
+        onBlur
+      }
+    }
+    
+    // Validadores comunes
+    export const required = (message = 'Este campo es obligatorio') => {
+      return (value) => {
+        return (value === undefined || value === null || value === '') ? message : null
+      }
+    }
+    
+    export const minLength = (min, message) => {
+      return (value) => {
+        return value.length < min ? (message || `Debe tener al menos ${min} caracteres`) : null
+      }
+    }
+    
+    export const email = (message = 'Email inválido') => {
+      return (value) => {
+        const re = /^\S+@\S+\.\S+$/
+        return !re.test(value) ? message : null
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Uso en componente">
+    ```vue
+    <script setup>
+    import { computed } from 'vue'
+    import { useField, required, minLength, email } from './useValidation'
+    
+    const emailField = useField('', [
+      required('El email es obligatorio'),
+      email()
+    ])
+    
+    const passwordField = useField('', [
+      required('La contraseña es obligatoria'),
+      minLength(6, 'La contraseña debe tener al menos 6 caracteres')
+    ])
+    
+    const isFormValid = computed(() => {
+      return emailField.isValid.value && passwordField.isValid.value
+    })
+    
+    function handleSubmit() {
+      // Validar todos los campos
+      const isEmailValid = emailField.validate()
+      const isPasswordValid = passwordField.validate()
+      
+      if (isFormValid.value) {
+        console.log('Enviando formulario...', {
+          email: emailField.value.value,
+          password: passwordField.value.value
+        })
+      }
+    }
+    </script>
+    
+    <template>
+      <form @submit.prevent="handleSubmit">
+        <div>
+          <label for="email">Email:</label>
+          <input 
+            id="email" 
+            v-model="emailField.value" 
+            @blur="emailField.onBlur" 
+            type="email" 
+            :class="{ 'error': emailField.errors.length && emailField.dirty }" 
+          />
+          <p v-if="emailField.errors.length && emailField.dirty" class="error-message">
+            {{ emailField.errors[0] }}
+          </p>
+        </div>
+        
+        <div>
+          <label for="password">Contraseña:</label>
+          <input 
+            id="password" 
+            v-model="passwordField.value" 
+            @blur="passwordField.onBlur" 
+            type="password" 
+            :class="{ 'error': passwordField.errors.length && passwordField.dirty }" 
+          />
+          <p v-if="passwordField.errors.length && passwordField.dirty" class="error-message">
+            {{ passwordField.errors[0] }}
+          </p>
+        </div>
+        
+        <button type="submit" :disabled="!isFormValid">Registrarse</button>
+      </form>
+    </template>
+    ```
+  </TabItem>
+</Tabs>
+
+### Integración con bibliotecas de validación
+
+Para aplicaciones más complejas, puedes utilizar bibliotecas de validación como VeeValidate, Vuelidate o Formkit, que se integran perfectamente con la Composition API:
+
+```vue
+<script setup>
+import { useForm, useField } from 'vee-validate'
+import * as yup from 'yup'
+
+// Definir esquema de validación
+const schema = yup.object({
+  email: yup.string().required('El email es obligatorio').email('Email inválido'),
+  password: yup.string().required('La contraseña es obligatoria').min(6, 'Mínimo 6 caracteres')
+})
+
+// Usar el hook de formulario
+const { handleSubmit, errors, values } = useForm({
+  validationSchema: schema
+})
+
+// Registrar campos
+const { value: email } = useField('email')
+const { value: password } = useField('password')
+
+// Función de envío
+const onSubmit = handleSubmit((values) => {
+  console.log('Formulario enviado:', values)
+})
+</script>
+
+<template>
+  <form @submit="onSubmit">
+    <div>
+      <label for="email">Email</label>
+      <input id="email" v-model="email" type="email" />
+      <p v-if="errors.email" class="error-message">{{ errors.email }}</p>
+    </div>
+    
+    <div>
+      <label for="password">Contraseña</label>
+      <input id="password" v-model="password" type="password" />
+      <p v-if="errors.password" class="error-message">{{ errors.password }}</p>
+    </div>
+    
+    <button type="submit">Enviar</button>
+  </form>
+</template>
+```
+
+<Aside>
+Cuando implementes validaciones de formularios, considera estas buenas prácticas:
+
+1. Validar tanto en el cliente como en el servidor
+2. Proporcionar retroalimentación inmediata al usuario
+3. Mostrar mensajes de error claros y específicos
+4. Considerar la accesibilidad (atributos ARIA, mensajes para lectores de pantalla)
+5. Implementar validación en tiempo real para campos críticos
+</Aside>

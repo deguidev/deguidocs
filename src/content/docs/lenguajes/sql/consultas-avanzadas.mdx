@@ -1,0 +1,819 @@
+---
+title: 4. Consultas Avanzadas
+description: Aprende a utilizar funciones de agregación, agrupaciones y consultas combinadas en SQL
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Consultas Avanzadas
+
+Las consultas avanzadas en SQL permiten realizar operaciones complejas sobre los datos, como cálculos agregados, combinación de tablas y subconsultas. Estas técnicas son fundamentales para el análisis de datos y la generación de informes en sistemas de bases de datos relacionales.
+
+## 4.1. Funciones de agregación (SUM, AVG, COUNT, MAX, MIN)
+
+Las funciones de agregación realizan cálculos sobre conjuntos de filas y devuelven un único valor. Son herramientas poderosas para el análisis de datos y estadísticas.
+
+### Funciones de agregación básicas
+
+<Tabs>
+  <TabItem label="COUNT">
+    La función `COUNT` cuenta el número de filas o valores no nulos en un conjunto de resultados.
+    
+    ```sql
+    -- Contar todas las filas de una tabla
+    SELECT COUNT(*) AS total_empleados FROM empleados;
+    
+    -- Contar valores no nulos en una columna
+    SELECT COUNT(telefono) AS empleados_con_telefono FROM empleados;
+    
+    -- Contar valores únicos
+    SELECT COUNT(DISTINCT departamento_id) AS num_departamentos FROM empleados;
+    ```
+  </TabItem>
+  <TabItem label="SUM">
+    La función `SUM` calcula la suma de los valores en una columna numérica.
+    
+    ```sql
+    -- Sumar todos los salarios
+    SELECT SUM(salario) AS suma_salarios FROM empleados;
+    
+    -- Sumar con condición
+    SELECT SUM(salario) AS suma_salarios_ventas 
+    FROM empleados 
+    WHERE departamento_id = 3;
+    
+    -- Sumar valores calculados
+    SELECT SUM(precio * cantidad) AS valor_total_inventario 
+    FROM productos;
+    ```
+  </TabItem>
+  <TabItem label="AVG">
+    La función `AVG` calcula el promedio (media aritmética) de los valores en una columna numérica.
+    
+    ```sql
+    -- Calcular el salario promedio
+    SELECT AVG(salario) AS salario_promedio FROM empleados;
+    
+    -- Promedio con condición
+    SELECT AVG(salario) AS salario_promedio_gerentes 
+    FROM empleados 
+    WHERE cargo LIKE '%Gerente%';
+    
+    -- Promedio con DISTINCT (valores únicos)
+    SELECT AVG(DISTINCT precio) AS precio_promedio_unico 
+    FROM productos;
+    ```
+  </TabItem>
+  <TabItem label="MAX y MIN">
+    Las funciones `MAX` y `MIN` devuelven el valor máximo y mínimo respectivamente de una columna.
+    
+    ```sql
+    -- Encontrar el salario máximo y mínimo
+    SELECT 
+        MAX(salario) AS salario_maximo, 
+        MIN(salario) AS salario_minimo 
+    FROM empleados;
+    
+    -- Encontrar la fecha más reciente y más antigua
+    SELECT 
+        MAX(fecha_pedido) AS pedido_mas_reciente,
+        MIN(fecha_pedido) AS pedido_mas_antiguo
+    FROM pedidos;
+    
+    -- Combinar con otras columnas (MySQL)
+    SELECT 
+        departamento_id,
+        MAX(salario) AS salario_maximo
+    FROM empleados
+    GROUP BY departamento_id;
+    ```
+  </TabItem>
+</Tabs>
+
+### Funciones de agregación avanzadas
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- STDDEV: Desviación estándar
+    SELECT STDDEV(salario) AS desviacion_salario FROM empleados;
+    
+    -- VARIANCE: Varianza
+    SELECT VARIANCE(salario) AS varianza_salario FROM empleados;
+    
+    -- GROUP_CONCAT: Concatenar valores de grupo
+    SELECT 
+        departamento_id,
+        GROUP_CONCAT(nombre SEPARATOR ', ') AS empleados
+    FROM empleados
+    GROUP BY departamento_id;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- STDDEV: Desviación estándar
+    SELECT STDDEV(salario) AS desviacion_salario FROM empleados;
+    
+    -- VARIANCE: Varianza
+    SELECT VARIANCE(salario) AS varianza_salario FROM empleados;
+    
+    -- LISTAGG: Concatenar valores de grupo (equivalente a GROUP_CONCAT)
+    SELECT 
+        departamento_id,
+        LISTAGG(nombre, ', ') WITHIN GROUP (ORDER BY nombre) AS empleados
+    FROM empleados
+    GROUP BY departamento_id;
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Las funciones de agregación ignoran los valores NULL en sus cálculos. Por ejemplo, AVG(columna) calcula el promedio solo de los valores no nulos. Si necesitas incluir los valores NULL como 0, puedes usar COALESCE o IFNULL, por ejemplo: AVG(COALESCE(columna, 0)).
+</Aside>
+
+## 4.2. Agrupar datos (GROUP BY)
+
+La cláusula `GROUP BY` permite agrupar filas que tienen los mismos valores en columnas especificadas. Se utiliza comúnmente con funciones de agregación para realizar cálculos sobre cada grupo.
+
+### Agrupación básica
+
+```sql
+-- Contar empleados por departamento
+SELECT 
+    departamento_id,
+    COUNT(*) AS num_empleados
+FROM empleados
+GROUP BY departamento_id;
+
+-- Calcular salario promedio por departamento
+SELECT 
+    departamento_id,
+    AVG(salario) AS salario_promedio
+FROM empleados
+GROUP BY departamento_id;
+```
+
+### Agrupación por múltiples columnas
+
+```sql
+-- Agrupar por departamento y cargo
+SELECT 
+    departamento_id,
+    cargo,
+    COUNT(*) AS num_empleados,
+    AVG(salario) AS salario_promedio
+FROM empleados
+GROUP BY departamento_id, cargo;
+```
+
+### Agrupación con ordenación
+
+```sql
+-- Ordenar grupos por el número de empleados (descendente)
+SELECT 
+    departamento_id,
+    COUNT(*) AS num_empleados
+FROM empleados
+GROUP BY departamento_id
+ORDER BY num_empleados DESC;
+```
+
+### Agrupación con expresiones
+
+```sql
+-- Agrupar por año de contratación
+SELECT 
+    YEAR(fecha_contratacion) AS anio,
+    COUNT(*) AS num_contrataciones
+FROM empleados
+GROUP BY YEAR(fecha_contratacion)
+ORDER BY anio;
+```
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Agrupar por rango de salario
+    SELECT 
+        CASE 
+            WHEN salario < 30000 THEN 'Bajo'
+            WHEN salario BETWEEN 30000 AND 60000 THEN 'Medio'
+            ELSE 'Alto'
+        END AS rango_salario,
+        COUNT(*) AS num_empleados
+    FROM empleados
+    GROUP BY rango_salario;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Agrupar por rango de salario
+    SELECT 
+        CASE 
+            WHEN salario < 30000 THEN 'Bajo'
+            WHEN salario BETWEEN 30000 AND 60000 THEN 'Medio'
+            ELSE 'Alto'
+        END AS rango_salario,
+        COUNT(*) AS num_empleados
+    FROM empleados
+    GROUP BY CASE 
+        WHEN salario < 30000 THEN 'Bajo'
+        WHEN salario BETWEEN 30000 AND 60000 THEN 'Medio'
+        ELSE 'Alto'
+    END;
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+  Cuando se utiliza GROUP BY, todas las columnas en la lista SELECT deben ser:
+  1. Columnas incluidas en la cláusula GROUP BY, o
+  2. Columnas utilizadas dentro de funciones de agregación (COUNT, SUM, AVG, etc.)
+  
+  De lo contrario, la consulta producirá un error o resultados impredecibles.
+</Aside>
+
+### Agrupación con ROLLUP (Totales y subtotales)
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Generar subtotales y total general
+    SELECT 
+        departamento_id,
+        cargo,
+        SUM(salario) AS suma_salarios
+    FROM empleados
+    GROUP BY departamento_id, cargo WITH ROLLUP;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Generar subtotales y total general
+    SELECT 
+        departamento_id,
+        cargo,
+        SUM(salario) AS suma_salarios
+    FROM empleados
+    GROUP BY ROLLUP(departamento_id, cargo);
+    ```
+  </TabItem>
+</Tabs>
+
+## 4.3. Filtrar grupos (HAVING)
+
+La cláusula `HAVING` permite filtrar grupos basados en condiciones de agregación. Mientras que `WHERE` filtra filas individuales antes de la agrupación, `HAVING` filtra los grupos después de que se han formado.
+
+### Sintaxis básica
+
+```sql
+SELECT columna1, columna2, funcion_agregacion(columna3)
+FROM tabla
+[WHERE condicion_filas]
+GROUP BY columna1, columna2
+HAVING condicion_grupos
+[ORDER BY columna];
+```
+
+### Ejemplos de HAVING
+
+```sql
+-- Encontrar departamentos con más de 5 empleados
+SELECT 
+    departamento_id,
+    COUNT(*) AS num_empleados
+FROM empleados
+GROUP BY departamento_id
+HAVING COUNT(*) > 5;
+
+-- Departamentos con salario promedio superior a 50000
+SELECT 
+    departamento_id,
+    AVG(salario) AS salario_promedio
+FROM empleados
+GROUP BY departamento_id
+HAVING AVG(salario) > 50000;
+
+-- Productos con ventas totales superiores a 10000
+SELECT 
+    p.id_producto,
+    p.nombre,
+    SUM(dp.cantidad * dp.precio) AS ventas_totales
+FROM productos p
+JOIN detalles_pedido dp ON p.id_producto = dp.id_producto
+GROUP BY p.id_producto, p.nombre
+HAVING SUM(dp.cantidad * dp.precio) > 10000
+ORDER BY ventas_totales DESC;
+```
+
+### Combinando WHERE y HAVING
+
+```sql
+-- Departamentos con salario promedio alto, excluyendo gerentes
+SELECT 
+    departamento_id,
+    AVG(salario) AS salario_promedio
+FROM empleados
+WHERE cargo NOT LIKE '%Gerente%'  -- Filtro a nivel de fila
+GROUP BY departamento_id
+HAVING AVG(salario) > 40000;      -- Filtro a nivel de grupo
+```
+
+<Aside type="tip">
+  <strong>WHERE vs. HAVING:</strong>
+  <ul>
+    <li>Use <strong>WHERE</strong> para filtrar filas individuales antes de agruparlas.</li>
+    <li>Use <strong>HAVING</strong> para filtrar grupos después de la agrupación.</li>
+    <li>Por rendimiento, es mejor usar WHERE siempre que sea posible para reducir el número de filas antes de la agrupación.</li>
+  </ul>
+</Aside>
+
+### HAVING con expresiones complejas
+
+```sql
+-- Encontrar categorías donde el precio máximo es al menos el doble del precio promedio
+SELECT 
+    categoria_id,
+    AVG(precio) AS precio_promedio,
+    MAX(precio) AS precio_maximo
+FROM productos
+GROUP BY categoria_id
+HAVING MAX(precio) >= 2 * AVG(precio);
+
+-- Productos con ventas en al menos 3 meses diferentes
+SELECT 
+    p.id_producto,
+    p.nombre,
+    COUNT(DISTINCT MONTH(dp.fecha_venta)) AS num_meses_con_ventas
+FROM productos p
+JOIN detalles_pedido dp ON p.id_producto = dp.id_producto
+GROUP BY p.id_producto, p.nombre
+HAVING COUNT(DISTINCT MONTH(dp.fecha_venta)) >= 3;
+```
+
+## 4.4. Subconsultas (Subqueries)
+
+Las subconsultas son consultas anidadas dentro de otra consulta. Permiten realizar operaciones complejas y utilizar los resultados de una consulta como parte de otra.
+
+### Tipos de subconsultas
+
+1. **Subconsultas escalares**: Devuelven un único valor.
+2. **Subconsultas de fila**: Devuelven una sola fila con múltiples columnas.
+3. **Subconsultas de lista**: Devuelven una columna con múltiples filas.
+4. **Subconsultas de tabla**: Devuelven múltiples filas y columnas.
+
+### Subconsultas en la cláusula WHERE
+
+```sql
+-- Empleados con salario superior al promedio
+SELECT nombre, apellido, salario
+FROM empleados
+WHERE salario > (SELECT AVG(salario) FROM empleados);
+
+-- Productos que no tienen ventas
+SELECT id_producto, nombre
+FROM productos
+WHERE id_producto NOT IN (
+    SELECT DISTINCT id_producto 
+    FROM detalles_pedido
+);
+```
+
+### Subconsultas con operadores de comparación
+
+```sql
+-- Empleados con el salario más alto en cada departamento
+SELECT e.nombre, e.apellido, e.departamento_id, e.salario
+FROM empleados e
+WHERE e.salario = (
+    SELECT MAX(salario)
+    FROM empleados
+    WHERE departamento_id = e.departamento_id
+);
+```
+
+### Subconsultas con EXISTS y NOT EXISTS
+
+```sql
+-- Clientes que han realizado al menos un pedido
+SELECT id_cliente, nombre
+FROM clientes c
+WHERE EXISTS (
+    SELECT 1 FROM pedidos p
+    WHERE p.cliente_id = c.id_cliente
+);
+
+-- Clientes que nunca han realizado un pedido
+SELECT id_cliente, nombre
+FROM clientes c
+WHERE NOT EXISTS (
+    SELECT 1 FROM pedidos p
+    WHERE p.cliente_id = c.id_cliente
+);
+```
+
+### Subconsultas en la cláusula FROM
+
+```sql
+-- Promedio de ventas mensuales por producto
+SELECT 
+    producto_id,
+    AVG(total_ventas) AS promedio_ventas_mensuales
+FROM (
+    SELECT 
+        p.id_producto AS producto_id,
+        YEAR(dp.fecha_venta) AS anio,
+        MONTH(dp.fecha_venta) AS mes,
+        SUM(dp.cantidad * dp.precio) AS total_ventas
+    FROM productos p
+    JOIN detalles_pedido dp ON p.id_producto = dp.id_producto
+    GROUP BY p.id_producto, YEAR(dp.fecha_venta), MONTH(dp.fecha_venta)
+) AS ventas_mensuales
+GROUP BY producto_id;
+```
+
+### Subconsultas en la cláusula SELECT
+
+```sql
+-- Mostrar el salario y la diferencia con el promedio del departamento
+SELECT 
+    e.nombre,
+    e.departamento_id,
+    e.salario,
+    (SELECT AVG(salario) FROM empleados WHERE departamento_id = e.departamento_id) AS salario_promedio_dept,
+    e.salario - (SELECT AVG(salario) FROM empleados WHERE departamento_id = e.departamento_id) AS diferencia
+FROM empleados e;
+```
+
+### Subconsultas correlacionadas
+
+Las subconsultas correlacionadas hacen referencia a columnas de la consulta externa.
+
+```sql
+-- Empleados que ganan más que el promedio de su departamento
+SELECT e1.nombre, e1.apellido, e1.departamento_id, e1.salario
+FROM empleados e1
+WHERE e1.salario > (
+    SELECT AVG(e2.salario)
+    FROM empleados e2
+    WHERE e2.departamento_id = e1.departamento_id
+);
+```
+
+<Aside type="caution">
+  Las subconsultas correlacionadas pueden afectar al rendimiento, ya que la subconsulta se ejecuta una vez por cada fila procesada en la consulta externa. Considere alternativas como JOINs cuando sea posible.
+</Aside>
+
+## 4.5. Consultas combinadas (UNION, INTERSECT, MINUS/EXCEPT)
+
+Las operaciones de conjunto permiten combinar resultados de múltiples consultas. Cada consulta debe tener el mismo número de columnas y tipos de datos compatibles.
+
+### UNION y UNION ALL
+
+`UNION` combina los resultados de dos o más consultas y elimina duplicados. `UNION ALL` incluye todos los registros, incluyendo duplicados.
+
+```sql
+-- Combinar clientes y proveedores en una lista de contactos
+SELECT id_cliente AS id, nombre, email, 'Cliente' AS tipo
+FROM clientes
+UNION
+SELECT id_proveedor, nombre_empresa, email_contacto, 'Proveedor'
+FROM proveedores
+ORDER BY nombre;
+
+-- Unir todos los registros (incluyendo duplicados)
+SELECT producto_id, fecha
+FROM ventas
+UNION ALL
+SELECT producto_id, fecha
+FROM devoluciones;
+```
+
+### INTERSECT
+
+`INTERSECT` devuelve solo las filas que aparecen en ambos conjuntos de resultados.
+
+<Tabs>
+  <TabItem label="MySQL">
+    MySQL no soporta directamente INTERSECT, pero se puede simular con IN o JOIN:
+    
+    ```sql
+    -- Productos que se han vendido y también han sido devueltos
+    SELECT DISTINCT v.producto_id
+    FROM ventas v
+    WHERE v.producto_id IN (
+        SELECT DISTINCT producto_id
+        FROM devoluciones
+    );
+    
+    -- Alternativa usando JOIN
+    SELECT DISTINCT v.producto_id
+    FROM ventas v
+    JOIN devoluciones d ON v.producto_id = d.producto_id;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Productos que se han vendido y también han sido devueltos
+    SELECT producto_id
+    FROM ventas
+    INTERSECT
+    SELECT producto_id
+    FROM devoluciones;
+    ```
+  </TabItem>
+</Tabs>
+
+### EXCEPT/MINUS
+
+`EXCEPT` (SQL estándar) o `MINUS` (Oracle) devuelve las filas del primer conjunto que no aparecen en el segundo.
+
+<Tabs>
+  <TabItem label="MySQL">
+    MySQL no soporta directamente EXCEPT, pero se puede simular con NOT IN o LEFT JOIN:
+    
+    ```sql
+    -- Productos que se han vendido pero nunca han sido devueltos
+    SELECT DISTINCT v.producto_id
+    FROM ventas v
+    WHERE v.producto_id NOT IN (
+        SELECT DISTINCT producto_id
+        FROM devoluciones
+    );
+    
+    -- Alternativa usando LEFT JOIN
+    SELECT DISTINCT v.producto_id
+    FROM ventas v
+    LEFT JOIN devoluciones d ON v.producto_id = d.producto_id
+    WHERE d.producto_id IS NULL;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Productos que se han vendido pero nunca han sido devueltos
+    SELECT producto_id
+    FROM ventas
+    MINUS
+    SELECT producto_id
+    FROM devoluciones;
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Las operaciones de conjunto operan sobre filas completas, no sobre columnas individuales. Todas las consultas combinadas deben tener el mismo número de columnas y tipos de datos compatibles.
+</Aside>
+
+## 4.6. Joins (INNER, LEFT, RIGHT, FULL)
+
+Los joins permiten combinar filas de dos o más tablas basándose en una condición relacionada.
+
+### Tipos de JOIN
+
+<Tabs>
+  <TabItem label="INNER JOIN">
+    Devuelve filas cuando hay al menos una coincidencia en ambas tablas.
+    
+    ```sql
+    -- Obtener pedidos con información del cliente
+    SELECT 
+        p.id_pedido,
+        p.fecha_pedido,
+        c.nombre AS nombre_cliente,
+        c.email
+    FROM pedidos p
+    INNER JOIN clientes c ON p.cliente_id = c.id_cliente;
+    ```
+  </TabItem>
+  <TabItem label="LEFT JOIN">
+    Devuelve todas las filas de la tabla izquierda y las filas coincidentes de la tabla derecha.
+    
+    ```sql
+    -- Obtener todos los clientes y sus pedidos (si los tienen)
+    SELECT 
+        c.id_cliente,
+        c.nombre,
+        p.id_pedido,
+        p.fecha_pedido
+    FROM clientes c
+    LEFT JOIN pedidos p ON c.id_cliente = p.cliente_id;
+    
+    -- Encontrar clientes sin pedidos
+    SELECT 
+        c.id_cliente,
+        c.nombre
+    FROM clientes c
+    LEFT JOIN pedidos p ON c.id_cliente = p.cliente_id
+    WHERE p.id_pedido IS NULL;
+    ```
+  </TabItem>
+  <TabItem label="RIGHT JOIN">
+    Devuelve todas las filas de la tabla derecha y las filas coincidentes de la tabla izquierda.
+    
+    ```sql
+    -- Obtener todos los pedidos y sus clientes (incluso si el cliente ya no existe)
+    SELECT 
+        p.id_pedido,
+        p.fecha_pedido,
+        c.id_cliente,
+        c.nombre
+    FROM pedidos p
+    RIGHT JOIN clientes c ON p.cliente_id = c.id_cliente;
+    ```
+  </TabItem>
+  <TabItem label="FULL JOIN">
+    Devuelve filas cuando hay una coincidencia en una de las tablas.
+    
+    <Tabs>
+      <TabItem label="MySQL">
+        MySQL no soporta directamente FULL JOIN, pero se puede simular con UNION:
+        
+        ```sql
+        -- Simular FULL JOIN en MySQL
+        SELECT 
+            c.id_cliente,
+            c.nombre,
+            p.id_pedido,
+            p.fecha_pedido
+        FROM clientes c
+        LEFT JOIN pedidos p ON c.id_cliente = p.cliente_id
+        UNION
+        SELECT 
+            c.id_cliente,
+            c.nombre,
+            p.id_pedido,
+            p.fecha_pedido
+        FROM clientes c
+        RIGHT JOIN pedidos p ON c.id_cliente = p.cliente_id
+        WHERE c.id_cliente IS NULL;
+        ```
+      </TabItem>
+      <TabItem label="Oracle">
+        ```sql
+        -- FULL JOIN en Oracle
+        SELECT 
+            c.id_cliente,
+            c.nombre,
+            p.id_pedido,
+            p.fecha_pedido
+        FROM clientes c
+        FULL OUTER JOIN pedidos p ON c.id_cliente = p.cliente_id;
+        ```
+      </TabItem>
+    </Tabs>
+  </TabItem>
+</Tabs>
+
+### JOIN con múltiples tablas
+
+```sql
+-- Obtener detalles de pedidos con información de cliente y producto
+SELECT 
+    c.nombre AS cliente,
+    p.id_pedido,
+    p.fecha_pedido,
+    dp.cantidad,
+    pr.nombre AS producto,
+    dp.precio AS precio_unitario,
+    (dp.cantidad * dp.precio) AS subtotal
+FROM clientes c
+JOIN pedidos p ON c.id_cliente = p.cliente_id
+JOIN detalles_pedido dp ON p.id_pedido = dp.id_pedido
+JOIN productos pr ON dp.id_producto = pr.id_producto
+ORDER BY p.id_pedido, pr.nombre;
+```
+
+### JOIN con condiciones adicionales
+
+```sql
+-- Pedidos recientes con productos caros
+SELECT 
+    p.id_pedido,
+    p.fecha_pedido,
+    c.nombre AS cliente,
+    pr.nombre AS producto,
+    dp.precio
+FROM pedidos p
+JOIN clientes c ON p.cliente_id = c.id_cliente
+JOIN detalles_pedido dp ON p.id_pedido = dp.id_pedido
+JOIN productos pr ON dp.id_producto = pr.id_producto
+WHERE p.fecha_pedido >= '2023-01-01'
+  AND dp.precio > 100
+ORDER BY p.fecha_pedido DESC;
+```
+
+### JOIN con alias de tabla
+
+```sql
+-- Comparar salarios de empleados con sus gerentes
+SELECT 
+    e.nombre AS empleado,
+    e.salario AS salario_empleado,
+    g.nombre AS gerente,
+    g.salario AS salario_gerente
+FROM empleados e
+JOIN empleados g ON e.id_gerente = g.id_empleado
+WHERE e.salario > g.salario;
+```
+
+<Aside type="tip">
+  Usar alias de tabla hace que las consultas sean más legibles y reduce la cantidad de texto necesario, especialmente en consultas complejas con múltiples joins.
+</Aside>
+
+## 4.7. Joins cruzados (CROSS JOIN)
+
+Un `CROSS JOIN` devuelve el producto cartesiano de las filas de las tablas, es decir, cada fila de la primera tabla combinada con cada fila de la segunda tabla.
+
+### Sintaxis básica
+
+```sql
+SELECT columna1, columna2, ...
+FROM tabla1
+CROSS JOIN tabla2;
+
+-- Sintaxis alternativa (implícita)
+SELECT columna1, columna2, ...
+FROM tabla1, tabla2;
+```
+
+### Ejemplos de CROSS JOIN
+
+```sql
+-- Generar todas las combinaciones posibles de productos y categorías
+SELECT 
+    p.id_producto,
+    p.nombre AS producto,
+    c.id_categoria,
+    c.nombre AS categoria
+FROM productos p
+CROSS JOIN categorias c;
+
+-- Generar una tabla de multiplicar
+SELECT 
+    a.n AS factor1,
+    b.n AS factor2,
+    a.n * b.n AS producto
+FROM 
+    (SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) a
+CROSS JOIN
+    (SELECT 1 AS n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) b
+ORDER BY factor1, factor2;
+```
+
+### Casos de uso para CROSS JOIN
+
+1. **Generar combinaciones**: Útil para crear todas las combinaciones posibles entre elementos.
+
+```sql
+-- Generar todas las combinaciones de tamaños y colores para productos
+SELECT 
+    p.id_producto,
+    p.nombre AS producto,
+    t.valor AS talla,
+    c.valor AS color
+FROM productos p
+CROSS JOIN (SELECT 'S' AS valor UNION SELECT 'M' UNION SELECT 'L' UNION SELECT 'XL') t
+CROSS JOIN (SELECT 'Rojo' AS valor UNION SELECT 'Azul' UNION SELECT 'Negro' UNION SELECT 'Blanco') c;
+```
+
+2. **Rellenar fechas**: Generar series de fechas o números.
+
+```sql
+-- Generar un calendario para un mes específico
+SELECT 
+    DATE_ADD('2023-06-01', INTERVAL (a.a + (10 * b.a) + (100 * c.a)) DAY) AS fecha
+FROM 
+    (SELECT 0 AS a UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) a
+CROSS JOIN
+    (SELECT 0 AS a UNION SELECT 1 UNION SELECT 2) b
+CROSS JOIN
+    (SELECT 0 AS a) c
+WHERE DATE_ADD('2023-06-01', INTERVAL (a.a + (10 * b.a) + (100 * c.a)) DAY) <= '2023-06-30'
+ORDER BY fecha;
+```
+
+<Aside type="caution">
+  Un CROSS JOIN puede generar conjuntos de resultados muy grandes rápidamente, ya que el número de filas resultantes es el producto del número de filas en cada tabla (filas_tabla1 * filas_tabla2). Úselo con precaución, especialmente con tablas grandes.
+</Aside>
+
+### Diferencias entre CROSS JOIN y otros JOINs
+
+```sql
+-- CROSS JOIN: No tiene condición de unión
+SELECT e.nombre, d.nombre_departamento
+FROM empleados e
+CROSS JOIN departamentos d;
+
+-- INNER JOIN: Tiene condición de unión
+SELECT e.nombre, d.nombre_departamento
+FROM empleados e
+INNER JOIN departamentos d ON e.departamento_id = d.id_departamento;
+```
+
+<Aside type="note">
+  Un CROSS JOIN con una condición WHERE equivale funcionalmente a un INNER JOIN. Sin embargo, por claridad y rendimiento, es mejor usar INNER JOIN cuando se necesita una condición de unión.
+</Aside>

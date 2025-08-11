@@ -1,0 +1,113 @@
+---
+title: Plugins y extensiones
+description: Uso de plugins y extensiones en Alpine.js.
+---
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+
+# Plugins y extensiones
+
+Alpine.js soporta plugins oficiales y de la comunidad para ampliar sus funcionalidades.
+
+## ¿Qué es un plugin en Alpine.js?
+
+Un plugin es una extensión que añade nuevas funcionalidades o directivas a Alpine.js. Puedes usar plugins oficiales o de la comunidad para agregar animaciones, persistencia, máscaras de input, entre otros.
+
+## Instalación de plugins
+
+La mayoría de los plugins se instalan vía npm o CDN. Ejemplo con el plugin oficial de persistencia:
+<Code code={`npm install @alpinejs/persist`} lang="bash" title="Instalación por npm" />
+
+O por CDN:
+<Code code={`<script defer src="https://unpkg.com/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>`} lang="html" title="Instalación por CDN" />
+
+## Uso de un plugin (ejemplo: persistencia)
+
+Primero, importa y registra el plugin en tu JavaScript principal:
+<Code code={`import Alpine from 'alpinejs';
+import persist from '@alpinejs/persist';
+Alpine.plugin(persist);
+Alpine.start();`} lang="js" title="Registro del plugin" />
+
+Luego, puedes usar la nueva directiva <code>x-persist</code>:
+<Code code={`<input x-data x-model="$persist('')" placeholder="Persistente" />`} lang="html" title="Uso de x-persist" />
+
+## Ejemplo: Alpine.js con plugin de máscaras (mask)
+
+<Code code={`npm install @alpinejs/mask`} lang="bash" title="Instalación de mask" />
+
+<Code code={`import Alpine from 'alpinejs';
+import mask from '@alpinejs/mask';
+Alpine.plugin(mask);
+Alpine.start();`} lang="js" title="Registro de mask" />
+
+<Code code={`<input x-data x-mask="99/99/9999" placeholder="DD/MM/AAAA" />`} lang="html" title="Uso de x-mask" />
+
+## Ejemplo: Alpine.js con plugin de intersección (intersect)
+
+El plugin <b>@alpinejs/intersect</b> permite detectar cuando un elemento entra o sale del viewport, útil para animaciones o carga diferida:
+<Code code={`npm install @alpinejs/intersect`} lang="bash" title="Instalación de intersect" />
+
+<Code code={`import Alpine from 'alpinejs';
+import intersect from '@alpinejs/intersect';
+Alpine.plugin(intersect);
+Alpine.start();`} lang="js" title="Registro de intersect" />
+
+<Code code={`<div x-data x-intersect:enter="console.log('Entró al viewport')">
+  Observa la consola al hacer scroll
+</div>`} lang="html" title="Uso de x-intersect" />
+
+## Ejemplo: Alpine.js con plugin de colapso (collapse)
+
+El plugin <b>@alpinejs/collapse</b> facilita animaciones de mostrar/ocultar:
+<Code code={`npm install @alpinejs/collapse`} lang="bash" title="Instalación de collapse" />
+
+<Code code={`import Alpine from 'alpinejs';
+import collapse from '@alpinejs/collapse';
+Alpine.plugin(collapse);
+Alpine.start();`} lang="js" title="Registro de collapse" />
+
+<Code code={`<div x-data="{ abierto: false }">
+  <button @click="abierto = !abierto">Toggle</button>
+  <div x-show="abierto" x-collapse>
+    Contenido colapsable animado
+  </div>
+</div>`} lang="html" title="Uso de x-collapse" />
+
+## Plugins populares para Alpine.js
+
+- <b>@alpinejs/persist</b>: Persistencia de datos en localStorage.
+- <b>@alpinejs/mask</b>: Máscaras de input.
+- <b>@alpinejs/intersect</b>: Detecta cuando un elemento entra/sale del viewport.
+- <b>@alpinejs/collapse</b>: Animaciones de colapso/expansión.
+- <b>@alpinejs/focus</b>: Manejo avanzado de foco.
+
+## Cómo crear tu propio plugin
+
+Puedes extender Alpine.js creando tus propios plugins:
+<Code code={`function miPlugin(Alpine) {
+  Alpine.directive('saludar', (el, { expression }, { evaluate }) => {
+    el.textContent = '¡Hola ' + evaluate(expression) + '!';
+  });
+}
+Alpine.plugin(miPlugin);`} lang="js" title="Plugin personalizado" />
+
+## Buenas prácticas al usar plugins
+
+- Revisa la compatibilidad de versiones entre Alpine.js y el plugin.
+- Registra los plugins antes de llamar a <code>Alpine.start()</code>.
+- Consulta la documentación de cada plugin para conocer todas sus opciones y eventos.
+- Puedes combinar varios plugins en un mismo proyecto.
+
+## Recursos útiles
+
+- <a href="https://alpinejs.dev/plugins/official" target="_blank">Plugins oficiales de Alpine.js</a>
+- <a href="https://github.com/alpinejs" target="_blank">Repositorio de Alpine.js en GitHub</a>
+- <a href="https://alpinejs.dev/plugins/community" target="_blank">Plugins de la comunidad</a>
+
+<Aside type="tip">
+Explora los plugins de la comunidad para encontrar soluciones a necesidades específicas y comparte tus propios plugins si creas alguno útil.
+</Aside>

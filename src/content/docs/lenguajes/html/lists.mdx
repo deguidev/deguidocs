@@ -1,0 +1,345 @@
+---
+title: Listas
+description: Cómo crear y formatear diferentes tipos de listas en HTML.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Listas en HTML
+
+Las listas son elementos fundamentales en HTML que permiten organizar y estructurar contenido relacionado. Son especialmente útiles para mejorar la legibilidad y presentar información de manera ordenada.
+
+## Tipos de listas <Badge text="Fundamentos" variant="success" />
+
+HTML ofrece tres tipos principales de listas:
+
+1. Listas ordenadas (`<ol>`) - cuando el orden es importante
+2. Listas desordenadas (`<ul>`) - cuando el orden no importa
+3. Listas de definiciones (`<dl>`) - para términos y sus definiciones
+
+## Listas ordenadas (`<ol>`) <Badge text="Secuencial" variant="note" />
+
+Las listas ordenadas se utilizan cuando los elementos deben seguir una secuencia específica. Cada elemento se marca con un número o letra.
+
+### Sintaxis básica
+
+<Code code={`<ol>
+  <li>Primer elemento</li>
+  <li>Segundo elemento</li>
+  <li>Tercer elemento</li>
+</ol>`} lang="html" />
+
+Resultado:
+1. Primer elemento
+2. Segundo elemento
+3. Tercer elemento
+
+### Atributos de `<ol>`
+
+| Atributo | Descripción | Valores |
+|----------|-------------|--------|
+| `type` | Tipo de numeración | `1` (números, predeterminado), `a` (letras minúsculas), `A` (letras mayúsculas), `i` (números romanos minúsculas), `I` (números romanos mayúsculas) |
+| `start` | Número inicial | Cualquier número entero |
+| `reversed` | Orden inverso | No requiere valor |
+
+### Ejemplos de listas ordenadas
+
+#### Lista con letras mayúsculas
+
+<Code code={`<ol type="A">
+  <li>Elemento A</li>
+  <li>Elemento B</li>
+  <li>Elemento C</li>
+</ol>`} lang="html" />
+
+#### Lista con números romanos
+
+<Code code={`<ol type="i">
+  <li>Elemento i</li>
+  <li>Elemento ii</li>
+  <li>Elemento iii</li>
+</ol>`} lang="html" />
+
+#### Lista que comienza en un número específico
+
+<Code code={`<ol start="5">
+  <li>Elemento 5</li>
+  <li>Elemento 6</li>
+  <li>Elemento 7</li>
+</ol>`} lang="html" />
+
+#### Lista en orden inverso
+
+<Code code={`<ol reversed>
+  <li>Tercer lugar</li>
+  <li>Segundo lugar</li>
+  <li>Primer lugar</li>
+</ol>`} lang="html" />
+
+## Listas desordenadas (`<ul>`) <Badge text="No secuencial" variant="note" />
+
+Las listas desordenadas se utilizan cuando el orden de los elementos no es relevante. Cada elemento se marca con un punto, cuadrado u otro símbolo.
+
+### Sintaxis básica
+
+<Code code={`<ul>
+  <li>Elemento</li>
+  <li>Otro elemento</li>
+  <li>Un elemento más</li>
+</ul>`} lang="html" />
+
+### Personalización con CSS
+
+Puedes cambiar el estilo de los marcadores usando CSS:
+
+<Code code={`<ul style="list-style-type: square;">
+  <li>Elemento con marcador cuadrado</li>
+  <li>Otro elemento</li>
+</ul>
+
+<ul style="list-style-type: circle;">
+  <li>Elemento con marcador circular</li>
+  <li>Otro elemento</li>
+</ul>
+
+<ul style="list-style-type: none;">
+  <li>Elemento sin marcador</li>
+  <li>Otro elemento</li>
+</ul>`} lang="html" />
+
+<Aside type="tip">
+  Aunque puedes usar el atributo `style` directamente en HTML, es mejor práctica definir estos estilos en una hoja de estilos CSS externa.
+</Aside>
+
+## Listas de definiciones (`<dl>`) <Badge text="Términos" variant="success" />
+
+Las listas de definiciones se utilizan para presentar términos y sus definiciones correspondientes, similar a un diccionario o glosario.
+
+### Sintaxis básica
+
+<Code code={`<dl>
+  <dt>HTML</dt>
+  <dd>Lenguaje de marcado utilizado para crear páginas web.</dd>
+  
+  <dt>CSS</dt>
+  <dd>Lenguaje de hojas de estilo utilizado para describir la presentación de un documento HTML.</dd>
+  
+  <dt>JavaScript</dt>
+  <dd>Lenguaje de programación que permite crear contenido dinámico en páginas web.</dd>
+</dl>`} lang="html" />
+
+Donde:
+- `<dl>` (Definition List) - Contiene la lista completa
+- `<dt>` (Definition Term) - El término a definir
+- `<dd>` (Definition Description) - La definición del término
+
+### Múltiples términos o definiciones
+
+<Code code={`<dl>
+  <!-- Un término con múltiples definiciones -->
+  <dt>HTML</dt>
+  <dd>HyperText Markup Language</dd>
+  <dd>Lenguaje estándar para crear páginas web</dd>
+  
+  <!-- Múltiples términos con una definición -->
+  <dt>CSS</dt>
+  <dt>Cascading Style Sheets</dt>
+  <dd>Lenguaje para estilizar documentos HTML</dd>
+</dl>`} lang="html" />
+
+## Listas anidadas <Badge text="Jerarquía" variant="note" />
+
+Puedes crear listas dentro de listas para representar jerarquías o categorías.
+
+<Code code={`<ul>
+  <li>Frutas
+    <ul>
+      <li>Cítricos
+        <ul>
+          <li>Naranja</li>
+          <li>Limón</li>
+        </ul>
+      </li>
+      <li>Tropicales
+        <ul>
+          <li>Mango</li>
+          <li>Piña</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Verduras
+    <ul>
+      <li>De hoja
+        <ul>
+          <li>Lechuga</li>
+          <li>Espinaca</li>
+        </ul>
+      </li>
+      <li>De raíz
+        <ul>
+          <li>Zanahoria</li>
+          <li>Remolacha</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>`} lang="html" />
+
+<Aside>
+  Es posible anidar diferentes tipos de listas. Por ejemplo, puedes tener una lista ordenada dentro de una lista desordenada o viceversa.
+</Aside>
+
+## Listas de descripción con HTML5 <Badge text="Semántico" variant="success" />
+
+HTML5 introdujo el elemento `<figure>` y `<figcaption>` que pueden usarse junto con listas para crear descripciones más semánticas:
+
+<Code code={`<figure>
+  <figcaption>Lenguajes de programación populares:</figcaption>
+  <ul>
+    <li>JavaScript</li>
+    <li>Python</li>
+    <li>Java</li>
+    <li>C#</li>
+  </ul>
+</figure>`} lang="html" />
+
+## Atributo `value` en elementos `<li>` <Badge text="Control" variant="note" />
+
+En listas ordenadas, puedes establecer un valor específico para un elemento de la lista:
+
+<Code code={`<ol>
+  <li>Primer elemento</li>
+  <li value="5">Este será el elemento número 5</li>
+  <li>Este será el elemento número 6</li>
+</ol>`} lang="html" />
+
+## Listas de navegación <Badge text="Menús" variant="success" />
+
+Las listas son comúnmente utilizadas para crear menús de navegación:
+
+<Code code={`<nav>
+  <ul>
+    <li><a href="index.html">Inicio</a></li>
+    <li><a href="productos.html">Productos</a></li>
+    <li><a href="servicios.html">Servicios</a></li>
+    <li><a href="contacto.html">Contacto</a></li>
+  </ul>
+</nav>`} lang="html" />
+
+<Aside type="tip">
+  Con CSS, puedes transformar esta lista en un menú horizontal o vertical, con diferentes estilos y efectos de hover.
+</Aside>
+
+## Estilizando listas con CSS <Badge text="Personalización" variant="note" />
+
+### Propiedades CSS comunes para listas
+
+| Propiedad | Descripción | Ejemplo |
+|-----------|-------------|--------|
+| `list-style-type` | Tipo de marcador | `list-style-type: circle;` |
+| `list-style-image` | Imagen como marcador | `list-style-image: url('flecha.png');` |
+| `list-style-position` | Posición del marcador | `list-style-position: inside;` |
+| `list-style` | Atajo para las propiedades anteriores | `list-style: square inside;` |
+
+### Ejemplo de personalización con CSS
+
+<Code code={`<style>
+  .menu-personalizado {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .menu-personalizado li {
+    padding: 10px;
+    margin-bottom: 5px;
+    background-color: #f2f2f2;
+    border-left: 5px solid #0066cc;
+  }
+  
+  .menu-personalizado li:hover {
+    background-color: #e6e6e6;
+  }
+</style>
+
+<ul class="menu-personalizado">
+  <li>Elemento personalizado 1</li>
+  <li>Elemento personalizado 2</li>
+  <li>Elemento personalizado 3</li>
+</ul>`} lang="html" />
+
+## Mejores prácticas para listas
+
+1. **Usa el tipo de lista adecuado** para cada situación:
+   - `<ol>` para secuencias o instrucciones paso a paso
+   - `<ul>` para elementos sin un orden específico
+   - `<dl>` para términos y definiciones
+
+2. **Mantener la consistencia** en el formato y estilo de las listas en todo el sitio web.
+
+3. **Evita listas demasiado largas** que puedan abrumar al usuario. Considera dividirlas en secciones más pequeñas.
+
+4. **Usa listas anidadas con moderación**. Demasiados niveles pueden dificultar la lectura.
+
+5. **Aprovecha la semántica** de las listas para mejorar la accesibilidad y el SEO.
+
+<Aside type="caution">
+  Aunque puedes cambiar completamente la apariencia de las listas con CSS, mantener algo de la estructura visual de lista ayuda a los usuarios a reconocer el contenido como una lista.
+</Aside>
+
+## Ejemplo de lista completa
+
+<Code code={`<section>
+  <h2>Plan de estudio para desarrollo web</h2>
+  
+  <ol>
+    <li>
+      <h3>Fundamentos de HTML</h3>
+      <ul>
+        <li>Estructura básica</li>
+        <li>Elementos semánticos</li>
+        <li>Formularios</li>
+        <li>Tablas</li>
+      </ul>
+    </li>
+    
+    <li>
+      <h3>CSS</h3>
+      <ul>
+        <li>Selectores</li>
+        <li>Box model</li>
+        <li>Flexbox</li>
+        <li>Grid</li>
+        <li>Responsive design</li>
+      </ul>
+    </li>
+    
+    <li>
+      <h3>JavaScript</h3>
+      <ul>
+        <li>Sintaxis básica</li>
+        <li>DOM</li>
+        <li>Eventos</li>
+        <li>Fetch API</li>
+        <li>ES6+</li>
+      </ul>
+    </li>
+    
+    <li>
+      <h3>Frameworks y librerías</h3>
+      <dl>
+        <dt>React</dt>
+        <dd>Librería para construir interfaces de usuario</dd>
+        
+        <dt>Vue</dt>
+        <dd>Framework progresivo para construir UIs</dd>
+        
+        <dt>Angular</dt>
+        <dd>Framework completo para aplicaciones web</dd>
+      </dl>
+    </li>
+  </ol>
+</section>`} lang="html" title="Ejemplo de lista compleja combinando diferentes tipos" />

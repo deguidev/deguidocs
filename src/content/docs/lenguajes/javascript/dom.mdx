@@ -1,0 +1,163 @@
+---
+title: Manipulación del DOM
+description: Aprende a interactuar con el Document Object Model (DOM) usando JavaScript.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Manipulación del DOM <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  El DOM (Document Object Model) es la interfaz que nos permite interactuar con elementos HTML mediante JavaScript.
+</Aside>
+
+## Selección de elementos <Badge text="Básico" variant="note" />
+
+### Métodos tradicionales
+<Code code={`// Por ID
+const elemento = document.getElementById('miId');
+
+// Por clase
+const elementos = document.getElementsByClassName('miClase');
+
+// Por etiqueta
+const parrafos = document.getElementsByTagName('p');`} lang="javascript" />
+
+### Selectores modernos
+<Code code={`// Seleccionar un elemento
+const elemento = document.querySelector('.miClase');
+
+// Seleccionar todos los elementos
+const elementos = document.querySelectorAll('.miClase');
+
+// Selectores complejos
+const enlaces = document.querySelectorAll('nav a.activo');`} lang="javascript" />
+
+## Modificación de contenido y estilos <Badge text="Importante" variant="danger" />
+
+### Modificar contenido
+<Code code={`const elemento = document.querySelector('#miElemento');
+
+// Texto plano
+elemento.textContent = 'Nuevo texto';
+
+// HTML
+elemento.innerHTML = '<strong>Texto en negrita</strong>';
+
+// Atributos
+elemento.setAttribute('class', 'destacado');
+elemento.id = 'nuevoId';`} lang="javascript" />
+
+### Modificar estilos
+<Code code={`const elemento = document.querySelector('#miElemento');
+
+// Estilos directos
+elemento.style.color = 'red';
+elemento.style.backgroundColor = '#f0f0f0';
+elemento.style.padding = '10px';
+
+// Clases CSS
+elemento.classList.add('destacado');
+elemento.classList.remove('oculto');
+elemento.classList.toggle('activo');
+elemento.classList.replace('viejo', 'nuevo');`} lang="javascript" />
+
+## Creación y eliminación de elementos <Badge text="Avanzado" variant="note" />
+
+### Crear elementos
+<Code code={`// Crear elemento
+const nuevoParrafo = document.createElement('p');
+nuevoParrafo.textContent = 'Nuevo párrafo';
+
+// Crear texto
+const texto = document.createTextNode('Texto simple');
+
+// Crear fragmento (para múltiples elementos)
+const fragmento = document.createDocumentFragment();
+for (let i = 0; i < 3; i++) {
+    const li = document.createElement('li');
+    li.textContent = \`Item \${i + 1}\`;
+    fragmento.appendChild(li);
+}`} lang="javascript" />
+
+### Insertar elementos
+<Code code={`const contenedor = document.querySelector('#contenedor');
+const nuevoElemento = document.createElement('div');
+
+// Añadir al final
+contenedor.appendChild(nuevoElemento);
+
+// Añadir en posición específica
+contenedor.insertBefore(nuevoElemento, contenedor.firstChild);
+
+// Métodos modernos
+contenedor.append(nuevoElemento);
+contenedor.prepend(nuevoElemento);
+contenedor.before(nuevoElemento);
+contenedor.after(nuevoElemento);`} lang="javascript" />
+
+### Eliminar elementos
+<Code code={`const elemento = document.querySelector('#eliminar');
+
+// Eliminar directamente
+elemento.remove();
+
+// Eliminar desde el padre
+elemento.parentNode.removeChild(elemento);`} lang="javascript" />
+
+## Navegación por el DOM <Badge text="Intermedio" variant="note" />
+
+### Relaciones entre nodos
+<Code code={`const elemento = document.querySelector('#miElemento');
+
+// Padres
+const padre = elemento.parentElement;
+const padreNodo = elemento.parentNode;
+
+// Hijos
+const hijos = elemento.children;
+const primerHijo = elemento.firstElementChild;
+const ultimoHijo = elemento.lastElementChild;
+
+// Hermanos
+const siguiente = elemento.nextElementSibling;
+const anterior = elemento.previousElementSibling;`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+### Minimizar manipulaciones del DOM
+<Code code={`// ❌ Malo
+for (let i = 0; i < 100; i++) {
+    contenedor.innerHTML += '<div>' + i + '</div>';
+}
+
+// ✅ Bueno
+const fragmento = document.createDocumentFragment();
+for (let i = 0; i < 100; i++) {
+    const div = document.createElement('div');
+    div.textContent = i;
+    fragmento.appendChild(div);
+}
+contenedor.appendChild(fragmento);`} lang="javascript" />
+
+### Usar selectores eficientes
+<Code code={`// ❌ Malo
+document.querySelectorAll('div span a');
+
+// ✅ Bueno
+document.getElementById('miId');
+document.querySelector('.clase-especifica');`} lang="javascript" />
+
+### Cachear referencias a elementos
+<Code code={`// ❌ Malo
+function actualizar() {
+    document.getElementById('miElemento').textContent = 'Nuevo';
+}
+
+// ✅ Bueno
+const elemento = document.getElementById('miElemento');
+function actualizar() {
+    elemento.textContent = 'Nuevo';
+}`} lang="javascript" />

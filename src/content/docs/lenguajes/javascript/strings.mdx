@@ -1,0 +1,136 @@
+---
+title: Cadenas de texto (Strings)
+description: Aprende a trabajar con cadenas de texto en JavaScript, sus métodos y características principales.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Cadenas de texto (Strings) <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Las cadenas de texto son uno de los tipos de datos más utilizados en JavaScript.
+</Aside>
+
+## Métodos útiles <Badge text="Importante" variant="danger" />
+
+### Propiedades básicas
+<Code code={`const texto = "Hola Mundo";
+
+// Longitud de la cadena
+console.log(texto.length); // 10
+
+// Acceso a caracteres
+console.log(texto[0]); // "H"
+console.log(texto.charAt(0)); // "H"`} lang="javascript" />
+
+### Búsqueda y comprobación
+<Code code={`const texto = "JavaScript es genial";
+
+// Buscar subcadena
+console.log(texto.includes("Script")); // true
+console.log(texto.startsWith("Java")); // true
+console.log(texto.endsWith("genial")); // true
+
+// Encontrar posición
+console.log(texto.indexOf("Script")); // 4
+console.log(texto.lastIndexOf("a")); // 17`} lang="javascript" />
+
+### Extracción y modificación
+<Code code={`const texto = "JavaScript es genial";
+
+// Extraer subcadena
+console.log(texto.slice(0, 4)); // "Java"
+console.log(texto.substring(4, 10)); // "Script"
+
+// Dividir en array
+console.log(texto.split(" ")); // ["JavaScript", "es", "genial"]
+
+// Reemplazar
+console.log(texto.replace("JavaScript", "Python")); // "Python es genial"
+console.log(texto.replaceAll("a", "x")); // "JxvxScript es genixl"`} lang="javascript" />
+
+### Transformación
+<Code code={`const texto = "   Hola Mundo   ";
+
+// Eliminar espacios
+console.log(texto.trim()); // "Hola Mundo"
+console.log(texto.trimStart()); // "Hola Mundo   "
+console.log(texto.trimEnd()); // "   Hola Mundo"
+
+// Cambiar mayúsculas/minúsculas
+console.log(texto.toUpperCase()); // "   HOLA MUNDO   "
+console.log(texto.toLowerCase()); // "   hola mundo   "`} lang="javascript" />
+
+## Template literals <Badge text="Moderno" variant="success" />
+
+<Aside type="tip">
+  Los template literals permiten crear cadenas multilínea y usar interpolación.
+</Aside>
+
+### Cadenas multilínea
+<Code code={`const poema = \`
+    En un lugar
+    de la Mancha,
+    de cuyo nombre
+    no quiero acordarme...
+\`;`} lang="javascript" />
+
+### Interpolación
+<Code code={`const nombre = "Juan";
+const edad = 25;
+
+const mensaje = \`Hola, me llamo \${nombre} y tengo \${edad} años\`;
+console.log(mensaje); // "Hola, me llamo Juan y tengo 25 años"
+
+// Expresiones en template literals
+const precio = 19.99;
+const mensaje2 = \`El total es: \${precio * 1.21}€\`;`} lang="javascript" />
+
+## Concatenación <Badge text="Básico" variant="note" />
+
+### Métodos tradicionales
+<Code code={`// Operador +
+const nombre = "Juan";
+const apellido = "Pérez";
+const nombreCompleto = nombre + " " + apellido;
+
+// Método concat()
+const saludo = "Hola ".concat(nombre, " ", apellido);`} lang="javascript" />
+
+### Concatenación moderna
+<Code code={`// Template literals (recomendado)
+const nombre = "Juan";
+const apellido = "Pérez";
+const saludo = \`Hola \${nombre} \${apellido}\`;`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+### Usar template literals para interpolación
+<Code code={`// ❌ Malo
+const mensaje = "Hola " + nombre + ", tienes " + edad + " años";
+
+// ✅ Bueno
+const mensaje = \`Hola \${nombre}, tienes \${edad} años\`;`} lang="javascript" />
+
+### Métodos en cadena
+<Code code={`// ✅ Bueno
+const texto = "   HOLA mundo   ";
+const resultado = texto
+    .trim()
+    .toLowerCase()
+    .replace("mundo", "JavaScript");`} lang="javascript" />
+
+### Validación de strings
+<Code code={`function validarNombre(nombre) {
+    return typeof nombre === "string" && 
+           nombre.trim().length > 0;
+}
+
+// Uso
+if (validarNombre(" ")) {
+    console.log("Nombre válido");
+} else {
+    console.log("Nombre inválido");
+}`} lang="javascript" />

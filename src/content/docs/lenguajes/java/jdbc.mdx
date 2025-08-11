@@ -1,0 +1,1005 @@
+---
+title: 10. Acceso a Bases de Datos con JDBC
+description: Aprende sobre conexión a bases de datos, consultas, actualizaciones y transacciones con JDBC en Java
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## Introducción
+
+JDBC (Java Database Connectivity) es una API estándar de Java que permite a las aplicaciones Java interactuar con diferentes sistemas de gestión de bases de datos relacionales. JDBC proporciona un conjunto de clases e interfaces que permiten a los desarrolladores conectarse a bases de datos, ejecutar consultas SQL y procesar los resultados de manera uniforme, independientemente del sistema de base de datos subyacente.
+
+## 10.1 Introducción a JDBC
+
+### 10.1.1 ¿Qué es JDBC?
+
+JDBC (Java Database Connectivity) es una API de Java que define cómo un cliente puede acceder a una base de datos. Proporciona métodos para consultar y actualizar datos en una base de datos. JDBC es orientado a bases de datos relacionales y está basado en el concepto de controladores (drivers) que permiten la conexión a diferentes sistemas de gestión de bases de datos.
+
+### 10.1.2 Arquitectura de JDBC
+
+La arquitectura de JDBC consta de dos capas principales:
+
+1. **API JDBC**: Un conjunto de interfaces y clases Java que los desarrolladores utilizan para interactuar con bases de datos.
+2. **Controladores JDBC**: Implementaciones específicas que traducen las llamadas JDBC a un protocolo específico de base de datos.
+
+<table>
+  <thead>
+    <tr>
+      <th>Componente</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Aplicación Java</td>
+      <td>Utiliza la API JDBC para acceder a la base de datos</td>
+    </tr>
+    <tr>
+      <td>API JDBC</td>
+      <td>Proporciona interfaces y clases para interactuar con bases de datos</td>
+    </tr>
+    <tr>
+      <td>Administrador de controladores</td>
+      <td>Carga y gestiona los controladores JDBC</td>
+    </tr>
+    <tr>
+      <td>Controladores JDBC</td>
+      <td>Implementan la comunicación con bases de datos específicas</td>
+    </tr>
+    <tr>
+      <td>Base de datos</td>
+      <td>Sistema de gestión de bases de datos (MySQL, Oracle, PostgreSQL, etc.)</td>
+    </tr>
+  </tbody>
+</table>
+
+### 10.1.3 Tipos de controladores JDBC
+
+Existen cuatro tipos principales de controladores JDBC:
+
+1. **Tipo 1: Controlador JDBC-ODBC Bridge**
+   - Traduce llamadas JDBC a llamadas ODBC
+   - Requiere la instalación de ODBC en el cliente
+   - Rendimiento limitado y dependencia de bibliotecas nativas
+   - Obsoleto desde Java 8
+
+2. **Tipo 2: Controlador API nativo**
+   - Utiliza bibliotecas cliente nativas del proveedor de la base de datos
+   - Mejor rendimiento que el Tipo 1, pero requiere instalación de software adicional
+
+3. **Tipo 3: Controlador de red**
+   - Traduce llamadas JDBC a un protocolo independiente de la base de datos
+   - Un servidor intermedio traduce este protocolo al protocolo específico de la base de datos
+   - No requiere bibliotecas nativas en el cliente
+
+4. **Tipo 4: Controlador de protocolo nativo**
+   - Implementado completamente en Java
+   - Se comunica directamente con la base de datos usando el protocolo de red de la base de datos
+   - No requiere software intermedio
+   - El más utilizado actualmente
+
+<Aside type="tip">
+  Los controladores de Tipo 4 son los más recomendados para la mayoría de las aplicaciones debido a su rendimiento, portabilidad y facilidad de despliegue.
+</Aside>
+
+### 10.1.4 Paquetes principales de JDBC
+
+JDBC incluye varios paquetes que contienen las clases e interfaces necesarias:
+
+- `java.sql`: Contiene las clases e interfaces principales de JDBC
+- `javax.sql`: Proporciona soporte para fuentes de datos, conexiones agrupadas y otros servicios avanzados
+- `java.sql.rowset`: Implementaciones de interfaces RowSet para manejar conjuntos de resultados desconectados
+
+### 10.1.5 Interfaces principales de JDBC
+
+<table>
+  <thead>
+    <tr>
+      <th>Interfaz</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Driver</td>
+      <td>Maneja la comunicación con el servidor de base de datos</td>
+    </tr>
+    <tr>
+      <td>Connection</td>
+      <td>Representa una conexión con la base de datos</td>
+    </tr>
+    <tr>
+      <td>Statement</td>
+      <td>Utilizado para ejecutar consultas SQL estáticas</td>
+    </tr>
+    <tr>
+      <td>PreparedStatement</td>
+      <td>Utilizado para ejecutar consultas SQL precompiladas y parametrizadas</td>
+    </tr>
+    <tr>
+      <td>CallableStatement</td>
+      <td>Utilizado para ejecutar procedimientos almacenados</td>
+    </tr>
+    <tr>
+      <td>ResultSet</td>
+      <td>Representa el resultado de una consulta SQL</td>
+    </tr>
+    <tr>
+      <td>DatabaseMetaData</td>
+      <td>Proporciona información sobre la base de datos</td>
+    </tr>
+    <tr>
+      <td>ResultSetMetaData</td>
+      <td>Proporciona información sobre las columnas de un ResultSet</td>
+    </tr>
+  </tbody>
+</table>
+
+### 10.1.6 Configuración de JDBC
+
+Para utilizar JDBC en un proyecto Java, necesitas:
+
+1. **Añadir el controlador JDBC**: Incluir el archivo JAR del controlador JDBC específico para tu base de datos en el classpath de tu proyecto.
+
+2. **Importar los paquetes necesarios**: Incluir las importaciones adecuadas en tu código.
+
+<Code code={`// Importaciones básicas para JDBC
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;`} lang="java" />
+
+<Tabs>
+  <TabItem label="Maven">
+    <Code code={`<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.28</version>
+</dependency>`} lang="xml" />
+  </TabItem>
+  <TabItem label="Gradle">
+    <Code code={`implementation 'mysql:mysql-connector-java:8.0.28'`} lang="groovy" />
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  El ejemplo anterior muestra cómo incluir el controlador JDBC para MySQL. Para otras bases de datos, necesitarás incluir el controlador correspondiente (por ejemplo, PostgreSQL, Oracle, SQL Server, etc.).
+</Aside>
+
+## 10.2 Conexión a bases de datos
+
+### 10.2.1 Establecer una conexión
+
+Para conectarse a una base de datos utilizando JDBC, se siguen estos pasos:
+
+1. **Registrar el controlador JDBC**: Aunque desde Java 6 este paso es opcional ya que los controladores se registran automáticamente.
+2. **Establecer la conexión**: Utilizando la clase `DriverManager` o un `DataSource`.
+
+<Steps>
+<ol>
+  <li>
+    <strong>Crear la URL de conexión</strong>
+    <p>La URL de conexión varía según el sistema de base de datos:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Base de datos</th>
+          <th>Formato de URL</th>
+          <th>Ejemplo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MySQL</td>
+          <td>jdbc:mysql://host:puerto/basedatos</td>
+          <td>jdbc:mysql://localhost:3306/mibasedatos</td>
+        </tr>
+        <tr>
+          <td>PostgreSQL</td>
+          <td>jdbc:postgresql://host:puerto/basedatos</td>
+          <td>jdbc:postgresql://localhost:5432/mibasedatos</td>
+        </tr>
+        <tr>
+          <td>Oracle</td>
+          <td>jdbc:oracle:thin:@host:puerto:sid</td>
+          <td>jdbc:oracle:thin:@localhost:1521:orcl</td>
+        </tr>
+        <tr>
+          <td>SQL Server</td>
+          <td>jdbc:sqlserver://host:puerto;databaseName=basedatos</td>
+          <td>jdbc:sqlserver://localhost:1433;databaseName=mibasedatos</td>
+        </tr>
+        <tr>
+          <td>H2 (en memoria)</td>
+          <td>jdbc:h2:mem:nombre</td>
+          <td>jdbc:h2:mem:testdb</td>
+        </tr>
+        <tr>
+          <td>SQLite</td>
+          <td>jdbc:sqlite:ruta</td>
+          <td>jdbc:sqlite:C:/mibasedatos.db</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>
+    <strong>Establecer la conexión</strong>
+    <Code code={`Connection connection = null;
+try {
+    // Registrar el controlador (opcional desde Java 6)
+    // Class.forName("com.mysql.cj.jdbc.Driver");
+    
+    // Establecer la conexión
+    String url = "jdbc:mysql://localhost:3306/mibasedatos";
+    String usuario = "usuario";
+    String contraseña = "contraseña";
+    connection = DriverManager.getConnection(url, usuario, contraseña);
+    
+    System.out.println("Conexión establecida con éxito");
+    
+    // Realizar operaciones con la base de datos...
+    
+} catch (SQLException e) {
+    System.err.println("Error al conectar a la base de datos: " + e.getMessage());
+    e.printStackTrace();
+} finally {
+    // Cerrar la conexión
+    if (connection != null) {
+        try {
+            connection.close();
+            System.out.println("Conexión cerrada");
+        } catch (SQLException e) {
+            System.err.println("Error al cerrar la conexión: " + e.getMessage());
+        }
+    }
+}`} lang="java" />
+  </li>
+</ol>
+</Steps>
+
+### 10.2.2 Ejemplos de clases de conexión
+
+Una buena práctica es encapsular la lógica de conexión a la base de datos en una clase separada. A continuación se muestran ejemplos de clases de conexión para Oracle y MySQL:
+
+<Tabs>
+  <TabItem label="Conexión Oracle">
+    <Code code={`package db;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class ConexionOracle {
+   // Declaración de variables estáticas para la conexión
+    private static Connection conn = null;
+    private static String login = "MATRICULA"; // Usuario de la base de datos
+    private static String clave = "matricula"; // Contraseña de la base de datos
+    private static String url = "jdbc:oracle:thin:@localhost:1521:xe"; // URL de conexión a la base de datos
+    
+    // Método estático para obtener la conexión a la base de datos
+    public static Connection getConnection(){
+        try {
+            // Cargar el controlador JDBC
+            Class.forName("oracle.jdbc.OracleDriver");
+            // Establecer la conexión con la base de datos
+            conn = DriverManager.getConnection(url, login, clave);
+            // Deshabilitar el autocommit para manejar transacciones manualmente
+            conn.setAutoCommit(false);
+            
+            System.out.println("======================================================");
+            System.out.println("✅ Diego Frank Lipa Choque");
+            System.out.println("======================================================");
+            
+            // Verificar si la conexión se ha establecido con éxito
+            if (conn != null) {
+                System.out.println("Conexión Exitosa");
+            } else {
+                System.out.println("Alto: Conexión Fallida");
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            // Mostrar un mensaje de error en caso de excepción
+            System.out.println("Alto: Conexión Fallida " + e.getMessage());
+        }
+        // Devolver la conexión establecida
+        return conn;
+    }
+
+    // Método para cerrar la conexión a la base de datos
+    public void closeConnection() {
+        try {
+            // Cerrar la conexión
+            conn.close();
+        } catch (Exception e) {
+            // Mostrar un mensaje de error en caso de excepción al cerrar la conexión
+            System.out.println("Alto: error al desconectar");
+        }
+    }
+
+    // Método main para probar la conexión (opcional)
+    public static void main(String[] args) throws SQLException {
+        // Crear una instancia de la clase Conexion
+        ConexionOracle c = new ConexionOracle();
+        // Obtener la conexión a la base de datos
+        c.getConnection();
+    }
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Conexión MySQL">
+    <Code code={`package db;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.DriverManager;
+
+public class ConexionMysql {
+    // Variables estáticas para conexión MySQL
+
+    private static Connection conn = null;
+    private static String login = "root";           // Usuario MySQL
+    private static String clave = "";         // Contraseña MySQL
+    private static String url = "jdbc:mysql://localhost:3306/venta";
+
+    // Método para obtener conexión
+    public static Connection getConnection() {
+        try {
+            // Cargar el driver JDBC para MySQL
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Establecer conexión
+            conn = DriverManager.getConnection(url, login, clave);
+
+            // Manejo manual de transacciones
+            conn.setAutoCommit(false);
+
+            System.out.println("======================================================");
+            System.out.println("✅ Diego Frank Lipa Choque");
+            System.out.println("======================================================");
+
+            if (conn != null) {
+                System.out.println("Conexión a MySQL Exitosa");
+            } else {
+                System.out.println("Alto: Conexión Fallida");
+            }
+
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("❌ Error de conexión: " + e.getMessage());
+        }
+        return conn;
+    }
+
+    // Cerrar conexión
+    public void closeConnection() {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+                System.out.println("Conexión cerrada correctamente");
+            }
+        } catch (Exception e) {
+            System.out.println("Alto: error al desconectar: " + e.getMessage());
+        }
+    }
+
+    // Main de prueba
+    public static void main(String[] args) {
+        ConexionMysql c = new ConexionMysql();
+        c.getConnection();
+    }
+}`} lang="java" />
+  </TabItem>
+</Tabs>
+
+#### Uso de las clases de conexión
+
+Para utilizar estas clases de conexión en tu aplicación, puedes implementar un patrón de controlador que encapsule las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para cada entidad de tu modelo de datos:
+
+<Tabs>
+  <TabItem label="Controlador">
+    <Code code={`import db.ConexionOracle;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CategoriaControlador {
+
+    private Connection connection;
+
+    public CategoriaControlador() {
+        this.connection = ConexionOracle.getConnection();
+    }
+
+    // CREATE
+    public String crearCategoria(CategoriaModelo categoria) {
+        String sql = "INSERT INTO S_CATEGORIA (NOMBRE_CATEGORIA, DESCRIPCION, ESTADO) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, categoria.getNombreCategoria());
+            ps.setString(2, categoria.getDescripcion());
+            ps.setInt(3, categoria.getEstado());
+            ps.execute();
+            connection.commit();
+            return "Categoría creada correctamente";
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (Exception ex) {
+                // Manejar excepción de rollback
+            }
+            return "Error al crear categoría: " + e.getMessage();
+        }
+    }
+    
+    // READ
+    public List<CategoriaModelo> listarCategorias() {
+        List<CategoriaModelo> categorias = new ArrayList<>();
+        String sql = "SELECT * FROM S_CATEGORIA WHERE ESTADO = 1";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                CategoriaModelo categoria = new CategoriaModelo();
+                categoria.setIdCategoria(rs.getInt("ID_CATEGORIA"));
+                categoria.setNombreCategoria(rs.getString("NOMBRE_CATEGORIA"));
+                categoria.setDescripcion(rs.getString("DESCRIPCION"));
+                categoria.setEstado(rs.getInt("ESTADO"));
+                categorias.add(categoria);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al listar categorías: " + e.getMessage());
+        }
+        return categorias;
+    }
+    
+    // UPDATE
+    public String actualizarCategoria(CategoriaModelo categoria) {
+        String sql = "UPDATE S_CATEGORIA SET NOMBRE_CATEGORIA = ?, DESCRIPCION = ?, ESTADO = ? WHERE ID_CATEGORIA = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, categoria.getNombreCategoria());
+            ps.setString(2, categoria.getDescripcion());
+            ps.setInt(3, categoria.getEstado());
+            ps.setInt(4, categoria.getIdCategoria());
+            int filasAfectadas = ps.executeUpdate();
+            connection.commit();
+            
+            if (filasAfectadas > 0) {
+                return "Categoría actualizada correctamente";
+            } else {
+                return "No se encontró la categoría para actualizar";
+            }
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (Exception ex) {
+                // Manejar excepción de rollback
+            }
+            return "Error al actualizar categoría: " + e.getMessage();
+        }
+    }
+    
+    // DELETE (lógico - cambiar estado)
+    public String eliminarCategoria(int idCategoria) {
+        String sql = "UPDATE S_CATEGORIA SET ESTADO = 0 WHERE ID_CATEGORIA = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, idCategoria);
+            int filasAfectadas = ps.executeUpdate();
+            connection.commit();
+            
+            if (filasAfectadas > 0) {
+                return "Categoría eliminada correctamente";
+            } else {
+                return "No se encontró la categoría para eliminar";
+            }
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (Exception ex) {
+                // Manejar excepción de rollback
+            }
+            return "Error al eliminar categoría: " + e.getMessage();
+        }
+    }
+    
+    // Buscar por ID
+    public CategoriaModelo buscarCategoriaPorId(int idCategoria) {
+        String sql = "SELECT * FROM S_CATEGORIA WHERE ID_CATEGORIA = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, idCategoria);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    CategoriaModelo categoria = new CategoriaModelo();
+                    categoria.setIdCategoria(rs.getInt("ID_CATEGORIA"));
+                    categoria.setNombreCategoria(rs.getString("NOMBRE_CATEGORIA"));
+                    categoria.setDescripcion(rs.getString("DESCRIPCION"));
+                    categoria.setEstado(rs.getInt("ESTADO"));
+                    return categoria;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al buscar categoría: " + e.getMessage());
+        }
+        return null;
+    }
+    
+    // Cerrar recursos cuando ya no se necesite el controlador
+    public void cerrarRecursos() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al cerrar la conexión: " + e.getMessage());
+        }
+    }
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Modelo">
+    <Code code={`public class CategoriaModelo {
+    private int idCategoria;
+    private String nombreCategoria;
+    private String descripcion;
+    private int estado;
+    
+    // Constructor vacío
+    public CategoriaModelo() {
+    }
+    
+    // Constructor con parámetros
+    public CategoriaModelo(String nombreCategoria, String descripcion, int estado) {
+        this.nombreCategoria = nombreCategoria;
+        this.descripcion = descripcion;
+        this.estado = estado;
+    }
+    
+    // Constructor completo
+    public CategoriaModelo(int idCategoria, String nombreCategoria, String descripcion, int estado) {
+        this.idCategoria = idCategoria;
+        this.nombreCategoria = nombreCategoria;
+        this.descripcion = descripcion;
+        this.estado = estado;
+    }
+    
+    // Getters y Setters
+    public int getIdCategoria() {
+        return idCategoria;
+    }
+    
+    public void setIdCategoria(int idCategoria) {
+        this.idCategoria = idCategoria;
+    }
+    
+    public String getNombreCategoria() {
+        return nombreCategoria;
+    }
+    
+    public void setNombreCategoria(String nombreCategoria) {
+        this.nombreCategoria = nombreCategoria;
+    }
+    
+    public String getDescripcion() {
+        return descripcion;
+    }
+    
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+    
+    public int getEstado() {
+        return estado;
+    }
+    
+    public void setEstado(int estado) {
+        this.estado = estado;
+    }
+    
+    @Override
+    public String toString() {
+        return "Categoría{" +
+                "id=" + idCategoria +
+                ", nombre='" + nombreCategoria + '\'' +
+                ", descripción='" + descripcion + '\'' +
+                ", estado=" + estado +
+                '}';
+    }
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Uso">
+    <Code code={`public class Main {
+    public static void main(String[] args) {
+        // Crear una instancia del controlador
+        CategoriaControlador controlador = new CategoriaControlador();
+        
+        try {
+            // Crear una nueva categoría
+            CategoriaModelo nuevaCategoria = new CategoriaModelo();
+            nuevaCategoria.setNombreCategoria("Electrónicos");
+            nuevaCategoria.setDescripcion("Productos electrónicos y gadgets");
+            nuevaCategoria.setEstado(1); // 1 = activo
+            
+            String resultado = controlador.crearCategoria(nuevaCategoria);
+            System.out.println(resultado);
+            
+            // Listar todas las categorías
+            System.out.println("\nListado de categorías:");
+            List<CategoriaModelo> categorias = controlador.listarCategorias();
+            for (CategoriaModelo cat : categorias) {
+                System.out.println(cat);
+            }
+            
+            // Buscar una categoría por ID
+            System.out.println("\nBuscando categoría con ID 1:");
+            CategoriaModelo categoria = controlador.buscarCategoriaPorId(1);
+            if (categoria != null) {
+                System.out.println(categoria);
+                
+                // Actualizar la categoría
+                categoria.setDescripcion("Descripción actualizada");
+                resultado = controlador.actualizarCategoria(categoria);
+                System.out.println(resultado);
+            } else {
+                System.out.println("Categoría no encontrada");
+            }
+            
+            // Eliminar una categoría (cambio de estado)
+            System.out.println("\nEliminando categoría con ID 2:");
+            resultado = controlador.eliminarCategoria(2);
+            System.out.println(resultado);
+            
+        } finally {
+            // Siempre cerrar recursos al finalizar
+            controlador.cerrarRecursos();
+        }
+    }
+}`} lang="java" />
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Estas clases de conexión proporcionan una forma centralizada de gestionar las conexiones a la base de datos. Para aplicaciones más grandes, considera utilizar un pool de conexiones como HikariCP, C3P0 o el pool de conexiones integrado en tu servidor de aplicaciones.
+</Aside>
+
+### 10.2.3 Uso de DataSource
+
+En aplicaciones empresariales, es preferible utilizar `DataSource` en lugar de `DriverManager` para gestionar conexiones a la base de datos. `DataSource` proporciona ventajas como:
+
+- Agrupación de conexiones (connection pooling)
+- Distribución de carga
+- Transacciones distribuidas
+
+<Code code={`import javax.sql.DataSource;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+try {
+    // Obtener DataSource desde JNDI (Java Naming and Directory Interface)
+    InitialContext context = new InitialContext();
+    DataSource dataSource = (DataSource) context.lookup("java:comp/env/jdbc/MiBaseDatos");
+    
+    // Obtener conexión del pool
+    Connection connection = dataSource.getConnection();
+    
+    // Usar la conexión...
+    
+    // Devolver la conexión al pool (no cerrarla realmente)
+    connection.close();
+    
+} catch (NamingException | SQLException e) {
+    e.printStackTrace();
+}`} lang="java" />
+
+### 10.2.3 Uso de try-with-resources
+
+Desde Java 7, se recomienda utilizar el bloque try-with-resources para gestionar automáticamente el cierre de recursos como conexiones, statements y resultsets:
+
+<Code code={`String url = "jdbc:mysql://localhost:3306/mibasedatos";
+String usuario = "usuario";
+String contraseña = "contraseña";
+
+try (Connection connection = DriverManager.getConnection(url, usuario, contraseña)) {
+    System.out.println("Conexión establecida con éxito");
+    
+    // Realizar operaciones con la base de datos...
+    
+} catch (SQLException e) {
+    System.err.println("Error al conectar a la base de datos: " + e.getMessage());
+    e.printStackTrace();
+} // La conexión se cierra automáticamente al salir del bloque try`} lang="java" />
+
+### 10.2.4 Propiedades de conexión
+
+Puedes configurar propiedades adicionales al establecer una conexión utilizando un objeto `Properties`:
+
+<Code code={`import java.util.Properties;
+
+String url = "jdbc:mysql://localhost:3306/mibasedatos";
+Properties props = new Properties();
+
+// Configurar propiedades de conexión
+props.setProperty("user", "usuario");
+props.setProperty("password", "contraseña");
+props.setProperty("useSSL", "false");
+props.setProperty("serverTimezone", "UTC");
+
+try (Connection connection = DriverManager.getConnection(url, props)) {
+    // Usar la conexión...
+} catch (SQLException e) {
+    e.printStackTrace();
+}`} lang="java" />
+
+<Aside type="caution">
+  Nunca almacenes credenciales de base de datos directamente en el código. Utiliza archivos de propiedades, variables de entorno o sistemas de gestión de secretos para mayor seguridad.
+</Aside>
+
+### 10.2.5 Manejo de excepciones en JDBC
+
+JDBC utiliza `SQLException` para manejar errores relacionados con la base de datos. Esta excepción proporciona información detallada sobre el error:
+
+<Code code={`try {
+    // Código JDBC que puede lanzar SQLException
+} catch (SQLException e) {
+    System.err.println("Código de error SQL: " + e.getErrorCode());
+    System.err.println("Estado SQL: " + e.getSQLState());
+    System.err.println("Mensaje: " + e.getMessage());
+    
+    // Obtener excepciones encadenadas
+    SQLException nextException = e.getNextException();
+    while (nextException != null) {
+        System.err.println("Excepción encadenada: " + nextException.getMessage());
+        nextException = nextException.getNextException();
+    }
+    
+    e.printStackTrace();
+}`} lang="java" />
+
+## 10.3 Ejecutar consultas y actualizaciones
+
+### 10.3.1 Uso de Statement
+
+La interfaz `Statement` se utiliza para ejecutar consultas SQL estáticas. Es adecuada para consultas que se ejecutan una sola vez y no contienen parámetros.
+
+<Code code={`try (Connection connection = DriverManager.getConnection(url, usuario, contraseña);
+     Statement statement = connection.createStatement()) {
+    
+    // Ejecutar una consulta SELECT
+    ResultSet resultSet = statement.executeQuery("SELECT id, nombre, email FROM usuarios");
+    
+    // Procesar los resultados
+    while (resultSet.next()) {
+        int id = resultSet.getInt("id");
+        String nombre = resultSet.getString("nombre");
+        String email = resultSet.getString("email");
+        
+        System.out.println(id + ": " + nombre + " (" + email + ")");
+    }
+    
+    // Ejecutar una actualización (INSERT, UPDATE, DELETE)
+    int filasAfectadas = statement.executeUpdate(
+        "INSERT INTO usuarios (nombre, email) VALUES ('Juan Pérez', 'juan@ejemplo.com')"
+    );
+    System.out.println("Filas afectadas: " + filasAfectadas);
+    
+    // Ejecutar cualquier tipo de sentencia SQL
+    boolean esResultSet = statement.execute("SHOW TABLES");
+    if (esResultSet) {
+        ResultSet rs = statement.getResultSet();
+        // Procesar resultSet
+    } else {
+        int count = statement.getUpdateCount();
+        // Procesar recuento de actualizaciones
+    }
+    
+} catch (SQLException e) {
+    e.printStackTrace();
+}`} lang="java" />
+
+<Aside type="caution">
+  El uso de `Statement` con consultas SQL concatenadas puede ser vulnerable a ataques de inyección SQL. Para consultas con parámetros, utiliza siempre `PreparedStatement`.
+</Aside>
+
+### 10.3.2 Uso de PreparedStatement
+
+La interfaz `PreparedStatement` se utiliza para ejecutar consultas SQL precompiladas y parametrizadas. Ofrece mejor rendimiento y seguridad contra inyecciones SQL.
+
+<Code code={`try (Connection connection = DriverManager.getConnection(url, usuario, contraseña);
+     PreparedStatement preparedStatement = connection.prepareStatement(
+         "SELECT * FROM usuarios WHERE departamento = ? AND fecha_alta > ?")) {
+    
+    // Establecer parámetros
+    preparedStatement.setString(1, "Ventas");  // El primer ? es el índice 1
+    preparedStatement.setDate(2, java.sql.Date.valueOf("2023-01-01"));  // El segundo ? es el índice 2
+    
+    // Ejecutar consulta
+    ResultSet resultSet = preparedStatement.executeQuery();
+    
+    // Procesar resultados
+    while (resultSet.next()) {
+        // Procesar cada fila
+    }
+} catch (SQLException e) {
+    e.printStackTrace();
+}`} lang="java" />
+
+<table>
+  <thead>
+    <tr>
+      <th>Método</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>setString(int, String)</td>
+      <td>Establece un parámetro String</td>
+    </tr>
+    <tr>
+      <td>setInt(int, int)</td>
+      <td>Establece un parámetro int</td>
+    </tr>
+    <tr>
+      <td>setLong(int, long)</td>
+      <td>Establece un parámetro long</td>
+    </tr>
+    <tr>
+      <td>setDouble(int, double)</td>
+      <td>Establece un parámetro double</td>
+    </tr>
+    <tr>
+      <td>setBoolean(int, boolean)</td>
+      <td>Establece un parámetro boolean</td>
+    </tr>
+    <tr>
+      <td>setDate(int, Date)</td>
+      <td>Establece un parámetro Date</td>
+    </tr>
+    <tr>
+      <td>setTimestamp(int, Timestamp)</td>
+      <td>Establece un parámetro Timestamp</td>
+    </tr>
+    <tr>
+      <td>setNull(int, int)</td>
+      <td>Establece un parámetro NULL con el tipo SQL especificado</td>
+    </tr>
+    <tr>
+      <td>setObject(int, Object)</td>
+      <td>Establece un parámetro Object</td>
+    </tr>
+    <tr>
+      <td>clearParameters()</td>
+      <td>Limpia los valores de todos los parámetros</td>
+    </tr>
+  </tbody>
+</table>
+
+#### Ejemplo de inserción con PreparedStatement
+
+<Code code={`String sql = "INSERT INTO usuarios (nombre, email, edad, activo) VALUES (?, ?, ?, ?)";
+
+try (Connection connection = DriverManager.getConnection(url, usuario, contraseña);
+     PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    
+    // Establecer parámetros
+    pstmt.setString(1, "Ana García");
+    pstmt.setString(2, "ana@ejemplo.com");
+    pstmt.setInt(3, 28);
+    pstmt.setBoolean(4, true);
+    
+    // Ejecutar la inserción
+    int filasAfectadas = pstmt.executeUpdate();
+    System.out.println(filasAfectadas + " fila(s) insertada(s)");
+    
+    // Obtener claves generadas (como IDs autoincrementales)
+    try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+        if (generatedKeys.next()) {
+            long id = generatedKeys.getLong(1);
+            System.out.println("ID generado: " + id);
+        }
+    }
+    
+} catch (SQLException e) {
+    e.printStackTrace();
+}`} lang="java" />
+
+#### Operaciones por lotes (batch)
+
+Para mejorar el rendimiento al insertar o actualizar múltiples registros, puedes utilizar operaciones por lotes:
+
+<Code code={`String sql = "INSERT INTO productos (nombre, precio, stock) VALUES (?, ?, ?)";
+
+try (Connection connection = DriverManager.getConnection(url, usuario, contraseña);
+     PreparedStatement pstmt = connection.prepareStatement(sql)) {
+    
+    // Desactivar auto-commit para mejorar rendimiento
+    connection.setAutoCommit(false);
+    
+    // Primer lote
+    pstmt.setString(1, "Producto A");
+    pstmt.setDouble(2, 19.99);
+    pstmt.setInt(3, 100);
+    pstmt.addBatch();
+    
+    // Segundo lote
+    pstmt.setString(1, "Producto B");
+    pstmt.setDouble(2, 29.99);
+    pstmt.setInt(3, 50);
+    pstmt.addBatch();
+    
+    // Tercer lote
+    pstmt.setString(1, "Producto C");
+    pstmt.setDouble(2, 9.99);
+    pstmt.setInt(3, 200);
+    pstmt.addBatch();
+    
+    // Ejecutar todos los lotes
+    int[] resultados = pstmt.executeBatch();
+    
+    // Confirmar la transacción
+    connection.commit();
+    
+    // Mostrar resultados
+    System.out.println("Resultados del lote:");
+    for (int i = 0; i < resultados.length; i++) {
+        System.out.println("Lote " + (i+1) + ": " + resultados[i]);
+    }
+    
+} catch (SQLException e) {
+    e.printStackTrace();
+}`} lang="java" />
+
+### 10.3.3 Uso de CallableStatement
+
+La interfaz `CallableStatement` se utiliza para ejecutar procedimientos almacenados y funciones en la base de datos.
+
+<Code code={`try (Connection connection = DriverManager.getConnection(url, usuario, contraseña);
+     // Llamar a un procedimiento almacenado con parámetros de entrada y salida
+     CallableStatement cstmt = connection.prepareCall("{call calcular_estadisticas(?, ?, ?)}")) {
+    
+    // Registrar parámetros de salida
+    cstmt.registerOutParameter(2, java.sql.Types.INTEGER);
+    cstmt.registerOutParameter(3, java.sql.Types.DOUBLE);
+    
+    // Establecer parámetros de entrada
+    cstmt.setString(1, "Ventas");  // Primer parámetro (IN)
+    
+    // Ejecutar el procedimiento almacenado
+    cstmt.execute();
+    
+    // Obtener parámetros de salida
+    int totalRegistros = cstmt.getInt(2);  // Segundo parámetro (OUT)
+    double promedio = cstmt.getDouble(3);  // Tercer parámetro (OUT)
+    
+    System.out.println("Total de registros: " + totalRegistros);
+    System.out.println("Promedio: " + promedio);
+    
+} catch (SQLException e) {
+    e.printStackTrace();
+}`} lang="java" />
+
+#### Llamar a una función almacenada
+
+<Code code={`try (Connection connection = DriverManager.getConnection(url, usuario, contraseña);
+     // Llamar a una función almacenada que devuelve un valor
+     CallableStatement cstmt = connection.prepareCall("{? = call calcular_total(?, ?)}")) {
+    
+    // Registrar el parámetro de retorno
+    cstmt.registerOutParameter(1, java.sql.Types.DOUBLE);
+    
+    // Establecer parámetros de entrada
+    cstmt.setInt(2, 101);  // ID del cliente
+    cstmt.setString(3, "2023");  // Año
+    
+    // Ejecutar la función
+    cstmt.execute();
+    
+    // Obtener el valor de retorno
+    double total = cstmt.getDouble(1);
+    System.out.println("Total calculado: " + total);
+    
+} catch (SQLException e) {
+    e.printStackTrace();
+}`} lang="java" />

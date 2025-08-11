@@ -1,0 +1,279 @@
+---
+title: Animaciones CSS
+description: Guía de animaciones CSS y librerías de animación populares
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Animaciones CSS <Badge text="Configuración" variant="success" />
+
+## Animaciones Básicas CSS <Badge text="Paso 1" variant="note" />
+
+### Transiciones
+<Code code={`/* styles.css */
+.boton {
+  background-color: #3498db;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.boton:hover {
+  background-color: #2980b9;
+  transform: scale(1.1);
+}`} lang="css" />
+
+### Keyframes
+<Code code={`@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.elemento-animado {
+  animation: fadeIn 0.5s ease-out forwards;
+}`} lang="css" />
+
+## Animate.css <Badge text="Paso 2" variant="note" />
+
+### Instalación
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install animate.css
+    ```
+  </TabItem>
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    ```
+  </TabItem>
+</Tabs>
+
+### Uso Básico
+<Code code={`<!-- HTML -->
+<div class="animate__animated animate__fadeIn">
+  Contenido con fade in
+</div>
+
+<div class="animate__animated animate__bounce">
+  Contenido que rebota
+</div>
+
+<!-- JavaScript -->
+element.classList.add('animate__animated', 'animate__fadeIn');`} lang="html" />
+
+### Personalización
+<Code code={`/* Duración */
+.elemento {
+  --animate-duration: 2s;
+}
+
+/* Retardo */
+.elemento {
+  --animate-delay: 0.5s;
+}
+
+/* Repetición */
+.elemento {
+  --animate-repeat: 2;
+}`} lang="css" />
+
+## GSAP (GreenSock) <Badge text="Paso 3" variant="note" />
+
+### Instalación
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install gsap
+    ```
+  </TabItem>
+</Tabs>
+
+### Animaciones Básicas
+<Code code={`// Importar GSAP
+import gsap from 'gsap';
+
+// Animación básica
+gsap.to(".elemento", {
+  duration: 1,
+  x: 100,
+  y: 50,
+  rotation: 360,
+  scale: 1.5,
+  opacity: 0.5
+});
+
+// Timeline
+const tl = gsap.timeline();
+
+tl.to(".elemento1", { duration: 1, x: 100 })
+  .to(".elemento2", { duration: 1, y: 100 })
+  .to(".elemento3", { duration: 1, rotation: 360 });`} lang="javascript" />
+
+### Scroll Trigger
+<Code code={`// Importar ScrollTrigger
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+gsap.registerPlugin(ScrollTrigger);
+
+// Animación al hacer scroll
+gsap.to(".elemento", {
+  scrollTrigger: {
+    trigger: ".elemento",
+    start: "top center",
+    end: "bottom center",
+    scrub: true,
+    markers: true
+  },
+  y: 100,
+  opacity: 0
+});`} lang="javascript" />
+
+## Framer Motion (React) <Badge text="Paso 4" variant="note" />
+
+### Instalación
+```bash
+npm install framer-motion
+```
+
+### Componentes Animados
+<Code code={`import { motion } from 'framer-motion';
+
+// Animación básica
+function Componente() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      Contenido animado
+    </motion.div>
+  );
+}
+
+// Animación con variantes
+const variants = {
+  hidden: { opacity: 0, x: -100 },
+  visible: { opacity: 1, x: 0 }
+};
+
+function ComponenteConVariantes() {
+  return (
+    <motion.div
+      variants={variants}
+      initial="hidden"
+      animate="visible"
+      transition={{ duration: 0.5 }}
+    >
+      Contenido animado
+    </motion.div>
+  );
+}`} lang="javascript" />
+
+## Optimización y Rendimiento <Badge text="Paso 5" variant="caution" />
+
+### CSS
+<Code code={`/* Usar propiedades optimizadas */
+.elemento {
+  /* ✅ Bueno - Usa transform */
+  transform: translateX(100px);
+  
+  /* ❌ Malo - Evitar */
+  left: 100px;
+}
+
+/* Usar will-change con moderación */
+.elemento {
+  will-change: transform;
+}`} lang="css" />
+
+### JavaScript
+<Code code={`// Usar requestAnimationFrame
+function animar() {
+  requestAnimationFrame(() => {
+    elemento.style.transform = \`translateX(\${posicion}px)\`;
+  });
+}
+
+// Debounce para eventos de scroll
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}`} lang="javascript" />
+
+## Mejores Prácticas <Badge text="Recomendado" variant="success" />
+
+### 1. Accesibilidad
+<Code code={`/* Reducir el movimiento si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce) {
+  .elemento-animado {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* JavaScript */
+if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  // Desactivar o simplificar animaciones
+}`} lang="css" />
+
+### 2. Rendimiento
+```javascript
+// ✅ Bueno: Animar propiedades de transform y opacity
+gsap.to(elemento, {
+  transform: 'translateX(100px)',
+  opacity: 0.5
+});
+
+// ❌ Malo: Evitar animar width, height o left
+gsap.to(elemento, {
+  width: '200px',
+  height: '200px'
+});
+```
+
+### 3. Organización
+<Code code={`// animations/config.js
+export const fadeIn = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5 }
+};
+
+export const slideIn = {
+  initial: { x: -100 },
+  animate: { x: 0 },
+  transition: { duration: 0.3 }
+};
+
+// Uso
+import { fadeIn } from './animations/config';
+
+<motion.div {...fadeIn}>
+  Contenido
+</motion.div>`} lang="javascript" />
+
+<Aside type="tip">
+  Para más detalles sobre animaciones y optimización, consulta:
+  - [MDN Web Docs - Animaciones CSS](https://developer.mozilla.org/es/docs/Web/CSS/CSS_Animations)
+  - [GSAP Documentación](https://greensock.com/docs/)
+  - [Framer Motion](https://www.framer.com/motion/)
+  - [Animate.css](https://animate.style/)
+</Aside>

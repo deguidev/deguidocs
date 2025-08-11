@@ -1,0 +1,803 @@
+---
+title: 7. Manejo de Archivos
+description: Aprende a leer, escribir y manipular archivos y directorios en PHP
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Manejo de Archivos en PHP
+
+PHP ofrece un conjunto completo de funciones para trabajar con archivos y directorios en el servidor. Estas funcionalidades permiten leer, escribir, modificar y eliminar archivos, así como gestionar directorios y sus contenidos. El manejo de archivos es esencial para muchas aplicaciones web, desde la simple lectura de configuraciones hasta sistemas complejos de gestión de contenidos.
+
+## Leer y Escribir Archivos
+
+PHP proporciona varias formas de leer y escribir archivos, desde funciones básicas hasta métodos más avanzados.
+
+### Funciones Básicas para Archivos Pequeños
+
+Para archivos pequeños, PHP ofrece funciones simples que cargan todo el contenido de una vez:
+
+<Code code={`<?php
+// Leer todo el contenido de un archivo en una cadena
+$contenido = file_get_contents('archivo.txt');
+echo $contenido;
+
+// Escribir una cadena completa a un archivo (sobrescribe el contenido existente)
+file_put_contents('nuevo_archivo.txt', 'Este es el contenido del archivo.');
+
+// Agregar contenido al final de un archivo existente
+file_put_contents('log.txt', "Nueva entrada de registro: " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+
+// Leer un archivo en un array (cada línea es un elemento)
+$lineas = file('archivo.txt');
+foreach ($lineas as $numero_linea => $linea) {
+    echo "Línea #" . ($numero_linea + 1) . ": " . htmlspecialchars($linea) . "<br>\n";
+}
+?>`} lang="php" />
+
+<Aside type="tip">
+  Las funciones `file_get_contents()` y `file_put_contents()` son ideales para archivos pequeños, pero pueden consumir mucha memoria con archivos grandes. Para archivos de gran tamaño, es mejor usar las funciones de manejo de archivos con punteros.
+</Aside>
+
+### Manejo de Archivos con Punteros
+
+Para un control más preciso y eficiente, especialmente con archivos grandes, PHP proporciona un conjunto de funciones que trabajan con punteros de archivo:
+
+<Code code={`<?php
+// Abrir un archivo para lectura
+$archivo = fopen('datos.txt', 'r');
+
+// Verificar si se abrió correctamente
+if ($archivo) {
+    // Leer el archivo línea por línea
+    while (($linea = fgets($archivo)) !== false) {
+        echo htmlspecialchars($linea) . "<br>\n";
+    }
+    
+    // Cerrar el archivo
+    fclose($archivo);
+} else {
+    echo "Error al abrir el archivo";
+}
+
+// Abrir un archivo para escritura (crea el archivo si no existe, sobrescribe si existe)
+$archivo = fopen('salida.txt', 'w');
+
+// Escribir en el archivo
+fwrite($archivo, "Primera línea de texto\n");
+fwrite($archivo, "Segunda línea de texto\n");
+
+// Cerrar el archivo
+fclose($archivo);
+
+// Abrir un archivo para agregar contenido al final
+$archivo = fopen('log.txt', 'a');
+fwrite($archivo, date('Y-m-d H:i:s') . " - Operación completada\n");
+fclose($archivo);
+?>`} lang="php" />
+
+### Modos de Apertura de Archivos
+
+Al usar `fopen()`, el segundo parámetro especifica el modo de apertura del archivo:
+
+<Tabs>
+  <TabItem label="Modos Básicos">
+    <ul>
+      <li><strong>'r'</strong>: Abre para lectura. El puntero comienza al inicio del archivo.</li>
+      <li><strong>'w'</strong>: Abre para escritura. Crea el archivo si no existe o lo trunca si existe.</li>
+      <li><strong>'a'</strong>: Abre para escritura. Crea el archivo si no existe. El puntero comienza al final del archivo.</li>
+      <li><strong>'x'</strong>: Crea y abre para escritura. Devuelve FALSE si el archivo ya existe.</li>
+    </ul>
+  </TabItem>
+  
+  <TabItem label="Modos Adicionales">
+    <ul>
+      <li><strong>'r+'</strong>: Abre para lectura y escritura. El puntero comienza al inicio.</li>
+      <li><strong>'w+'</strong>: Abre para lectura y escritura. Crea el archivo si no existe o lo trunca si existe.</li>
+      <li><strong>'a+'</strong>: Abre para lectura y escritura. Crea el archivo si no existe. El puntero comienza al final.</li>
+      <li><strong>'x+'</strong>: Crea y abre para lectura y escritura. Devuelve FALSE si el archivo ya existe.</li>
+    </ul>
+  </TabItem>
+  
+  <TabItem label="Modos Binarios">
+    <p>Agregar 'b' a cualquier modo para abrir en modo binario:</p>
+    <ul>
+      <li><strong>'rb'</strong>, <strong>'wb'</strong>, <strong>'ab'</strong>, etc.</li>
+      <li>Importante en sistemas Windows para evitar transformaciones de caracteres de nueva línea.</li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+### Leer Datos Específicos
+
+<Code code={`<?php
+// Abrir archivo
+$archivo = fopen('datos.bin', 'rb');
+
+// Leer un solo carácter
+$caracter = fgetc($archivo); // Lee un byte
+
+// Leer una cantidad específica de bytes
+$datos = fread($archivo, 1024); // Lee 1KB
+
+// Mover el puntero del archivo
+fseek($archivo, 100); // Mueve el puntero a la posición 100
+$datos = fread($archivo, 50); // Lee 50 bytes desde la posición 100
+
+// Obtener la posición actual del puntero
+$posicion = ftell($archivo);
+echo "Posición actual: $posicion";
+
+// Rebobinar el archivo (volver al inicio)
+rewind($archivo);
+
+// Verificar si hemos llegado al final del archivo
+if (feof($archivo)) {
+    echo "Fin del archivo alcanzado";
+}
+
+fclose($archivo);
+?>`} lang="php" />
+
+### Bloqueo de Archivos
+
+Cuando múltiples scripts pueden acceder al mismo archivo simultáneamente, es importante usar bloqueos para evitar problemas de concurrencia:
+
+<Code code={`<?php
+$archivo = fopen('datos_compartidos.txt', 'r+');
+
+// Intentar obtener un bloqueo exclusivo (para escritura)
+if (flock($archivo, LOCK_EX)) {
+    // Realizar operaciones seguras en el archivo
+    ftruncate($archivo, 0); // Vaciar el archivo
+    fwrite($archivo, "Nuevos datos\n");
+    
+    // Liberar el bloqueo
+    flock($archivo, LOCK_UN);
+    echo "Operación completada con éxito";
+} else {
+    echo "No se pudo obtener el bloqueo";
+}
+
+fclose($archivo);
+
+// Ejemplo con bloqueo no bloqueante
+$archivo = fopen('otro_archivo.txt', 'r');
+
+// Intentar obtener un bloqueo compartido (para lectura) sin bloquear la ejecución
+if (flock($archivo, LOCK_SH | LOCK_NB)) {
+    // Leer datos...
+    flock($archivo, LOCK_UN);
+} else {
+    echo "El archivo está siendo modificado por otro proceso";
+}
+
+fclose($archivo);
+?>`} lang="php" />
+
+<Aside type="caution">
+  Los bloqueos de archivos en PHP son "recomendados" pero no estrictamente obligatorios. Otros procesos podrían ignorar los bloqueos si no están programados para respetarlos.
+</Aside>
+
+### Trabajar con CSV
+
+PHP tiene funciones específicas para trabajar con archivos CSV (valores separados por comas):
+
+<Code code={`<?php
+// Leer un archivo CSV
+$archivo = fopen('datos.csv', 'r');
+
+// Leer la primera línea como encabezados
+$encabezados = fgetcsv($archivo);
+
+// Leer los datos
+$datos = [];
+while (($fila = fgetcsv($archivo)) !== false) {
+    // Crear un array asociativo combinando encabezados con valores
+    $datos[] = array_combine($encabezados, $fila);
+}
+
+fclose($archivo);
+
+// Mostrar los datos
+echo "<pre>";
+print_r($datos);
+echo "</pre>";
+
+// Escribir un archivo CSV
+$archivo_salida = fopen('exportacion.csv', 'w');
+
+// Escribir encabezados
+$encabezados = ['Nombre', 'Edad', 'Ciudad'];
+fputcsv($archivo_salida, $encabezados);
+
+// Escribir datos
+$filas = [
+    ['María', 28, 'Madrid'],
+    ['Juan', 35, 'Barcelona'],
+    ['Ana', 42, 'Valencia']
+];
+
+foreach ($filas as $fila) {
+    fputcsv($archivo_salida, $fila);
+}
+
+fclose($archivo_salida);
+?>`} lang="php" />
+
+### Serializar Datos
+
+Para guardar estructuras de datos complejas en archivos:
+
+<Code code={`<?php
+// Datos a guardar
+$datos = [
+    'usuario' => [
+        'id' => 123,
+        'nombre' => 'Carlos',
+        'roles' => ['editor', 'admin']
+    ],
+    'configuracion' => [
+        'tema' => 'oscuro',
+        'notificaciones' => true
+    ]
+];
+
+// Serializar y guardar
+$serializado = serialize($datos);
+file_put_contents('datos_serializados.txt', $serializado);
+
+// Leer y deserializar
+$contenido = file_get_contents('datos_serializados.txt');
+$datos_recuperados = unserialize($contenido);
+
+echo "Tema: " . $datos_recuperados['configuracion']['tema'];
+
+// Alternativa usando JSON (más portable)
+$json = json_encode($datos, JSON_PRETTY_PRINT);
+file_put_contents('datos.json', $json);
+
+$contenido_json = file_get_contents('datos.json');
+$datos_json = json_decode($contenido_json, true); // true para obtener arrays asociativos
+
+echo "Nombre de usuario: " . $datos_json['usuario']['nombre'];
+?>`} lang="php" />
+
+<Aside type="note">
+  JSON es generalmente preferible a la serialización nativa de PHP cuando necesitas interoperabilidad con otros sistemas o lenguajes.
+</Aside>
+
+## Subir Archivos
+
+La subida de archivos es una funcionalidad común en aplicaciones web. PHP facilita este proceso mediante el manejo de formularios con `enctype="multipart/form-data"` y la variable superglobal `$_FILES`.
+
+### Formulario Básico de Subida
+
+<Code code={`<!-- HTML del formulario -->
+<form action="procesar_subida.php" method="post" enctype="multipart/form-data">
+    <label for="archivo">Seleccionar archivo:</label>
+    <input type="file" name="archivo" id="archivo">
+    <br>
+    <input type="submit" value="Subir Archivo">
+</form>`} lang="html" />
+
+<Code code={`<?php
+// procesar_subida.php
+
+// Verificar si se ha subido un archivo
+if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
+    // Obtener detalles del archivo
+    $nombre_temporal = $_FILES['archivo']['tmp_name'];
+    $nombre_archivo = $_FILES['archivo']['name'];
+    $tamano_archivo = $_FILES['archivo']['size'];
+    $tipo_archivo = $_FILES['archivo']['type'];
+    
+    // Directorio donde se guardará el archivo
+    $directorio_destino = 'uploads/';
+    
+    // Crear el directorio si no existe
+    if (!is_dir($directorio_destino)) {
+        mkdir($directorio_destino, 0755, true);
+    }
+    
+    // Ruta completa de destino
+    $ruta_destino = $directorio_destino . $nombre_archivo;
+    
+    // Mover el archivo subido al destino final
+    if (move_uploaded_file($nombre_temporal, $ruta_destino)) {
+        echo "Archivo subido con éxito a $ruta_destino";
+        echo "<br>Tamaño: $tamano_archivo bytes";
+        echo "<br>Tipo: $tipo_archivo";
+    } else {
+        echo "Error al mover el archivo subido";
+    }
+} else {
+    // Mostrar código de error si existe
+    if (isset($_FILES['archivo'])) {
+        $codigo_error = $_FILES['archivo']['error'];
+        echo "Error en la subida. Código: $codigo_error";
+        
+        // Mostrar mensaje según el código de error
+        switch ($codigo_error) {
+            case UPLOAD_ERR_INI_SIZE:
+                echo " - El archivo excede el tamaño máximo permitido en php.ini";
+                break;
+            case UPLOAD_ERR_FORM_SIZE:
+                echo " - El archivo excede el tamaño máximo especificado en el formulario";
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                echo " - El archivo se subió parcialmente";
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                echo " - No se subió ningún archivo";
+                break;
+            case UPLOAD_ERR_NO_TMP_DIR:
+                echo " - Falta la carpeta temporal";
+                break;
+            case UPLOAD_ERR_CANT_WRITE:
+                echo " - Error al escribir el archivo en el disco";
+                break;
+            case UPLOAD_ERR_EXTENSION:
+                echo " - Una extensión de PHP detuvo la subida";
+                break;
+        }
+    } else {
+        echo "No se ha enviado ningún archivo";
+    }
+}
+?>`} lang="php" />
+
+### Validación y Seguridad en Subidas
+
+La validación de archivos subidos es crucial para la seguridad:
+
+<Code code={`<?php
+// Validación completa de archivos subidos
+function validar_archivo($archivo) {
+    $errores = [];
+    
+    // Verificar si hay errores en la subida
+    if ($archivo['error'] !== UPLOAD_ERR_OK) {
+        $errores[] = "Error en la subida del archivo (código: {$archivo['error']})";
+        return $errores;
+    }
+    
+    // Verificar tamaño (ejemplo: máximo 2MB)
+    $tamano_maximo = 2 * 1024 * 1024; // 2MB en bytes
+    if ($archivo['size'] > $tamano_maximo) {
+        $errores[] = "El archivo es demasiado grande. Máximo: 2MB";
+    }
+    
+    // Verificar tipo de archivo (ejemplo: solo imágenes)
+    $tipos_permitidos = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!in_array($archivo['type'], $tipos_permitidos)) {
+        $errores[] = "Tipo de archivo no permitido. Solo se aceptan: JPEG, PNG, GIF";
+    }
+    
+    // Verificar extensión (doble verificación)
+    $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+    $extensiones_permitidas = ['jpg', 'jpeg', 'png', 'gif'];
+    if (!in_array($extension, $extensiones_permitidas)) {
+        $errores[] = "Extensión de archivo no permitida. Solo se aceptan: JPG, JPEG, PNG, GIF";
+    }
+    
+    // Verificar que el archivo sea realmente una imagen (si aplica)
+    if (function_exists('exif_imagetype')) {
+        $tipo_imagen = @exif_imagetype($archivo['tmp_name']);
+        if (!$tipo_imagen || !in_array($tipo_imagen, [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF])) {
+            $errores[] = "El archivo no es una imagen válida";
+        }
+    }
+    
+    return $errores;
+}
+
+// Uso de la función
+if (isset($_FILES['archivo'])) {
+    $errores = validar_archivo($_FILES['archivo']);
+    
+    if (empty($errores)) {
+        // Generar nombre único para evitar sobrescrituras
+        $nombre_unico = time() . '_' . bin2hex(random_bytes(8)) . '_' . basename($_FILES['archivo']['name']);
+        $ruta_destino = 'uploads/' . $nombre_unico;
+        
+        // Mover el archivo
+        if (move_uploaded_file($_FILES['archivo']['tmp_name'], $ruta_destino)) {
+            echo "Archivo subido y validado correctamente";
+            
+            // Establecer permisos adecuados
+            chmod($ruta_destino, 0644); // Solo lectura para grupo y otros
+        } else {
+            echo "Error al mover el archivo";
+        }
+    } else {
+        echo "Errores de validación:<br>";
+        foreach ($errores as $error) {
+            echo "- $error<br>";
+        }
+    }
+}
+?>`} lang="php" />
+
+### Subida Múltiple de Archivos
+
+<Code code={`<!-- Formulario para subida múltiple -->
+<form action="procesar_multiple.php" method="post" enctype="multipart/form-data">
+    <label for="archivos">Seleccionar archivos:</label>
+    <input type="file" name="archivos[]" id="archivos" multiple>
+    <br>
+    <input type="submit" value="Subir Archivos">
+</form>`} lang="html" />
+
+<Code code={`<?php
+// procesar_multiple.php
+
+// Verificar si hay archivos subidos
+if (isset($_FILES['archivos']) && !empty($_FILES['archivos']['name'][0])) {
+    // Contar archivos
+    $total_archivos = count($_FILES['archivos']['name']);
+    echo "Total de archivos: $total_archivos<br>";
+    
+    // Directorio de destino
+    $directorio_destino = 'uploads/';
+    if (!is_dir($directorio_destino)) {
+        mkdir($directorio_destino, 0755, true);
+    }
+    
+    // Procesar cada archivo
+    $archivos_subidos = 0;
+    for ($i = 0; $i < $total_archivos; $i++) {
+        // Verificar si este archivo se subió sin errores
+        if ($_FILES['archivos']['error'][$i] === UPLOAD_ERR_OK) {
+            $nombre_temporal = $_FILES['archivos']['tmp_name'][$i];
+            $nombre_archivo = $_FILES['archivos']['name'][$i];
+            
+            // Generar nombre único
+            $nombre_unico = time() . '_' . $i . '_' . basename($nombre_archivo);
+            $ruta_destino = $directorio_destino . $nombre_unico;
+            
+            // Mover el archivo
+            if (move_uploaded_file($nombre_temporal, $ruta_destino)) {
+                $archivos_subidos++;
+                echo "Archivo #$i: $nombre_archivo subido correctamente<br>";
+            } else {
+                echo "Error al mover el archivo #$i: $nombre_archivo<br>";
+            }
+        } else {
+            echo "Error en la subida del archivo #$i. Código: {$_FILES['archivos']['error'][$i]}<br>";
+        }
+    }
+    
+    echo "<br>Total de archivos subidos con éxito: $archivos_subidos de $total_archivos";
+} else {
+    echo "No se han seleccionado archivos para subir";
+}
+?>`} lang="php" />
+
+<Aside type="caution">
+  <strong>Consideraciones de seguridad para subida de archivos:</strong>
+  <ul>
+    <li>Siempre valide el tipo, tamaño y contenido de los archivos subidos</li>
+    <li>Nunca confíe en la extensión o el tipo MIME proporcionado por el cliente</li>
+    <li>Almacene los archivos subidos fuera del directorio público web cuando sea posible</li>
+    <li>Use nombres de archivo aleatorios para evitar sobrescrituras y ataques de adivinación</li>
+    <li>Establezca permisos restrictivos en los archivos subidos</li>
+    <li>Considere el uso de bibliotecas especializadas para manejar subidas de archivos en proyectos grandes</li>
+  </ul>
+</Aside>
+
+## Funciones de Sistema de Archivos
+
+PHP ofrece numerosas funciones para trabajar con el sistema de archivos, permitiendo operaciones como verificar la existencia de archivos, obtener información, manipular permisos y gestionar directorios.
+
+### Verificación de Archivos y Directorios
+
+<Code code={`<?php
+// Verificar si un archivo existe
+if (file_exists('config.php')) {
+    echo "El archivo config.php existe<br>";
+}
+
+// Verificar si es un archivo regular
+if (is_file('datos.txt')) {
+    echo "datos.txt es un archivo regular<br>";
+}
+
+// Verificar si es un directorio
+if (is_dir('imagenes')) {
+    echo "'imagenes' es un directorio<br>";
+}
+
+// Verificar si un archivo es legible
+if (is_readable('log.txt')) {
+    echo "log.txt es legible<br>";
+}
+
+// Verificar si un archivo es escribible
+if (is_writable('config.ini')) {
+    echo "config.ini es escribible<br>";
+}
+
+// Verificar si un archivo es ejecutable
+if (is_executable('script.sh')) {
+    echo "script.sh es ejecutable<br>";
+}
+?>`} lang="php" />
+
+### Información de Archivos
+
+<Code code={`<?php
+// Obtener el tamaño de un archivo en bytes
+$tamano = filesize('documento.pdf');
+echo "Tamaño: $tamano bytes<br>";
+
+// Obtener la fecha de última modificación
+$ultima_mod = filemtime('index.php');
+echo "Última modificación: " . date('Y-m-d H:i:s', $ultima_mod) . "<br>";
+
+// Obtener la fecha de último acceso
+$ultimo_acceso = fileatime('datos.txt');
+echo "Último acceso: " . date('Y-m-d H:i:s', $ultimo_acceso) . "<br>";
+
+// Obtener la fecha de creación (solo en algunos sistemas)
+$creacion = filectime('imagen.jpg');
+echo "Fecha de creación/cambio: " . date('Y-m-d H:i:s', $creacion) . "<br>";
+
+// Obtener el tipo MIME de un archivo
+if (function_exists('mime_content_type')) {
+    $tipo_mime = mime_content_type('documento.pdf');
+    echo "Tipo MIME: $tipo_mime<br>";
+}
+
+// Obtener información completa del archivo
+$info = stat('archivo.zip');
+echo "<pre>";
+print_r($info);
+echo "</pre>";
+
+// Obtener la extensión de un archivo
+$extension = pathinfo('documento.pdf', PATHINFO_EXTENSION);
+echo "Extensión: $extension<br>";
+
+// Obtener el nombre del archivo sin la ruta
+$nombre_archivo = basename('/var/www/html/documentos/informe.docx');
+echo "Nombre del archivo: $nombre_archivo<br>";
+
+// Obtener el nombre del archivo sin extensión
+$nombre_sin_extension = pathinfo('informe.docx', PATHINFO_FILENAME);
+echo "Nombre sin extensión: $nombre_sin_extension<br>";
+
+// Obtener el directorio padre
+$directorio = dirname('/var/www/html/documentos/informe.docx');
+echo "Directorio: $directorio<br>";
+?>`} lang="php" />
+
+### Manipulación de Archivos
+
+<Code code={`<?php
+// Copiar un archivo
+if (copy('original.txt', 'copia.txt')) {
+    echo "Archivo copiado con éxito<br>";
+}
+
+// Renombrar o mover un archivo
+if (rename('antiguo.txt', 'nuevo.txt')) {
+    echo "Archivo renombrado con éxito<br>";
+}
+
+// Mover un archivo a otro directorio
+if (rename('archivo.txt', 'backup/archivo.txt')) {
+    echo "Archivo movido con éxito<br>";
+}
+
+// Eliminar un archivo
+if (unlink('temporal.tmp')) {
+    echo "Archivo eliminado con éxito<br>";
+}
+
+// Cambiar permisos de un archivo (modo octal)
+if (chmod('script.php', 0755)) { // rwxr-xr-x
+    echo "Permisos cambiados con éxito<br>";
+}
+
+// Cambiar propietario del archivo (solo en sistemas Unix/Linux)
+if (function_exists('chown') && chown('archivo.txt', 'nuevo_propietario')) {
+    echo "Propietario cambiado con éxito<br>";
+}
+
+// Cambiar grupo del archivo (solo en sistemas Unix/Linux)
+if (function_exists('chgrp') && chgrp('archivo.txt', 'nuevo_grupo')) {
+    echo "Grupo cambiado con éxito<br>";
+}
+
+// Truncar un archivo a una longitud específica
+if (file_exists('log.txt')) {
+    $archivo = fopen('log.txt', 'r+');
+    ftruncate($archivo, 100); // Truncar a 100 bytes
+    fclose($archivo);
+    echo "Archivo truncado<br>";
+}
+
+// Crear un enlace simbólico (solo en sistemas Unix/Linux)
+if (function_exists('symlink') && symlink('archivo_original.txt', 'enlace.txt')) {
+    echo "Enlace simbólico creado<br>";
+}
+
+// Verificar si un archivo es un enlace simbólico
+if (function_exists('is_link') && is_link('enlace.txt')) {
+    echo "Es un enlace simbólico<br>";
+    
+    // Obtener la ruta del enlace
+    $destino = readlink('enlace.txt');
+    echo "Apunta a: $destino<br>";
+}
+?>`} lang="php" />
+
+### Manejo de Directorios
+
+<Code code={`<?php
+// Crear un directorio
+if (!is_dir('nuevo_directorio')) {
+    if (mkdir('nuevo_directorio', 0755)) {
+        echo "Directorio creado con éxito<br>";
+    }
+}
+
+// Crear directorios anidados (recursivo)
+if (!is_dir('ruta/a/directorio/profundo')) {
+    if (mkdir('ruta/a/directorio/profundo', 0755, true)) {
+        echo "Directorios anidados creados con éxito<br>";
+    }
+}
+
+// Eliminar un directorio (debe estar vacío)
+if (is_dir('directorio_vacio')) {
+    if (rmdir('directorio_vacio')) {
+        echo "Directorio eliminado con éxito<br>";
+    }
+}
+
+// Cambiar al directorio especificado
+chdir('/var/www/html');
+echo "Directorio actual: " . getcwd() . "<br>";
+
+// Obtener el directorio de trabajo actual
+$directorio_actual = getcwd();
+echo "Estamos en: $directorio_actual<br>";
+
+// Leer el contenido de un directorio
+if (is_dir('imagenes')) {
+    echo "Contenido del directorio 'imagenes':<br>";
+    $archivos = scandir('imagenes');
+    
+    foreach ($archivos as $archivo) {
+        // Omitir . y ..
+        if ($archivo != '.' && $archivo != '..') {
+            $ruta_completa = 'imagenes/' . $archivo;
+            $tipo = is_dir($ruta_completa) ? 'Directorio' : 'Archivo';
+            echo "- $archivo ($tipo)<br>";
+        }
+    }
+}
+
+// Alternativa usando glob() para listar archivos con un patrón
+$imagenes = glob('imagenes/*.{jpg,png,gif}', GLOB_BRACE);
+echo "Imágenes encontradas: " . count($imagenes) . "<br>";
+foreach ($imagenes as $imagen) {
+    echo "- $imagen<br>";
+}
+
+// Recorrer un directorio con RecursiveDirectoryIterator
+$directorio = new RecursiveDirectoryIterator('proyecto');
+$iterador = new RecursiveIteratorIterator($directorio);
+
+echo "Listado recursivo de archivos:<br>";
+foreach ($iterador as $archivo) {
+    // Omitir . y ..
+    if ($archivo->isFile()) {
+        echo $archivo->getPathname() . "<br>";
+    }
+}
+?>`} lang="php" />
+
+### Función para Eliminar Directorios Recursivamente
+
+<Code code={`<?php
+/**
+ * Elimina un directorio y todo su contenido recursivamente
+ * @param string $dir Ruta del directorio a eliminar
+ * @return bool True si se eliminó correctamente, False en caso contrario
+ */
+function eliminar_directorio_recursivo($dir) {
+    if (!file_exists($dir)) {
+        return true;
+    }
+    
+    if (!is_dir($dir)) {
+        return unlink($dir);
+    }
+    
+    foreach (scandir($dir) as $item) {
+        if ($item == '.' || $item == '..') {
+            continue;
+        }
+        
+        if (!eliminar_directorio_recursivo($dir . DIRECTORY_SEPARATOR . $item)) {
+            return false;
+        }
+    }
+    
+    return rmdir($dir);
+}
+
+// Uso de la función
+if (eliminar_directorio_recursivo('directorio_temporal')) {
+    echo "Directorio y todo su contenido eliminados con éxito";
+} else {
+    echo "Error al eliminar el directorio";
+}
+?>`} lang="php" />
+
+### Rutas y Directorios Temporales
+
+<Code code={`<?php
+// Obtener la ruta del directorio temporal del sistema
+$directorio_temporal = sys_get_temp_dir();
+echo "Directorio temporal del sistema: $directorio_temporal<br>";
+
+// Crear un archivo temporal
+$archivo_temporal = tempnam(sys_get_temp_dir(), 'prefijo_');
+echo "Archivo temporal creado: $archivo_temporal<br>";
+
+// Escribir en el archivo temporal
+file_put_contents($archivo_temporal, "Datos temporales: " . date('Y-m-d H:i:s'));
+
+// Leer el contenido
+echo "Contenido: " . file_get_contents($archivo_temporal) . "<br>";
+
+// Eliminar el archivo temporal cuando ya no se necesite
+unlink($archivo_temporal);
+
+// Crear un directorio temporal (PHP 7+)
+if (function_exists('random_bytes')) {
+    $dir_temp = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'tmp_' . bin2hex(random_bytes(8));
+} else {
+    $dir_temp = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'tmp_' . uniqid();
+}
+
+mkdir($dir_temp);
+echo "Directorio temporal creado: $dir_temp<br>";
+
+// Usar el directorio temporal...
+
+// Eliminar el directorio temporal cuando ya no se necesite
+rmdir($dir_temp);
+?>`} lang="php" />
+
+## Resumen
+
+El manejo de archivos en PHP es una funcionalidad poderosa que permite:
+
+- Leer y escribir archivos con diferentes métodos según las necesidades
+- Subir archivos de forma segura desde formularios web
+- Manipular archivos y directorios en el servidor
+- Obtener información detallada sobre archivos y directorios
+- Trabajar con formatos específicos como CSV o JSON
+- Gestionar permisos y propiedades de archivos
+
+<Aside type="tip">
+  <strong>Mejores prácticas para el manejo de archivos:</strong>
+  <ul>
+    <li>Siempre verifique que las operaciones de archivos se completen correctamente</li>
+    <li>Cierre los punteros de archivo después de usarlos</li>
+    <li>Valide y sanitice los nombres de archivo proporcionados por los usuarios</li>
+    <li>Use rutas absolutas cuando sea posible para evitar problemas de rutas relativas</li>
+    <li>Implemente un manejo adecuado de errores para operaciones de archivos</li>
+    <li>Considere los permisos de archivos y directorios para garantizar la seguridad</li>
+    <li>Utilice bloqueos de archivos cuando múltiples procesos puedan acceder al mismo archivo</li>
+  </ul>
+</Aside>

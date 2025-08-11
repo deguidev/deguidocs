@@ -1,0 +1,166 @@
+---
+title: 01. Introducción a Vue 3
+description: ¿Qué es Vue? Diferencias con Vue 2 y ventajas de la Composition API
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## ¿Qué es Vue?
+
+Vue.js es un framework progresivo de JavaScript para construir interfaces de usuario. A diferencia de otros frameworks monolíticos, Vue está diseñado desde cero para ser adoptado incrementalmente. La biblioteca central se enfoca solo en la capa de vista, y es fácil de integrar con otras bibliotecas o proyectos existentes.
+
+<Aside type="tip">
+Vue 3 fue lanzado oficialmente en septiembre de 2020 y representa una reescritura completa del framework con mejor rendimiento y nuevas características.
+</Aside>
+
+Características principales de Vue:
+
+- **Reactivo y componible**: Sistema de componentes que permite construir interfaces modulares y reutilizables
+- **Rendimiento optimizado**: Virtual DOM eficiente y compilación inteligente
+- **Pequeño tamaño**: Núcleo liviano (aprox. 20KB min+gzip) con rendimiento excepcional
+- **Ecosistema completo**: Herramientas oficiales para routing, gestión de estado y construcción de proyectos
+- **Curva de aprendizaje suave**: Sintaxis familiar para desarrolladores de HTML, CSS y JavaScript
+
+## Diferencias con Vue 2
+
+Vue 3 introduce cambios significativos respecto a Vue 2:
+
+<Tabs>
+  <TabItem label="Arquitectura interna">
+    - **Reescritura completa en TypeScript**: Mejor soporte para tipado y autocompletado
+    - **Nuevo sistema de reactividad**: Basado en Proxy de ES6 en lugar de Object.defineProperty
+    - **Renderizador modular**: Mejor separación de responsabilidades y tree-shaking
+    - **Mejor rendimiento**: Más rápido en todos los escenarios (hasta 2x más rápido)
+    - **Menor tamaño**: Mejor tree-shaking para reducir el tamaño del bundle
+  </TabItem>
+  <TabItem label="API y sintaxis">
+    - **Multiple root nodes**: Los componentes pueden tener múltiples nodos raíz (fragments)
+    - **Composition API**: Nueva forma de organizar la lógica (alternativa a Options API)
+    - **Teleport**: Componente para renderizar contenido en otro lugar del DOM
+    - **Suspense**: Manejo mejorado de componentes asíncronos
+    - **createApp**: Nueva API para crear instancias de aplicación
+    - **Emits component option**: Declaración explícita de eventos emitidos
+  </TabItem>
+</Tabs>
+
+<Code code={`// Vue 2 - Creación de instancia
+const app = new Vue({
+  el: '#app',
+  data: { count: 0 }
+})
+
+// Vue 3 - Creación de aplicación
+const app = createApp({
+  data() {
+    return { count: 0 }
+  }
+})
+app.mount('#app')`} lang="js" title="Comparación de sintaxis básica" />
+
+## Ventajas de la Composition API
+
+La Composition API es una de las características más importantes de Vue 3, que ofrece una forma alternativa de organizar la lógica de los componentes:
+
+### 1. Mejor organización del código
+
+Permite agrupar el código por funcionalidad lógica en lugar de por opciones, lo que facilita entender y mantener componentes complejos.
+
+<Code code={`// Options API (Vue 2)
+export default {
+  data() {
+    return { count: 0, name: 'Vue' }
+  },
+  methods: {
+    increment() { this.count++ }
+  },
+  computed: {
+    doubleCount() { return this.count * 2 }
+  },
+  mounted() {
+    console.log('Component mounted')
+  }
+}
+
+// Composition API (Vue 3)
+import { ref, computed, onMounted } from 'vue'
+
+export default {
+  setup() {
+    // Estado
+    const count = ref(0)
+    const name = ref('Vue')
+    
+    // Computadas
+    const doubleCount = computed(() => count.value * 2)
+    
+    // Métodos
+    function increment() {
+      count.value++
+    }
+    
+    // Ciclo de vida
+    onMounted(() => {
+      console.log('Component mounted')
+    })
+    
+    // Exponer al template
+    return {
+      count,
+      name,
+      doubleCount,
+      increment
+    }
+  }
+}`} lang="js" title="Options API vs Composition API" />
+
+### 2. Reutilización de lógica
+
+Facilita extraer y reutilizar lógica entre componentes mediante funciones composables (composables), eliminando las limitaciones de mixins.
+
+<Code code={`// useCounter.js - Composable reutilizable
+import { ref, computed } from 'vue'
+
+export function useCounter(initialValue = 0) {
+  const count = ref(initialValue)
+  const doubleCount = computed(() => count.value * 2)
+  
+  function increment() {
+    count.value++
+  }
+  
+  return {
+    count,
+    doubleCount,
+    increment
+  }
+}
+
+// Uso en un componente
+import { useCounter } from './composables/useCounter'
+
+export default {
+  setup() {
+    const { count, doubleCount, increment } = useCounter(10)
+    
+    return {
+      count,
+      doubleCount,
+      increment
+    }
+  }
+}`} lang="js" title="Composable reutilizable" />
+
+### 3. Mejor soporte para TypeScript
+
+Ofrece inferencia de tipos más precisa y mejor experiencia de desarrollo con TypeScript.
+
+### 4. Menor tamaño de bundle
+
+Permite un mejor tree-shaking, ya que solo se incluyen las funciones que realmente se utilizan.
+
+<Aside type="note">
+La Composition API no reemplaza la Options API. Ambas pueden coexistir y Vue 3 sigue soportando completamente la Options API.
+</Aside>

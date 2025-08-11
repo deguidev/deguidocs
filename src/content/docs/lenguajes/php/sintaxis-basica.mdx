@@ -1,0 +1,408 @@
+---
+title: 2. Sintaxis Básica
+description: Aprende sobre variables, constantes, tipos de datos, operadores y comentarios en PHP
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Sintaxis Básica de PHP
+
+PHP es un lenguaje de programación interpretado que se ejecuta en el servidor. Todo código PHP debe estar encerrado entre las etiquetas `<?php` y `?>`. Sin embargo, cuando un archivo contiene solo código PHP, se recomienda omitir la etiqueta de cierre para evitar problemas con espacios en blanco.
+
+<Code code={`<?php
+    // Tu código PHP aquí
+    echo "Hola Mundo";
+?>`} lang="php" />
+
+<Aside type="tip">
+  PHP también permite la sintaxis abreviada `<?=` que equivale a `<?php echo`.
+  Por ejemplo: `<?= "Hola Mundo" ?>` es lo mismo que `<?php echo "Hola Mundo"; ?>`
+</Aside>
+
+## Variables y Constantes
+
+Las variables y constantes son elementos fundamentales en PHP que nos permiten almacenar y manipular datos durante la ejecución de nuestros scripts. Mientras que las variables pueden cambiar su valor durante la ejecución, las constantes mantienen un valor fijo.
+
+### Variables
+
+En PHP, las variables se identifican con un signo de dólar seguido por el nombre de la variable. Los nombres de variables son sensibles a mayúsculas y minúsculas.
+
+<Code code={`<?php
+    $nombre = "Juan";
+    $edad = 25;
+    $precio = 19.99;
+    $activo = true;
+    
+    echo "Hola, mi nombre es $nombre y tengo $edad años.";
+?>`} lang="php" />
+
+#### Reglas para nombrar variables:
+
+- Deben comenzar con una letra o un guion bajo (_)
+- Solo pueden contener caracteres alfanuméricos y guiones bajos (A-z, 0-9, y _)
+- No pueden contener espacios
+- Son sensibles a mayúsculas y minúsculas ($nombre y $Nombre son variables diferentes)
+
+### Constantes
+
+Las constantes son identificadores que representan valores que no cambian durante la ejecución del script. Se definen usando la función `define()` o la palabra clave `const`.
+
+<Tabs>
+  <TabItem label="Usando define()">
+    <Code code={`<?php
+    define("PI", 3.14159);
+    define("NOMBRE_SITIO", "Mi Aplicación PHP");
+    
+    echo "El valor de PI es: " . PI;
+    echo "<br>";
+    echo "Bienvenido a " . NOMBRE_SITIO;
+?>`} lang="php" />
+  </TabItem>
+  <TabItem label="Usando const">
+    <Code code={`<?php
+    const PI = 3.14159;
+    const NOMBRE_SITIO = "Mi Aplicación PHP";
+    
+    echo "El valor de PI es: " . PI;
+    echo "<br>";
+    echo "Bienvenido a " . NOMBRE_SITIO;
+?>`} lang="php" />
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Por convención, los nombres de las constantes suelen escribirse en mayúsculas para distinguirlas fácilmente de las variables.
+</Aside>
+
+## Tipos de Datos
+
+Los tipos de datos en PHP definen qué tipo de información puede almacenar una variable y cómo se comportará al realizar operaciones con ella. PHP es un lenguaje de tipado dinámico, lo que significa que no necesitas declarar el tipo de una variable al crearla, y puede cambiar durante la ejecución del script.
+
+PHP soporta varios tipos de datos que se pueden clasificar en tipos escalares, compuestos y especiales.
+
+### Tipos Escalares
+
+Los tipos escalares son los tipos de datos básicos en PHP. Representan valores únicos y simples.
+
+#### Integer (Entero)
+Representa números enteros sin decimales. Pueden ser positivos o negativos.
+
+#### Float (Número de punto flotante)
+Representa números con decimales o en notación científica.
+
+#### String (Cadena de texto)
+Representa una secuencia de caracteres. Pueden definirse con comillas simples ('') o dobles (""). Las comillas dobles permiten la interpolación de variables.
+
+#### Boolean (Booleano)
+Representa un valor de verdad: `true` (verdadero) o `false` (falso). Útil para condiciones y lógica.
+
+<Code code={`<?php
+    // Integer (entero)
+    $entero = 42;
+    echo "Entero: $entero, tipo: " . gettype($entero);
+    echo "<br>";
+    
+    // Float (número de punto flotante)
+    $flotante = 3.14159;
+    echo "Flotante: $flotante, tipo: " . gettype($flotante);
+    echo "<br>";
+    
+    // String (cadena de texto)
+    $cadena = "Hola Mundo";
+    echo "Cadena: $cadena, tipo: " . gettype($cadena);
+    echo "<br>";
+    
+    // Boolean (booleano)
+    $verdadero = true;
+    $falso = false;
+    echo "Verdadero: " . ($verdadero ? 'true' : 'false') . ", tipo: " . gettype($verdadero);
+    echo "<br>";
+    echo "Falso: " . ($falso ? 'true' : 'false') . ", tipo: " . gettype($falso);
+?>`} lang="php" />
+
+<Aside type="tip">
+  Puedes usar las funciones `is_int()`, `is_float()`, `is_string()` y `is_bool()` para verificar el tipo de una variable.
+</Aside>
+
+### Tipos Compuestos
+
+Los tipos compuestos son aquellos que pueden contener múltiples valores o estructuras más complejas.
+
+#### Array (Arreglo)
+Un array es una estructura de datos que puede almacenar múltiples valores en una sola variable. PHP soporta tanto arrays indexados numéricamente como arrays asociativos (con claves personalizadas).
+
+#### Object (Objeto)
+Los objetos son instancias de clases que encapsulan datos y comportamientos. PHP es un lenguaje orientado a objetos que permite crear y manipular objetos.
+
+<Code code={`<?php
+    // Array indexado numéricamente
+    $colores = ["rojo", "verde", "azul"];
+    echo "El segundo color es: " . $colores[1]; // Muestra: verde
+    echo "<br>";
+    
+    // Array asociativo
+    $persona = [
+        "nombre" => "María",
+        "edad" => 30,
+        "ciudad" => "Madrid"
+    ];
+    echo "Nombre: " . $persona["nombre"] . ", Edad: " . $persona["edad"];
+    echo "<br>";
+    
+    // Object (objeto)
+    class Persona {
+        public $nombre;
+        public $edad;
+        
+        function __construct($nombre, $edad) {
+            $this->nombre = $nombre;
+            $this->edad = $edad;
+        }
+        
+        function saludar() {
+            return "Hola, soy $this->nombre y tengo $this->edad años.";
+        }
+    }
+    
+    $persona1 = new Persona("Carlos", 25);
+    echo $persona1->saludar(); // Muestra: Hola, soy Carlos y tengo 25 años.
+?>`} lang="php" />
+
+<Aside type="note">
+  Los arrays en PHP son extremadamente flexibles y pueden contener valores de diferentes tipos, incluso otros arrays (arrays multidimensionales).
+</Aside>
+
+### Tipos Especiales
+
+PHP también tiene tipos de datos especiales que cumplen funciones específicas en el lenguaje.
+
+#### NULL
+Representa una variable sin valor. Una variable es NULL si se le ha asignado la constante NULL, si aún no se le ha asignado un valor, o si ha sido borrada con la función `unset()`.
+
+#### Resource (Recurso)
+Un recurso es un tipo de dato especial que representa una referencia a un recurso externo, como una conexión a una base de datos, un archivo abierto o una imagen. Los recursos son manejados por funciones especiales y deben ser liberados cuando ya no se necesitan.
+
+<Code code={`<?php
+    // NULL
+    $nada = NULL;
+    echo "Variable nula, tipo: " . gettype($nada); // Muestra: NULL
+    echo "<br>";
+    
+    // Verificar si una variable es NULL
+    if (is_null($nada)) {
+        echo "La variable es NULL";
+    }
+    echo "<br>";
+    
+    // Resource (recurso)
+    // Primero creamos un archivo de ejemplo
+    file_put_contents("ejemplo.txt", "Este es un archivo de ejemplo");
+    
+    // Abrimos el archivo como recurso
+    $archivo = fopen("ejemplo.txt", "r");
+    echo "Tipo de archivo: " . gettype($archivo); // Muestra: resource
+    echo "<br>";
+    
+    // Leer contenido
+    $contenido = fread($archivo, filesize("ejemplo.txt"));
+    echo "Contenido: $contenido";
+    echo "<br>";
+    
+    // Cerrar el recurso cuando ya no se necesite
+    fclose($archivo);
+?>`} lang="php" />
+
+<Aside type="caution">
+  Es importante cerrar los recursos (como archivos o conexiones a bases de datos) cuando ya no se necesitan para liberar memoria y evitar problemas de rendimiento.
+</Aside>
+
+## Operadores
+
+Los operadores en PHP son símbolos que te permiten realizar operaciones específicas con valores y variables. Estos pueden ser tan simples como sumar dos números o tan complejos como verificar relaciones entre valores o manipular bits individuales.
+
+PHP proporciona una amplia gama de operadores para realizar diferentes tipos de operaciones.
+
+### Operadores Aritméticos
+
+<Code code={`<?php
+    $a = 10;
+    $b = 3;
+    
+    echo $a + $b;  // Suma: 13
+    echo "<br>";
+    echo $a - $b;  // Resta: 7
+    echo "<br>";
+    echo $a * $b;  // Multiplicación: 30
+    echo "<br>";
+    echo $a / $b;  // División: 3.3333...
+    echo "<br>";
+    echo $a % $b;  // Módulo (resto): 1
+    echo "<br>";
+    echo $a ** $b; // Exponenciación: 1000 (10^3)
+?>`} lang="php" />
+
+### Operadores de Asignación
+
+<Code code={`<?php
+    $x = 10;       // Asignación básica
+    
+    $x += 5;       // Equivale a: $x = $x + 5
+    echo $x;       // Muestra: 15
+    echo "<br>";
+    
+    $x -= 3;       // Equivale a: $x = $x - 3
+    echo $x;       // Muestra: 12
+    echo "<br>";
+    
+    $x *= 2;       // Equivale a: $x = $x * 2
+    echo $x;       // Muestra: 24
+    echo "<br>";
+    
+    $x /= 4;       // Equivale a: $x = $x / 4
+    echo $x;       // Muestra: 6
+    echo "<br>";
+    
+    $x %= 4;       // Equivale a: $x = $x % 4
+    echo $x;       // Muestra: 2
+?>`} lang="php" />
+
+### Operadores de Comparación
+
+<Code code={`<?php
+    $a = 10;
+    $b = "10";
+    $c = 20;
+    
+    // Igual (==): compara valor
+    var_dump($a == $b);  // bool(true)
+    
+    // Idéntico (===): compara valor y tipo
+    var_dump($a === $b); // bool(false)
+    
+    // Diferente (!= o <>)
+    var_dump($a != $c);  // bool(true)
+    var_dump($a <> $c);  // bool(true)
+    
+    // No idéntico (!==)
+    var_dump($a !== $b); // bool(true)
+    
+    // Mayor que (>)
+    var_dump($c > $a);   // bool(true)
+    
+    // Menor que (<)
+    var_dump($a < $c);   // bool(true)
+    
+    // Mayor o igual que (>=)
+    var_dump($a >= 10);  // bool(true)
+    
+    // Menor o igual que (<=)
+    var_dump($a <= 10);  // bool(true)
+    
+    // Nave espacial (<=>) - PHP 7+
+    // Devuelve -1 si izquierda < derecha, 0 si son iguales, 1 si izquierda > derecha
+    echo $a <=> $c;      // -1
+?>`} lang="php" />
+
+### Operadores Lógicos
+
+<Code code={`<?php
+    $x = true;
+    $y = false;
+    
+    // AND (&&)
+    var_dump($x && $y); // bool(false)
+    var_dump($x and $y); // bool(false)
+    
+    // OR (||)
+    var_dump($x || $y); // bool(true)
+    var_dump($x or $y); // bool(true)
+    
+    // XOR
+    var_dump($x xor $y); // bool(true)
+    
+    // NOT (!)
+    var_dump(!$x); // bool(false)
+?>`} lang="php" />
+
+<Aside type="caution">
+  Los operadores `and` y `or` tienen menor precedencia que `&&` y `||`. Esto puede llevar a resultados inesperados en expresiones complejas. Se recomienda usar `&&` y `||` para mayor claridad.
+</Aside>
+
+### Operadores de Incremento/Decremento
+
+<Code code={`<?php
+    $a = 5;
+    
+    // Pre-incremento
+    echo ++$a; // Incrementa $a a 6 y luego devuelve $a (muestra: 6)
+    echo "<br>";
+    
+    // Post-incremento
+    $a = 5;
+    echo $a++; // Devuelve $a (5) y luego incrementa $a a 6 (muestra: 5)
+    echo "<br>";
+    echo $a;   // Muestra: 6
+    echo "<br>";
+    
+    // Pre-decremento
+    $a = 5;
+    echo --$a; // Decrementa $a a 4 y luego devuelve $a (muestra: 4)
+    echo "<br>";
+    
+    // Post-decremento
+    $a = 5;
+    echo $a--; // Devuelve $a (5) y luego decrementa $a a 4 (muestra: 5)
+    echo "<br>";
+    echo $a;   // Muestra: 4
+?>`} lang="php" />
+
+### Operadores de Cadenas
+
+<Code code={`<?php
+    $a = "Hola";
+    $b = "Mundo";
+    
+    // Concatenación (.)
+    echo $a . " " . $b; // Muestra: Hola Mundo
+    echo "<br>";
+    
+    // Concatenación con asignación (.=)
+    $a .= " " . $b;
+    echo $a; // Muestra: Hola Mundo
+?>`} lang="php" />
+
+## Comentarios
+
+Los comentarios son notas que puedes incluir en tu código para explicar lo que hace, por qué lo hace, o cualquier otra información relevante. Son fundamentales para hacer tu código más legible y mantenible, especialmente cuando trabajas en equipo o cuando revisas tu propio código después de un tiempo.
+
+Los comentarios son partes del código que el intérprete de PHP ignora. Son útiles para documentar el código y hacerlo más comprensible.
+
+<Code code={`<?php
+    // Este es un comentario de una línea
+    
+    # Este también es un comentario de una línea (estilo shell)
+    
+    /* 
+       Este es un comentario
+       de múltiples líneas
+    */
+    
+    /**
+     * Este es un comentario de documentación (DocBlock)
+     * @param string $nombre El nombre de la persona
+     * @return string Saludo personalizado
+     */
+    function saludar($nombre) {
+        return "Hola, $nombre!";
+    }
+    
+    echo saludar("María"); // Muestra: Hola, María!
+?>`} lang="php" />
+
+<Aside type="tip">
+  Los comentarios de documentación (DocBlocks) son especialmente útiles cuando se trabaja en proyectos grandes o cuando se desarrollan bibliotecas que serán utilizadas por otros desarrolladores. Herramientas como PHPDocumentor pueden generar documentación automáticamente a partir de estos comentarios.
+</Aside>

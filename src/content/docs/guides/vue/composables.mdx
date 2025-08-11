@@ -1,0 +1,444 @@
+---
+title: 13. Composables
+description: ¿Qué es un composable? useX() funciones reutilizables, carpeta composables/ y uso de ref, watch, computed dentro de composables
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## ¿Qué es un Composable?
+
+Un **composable** es una función que aprovecha la Composition API de Vue 3 para encapsular y reutilizar lógica con estado. Los composables permiten extraer y reutilizar lógica entre componentes sin las limitaciones de las mezclas (mixins) o los componentes de orden superior (HOCs) que se usaban en Vue 2.
+
+<Aside type="tip">
+Los composables son la forma recomendada en Vue 3 para compartir lógica con estado entre componentes.
+</Aside>
+
+### Características principales de los composables
+
+- **Funciones JavaScript puras**: Los composables son simplemente funciones que siguen una convención de nomenclatura.
+- **Encapsulamiento de lógica**: Permiten agrupar código relacionado en una unidad cohesiva.
+- **Estado reactivo**: Pueden crear y manipular estado reactivo usando `ref`, `reactive`, etc.
+- **Composición**: Pueden componerse entre sí, llamando a otros composables.
+- **Convención de nombres**: Por convención, los nombres de los composables comienzan con `use` (por ejemplo, `useCounter`).
+
+### Ejemplo básico de un composable
+
+<Code code={`// useCounter.js
+import { ref } from 'vue'
+
+export function useCounter(initialValue = 0) {
+  // Estado reactivo encapsulado
+  const count = ref(initialValue)
+  
+  // Funciones para manipular el estado
+  function increment() {
+    count.value++
+  }
+  
+  function decrement() {
+    count.value--
+  }
+  
+  function reset() {
+    count.value = initialValue
+  }
+  
+  // Exponer estado y métodos
+  return {
+    count,
+    increment,
+    decrement,
+    reset
+  }
+}`} lang="javascript" title="Ejemplo básico de un composable" />
+
+### Uso en un componente
+
+<Code code={`<template>
+  <div>
+    <p>Contador: {{ count }}</p>
+    <button @click="increment">Incrementar</button>
+    <button @click="decrement">Decrementar</button>
+    <button @click="reset">Reiniciar</button>
+  </div>
+</template>
+
+<script setup>
+import { useCounter } from './composables/useCounter'
+
+// Usar el composable
+const { count, increment, decrement, reset } = useCounter(10)
+</script>`} lang="vue" title="Uso de un composable en un componente" />
+
+## useX() - Funciones Reutilizables
+
+La convención de nombrar los composables con el prefijo `use` ayuda a identificarlos fácilmente y sigue el patrón establecido por React Hooks, aunque los composables de Vue tienen algunas diferencias importantes.
+
+### Ejemplos de composables comunes
+
+<Tabs>
+<TabItem label="useFetch">
+<Code code={`// useFetch.js
+import { ref, reactive, computed } from 'vue'
+
+export function useFetch(url, options = {}) {
+  const data = ref(null)
+  const error = ref(null)
+  const loading = ref(false)
+  
+  const status = reactive({
+    code: 0,
+    text: '',
+    ok: false
+  })
+  
+  const statusText = computed(() => status.code + ': ' + status.text)
+  
+  const execute = async (newUrl = url, newOptions = {}) => {
+    loading.value = true
+    error.value = null
+    data.value = null
+    
+    try {
+      const response = await fetch(newUrl, { ...options, ...newOptions })
+      
+      // Actualizar estado
+      status.code = response.status
+      status.text = response.statusText
+      status.ok = response.ok
+      
+      if (response.ok) {
+        data.value = await response.json()
+      } else {
+        error.value = new Error('Error en la petición: ' + response.status)
+      }
+    } catch (err) {
+      error.value = err
+    } finally {
+      loading.value = false
+    }
+    
+    return { data, error, loading }
+  }
+  
+  // Ejecutar la petición inmediatamente si se proporciona una URL
+  if (url) {
+    execute()
+  }
+  
+  return {
+    data,
+    error,
+    loading,
+    status,
+    statusText,
+    execute
+  }
+}`} lang="javascript" title="Composable useFetch" />
+</TabItem>
+<TabItem label="useLocalStorage">
+<Code code={`// useLocalStorage.js
+import { ref, watch } from 'vue'
+
+export function useLocalStorage(key, defaultValue = null) {
+  // Intentar recuperar el valor almacenado
+  const storedValue = localStorage.getItem(key)
+  
+  // Crear referencia reactiva con el valor almacenado o el valor predeterminado
+  const value = ref(storedValue ? JSON.parse(storedValue) : defaultValue)
+  
+  // Sincronizar cambios con localStorage
+  watch(value, (newValue) => {
+    if (newValue === null) {
+      localStorage.removeItem(key)
+    } else {
+      localStorage.setItem(key, JSON.stringify(newValue))
+    }
+  }, { deep: true })
+  
+  // Función para eliminar el valor
+  const removeItem = () => {
+    value.value = null
+  }
+  
+  return {
+    value,
+    removeItem
+  }
+}`} lang="javascript" title="Composable useLocalStorage" />
+</TabItem>
+<TabItem label="useWindowSize">
+<Code code={`// useWindowSize.js
+import { ref, onMounted, onUnmounted } from 'vue'
+
+export function useWindowSize() {
+  const width = ref(window?.innerWidth || 0)
+  const height = ref(window?.innerHeight || 0)
+  
+  const update = () => {
+    width.value = window.innerWidth
+    height.value = window.innerHeight
+  }
+  
+  onMounted(() => {
+    window.addEventListener('resize', update)
+    update() // Actualizar valores iniciales
+  })
+  
+  onUnmounted(() => {
+    window.removeEventListener('resize', update)
+  })
+  
+  return {
+    width,
+    height
+  }
+}`} lang="javascript" title="Composable useWindowSize" />
+</TabItem>
+</Tabs>
+
+## Carpeta composables/
+
+Una práctica común en proyectos Vue 3 es organizar los composables en una carpeta dedicada llamada `composables/`. Esto facilita la localización y reutilización de la lógica compartida.
+
+### Estructura de carpetas recomendada
+
+```
+src/
+├── assets/
+├── components/
+├── composables/     # Carpeta para composables
+│   ├── index.js     # Exportaciones centralizadas (opcional)
+│   ├── useCounter.js
+│   ├── useFetch.js
+│   ├── useLocalStorage.js
+│   └── useWindowSize.js
+├── router/
+├── store/
+└── views/
+```
+
+### Archivo index.js para exportaciones centralizadas
+
+Puedes crear un archivo `index.js` en la carpeta `composables/` para centralizar las exportaciones:
+
+<Code code={`// composables/index.js
+export { useCounter } from './useCounter'
+export { useFetch } from './useFetch'
+export { useLocalStorage } from './useLocalStorage'
+export { useWindowSize } from './useWindowSize'
+
+// Esto permite importar así:
+// import { useCounter, useFetch } from '@/composables'`} lang="javascript" title="Exportaciones centralizadas" />
+
+### Organización por dominios
+
+Para proyectos más grandes, puedes organizar los composables por dominios o funcionalidades:
+
+```
+src/composables/
+├── auth/
+│   ├── index.js
+│   ├── useAuth.js
+│   └── usePermissions.js
+├── ui/
+│   ├── index.js
+│   ├── useBreakpoints.js
+│   └── useTheme.js
+└── utils/
+    ├── index.js
+    ├── useDebounce.js
+    └── useEventBus.js
+```
+
+## Uso de ref, watch, computed dentro de composables
+
+Los composables pueden utilizar todas las APIs de la Composition API de Vue, como `ref`, `reactive`, `computed`, `watch`, y los hooks de ciclo de vida.
+
+### Uso de ref y reactive
+
+<Code code={`// useForm.js
+import { ref, reactive } from 'vue'
+
+export function useForm(initialValues = {}) {
+  // Usando ref para valores simples
+  const isSubmitting = ref(false)
+  const isValid = ref(true)
+  
+  // Usando reactive para objetos complejos
+  const formData = reactive({ ...initialValues })
+  const errors = reactive({})
+  
+  const resetForm = () => {
+    Object.keys(formData).forEach(key => {
+      formData[key] = initialValues[key] || ''
+    })
+    Object.keys(errors).forEach(key => {
+      delete errors[key]
+    })
+    isValid.value = true
+  }
+  
+  return {
+    formData,
+    errors,
+    isSubmitting,
+    isValid,
+    resetForm
+  }
+}`} lang="javascript" title="Uso de ref y reactive" />
+
+### Uso de computed
+
+<Code code={`// useCart.js
+import { ref, computed } from 'vue'
+
+export function useCart() {
+  const items = ref([])
+  
+  // Propiedades computadas
+  const totalItems = computed(() => items.value.length)
+  
+  const totalPrice = computed(() => {
+    return items.value.reduce((total, item) => {
+      return total + (item.price * item.quantity)
+    }, 0)
+  })
+  
+  const isEmpty = computed(() => items.value.length === 0)
+  
+  function addItem(item) {
+    const existingItem = items.value.find(i => i.id === item.id)
+    
+    if (existingItem) {
+      existingItem.quantity += 1
+    } else {
+      items.value.push({ ...item, quantity: 1 })
+    }
+  }
+  
+  function removeItem(itemId) {
+    items.value = items.value.filter(item => item.id !== itemId)
+  }
+  
+  return {
+    items,
+    totalItems,
+    totalPrice,
+    isEmpty,
+    addItem,
+    removeItem
+  }
+}`} lang="javascript" title="Uso de computed" />
+
+### Uso de watch y watchEffect
+
+<Code code={`// useSearchQuery.js
+import { ref, watch, watchEffect } from 'vue'
+
+export function useSearchQuery(initialQuery = '') {
+  const searchQuery = ref(initialQuery)
+  const results = ref([])
+  const isLoading = ref(false)
+  const error = ref(null)
+  
+  // Observar cambios en searchQuery con un retraso
+  watch(searchQuery, async (newQuery, oldQuery) => {
+    if (newQuery === oldQuery) return
+    
+    isLoading.value = true
+    error.value = null
+    
+    try {
+      // Simular una llamada a API
+      await new Promise(resolve => setTimeout(resolve, 300))
+      results.value = ['Resultado para: ' + newQuery, 'Otro resultado']
+    } catch (err) {
+      error.value = err
+      results.value = []
+    } finally {
+      isLoading.value = false
+    }
+  }, { debounce: 300 })
+  
+  // watchEffect se ejecuta inmediatamente y luego cuando cambian las dependencias
+  watchEffect(() => {
+    console.log('Búsqueda actual: ' + searchQuery.value + ', Resultados: ' + results.value.length)
+  })
+  
+  return {
+    searchQuery,
+    results,
+    isLoading,
+    error
+  }
+}`} lang="javascript" title="Uso de watch y watchEffect" />
+
+### Uso de hooks de ciclo de vida
+
+<Code code={`// usePageVisibility.js
+import { ref, onMounted, onUnmounted } from 'vue'
+
+export function usePageVisibility() {
+  const isVisible = ref(true)
+  
+  const handleVisibilityChange = () => {
+    isVisible.value = !document.hidden
+  }
+  
+  onMounted(() => {
+    // Registrar el evento cuando el componente se monta
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+  })
+  
+  onUnmounted(() => {
+    // Limpiar el evento cuando el componente se desmonta
+    document.removeEventListener('visibilitychange', handleVisibilityChange)
+  })
+  
+  return {
+    isVisible
+  }
+}`} lang="javascript" title="Uso de hooks de ciclo de vida" />
+
+<Aside type="caution">
+Los hooks de ciclo de vida como `onMounted` y `onUnmounted` solo funcionan cuando el composable se llama dentro de un componente o dentro de otro composable que eventualmente se usa en un componente.
+</Aside>
+
+### Composición de composables
+
+Una de las ventajas más poderosas de los composables es que pueden componerse entre sí:
+
+<Code code={`// useUserProfile.js
+import { computed } from 'vue'
+import { useLocalStorage } from './useLocalStorage'
+import { useFetch } from './useFetch'
+
+export function useUserProfile() {
+  // Usar otros composables
+  const { value: userId } = useLocalStorage('user_id')
+  const { data: user, loading, error, execute: fetchUser } = useFetch(null)
+  
+  // Computar propiedades basadas en datos de otros composables
+  const isLoggedIn = computed(() => !!userId.value)
+  const username = computed(() => user.value?.username || 'Invitado')
+  
+  // Cargar perfil de usuario
+  const loadProfile = async () => {
+    if (userId.value) {
+      await fetchUser('/api/users/' + userId.value)
+    }
+  }
+  
+  return {
+    user,
+    loading,
+    error,
+    isLoggedIn,
+    username,
+    loadProfile
+  }
+}`} lang="javascript" title="Composición de composables" />

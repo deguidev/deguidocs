@@ -1,0 +1,340 @@
+---
+title: 10. Slots
+description: Slot básico, v-slot y sintaxis abreviada, slots nombrados y pasar datos a los slots
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Slot básico
+
+Los slots son un mecanismo de distribución de contenido en Vue que te permite insertar contenido en componentes. Los slots actúan como marcadores de posición en los componentes hijos donde el componente padre puede inyectar contenido.
+
+### Componente con slot básico
+
+<Tabs>
+  <TabItem label="CardComponent.vue">
+    ```vue
+    <script setup>
+    // No es necesario definir props para recibir el contenido del slot
+    </script>
+
+    <template>
+      <div class="card">
+        <div class="card-body">
+          <!-- El slot recibe el contenido del componente padre -->
+          <slot></slot>
+        </div>
+      </div>
+    </template>
+    
+    <style scoped>
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+    }
+    </style>
+    ```
+  </TabItem>
+</Tabs>
+
+### Uso del slot básico desde el componente padre
+
+<Tabs>
+  <TabItem label="ParentComponent.vue">
+    ```vue
+    <script setup>
+    import CardComponent from './CardComponent.vue'
+    </script>
+
+    <template>
+      <CardComponent>
+        <!-- Este contenido se insertará dentro del slot en CardComponent -->
+        <h3>Título de la tarjeta</h3>
+        <p>Este es el contenido que se mostrará dentro de la tarjeta.</p>
+      </CardComponent>
+    </template>
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Si un componente no contiene un elemento `<slot>`, cualquier contenido proporcionado entre sus etiquetas de apertura y cierre será descartado.
+</Aside>
+
+## v-slot y sintaxis abreviada
+
+La directiva `v-slot` proporciona una forma más estructurada de trabajar con slots. También tiene una sintaxis abreviada usando el símbolo `#`.
+
+### Uso de v-slot con template
+
+<Tabs>
+  <TabItem label="Composition API">
+    ```vue
+    <script setup>
+    import ComponentWithSlot from './ComponentWithSlot.vue'
+    </script>
+
+    <template>
+      <ComponentWithSlot>
+        <!-- Sintaxis completa con v-slot en template -->
+        <template v-slot:default>
+          <p>Este contenido va en el slot predeterminado</p>
+        </template>
+      </ComponentWithSlot>
+      
+      <!-- El mismo ejemplo usando la sintaxis abreviada # -->
+      <ComponentWithSlot>
+        <template #default>
+          <p>Usando la sintaxis abreviada para el slot predeterminado</p>
+        </template>
+      </ComponentWithSlot>
+      
+      <!-- Para el slot default, puedes omitir el nombre cuando no hay otros slots -->
+      <ComponentWithSlot>
+        <template v-slot>
+          <p>Slot predeterminado sin especificar nombre</p>
+        </template>
+      </ComponentWithSlot>
+      
+      <!-- La forma más común (sin template cuando solo hay slot predeterminado) -->
+      <ComponentWithSlot>
+        <p>Contenido directo para el slot predeterminado</p>
+      </ComponentWithSlot>
+    </template>
+    ```
+  </TabItem>
+</Tabs>
+
+## Slots nombrados (#header, #footer)
+
+Los slots nombrados permiten definir múltiples puntos de distribución en un componente. Esto es especialmente útil cuando necesitas una estructura más compleja.
+
+### Definición de slots nombrados en un componente
+
+<Tabs>
+  <TabItem label="LayoutComponent.vue">
+    ```vue
+    <script setup>
+    // No se requiere código especial para slots nombrados en Composition API
+    </script>
+
+    <template>
+      <div class="layout">
+        <header class="header">
+          <slot name="header"><!-- Contenido fallback si no se proporciona --></slot>
+        </header>
+        
+        <main class="content">
+          <slot><!-- Slot predeterminado --></slot>
+        </main>
+        
+        <footer class="footer">
+          <slot name="footer"><!-- Contenido fallback si no se proporciona --></slot>
+        </footer>
+      </div>
+    </template>
+    ```
+  </TabItem>
+</Tabs>
+
+### Uso de slots nombrados desde el componente padre
+
+<Tabs>
+  <TabItem label="AppComponent.vue">
+    ```vue
+    <script setup>
+    import LayoutComponent from './LayoutComponent.vue'
+    </script>
+
+    <template>
+      <LayoutComponent>
+        <!-- Contenido para el slot header usando sintaxis completa -->
+        <template v-slot:header>
+          <h1>Encabezado de la página</h1>
+        </template>
+        
+        <!-- El contenido sin template va al slot predeterminado -->
+        <p>Este es el contenido principal que va en el slot predeterminado.</p>
+        
+        <!-- Contenido para el slot footer usando sintaxis abreviada # -->
+        <template #footer>
+          <p>© 2025 - Mi Aplicación Vue</p>
+        </template>
+      </LayoutComponent>
+    </template>
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Puedes usar tanto la sintaxis completa `v-slot:nombre` como la abreviada `#nombre` para los slots nombrados. La abreviada es más común en aplicaciones modernas.
+</Aside>
+
+## Pasar datos a los slots (scoped slots)
+
+Los slots con alcance (scoped slots) permiten que un componente hijo pase datos al contenido del slot definido por el componente padre. Esto es extremadamente útil cuando quieres que el padre personalice la visualización de los datos del hijo.
+
+### Componente hijo que pasa datos a los slots
+
+<Tabs>
+  <TabItem label="UserList.vue">
+    ```vue
+    <script setup>
+    import { ref } from 'vue'
+    
+    const users = ref([
+      { id: 1, name: 'Ana', role: 'Developer' },
+      { id: 2, name: 'Carlos', role: 'Designer' },
+      { id: 3, name: 'Elena', role: 'Manager' }
+    ])
+    </script>
+
+    <template>
+      <div>
+        <h2>Lista de usuarios</h2>
+        <ul>
+          <li v-for="user in users" :key="user.id">
+            <!-- Pasamos el objeto user al slot -->
+            <slot name="user" :user="user" :index="user.id">
+              <!-- Contenido predeterminado si no se proporciona slot -->
+              {{ user.name }}
+            </slot>
+          </li>
+        </ul>
+        
+        <!-- Otro ejemplo con estadísticas -->
+        <div class="stats">
+          <slot name="stats" :total="users.length">
+            Total: {{ users.length }} usuarios
+          </slot>
+        </div>
+      </div>
+    </template>
+    ```
+  </TabItem>
+</Tabs>
+
+### Componente padre que recibe y usa los datos del slot
+
+<Tabs>
+  <TabItem label="TeamPage.vue">
+    ```vue
+    <script setup>
+    import UserList from './UserList.vue'
+    </script>
+
+    <template>
+      <div>
+        <h1>Nuestro equipo</h1>
+        
+        <UserList>
+          <!-- Accediendo a los datos del slot usando destructuring -->
+          <template #user="{ user }">
+            <div class="user-card">
+              <strong>{{ user.name }}</strong>
+              <em>{{ user.role }}</em>
+            </div>
+          </template>
+          
+          <!-- Ejemplo usando todos los props pasados -->
+          <template #stats="slotProps">
+            <div class="statistics">
+              <p>El equipo tiene {{ slotProps.total }} miembros</p>
+            </div>
+          </template>
+        </UserList>
+      </div>
+    </template>
+    ```
+  </TabItem>
+</Tabs>
+
+### Destructuring avanzado en scoped slots
+
+<Tabs>
+  <TabItem label="Ejemplo de destructuring avanzado">
+    ```vue
+    <template>
+      <DataTable :items="products">
+        <!-- Destructuring básico -->
+        <template #header="{ column }">
+          {{ column.toUpperCase() }}
+        </template>
+        
+        <!-- Renombrar propiedades durante el destructuring -->
+        <template #item="{ item: product, index: idx }">
+          {{ idx + 1 }}. {{ product.name }} - ${{ product.price }}
+        </template>
+        
+        <!-- Valores por defecto durante el destructuring -->
+        <template #footer="{ total = 0, currency = '€' }">
+          Total: {{ currency }}{{ total }}
+        </template>
+      </DataTable>
+    </template>
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Los scoped slots son particularmente útiles para componentes de UI como tablas, listas o cualquier componente que itera sobre colecciones de datos, ya que permiten una personalización extremadamente flexible.
+</Aside>
+
+## Casos de uso comunes para slots
+
+### Componentes de layout
+
+Definir la estructura mientras permites al usuario personalizar las diferentes secciones:
+
+```vue
+<BaseLayout>
+  <template #header>
+    <AppHeader />
+  </template>
+  
+  <MainContent />
+  
+  <template #sidebar>
+    <AppSidebar />
+  </template>
+  
+  <template #footer>
+    <AppFooter />
+  </template>
+</BaseLayout>
+```
+
+### Componentes de lista con renderizado personalizado
+
+```vue
+<DataList :items="products">
+  <template #item="{ item }">
+    <ProductCard 
+      :title="item.name"
+      :price="item.price"
+      :image="item.image"
+    />
+  </template>
+  
+  <template #empty>
+    <p>No hay productos disponibles</p>
+  </template>
+</DataList>
+```
+
+### Componentes de modal/diálogo
+
+```vue
+<ModalDialog title="Confirmar acción">
+  <p>¿Estás seguro de que deseas continuar?</p>
+  
+  <template #actions>
+    <Button @click="confirm" primary>Confirmar</Button>
+    <Button @click="cancel">Cancelar</Button>
+  </template>
+</ModalDialog>
+```

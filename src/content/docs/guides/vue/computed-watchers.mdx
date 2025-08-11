@@ -1,0 +1,244 @@
+---
+title: 05. Computadas y Observadores
+description: computed(), watch(), watchEffect() y diferencias entre watch y watchEffect
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Propiedades computadas con `computed()`
+
+Las propiedades computadas son valores reactivos derivados de otros estados reactivos. Se recalculan automáticamente cuando sus dependencias cambian.
+
+### Uso básico
+
+```vue
+<script setup>
+import { ref, computed } from 'vue'
+
+const count = ref(1)
+const doubleCount = computed(() => count.value * 2)
+</script>
+
+<template>
+  <p>Contador: {{ count }}</p>
+  <p>Doble: {{ doubleCount }}</p>
+  <button @click="count++">Incrementar</button>
+</template>
+```
+
+### Propiedades computadas con getter y setter
+
+```vue
+<script setup>
+import { ref, computed } from 'vue'
+
+const firstName = ref('Juan')
+const lastName = ref('Pérez')
+
+const fullName = computed({
+  // getter
+  get() {
+    return `${firstName.value} ${lastName.value}`
+  },
+  // setter
+  set(newValue) {
+    [firstName.value, lastName.value] = newValue.split(' ')
+  }
+})
+</script>
+
+<template>
+  <p>Nombre completo: {{ fullName }}</p>
+  <button @click="fullName = 'María López'">Cambiar nombre</button>
+</template>
+```
+
+<Aside type="caution">
+  Las propiedades computadas son cacheadas basadas en sus dependencias reactivas. Una propiedad computada solo se recalculará cuando alguna de sus dependencias reactivas cambie.
+</Aside>
+
+## Observadores con `watch()`
+
+El método `watch()` permite observar y reaccionar a cambios en datos reactivos específicos.
+
+### Observando una única fuente
+
+```vue
+<script setup>
+import { ref, watch } from 'vue'
+
+const count = ref(0)
+
+watch(count, (newValue, oldValue) => {
+  console.log(`El contador cambió de ${oldValue} a ${newValue}`)
+})
+</script>
+
+<template>
+  <p>Contador: {{ count }}</p>
+  <button @click="count++">Incrementar</button>
+</template>
+```
+
+### Observando múltiples fuentes
+
+```vue
+<script setup>
+import { ref, watch } from 'vue'
+
+const firstName = ref('Juan')
+const lastName = ref('Pérez')
+
+watch(
+  [firstName, lastName],
+  ([newFirstName, newLastName], [oldFirstName, oldLastName]) => {
+    console.log(`Nombre: ${oldFirstName} → ${newFirstName}`)
+    console.log(`Apellido: ${oldLastName} → ${newLastName}`)
+  }
+)
+</script>
+```
+
+### Observando propiedades anidadas
+
+```vue
+<script setup>
+import { ref, watch } from 'vue'
+
+const user = ref({
+  name: 'Juan',
+  profile: {
+    age: 30
+  }
+})
+
+// Para observar propiedades anidadas, usa una función getter
+watch(
+  () => user.value.profile.age,
+  (newAge, oldAge) => {
+    console.log(`La edad cambió de ${oldAge} a ${newAge}`)
+  }
+)
+</script>
+```
+
+### Opciones de `watch()`
+
+```vue
+<script setup>
+import { ref, watch } from 'vue'
+
+const count = ref(0)
+
+watch(
+  count,
+  (newValue, oldValue) => {
+    console.log(`El contador cambió a ${newValue}`)
+  },
+  {
+    immediate: true, // Ejecuta el callback inmediatamente al crear el observador
+    deep: true,      // Detecta cambios en propiedades anidadas (para objetos)
+    flush: 'post'    // Ejecuta el callback después de la actualización del DOM
+  }
+)
+</script>
+```
+
+## Observadores con `watchEffect()`
+
+`watchEffect()` ejecuta y rastrea automáticamente las dependencias reactivas utilizadas dentro de su función callback.
+
+### Uso básico
+
+```vue
+<script setup>
+import { ref, watchEffect } from 'vue'
+
+const count = ref(0)
+const name = ref('Juan')
+
+watchEffect(() => {
+  console.log(`Count: ${count.value}, Name: ${name.value}`)
+  // Se ejecuta automáticamente cuando count o name cambian
+})
+</script>
+
+<template>
+  <p>Contador: {{ count }}</p>
+  <button @click="count++">Incrementar contador</button>
+  <input v-model="name" />
+</template>
+```
+
+### Opciones de `watchEffect()`
+
+```vue
+<script setup>
+import { ref, watchEffect } from 'vue'
+
+const count = ref(0)
+
+watchEffect(
+  () => {
+    console.log(`El contador es: ${count.value}`)
+  },
+  {
+    flush: 'post', // Ejecuta el callback después de la actualización del DOM
+    onTrack(e) {   // Se llama cuando una dependencia es rastreada
+      console.log('Dependencia rastreada:', e)
+    },
+    onTrigger(e) {  // Se llama cuando el observador es disparado
+      console.log('Observador disparado:', e)
+    }
+  }
+)
+</script>
+```
+
+## Diferencias entre `watch` y `watchEffect`
+
+<Tabs>
+  <TabItem label="watch">
+    ```js
+    // Requiere especificar explícitamente qué observar
+    watch(source, (newValue, oldValue) => {
+      // Solo se ejecuta cuando 'source' cambia
+      // Tiene acceso al valor anterior y al nuevo
+    })
+    ```
+    
+    - ✅ Control preciso sobre qué datos observar
+    - ✅ Acceso a valores anteriores y nuevos
+    - ✅ Control sobre cuándo se dispara (puede ser perezoso)
+    - ❌ Más verboso para múltiples dependencias
+  </TabItem>
+  <TabItem label="watchEffect">
+    ```js
+    // Rastrea automáticamente las dependencias usadas dentro
+    watchEffect(() => {
+      // Se ejecuta inmediatamente y cuando cualquier
+      // dependencia reactiva utilizada dentro cambia
+      // No tiene acceso a valores anteriores
+    })
+    ```
+    
+    - ✅ Rastreo automático de dependencias
+    - ✅ Menos código para múltiples dependencias
+    - ✅ Se ejecuta inmediatamente por defecto
+    - ❌ No tiene acceso a valores anteriores
+    - ❌ Menos control sobre qué exactamente dispara la ejecución
+  </TabItem>
+</Tabs>
+
+### Tabla comparativa
+
+| Característica | `watch()` | `watchEffect()` |
+|---------------|-----------|----------------|
+| Rastreo de dependencias | Manual (explícito) | Automático |
+| Ejecución inicial | No (a menos que `immediate: true`) | Sí |
+| Acceso a valores anteriores | Sí | No |
+| Múltiples fuentes | Requiere array o función getter | Automático al usar dentro |
+| Caso de uso ideal | Cuando necesitas reaccionar a cambios específicos con acceso al valor anterior | Cuando necesitas ejecutar efectos secundarios basados en múltiples dependencias |

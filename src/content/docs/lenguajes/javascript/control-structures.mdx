@@ -1,0 +1,228 @@
+---
+title: Estructuras de control
+description: Aprende sobre las diferentes estructuras de control en JavaScript, incluyendo condicionales, bucles y manejo de errores.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Estructuras de control <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Las estructuras de control son fundamentales para dirigir el flujo de ejecución de tu programa.
+</Aside>
+
+## Condicionales <Badge text="Básico" variant="note" />
+
+### if...else
+```javascript
+let edad = 18;
+
+if (edad >= 18) {
+    console.log("Eres mayor de edad");
+} else if (edad >= 13) {
+    console.log("Eres adolescente");
+} else {
+    console.log("Eres menor de edad");
+}
+```
+
+### switch
+```javascript
+let dia = "Lunes";
+
+switch (dia) {
+    case "Lunes":
+        console.log("Inicio de semana");
+        break;
+    case "Viernes":
+        console.log("¡Fin de semana!");
+        break;
+    default:
+        console.log("Día entre semana");
+}
+```
+
+## Bucles
+
+### for
+```javascript
+// Bucle tradicional
+for (let i = 0; i < 5; i++) {
+    console.log(i);
+}
+
+// for...of (para iterables)
+const array = [1, 2, 3];
+for (const elemento of array) {
+    console.log(elemento);
+}
+
+// for...in (para objetos)
+const persona = { nombre: "Juan", edad: 25 };
+for (const propiedad in persona) {
+    console.log(`${propiedad}: ${persona[propiedad]}`);
+}
+```
+
+### while
+```javascript
+let contador = 0;
+while (contador < 5) {
+    console.log(contador);
+    contador++;
+}
+```
+
+### do...while
+```javascript
+let numero = 0;
+do {
+    console.log(numero);
+    numero++;
+} while (numero < 5);
+```
+
+## Control de flujo
+
+### break
+```javascript
+for (let i = 0; i < 10; i++) {
+    if (i === 5) {
+        break; // Sale del bucle
+    }
+    console.log(i);
+}
+```
+
+### continue
+```javascript
+for (let i = 0; i < 5; i++) {
+    if (i === 2) {
+        continue; // Salta a la siguiente iteración
+    }
+    console.log(i);
+}
+```
+
+### return
+```javascript
+function ejemplo() {
+    if (condicion) {
+        return true; // Sale de la función
+    }
+    // Más código...
+}
+```
+
+## Manejo de errores
+
+### try...catch
+```javascript
+try {
+    // Código que puede lanzar un error
+    throw new Error("¡Algo salió mal!");
+} catch (error) {
+    console.error(error.message);
+} finally {
+    // Se ejecuta siempre
+    console.log("Limpieza final");
+}
+```
+
+## Patrones comunes
+
+### Guard Clauses
+```javascript
+function procesarUsuario(usuario) {
+    if (!usuario) {
+        return;
+    }
+
+    if (!usuario.activo) {
+        return;
+    }
+
+    // Procesar usuario...
+}
+```
+
+### Operador ternario en condicionales simples
+```javascript
+const edad = 20;
+const mensaje = edad >= 18 ? "Mayor de edad" : "Menor de edad";
+```
+
+### Switch con objetos
+```javascript
+const acciones = {
+    CREAR: () => console.log("Creando..."),
+    EDITAR: () => console.log("Editando..."),
+    ELIMINAR: () => console.log("Eliminando...")
+};
+
+const accion = "CREAR";
+acciones[accion]?.();
+```
+
+## Mejores prácticas
+
+1. Usar llaves incluso en bloques de una línea
+```javascript
+// ✅ Bueno
+if (condicion) {
+    hacerAlgo();
+}
+```
+
+2. Evitar anidación excesiva
+```javascript
+// ❌ Malo
+if (a) {
+    if (b) {
+        if (c) {
+            // ...
+        }
+    }
+}
+
+// ✅ Bueno
+if (!a || !b || !c) return;
+// Código principal aquí
+```
+
+3. Usar switch cuando hay múltiples condiciones
+```javascript
+// ✅ Bueno
+switch (tipo) {
+    case "A":
+        // ...
+        break;
+    case "B":
+        // ...
+        break;
+    default:
+        // ...
+}
+```
+
+4. Manejar todos los casos posibles
+```javascript
+// ✅ Bueno
+if (condicion) {
+    // caso verdadero
+} else {
+    // caso falso
+}
+```
+
+5. Usar try-catch para código propenso a errores
+```javascript
+// ✅ Bueno
+try {
+    JSON.parse(datos);
+} catch (error) {
+    console.error("Datos JSON inválidos");
+}
+```

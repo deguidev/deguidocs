@@ -1,0 +1,667 @@
+---
+title: 8. Manejo de Excepciones
+description: Aprende sobre excepciones, bloques try-catch-finally, lanzamiento y propagación de excepciones en Java
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## Introducción
+
+El manejo de excepciones es una parte fundamental de la programación en Java que permite gestionar situaciones anómalas o inesperadas durante la ejecución de un programa. Un buen manejo de excepciones mejora la robustez, la seguridad y la experiencia del usuario en las aplicaciones.
+
+## 8.1 ¿Qué son las excepciones?
+
+Las excepciones son eventos que ocurren durante la ejecución de un programa que interrumpen el flujo normal de las instrucciones. Representan condiciones de error o situaciones inesperadas que requieren un tratamiento especial.
+
+### 8.1.1 Jerarquía de excepciones en Java
+
+En Java, todas las excepciones son instancias de clases que descienden de la clase `java.lang.Throwable`.
+
+<Code code={`// Jerarquía simplificada de excepciones en Java
+java.lang.Object
+    ├── java.lang.Throwable
+        ├── java.lang.Error             // Errores graves, normalmente no se capturan
+        └── java.lang.Exception         // Excepciones que deben manejarse
+            └── java.lang.RuntimeException // Excepciones no comprobadas`} lang="text" />
+
+### 8.1.2 Tipos de excepciones
+
+En Java, las excepciones se dividen en tres categorías principales:
+
+<table>
+  <thead>
+    <tr>
+      <th>Tipo</th>
+      <th>Descripción</th>
+      <th>Ejemplos</th>
+      <th>¿Deben declararse?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Excepciones comprobadas (checked)</td>
+      <td>Excepciones que el compilador obliga a manejar o declarar</td>
+      <td>IOException, SQLException</td>
+      <td>Sí, con throws o try-catch</td>
+    </tr>
+    <tr>
+      <td>Excepciones no comprobadas (unchecked)</td>
+      <td>Subclases de RuntimeException, representan errores de programación</td>
+      <td>NullPointerException, ArrayIndexOutOfBoundsException</td>
+      <td>No, son opcionales</td>
+    </tr>
+    <tr>
+      <td>Errores (errors)</td>
+      <td>Problemas graves, normalmente irrecuperables</td>
+      <td>OutOfMemoryError, StackOverflowError</td>
+      <td>No, generalmente no se manejan</td>
+    </tr>
+  </tbody>
+</table>
+
+### 8.1.3 Excepciones comunes en Java
+
+<table>
+  <thead>
+    <tr>
+      <th>Excepción</th>
+      <th>Tipo</th>
+      <th>Causa</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>NullPointerException</td>
+      <td>No comprobada</td>
+      <td>Intentar acceder o invocar un método en una referencia nula</td>
+    </tr>
+    <tr>
+      <td>ArrayIndexOutOfBoundsException</td>
+      <td>No comprobada</td>
+      <td>Intentar acceder a un índice fuera de los límites de un arreglo</td>
+    </tr>
+    <tr>
+      <td>IllegalArgumentException</td>
+      <td>No comprobada</td>
+      <td>Pasar un argumento ilegal o inapropiado a un método</td>
+    </tr>
+    <tr>
+      <td>NumberFormatException</td>
+      <td>No comprobada</td>
+      <td>Intentar convertir una cadena a un formato numérico cuando no es posible</td>
+    </tr>
+    <tr>
+      <td>ClassCastException</td>
+      <td>No comprobada</td>
+      <td>Intentar convertir un objeto a una subclase de la que no es instancia</td>
+    </tr>
+    <tr>
+      <td>IOException</td>
+      <td>Comprobada</td>
+      <td>Error en operaciones de entrada/salida</td>
+    </tr>
+    <tr>
+      <td>SQLException</td>
+      <td>Comprobada</td>
+      <td>Error en operaciones con bases de datos</td>
+    </tr>
+    <tr>
+      <td>FileNotFoundException</td>
+      <td>Comprobada</td>
+      <td>Intentar acceder a un archivo que no existe</td>
+    </tr>
+  </tbody>
+</table>
+
+### 8.1.4 Ejemplo de excepción en tiempo de ejecución
+
+<Code code={`public class EjemploExcepcion {
+    public static void main(String[] args) {
+        int[] numeros = {1, 2, 3};
+        System.out.println("Antes de la excepción");
+        
+        // Esto generará una ArrayIndexOutOfBoundsException
+        System.out.println(numeros[5]);
+        
+        // Esta línea nunca se ejecutará
+        System.out.println("Después de la excepción");
+    }
+}`} lang="java" />
+
+Salida:
+
+```
+Antes de la excepción
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 3
+    at EjemploExcepcion.main(EjemploExcepcion.java:7)
+```
+
+<Aside type="caution">
+  Sin un manejo adecuado de excepciones, cualquier excepción no controlada terminará abruptamente la ejecución del programa, lo que puede llevar a pérdida de datos o comportamientos inesperados.
+</Aside>
+
+## 8.2 try, catch, finally
+
+Java proporciona los bloques `try`, `catch` y `finally` para manejar excepciones de forma estructurada.
+
+### 8.2.1 Estructura básica
+
+<Code code={`try {
+    // Código que puede generar una excepción
+} catch (TipoExcepcion1 e1) {
+    // Código para manejar la excepción de tipo TipoExcepcion1
+} catch (TipoExcepcion2 e2) {
+    // Código para manejar la excepción de tipo TipoExcepcion2
+} finally {
+    // Código que se ejecuta siempre, haya o no excepción
+}`} lang="java" />
+
+### 8.2.2 Bloque try
+
+El bloque `try` contiene el código que puede generar una excepción. Si ocurre una excepción dentro de este bloque, la ejecución normal se interrumpe y se busca un bloque `catch` adecuado para manejarla.
+
+### 8.2.3 Bloque catch
+
+El bloque `catch` captura y maneja una excepción. Puede haber múltiples bloques `catch` para manejar diferentes tipos de excepciones.
+
+<Code code={`try {
+    int resultado = 10 / 0; // Genera ArithmeticException
+} catch (ArithmeticException e) {
+    System.out.println("Error aritmético: " + e.getMessage());
+} catch (Exception e) {
+    // Captura cualquier otra excepción que herede de Exception
+    System.out.println("Error general: " + e.getMessage());
+}`} lang="java" />
+
+<Aside type="tip">
+  Los bloques `catch` se evalúan en orden, por lo que debes colocar las excepciones más específicas antes que las más generales. Si colocas `Exception` primero, capturará todas las excepciones y los bloques posteriores nunca se ejecutarán.
+</Aside>
+
+#### Multi-catch (Java 7+)
+
+Desde Java 7, puedes capturar múltiples excepciones en un solo bloque `catch` usando el operador `|`:
+
+<Code code={`try {
+    // Código que puede generar diferentes excepciones
+} catch (IOException | SQLException e) {
+    // Maneja ambas excepciones de la misma manera
+    System.out.println("Error de E/S o SQL: " + e.getMessage());
+}`} lang="java" />
+
+### 8.2.4 Bloque finally
+
+El bloque `finally` contiene código que se ejecuta siempre, independientemente de si ocurre una excepción o no. Es útil para tareas de limpieza como cerrar recursos.
+
+<Code code={`FileInputStream archivo = null;
+try {
+    archivo = new FileInputStream("datos.txt");
+    // Procesar el archivo
+} catch (FileNotFoundException e) {
+    System.out.println("El archivo no existe: " + e.getMessage());
+} finally {
+    // Este código se ejecuta siempre
+    if (archivo != null) {
+        try {
+            archivo.close();
+        } catch (IOException e) {
+            System.out.println("Error al cerrar el archivo: " + e.getMessage());
+        }
+    }
+}`} lang="java" />
+
+<Aside type="note">
+  El bloque `finally` se ejecuta incluso si hay un `return` dentro del bloque `try` o `catch`. La única excepción es si se llama a `System.exit()` o si la JVM se cierra abruptamente.
+</Aside>
+
+### 8.2.5 try-with-resources (Java 7+)
+
+Java 7 introdujo la estructura `try-with-resources` que simplifica el manejo de recursos que deben cerrarse automáticamente (clases que implementan `AutoCloseable` o `Closeable`).
+
+<Code code={`// Antes de Java 7
+BufferedReader br = null;
+try {
+    br = new BufferedReader(new FileReader("archivo.txt"));
+    String linea = br.readLine();
+    System.out.println(linea);
+} catch (IOException e) {
+    e.printStackTrace();
+} finally {
+    if (br != null) {
+        try {
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+// Con try-with-resources (Java 7+)
+try (BufferedReader br = new BufferedReader(new FileReader("archivo.txt"))) {
+    String linea = br.readLine();
+    System.out.println(linea);
+} catch (IOException e) {
+    e.printStackTrace();
+} // br se cierra automáticamente`} lang="java" />
+
+<Aside type="tip">
+  Puedes declarar múltiples recursos en un solo try-with-resources, separándolos por punto y coma:
+  <Code code={`try (FileInputStream input = new FileInputStream("entrada.txt");
+     FileOutputStream output = new FileOutputStream("salida.txt")) {
+    // Código para leer de input y escribir en output
+}`} lang="java" />
+</Aside>
+
+### 8.2.6 Ejemplo completo
+
+<Code code={`import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class ManejoExcepciones {
+    public static void main(String[] args) {
+        // Ejemplo 1: try-catch básico
+        try {
+            int resultado = 10 / 0;
+            System.out.println("Resultado: " + resultado); // No se ejecuta
+        } catch (ArithmeticException e) {
+            System.out.println("Error: División por cero");
+            System.out.println("Mensaje de excepción: " + e.getMessage());
+            // e.printStackTrace(); // Imprime la traza completa de la excepción
+        }
+        
+        System.out.println("El programa continúa...");
+        
+        // Ejemplo 2: try-catch-finally
+        try {
+            int[] numeros = {1, 2, 3};
+            System.out.println(numeros[5]); // Genera ArrayIndexOutOfBoundsException
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Error: Índice fuera de rango");
+        } finally {
+            System.out.println("Este bloque siempre se ejecuta");
+        }
+        
+        // Ejemplo 3: try-with-resources
+        try (BufferedReader br = new BufferedReader(new FileReader("archivo.txt"))) {
+            String linea = br.readLine();
+            System.out.println("Primera línea: " + linea);
+        } catch (IOException e) {
+            System.out.println("Error de E/S: " + e.getMessage());
+        }
+    }
+}`} lang="java" />
+
+## 8.3 Lanzamiento y propagación de excepciones
+
+Además de capturar excepciones, puedes lanzarlas explícitamente y decidir si manejarlas localmente o propagarlas a métodos superiores.
+
+### 8.3.1 Lanzar excepciones con throw
+
+Puedes lanzar una excepción explícitamente usando la palabra clave `throw`:
+
+<Code code={`public void verificarEdad(int edad) {
+    if (edad < 0) {
+        throw new IllegalArgumentException("La edad no puede ser negativa");
+    }
+    if (edad < 18) {
+        throw new ArithmeticException("Debe ser mayor de edad");
+    }
+    System.out.println("Edad válida: " + edad);
+}`} lang="java" />
+
+### 8.3.2 Declarar excepciones con throws
+
+Cuando un método puede generar una excepción comprobada pero no la maneja internamente, debe declararla en su firma usando la palabra clave `throws`:
+
+<Code code={`// Declarando una excepción comprobada
+public void leerArchivo(String ruta) throws IOException {
+    FileReader fr = new FileReader(ruta); // Puede lanzar FileNotFoundException
+    BufferedReader br = new BufferedReader(fr);
+    String linea = br.readLine(); // Puede lanzar IOException
+    br.close();
+}`} lang="java" />
+
+<Aside type="note">
+  Solo es obligatorio declarar las excepciones comprobadas (checked). Las excepciones no comprobadas (unchecked) como `RuntimeException` y sus subclases pueden ser declaradas, pero no es obligatorio.
+</Aside>
+
+### 8.3.3 Propagación de excepciones
+
+Cuando ocurre una excepción dentro de un método, si no se maneja localmente, se propaga hacia arriba en la pila de llamadas hasta encontrar un manejador adecuado o hasta llegar al método `main`.
+
+<Code code={`public class PropagacionExcepciones {
+    public static void main(String[] args) {
+        try {
+            metodo1();
+        } catch (Exception e) {
+            System.out.println("Excepción capturada en main: " + e.getMessage());
+        }
+    }
+    
+    public static void metodo1() throws Exception {
+        metodo2();
+    }
+    
+    public static void metodo2() throws Exception {
+        metodo3();
+    }
+    
+    public static void metodo3() throws Exception {
+        throw new Exception("Excepción generada en metodo3");
+    }
+}`} lang="java" />
+
+Salida:
+```
+Excepción capturada en main: Excepción generada en metodo3
+```
+
+### 8.3.4 Re-lanzamiento de excepciones
+
+Puedes capturar una excepción, realizar alguna acción y luego re-lanzarla para que sea manejada por un nivel superior:
+
+<Code code={`public void procesarDatos() throws IOException {
+    try {
+        // Código que puede generar IOException
+        FileReader fr = new FileReader("datos.txt");
+        // ...
+    } catch (IOException e) {
+        System.out.println("Error al procesar datos: " + e.getMessage());
+        // Realizar alguna acción de limpieza o registro
+        
+        // Re-lanzar la excepción para que sea manejada por el método llamador
+        throw e;
+        
+        // Alternativamente, puedes envolver la excepción original en otra
+        // throw new RuntimeException("Error en procesamiento", e);
+    }
+}`} lang="java" />
+
+### 8.3.5 Excepciones encadenadas
+
+Puedes encadenar excepciones para preservar la información de la causa original:
+
+<Code code={`try {
+    // Código que puede generar SQLException
+} catch (SQLException e) {
+    // Crear una nueva excepción con la original como causa
+    throw new RuntimeException("Error en la base de datos", e);
+}`} lang="java" />
+
+<Aside type="tip">
+  Al encadenar excepciones, la traza de la pila incluirá tanto la excepción actual como la causa original, lo que facilita la depuración.
+</Aside>
+
+## 8.4 Crear excepciones personalizadas
+
+Puedes crear tus propias clases de excepciones para representar errores específicos de tu aplicación.
+
+### 8.4.1 Creación de excepciones comprobadas
+
+Para crear una excepción comprobada, extiende directamente de `Exception` o alguna de sus subclases:
+
+<Code code={`// Excepción comprobada personalizada
+public class SaldoInsuficienteException extends Exception {
+    private double saldo;
+    private double cantidadSolicitada;
+    
+    // Constructor
+    public SaldoInsuficienteException(String mensaje, double saldo, double cantidadSolicitada) {
+        super(mensaje);
+        this.saldo = saldo;
+        this.cantidadSolicitada = cantidadSolicitada;
+    }
+    
+    // Constructor con causa
+    public SaldoInsuficienteException(String mensaje, Throwable causa, double saldo, double cantidadSolicitada) {
+        super(mensaje, causa);
+        this.saldo = saldo;
+        this.cantidadSolicitada = cantidadSolicitada;
+    }
+    
+    // Getters
+    public double getSaldo() {
+        return saldo;
+    }
+    
+    public double getCantidadSolicitada() {
+        return cantidadSolicitada;
+    }
+    
+    public double getDeficit() {
+        return cantidadSolicitada - saldo;
+    }
+}`} lang="java" />
+
+### 8.4.2 Creación de excepciones no comprobadas
+
+Para crear una excepción no comprobada, extiende de `RuntimeException` o alguna de sus subclases:
+
+<Code code={`// Excepción no comprobada personalizada
+public class UsuarioNoAutenticadoException extends RuntimeException {
+    private String usuario;
+    
+    public UsuarioNoAutenticadoException(String mensaje, String usuario) {
+        super(mensaje);
+        this.usuario = usuario;
+    }
+    
+    public String getUsuario() {
+        return usuario;
+    }
+}`} lang="java" />
+
+### 8.4.3 Uso de excepciones personalizadas
+
+<Code code={`public class CuentaBancaria {
+    private String numero;
+    private double saldo;
+    
+    public CuentaBancaria(String numero, double saldoInicial) {
+        this.numero = numero;
+        this.saldo = saldoInicial;
+    }
+    
+    public void retirar(double cantidad) throws SaldoInsuficienteException {
+        if (cantidad <= 0) {
+            throw new IllegalArgumentException("La cantidad debe ser positiva");
+        }
+        
+        if (saldo < cantidad) {
+            throw new SaldoInsuficienteException(
+                "Saldo insuficiente para realizar el retiro", 
+                saldo, 
+                cantidad
+            );
+        }
+        
+        saldo -= cantidad;
+        System.out.println("Retiro exitoso. Nuevo saldo: " + saldo);
+    }
+    
+    public double getSaldo() {
+        return saldo;
+    }
+}
+
+// Uso
+public class PruebaCuenta {
+    public static void main(String[] args) {
+        CuentaBancaria cuenta = new CuentaBancaria("123456", 1000);
+        
+        try {
+            cuenta.retirar(1500); // Intentar retirar más del saldo disponible
+        } catch (SaldoInsuficienteException e) {
+            System.out.println(e.getMessage());
+            System.out.println("Saldo actual: " + e.getSaldo());
+            System.out.println("Cantidad solicitada: " + e.getCantidadSolicitada());
+            System.out.println("Deficit: " + e.getDeficit());
+        }
+    }
+}`} lang="java" />
+
+### 8.4.4 Buenas prácticas para excepciones personalizadas
+
+1. **Nombres descriptivos**: Usa nombres que terminen en "Exception" y describan claramente el problema.
+2. **Mensajes informativos**: Proporciona mensajes de error claros y detallados.
+3. **Datos relevantes**: Incluye campos y métodos que proporcionen información adicional sobre el error.
+4. **Serialización**: Implementa `Serializable` si tus excepciones pueden atravesar límites de red o ser serializadas.
+5. **Documentación**: Documenta claramente cuándo y por qué se lanza cada excepción.
+
+<Code code={`/**
+ * Excepción lanzada cuando se intenta realizar una operación en un recurso bloqueado.
+ * 
+ * @author Tu Nombre
+ */
+public class RecursoBloqueadoException extends Exception implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String idRecurso;
+    private String usuarioBloqueo;
+    
+    /**
+     * Crea una nueva excepción de recurso bloqueado.
+     * 
+     * @param idRecurso El identificador del recurso bloqueado
+     * @param usuarioBloqueo El usuario que tiene bloqueado el recurso
+     */
+    public RecursoBloqueadoException(String idRecurso, String usuarioBloqueo) {
+        super("El recurso " + idRecurso + " está bloqueado por " + usuarioBloqueo);
+        this.idRecurso = idRecurso;
+        this.usuarioBloqueo = usuarioBloqueo;
+    }
+    
+    // Getters
+    public String getIdRecurso() {
+        return idRecurso;
+    }
+    
+    public String getUsuarioBloqueo() {
+        return usuarioBloqueo;
+    }
+}`} lang="java" />
+
+## 8.5 Mejores prácticas en el manejo de excepciones
+
+### 8.5.1 Qué hacer
+
+<Steps>
+<ol>
+  <li>
+    <strong>Captura excepciones específicas</strong>: Evita capturar `Exception` o `Throwable` directamente; captura tipos específicos para un manejo más preciso.
+  </li>
+  <li>
+    <strong>Proporciona información útil</strong>: Incluye detalles relevantes en los mensajes de excepción para facilitar la depuración.
+  </li>
+  <li>
+    <strong>Libera recursos adecuadamente</strong>: Usa `try-with-resources` o bloques `finally` para garantizar la liberación de recursos.
+  </li>
+  <li>
+    <strong>Documenta las excepciones</strong>: Usa Javadoc para documentar qué excepciones puede lanzar un método y en qué circunstancias.
+  </li>
+  <li>
+    <strong>Registra excepciones</strong>: Utiliza un sistema de registro (logging) para registrar excepciones con fines de depuración y monitoreo.
+  </li>
+</ol>
+</Steps>
+
+### 8.5.2 Qué evitar
+
+<Steps>
+<ol>
+  <li>
+    <strong>Bloques catch vacíos</strong>: Nunca ignores las excepciones sin al menos registrarlas o manejarlas adecuadamente.
+    <Code code={`// MAL
+try {
+    // Código
+} catch (Exception e) {
+    // No hacer nada - ¡PELIGROSO!
+}
+
+// BIEN
+try {
+    // Código
+} catch (Exception e) {
+    logger.error("Error al procesar", e);
+    // Manejo adecuado
+}`} lang="java" />
+  </li>
+  <li>
+    <strong>Capturar excepciones demasiado generales</strong>: Evita capturar `Exception` cuando puedes manejar tipos más específicos.
+  </li>
+  <li>
+    <strong>Convertir excepciones comprobadas en no comprobadas</strong>: No envuelvas excepciones comprobadas en `RuntimeException` solo para evitar declararlas.
+  </li>
+  <li>
+    <strong>Usar excepciones para flujo de control normal</strong>: Las excepciones deben usarse para situaciones excepcionales, no para controlar el flujo normal del programa.
+  </li>
+  <li>
+    <strong>Exponer detalles de implementación</strong>: No expongas detalles internos o sensibles en los mensajes de excepción visibles para el usuario final.
+  </li>
+</ol>
+</Steps>
+
+### 8.5.3 Ejemplo de manejo de excepciones con logging
+
+<Code code={`import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class ManejoExcepcionesAvanzado {
+    private static final Logger logger = Logger.getLogger(ManejoExcepcionesAvanzado.class.getName());
+    
+    public static void main(String[] args) {
+        try {
+            procesarArchivo("datos.txt");
+        } catch (IOException e) {
+            // Registrar la excepción con nivel adecuado
+            logger.log(Level.SEVERE, "Error al procesar el archivo", e);
+            
+            // Mostrar mensaje amigable al usuario
+            System.out.println("Lo sentimos, no se pudo procesar el archivo. Por favor, inténtelo más tarde.");
+            
+            // Opcionalmente, terminar el programa con código de error
+            System.exit(1);
+        }
+    }
+    
+    public static void procesarArchivo(String ruta) throws IOException {
+        if (!archivoExiste(ruta)) {
+            logger.warning("El archivo no existe: " + ruta);
+            throw new IOException("El archivo no existe: " + ruta);
+        }
+        
+        try {
+            // Procesar el archivo
+            logger.info("Procesando archivo: " + ruta);
+            // ...
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Error durante el procesamiento del archivo", e);
+            throw new IOException("Error al leer el contenido del archivo", e);
+        }
+    }
+    
+    private static boolean archivoExiste(String ruta) {
+        // Verificar si el archivo existe
+        return false; // Simulación
+    }
+}`} lang="java" />
+
+## Resumen
+
+El manejo de excepciones en Java es una parte fundamental para crear aplicaciones robustas y confiables. En este capítulo hemos aprendido:
+
+1. **Qué son las excepciones**: Eventos que interrumpen el flujo normal del programa, clasificadas en comprobadas, no comprobadas y errores.
+
+2. **Bloques try-catch-finally**: Mecanismos para capturar y manejar excepciones, garantizando la liberación de recursos.
+
+3. **Lanzamiento y propagación**: Cómo lanzar excepciones con `throw`, declararlas con `throws` y propagarlas a través de la pila de llamadas.
+
+4. **Excepciones personalizadas**: Creación de clases de excepciones propias para representar errores específicos de la aplicación.
+
+5. **Mejores prácticas**: Recomendaciones para un manejo efectivo y seguro de las excepciones.
+
+Un buen manejo de excepciones mejora la robustez, la seguridad y la experiencia del usuario en las aplicaciones Java, facilitando la identificación y solución de problemas durante el desarrollo y la ejecución.

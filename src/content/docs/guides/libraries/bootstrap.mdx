@@ -1,0 +1,219 @@
+---
+title: Bootstrap
+description: Guía de integración y configuración de Bootstrap en tu proyecto
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Bootstrap <Badge text="Configuración" variant="success" />
+
+## Instalación <Badge text="Paso 1" variant="note" />
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install bootstrap @popperjs/core
+    ```
+  </TabItem>
+  <TabItem label="CDN">
+    ```html
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- JavaScript Bundle con Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    ```
+  </TabItem>
+</Tabs>
+
+## Integración <Badge text="Paso 2" variant="note" />
+
+### HTML Básico
+<Code code={`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="path/to/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1>¡Hola Bootstrap!</h1>
+  </div>
+  
+  <script src="path/to/bootstrap.bundle.min.js"></script>
+</body>
+</html>`} lang="html" />
+
+### Vue.js
+<Code code={`<!-- App.vue -->
+<template>
+  <div class="container">
+    <button class="btn btn-primary">Botón Bootstrap</button>
+  </div>
+</template>
+
+<script>
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+
+export default {
+  name: 'App'
+}
+</script>`} lang="vue" />
+
+### Angular
+<Code code={`// angular.json
+{
+  "projects": {
+    "your-app": {
+      "architect": {
+        "build": {
+          "options": {
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css"
+            ],
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+// app.component.html
+<div class="container">
+  <button class="btn btn-primary">Botón Bootstrap</button>
+</div>`} lang="typescript" />
+
+## Personalización <Badge text="Paso 3" variant="note" />
+
+### SASS
+<Code code={`// styles/custom.scss
+
+// Tus variables personalizadas
+$primary: #1a365d;
+$secondary: #2d3748;
+$border-radius: 1rem;
+
+// Importar Bootstrap
+@import "~bootstrap/scss/bootstrap";
+
+// Tus estilos personalizados
+.btn-custom {
+  @extend .btn;
+  @extend .btn-primary;
+  padding: 1rem 2rem;
+}`} lang="scss" />
+
+### Variables CSS
+<Code code={`/* styles/custom.css */
+:root {
+  --bs-primary: #1a365d;
+  --bs-secondary: #2d3748;
+  --bs-border-radius: 1rem;
+}
+
+/* Personalizar componentes específicos */
+.btn-primary {
+  --bs-btn-bg: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-bg: #0d2235;
+}`} lang="css" />
+
+## Configuración de Componentes <Badge text="Paso 4" variant="note" />
+
+### JavaScript Initialization
+<Code code={`// Tooltips
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+const tooltipList = [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el))
+
+// Popovers
+const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+const popoverList = [...popoverTriggerList].map(el => new bootstrap.Popover(el))
+
+// Modal
+const myModal = new bootstrap.Modal(document.getElementById('myModal'), {
+  keyboard: false,
+  backdrop: 'static'
+})`} lang="javascript" />
+
+## Optimización para Producción <Badge text="Paso 5" variant="caution" />
+
+### Importar solo los componentes necesarios
+<Code code={`// Importar solo los componentes que necesitas
+import 'bootstrap/js/dist/modal';
+import 'bootstrap/js/dist/tooltip';
+
+// SCSS modular
+// styles/custom.scss
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
+// Solo los componentes necesarios
+@import "~bootstrap/scss/grid";
+@import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/card";`} lang="scss" />
+
+## Grid System <Badge text="Fundamental" variant="success" />
+
+```html
+<div class="container">
+  <div class="row">
+    <!-- Columnas responsivas -->
+    <div class="col-12 col-md-6 col-lg-4">
+      Columna 1
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+      Columna 2
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+      Columna 3
+    </div>
+  </div>
+</div>
+```
+
+## Mejores Prácticas <Badge text="Recomendado" variant="success" />
+
+### Estructura de Archivos
+```
+src/
+├── styles/
+│   ├── custom.scss     # Personalización de Bootstrap
+│   └── variables.scss  # Variables personalizadas
+├── js/
+│   └── bootstrap.js    # Inicialización de componentes
+```
+
+### Uso de Utilidades
+```html
+<!-- ✅ Bueno: Uso de utilidades de Bootstrap -->
+<div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+  <h2 class="mb-0">Título</h2>
+  <button class="btn btn-primary">Acción</button>
+</div>
+```
+
+### Componentes Personalizados
+<Code code={`/* styles/custom.scss */
+.card-custom {
+  @extend .card;
+  border-radius: $border-radius-lg;
+  box-shadow: $box-shadow-sm;
+  
+  .card-header {
+    background-color: $primary;
+    color: $white;
+  }
+}`} lang="scss" />
+
+<Aside type="tip">
+  Para más detalles y documentación completa, visita la [documentación oficial de Bootstrap](https://getbootstrap.com/docs).
+</Aside>

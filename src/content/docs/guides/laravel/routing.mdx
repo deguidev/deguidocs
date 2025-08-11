@@ -1,0 +1,501 @@
+---
+title: 3. Rutas (Routing) en Laravel
+description: Aprende a definir rutas, parámetros, agrupación y redirecciones en Laravel
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Rutas (Routing) en Laravel
+
+El sistema de rutas de Laravel es una parte fundamental del framework que permite definir cómo la aplicación responde a las solicitudes HTTP. Las rutas se definen en archivos ubicados en el directorio <Code code="routes/" lang="php" inline />, donde cada archivo corresponde a un tipo específico de ruta.
+
+<Aside type="tip">
+Los archivos de rutas se cargan automáticamente por el framework, y se encuentran en el directorio <Code code="routes/" lang="php" inline />.
+</Aside>
+
+## Archivos de rutas principales
+
+| Archivo | Descripción |
+|---------|-------------|
+| <Code code="routes/web.php" lang="php" inline /> | Rutas para la interfaz web |
+| <Code code="routes/api.php" lang="php" inline /> | Rutas para la API |
+| <Code code="routes/console.php" lang="php" inline /> | Comandos de consola personalizados |
+| <Code code="routes/channels.php" lang="php" inline /> | Canales de broadcasting |
+
+## Definir rutas básicas
+
+Laravel proporciona métodos para definir rutas para todos los verbos HTTP comunes. Cada método acepta dos parámetros: la URI y una función callback o un controlador.
+
+### Rutas GET
+
+Las rutas GET se utilizan para solicitar datos del servidor sin modificarlos.
+
+<Code code={`// En routes/web.php
+use Illuminate\Support\Facades\Route;
+
+Route::get('/usuarios', function () {
+    return 'Lista de usuarios';
+});
+
+// Usando un controlador
+Route::get('/usuarios', [UsuarioController::class, 'index']);`} lang="php" />
+
+### Rutas POST
+
+Las rutas POST se utilizan para enviar datos al servidor, como al enviar un formulario.
+
+<Code code={`Route::post('/usuarios', function () {
+    // Lógica para crear un nuevo usuario
+    return 'Usuario creado';
+});
+
+// Usando un controlador
+Route::post('/usuarios', [UsuarioController::class, 'store']);`} lang="php" />
+
+### Rutas PUT/PATCH
+
+Las rutas PUT y PATCH se utilizan para actualizar recursos existentes.
+
+<Code code={`Route::put('/usuarios/{id}', function ($id) {
+    // Lógica para actualizar un usuario
+    return 'Usuario ' . $id . ' actualizado';
+});
+
+Route::patch('/usuarios/{id}', [UsuarioController::class, 'update']);`} lang="php" />
+
+### Rutas DELETE
+
+Las rutas DELETE se utilizan para eliminar recursos.
+
+<Code code={`Route::delete('/usuarios/{id}', function ($id) {
+    // Lógica para eliminar un usuario
+    return 'Usuario ' . $id . ' eliminado';
+});
+
+Route::delete('/usuarios/{id}', [UsuarioController::class, 'destroy']);`} lang="php" />
+
+### Rutas para múltiples verbos HTTP
+
+Si necesitas que una ruta responda a múltiples verbos HTTP, puedes usar el método <Code code="match" lang="php" inline />:
+
+<Code code={`Route::match(['get', 'post'], '/usuarios/buscar', function () {
+    // Lógica para buscar usuarios
+});
+
+// O para todos los verbos HTTP
+Route::any('/usuarios/acciones', function () {
+    // Responde a cualquier verbo HTTP
+});`} lang="php" />
+
+<Aside type="note">
+En aplicaciones web modernas, los formularios HTML solo admiten métodos GET y POST. Para simular PUT, PATCH o DELETE desde un formulario, debes incluir un campo <Code code="_method" lang="php" inline /> con el valor del método HTTP deseado.
+</Aside>
+
+<Code code={`<form action="/usuarios/1" method="POST">
+    @csrf
+    @method('PUT')
+    <!-- Campos del formulario -->
+    <button type="submit">Actualizar</button>
+</form>`} lang="html" />
+
+## Rutas con parámetros
+
+Las rutas con parámetros permiten capturar segmentos de la URI para utilizarlos en tu aplicación. Estos parámetros se definen en la ruta utilizando llaves <Code code="{}" lang="php" inline />.
+
+### Parámetros requeridos
+
+Los parámetros requeridos se definen con llaves y se pasan como argumentos a la función de callback o método del controlador.
+
+<Code code={`Route::get('/usuarios/{id}', function ($id) {
+    return 'Usuario con ID: ' . $id;
+});
+
+// Múltiples parámetros
+Route::get('/posts/{post}/comentarios/{comentario}', function ($postId, $comentarioId) {
+    return 'Post ' . $postId . ', comentario ' . $comentarioId;
+});`} lang="php" />
+
+### Parámetros opcionales
+
+Los parámetros opcionales se definen añadiendo un signo de interrogación <Code code="?" lang="php" inline /> después del nombre del parámetro. Debes proporcionar un valor predeterminado para estos parámetros en la función.
+
+<Code code={`Route::get('/usuarios/{nombre?}', function ($nombre = 'invitado') {
+    return 'Hola ' . $nombre;
+});
+
+// Con controlador
+Route::get('/productos/{categoria?}', [ProductoController::class, 'index']);`} lang="php" />
+
+### Restricciones de parámetros
+
+Puedes restringir el formato de los parámetros de ruta utilizando el método <Code code="where" lang="php" inline />. Este método acepta el nombre del parámetro y una expresión regular que define el patrón permitido.
+
+<Code code={`Route::get('/usuarios/{id}', function ($id) {
+    return 'Usuario ' . $id;
+})->where('id', '[0-9]+'); // Solo números
+
+// Múltiples restricciones
+Route::get('/posts/{post}/comentarios/{comentario}', function ($postId, $comentarioId) {
+    // Lógica de la ruta
+})->where([
+    'post' => '[0-9]+',
+    'comentario' => '[0-9]+'
+]);
+
+// Restricciones comunes
+Route::get('/categoria/{slug}', function ($slug) {
+    // Lógica de la ruta
+})->whereAlpha('slug'); // Solo caracteres alfabéticos`} lang="php" />
+
+<Aside type="tip">
+Laravel proporciona métodos auxiliares para restricciones comunes:
+- <Code code="whereNumber('param')" lang="php" inline /> - Solo números
+- <Code code="whereAlpha('param')" lang="php" inline /> - Solo letras
+- <Code code="whereAlphaNumeric('param')" lang="php" inline /> - Letras y números
+- <Code code="whereUuid('param')" lang="php" inline /> - UUID válido
+- <Code code="whereUlid('param')" lang="php" inline /> - ULID válido
+</Aside>
+
+### Restricciones globales
+
+Si deseas que un parámetro de ruta siga siempre un patrón específico en toda tu aplicación, puedes definir restricciones globales en el método <Code code="boot" lang="php" inline /> de <Code code="RouteServiceProvider" lang="php" inline />:
+
+<Code code={`// En app/Providers/RouteServiceProvider.php
+public function boot(): void
+{
+    Route::pattern('id', '[0-9]+'); // Todas las {id} deben ser numéricas
+    
+    // ...
+}`} lang="php" />
+
+## Rutas nombradas
+
+Las rutas nombradas te permiten generar URLs o redirecciones a rutas específicas sin tener que recordar sus URIs. Esto es útil cuando las URIs cambian, ya que solo necesitarás actualizar la definición de la ruta, no todas las referencias a ella en tu código.
+
+### Asignar nombres a las rutas
+
+Para asignar un nombre a una ruta, utiliza el método <Code code="name" lang="php" inline /> en la definición de la ruta:
+
+<Code code={`Route::get('/perfil/usuario', function () {
+    // Lógica de la ruta
+})->name('perfil.usuario');
+
+// Con controlador
+Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');`} lang="php" />
+
+<Aside type="tip">
+Es una buena práctica usar nombres de rutas con formato de espacio de nombres (por ejemplo, <Code code="admin.dashboard" lang="php" inline />) para organizar mejor tus rutas, especialmente en aplicaciones grandes.
+</Aside>
+
+### Generar URLs a partir de rutas nombradas
+
+Una vez que has asignado un nombre a una ruta, puedes generar URLs o redirecciones utilizando los helpers <Code code="route()" lang="php" inline /> o <Code code="redirect()->route()" lang="php" inline />:
+
+<Code code={`// Generar una URL
+$url = route('perfil.usuario'); // http://ejemplo.com/perfil/usuario
+
+// Con parámetros
+$url = route('usuarios.show', ['id' => 1]); // http://ejemplo.com/usuarios/1
+
+// Con parámetros y query string
+$url = route('usuarios.index', ['sort' => 'nombre', 'order' => 'asc']);
+// http://ejemplo.com/usuarios?sort=nombre&order=asc
+
+// Redireccionar a una ruta nombrada
+return redirect()->route('perfil.usuario');
+
+// Redireccionar con parámetros
+return redirect()->route('usuarios.show', ['id' => 1]);`} lang="php" />
+
+### Verificar la ruta actual
+
+Puedes verificar si la ruta actual coincide con un nombre específico utilizando el método <Code code="named()" lang="php" inline /> de la fachada <Code code="Route" lang="php" inline />:
+
+<Code code={`// Verificar si la ruta actual es 'perfil.usuario'
+if (Route::currentRouteName() === 'perfil.usuario') {
+    // Lógica específica
+}
+
+// O usando el helper named()
+if (Route::named('perfil.*')) {
+    // Coincide con cualquier ruta que comience con 'perfil.'
+}`} lang="php" />
+
+### Uso en plantillas Blade
+
+En las plantillas Blade, puedes generar URLs a rutas nombradas utilizando el helper <Code code="route()" lang="php" inline />:
+
+<Code code={`<a href="{{ route('perfil.usuario') }}">Ver perfil</a>
+
+<!-- Con parámetros -->
+<a href="{{ route('usuarios.show', ['id' => $usuario->id]) }}">Ver usuario</a>
+
+<!-- Verificar la ruta actual para marcar elementos de menú como activos -->
+<a href="{{ route('dashboard') }}" class="{{ Route::currentRouteName() === 'dashboard' ? 'active' : '' }}">
+    Dashboard
+</a>`} lang="html" />
+
+## Agrupación de rutas
+
+La agrupación de rutas te permite compartir atributos comunes, como middleware, prefijos de URL, espacios de nombres de controladores y más, entre un conjunto de rutas sin tener que definir estos atributos en cada ruta individual.
+
+### Agrupación básica
+
+Para crear un grupo de rutas, utiliza el método <Code code="Route::group()" lang="php" inline />:
+
+<Code code={`Route::group([], function () {
+    Route::get('/usuarios', function () {
+        // ...
+    });
+    
+    Route::get('/usuarios/{id}', function ($id) {
+        // ...
+    });
+});
+`} lang="php" />
+
+### Prefijos de URL
+
+El atributo <Code code="prefix" lang="php" inline /> te permite añadir un prefijo a todas las rutas dentro del grupo:
+
+<Code code={`Route::group(['prefix' => 'admin'], function () {
+    // Ruta: /admin/dashboard
+    Route::get('/dashboard', function () {
+        return 'Panel de administración';
+    });
+    
+    // Ruta: /admin/usuarios
+    Route::get('/usuarios', [AdminController::class, 'usuarios']);
+    
+    // Rutas anidadas: /admin/reportes/ventas
+    Route::prefix('reportes')->group(function () {
+        Route::get('/ventas', [ReporteController::class, 'ventas']);
+        Route::get('/usuarios', [ReporteController::class, 'usuarios']);
+    });
+});
+`} lang="php" />
+
+### Middleware
+
+El atributo <Code code="middleware" lang="php" inline /> te permite aplicar uno o varios middleware a todas las rutas del grupo:
+
+<Code code={`// Aplicar un solo middleware
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/perfil', [PerfilController::class, 'show']);
+});
+
+// Aplicar múltiples middleware
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/configuracion', [ConfiguracionController::class, 'index']);
+    Route::post('/configuracion', [ConfiguracionController::class, 'update']);
+});
+`} lang="php" />
+
+<Aside type="tip">
+También puedes usar el método <Code code="withoutMiddleware()" lang="php" inline /> para excluir middleware específicos dentro de un grupo.
+</Aside>
+
+### Espacio de nombres de controladores
+
+El atributo <Code code="namespace" lang="php" inline /> te permite especificar un espacio de nombres para los controladores dentro del grupo:
+
+<Code code={`Route::namespace('App\Http\Controllers\Admin')->group(function () {
+    // Los controladores estarán en App\Http\Controllers\Admin
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+});
+`} lang="php" />
+
+### Prefijos de nombres de rutas
+
+El atributo <Code code="name" lang="php" inline /> te permite añadir un prefijo a todos los nombres de rutas dentro del grupo:
+
+<Code code={`Route::name('admin.')->group(function () {
+    // Nombre de ruta: admin.dashboard
+    Route::get('/admin/dashboard', function () {
+        // ...
+    })->name('dashboard');
+    
+    // Nombre de ruta: admin.usuarios.index
+    Route::get('/admin/usuarios', function () {
+        // ...
+    })->name('usuarios.index');
+});
+`} lang="php" />
+
+### Agrupación por dominio
+
+Puedes agrupar rutas por dominio o subdominio utilizando el atributo <Code code="domain" lang="php" inline />:
+
+<Code code={`// Rutas para un subdominio específico
+Route::domain('admin.ejemplo.com')->group(function () {
+    Route::get('/', [AdminController::class, 'index']);
+});
+
+// Rutas con parámetros de subdominio
+Route::domain('{cuenta}.ejemplo.com')->group(function () {
+    Route::get('/', function ($cuenta) {
+        return 'Cuenta: ' . $cuenta;
+    });
+});
+`} lang="php" />
+
+### Combinación de múltiples atributos
+
+Puedes combinar múltiples atributos en un solo grupo:
+
+<Code code={`Route::prefix('api')
+    ->middleware(['api', 'auth:api'])
+    ->namespace('App\Http\Controllers\Api')
+    ->name('api.')
+    ->group(function () {
+        Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
+        Route::post('/usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
+    });
+`} lang="php" />
+
+## Redirecciones y respuestas personalizadas
+
+Laravel proporciona varias formas de devolver respuestas desde tus rutas, incluyendo redirecciones, respuestas JSON, descargas de archivos y más.
+
+### Respuestas básicas
+
+La forma más simple de devolver una respuesta es retornando una cadena de texto o un array desde una ruta o controlador:
+
+<Code code={`Route::get('/saludo', function () {
+    return 'Hola mundo'; // Respuesta de texto simple
+});
+
+Route::get('/datos', function () {
+    return ['nombre' => 'Juan', 'edad' => 30]; // Se convierte automáticamente a JSON
+});
+`} lang="php" />
+
+### Respuestas con códigos de estado HTTP
+
+Puedes especificar un código de estado HTTP personalizado utilizando el helper <Code code="response()" lang="php" inline />:
+
+<Code code={`Route::get('/no-autorizado', function () {
+    return response('No autorizado', 401);
+});
+
+Route::get('/no-encontrado', function () {
+    return response('No encontrado', 404);
+});
+`} lang="php" />
+
+### Respuestas con encabezados personalizados
+
+Puedes añadir encabezados HTTP personalizados a tus respuestas:
+
+<Code code={`Route::get('/documento', function () {
+    return response('Contenido del documento')
+        ->header('Content-Type', 'text/plain')
+        ->header('X-Header-Personalizado', 'Valor personalizado');
+});
+`} lang="php" />
+
+### Respuestas JSON
+
+Para devolver una respuesta JSON con el encabezado <Code code="Content-Type: application/json" lang="php" inline />, utiliza el método <Code code="json()" lang="php" inline />:
+
+<Code code={`Route::get('/api/usuarios', function () {
+    return response()->json([
+        'nombre' => 'Juan',
+        'apellido' => 'Pérez',
+        'email' => 'juan@ejemplo.com'
+    ]);
+});
+
+// Con código de estado personalizado
+Route::post('/api/usuarios', function () {
+    return response()->json(['mensaje' => 'Usuario creado'], 201);
+});
+`} lang="php" />
+
+### Redirecciones
+
+Para redireccionar a otra URL o ruta, utiliza el helper <Code code="redirect()" lang="php" inline />:
+
+<Code code={`// Redireccionar a una URL
+Route::get('/redirigir', function () {
+    return redirect('https://laravel.com');
+});
+
+// Redireccionar a una ruta nombrada
+Route::get('/ir-a-inicio', function () {
+    return redirect()->route('inicio');
+});
+
+// Redireccionar a una ruta con parámetros
+Route::get('/ir-a-perfil', function () {
+    return redirect()->route('usuarios.perfil', ['id' => 1]);
+});
+
+// Redireccionar a la página anterior
+Route::post('/cancelar', function () {
+    return redirect()->back();
+});
+
+// Redireccionar con datos de sesión flash
+Route::post('/guardar', function () {
+    return redirect()->route('dashboard')
+        ->with('mensaje', 'Datos guardados correctamente');
+});
+`} lang="php" />
+
+### Descargas de archivos
+
+Para generar una respuesta de descarga de archivo, utiliza el método <Code code="download()" lang="php" inline />:
+
+<Code code={`// Descargar un archivo con su nombre original
+Route::get('/descargar/archivo', function () {
+    return response()->download(storage_path('app/archivo.pdf'));
+});
+
+// Descargar con un nombre personalizado
+Route::get('/descargar/reporte', function () {
+    return response()->download(
+        storage_path('app/reportes/datos.pdf'),
+        'reporte-anual.pdf'
+    );
+});
+
+// Mostrar un archivo en el navegador en lugar de descargarlo
+Route::get('/ver/imagen', function () {
+    return response()->file(storage_path('app/public/imagen.jpg'));
+});
+`} lang="php" />
+
+### Respuestas de vista
+
+Para devolver una vista como respuesta, utiliza el helper <Code code="view()" lang="php" inline />:
+
+<Code code={`Route::get('/bienvenida', function () {
+    return view('bienvenida');
+});
+
+// Con datos para la vista
+Route::get('/perfil/{id}', function ($id) {
+    $usuario = Usuario::find($id);
+    return view('usuarios.perfil', ['usuario' => $usuario]);
+});
+
+// Con datos usando el método with()
+Route::get('/dashboard', function () {
+    return view('dashboard')
+        ->with('nombre', 'Juan')
+        ->with('rol', 'Administrador');
+});
+`} lang="php" />
+
+<Aside type="tip">
+En aplicaciones reales, es recomendable mover la lógica de las rutas a controladores para mantener tus archivos de rutas limpios y organizados.
+</Aside>
+
+## Conclusión
+
+El sistema de rutas de Laravel es flexible y potente, permitiendo organizar fácilmente cómo tu aplicación responde a las solicitudes HTTP. Utilizando las características como rutas nombradas, agrupación y parámetros, puedes crear una estructura de rutas limpia y mantenible para tu aplicación.

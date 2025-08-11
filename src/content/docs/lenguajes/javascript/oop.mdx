@@ -1,0 +1,242 @@
+---
+title: Clases y POO
+description: Aprende sobre Programación Orientada a Objetos (POO) en JavaScript usando clases, herencia, encapsulación y más.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Clases y POO <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Las clases en JavaScript proporcionan una sintaxis clara para implementar la programación orientada a objetos.
+</Aside>
+
+## Definición de clases <Badge text="Básico" variant="note" />
+
+### Sintaxis básica
+<Code code={`class Usuario {
+    constructor(nombre, email) {
+        this.nombre = nombre;
+        this.email = email;
+    }
+
+    saludar() {
+        return \`Hola, soy \${this.nombre}\`;
+    }
+}
+
+const usuario = new Usuario('Ana', 'ana@email.com');
+console.log(usuario.saludar()); // "Hola, soy Ana"`} lang="javascript" />
+
+### Propiedades privadas
+<Code code={`class CuentaBancaria {
+    #saldo = 0;  // Propiedad privada
+    
+    constructor(titular) {
+        this.titular = titular;
+    }
+    
+    depositar(cantidad) {
+        if (cantidad > 0) {
+            this.#saldo += cantidad;
+            return true;
+        }
+        return false;
+    }
+    
+    obtenerSaldo() {
+        return this.#saldo;
+    }
+}
+
+const cuenta = new CuentaBancaria('Juan');
+cuenta.depositar(100);
+console.log(cuenta.obtenerSaldo()); // 100
+// console.log(cuenta.#saldo); // Error: propiedad privada`} lang="javascript" />
+
+## Herencia <Badge text="Avanzado" variant="note" />
+
+### Extendiendo clases
+<Code code={`class Animal {
+    constructor(nombre) {
+        this.nombre = nombre;
+    }
+    
+    hablar() {
+        return 'El animal hace un sonido';
+    }
+}
+
+class Perro extends Animal {
+    constructor(nombre, raza) {
+        super(nombre);
+        this.raza = raza;
+    }
+    
+    hablar() {
+        return 'Guau guau!';
+    }
+}
+
+const perro = new Perro('Max', 'Labrador');
+console.log(perro.hablar()); // "Guau guau!"`} lang="javascript" />
+
+## Getters y Setters <Badge text="Intermedio" variant="note" />
+
+<Code code={`class Producto {
+    #precio = 0;
+    
+    constructor(nombre, precio) {
+        this.nombre = nombre;
+        this.precio = precio; // Usa el setter
+    }
+    
+    get precio() {
+        return \`$\${this.#precio}\`;
+    }
+    
+    set precio(valor) {
+        if (valor < 0) throw new Error('El precio no puede ser negativo');
+        this.#precio = valor;
+    }
+}
+
+const producto = new Producto('Laptop', 999);
+console.log(producto.precio); // "$999"
+// producto.precio = -100; // Error`} lang="javascript" />
+
+## Métodos estáticos <Badge text="Avanzado" variant="note" />
+
+<Code code={`class Calculadora {
+    static sumar(a, b) {
+        return a + b;
+    }
+    
+    static multiplicar(a, b) {
+        return a * b;
+    }
+}
+
+console.log(Calculadora.sumar(5, 3));      // 8
+console.log(Calculadora.multiplicar(4, 2)); // 8`} lang="javascript" />
+
+## Patrones de diseño <Badge text="Avanzado" variant="danger" />
+
+### Singleton
+<Code code={`class Configuracion {
+    static #instancia;
+    #config = {};
+    
+    constructor() {
+        if (Configuracion.#instancia) {
+            return Configuracion.#instancia;
+        }
+        Configuracion.#instancia = this;
+    }
+    
+    set(clave, valor) {
+        this.#config[clave] = valor;
+    }
+    
+    get(clave) {
+        return this.#config[clave];
+    }
+}
+
+const config1 = new Configuracion();
+const config2 = new Configuracion();
+console.log(config1 === config2); // true`} lang="javascript" />
+
+### Factory
+<Code code={`class ProductoFactory {
+    static crearProducto(tipo, nombre, precio) {
+        switch (tipo) {
+            case 'libro':
+                return new Libro(nombre, precio);
+            case 'electronico':
+                return new Electronico(nombre, precio);
+            default:
+                throw new Error('Tipo de producto no válido');
+        }
+    }
+}
+
+class Libro {
+    constructor(nombre, precio) {
+        this.nombre = nombre;
+        this.precio = precio;
+        this.tipo = 'libro';
+    }
+}
+
+class Electronico {
+    constructor(nombre, precio) {
+        this.nombre = nombre;
+        this.precio = precio;
+        this.tipo = 'electronico';
+    }
+}
+
+const libro = ProductoFactory.crearProducto('libro', 'JavaScript Avanzado', 29.99);
+console.log(libro.tipo); // "libro"`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+### Encapsulación
+<Code code={`// ✅ Bueno
+class Usuario {
+    #password;
+    
+    constructor(username, password) {
+        this.username = username;
+        this.#password = this.#hashPassword(password);
+    }
+    
+    #hashPassword(password) {
+        // Método privado para hash
+        return password.split('').reverse().join('');
+    }
+    
+    verificarPassword(password) {
+        return this.#password === this.#hashPassword(password);
+    }
+}`} lang="javascript" />
+
+### Composición sobre herencia
+<Code code={`// ❌ Malo: Herencia profunda
+class Animal extends SerVivo extends Organismo { }
+
+// ✅ Bueno: Composición
+class Animal {
+    constructor() {
+        this.serVivo = new SerVivo();
+        this.organismo = new Organismo();
+    }
+}`} lang="javascript" />
+
+### Principio de responsabilidad única
+<Code code={`// ❌ Malo
+class Usuario {
+    guardarEnDB() { }
+    enviarEmail() { }
+    generarReporte() { }
+}
+
+// ✅ Bueno
+class Usuario {
+    obtenerDatos() { }
+}
+
+class UsuarioRepositorio {
+    guardar(usuario) { }
+}
+
+class EmailService {
+    enviar(usuario, mensaje) { }
+}
+
+class ReporteService {
+    generar(usuario) { }
+}`} lang="javascript" />

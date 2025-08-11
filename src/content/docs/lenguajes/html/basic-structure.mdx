@@ -1,0 +1,207 @@
+---
+title: Estructura básica
+description: Estructura fundamental de un documento HTML.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Estructura básica de HTML
+
+## Estructura fundamental <Badge text="Importante" variant="danger" />
+
+<Aside type="caution">
+  Todo documento HTML debe seguir esta estructura básica para ser válido y funcionar correctamente en los navegadores.
+</Aside>
+
+Todo documento HTML debe incluir las siguientes etiquetas:
+
+<Code code={`<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Título de la página</title>
+</head>
+<body>
+    <!-- Contenido de la página -->
+</body>
+</html>`} lang="html" title="Estructura básica de un documento HTML" />
+
+## Elementos en bloque vs. elementos en línea <Badge text="Conceptos clave" variant="success" />
+
+<Aside>
+  Entender la diferencia entre elementos en bloque y en línea es fundamental para el diseño y estructura de páginas web.
+</Aside>
+
+Los elementos HTML se clasifican principalmente en dos tipos según su comportamiento de visualización:
+
+### Elementos en bloque
+
+Ocupan todo el ancho disponible y crean una nueva línea antes y después del elemento.
+
+- Ejemplos: `<div>`, `<p>`, `<h1>`, `<section>`, `<article>`, `<ul>`, `<li>`
+
+### Elementos en línea
+
+Ocupan solo el espacio necesario y no crean nuevas líneas.
+
+- Ejemplos: `<span>`, `<a>`, `<strong>`, `<em>`, `<img>`, `<code>`
+
+## Etiquetas semánticas <Badge text="HTML5" variant="note" />
+
+<Aside type="tip">
+  Las etiquetas semánticas mejoran significativamente la accesibilidad y el SEO de tu sitio web.
+</Aside>
+
+Las etiquetas semánticas proporcionan significado a la estructura de la página:
+
+### header
+
+Define la cabecera de la página o de una sección. Generalmente contiene el logotipo, título principal y navegación.
+
+<Code code={`<header>
+    <h1>Título del sitio</h1>
+    <nav>
+        <!-- Menú de navegación -->
+    </nav>
+</header>`} lang="html" />
+
+### body
+
+Define el contenido principal de la página. Generalmente contiene el contenido visible de la página.
+
+<Code code={`<body>
+    <!-- Contenido de la página -->
+</body>`} lang="html" />
+
+### nav
+
+Contiene los enlaces de navegación principales del sitio. Generalmente se encuentra en la cabecera.
+
+<Code code={`<nav>
+    <ul>
+        <li><a href="/">Inicio</a></li>
+        <li><a href="/servicios">Servicios</a></li>
+        <li><a href="/contacto">Contacto</a></li>
+    </ul>
+</nav>`} lang="html" />
+
+### main
+
+Contiene el contenido principal de la página. Debe ser único en el documento.
+
+<Code code={`<main>
+    <h2>Título de la sección principal</h2>
+    <p>Contenido principal de la página...</p>
+</main>`} lang="html" />
+
+### section
+
+Representa una sección genérica de contenido que normalmente incluye un encabezado.
+
+<Code code={`<section>
+    <h2>Nuestros servicios</h2>
+    <p>Descripción de los servicios ofrecidos...</p>
+</section>`} lang="html" />
+
+### article
+
+Representa un contenido independiente y autocontenido que podría distribuirse por separado.
+
+<Code code={`<article>
+    <h2>Título del artículo</h2>
+    <p>Contenido del artículo...</p>
+    <footer>
+        <p>Autor: Nombre del autor</p>
+    </footer>
+</article>`} lang="html" />
+
+### aside
+
+Contenido relacionado indirectamente con el contenido principal, como barras laterales.
+
+<Code code={`<aside>
+    <h3>Artículos relacionados</h3>
+    <ul>
+        <li><a href="#">Artículo 1</a></li>
+        <li><a href="#">Artículo 2</a></li>
+    </ul>
+</aside>`} lang="html" />
+
+### footer
+
+Pie de página del documento o sección. Contiene información como derechos de autor, enlaces a políticas, etc.
+
+<Code code={`<footer>
+    <p>&copy; 2025 Mi Sitio Web. Todos los derechos reservados.</p>
+    <nav>
+        <a href="/privacidad">Política de privacidad</a>
+        <a href="/terminos">Términos de uso</a>
+    </nav>
+</footer>`} lang="html" />
+
+## Encabezados: h1 a h6 <Badge text="Estructura" variant="success" />
+
+<Aside>
+  Los encabezados son fundamentales para la estructura del documento y el SEO. Los motores de búsqueda utilizan los encabezados para entender la jerarquía del contenido.
+</Aside>
+
+Los encabezados definen la jerarquía y estructura del contenido:
+
+<Code code={`<h1>Título principal</h1>
+<h2>Subtítulo</h2>
+<h3>Título de tercer nivel</h3>
+<h4>Título de cuarto nivel</h4>
+<h5>Título de quinto nivel</h5>
+<h6>Título de sexto nivel</h6>`} lang="html" />
+
+**Buenas prácticas:**
+- Usar solo un `<h1>` por página
+- Mantener una jerarquía lógica (no saltar niveles)
+- Los encabezados deben reflejar la estructura del contenido
+
+## Párrafos: p
+
+Definen bloques de texto:
+
+<Code code={`<p>Este es un párrafo de texto. Los párrafos son elementos en bloque que separan contenido textual.</p>
+<p>Este es otro párrafo separado del anterior.</p>`} lang="html" />
+
+## Agrupadores: div y span <Badge text="Contenedores" variant="note" /> <Badge text="🐛" variant="success" />
+
+<Aside type="note">
+  Los agrupadores son útiles para organizar y estilizar el contenido, pero siempre es preferible usar etiquetas semánticas cuando sea posible.
+</Aside>
+
+### div
+
+Contenedor genérico en bloque sin significado semántico específico:
+
+<Code code={`<div class="contenedor">
+    <p>Contenido dentro de un div</p>
+    <p>Más contenido...</p>
+</div>`} lang="html" />
+
+### span
+
+Contenedor genérico en línea sin significado semántico específico:
+
+<Code code={`<p>Este es un texto con <span class="destacado">palabras destacadas</span> dentro del párrafo.</p>`} lang="html" />
+
+## Separadores y espacios
+
+### br
+
+Inserta un salto de línea:
+
+<Code code={`<p>Primera línea<br>Segunda línea</p>`} lang="html" />
+
+### hr
+
+Inserta una línea horizontal separadora:
+
+<Code code={`<p>Texto antes del separador</p>
+<hr>
+<p>Texto después del separador</p>`} lang="html" />

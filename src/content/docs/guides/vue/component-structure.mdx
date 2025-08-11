@@ -1,0 +1,435 @@
+---
+title: 02. Estructura del Componente
+description: Template, script setup, style, tipado con lang="ts" e importación y uso de componentes
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Estructura de un Componente Vue 3
+
+Un componente Vue 3 está compuesto por tres secciones principales: `<template>`, `<script>` y `<style>`. Con Vue 3 y la Composition API, la estructura interna del bloque `<script>` cambia significativamente, especialmente con la introducción de `<script setup>`.
+
+<Aside type="tip">
+Los archivos de componente Vue tienen la extensión `.vue` y se conocen como Single-File Components (SFC).
+</Aside>
+
+### Estructura básica
+
+<Code code={`<template>
+  <!-- Estructura HTML del componente -->
+  <div class="greeting">
+    <h1>{{ message }}</h1>
+    <button @click="increment">Contador: {{ count }}</button>
+  </div>
+</template>
+
+<script>
+  // Lógica del componente
+</script>
+
+<style>
+  /* Estilos del componente */
+  .greeting {
+    color: #2c3e50;
+  }
+</style>`} lang="vue" title="Estructura básica de un componente Vue" />
+
+### Ejemplo completo: Contador sin estilos
+
+<Aside type="tip">
+A continuación se muestra un ejemplo completo y funcional de un contador en Vue, implementado sin estilos para enfocarse en la estructura y funcionalidad del componente.
+</Aside>
+
+<Code code={`<template>
+  <div>
+    <h2>Contador Simple</h2>
+    <p>Valor actual: {{ count }}</p>
+    <button @click="increment">Incrementar</button>
+    <button @click="decrement">Decrementar</button>
+    <button @click="reset">Reiniciar</button>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+// Estado reactivo del contador
+const count = ref(0)
+
+// Métodos para manipular el contador
+function increment() {
+  count.value++
+}
+
+function decrement() {
+  count.value--
+}
+
+function reset() {
+  count.value = 0
+}
+</script>
+`} lang="vue" title="Contador completo sin estilos" />
+
+<Aside type="note">
+Este contador demuestra los conceptos básicos de Vue:
+- Estado reactivo con `ref`
+- Interpolación de variables en el template con `{{ }}`
+- Manejo de eventos con `@click`
+- Funciones para actualizar el estado
+</Aside>
+
+## Template
+
+El bloque `<template>` contiene la estructura HTML del componente. Vue utiliza una sintaxis de plantilla basada en HTML con algunas características especiales:
+
+### Interpolación de texto
+
+```vue
+<template>
+  <p>{{ message }}</p>
+  <p>{{ formatDate(date) }}</p>
+</template>
+```
+
+### Directivas
+
+Las directivas son atributos especiales con el prefijo `v-`:
+
+```vue
+<template>
+  <div v-if="isVisible">Contenido condicional</div>
+  <ul>
+    <li v-for="item in items" :key="item.id">{{ item.name }}</li>
+  </ul>
+  <button v-on:click="handleClick">Click me</button>
+  <input v-model="username" placeholder="Username" />
+</template>
+```
+
+### Binding de atributos
+
+```vue
+<template>
+  <img :src="imageUrl" :alt="imageDescription">
+  <div :class="{ active: isActive }" :style="{ color: textColor }"></div>
+</template>
+```
+
+### Slots
+
+```vue
+<template>
+  <slot name="header"></slot>
+  <slot></slot> <!-- slot por defecto -->
+  <slot name="footer"></slot>
+</template>
+```
+
+## Script Setup
+
+Vue 3 introduce `<script setup>`, una azucar sintáctica para usar Composition API con menos código repetitivo. Todo lo declarado dentro de `<script setup>` está disponible automáticamente en el template.
+
+<Tabs>
+  <TabItem label="Script Setup">
+    ```vue
+    <script setup>
+    import { ref, computed, onMounted } from 'vue'
+    
+    // Variables reactivas
+    const count = ref(0)
+    const message = ref('Hola Vue 3')
+    
+    // Propiedades computadas
+    const doubleCount = computed(() => count.value * 2)
+    
+    // Métodos
+    function increment() {
+      count.value++
+    }
+    
+    // Hooks de ciclo de vida
+    onMounted(() => {
+      console.log('Componente montado')
+    })
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Script Normal">
+    ```vue
+    <script>
+    import { ref, computed, onMounted } from 'vue'
+    
+    export default {
+      setup() {
+        // Variables reactivas
+        const count = ref(0)
+        const message = ref('Hola Vue 3')
+        
+        // Propiedades computadas
+        const doubleCount = computed(() => count.value * 2)
+        
+        // Métodos
+        function increment() {
+          count.value++
+        }
+        
+        // Hooks de ciclo de vida
+        onMounted(() => {
+          console.log('Componente montado')
+        })
+        
+        // Exponer al template
+        return {
+          count,
+          message,
+          doubleCount,
+          increment
+        }
+      }
+    }
+    </script>
+    ```
+  </TabItem>
+</Tabs>
+
+### Ventajas de `<script setup>`
+
+- **Menos código repetitivo**: No es necesario devolver explícitamente las variables y funciones
+- **Mejor rendimiento**: La compilación es más eficiente
+- **Mejor inferencia de tipos**: Mejor soporte para TypeScript
+- **Más legible**: Estructura más clara y directa
+
+### Macros de compilación
+
+En `<script setup>` se utilizan macros especiales para definir props, emits, etc.:
+
+<Code code={`<script setup>
+// Props
+const props = defineProps({
+  title: String,
+  likes: { type: Number, default: 0 }
+})
+
+// Eventos
+const emit = defineEmits(['update', 'delete'])
+
+// Exponer propiedades/métodos al componente padre
+defineExpose({
+  submit() {
+    // ...
+  }
+})
+</script>`} lang="vue" title="Macros en script setup" />
+
+## Style
+
+El bloque `<style>` contiene los estilos CSS del componente. Vue permite estilos encapsulados con el atributo `scoped`.
+
+<Tabs>
+  <TabItem label="Estilos básicos">
+    ```vue
+    <style>
+    /* Estilos globales */
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    </style>
+    ```
+  </TabItem>
+  <TabItem label="Estilos con scope">
+    ```vue
+    <style scoped>
+    /* Estilos encapsulados al componente */
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    </style>
+    ```
+  </TabItem>
+  <TabItem label="CSS con preprocesadores">
+    ```vue
+    <style lang="scss" scoped>
+    $primary-color: #4CAF50;
+    
+    .button {
+      background-color: $primary-color;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: darken($primary-color, 10%);
+      }
+    }
+    </style>
+    ```
+  </TabItem>
+</Tabs>
+
+### CSS Modules
+
+Vue también soporta CSS Modules:
+
+```vue
+<template>
+  <button :class="$style.button">Click me</button>
+</template>
+
+<style module>
+.button {
+  background-color: #4CAF50;
+  color: white;
+}
+</style>
+```
+
+## Tipado con lang="ts"
+
+Vue 3 ofrece excelente soporte para TypeScript. Para usar TypeScript en un componente, se agrega el atributo `lang="ts"` al bloque `<script>`.
+
+<Code code={`<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+// Interfaces y tipos
+interface User {
+  id: number
+  name: string
+  email: string
+  active: boolean
+}
+
+// Variables tipadas
+const count = ref<number>(0)
+const user = ref<User>({
+  id: 1,
+  name: 'John Doe',
+  email: 'john@example.com',
+  active: true
+})
+
+// Props tipadas
+const props = defineProps<{
+  title: string
+  items: Array<{ id: number, text: string }>
+  callback?: (id: number) => void
+}>()
+
+// Emits tipados
+const emit = defineEmits<{
+  (e: 'update', id: number, value: string): void
+  (e: 'select', item: { id: number, text: string }): void
+}>()
+
+// Funciones tipadas
+function processUser(user: User): boolean {
+  return user.active
+}
+</script>`} lang="vue" title="Vue con TypeScript" />
+
+### Definición de props con valores por defecto
+
+En TypeScript, se puede usar `withDefaults` para definir valores por defecto para props tipadas:
+
+```ts
+interface Props {
+  title?: string
+  count?: number
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  title: 'Untitled',
+  count: 0
+})
+```
+
+## Importación y uso de componentes
+
+En Vue 3 con `<script setup>`, los componentes importados se registran automáticamente.
+
+<Code code={`<script setup>
+// Importación de componentes
+import BaseButton from './BaseButton.vue'
+import BaseInput from './BaseInput.vue'
+import { SearchBox, FilterMenu } from './SearchComponents'
+
+// Los componentes importados están disponibles automáticamente en el template
+</script>
+
+<template>
+  <div>
+    <BaseInput v-model="searchQuery" />
+    <BaseButton @click="search">Buscar</BaseButton>
+    
+    <SearchBox />
+    <FilterMenu :options="filterOptions" />
+  </div>
+</template>`} lang="vue" title="Importación y uso de componentes" />
+
+### Importación dinámica (Lazy Loading)
+
+Para componentes grandes o que no son necesarios inmediatamente, se puede usar importación dinámica:
+
+```vue
+<script setup>
+import { defineAsyncComponent } from 'vue'
+
+const HeavyComponent = defineAsyncComponent(() => 
+  import('./HeavyComponent.vue')
+)
+</script>
+
+<template>
+  <HeavyComponent v-if="showHeavyComponent" />
+</template>
+```
+
+### Componentes globales vs. locales
+
+<Tabs>
+  <TabItem label="Registro global">
+    ```js
+    // main.js
+    import { createApp } from 'vue'
+    import App from './App.vue'
+    import BaseButton from './components/BaseButton.vue'
+    import BaseInput from './components/BaseInput.vue'
+    
+    const app = createApp(App)
+    
+    // Registro global (disponible en toda la aplicación)
+    app.component('BaseButton', BaseButton)
+    app.component('BaseInput', BaseInput)
+    
+    app.mount('#app')
+    ```
+  </TabItem>
+  <TabItem label="Registro local (recomendado)">
+    ```vue
+    <script setup>
+    // Registro local (solo disponible en este componente)
+    import BaseButton from './components/BaseButton.vue'
+    import BaseInput from './components/BaseInput.vue'
+    </script>
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+El registro local de componentes es generalmente preferible al registro global, ya que permite un mejor tree-shaking y hace que las dependencias sean más explícitas.
+</Aside>

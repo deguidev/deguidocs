@@ -1,0 +1,158 @@
+---
+title: Sintaxis básica y directivas
+description: Aprende la sintaxis básica y las directivas principales de Alpine.js.
+---
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+
+# Sintaxis básica y directivas
+
+Alpine.js utiliza atributos personalizados (directivas) en el HTML, como `x-data`, `x-bind`, `x-on`, etc., para añadir reactividad y lógica.
+
+## Principales directivas de Alpine.js
+
+<Aside type="note">
+Las directivas de Alpine.js siempre comienzan con el prefijo <code>x-</code> y permiten agregar reactividad y lógica directamente en el HTML.
+</Aside>
+
+### 1. <code>x-data</code>
+Define el estado local del componente. Es el punto de entrada para Alpine.js.
+<Code code={`<div x-data="{ count: 0 }">
+  <span x-text="count"></span>
+</div>`} lang="html" title="Ejemplo x-data" />
+
+### 2. <code>x-init</code>
+Ejecuta código cuando el componente se inicializa.
+<Code code={`<div x-data x-init="console.log('Componente listo')">
+  ...
+</div>`} lang="html" title="Ejemplo x-init" />
+
+### 3. <code>x-bind</code>
+Enlaza atributos HTML a datos de Alpine.
+<Code code={`<button x-data="{ disabled: true }" :disabled="disabled">Botón</button>`} lang="html" title="Ejemplo x-bind" />
+
+### 4. <code>x-on</code>
+Escucha y responde a eventos del DOM. Se puede usar la sintaxis abreviada <code>@</code>.
+<Code code={`<button x-on:click="alert('¡Hola!')">Haz clic</button>
+<!-- o -->
+<button @click="alert('¡Hola!')">Haz clic</button>`} lang="html" title="Ejemplo x-on" />
+
+### 5. <code>x-show</code>
+Muestra u oculta elementos condicionalmente (usa <code>display: none</code>).
+<Code code={`<div x-data="{ visible: true }">
+  <p x-show="visible">Visible si 'visible' es true</p>
+</div>`} lang="html" title="Ejemplo x-show" />
+
+### 6. <code>x-if</code>
+Renderiza elementos condicionalmente (elimina/agrega del DOM).
+<Code code={`<template x-if="loggedIn">
+  <span>Bienvenido</span>
+</template>`} lang="html" title="Ejemplo x-if" />
+
+### 7. <code>x-model</code>
+Enlaza datos bidireccionalmente con inputs.
+<Code code={`<input x-data="{ nombre: '' }" x-model="nombre" placeholder="Tu nombre" />`} lang="html" title="Ejemplo x-model" />
+
+### 8. <code>x-for</code>
+Renderiza listas de elementos.
+<Code code={`<ul x-data="{ items: ['A', 'B', 'C'] }">
+  <template x-for="item in items" :key="item">
+    <li x-text="item"></li>
+  </template>
+</ul>`} lang="html" title="Ejemplo x-for" />
+
+## Otras directivas útiles de Alpine.js
+
+### 9. <code>x-html</code>
+Permite renderizar HTML dinámico de forma segura (¡cuidado con XSS!).
+<Code code={`<div x-data="{ contenido: '<b>Texto en negrita</b>' }">
+  <div x-html="contenido"></div>
+</div>`} lang="html" title="Ejemplo x-html" />
+
+### 10. <code>x-text</code>
+Establece el texto de un elemento de forma reactiva.
+<Code code={`<div x-data="{ mensaje: 'Hola mundo' }">
+  <span x-text="mensaje"></span>
+</div>`} lang="html" title="Ejemplo x-text" />
+
+### 11. <code>x-cloak</code>
+Oculta el elemento hasta que Alpine.js haya inicializado el DOM.
+<Code code={`<div x-data x-cloak>
+  <p>Este contenido se muestra solo cuando Alpine está listo.</p>
+</div>
+<style>
+  [x-cloak] { display: none; }
+</style>`} lang="html" title="Ejemplo x-cloak" />
+
+### 12. <code>x-teleport</code>
+Mueve el contenido a otro lugar del DOM (útil para modales, tooltips, etc.).
+<Code code={`<div x-data="{ abierto: false }">
+  <button @click="abierto = true">Abrir modal</button>
+  <div x-teleport="#modales" x-show="abierto">
+    <p>¡Soy un modal!</p>
+    <button @click="abierto = false">Cerrar</button>
+  </div>
+</div>
+<div id="modales"></div>`} lang="html" title="Ejemplo x-teleport" />
+
+### 13. <code>x-id</code>
+Genera identificadores únicos para elementos.
+<Code code={`<div x-data="{ id: $id('input') }">
+  <label :for="id">Nombre</label>
+  <input :id="id" type="text" />
+</div>`} lang="html" title="Ejemplo x-id" />
+
+### 14. <code>x-ignore</code>
+Evita que Alpine.js procese un elemento y sus hijos.
+<Code code={`<div x-ignore>
+  <script>/* Este bloque no será procesado por Alpine */</script>
+</div>`} lang="html" title="Ejemplo x-ignore" />
+
+### 15. <code>x-effect</code>
+Ejecuta una expresión cada vez que cambian las dependencias reactivas usadas dentro de ella.
+<Code code={`<div x-data="{ count: 0 }">
+  <button @click="count++">Incrementar</button>
+  <span x-effect="console.log(count)"></span>
+</div>`} lang="html" title="Ejemplo x-effect" />
+
+### 16. <code>x-ref</code> y <code>$refs</code>
+Permite referenciar elementos del DOM para manipularlos desde el código Alpine.
+<Code code={`<div x-data="{ enfocar() { this.$refs.input.focus() } }">
+  <input x-ref="input" type="text" />
+  <button @click="enfocar()">Foco</button>
+</div>`} lang="html" title="Ejemplo x-ref y $refs" />
+
+### 17. <code>x-transition</code>
+Agrega animaciones de entrada y salida a los elementos.
+<Code code={`<div x-data="{ visible: false }">
+  <button @click="visible = !visible">Mostrar/Ocultar</button>
+  <div x-show="visible" x-transition>
+    <p>Animación de transición</p>
+  </div>
+</div>`} lang="html" title="Ejemplo x-transition" />
+
+### 18. <code>x-intersect</code> (plugin)
+Detecta cuando un elemento entra o sale del viewport.
+<Code code={`<div x-data x-intersect:enter="console.log('Entró al viewport')">
+  Observa la consola al hacer scroll
+</div>`} lang="html" title="Ejemplo x-intersect" />
+
+### 19. <code>x-collapse</code> (plugin)
+Agrega animaciones de colapso/expansión.
+<Code code={`<div x-data="{ abierto: false }">
+  <button @click="abierto = !abierto">Toggle</button>
+  <div x-show="abierto" x-collapse>
+    Contenido colapsable animado
+  </div>
+</div>`} lang="html" title="Ejemplo x-collapse" />
+
+### 20. <code>x-mask</code> (plugin)
+Permite aplicar máscaras de entrada a los campos de formulario.
+<Code code={`<input x-data x-mask="99/99/9999" placeholder="DD/MM/AAAA" />`} lang="html" title="Ejemplo x-mask" />
+
+<Aside type="tip">
+Consulta la <a href="https://alpinejs.dev/directives/overview" target="_blank">documentación oficial</a> para ver la lista completa y actualizada de directivas y plugins.
+</Aside>

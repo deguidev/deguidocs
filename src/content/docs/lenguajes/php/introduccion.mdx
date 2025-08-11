@@ -1,0 +1,136 @@
+---
+title: 1. Introducción a PHP
+description: Conoce qué es PHP, su historia, instalación y cómo crear tu primer script
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## ¿Qué es PHP?
+
+PHP (acrónimo recursivo de "PHP: Hypertext Preprocessor") es un lenguaje de programación interpretado de código abierto, especialmente adecuado para el desarrollo web y que puede ser incrustado en HTML.
+
+<Aside type="tip">
+  PHP es uno de los lenguajes de programación más populares para el desarrollo web del lado del servidor, impulsando aproximadamente el 77% de todos los sitios web cuyo lenguaje de servidor es conocido.
+</Aside>
+
+### Características principales
+
+- **Lenguaje del lado del servidor**: El código PHP se ejecuta en el servidor, generando HTML que luego se envía al cliente.
+- **Sintaxis sencilla**: Fácil de aprender, especialmente para personas con experiencia en C, Java o JavaScript.
+- **Multiplataforma**: Funciona en diferentes sistemas operativos (Windows, Linux, macOS, etc.).
+- **Soporte para bases de datos**: Compatible con la mayoría de bases de datos populares.
+- **Gratuito y de código abierto**: Disponible sin costo y con una gran comunidad de desarrolladores.
+- **Amplia documentación**: Extensa documentación oficial y recursos de aprendizaje.
+
+## Historia y versiones
+
+PHP ha evolucionado significativamente desde su creación:
+
+<Tabs>
+  <TabItem label="Orígenes">
+    PHP fue creado originalmente por Rasmus Lerdorf en 1994 como un conjunto simple de scripts en Perl para rastrear visitas a su currículum en línea, llamándolo "Personal Home Page Tools".
+  </TabItem>
+  <TabItem label="PHP 3">
+    En 1997, Zeev Suraski y Andi Gutmans reescribieron el analizador, creando PHP 3.0, la primera versión que se asemeja al PHP que conocemos hoy.
+  </TabItem>
+  <TabItem label="PHP 4 y 5">
+    PHP 4 (2000) introdujo el motor Zend Engine.
+    PHP 5 (2004) añadió soporte mejorado para la programación orientada a objetos, PDO para acceso a bases de datos, y muchas mejoras de rendimiento.
+  </TabItem>
+  <TabItem label="PHP 7 y 8">
+    PHP 7 (2015) trajo mejoras significativas de rendimiento y nuevas características como tipos de retorno, operador de nave espacial, y más.
+    PHP 8 (2020) introdujo JIT (compilación Just-In-Time), tipos de unión, atributos, y otras características modernas.
+  </TabItem>
+</Tabs>
+
+## Instalación (XAMPP, Laragon)
+
+Para desarrollar con PHP, necesitas un entorno que incluya PHP, un servidor web y generalmente una base de datos. Las opciones más populares son:
+
+### XAMPP
+
+XAMPP es una distribución de Apache que incluye PHP, MySQL y Perl. Es fácil de instalar y está disponible para Windows, Linux y macOS.
+
+<Code code={`# Pasos para instalar XAMPP
+1. Descarga XAMPP desde https://www.apachefriends.org/
+2. Ejecuta el instalador y sigue las instrucciones
+3. Inicia el panel de control de XAMPP y activa los módulos Apache y MySQL
+4. Accede a http://localhost para verificar la instalación`} lang="bash" />
+
+### Laragon
+
+Laragon es un entorno de desarrollo universal para PHP, Node.js, Python, Java, Go, Ruby. Es especialmente popular entre los desarrolladores de Laravel.
+
+<Code code={`# Pasos para instalar Laragon (versión gratuita 6.0.0)
+1. Descarga Laragon desde https://github.com/leokhoa/laragon/releases/download/6.0.0/laragon-wamp.exe
+2. Ejecuta el instalador
+3. Inicia Laragon y haz clic en "Start All"
+4. Accede a http://localhost para verificar la instalación`} lang="bash" />
+
+<Aside type="note">
+  Laragon ofrece una experiencia más moderna y flexible que XAMPP, con características como cambio rápido entre versiones de PHP, creación automática de hosts virtuales, y una interfaz más intuitiva. La versión 6.0.0 es completamente gratuita, mientras que versiones más recientes pueden tener funciones de pago.
+</Aside>
+
+## Primer script en PHP
+
+Crear tu primer script en PHP es muy sencillo:
+
+1. Crea un archivo llamado `hola.php` en la carpeta `htdocs` (XAMPP) o `www` (Laragon)
+2. Añade el siguiente código:
+
+<Code code={`<?php
+    // Mi primer script en PHP
+    echo "<h1>¡Hola, mundo!</h1>";
+    echo "<p>La fecha actual es: " . date('Y-m-d H:i:s') . "</p>";
+?>`} lang="php" />
+
+3. Accede a `http://localhost/hola.php` en tu navegador para ver el resultado
+
+### Estructura básica de un script PHP
+
+<Code code={`<?php
+    // Código PHP aquí
+    
+    // Variables
+    $nombre = "Usuario";
+    $edad = 25;
+    
+    // Salida
+    echo "Hola, $nombre. Tienes $edad años.";
+    
+    // Condicionales
+    if ($edad >= 18) {
+        echo " Eres mayor de edad.";
+    } else {
+        echo " Eres menor de edad.";
+    }
+?>`} lang="php" />
+
+<Aside type="tip">
+  PHP se puede mezclar con HTML, lo que lo hace muy flexible para el desarrollo web:
+  
+  ```php
+  <!DOCTYPE html>
+  <html>
+  <head>
+      <title>Mi página PHP</title>
+  </head>
+  <body>
+      <h1>Bienvenido</h1>
+      <?php
+          echo "<p>Hoy es " . date('l, d \de F \de Y') . "</p>";
+      ?>
+  </body>
+  </html>
+  ```
+</Aside>
+
+## Recursos adicionales
+
+- [Documentación oficial de PHP](https://www.php.net/docs.php)
+- [PHP: The Right Way](https://phptherightway.com/)
+- [Laracasts - PHP para principiantes](https://laracasts.com/series/php-for-beginners)

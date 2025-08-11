@@ -1,0 +1,157 @@
+---
+title: 🧭 01. Introducción a Ziggy.js
+description: Aprende qué es Ziggy.js y sus ventajas en Laravel
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## ¿Qué es Ziggy y para qué sirve?
+
+Ziggy es una biblioteca de JavaScript que permite utilizar las rutas con nombre de Laravel directamente en tu código JavaScript o Vue. Desarrollada por [Tighten](https://tighten.co/), Ziggy resuelve uno de los problemas más comunes en el desarrollo web moderno: mantener sincronizadas las rutas entre el backend (Laravel) y el frontend (JavaScript).
+
+<Aside type="tip">
+  Ziggy exporta tus rutas de Laravel a JavaScript, permitiendo generar URLs usando los mismos nombres de rutas que usas en PHP.
+</Aside>
+
+En esencia, Ziggy hace tres cosas fundamentales:
+
+1. **Exporta tus rutas de Laravel a JavaScript**: Toma todas las rutas definidas en tu aplicación Laravel y las hace disponibles en el frontend.
+
+2. **Proporciona una función `route()`**: Similar a la función helper `route()` de Laravel en PHP, pero disponible en JavaScript.
+
+3. **Mantiene la consistencia**: Asegura que los cambios en las rutas del backend se reflejen automáticamente en el frontend.
+
+<Code code={`// En PHP (Laravel)
+$url = route('users.show', ['user' => 1]);
+
+// En JavaScript (con Ziggy)
+const url = route('users.show', { user: 1 });`} lang="js" title="Comparación de uso entre PHP y JavaScript" />
+
+## Ventajas de usar Ziggy con Laravel y Vue
+
+Utilizar Ziggy en proyectos que combinan Laravel con Vue ofrece numerosas ventajas:
+
+### 1. Mantenimiento simplificado
+
+- **Fuente única de verdad**: Las rutas se definen una sola vez en Laravel y se utilizan en toda la aplicación.
+- **Actualizaciones automáticas**: Cambiar una ruta en Laravel actualiza automáticamente todas las referencias en JavaScript.
+
+### 2. Mejora en la productividad
+
+- **Autocompletado**: Los editores modernos pueden proporcionar sugerencias de nombres de rutas.
+- **Menos código repetitivo**: No es necesario duplicar la lógica de generación de URLs.
+- **Menos errores**: Reduce los errores tipográficos en URLs hardcodeadas.
+
+### 3. Integración perfecta con Vue
+
+- **Componentes Vue**: Fácil integración con componentes de Vue para navegación.
+- **Composition API**: Funciona perfectamente con la nueva Composition API de Vue 3.
+- **Reactividad**: Las rutas pueden ser parte del sistema reactivo de Vue.
+
+<Code code={`<script setup>
+import { ref } from 'vue';
+import route from 'ziggy-js';
+
+const userId = ref(1);
+const profileUrl = computed(() => route('users.profile', { id: userId.value }));
+</script>
+
+<template>
+  <a :href="profileUrl">Ver perfil</a>
+</template>`} lang="vue" title="Ejemplo de uso con Vue 3 Composition API" />
+
+### 4. Seguridad mejorada
+
+- **Validación de parámetros**: Ziggy valida los parámetros requeridos para cada ruta.
+- **Protección contra CSRF**: Se integra con la protección CSRF de Laravel.
+
+## Comparación con otras soluciones
+
+<Tabs>
+  <TabItem label="Ziggy vs. URLs hardcodeadas">
+    ### Ziggy vs. URLs hardcodeadas
+    
+    **URLs hardcodeadas:**
+    ```js
+    // URLs hardcodeadas
+    axios.get('/api/users/1');
+    // Si la ruta cambia a '/api/v2/users/1', hay que actualizar cada referencia
+    ```
+    
+    **Con Ziggy:**
+    ```js
+    // Con Ziggy
+    axios.get(route('api.users.show', { user: 1 }));
+    // Si la ruta cambia, no hay que modificar el código JavaScript
+    ```
+    
+    **Ventajas de Ziggy:**
+    - No hay que actualizar manualmente las URLs en el frontend cuando cambian en el backend
+    - Menos propenso a errores tipográficos
+    - Más legible y mantenible
+  </TabItem>
+  
+  <TabItem label="Ziggy vs. API manual">
+    ### Ziggy vs. API manual de rutas
+    
+    **API manual:**
+    ```js
+    // Archivo routes.js manual
+    export const routes = {
+      users: {
+        index: '/users',
+        show: (id) => `/users/${id}`,
+        create: '/users/create'
+      }
+    };
+    
+    // Uso
+    import { routes } from './routes';
+    axios.get(routes.users.show(1));
+    ```
+    
+    **Con Ziggy:**
+    ```js
+    // Con Ziggy
+    axios.get(route('users.show', { id: 1 }));
+    ```
+    
+    **Ventajas de Ziggy:**
+    - No requiere mantenimiento manual del archivo de rutas
+    - Sincronización automática con el backend
+    - Validación de parámetros incluida
+  </TabItem>
+  
+  <TabItem label="Ziggy vs. Axios sin rutas">
+    ### Ziggy vs. Axios sin sistema de rutas
+    
+    **Axios sin sistema de rutas:**
+    ```js
+    // Axios sin sistema de rutas
+    axios.get('/api/users');
+    axios.post('/api/users', userData);
+    axios.put(`/api/users/${userId}`, userData);
+    ```
+    
+    **Con Ziggy:**
+    ```js
+    // Con Ziggy
+    axios.get(route('api.users.index'));
+    axios.post(route('api.users.store'), userData);
+    axios.put(route('api.users.update', { user: userId }), userData);
+    ```
+    
+    **Ventajas de Ziggy:**
+    - Nombres semánticos para las rutas
+    - Consistencia con el backend
+    - Mejor documentación implícita (los nombres de rutas describen su propósito)
+    - Soporte para parámetros de ruta complejos
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  <p>Ziggy brilla especialmente en aplicaciones que utilizan Laravel como backend y JavaScript/Vue en el frontend, como aplicaciones SPA con Laravel y Vue, o aplicaciones que utilizan Inertia.js.</p>
+</Aside>

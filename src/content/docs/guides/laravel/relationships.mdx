@@ -1,0 +1,304 @@
+---
+title: 10. Relaciones y Claves Foráneas (ORM)
+description: Aprende a gestionar relaciones y claves foráneas en Laravel
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Relaciones y Claves Foráneas en Laravel
+
+Las relaciones entre tablas son fundamentales en cualquier base de datos relacional. Laravel proporciona una forma elegante de definir y trabajar con estas relaciones tanto a nivel de migración (estructura de la base de datos) como a nivel de modelo (ORM Eloquent).
+
+<Aside type="tip">
+  Las claves foráneas son esenciales para mantener la integridad referencial de tu base de datos, asegurando que los datos relacionados sean consistentes.
+</Aside>
+
+## Sintaxis Básica de Claves Foráneas (foreign)
+
+Las claves foráneas en Laravel se definen dentro de las migraciones utilizando el método `foreign()`. Este método establece una restricción de clave foránea entre dos tablas.
+
+<Code code={`Schema::create('posts', function (Blueprint $table) {
+    $table->id();
+    $table->unsignedBigInteger('user_id');
+    $table->string('title');
+    $table->text('content');
+    $table->timestamps();
+    
+    // Definición básica de clave foránea
+    $table->foreign('user_id')
+          ->references('id')
+          ->on('users');
+});
+`} lang="php" title="Ejemplo de migración con clave foránea" />
+
+En este ejemplo:
+
+1. Primero creamos la columna `user_id` como `unsignedBigInteger` (debe coincidir con el tipo de la columna referenciada)
+2. Luego definimos la restricción de clave foránea con `foreign('user_id')`
+3. Especificamos la columna a la que hace referencia con `references('id')`
+4. Indicamos la tabla a la que hace referencia con `on('users')`
+
+<Aside type="caution">
+  Es importante que la columna que será clave foránea tenga el mismo tipo de dato que la columna a la que hace referencia. Por ejemplo, si la columna `id` en la tabla `users` es de tipo `bigIncrements`, la columna `user_id` debe ser `unsignedBigInteger`.
+</Aside>
+
+## Relación Uno a Uno en Migraciones
+
+Una relación uno a uno significa que un registro en una tabla está relacionado con exactamente un registro en otra tabla. Por ejemplo, un usuario tiene un perfil.
+
+<Tabs>
+  <TabItem label="Migración de usuarios">
+    <Code code={`Schema::create('users', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('email')->unique();
+    $table->timestamp('email_verified_at')->nullable();
+    $table->string('password');
+    $table->rememberToken();
+    $table->timestamps();
+});
+`} lang="php" />
+  </TabItem>
+  <TabItem label="Migración de perfiles">
+    <Code code={`Schema::create('profiles', function (Blueprint $table) {
+    $table->id();
+    $table->unsignedBigInteger('user_id');
+    $table->string('bio')->nullable();
+    $table->string('website')->nullable();
+    $table->string('twitter')->nullable();
+    $table->timestamps();
+    
+    // Relación uno a uno
+    $table->foreign('user_id')
+          ->references('id')
+          ->on('users')
+          ->onDelete('cascade');
+          
+    // Aseguramos que un usuario solo tenga un perfil
+    $table->unique('user_id');
+});
+`} lang="php" />
+  </TabItem>
+</Tabs>
+
+Características importantes:
+
+- Añadimos `$table->unique('user_id')` para garantizar que un usuario solo pueda tener un perfil
+- Usamos `onDelete('cascade')` para que si se elimina un usuario, también se elimine su perfil automáticamente
+
+## Relación Uno a Muchos en Migraciones
+
+Una relación uno a muchos significa que un registro en una tabla puede estar relacionado con múltiples registros en otra tabla. Por ejemplo, un usuario puede tener muchos posts.
+
+<Tabs>
+  <TabItem label="Migración de usuarios">
+    <Code code={`Schema::create('users', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('email')->unique();
+    $table->timestamps();
+});
+`} lang="php" />
+  </TabItem>
+  <TabItem label="Migración de posts">
+    <Code code={`Schema::create('posts', function (Blueprint $table) {
+    $table->id();
+    $table->unsignedBigInteger('user_id');
+    $table->string('title');
+    $table->text('content');
+    $table->timestamps();
+    
+    // Relación uno a muchos
+    $table->foreign('user_id')
+          ->references('id')
+          ->on('users')
+          ->onDelete('cascade');
+});
+`} lang="php" />
+  </TabItem>
+</Tabs>
+
+En este caso:
+
+- No añadimos `unique()` a `user_id` porque un usuario puede tener múltiples posts
+- Mantenemos `onDelete('cascade')` para que si se elimina un usuario, se eliminen todos sus posts
+
+## Relación Muchos a Muchos en Migraciones (Tablas Pivote)
+
+Una relación muchos a muchos significa que múltiples registros en una tabla pueden estar relacionados con múltiples registros en otra tabla. Por ejemplo, un post puede tener muchas etiquetas y una etiqueta puede estar en muchos posts.
+
+Para este tipo de relación, necesitamos una tabla pivote (o tabla intermedia).
+
+<Tabs>
+  <TabItem label="Migración de posts">
+    <Code code={`Schema::create('posts', function (Blueprint $table) {
+    $table->id();
+    $table->string('title');
+    $table->text('content');
+    $table->timestamps();
+});
+`} lang="php" />
+  </TabItem>
+  <TabItem label="Migración de etiquetas">
+    <Code code={`Schema::create('tags', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('slug')->unique();
+    $table->timestamps();
+});
+`} lang="php" />
+  </TabItem>
+  <TabItem label="Tabla pivote post_tag">
+    <Code code={`Schema::create('post_tag', function (Blueprint $table) {
+    $table->id();
+    $table->unsignedBigInteger('post_id');
+    $table->unsignedBigInteger('tag_id');
+    $table->timestamps();
+    
+    // Claves foráneas
+    $table->foreign('post_id')
+          ->references('id')
+          ->on('posts')
+          ->onDelete('cascade');
+          
+    $table->foreign('tag_id')
+          ->references('id')
+          ->on('tags')
+          ->onDelete('cascade');
+    
+    // Evitar duplicados
+    $table->unique(['post_id', 'tag_id']);
+});
+`} lang="php" />
+  </TabItem>
+</Tabs>
+
+Características importantes de la tabla pivote:
+
+- El nombre de la tabla sigue la convención: nombres de las tablas relacionadas en orden alfabético y en singular (`post_tag`)
+- Contiene claves foráneas a ambas tablas relacionadas
+- Incluye un índice único compuesto para evitar duplicados en la relación
+
+<Aside type="tip">
+  Aunque no es obligatorio, es una buena práctica añadir timestamps a las tablas pivote para saber cuándo se creó la relación.
+</Aside>
+
+## Relaciones con onDelete y onUpdate
+
+Los métodos `onDelete()` y `onUpdate()` permiten especificar qué debe ocurrir cuando se elimina o actualiza un registro referenciado.
+
+<Code code={`$table->foreign('user_id')
+      ->references('id')
+      ->on('users')
+      ->onDelete('cascade')
+      ->onUpdate('cascade');
+`} lang="php" title="Opciones de onDelete y onUpdate" />
+
+Opciones disponibles:
+
+| Opción | Descripción |
+|--------|-------------|
+| `cascade` | Elimina o actualiza los registros relacionados automáticamente |
+| `restrict` | Impide la eliminación o actualización si existen registros relacionados |
+| `set null` | Establece la clave foránea como NULL (la columna debe permitir valores nulos) |
+| `no action` | Similar a `restrict`, pero se verifica al final de la transacción |
+| `set default` | Establece la clave foránea al valor predeterminado de la columna |
+
+<Aside type="caution">
+  Si usas `set null`, asegúrate de que la columna de clave foránea permita valores nulos con `$table->nullable()`.
+</Aside>
+
+## Definir Claves Foráneas con foreignId()
+
+A partir de Laravel 7, se introdujo el método `foreignId()` que simplifica la creación de claves foráneas.
+
+<Code code={`Schema::create('posts', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id');
+    $table->string('title');
+    $table->text('content');
+    $table->timestamps();
+    
+    // Definir la restricción de clave foránea
+    $table->foreign('user_id')->references('id')->on('users');
+});
+`} lang="php" title="Uso de foreignId()" />
+
+El método `foreignId()` es equivalente a `$table->unsignedBigInteger()`, pero comunica mejor la intención de que la columna será una clave foránea.
+
+## Uso de constrained() para relaciones automáticas
+
+El método `constrained()` simplifica aún más la definición de claves foráneas al inferir automáticamente la tabla y columna referenciadas.
+
+<Code code={`Schema::create('posts', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained();
+    $table->string('title');
+    $table->text('content');
+    $table->timestamps();
+});
+`} lang="php" title="Uso de constrained()" />
+
+En este ejemplo:
+
+- `constrained()` infiere automáticamente que la clave foránea `user_id` hace referencia a la columna `id` en la tabla `users`
+- Laravel sigue la convención de que el nombre de la tabla es el plural del prefijo de la columna (antes de `_id`)
+
+También puedes especificar la tabla y la columna si no sigues las convenciones:
+
+<Code code={`// Especificar tabla
+$table->foreignId('user_id')->constrained('personas');
+
+// Especificar tabla y columna
+$table->foreignId('user_id')->constrained('personas', 'persona_id');
+`} lang="php" />
+
+Puedes encadenar métodos adicionales:
+
+<Code code={`$table->foreignId('user_id')
+      ->constrained()
+      ->onUpdate('cascade')
+      ->onDelete('cascade');
+`} lang="php" />
+
+## Eliminar Claves Foráneas (dropForeign)
+
+Cuando necesitas modificar o eliminar una tabla con claves foráneas, primero debes eliminar las restricciones de clave foránea.
+
+<Code code={`Schema::table('posts', function (Blueprint $table) {
+    // Eliminar una clave foránea específica
+    $table->dropForeign('posts_user_id_foreign');
+    
+    // Forma alternativa usando un array
+    $table->dropForeign(['user_id']);
+});
+`} lang="php" title="Eliminar claves foráneas" />
+
+El nombre de la restricción de clave foránea sigue el patrón: `{tabla}_{columna}_foreign`.
+
+<Aside type="note">
+  Si necesitas eliminar todas las claves foráneas de una tabla, puedes usar `$table->dropForeign()`.
+</Aside>
+
+## Mejores Prácticas
+
+1. **Orden de las migraciones**: Asegúrate de que las tablas referenciadas se creen antes que las tablas que las referencian.
+
+2. **Consistencia de tipos**: Usa el mismo tipo de datos para la clave foránea y la columna referenciada.
+
+3. **Índices**: Las claves foráneas deben estar indexadas para mejorar el rendimiento:
+
+   ```php
+   $table->foreignId('user_id')->constrained()->index();
+   ```
+
+4. **Cascada con precaución**: Usa `onDelete('cascade')` con cuidado, ya que puede eliminar datos en cascada sin confirmación adicional.
+
+5. **Nombres descriptivos**: Usa nombres de columnas descriptivos para las claves foráneas, como `author_id` en lugar de simplemente `user_id` si la relación es específica.
+
+<Aside type="tip">
+  Recuerda que las migraciones son versionadas, por lo que cualquier cambio en la estructura de la base de datos debe realizarse mediante nuevas migraciones, no modificando las existentes que ya se han ejecutado en producción.
+</Aside>

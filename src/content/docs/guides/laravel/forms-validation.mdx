@@ -1,0 +1,340 @@
+---
+title: 7. Formularios y Validación en Laravel
+description: Aprende a crear formularios, validar datos y mostrar errores en Laravel
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Introducción
+
+Los formularios son una parte fundamental de cualquier aplicación web, ya que permiten a los usuarios interactuar con el sistema. Laravel ofrece herramientas robustas para la creación de formularios y la validación de datos, lo que facilita el desarrollo de aplicaciones seguras y confiables.
+
+## Crear formularios con Blade
+
+Blade es el motor de plantillas de Laravel que nos permite crear formularios HTML de manera sencilla y elegante. A continuación, veremos cómo crear diferentes tipos de formularios utilizando Blade.
+
+### Estructura básica de un formulario
+
+<Code code={`<!-- resources/views/products/create.blade.php -->
+<form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
+    @csrf
+    
+    <div class="mb-3">
+        <label for="name" class="form-label">Nombre del producto</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}">
+    </div>
+    
+    <div class="mb-3">
+        <label for="price" class="form-label">Precio</label>
+        <input type="number" class="form-control" id="price" name="price" step="0.01" value="{{ old('price') }}">
+    </div>
+    
+    <div class="mb-3">
+        <label for="description" class="form-label">Descripción</label>
+        <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
+    </div>
+    
+    <div class="mb-3">
+        <label for="image" class="form-label">Imagen</label>
+        <input type="file" class="form-control" id="image" name="image">
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Guardar producto</button>
+</form>`} lang="html" />
+
+### Elementos clave en formularios Blade
+
+- **@csrf**: Genera un token CSRF para proteger contra ataques de falsificación de solicitudes entre sitios.
+- **route()**: Genera URLs para rutas con nombre, evitando URLs hardcodeadas.
+- **old()**: Recupera valores antiguos de la sesión en caso de errores de validación.
+- **enctype="multipart/form-data"**: Necesario para formularios que incluyen carga de archivos.
+
+### Formularios para diferentes métodos HTTP
+
+Blade permite trabajar con diferentes métodos HTTP como PUT, PATCH o DELETE, que no son soportados nativamente por los formularios HTML:
+
+<Code code={`<form action="{{ route('products.update', $product->id) }}" method="POST">
+    @csrf
+    @method('PUT')
+    
+    <!-- Campos del formulario -->
+    
+    <button type="submit">Actualizar producto</button>
+</form>`} lang="html" />
+
+### Formularios con relaciones
+
+Para formularios que manejan relaciones entre modelos, podemos usar selectores:
+
+<Code code={`<div class="mb-3">
+    <label for="category_id" class="form-label">Categoría</label>
+    <select class="form-control" id="category_id" name="category_id">
+        <option value="">Seleccione una categoría</option>
+        @foreach($categories as $category)
+            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                {{ $category->name }}
+            </option>
+        @endforeach
+    </select>
+</div>`} lang="html" />
+
+## Validaciones en controladores
+
+Laravel proporciona varias formas de validar datos. La más directa es utilizando el método `validate()` en el controlador.
+
+### Validación básica en controladores
+
+<Code code={`public function store(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'price' => 'required|numeric|min:0',
+        'description' => 'required|string',
+        'category_id' => 'required|exists:categories,id',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+    
+    // Crear el producto con los datos validados
+    Product::create($validated);
+    
+    return redirect()->route('products.index')
+        ->with('success', 'Producto creado correctamente');
+}`} lang="php" />
+
+### Reglas de validación comunes
+
+- **required**: El campo debe estar presente y no vacío.
+- **string**: El campo debe ser una cadena de texto.
+- **numeric**: El campo debe ser un número.
+- **integer**: El campo debe ser un número entero.
+- **min:valor**: El campo debe tener un valor mínimo (para números) o longitud mínima (para strings).
+- **max:valor**: El campo debe tener un valor máximo o longitud máxima.
+- **email**: El campo debe ser una dirección de email válida.
+- **unique:tabla,columna**: El campo debe ser único en la tabla especificada.
+- **exists:tabla,columna**: El campo debe existir en la tabla especificada.
+- **confirmed**: El campo debe tener un campo de confirmación (ej: password_confirmation).
+
+### Mensajes de error personalizados
+
+Podemos personalizar los mensajes de error de validación:
+
+<Code code={`$validated = $request->validate(
+    [
+        'name' => 'required|string|max:255',
+        'price' => 'required|numeric|min:0',
+    ],
+    [
+        'name.required' => 'El nombre del producto es obligatorio',
+        'price.required' => 'El precio es obligatorio',
+        'price.numeric' => 'El precio debe ser un número',
+        'price.min' => 'El precio no puede ser negativo',
+    ]
+);`} lang="php" />
+
+## Validación con FormRequest
+
+Para validaciones más complejas o reutilizables, Laravel ofrece las clases FormRequest, que encapsulan la lógica de validación.
+
+### Crear un FormRequest
+
+<Code code={`php artisan make:request StoreProductRequest`} lang="bash" />
+
+Esto generará una nueva clase en `app/Http/Requests/StoreProductRequest.php`.
+
+### Estructura de un FormRequest
+
+<Code code={`<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreProductRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true; // Cambia a true para permitir la solicitud
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'description' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ];
+    }
+    
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'El nombre del producto es obligatorio',
+            'price.required' => 'El precio es obligatorio',
+            'price.numeric' => 'El precio debe ser un número',
+            'price.min' => 'El precio no puede ser negativo',
+        ];
+    }
+}`} lang="php" />
+
+### Usar FormRequest en el controlador
+
+<Code code={`public function store(StoreProductRequest $request)
+{
+    // La validación ya se ha realizado automáticamente
+    // Si llegamos aquí, los datos son válidos
+    
+    $product = Product::create($request->validated());
+    
+    // Manejar la carga de imágenes si es necesario
+    if ($request->hasFile('image')) {
+        $path = $request->file('image')->store('products', 'public');
+        $product->update(['image_path' => $path]);
+    }
+    
+    return redirect()->route('products.index')
+        ->with('success', 'Producto creado correctamente');
+}`} lang="php" />
+
+<Aside type="tip">
+  Al utilizar FormRequest, Laravel inyecta y valida automáticamente la solicitud antes de ejecutar el método del controlador. Si la validación falla, se redirige automáticamente al usuario con los errores.
+</Aside>
+
+## Mostrar errores en vistas
+
+Cuando la validación falla, Laravel redirige automáticamente al usuario a la página anterior y almacena los errores en la sesión. Podemos mostrar estos errores en nuestras vistas Blade.
+
+### Verificar si hay errores
+
+<Code code={`@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif`} lang="html" />
+
+### Mostrar errores específicos
+
+<Code code={`<div class="mb-3">
+    <label for="name" class="form-label">Nombre del producto</label>
+    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}">
+    @error('name')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>`} lang="html" />
+
+### Componente de error reutilizable
+
+Podemos crear componentes Blade para mostrar errores de manera consistente:
+
+<Code code={`<!-- resources/views/components/form/input.blade.php -->
+@props(['name', 'label', 'type' => 'text'])
+
+<div class="mb-3">
+    <label for="{{ $name }}" class="form-label">{{ $label }}</label>
+    <input 
+        type="{{ $type }}" 
+        class="form-control @error($name) is-invalid @enderror" 
+        id="{{ $name }}" 
+        name="{{ $name }}" 
+        value="{{ old($name) }}"
+        {{ $attributes }}
+    >
+    @error($name)
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>`} lang="html" />
+
+Y usarlo en nuestros formularios:
+
+<Code code={`<x-form.input name="name" label="Nombre del producto" />
+<x-form.input name="price" label="Precio" type="number" step="0.01" />`} lang="html" />
+
+## Validaciones personalizadas
+
+Laravel permite crear reglas de validación personalizadas para casos específicos que no están cubiertos por las reglas estándar.
+
+### Usando Closures
+
+<Code code={`$validator = Validator::make($request->all(), [
+    'code' => [
+        'required',
+        function ($attribute, $value, $fail) {
+            if (strtoupper(substr($value, 0, 3)) !== 'PRD') {
+                $fail('El código del producto debe comenzar con PRD');
+            }
+        },
+    ],
+]);`} lang="php" />
+
+### Creando una regla personalizada
+
+<Code code={`php artisan make:rule ProductCode`} lang="bash" />
+
+Esto generará una nueva clase en `app/Rules/ProductCode.php`:
+
+<Code code={`<?php
+
+namespace App\Rules;
+
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
+
+class ProductCode implements ValidationRule
+{
+    /**
+     * Run the validation rule.
+     */
+    public function validate(string $attribute, mixed $value, Closure $fail): void
+    {
+        if (strtoupper(substr($value, 0, 3)) !== 'PRD') {
+            $fail('El código del producto debe comenzar con PRD');
+        }
+    }
+}`} lang="php" />
+
+Y usarla en la validación:
+
+<Code code={`use App\Rules\ProductCode;
+
+$request->validate([
+    'code' => ['required', new ProductCode],
+]);`} lang="php" />
+
+### Validadores condicionales
+
+A veces necesitamos aplicar reglas de validación solo bajo ciertas condiciones:
+
+<Code code={`$request->validate([
+    'payment_method' => 'required|in:credit_card,bank_transfer',
+    'card_number' => 'required_if:payment_method,credit_card',
+    'expiration_date' => 'required_if:payment_method,credit_card',
+    'cvv' => 'required_if:payment_method,credit_card',
+    'bank_account' => 'required_if:payment_method,bank_transfer',
+]);`} lang="php" />
+
+## Conclusión
+
+Laravel proporciona un sistema completo y flexible para la creación de formularios y la validación de datos. Desde validaciones simples en controladores hasta reglas personalizadas complejas, Laravel ofrece todas las herramientas necesarias para garantizar que los datos que ingresan a nuestra aplicación sean válidos y seguros.
+
+Recuerda siempre validar los datos de entrada para proteger tu aplicación contra datos maliciosos o incorrectos, y proporcionar retroalimentación clara a los usuarios cuando se producen errores de validación.

@@ -1,0 +1,715 @@
+---
+title: 5. Layouts y estructura de páginas
+description: Aprende a crear y gestionar layouts para tus aplicaciones Inertia.js
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Layouts y estructura de páginas
+
+Los layouts son componentes fundamentales en aplicaciones Inertia.js que proporcionan una estructura común para diferentes páginas. Con Vue 3 y su Composition API, podemos crear layouts altamente reutilizables y flexibles.
+
+## Creación de layout principal
+
+En Inertia.js, los layouts se implementan como componentes Vue normales. Con la Composition API, creamos layouts que pueden manejar el estado, proporcionar funcionalidades compartidas y mantener la UI consistente.
+
+### Estructura de carpetas recomendada
+
+```
+resources/js/
+  ├── Layouts/
+  │   ├── AppLayout.vue        # Layout principal
+  │   ├── GuestLayout.vue      # Layout para usuarios no autenticados
+  │   └── ...
+  └── Pages/
+      ├── Dashboard/
+      ├── Users/
+      └── ...
+```
+
+### Ejemplo de layout principal
+
+<Code code={`<script setup>
+import { ref, onMounted } from 'vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import NavLink from '@/Components/NavLink.vue';
+import Dropdown from '@/Components/Dropdown.vue';
+import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+
+// Estado reactivo del layout
+const showingNavigationDropdown = ref(false);
+
+// Acceder a los datos compartidos globalmente
+const page = usePage();
+
+// Comprobar si la ruta actual coincide con la proporcionada
+const isCurrentRoute = (routeName) => {
+  return route().current(routeName);
+};
+
+onMounted(() => {
+  // Lógica que se ejecuta cuando se monta el componente
+  console.log('Layout principal montado');
+});
+</script>
+
+<template>
+  <div class="min-h-screen bg-gray-100">
+    <!-- Navegación principal -->  
+    <nav class="bg-white border-b border-gray-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex">
+            <!-- Logo -->  
+            <div class="shrink-0 flex items-center">
+              <Link href="/dashboard" class="text-xl font-bold text-gray-900">
+                Mi Aplicación
+              </Link>
+            </div>
+
+            <!-- Enlaces de navegación -->  
+            <div class="hidden space-x-8 sm:ml-10 sm:flex">
+              <NavLink href="/dashboard" :active="isCurrentRoute('dashboard')">
+                Dashboard
+              </NavLink>
+              
+              <NavLink href="/users" :active="isCurrentRoute('users.index')">
+                Usuarios
+              </NavLink>
+            </div>
+          </div>
+
+          <!-- Menú de usuario -->  
+          <div class="hidden sm:flex sm:items-center sm:ml-6">
+            <Dropdown>
+              <template #trigger>
+                <span class="inline-flex rounded-md">
+                  <button
+                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
+                  >
+                    {{ page.props.auth.user.name }}
+                    <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </span>
+              </template>
+
+              <template #content>
+                <div class="block px-4 py-2 text-xs text-gray-400">
+                  Administrar cuenta
+                </div>
+
+                <Link href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  Perfil
+                </Link>
+
+                <Link
+                  href="/logout"
+                  method="post"
+                  as="button"
+                  class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Cerrar sesión
+                </Link>
+              </template>
+            </Dropdown>
+          </div>
+
+          <!-- Hamburguesa para móvil -->  
+          <div class="-mr-2 flex items-center sm:hidden">
+            <button
+              @click="showingNavigationDropdown = !showingNavigationDropdown"
+              class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out"
+            >
+              <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                <path
+                  :class="{'hidden': showingNavigationDropdown, 'inline-flex': !showingNavigationDropdown }"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+                <path
+                  :class="{'hidden': !showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menú de navegación responsive -->  
+      <div
+        :class="{'block': showingNavigationDropdown, 'hidden': !showingNavigationDropdown}"
+        class="sm:hidden"
+      >
+        <div class="pt-2 pb-3 space-y-1">
+          <ResponsiveNavLink href="/dashboard" :active="isCurrentRoute('dashboard')">
+            Dashboard
+          </ResponsiveNavLink>
+          
+          <ResponsiveNavLink href="/users" :active="isCurrentRoute('users.index')">
+            Usuarios
+          </ResponsiveNavLink>
+        </div>
+
+        <!-- Opciones de usuario responsive -->  
+        <div class="pt-4 pb-1 border-t border-gray-200">
+          <div class="px-4">
+            <div class="font-medium text-base text-gray-800">{{ page.props.auth.user.name }}</div>
+            <div class="font-medium text-sm text-gray-500">{{ page.props.auth.user.email }}</div>
+          </div>
+
+          <div class="mt-3 space-y-1">
+            <ResponsiveNavLink href="/profile">
+              Perfil
+            </ResponsiveNavLink>
+            
+            <ResponsiveNavLink
+              href="/logout"
+              method="post"
+              as="button"
+            >
+              Cerrar sesión
+            </ResponsiveNavLink>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Encabezado de página -->  
+    <header v-if="$slots.header" class="bg-white shadow">
+      <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <slot name="header"></slot>
+      </div>
+    </header>
+
+    <!-- Contenido principal -->  
+    <main>
+      <slot></slot>
+    </main>
+  </div>
+</template>`} lang="vue" title="resources/js/Layouts/AppLayout.vue" />
+
+<Aside type="tip">
+  El uso de `<script setup>` simplifica la sintaxis de la Composition API, eliminando la necesidad de retornar explícitamente valores reactivos o métodos.
+</Aside>
+
+## Layouts anidados y dinámicos
+
+Inertia.js y Vue 3 permiten implementar sistemas de layouts anidados y dinámicos para manejar interfaces complejas.
+
+### Layout anidado
+
+Los layouts anidados son útiles cuando necesitas mantener un layout principal pero quieres añadir estructuras específicas para ciertas secciones de tu aplicación.
+
+<Code code={`<script setup>
+import { ref } from 'vue';
+import AppLayout from '@/Layouts/AppLayout.vue';
+
+// Props específicas del layout anidado
+const props = defineProps({
+  title: {
+    type: String,
+    required: true
+  },
+  showSidebar: {
+    type: Boolean,
+    default: true
+  }
+});
+
+// Estado local para el sidebar
+const sidebarCollapsed = ref(false);
+
+const toggleSidebar = () => {
+  sidebarCollapsed.value = !sidebarCollapsed.value;
+};
+</script>
+
+<template>
+  <!-- Usa el layout principal como base -->
+  <AppLayout>
+    <!-- Pasa el título al slot de encabezado del layout principal -->
+    <template #header>
+      <div class="flex justify-between items-center">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+          {{ props.title }}
+        </h2>
+        
+        <button 
+          v-if="showSidebar" 
+          @click="toggleSidebar"
+          class="px-3 py-1 text-sm bg-white border rounded-md"
+        >
+          {{ sidebarCollapsed ? 'Expandir' : 'Contraer' }} panel
+        </button>
+      </div>
+    </template>
+    
+    <!-- Contenido con estructura de dos columnas -->
+    <div class="py-12">
+      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="flex">
+          <!-- Sidebar lateral -->
+          <div 
+            v-if="showSidebar" 
+            :class="[sidebarCollapsed ? 'w-16' : 'w-64', 'transition-all duration-300 ease-in-out']" 
+            class="bg-white shadow-sm rounded-l-md p-4"
+          >
+            <div v-if="!sidebarCollapsed">
+              <h3 class="font-medium text-lg mb-3">Panel lateral</h3>
+              <slot name="sidebar"></slot>
+            </div>
+            <div v-else class="flex flex-col items-center">
+              <!-- Iconos para modo colapsado -->
+              <slot name="collapsed-sidebar"></slot>
+            </div>
+          </div>
+          
+          <!-- Área de contenido principal -->
+          <div class="flex-1 bg-white shadow-sm rounded-r-md p-6">
+            <slot></slot>
+          </div>
+        </div>
+      </div>
+    </div>
+  </AppLayout>
+</template>`} lang="vue" title="resources/js/Layouts/AdminLayout.vue" />
+
+### Layout dinámico
+
+Los layouts dinámicos cambian su apariencia o comportamiento basado en props o estado. Esto es especialmente útil para interfaces que necesitan responder a diferentes configuraciones.
+
+<Code code={`<script setup>
+import { computed } from 'vue';
+
+// Props para configuración del layout
+const props = defineProps({
+  variant: {
+    type: String,
+    default: 'default',
+    validator: (val) => ['default', 'compact', 'wide', 'minimal'].includes(val)
+  },
+  contentClass: {
+    type: String,
+    default: ''
+  },
+  showFooter: {
+    type: Boolean,
+    default: true
+  },
+  centered: {
+    type: Boolean,
+    default: false
+  }
+});
+
+// Clases computadas para el contenedor principal
+const containerClasses = computed(() => {
+  const classes = ['min-h-screen'];
+  
+  if (props.centered) {
+    classes.push('flex items-center justify-center');
+  }
+  
+  return classes;
+});
+
+// Clases computadas para el contenido
+const contentContainerClasses = computed(() => {
+  const classes = ['bg-white shadow-sm rounded-md overflow-hidden'];
+  
+  // Aplicar variante de layout
+  switch (props.variant) {
+    case 'compact':
+      classes.push('max-w-3xl mx-auto');
+      break;
+    case 'wide':
+      classes.push('max-w-7xl mx-auto');
+      break;
+    case 'minimal':
+      classes.push('max-w-xl mx-auto');
+      break;
+    default:
+      classes.push('max-w-5xl mx-auto');
+  }
+  
+  // Agregar clases personalizadas
+  if (props.contentClass) {
+    classes.push(props.contentClass);
+  }
+  
+  return classes;
+});
+</script>
+
+<template>
+  <div :class="containerClasses">
+    <!-- Encabezado siempre presente -->
+    <header class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+        <slot name="header">
+          <h1 class="text-lg font-medium">
+            <slot name="title">Página</slot>
+          </h1>
+        </slot>
+      </div>
+    </header>
+    
+    <!-- Contenedor principal con clases dinámicas -->
+    <main class="py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+      <div :class="contentContainerClasses">
+        <div class="p-6">
+          <slot></slot>
+        </div>
+      </div>
+    </main>
+    
+    <!-- Footer opcional -->
+    <footer v-if="showFooter" class="bg-white border-t mt-auto">
+      <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+        <slot name="footer">
+          <p class="text-center text-gray-500 text-sm">
+            &copy; {{ new Date().getFullYear() }} Mi Aplicación. Todos los derechos reservados.
+          </p>
+        </slot>
+      </div>
+    </footer>
+  </div>
+</template>`} lang="vue" title="resources/js/Layouts/DynamicLayout.vue" />
+
+## Slots y contenido dinámico en layouts
+
+Los slots son una característica poderosa en Vue que te permite insertar contenido dinámico en puntos específicos de tus layouts. Con la Composition API, podemos detectar y trabajar con slots de manera eficiente.
+
+### Tipos de slots en layouts
+
+<Code code={`<script setup>
+import { useSlots, computed } from 'vue';
+import { Head } from '@inertiajs/vue3';
+
+// Props para el layout con configuración de slots
+const props = defineProps({
+  title: String,
+  description: String
+});
+
+// Acceder a los slots disponibles
+const slots = useSlots();
+
+// Comprobar si ciertos slots existen
+const hasActions = computed(() => !!slots.actions);
+const hasSidebar = computed(() => !!slots.sidebar);
+</script>
+
+<template>
+  <div>
+    <!-- Manejo de título de página -->
+    <Head :title="title" />
+
+    <!-- Estructura de la página con slots -->
+    <div class="min-h-screen bg-gray-100">
+      <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-900">
+              <!-- Slot con respaldo: usa el slot si existe, o el título de las props -->
+              <slot name="header-title">
+                {{ title || 'Página sin título' }}
+              </slot>
+            </h1>
+
+            <!-- Contenedor de acciones que solo se muestra si hay contenido -->
+            <div v-if="hasActions" class="flex space-x-3">
+              <slot name="actions"></slot>
+            </div>
+          </div>
+          
+          <!-- Descripción opcional -->
+          <p v-if="description || slots.description" class="mt-2 text-sm text-gray-500">
+            <slot name="description">
+              {{ description }}
+            </slot>
+          </p>
+        </div>
+      </header>
+
+      <!-- Contenido principal con distribuón dinámica basada en la presencia de sidebar -->
+      <main class="py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div :class="{'flex': hasSidebar}">
+            <!-- Barra lateral condicional -->
+            <aside v-if="hasSidebar" class="w-64 mr-8">
+              <div class="bg-white p-4 shadow rounded-lg">
+                <slot name="sidebar"></slot>
+              </div>
+            </aside>
+
+            <!-- Contenido principal -->
+            <div :class="{'flex-1': hasSidebar}">
+              <div class="bg-white shadow rounded-lg p-6">
+                <!-- Slot de contenido por defecto -->
+                <slot></slot>
+              </div>
+              
+              <!-- Área de contenido secundario opcional -->
+              <div v-if="slots.secondary" class="mt-6 bg-white shadow rounded-lg p-6">
+                <slot name="secondary"></slot>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Pie de página -->
+      <footer class="bg-white border-t mt-8">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <slot name="footer">
+            <p class="text-center text-gray-500">
+              &copy; {{ new Date().getFullYear() }} Mi Aplicación
+            </p>
+          </slot>
+        </div>
+      </footer>
+    </div>
+  </div>
+</template>`} lang="vue" title="resources/js/Layouts/SlotLayout.vue" />
+
+### Uso de slots dinámicos
+
+Para demostrar cómo un componente de página utiliza los slots de un layout:
+
+<Code code={`<script setup>
+import { ref } from 'vue';
+import SlotLayout from '@/Layouts/SlotLayout.vue';
+import Button from '@/Components/Button.vue';
+import Card from '@/Components/Card.vue';
+
+// Estado de la página
+const isLoading = ref(false);
+const items = ref(['Item 1', 'Item 2', 'Item 3']);
+
+// Métodos de la página
+const handleRefresh = () => {
+  isLoading.value = true;
+  // Simular carga
+  setTimeout(() => {
+    isLoading.value = false;
+  }, 1000);
+};
+</script>
+
+<template>
+  <SlotLayout
+    title="Panel de control"
+    description="Vista general de la aplicación"
+  >
+    <!-- Personalizar acción del encabezado -->
+    <template #actions>
+      <Button type="primary" :loading="isLoading" @click="handleRefresh">
+        Actualizar
+      </Button>
+    </template>
+
+    <!-- Contenido de la barra lateral -->
+    <template #sidebar>
+      <h3 class="text-lg font-medium mb-4">Navegación</h3>
+      <ul class="space-y-2">
+        <li><a href="#" class="text-blue-600 hover:underline">Panel principal</a></li>
+        <li><a href="#" class="text-gray-600 hover:text-blue-600">Estadísticas</a></li>
+        <li><a href="#" class="text-gray-600 hover:text-blue-600">Configuración</a></li>
+      </ul>
+    </template>
+
+    <!-- Contenido principal (slot predeterminado) -->
+    <div>
+      <h2 class="text-xl font-bold mb-4">Resumen</h2>
+      <p class="mb-6">Bienvenido al panel de control de la aplicación.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card title="Usuarios" value="1,234" icon="users" />
+        <Card title="Ingresos" value="$5,678" icon="currency-dollar" />
+        <Card title="Pedidos" value="89" icon="shopping-cart" />
+      </div>
+    </div>
+
+    <!-- Contenido secundario -->
+    <template #secondary>
+      <h3 class="text-lg font-medium mb-4">Actividad reciente</h3>
+      <ul class="space-y-2">
+        <li v-for="(item, index) in items" :key="index" class="p-2 border-b">
+          {{ item }}
+        </li>
+      </ul>
+    </template>
+  </SlotLayout>
+</template>`} lang="vue" title="resources/js/Pages/Dashboard.vue" />
+
+<Aside type="note">
+  Con la Composition API, puedes detectar la presencia de slots usando `useSlots()` y crear interfaces adaptables en función del contenido que proporciona el componente hijo.
+</Aside>
+
+## Cambio de layout por página
+
+Con Inertia.js, puedes cambiar fácilmente el layout que utiliza cada página. Existen varias formas de implementar este cambio, todas compatibles con la Composition API de Vue 3.
+
+### Usando layout por defecto y explícito
+
+Una estrategia común es definir un layout por defecto en el archivo `app.js` de Inertia, pero permitir que cada página lo sobrescriba cuando sea necesario.
+
+<Code code={`// resources/js/app.js
+import { createApp, h } from 'vue'
+import { createInertiaApp } from '@inertiajs/vue3'
+import DefaultLayout from '@/Layouts/AppLayout.vue'
+
+createInertiaApp({
+  resolve: name => {
+    const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
+    const page = pages["./Pages/" + name + ".vue"]
+    
+    // Asigna el layout por defecto a la página si no tiene uno definido
+    page.default.layout = page.default.layout || DefaultLayout
+    
+    return page
+  },
+  setup({ el, App, props, plugin }) {
+    createApp({ render: () => h(App, props) })
+      .use(plugin)
+      .mount(el)
+  },
+})`} lang="js" title="resources/js/app.js" />
+
+### Definición de layout en componentes de página
+
+Cada componente de página puede definir su propio layout.
+
+<Code code={`<script setup>
+import { ref } from 'vue';
+import GuestLayout from '@/Layouts/GuestLayout.vue';
+
+// Definir el layout para esta página
+defineOptions({
+  layout: GuestLayout,
+});
+
+// Estado del formulario
+const form = ref({
+  email: '',
+  password: '',
+  remember: false,
+});
+</script>
+
+<template>
+  <div class="p-8">
+    <h1 class="text-2xl font-bold mb-6">Iniciar sesión</h1>
+    <!-- Contenido del formulario de login -->
+  </div>
+</template>`} lang="vue" title="resources/js/Pages/Auth/Login.vue" />
+
+### Layouts dinámicos basados en props
+
+También puedes cambiar el layout dinámicamente basado en props o estado:
+
+<Code code={`<script setup>
+import { computed } from 'vue';
+import AdminLayout from '@/Layouts/AdminLayout.vue';
+import UserLayout from '@/Layouts/UserLayout.vue';
+import GuestLayout from '@/Layouts/GuestLayout.vue';
+
+// Props de la página
+const props = defineProps({
+  user: Object,
+});
+
+// Layout dinámico basado en el rol del usuario
+const layout = computed(() => {
+  if (!props.user) return GuestLayout;
+  if (props.user.is_admin) return AdminLayout;
+  return UserLayout;
+});
+
+// Asignar el layout dinámicamente
+defineOptions({
+  get layout() {
+    return layout.value;
+  },
+});
+</script>
+
+<template>
+  <div>
+    <h1 class="text-2xl font-bold mb-4">Panel de control</h1>
+    <!-- Contenido adaptado al rol del usuario -->
+  </div>
+</template>`} lang="vue" title="resources/js/Pages/Dashboard.vue" />
+
+### Implementación de resolvedPage en HandleInertiaRequests middleware
+
+Puedes enviar datos desde el backend que influyan en la selección del layout:
+
+<Code code={`// app/Http/Middleware/HandleInertiaRequests.php
+namespace App\Http\Middleware;
+
+use Illuminate\Http\Request;
+use Inertia\Middleware;
+
+class HandleInertiaRequests extends Middleware
+{
+    public function resolveComponent($request, $response)
+    {
+        $component = parent::resolveComponent($request, $response);
+        $userAgent = $request->userAgent();
+        
+        // Determinar el layout basado en el User Agent
+        if (str_contains($userAgent, 'Mobile')) {
+            $response->with('layout', 'mobile');
+        } else {
+            $response->with('layout', 'desktop');
+        }
+        
+        return $component;
+    }
+}`} lang="php" title="app/Http/Middleware/HandleInertiaRequests.php" />
+
+Y luego usar esa información en el frontend:
+
+<Code code={`<script setup>
+import { computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import DesktopLayout from '@/Layouts/DesktopLayout.vue';
+import MobileLayout from '@/Layouts/MobileLayout.vue';
+
+// Obtener la información de layout desde las props compartidas
+const page = usePage();
+const layoutType = computed(() => page.props.layout);
+
+// Determinar el layout basado en la prop recibida
+const layout = computed(() => {
+  return layoutType.value === 'mobile' ? MobileLayout : DesktopLayout;
+});
+
+// Asignar el layout dinámicamente
+defineOptions({
+  get layout() {
+    return layout.value;
+  },
+});
+</script>
+
+<template>
+  <!-- Contenido de la página -->
+</template>`} lang="vue" title="resources/js/Pages/Responsive.vue" />
+
+<Aside type="tip">
+  En Vue 3 y con Composition API, `defineOptions` permite asignar opciones a nivel de componente, como el layout, mientras mantienes la sintaxis clara y concisa de `<script setup>`.
+</Aside>

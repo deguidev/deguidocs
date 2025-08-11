@@ -1,0 +1,225 @@
+---
+title: JSON y Almacenamiento Local
+description: Aprende a trabajar con JSON y a utilizar el almacenamiento local del navegador en JavaScript.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# JSON y Almacenamiento Local <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  JSON es un formato ligero de intercambio de datos, mientras que el almacenamiento local permite persistir datos en el navegador.
+</Aside>
+
+## JSON <Badge text="Básico" variant="note" />
+
+### Sintaxis básica
+<Code code={`// Objeto JSON válido
+const persona = {
+    "nombre": "Juan",
+    "edad": 25,
+    "ciudad": "Madrid",
+    "activo": true,
+    "hobbies": ["lectura", "música"],
+    "direccion": {
+        "calle": "Principal",
+        "numero": 123
+    }
+}`} lang="javascript" />
+
+### Métodos JSON
+<Code code={`// Convertir objeto a string JSON
+const objeto = { nombre: "Juan", edad: 25 };
+const jsonString = JSON.stringify(objeto);
+console.log(jsonString);
+// '{"nombre":"Juan","edad":25}'
+
+// Convertir string JSON a objeto
+const jsonString = '{"nombre":"Juan","edad":25}';
+const objeto = JSON.parse(jsonString);
+console.log(objeto.nombre); // "Juan"`} lang="javascript" />
+
+### Manejo de errores
+<Code code={`try {
+    // Intentar parsear JSON inválido
+    const datos = JSON.parse('{"nombre": "Juan", edad: 25}');
+} catch (error) {
+    console.error('Error al parsear JSON:', error);
+}
+
+// Validar JSON antes de parsear
+function esJSONValido(str) {
+    try {
+        JSON.parse(str);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}`} lang="javascript" />
+
+## localStorage <Badge text="Importante" variant="danger" />
+
+### Operaciones básicas
+<Code code={`// Guardar datos
+localStorage.setItem('usuario', 'Juan');
+localStorage.setItem('edad', '25');
+
+// Obtener datos
+const usuario = localStorage.getItem('usuario');
+const edad = localStorage.getItem('edad');
+
+// Eliminar datos
+localStorage.removeItem('edad');
+
+// Limpiar todo
+localStorage.clear();
+
+// Obtener número de items
+console.log(localStorage.length);`} lang="javascript" />
+
+### Almacenar objetos
+<Code code={`const usuario = {
+    nombre: 'Juan',
+    edad: 25,
+    preferencias: {
+        tema: 'oscuro',
+        notificaciones: true
+    }
+};
+
+// Guardar objeto
+localStorage.setItem('usuario', JSON.stringify(usuario));
+
+// Recuperar objeto
+const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));`} lang="javascript" />
+
+## sessionStorage <Badge text="Alternativa" variant="note" />
+
+### Diferencias con localStorage
+<Code code={`// sessionStorage se borra al cerrar la pestaña/navegador
+sessionStorage.setItem('temporal', 'valor');
+
+// Mismo API que localStorage
+sessionStorage.getItem('temporal');
+sessionStorage.removeItem('temporal');
+sessionStorage.clear();`} lang="javascript" />
+
+## Wrapper personalizado <Badge text="Avanzado" variant="success" />
+
+### Clase Storage
+<Code code={`class Storage {
+    constructor(type = 'localStorage') {
+        this.storage = window[type];
+    }
+
+    set(key, value) {
+        try {
+            const serializado = JSON.stringify(value);
+            this.storage.setItem(key, serializado);
+            return true;
+        } catch (e) {
+            console.error('Error al guardar:', e);
+            return false;
+        }
+    }
+
+    get(key, defaultValue = null) {
+        try {
+            const item = this.storage.getItem(key);
+            return item ? JSON.parse(item) : defaultValue;
+        } catch (e) {
+            console.error('Error al recuperar:', e);
+            return defaultValue;
+        }
+    }
+
+    remove(key) {
+        this.storage.removeItem(key);
+    }
+
+    clear() {
+        this.storage.clear();
+    }
+
+    has(key) {
+        return this.storage.getItem(key) !== null;
+    }
+}
+
+// Uso
+const storage = new Storage();
+storage.set('usuario', { nombre: 'Juan', edad: 25 });
+const usuario = storage.get('usuario');`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+### Manejo de cuota
+<Code code={`function estimarEspacioDisponible() {
+    let total = 0;
+    try {
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            const value = localStorage.getItem(key);
+            total += (key.length + value.length) * 2; // UTF-16
+        }
+        return {
+            usado: total,
+            aproximadoEnMB: (total / 1024 / 1024).toFixed(2)
+        };
+    } catch (e) {
+        console.error('Error al calcular espacio:', e);
+        return null;
+    }
+}`} lang="javascript" />
+
+### Versionado de datos
+<Code code={`const DATA_VERSION = '1.0';
+
+function guardarConVersion(key, data) {
+    const withVersion = {
+        version: DATA_VERSION,
+        data: data,
+        timestamp: Date.now()
+    };
+    localStorage.setItem(key, JSON.stringify(withVersion));
+}
+
+function obtenerConVersion(key) {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    
+    const parsed = JSON.parse(raw);
+    if (parsed.version !== DATA_VERSION) {
+        // Manejar migración de datos si es necesario
+        console.warn('Versión de datos obsoleta');
+        return null;
+    }
+    
+    return parsed.data;
+}`} lang="javascript" />
+
+### Encapsulación de datos
+<Code code={`// ❌ Malo
+localStorage.setItem('datos', JSON.stringify(datos));
+
+// ✅ Bueno
+const StorageService = {
+    guardarDatos(datos) {
+        if (!this.validarDatos(datos)) {
+            throw new Error('Datos inválidos');
+        }
+        localStorage.setItem('datos', JSON.stringify(datos));
+    },
+    
+    obtenerDatos() {
+        const datos = localStorage.getItem('datos');
+        return datos ? JSON.parse(datos) : null;
+    },
+    
+    validarDatos(datos) {
+        // Implementar validación
+        return true;
+    }
+};`} lang="javascript" />

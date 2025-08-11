@@ -1,0 +1,85 @@
+---
+title: Introducción a HTML
+description: Conceptos básicos y fundamentos del lenguaje de marcado HTML.
+---
+
+import { Code } from '@astrojs/starlight/components';
+
+# Introducción a HTML
+
+## ¿Qué es HTML?
+
+HTML (HyperText Markup Language) es el lenguaje estándar utilizado para crear y diseñar páginas web. No es un lenguaje de programación, sino un lenguaje de marcado que define la estructura y el contenido de una página web mediante el uso de etiquetas.
+
+## Historia de HTML
+
+- **1991**: Tim Berners-Lee crea HTML como un medio para compartir documentos entre científicos.
+- **1995**: HTML 2.0 se convierte en el primer estándar oficial.
+- **1997**: HTML 3.2 introduce tablas y más opciones de formato.
+- **1999**: HTML 4.01 mejora la accesibilidad y los scripts.
+- **2014**: HTML5 se convierte en la recomendación oficial del W3C, introduciendo nuevos elementos semánticos y capacidades multimedia.
+
+## Características principales
+
+- **Estructura**: Define la organización y jerarquía del contenido.
+- **Semántica**: Proporciona significado a diferentes partes del documento.
+- **Enlaces**: Permite la navegación entre páginas mediante hipervinculos.
+- **Multimedia**: Facilita la inclusión de imágenes, videos y audio.
+- **Formularios**: Permite la interacción del usuario mediante la entrada de datos.
+
+## Estructura básica de un documento HTML
+
+<Code code={`<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi primera página web</title>
+</head>
+<body>
+    <h1>Hola Mundo</h1>
+    <p>Esta es mi primera página web creada con HTML.</p>
+</body>
+</html>`} lang="html" title="Estructura básica de HTML" />
+
+## Elementos fundamentales
+
+### Etiquetas de estructura
+
+- <Code code="<!DOCTYPE html>" lang="html" /> Declara el tipo de documento.
+- <Code code="<html>" lang="html" /> Elemento raíz que contiene todo el documento.
+- <Code code="<head>" lang="html" /> Contiene metadatos, título y enlaces a recursos externos.
+- <Code code="<body>" lang="html" /> Contiene todo el contenido visible de la página.
+
+### Etiquetas de texto
+
+- <Code code="<h1>" lang="html" /> a <Code code="<h6>" lang="html" />: Encabezados de diferentes niveles.
+- <Code code="<p>" lang="html" />: Párrafos de texto.
+- <Code code="<strong>" lang="html" />: Texto en negrita con importancia semántica.
+- <Code code="<em>" lang="html" />: Texto en cursiva con énfasis semántico.
+
+### Etiquetas de enlace
+
+- <Code code={`<a href="url">Texto del enlace</a>`} lang="html" />: Crea un hipervínculo.
+
+### Etiquetas de imagen
+
+- <Code code={`<img src="ruta-imagen.jpg" alt="Descripción">`} lang="html" />: Inserta una imagen.
+
+## Herramientas para trabajar con HTML
+
+- **Editores de código**: Visual Studio Code, Sublime Text, Atom.
+- **Navegadores web**: Chrome, Firefox, Safari, Edge (con herramientas de desarrollo).
+- **Validadores**: W3C Markup Validation Service para verificar que el código cumple con los estándares.
+
+## Prácticas recomendadas 🌻
+
+1. **Usar HTML semántico**: Utilizar las etiquetas adecuadas para cada tipo de contenido.
+2. **Mantener la accesibilidad**: Asegurar que el sitio sea accesible para todos los usuarios.
+3. **Separar estructura (HTML), presentación (CSS) y comportamiento (JavaScript)**.
+4. **Validar el código**: Comprobar que cumple con los estándares web.
+5. **Optimizar para dispositivos móviles**: Diseñar pensando en diferentes tamaños de pantalla. 
+
+## Conclusión
+
+HTML es la base fundamental de cualquier página web. Dominar este lenguaje de marcado es el primer paso para convertirse en un desarrollador web competente. A medida que avances, podrás combinar HTML con CSS para el diseño y JavaScript para la interactividad, creando experiencias web completas y atractivas.

@@ -1,0 +1,76 @@
+---
+title: 1. Introducción a Laravel
+description: Introducción a Laravel, requisitos del sistema, arquitectura MVC y filosofía de desarrollo
+---
+
+# Introducción a Laravel
+
+## ¿Qué es Laravel?
+
+Laravel es un framework de desarrollo web PHP de código abierto, elegante y expresivo, creado por Taylor Otwell en 2011. Está diseñado para facilitar tareas comunes utilizadas en la mayoría de los proyectos web, como autenticación, enrutamiento, sesiones y caché.
+
+Laravel sigue el patrón de arquitectura MVC (Modelo-Vista-Controlador) y se enfoca en la sintaxis elegante, la simplicidad y la legibilidad del código. Su filosofía se centra en el "desarrollo web sin fricción", permitiendo a los desarrolladores crear aplicaciones robustas con código limpio y estructurado.
+
+## Requisitos del sistema
+
+Para trabajar con Laravel, necesitarás:
+
+- PHP >= 8.1
+- Composer (gestor de dependencias para PHP)
+- Extensiones de PHP:
+  - BCMath
+  - Ctype
+  - Fileinfo
+  - JSON
+  - Mbstring
+  - OpenSSL
+  - PDO
+  - Tokenizer
+  - XML
+- Servidor web (Apache, Nginx) o servidor integrado de PHP
+- Base de datos compatible (MySQL, PostgreSQL, SQLite, SQL Server)
+
+## Arquitectura MVC
+
+Laravel implementa el patrón de diseño Modelo-Vista-Controlador (MVC), que separa la lógica de la aplicación en tres componentes principales:
+
+### Modelo
+- Representa la estructura de datos y la lógica de negocio
+- En Laravel, los modelos son clases Eloquent que interactúan con la base de datos
+- Encapsula las operaciones CRUD (Crear, Leer, Actualizar, Eliminar)
+
+### Vista
+- Representa la interfaz de usuario
+- En Laravel, las vistas utilizan el motor de plantillas Blade
+- Se encargan de mostrar los datos al usuario final
+
+### Controlador
+- Actúa como intermediario entre el Modelo y la Vista
+- Procesa las solicitudes HTTP
+- Contiene la lógica para manipular los datos del modelo y pasarlos a la vista
+
+## Filosofía de desarrollo y ventajas
+
+### Filosofía de Laravel
+
+Laravel se basa en varios principios fundamentales:
+
+1. **Convención sobre configuración**: Laravel proporciona configuraciones predeterminadas sensatas, reduciendo la necesidad de configuración manual.
+2. **Expresividad**: El código debe ser legible y elegante.
+3. **Desarrollo rápido**: Proporciona herramientas que aceleran el desarrollo.
+4. **Pruebas integradas**: Facilita la escritura de pruebas unitarias y de integración.
+
+### Ventajas de Laravel
+
+- **Sintaxis elegante y expresiva**: Laravel ofrece una sintaxis clara y concisa que hace que el código sea más legible y mantenible.
+- **Ecosistema robusto**: Cuenta con un amplio conjunto de paquetes y herramientas oficiales y de la comunidad.
+- **Eloquent ORM**: Un ORM (Object-Relational Mapping) potente y fácil de usar para interactuar con bases de datos.
+- **Sistema de migraciones**: Permite versionar y compartir el esquema de la base de datos.
+- **Artisan CLI**: Una interfaz de línea de comandos que proporciona comandos útiles para tareas comunes.
+- **Sistema de plantillas Blade**: Un motor de plantillas potente y fácil de aprender.
+- **Sistema de enrutamiento expresivo**: Facilita la definición de rutas y su vinculación con controladores.
+- **Middleware**: Proporciona un mecanismo para filtrar las solicitudes HTTP.
+- **Seguridad incorporada**: Incluye protección contra vulnerabilidades comunes como CSRF, XSS, SQL Injection, etc.
+- **Comunidad activa**: Una gran comunidad de desarrolladores y abundante documentación.
+
+Laravel se ha convertido en uno de los frameworks PHP más populares debido a su enfoque en la experiencia del desarrollador, su documentación completa y su ecosistema en constante crecimiento.

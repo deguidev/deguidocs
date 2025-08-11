@@ -1,0 +1,181 @@
+---
+title: Operadores
+description: Conoce los diferentes tipos de operadores en JavaScript y cómo utilizarlos.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Operadores <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Los operadores son esenciales para realizar operaciones y comparaciones en JavaScript.
+</Aside>
+
+## Operadores aritméticos <Badge text="Básico" variant="note" />
+
+### Operadores básicos
+```javascript
+let suma = 5 + 3;        // 8
+let resta = 5 - 3;       // 2
+let multiplicacion = 5 * 3;   // 15
+let division = 15 / 3;    // 5
+let modulo = 5 % 2;      // 1 (resto)
+let exponente = 2 ** 3;   // 8 (2³)
+```
+
+### Incremento y decremento
+```javascript
+let numero = 5;
+numero++;    // Post-incremento
+++numero;    // Pre-incremento
+numero--;    // Post-decremento
+--numero;    // Pre-decremento
+```
+
+## Operadores de comparación
+
+### Comparación simple
+```javascript
+5 == "5"     // true (compara valor)
+5 != "5"     // false
+```
+
+### Comparación estricta
+```javascript
+5 === "5"    // false (compara valor y tipo)
+5 !== "5"    // true
+```
+
+### Comparaciones numéricas
+```javascript
+5 > 3        // true
+5 >= 5       // true
+3 < 5        // true
+3 <= 3       // true
+```
+
+## Operadores lógicos
+
+### AND (&&)
+```javascript
+true && true     // true
+true && false    // false
+false && true    // false
+false && false   // false
+```
+
+### OR (||)
+```javascript
+true || true     // true
+true || false    // true
+false || true    // true
+false || false   // false
+```
+
+### NOT (!)
+```javascript
+!true            // false
+!false           // true
+```
+
+### Nullish coalescing (??)
+```javascript
+null ?? "valor"      // "valor"
+undefined ?? "valor" // "valor"
+0 ?? "valor"        // 0
+"" ?? "valor"       // ""
+```
+
+## Operadores de asignación
+
+### Asignación simple
+```javascript
+let x = 5;
+```
+
+### Asignación compuesta
+```javascript
+x += 3;      // x = x + 3
+x -= 3;      // x = x - 3
+x *= 3;      // x = x * 3
+x /= 3;      // x = x / 3
+x %= 3;      // x = x % 3
+x **= 3;     // x = x ** 3
+```
+
+## Operador ternario
+
+```javascript
+let edad = 20;
+let mensaje = edad >= 18 ? "Mayor de edad" : "Menor de edad";
+```
+
+## Operadores de bits
+
+```javascript
+let a = 5;    // 101 en binario
+let b = 3;    // 011 en binario
+
+a & b         // AND: 001 (1)
+a | b         // OR: 111 (7)
+a ^ b         // XOR: 110 (6)
+~a            // NOT: -6
+a << 1        // Left shift: 1010 (10)
+a >> 1        // Right shift: 010 (2)
+```
+
+## Precedencia de operadores
+
+```javascript
+let resultado = 2 + 3 * 4;    // 14 (no 20)
+let conParentesis = (2 + 3) * 4;  // 20
+```
+
+## Operadores de encadenamiento opcional
+
+### Encadenamiento opcional (?.)
+```javascript
+const usuario = {
+    direccion: {
+        calle: "Principal"
+    }
+};
+
+const calle = usuario?.direccion?.calle;  // "Principal"
+const numero = usuario?.direccion?.numero; // undefined
+```
+
+## Mejores prácticas
+
+1. Usar comparación estricta (=== y !==)
+```javascript
+// ✅ Bueno
+if (valor === null) {
+    // código
+}
+```
+
+2. Evitar operadores de incremento/decremento en expresiones complejas
+```javascript
+// ❌ Malo
+let x = y++ + ++z;
+
+// ✅ Bueno
+y++;
+++z;
+let x = y + z;
+```
+
+3. Usar paréntesis para clarificar precedencia
+```javascript
+// ✅ Bueno
+let resultado = (a + b) * c;
+```
+
+4. Utilizar el operador nullish coalescing para valores por defecto
+```javascript
+// ✅ Bueno
+const valor = entrada ?? valorPorDefecto;
+```

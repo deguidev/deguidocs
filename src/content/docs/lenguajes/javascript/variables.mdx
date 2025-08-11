@@ -1,0 +1,170 @@
+---
+title: Variables y constantes
+description: Aprende cómo declarar y usar variables y constantes en JavaScript.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Variables y constantes <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Las variables y constantes son fundamentales para almacenar y manipular datos en JavaScript.
+</Aside>
+
+## Declaración con var, let y const <Badge text="Importante" variant="danger" />
+
+JavaScript ofrece tres formas de declarar variables:
+
+### var (forma tradicional)
+```javascript
+var nombre = "Juan";
+var edad = 25;
+```
+
+### let (ES6+)
+```javascript
+let nombre = "María";
+let edad = 30;
+```
+
+### const (para valores inmutables)
+```javascript
+const PI = 3.14159;
+const URL_BASE = "https://api.ejemplo.com";
+```
+
+## Alcance (scope) y hoisting
+
+### Scope de var
+- Función-scoped
+- Hoisted al inicio de su contexto
+
+```javascript
+function ejemplo() {
+    var x = 1;
+    if (true) {
+        var x = 2; // Misma variable
+        console.log(x); // 2
+    }
+    console.log(x); // 2
+}
+```
+
+### Scope de let y const
+- Bloque-scoped
+- No hoisted
+
+```javascript
+function ejemplo() {
+    let x = 1;
+    if (true) {
+        let x = 2; // Nueva variable
+        console.log(x); // 2
+    }
+    console.log(x); // 1
+}
+```
+
+## Hoisting
+
+El hoisting mueve las declaraciones al inicio:
+
+```javascript
+console.log(x); // undefined
+var x = 5;
+
+// Es equivalente a:
+var x;
+console.log(x);
+x = 5;
+
+// Con let/const esto causa un error:
+console.log(y); // ReferenceError
+let y = 5;
+```
+
+## Buenas prácticas al declarar
+
+1. **Usar const por defecto**
+```javascript
+const CONFIG = {
+    api: "https://api.ejemplo.com",
+    timeout: 5000
+};
+```
+
+2. **Usar let cuando necesites reasignar**
+```javascript
+let contador = 0;
+contador++;
+```
+
+3. **Evitar var**
+```javascript
+// ❌ Malo
+var nombre = "Juan";
+
+// ✅ Bueno
+const nombre = "Juan";
+```
+
+4. **Nombres descriptivos**
+```javascript
+// ❌ Malo
+const x = 3600000;
+
+// ✅ Bueno
+const MILISEGUNDOS_POR_HORA = 3600000;
+```
+
+5. **Declarar una variable por línea**
+```javascript
+// ❌ Malo
+let a = 1, b = 2, c = 3;
+
+// ✅ Bueno
+let a = 1;
+let b = 2;
+let c = 3;
+```
+
+## Temporal Dead Zone (TDZ)
+
+La TDZ es el período entre el inicio del scope y la declaración de la variable:
+
+```javascript
+{
+    // TDZ para la variable nombre
+    console.log(nombre); // ReferenceError
+    let nombre = "Juan";
+}
+```
+
+## Diferencias principales
+
+| Característica | var | let | const |
+|----------------|-----|-----|-------|
+| Scope | Función | Bloque | Bloque |
+| Hoisting | Sí | No | No |
+| Redeclaración | Permitida | No permitida | No permitida |
+| Reasignación | Permitida | Permitida | No permitida |
+| TDZ | No | Sí | Sí |
+
+## Ejercicios prácticos
+
+```javascript
+// 1. Corregir el siguiente código
+var precio = 100;
+var precio = 200; // ¿Qué problema hay aquí?
+
+// 2. ¿Qué imprimirá?
+const obj = { x: 1 };
+obj.x = 2;
+console.log(obj.x);
+
+// 3. Identificar el error
+const MAX_PUNTOS;
+MAX_PUNTOS = 100;
+```

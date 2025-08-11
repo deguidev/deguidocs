@@ -1,0 +1,377 @@
+---
+title: 1. Introducción a Java
+description: Conoce qué es Java, sus características, instalación y cómo crear tu primer programa
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Introducción a Java
+
+Java es uno de los lenguajes de programación más populares y ampliamente utilizados en el mundo. Desde su lanzamiento en 1995 por Sun Microsystems (ahora propiedad de Oracle), Java ha revolucionado el desarrollo de software con su filosofía "Write Once, Run Anywhere" (Escribe una vez, ejecuta en cualquier lugar).
+
+## 1.1 ¿Qué es Java?
+
+Java es un lenguaje de programación de alto nivel, orientado a objetos, con una sintaxis inspirada en C y C++, pero con un modelo de objetos más simple y eliminando herramientas de bajo nivel que suelen inducir a muchos errores, como la manipulación directa de punteros o memoria.
+
+<Aside type="note">
+  Java fue creado por James Gosling y su equipo en Sun Microsystems a principios de los años 90, y fue presentado oficialmente en 1995.
+</Aside>
+
+### Arquitectura de Java
+
+La arquitectura de Java se basa en la Java Virtual Machine (JVM), que es el componente que permite la portabilidad del código Java entre diferentes plataformas.
+
+<Tabs>
+  <TabItem label="Componentes principales">
+    <ul>
+      <li><strong>JVM (Java Virtual Machine):</strong> Máquina virtual que ejecuta el bytecode de Java.</li>
+      <li><strong>JRE (Java Runtime Environment):</strong> Contiene la JVM y las bibliotecas estándar necesarias para ejecutar aplicaciones Java.</li>
+      <li><strong>JDK (Java Development Kit):</strong> Incluye el JRE más herramientas de desarrollo como el compilador (javac).</li>
+    </ul>
+  </TabItem>
+  <TabItem label="Proceso de ejecución">
+    <ol>
+      <li>El código fuente Java (.java) se compila a bytecode (.class) usando el compilador javac.</li>
+      <li>El bytecode es independiente de la plataforma y puede ser ejecutado en cualquier dispositivo que tenga una JVM.</li>
+      <li>La JVM interpreta el bytecode y lo convierte en instrucciones específicas para el sistema operativo y hardware subyacente.</li>
+    </ol>
+  </TabItem>
+</Tabs>
+
+### Ediciones de Java
+
+Java se distribuye en diferentes ediciones, cada una orientada a un tipo específico de desarrollo:
+
+- **Java SE (Standard Edition):** <Badge text="Fundamental" variant="default">Fundamental</Badge> Base del lenguaje, incluye las APIs core y es utilizada para aplicaciones de escritorio y aplicaciones simples.
+
+- **Java EE (Enterprise Edition):** <Badge text="Avanzado" variant="default">Avanzado</Badge> Construida sobre Java SE, añade APIs para el desarrollo de aplicaciones empresariales a gran escala, como sistemas distribuidos y aplicaciones web multicapa.
+
+- **Java ME (Micro Edition):** <Badge text="Especializado" variant="default">Especializado</Badge> Versión reducida de Java SE, diseñada para dispositivos con recursos limitados como teléfonos móviles y dispositivos embebidos.
+
+- **Jakarta EE:** <Badge text="Moderno" variant="default">Moderno</Badge> Anteriormente conocida como Java EE, es la versión de código abierto de Java Enterprise Edition, ahora bajo la Fundación Eclipse.
+
+## 1.2 Características principales
+
+Java posee varias características que lo han convertido en uno de los lenguajes más populares y duraderos:
+
+### Orientado a Objetos
+
+Java es un lenguaje completamente orientado a objetos, donde casi todo se trata como un objeto con propiedades y comportamientos.
+
+<Code code={`// Ejemplo de clase en Java
+public class Persona {
+    // Atributos (propiedades)
+    private String nombre;
+    private int edad;
+    
+    // Constructor
+    public Persona(String nombre, int edad) {
+        this.nombre = nombre;
+        this.edad = edad;
+    }
+    
+    // Métodos (comportamientos)
+    public void saludar() {
+        System.out.println("Hola, mi nombre es " + nombre);
+    }
+    
+    // Getters y setters
+    public String getNombre() {
+        return nombre;
+    }
+    
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+    
+    public int getEdad() {
+        return edad;
+    }
+    
+    public void setEdad(int edad) {
+        this.edad = edad;
+    }
+}`} lang="java" />
+
+### Independencia de la plataforma
+
+El código Java se compila a bytecode que puede ejecutarse en cualquier dispositivo que tenga una JVM, lo que hace que Java sea verdaderamente multiplataforma.
+
+<Aside type="tip">
+  El lema "Write Once, Run Anywhere" (WORA) refleja esta característica fundamental de Java.
+</Aside>
+
+### Robusto y seguro
+
+Java fue diseñado con un fuerte énfasis en la fiabilidad y seguridad:
+
+- **Gestión automática de memoria:** Incluye un recolector de basura (garbage collector) que libera automáticamente la memoria no utilizada.
+- **Verificación estricta de tipos:** Detecta errores en tiempo de compilación.
+- **Manejo de excepciones:** Sistema robusto para manejar errores en tiempo de ejecución.
+- **Modelo de seguridad:** Sandbox de seguridad que limita el acceso a recursos del sistema.
+
+### Multihilo
+
+Java soporta programación concurrente a través de su API de hilos, permitiendo ejecutar múltiples tareas simultáneamente.
+
+<Code code={`// Ejemplo de hilo en Java
+public class MiHilo extends Thread {
+    public void run() {
+        System.out.println("El hilo está corriendo");
+    }
+    
+    public static void main(String args[]) {
+        MiHilo hilo = new MiHilo();
+        hilo.start(); // Inicia la ejecución del hilo
+    }
+}`} lang="java" />
+
+### Alto rendimiento
+
+Aunque Java es un lenguaje interpretado, la JVM utiliza técnicas como la compilación Just-In-Time (JIT) para optimizar el rendimiento en tiempo de ejecución.
+
+### Distribuido
+
+Java incluye extensas bibliotecas para trabajar con protocolos como TCP/IP, HTTP y FTP, facilitando el desarrollo de aplicaciones distribuidas.
+
+### Dinámico
+
+Java está diseñado para adaptarse a un entorno en evolución, permitiendo la carga dinámica de clases y la reflexión.
+
+## 1.3 Instalación del JDK y configuración del entorno
+
+Para comenzar a desarrollar en Java, necesitas instalar el JDK (Java Development Kit). A continuación, se detallan los pasos para diferentes sistemas operativos:
+
+<Steps>
+<ol>
+  <li>
+    <strong>Descargar el JDK</strong>
+    <p>Visita la página oficial de Oracle o adopta OpenJDK para descargar la última versión del JDK:</p>
+    <ul>
+      <li><a href="https://www.oracle.com/java/technologies/downloads/" target="_blank">Oracle JDK</a></li>
+      <li><a href="https://adoptopenjdk.net/" target="_blank">AdoptOpenJDK</a></li>
+    </ul>
+  </li>
+  <li>
+    <strong>Instalar el JDK</strong>
+    <Tabs>
+      <TabItem label="Windows">
+        <ol>
+          <li>Ejecuta el instalador descargado (.exe o .msi)</li>
+          <li>Sigue las instrucciones del asistente de instalación</li>
+          <li>Anota la ruta de instalación (por defecto suele ser algo como <code>C:\Program Files\Java\jdk-[version]</code>)</li>
+        </ol>
+      </TabItem>
+      <TabItem label="macOS">
+        <ol>
+          <li>Abre el archivo .dmg o .pkg descargado</li>
+          <li>Sigue las instrucciones del instalador</li>
+          <li>La instalación se realizará en <code>/Library/Java/JavaVirtualMachines/</code></li>
+        </ol>
+      </TabItem>
+      <TabItem label="Linux">
+        <p>Usando apt (Debian/Ubuntu):</p>
+        <Code code={`sudo apt update
+sudo apt install openjdk-17-jdk`} lang="bash" />
+        <p>Usando yum (Fedora/CentOS):</p>
+        <Code code={`sudo yum install java-17-openjdk-devel`} lang="bash" />
+      </TabItem>
+    </Tabs>
+  </li>
+  <li>
+    <strong>Configurar las variables de entorno</strong>
+    <Tabs>
+      <TabItem label="Windows">
+        <ol>
+          <li>Abre el Panel de control > Sistema > Configuración avanzada del sistema</li>
+          <li>Haz clic en "Variables de entorno"</li>
+          <li>En "Variables del sistema", crea o edita la variable JAVA_HOME con la ruta de instalación del JDK</li>
+          <li>Edita la variable PATH y añade <code>%JAVA_HOME%\bin</code></li>
+        </ol>
+      </TabItem>
+      <TabItem label="macOS">
+        <p>Edita el archivo ~/.bash_profile o ~/.zshrc (dependiendo de tu shell):</p>
+        <Code code={`export JAVA_HOME=$(/usr/libexec/java_home)
+export PATH=$JAVA_HOME/bin:$PATH`} lang="bash" />
+        <p>Luego ejecuta <code>source ~/.bash_profile</code> o <code>source ~/.zshrc</code></p>
+      </TabItem>
+      <TabItem label="Linux">
+        <p>Edita el archivo ~/.bashrc:</p>
+        <Code code={`export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+export PATH=$JAVA_HOME/bin:$PATH`} lang="bash" />
+        <p>Luego ejecuta <code>source ~/.bashrc</code></p>
+      </TabItem>
+    </Tabs>
+  </li>
+  <li>
+    <strong>Verificar la instalación</strong>
+    <p>Abre una terminal o línea de comandos y ejecuta:</p>
+    <Code code={`java -version
+javac -version`} lang="bash" />
+    <p>Deberías ver la versión de Java instalada en ambos comandos.</p>
+  </li>
+</ol>
+</Steps>
+
+### IDEs recomendados para Java
+
+Aunque puedes programar en Java con un simple editor de texto, los IDEs (Entornos de Desarrollo Integrado) facilitan enormemente el desarrollo:
+
+<Tabs>
+  <TabItem label="IntelliJ IDEA">
+    <p>Desarrollado por JetBrains, es uno de los IDEs más potentes y populares para Java.</p>
+    <ul>
+      <li><strong>Versión Community:</strong> Gratuita y de código abierto</li>
+      <li><strong>Versión Ultimate:</strong> De pago, con características adicionales para desarrollo empresarial</li>
+      <li><a href="https://www.jetbrains.com/idea/download/" target="_blank">Descargar IntelliJ IDEA</a></li>
+    </ul>
+  </TabItem>
+  <TabItem label="Eclipse">
+    <p>IDE de código abierto muy popular, especialmente en entornos empresariales.</p>
+    <ul>
+      <li>Completamente gratuito</li>
+      <li>Gran cantidad de plugins disponibles</li>
+      <li><a href="https://www.eclipse.org/downloads/" target="_blank">Descargar Eclipse</a></li>
+    </ul>
+  </TabItem>
+  <TabItem label="NetBeans">
+    <p>IDE oficial de Java antes de la adquisición por Oracle, ahora bajo Apache.</p>
+    <ul>
+      <li>Interfaz intuitiva, ideal para principiantes</li>
+      <li>Buen soporte para aplicaciones JavaFX y Java EE</li>
+      <li><a href="https://netbeans.apache.org/download/" target="_blank">Descargar NetBeans</a></li>
+    </ul>
+  </TabItem>
+  <TabItem label="VS Code">
+    <p>Editor de código ligero con extensiones para desarrollo Java.</p>
+    <ul>
+      <li>Más ligero que los IDEs tradicionales</li>
+      <li>Requiere instalar extensiones como "Extension Pack for Java"</li>
+      <li><a href="https://code.visualstudio.com/download" target="_blank">Descargar VS Code</a></li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+## 1.4 Tu primer programa: "Hola Mundo"
+
+Vamos a crear el clásico programa "Hola Mundo" para verificar que todo está correctamente configurado y entender la estructura básica de un programa Java.
+
+<Steps>
+<ol>
+  <li>
+    <strong>Crear un archivo fuente</strong>
+    <p>Crea un archivo llamado <code>HolaMundo.java</code> con tu editor o IDE favorito.</p>
+    <Aside type="caution">
+      En Java, el nombre del archivo debe coincidir exactamente con el nombre de la clase pública que contiene, incluyendo mayúsculas y minúsculas.
+    </Aside>
+  </li>
+  <li>
+    <strong>Escribir el código</strong>
+    <Code code={`public class HolaMundo {
+    // El método main es el punto de entrada de la aplicación
+    public static void main(String[] args) {
+        // Imprime un mensaje en la consola
+        System.out.println("¡Hola, Mundo!");
+    }
+}`} lang="java" />
+  </li>
+  <li>
+    <strong>Compilar el programa</strong>
+    <p>Abre una terminal en el directorio donde guardaste el archivo y ejecuta:</p>
+    <Code code={`javac HolaMundo.java`} lang="bash" />
+    <p>Esto generará un archivo <code>HolaMundo.class</code> que contiene el bytecode.</p>
+  </li>
+  <li>
+    <strong>Ejecutar el programa</strong>
+    <p>En la misma terminal, ejecuta:</p>
+    <Code code={`java HolaMundo`} lang="bash" />
+    <p>Deberías ver el mensaje "¡Hola, Mundo!" en la consola.</p>
+  </li>
+</ol>
+</Steps>
+
+### Explicación del código
+
+<Tabs>
+  <TabItem label="Estructura">
+    <ul>
+      <li><code>public class HolaMundo</code> seguido de llaves: Define una clase pública llamada HolaMundo.</li>
+      <li><code>public static void main(String[] args)</code> seguido de llaves: Define el método principal que se ejecuta al iniciar el programa.</li>
+      <li><code>System.out.println("¡Hola, Mundo!");</code>: Imprime el texto en la consola.</li>
+    </ul>
+  </TabItem>
+  <TabItem label="Palabras clave">
+    <ul>
+      <li><code>public</code>: Modificador de acceso que hace que la clase o método sea accesible desde cualquier parte.</li>
+      <li><code>class</code>: Define una clase en Java.</li>
+      <li><code>static</code>: Indica que el método pertenece a la clase, no a instancias de la clase.</li>
+      <li><code>void</code>: Indica que el método no devuelve ningún valor.</li>
+      <li><code>main</code>: Nombre del método principal que la JVM busca para iniciar la ejecución.</li>
+    </ul>
+  </TabItem>
+  <TabItem label="Parámetros">
+    <p><code>String[] args</code>: Array de cadenas que contiene los argumentos pasados al programa desde la línea de comandos.</p>
+    <p>Ejemplo de uso de argumentos:</p>
+    <Code code={`public class Argumentos {
+    public static void main(String[] args) {
+        System.out.println("Número de argumentos: " + args.length);
+        for (int i = 0; i < args.length; i++) {
+            System.out.println("Argumento " + i + ": " + args[i]);
+        }
+    }
+}`} lang="java" />
+    <p>Ejecución: <code>java Argumentos uno dos tres</code></p>
+  </TabItem>
+</Tabs>
+
+### Variaciones del "Hola Mundo"
+
+<Tabs>
+  <TabItem label="Con formato">
+    <Code code={`public class HolaMundoFormato {
+    public static void main(String[] args) {
+        String nombre = "Juan";
+        int edad = 25;
+        System.out.printf("¡Hola, %s! Tienes %d años.\n", nombre, edad);
+    }
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Interactivo">
+    <Code code={`import java.util.Scanner;
+
+public class HolaMundoInteractivo {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("Por favor, introduce tu nombre: ");
+        String nombre = scanner.nextLine();
+        
+        System.out.println("¡Hola, " + nombre + "! Bienvenido/a a Java.");
+        
+        scanner.close();
+    }
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="GUI (Swing)">
+    <Code code={`import javax.swing.JOptionPane;
+
+public class HolaMundoGUI {
+    public static void main(String[] args) {
+        JOptionPane.showMessageDialog(
+            null, 
+            "¡Hola, Mundo!", 
+            "Mi Primera Aplicación Java", 
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+}`} lang="java" />
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  <p>Ahora que has creado tu primer programa en Java, estás listo para explorar más características del lenguaje. En las siguientes secciones, aprenderás sobre tipos de datos, estructuras de control, clases, objetos y mucho más.</p>
+</Aside>

@@ -1,0 +1,504 @@
+---
+title: 5. Arreglos y Strings
+description: Aprende sobre arreglos indexados y asociativos, funciones para arrays y manipulación de cadenas en PHP
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Arreglos y Strings en PHP
+
+Los arreglos (arrays) y las cadenas de texto (strings) son tipos de datos fundamentales en PHP que se utilizan para almacenar y manipular colecciones de valores y texto, respectivamente. Dominar su uso es esencial para cualquier desarrollador PHP.
+
+## Arreglos (Arrays)
+
+Un array en PHP es una estructura de datos que puede almacenar múltiples valores en una sola variable. PHP ofrece una gran flexibilidad en el manejo de arrays, permitiendo almacenar diferentes tipos de datos en un mismo array.
+
+### Arreglos Indexados
+
+Los arreglos indexados utilizan números como índices, comenzando generalmente desde 0. Son similares a los arrays en otros lenguajes de programación.
+
+<Code code={`<?php
+    // Crear un array indexado
+    $frutas = ["manzana", "banana", "naranja", "uva"];
+    
+    // Sintaxis alternativa
+    $frutas = array("manzana", "banana", "naranja", "uva");
+    
+    // Acceder a elementos por su índice
+    echo $frutas[0]; // Muestra: manzana
+    echo $frutas[2]; // Muestra: naranja
+    
+    // Modificar un elemento
+    $frutas[1] = "pera";
+    echo $frutas[1]; // Muestra: pera
+    
+    // Añadir un elemento al final
+    $frutas[] = "piña";
+    
+    // Recorrer un array indexado
+    for ($i = 0; $i < count($frutas); $i++) {
+        echo "$i: $frutas[$i]<br>";
+    }
+    
+    // Usando foreach (más común)
+    foreach ($frutas as $fruta) {
+        echo "$fruta<br>";
+    }
+    
+    // Foreach con índice y valor
+    foreach ($frutas as $indice => $fruta) {
+        echo "$indice: $fruta<br>";
+    }
+?>`} lang="php" />
+
+### Arreglos Asociativos
+
+Los arreglos asociativos utilizan claves personalizadas en lugar de índices numéricos. Esto permite crear mapeos más descriptivos entre claves y valores.
+
+<Code code={`<?php
+    // Crear un array asociativo
+    $persona = [
+        "nombre" => "María",
+        "edad" => 28,
+        "ciudad" => "Barcelona",
+        "profesion" => "Ingeniera"
+    ];
+    
+    // Sintaxis alternativa
+    $persona = array(
+        "nombre" => "María",
+        "edad" => 28,
+        "ciudad" => "Barcelona",
+        "profesion" => "Ingeniera"
+    );
+    
+    // Acceder a elementos por su clave
+    echo $persona["nombre"]; // Muestra: María
+    echo $persona["profesion"]; // Muestra: Ingeniera
+    
+    // Modificar un elemento
+    $persona["ciudad"] = "Madrid";
+    
+    // Añadir un nuevo elemento
+    $persona["email"] = "maria@ejemplo.com";
+    
+    // Recorrer un array asociativo
+    foreach ($persona as $clave => $valor) {
+        echo "$clave: $valor<br>";
+    }
+?>`} lang="php" />
+
+### Arrays Multidimensionales
+
+Los arrays multidimensionales son arrays que contienen otros arrays. Pueden ser indexados, asociativos o una combinación de ambos.
+
+<Code code={`<?php
+    // Array multidimensional indexado
+    $matriz = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9]
+    ];
+    
+    echo $matriz[0][1]; // Muestra: 2
+    echo $matriz[2][0]; // Muestra: 7
+    
+    // Array multidimensional asociativo
+    $estudiantes = [
+        "estudiante1" => [
+            "nombre" => "Ana",
+            "edad" => 20,
+            "calificaciones" => [85, 90, 78]
+        ],
+        "estudiante2" => [
+            "nombre" => "Carlos",
+            "edad" => 22,
+            "calificaciones" => [92, 88, 94]
+        ]
+    ];
+    
+    echo $estudiantes["estudiante1"]["nombre"]; // Muestra: Ana
+    echo $estudiantes["estudiante2"]["calificaciones"][1]; // Muestra: 88
+    
+    // Recorrer un array multidimensional
+    foreach ($estudiantes as $id => $datos) {
+        echo "ID: $id<br>";
+        echo "Nombre: {$datos['nombre']}<br>";
+        echo "Edad: {$datos['edad']}<br>";
+        echo "Calificaciones: ";
+        foreach ($datos['calificaciones'] as $calificacion) {
+            echo "$calificacion ";
+        }
+        echo "<br><br>";
+    }
+?>`} lang="php" />
+
+<Aside type="tip">
+  Los arrays en PHP son extremadamente flexibles. Puedes mezclar diferentes tipos de datos en un mismo array e incluso tener arrays con índices numéricos y asociativos mezclados.
+</Aside>
+
+## Funciones para Arrays
+
+PHP ofrece una amplia gama de funciones integradas para trabajar con arrays. Estas funciones facilitan tareas comunes como agregar, eliminar, buscar y manipular elementos.
+
+### Funciones Básicas
+
+<Code code={`<?php
+    $numeros = [5, 8, 2, 10, 3];
+    $colores = ["rojo", "verde", "azul"];
+    
+    // Contar elementos
+    echo count($numeros); // Muestra: 5
+    
+    // Verificar si un elemento existe
+    echo in_array(8, $numeros) ? "Sí existe" : "No existe"; // Muestra: Sí existe
+    echo in_array("amarillo", $colores) ? "Sí existe" : "No existe"; // Muestra: No existe
+    
+    // Buscar la posición de un elemento
+    $posicion = array_search("verde", $colores);
+    echo "'verde' está en la posición: $posicion"; // Muestra: 'verde' está en la posición: 1
+    
+    // Obtener las claves de un array
+    $persona = ["nombre" => "Juan", "edad" => 25, "ciudad" => "Madrid"];
+    $claves = array_keys($persona);
+    print_r($claves); // Array ( [0] => nombre [1] => edad [2] => ciudad )
+    
+    // Obtener los valores de un array
+    $valores = array_values($persona);
+    print_r($valores); // Array ( [0] => Juan [1] => 25 [2] => Madrid )
+?>`} lang="php" />
+
+### Agregar y Eliminar Elementos
+
+<Code code={`<?php
+    $frutas = ["manzana", "banana", "naranja"];
+    
+    // Agregar elementos al final
+    array_push($frutas, "uva", "pera");
+    print_r($frutas); // Array ( [0] => manzana [1] => banana [2] => naranja [3] => uva [4] => pera )
+    
+    // Agregar elementos al inicio
+    array_unshift($frutas, "fresa", "kiwi");
+    print_r($frutas); // Array ( [0] => fresa [1] => kiwi [2] => manzana [3] => banana [4] => naranja [5] => uva [6] => pera )
+    
+    // Eliminar el último elemento
+    $ultimo = array_pop($frutas);
+    echo "Elemento eliminado: $ultimo<br>"; // Muestra: Elemento eliminado: pera
+    
+    // Eliminar el primer elemento
+    $primero = array_shift($frutas);
+    echo "Elemento eliminado: $primero<br>"; // Muestra: Elemento eliminado: fresa
+    
+    // Eliminar elementos específicos
+    unset($frutas[2]); // Elimina "banana"
+    print_r($frutas); // Array ( [0] => kiwi [1] => manzana [3] => naranja [4] => uva )
+    
+    // Reindexar el array después de unset
+    $frutas = array_values($frutas);
+    print_r($frutas); // Array ( [0] => kiwi [1] => manzana [2] => naranja [3] => uva )
+?>`} lang="php" />
+
+### Ordenar Arrays
+
+<Code code={`<?php
+    $numeros = [5, 8, 2, 10, 3];
+    $frutas = ["manzana", "banana", "naranja", "uva"];
+    $persona = ["nombre" => "Juan", "edad" => 25, "ciudad" => "Madrid"];
+    
+    // Ordenar de menor a mayor
+    sort($numeros);
+    print_r($numeros); // Array ( [0] => 2 [1] => 3 [2] => 5 [3] => 8 [4] => 10 )
+    
+    // Ordenar de mayor a menor
+    rsort($numeros);
+    print_r($numeros); // Array ( [0] => 10 [1] => 8 [2] => 5 [3] => 3 [4] => 2 )
+    
+    // Ordenar alfabéticamente
+    sort($frutas);
+    print_r($frutas); // Array ( [0] => banana [1] => manzana [2] => naranja [3] => uva )
+    
+    // Ordenar array asociativo por valores
+    asort($persona);
+    print_r($persona); // Ordenado por valores
+    
+    // Ordenar array asociativo por claves
+    ksort($persona);
+    print_r($persona); // Ordenado por claves
+?>`} lang="php" />
+
+### Combinar y Dividir Arrays
+
+<Code code={`<?php
+    $numeros1 = [1, 2, 3];
+    $numeros2 = [4, 5, 6];
+    
+    // Combinar arrays
+    $combinado = array_merge($numeros1, $numeros2);
+    print_r($combinado); // Array ( [0] => 1 [1] => 2 [2] => 3 [3] => 4 [4] => 5 [5] => 6 )
+    
+    // Combinar arrays con operador de propagación (PHP 7.4+)
+    $combinado = [...$numeros1, ...$numeros2];
+    print_r($combinado); // Array ( [0] => 1 [1] => 2 [2] => 3 [3] => 4 [4] => 5 [5] => 6 )
+    
+    // Dividir un array en partes
+    $numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    $partes = array_chunk($numeros, 3);
+    print_r($partes);
+    // Array (
+    //     [0] => Array ( [0] => 1 [1] => 2 [2] => 3 )
+    //     [1] => Array ( [0] => 4 [1] => 5 [2] => 6 )
+    //     [2] => Array ( [0] => 7 [1] => 8 [2] => 9 )
+    //     [3] => Array ( [0] => 10 )
+    // )
+    
+    // Crear array asociativo a partir de dos arrays
+    $claves = ["nombre", "edad", "ciudad"];
+    $valores = ["Ana", 28, "Barcelona"];
+    $persona = array_combine($claves, $valores);
+    print_r($persona); // Array ( [nombre] => Ana [edad] => 28 [ciudad] => Barcelona )
+?>`} lang="php" />
+
+### Filtrar y Transformar Arrays
+
+<Code code={`<?php
+    $numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    
+    // Filtrar elementos
+    $pares = array_filter($numeros, function($n) {
+        return $n % 2 == 0;
+    });
+    print_r($pares); // Array ( [1] => 2 [3] => 4 [5] => 6 [7] => 8 [9] => 10 )
+    
+    // Transformar elementos
+    $cuadrados = array_map(function($n) {
+        return $n * $n;
+    }, $numeros);
+    print_r($cuadrados); // Array ( [0] => 1 [1] => 4 [2] => 9 [3] => 16 [4] => 25 [5] => 36 [6] => 49 [7] => 64 [8] => 81 [9] => 100 )
+    
+    // Reducir un array a un solo valor
+    $suma = array_reduce($numeros, function($acumulador, $n) {
+        return $acumulador + $n;
+    }, 0);
+    echo "La suma es: $suma"; // Muestra: La suma es: 55
+?>`} lang="php" />
+
+<Aside type="note">
+  PHP tiene más de 80 funciones dedicadas a la manipulación de arrays. Puedes consultar la documentación oficial para ver todas las opciones disponibles: [php.net/manual/es/ref.array.php](https://www.php.net/manual/es/ref.array.php)
+</Aside>
+
+## Manipulación de Cadenas (Strings)
+
+Las cadenas de texto o strings son secuencias de caracteres que se utilizan para representar texto en PHP. El lenguaje ofrece numerosas funciones para manipular y procesar texto.
+
+### Creación y Acceso a Strings
+
+<Code code={`<?php
+    // Crear strings
+    $texto1 = "Hola Mundo"; // Con comillas dobles
+    $texto2 = 'Hola PHP';   // Con comillas simples
+    
+    // Diferencia entre comillas simples y dobles
+    $nombre = "María";
+    echo "Hola $nombre"; // Muestra: Hola María (interpola la variable)
+    echo 'Hola $nombre'; // Muestra: Hola $nombre (no interpola)
+    
+    // Acceder a caracteres individuales
+    echo $texto1[0]; // Muestra: H
+    echo $texto1[5]; // Muestra: M
+    
+    // Modificar un carácter
+    $texto1[0] = 'h';
+    echo $texto1; // Muestra: hola Mundo
+?>`} lang="php" />
+
+### Funciones Básicas para Strings
+
+<Code code={`<?php
+    $texto = "Hola Mundo PHP";
+    
+    // Longitud de una cadena
+    echo strlen($texto); // Muestra: 14
+    
+    // Contar palabras
+    echo str_word_count($texto); // Muestra: 3
+    
+    // Convertir a mayúsculas/minúsculas
+    echo strtoupper($texto); // Muestra: HOLA MUNDO PHP
+    echo strtolower($texto); // Muestra: hola mundo php
+    echo ucfirst($texto);    // Muestra: Hola mundo php (primera letra en mayúscula)
+    echo ucwords($texto);    // Muestra: Hola Mundo Php (primera letra de cada palabra en mayúscula)
+    
+    // Revertir una cadena
+    echo strrev($texto); // Muestra: PHP odnuM aloH
+    
+    // Repetir una cadena
+    echo str_repeat("PHP ", 3); // Muestra: PHP PHP PHP 
+?>`} lang="php" />
+
+### Buscar y Reemplazar
+
+<Code code={`<?php
+    $texto = "PHP es un lenguaje de programación. PHP es fácil de aprender.";
+    
+    // Buscar una subcadena
+    echo strpos($texto, "PHP"); // Muestra: 0 (primera ocurrencia)
+    echo strrpos($texto, "PHP"); // Muestra: 31 (última ocurrencia)
+    
+    // Buscar insensible a mayúsculas/minúsculas
+    echo stripos($texto, "php"); // Muestra: 0
+    
+    // Verificar si una cadena contiene otra
+    echo str_contains($texto, "lenguaje") ? "Sí" : "No"; // Muestra: Sí (PHP 8+)
+    echo str_starts_with($texto, "PHP") ? "Sí" : "No"; // Muestra: Sí (PHP 8+)
+    echo str_ends_with($texto, ".") ? "Sí" : "No"; // Muestra: Sí (PHP 8+)
+    
+    // Reemplazar texto
+    echo str_replace("PHP", "JavaScript", $texto); 
+    // Muestra: JavaScript es un lenguaje de programación. JavaScript es fácil de aprender.
+    
+    // Reemplazar insensible a mayúsculas/minúsculas
+    echo str_ireplace("php", "Python", $texto);
+    // Muestra: Python es un lenguaje de programación. Python es fácil de aprender.
+    
+    // Reemplazar múltiples valores
+    echo str_replace(
+        ["PHP", "fácil"], 
+        ["JavaScript", "divertido"], 
+        $texto
+    );
+    // Muestra: JavaScript es un lenguaje de programación. JavaScript es divertido de aprender.
+?>`} lang="php" />
+
+### Extraer Subcadenas
+
+<Code code={`<?php
+    $texto = "PHP es un lenguaje de programación muy popular";
+    
+    // Extraer una parte de la cadena
+    echo substr($texto, 0, 3); // Muestra: PHP (desde posición 0, 3 caracteres)
+    echo substr($texto, 7, 10); // Muestra: un lenguaj (desde posición 7, 10 caracteres)
+    echo substr($texto, -8); // Muestra: popular (8 caracteres desde el final)
+    
+    // Extraer hasta un carácter específico
+    echo strstr($texto, "lenguaje"); // Muestra: lenguaje de programación muy popular
+    echo stristr($texto, "LENGUAJE"); // Igual que strstr pero insensible a mayúsculas/minúsculas
+    
+    // Dividir una cadena en un array
+    $palabras = explode(" ", $texto);
+    print_r($palabras);
+    // Array ( [0] => PHP [1] => es [2] => un [3] => lenguaje [4] => de [5] => programación [6] => muy [7] => popular )
+    
+    // Unir un array en una cadena
+    $array = ["PHP", "es", "genial"];
+    echo implode(" ", $array); // Muestra: PHP es genial
+?>`} lang="php" />
+
+### Formateo de Strings
+
+<Code code={`<?php
+    // Formatear números y texto
+    $nombre = "Ana";
+    $edad = 28;
+    $altura = 1.65;
+    
+    // Usando printf (imprime directamente)
+    printf("Nombre: %s, Edad: %d, Altura: %.2f metros", $nombre, $edad, $altura);
+    // Muestra: Nombre: Ana, Edad: 28, Altura: 1.65 metros
+    
+    // Usando sprintf (devuelve una cadena formateada)
+    $info = sprintf("Nombre: %s, Edad: %d, Altura: %.2f metros", $nombre, $edad, $altura);
+    echo $info;
+    
+    // Especificadores de formato comunes:
+    // %s - String
+    // %d - Número entero
+    // %f - Número de punto flotante
+    // %.2f - Número de punto flotante con 2 decimales
+    // %% - Símbolo de porcentaje
+    
+    // Rellenar una cadena
+    echo str_pad("PHP", 10, "-", STR_PAD_RIGHT); // Muestra: PHP-------
+    echo str_pad("PHP", 10, "-", STR_PAD_LEFT);  // Muestra: -------PHP
+    echo str_pad("PHP", 10, "-", STR_PAD_BOTH);  // Muestra: ---PHP----
+?>`} lang="php" />
+
+### Eliminar Espacios y Caracteres
+
+<Code code={`<?php
+    $texto = "  Hola Mundo  ";
+    
+    // Eliminar espacios al inicio y al final
+    echo trim($texto); // Muestra: "Hola Mundo"
+    echo ltrim($texto); // Muestra: "Hola Mundo  " (solo elimina al inicio)
+    echo rtrim($texto); // Muestra: "  Hola Mundo" (solo elimina al final)
+    
+    // Eliminar caracteres específicos
+    echo trim("###Hola###", "#"); // Muestra: "Hola"
+    
+    // Eliminar etiquetas HTML
+    echo strip_tags("<p>Hola <b>Mundo</b></p>"); // Muestra: "Hola Mundo"
+    
+    // Escapar caracteres HTML
+    echo htmlspecialchars("<p>Hola & Mundo</p>");
+    // Muestra: &lt;p&gt;Hola &amp; Mundo&lt;/p&gt;
+?>`} lang="php" />
+
+### Comparación de Strings
+
+<Code code={`<?php
+    $texto1 = "Hola";
+    $texto2 = "hola";
+    $texto3 = "Hola";
+    
+    // Comparación sensible a mayúsculas/minúsculas
+    echo ($texto1 == $texto2) ? "Iguales" : "Diferentes"; // Muestra: Diferentes
+    echo ($texto1 == $texto3) ? "Iguales" : "Diferentes"; // Muestra: Iguales
+    
+    // Comparación insensible a mayúsculas/minúsculas
+    echo (strcasecmp($texto1, $texto2) == 0) ? "Iguales" : "Diferentes"; // Muestra: Iguales
+    
+    // Comparar parte de una cadena
+    echo (strncmp($texto1, "Ho", 2) == 0) ? "Coincide" : "No coincide"; // Muestra: Coincide
+    
+    // Similitud entre cadenas
+    echo similar_text("PHP", "Python", $porcentaje);
+    echo "Porcentaje de similitud: $porcentaje%";
+?>`} lang="php" />
+
+<Aside type="tip">
+  Al trabajar con caracteres especiales o multibyte (como á, é, ñ, etc.), es recomendable usar las funciones de la extensión `mb_string` como `mb_strlen()`, `mb_substr()`, etc., para un manejo correcto de la codificación UTF-8.
+</Aside>
+
+### Expresiones Regulares
+
+Las expresiones regulares son patrones que permiten realizar búsquedas y manipulaciones avanzadas en strings.
+
+<Code code={`<?php
+    $texto = "Mi correo es usuario@ejemplo.com y mi teléfono es 123-456-7890";
+    
+    // Buscar coincidencias
+    preg_match('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $texto, $coincidencias);
+    echo "Email encontrado: " . $coincidencias[0]; // Muestra: Email encontrado: usuario@ejemplo.com
+    
+    // Buscar todas las coincidencias
+    preg_match_all('/\d/', $texto, $coincidencias);
+    echo "Dígitos encontrados: " . implode(", ", $coincidencias[0]);
+    // Muestra: Dígitos encontrados: 1, 2, 3, 4, 5, 6, 7, 8, 9, 0
+    
+    // Reemplazar usando expresiones regulares
+    $textoModificado = preg_replace('/\d{3}-\d{3}-\d{4}/', '(XXX) XXX-XXXX', $texto);
+    echo $textoModificado;
+    // Muestra: Mi correo es usuario@ejemplo.com y mi teléfono es (XXX) XXX-XXXX
+    
+    // Dividir una cadena usando expresiones regulares
+    $partes = preg_split('/\s+/', "Hola  Mundo  PHP");
+    print_r($partes); // Array ( [0] => Hola [1] => Mundo [2] => PHP )
+?>`} lang="php" />
+
+<Aside type="caution">
+  Las expresiones regulares son muy potentes pero pueden ser complejas. Es importante entender bien su sintaxis para evitar errores y problemas de rendimiento. Además, para patrones simples, las funciones estándar de strings suelen ser más eficientes.
+</Aside>

@@ -1,0 +1,197 @@
+---
+title: Módulos
+description: Aprende a organizar tu código JavaScript usando el sistema de módulos ES6.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Módulos <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Los módulos permiten organizar el código en archivos separados y reutilizables.
+</Aside>
+
+## Exportación <Badge text="Básico" variant="note" />
+
+### Exportaciones nombradas
+<Code code={`// matematica.js
+export const sumar = (a, b) => a + b;
+export const restar = (a, b) => a - b;
+
+export class Calculadora {
+    static multiplicar(a, b) {
+        return a * b;
+    }
+}
+
+// También puedes exportar al final
+const PI = 3.14159;
+export { PI };`} lang="javascript" />
+
+### Exportación por defecto
+<Code code={`// usuario.js
+export default class Usuario {
+    constructor(nombre) {
+        this.nombre = nombre;
+    }
+}
+
+// O también
+const config = {
+    api: 'https://api.ejemplo.com',
+    timeout: 5000
+};
+
+export default config;`} lang="javascript" />
+
+## Importación <Badge text="Importante" variant="danger" />
+
+### Importaciones básicas
+<Code code={`// Importar exportaciones nombradas
+import { sumar, restar } from './matematica.js';
+
+// Importar con alias
+import { sumar as suma, restar as resta } from './matematica.js';
+
+// Importar todo como un objeto
+import * as Matematica from './matematica.js';
+
+// Importar exportación por defecto
+import Usuario from './usuario.js';
+
+// Combinar importaciones
+import Usuario, { roles } from './usuario.js';`} lang="javascript" />
+
+### Importaciones dinámicas
+<Code code={`// Importación dinámica
+async function cargarModulo() {
+    try {
+        const modulo = await import('./modulo.js');
+        modulo.inicializar();
+    } catch (error) {
+        console.error('Error al cargar el módulo:', error);
+    }
+}
+
+// O con then/catch
+import('./modulo.js')
+    .then(modulo => modulo.inicializar())
+    .catch(error => console.error(error));`} lang="javascript" />
+
+## Agregación de módulos <Badge text="Avanzado" variant="note" />
+
+### Re-exportación
+<Code code={`// modulos/index.js
+export { default as Usuario } from './usuario.js';
+export { Roles } from './roles.js';
+export { Permisos } from './permisos.js';
+
+// uso
+import { Usuario, Roles, Permisos } from './modulos';`} lang="javascript" />
+
+### Barrel pattern
+<Code code={`// servicios/index.js
+export * from './autenticacion.js';
+export * from './usuarios.js';
+export * from './productos.js';
+
+// uso
+import { 
+    login, 
+    obtenerUsuario, 
+    listarProductos 
+} from './servicios';`} lang="javascript" />
+
+
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+### Organización de archivos
+<Code code={`// ✅ Bueno
+src/
+  components/
+    Button/
+      index.js      // Exporta el componente
+      styles.js     // Estilos
+      utils.js      // Utilidades
+      constants.js  // Constantes
+  services/
+    api.js
+    auth.js
+  utils/
+    index.js        // Re-exporta utilidades comunes
+    format.js
+    validate.js`} lang="javascript" />
+
+### Importaciones limpias
+<Code code={`// ❌ Malo
+import { 
+    cosa1, cosa2, cosa3, 
+    cosa4, cosa5 
+} from './modulo-grande';
+
+// ✅ Bueno
+import { 
+    cosa1,
+    cosa2,
+    cosa3,
+    cosa4,
+    cosa5 
+} from './modulo-grande';
+
+// ✅ Mejor (si se usan todas)
+import * as ModuloGrande from './modulo-grande';`} lang="javascript" />
+
+### Exportaciones consistentes
+<Code code={`// ❌ Malo - Mezclando estilos
+export const funcion1 = () => {};
+const funcion2 = () => {};
+export { funcion2 };
+export default class {};
+
+// ✅ Bueno - Exportaciones al final
+const funcion1 = () => {};
+const funcion2 = () => {};
+class Principal {}
+
+export {
+    funcion1,
+    funcion2,
+    Principal as default
+};`} lang="javascript" />
+
+### Módulos puros
+<Code code={`// ❌ Malo - Efectos secundarios en módulo
+console.log('Módulo cargado');
+inicializarBaseDatos();
+configurarAPI();
+
+export function utilidad() {}
+
+// ✅ Bueno - Sin efectos secundarios
+export function inicializar() {
+    console.log('Inicializando...');
+    inicializarBaseDatos();
+    configurarAPI();
+}
+
+export function utilidad() {}`} lang="javascript" />
+
+### Lazy loading
+<Code code={`// Componente que usa lazy loading
+async function cargarVisualizador() {
+    const { Visualizador } = await import(
+        /* webpackChunkName: "visualizador" */
+        './componentes/Visualizador'
+    );
+    
+    return new Visualizador();
+}
+
+// Uso
+boton.addEventListener('click', async () => {
+    const visualizador = await cargarVisualizador();
+    visualizador.mostrar(datos);
+});`} lang="javascript" />

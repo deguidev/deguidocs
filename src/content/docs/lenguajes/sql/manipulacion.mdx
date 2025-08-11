@@ -1,0 +1,674 @@
+---
+title: 3. Manipulación de Datos (DML)
+description: Aprende a insertar, consultar, actualizar y eliminar datos en bases de datos SQL
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Manipulación de Datos (DML – Data Manipulation Language)
+
+El Lenguaje de Manipulación de Datos (DML) es un subconjunto de SQL que permite a los usuarios insertar, consultar, actualizar y eliminar datos en una base de datos. Estas operaciones son fundamentales para interactuar con los datos almacenados en las tablas.
+
+## 3.1. Insertar registros (INSERT)
+
+El comando `INSERT` permite añadir nuevos registros a una tabla existente.
+
+### Sintaxis básica
+
+```sql
+INSERT INTO nombre_tabla [(columna1, columna2, ...)] VALUES (valor1, valor2, ...);
+```
+
+### Ejemplos de inserción de datos
+
+<Tabs>
+  <TabItem label="Inserción básica">
+    ```sql
+    -- Insertar un registro especificando todas las columnas
+    INSERT INTO empleados (id_empleado, nombre, apellido, email, fecha_contratacion, salario)
+    VALUES (1, 'Juan', 'Pérez', 'juan.perez@ejemplo.com', '2023-01-15', 35000.00);
+    
+    -- Insertar un registro sin especificar columnas (debe seguir el orden de las columnas en la tabla)
+    INSERT INTO departamentos
+    VALUES (1, 'Ventas', 'Edificio A', 101);
+    ```
+  </TabItem>
+  <TabItem label="Múltiples registros">
+    ```sql
+    -- Insertar múltiples registros en una sola sentencia
+    INSERT INTO productos (id_producto, nombre, precio, stock) VALUES
+    (101, 'Teclado inalámbrico', 45.99, 50),
+    (102, 'Mouse óptico', 25.50, 100),
+    (103, 'Monitor 24"', 199.99, 25);
+    ```
+  </TabItem>
+  <TabItem label="Inserción con SELECT">
+    ```sql
+    -- Insertar datos desde otra tabla
+    INSERT INTO empleados_historico (id_empleado, nombre, apellido, fecha_baja)
+    SELECT id_empleado, nombre, apellido, CURRENT_DATE
+    FROM empleados
+    WHERE departamento_id = 5;
+    ```
+  </TabItem>
+</Tabs>
+
+### Diferencias entre MySQL y Oracle
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Insertar ignorando duplicados
+    INSERT IGNORE INTO clientes (id_cliente, nombre, email)
+    VALUES (1, 'Ana García', 'ana@ejemplo.com');
+    
+    -- Insertar o actualizar si existe (UPSERT)
+    INSERT INTO productos (id_producto, nombre, precio, stock)
+    VALUES (101, 'Teclado mecánico', 89.99, 30)
+    ON DUPLICATE KEY UPDATE 
+    precio = VALUES(precio),
+    stock = stock + VALUES(stock);
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Insertar con secuencia para generar ID
+    INSERT INTO empleados (id_empleado, nombre, apellido)
+    VALUES (empleados_seq.NEXTVAL, 'Carlos', 'Ruiz');
+    
+    -- Insertar o actualizar si existe (MERGE)
+    MERGE INTO productos p
+    USING (SELECT 101 AS id, 'Teclado mecánico' AS nombre, 89.99 AS precio, 30 AS stock FROM dual) d
+    ON (p.id_producto = d.id)
+    WHEN MATCHED THEN
+      UPDATE SET p.precio = d.precio, p.stock = p.stock + d.stock
+    WHEN NOT MATCHED THEN
+      INSERT (id_producto, nombre, precio, stock)
+      VALUES (d.id, d.nombre, d.precio, d.stock);
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Al insertar datos, es una buena práctica especificar siempre las columnas en las que se insertarán los valores, incluso si se van a proporcionar valores para todas las columnas. Esto hace que la consulta sea más robusta frente a cambios futuros en la estructura de la tabla.
+</Aside>
+
+## 3.2. Consultar datos (SELECT)
+
+El comando `SELECT` es uno de los más utilizados en SQL y permite recuperar datos de una o más tablas.
+
+### Sintaxis básica
+
+```sql
+SELECT [DISTINCT] columna1, columna2, ...
+FROM nombre_tabla
+[WHERE condicion]
+[GROUP BY columnas]
+[HAVING condicion_grupo]
+[ORDER BY columnas [ASC|DESC]]
+[LIMIT n];
+```
+
+### Ejemplos de consultas básicas
+
+```sql
+-- Seleccionar todas las columnas de una tabla
+SELECT * FROM empleados;
+
+-- Seleccionar columnas específicas
+SELECT nombre, apellido, salario FROM empleados;
+
+-- Seleccionar con alias de columna
+SELECT 
+    nombre AS nombre_empleado, 
+    salario AS salario_mensual,
+    salario * 12 AS salario_anual
+FROM empleados;
+```
+
+### Eliminar duplicados con DISTINCT
+
+```sql
+-- Obtener departamentos únicos donde trabajan empleados
+SELECT DISTINCT departamento_id FROM empleados;
+
+-- Combinaciones únicas de departamento y cargo
+SELECT DISTINCT departamento_id, cargo FROM empleados;
+```
+
+### Funciones de agregación
+
+```sql
+-- Contar registros
+SELECT COUNT(*) AS total_empleados FROM empleados;
+
+-- Calcular suma, promedio, máximo y mínimo
+SELECT 
+    SUM(salario) AS suma_salarios,
+    AVG(salario) AS promedio_salario,
+    MAX(salario) AS salario_maximo,
+    MIN(salario) AS salario_minimo
+FROM empleados;
+```
+
+### Agrupación con GROUP BY
+
+```sql
+-- Contar empleados por departamento
+SELECT 
+    departamento_id,
+    COUNT(*) AS num_empleados
+FROM empleados
+GROUP BY departamento_id;
+
+-- Calcular salario promedio por departamento y cargo
+SELECT 
+    departamento_id,
+    cargo,
+    AVG(salario) AS salario_promedio
+FROM empleados
+GROUP BY departamento_id, cargo;
+```
+
+### Filtrar grupos con HAVING
+
+```sql
+-- Encontrar departamentos con más de 5 empleados
+SELECT 
+    departamento_id,
+    COUNT(*) AS num_empleados
+FROM empleados
+GROUP BY departamento_id
+HAVING COUNT(*) > 5;
+```
+
+<Aside type="note">
+  La cláusula `WHERE` filtra filas antes de agruparlas, mientras que `HAVING` filtra grupos después de que se han formado. `HAVING` se usa generalmente con funciones de agregación, mientras que `WHERE` se usa con columnas individuales.
+</Aside>
+
+## 3.3. Filtrar resultados (WHERE)
+
+La cláusula `WHERE` permite filtrar los registros que cumplen con una condición específica.
+
+### Operadores de comparación
+
+```sql
+-- Igualdad
+SELECT * FROM empleados WHERE departamento_id = 3;
+
+-- Desigualdad
+SELECT * FROM empleados WHERE salario > 50000;
+SELECT * FROM productos WHERE categoria_id != 5;
+
+-- Comparaciones
+SELECT * FROM pedidos WHERE fecha_pedido >= '2023-01-01';
+SELECT * FROM productos WHERE stock <= 10;
+```
+
+### Operadores lógicos
+
+```sql
+-- AND: ambas condiciones deben ser verdaderas
+SELECT * FROM empleados 
+WHERE departamento_id = 3 AND salario > 40000;
+
+-- OR: al menos una condición debe ser verdadera
+SELECT * FROM productos 
+WHERE categoria_id = 1 OR categoria_id = 2;
+
+-- NOT: niega una condición
+SELECT * FROM clientes 
+WHERE NOT ciudad = 'Madrid';
+```
+
+### Operadores especiales
+
+#### BETWEEN
+
+```sql
+-- Valores dentro de un rango (inclusivo)
+SELECT * FROM productos 
+WHERE precio BETWEEN 10.00 AND 50.00;
+
+-- Fechas dentro de un rango
+SELECT * FROM pedidos 
+WHERE fecha_pedido BETWEEN '2023-01-01' AND '2023-03-31';
+```
+
+#### IN
+
+```sql
+-- Valores que coinciden con cualquiera en una lista
+SELECT * FROM empleados 
+WHERE departamento_id IN (1, 3, 5);
+
+-- Subconsulta con IN
+SELECT * FROM productos 
+WHERE categoria_id IN (SELECT id_categoria FROM categorias WHERE activo = 1);
+```
+
+#### LIKE
+
+```sql
+-- Coincidencia de patrones con comodín %
+SELECT * FROM empleados WHERE nombre LIKE 'Mar%';  -- Nombres que empiezan con "Mar"
+SELECT * FROM productos WHERE descripcion LIKE '%portátil%';  -- Contiene "portátil"
+SELECT * FROM clientes WHERE email LIKE '%@gmail.com';  -- Termina con "@gmail.com"
+
+-- Comodín _ (un solo carácter)
+SELECT * FROM empleados WHERE codigo LIKE 'E-___';  -- E- seguido de exactamente 3 caracteres
+```
+
+#### IS NULL / IS NOT NULL
+
+```sql
+-- Encontrar valores nulos
+SELECT * FROM empleados WHERE fecha_baja IS NULL;
+
+-- Encontrar valores no nulos
+SELECT * FROM clientes WHERE telefono IS NOT NULL;
+```
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Búsqueda de texto completo (requiere índice FULLTEXT)
+    SELECT * FROM articulos 
+    WHERE MATCH(titulo, contenido) AGAINST('inteligencia artificial');
+    
+    -- Expresiones regulares
+    SELECT * FROM productos 
+    WHERE nombre REGEXP '^[A-Z][0-9]';
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Expresiones regulares
+    SELECT * FROM productos 
+    WHERE REGEXP_LIKE(nombre, '^[A-Z][0-9]');
+    
+    -- Búsqueda de texto con Oracle Text
+    SELECT * FROM articulos 
+    WHERE CONTAINS(contenido, 'inteligencia NEAR artificial') > 0;
+    ```
+  </TabItem>
+</Tabs>
+
+## 3.4. Ordenar resultados (ORDER BY)
+
+La cláusula `ORDER BY` permite ordenar los resultados de una consulta según una o más columnas.
+
+### Sintaxis básica
+
+```sql
+SELECT columna1, columna2, ...
+FROM nombre_tabla
+[WHERE condicion]
+ORDER BY columna1 [ASC|DESC], columna2 [ASC|DESC], ...;
+```
+
+### Ejemplos de ordenación
+
+```sql
+-- Ordenar por una columna (ascendente por defecto)
+SELECT nombre, apellido, salario FROM empleados
+ORDER BY salario;
+
+-- Ordenar de forma descendente
+SELECT nombre, apellido, salario FROM empleados
+ORDER BY salario DESC;
+
+-- Ordenar por múltiples columnas
+SELECT nombre, apellido, departamento_id, salario FROM empleados
+ORDER BY departamento_id ASC, salario DESC;
+```
+
+### Ordenar por posición de columna
+
+```sql
+-- Ordenar por la segunda columna seleccionada
+SELECT nombre, fecha_contratacion, salario FROM empleados
+ORDER BY 2 DESC;  -- Ordena por fecha_contratacion descendente
+```
+
+<Aside type="caution">
+  Ordenar por posición de columna puede hacer que el código sea menos mantenible, ya que si cambia el orden de las columnas en el SELECT, también cambiará el comportamiento de la ordenación.
+</Aside>
+
+### Ordenar con expresiones
+
+```sql
+-- Ordenar por una expresión calculada
+SELECT 
+    nombre, 
+    apellido, 
+    salario, 
+    salario * 1.1 AS salario_con_aumento
+FROM empleados
+ORDER BY salario * 1.1 DESC;
+
+-- También se puede ordenar por el alias
+SELECT 
+    nombre, 
+    apellido, 
+    salario, 
+    salario * 1.1 AS salario_con_aumento
+FROM empleados
+ORDER BY salario_con_aumento DESC;
+```
+
+### Ordenar con valores NULL
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- En MySQL, NULL se considera menor que cualquier valor no NULL
+    -- Por defecto, los NULL aparecen primero en orden ASC
+    
+    -- Colocar NULL al final en ordenación ascendente
+    SELECT nombre, fecha_baja FROM empleados
+    ORDER BY fecha_baja IS NULL, fecha_baja ASC;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- En Oracle, se puede especificar explícitamente dónde colocar los NULL
+    
+    -- NULL primero (comportamiento por defecto en ASC)
+    SELECT nombre, fecha_baja FROM empleados
+    ORDER BY fecha_baja ASC NULLS FIRST;
+    
+    -- NULL último
+    SELECT nombre, fecha_baja FROM empleados
+    ORDER BY fecha_baja ASC NULLS LAST;
+    ```
+  </TabItem>
+</Tabs>
+
+## 3.5. Limitar resultados (LIMIT en MySQL, ROWNUM en Oracle)
+
+A menudo es útil limitar el número de filas devueltas por una consulta, especialmente cuando se trabaja con grandes conjuntos de datos.
+
+<Tabs>
+  <TabItem label="MySQL">
+    ### LIMIT en MySQL
+    
+    ```sql
+    -- Obtener los primeros 10 registros
+    SELECT * FROM productos
+    ORDER BY precio DESC
+    LIMIT 10;
+    
+    -- Paginación: obtener registros del 11 al 20
+    -- LIMIT [offset], [count]
+    SELECT * FROM productos
+    ORDER BY precio DESC
+    LIMIT 10, 10;
+    
+    -- Sintaxis alternativa para paginación
+    SELECT * FROM productos
+    ORDER BY precio DESC
+    LIMIT 10 OFFSET 10;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ### ROWNUM y ROW_NUMBER() en Oracle
+    
+    ```sql
+    -- Usando ROWNUM (Oracle 11g y anteriores)
+    -- IMPORTANTE: ROWNUM se aplica antes de ORDER BY, por lo que debe usarse con subconsultas
+    SELECT * FROM (
+        SELECT * FROM productos
+        ORDER BY precio DESC
+    ) WHERE ROWNUM <= 10;
+    
+    -- Para paginación en Oracle 12c y posteriores
+    SELECT * FROM productos
+    ORDER BY precio DESC
+    FETCH FIRST 10 ROWS ONLY;
+    
+    -- Paginación: obtener registros del 11 al 20
+    SELECT * FROM productos
+    ORDER BY precio DESC
+    OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY;
+    
+    -- Usando ROW_NUMBER() (Oracle 11g y posteriores)
+    SELECT * FROM (
+        SELECT p.*, ROW_NUMBER() OVER (ORDER BY precio DESC) AS rn
+        FROM productos p
+    ) WHERE rn BETWEEN 11 AND 20;
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  La paginación es esencial para aplicaciones web que muestran grandes conjuntos de datos. Implementar correctamente la paginación mejora el rendimiento y la experiencia del usuario.
+</Aside>
+
+## 3.6. Actualizar registros (UPDATE)
+
+El comando `UPDATE` permite modificar datos existentes en una tabla.
+
+### Sintaxis básica
+
+```sql
+UPDATE nombre_tabla
+SET columna1 = valor1, columna2 = valor2, ...
+[WHERE condicion];
+```
+
+### Ejemplos de actualización
+
+```sql
+-- Actualizar un solo registro
+UPDATE empleados
+SET salario = 55000
+WHERE id_empleado = 101;
+
+-- Actualizar múltiples columnas
+UPDATE clientes
+SET 
+    telefono = '555-123-4567',
+    direccion = 'Calle Nueva 123',
+    fecha_actualizacion = CURRENT_DATE
+WHERE id_cliente = 25;
+
+-- Actualizar múltiples registros
+UPDATE productos
+SET precio = precio * 1.1
+WHERE categoria_id = 3;
+```
+
+<Aside type="caution">
+  Si se omite la cláusula WHERE en un UPDATE, la operación afectará a TODOS los registros de la tabla. Siempre verifique su cláusula WHERE antes de ejecutar un UPDATE.
+</Aside>
+
+### Actualizaciones con subconsultas
+
+```sql
+-- Actualizar basado en datos de otra tabla
+UPDATE productos p
+SET p.precio = p.precio * 1.2
+WHERE p.categoria_id IN (
+    SELECT id_categoria 
+    FROM categorias 
+    WHERE nombre = 'Electrónica'
+);
+```
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Actualizar con JOIN en MySQL
+    UPDATE productos p
+    JOIN categorias c ON p.categoria_id = c.id_categoria
+    SET p.precio = p.precio * 1.2
+    WHERE c.nombre = 'Electrónica';
+    
+    -- Actualizar múltiples tablas
+    UPDATE pedidos p, detalles_pedido dp
+    SET 
+        p.estado = 'Completado',
+        dp.estado_linea = 'Enviado'
+    WHERE p.id_pedido = dp.id_pedido
+    AND p.id_pedido = 1001;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Actualizar con subconsulta correlacionada
+    UPDATE productos p
+    SET p.precio = p.precio * 1.2
+    WHERE EXISTS (
+        SELECT 1 FROM categorias c
+        WHERE p.categoria_id = c.id_categoria
+        AND c.nombre = 'Electrónica'
+    );
+    
+    -- Actualizar con MERGE
+    MERGE INTO productos p
+    USING categorias c
+    ON (p.categoria_id = c.id_categoria)
+    WHEN MATCHED THEN
+      UPDATE SET p.precio = p.precio * 1.2
+      WHERE c.nombre = 'Electrónica';
+    ```
+  </TabItem>
+</Tabs>
+
+## 3.7. Eliminar registros (DELETE)
+
+El comando `DELETE` permite eliminar registros existentes de una tabla.
+
+### Sintaxis básica
+
+```sql
+DELETE FROM nombre_tabla
+[WHERE condicion];
+```
+
+### Ejemplos de eliminación
+
+```sql
+-- Eliminar un registro específico
+DELETE FROM clientes
+WHERE id_cliente = 1001;
+
+-- Eliminar múltiples registros
+DELETE FROM productos
+WHERE categoria_id = 5 AND stock = 0;
+
+-- Eliminar registros basados en una fecha
+DELETE FROM registros_log
+WHERE fecha_registro < '2023-01-01';
+```
+
+<Aside type="caution">
+  Al igual que con UPDATE, si se omite la cláusula WHERE en un DELETE, se eliminarán TODOS los registros de la tabla. Siempre verifique su cláusula WHERE antes de ejecutar un DELETE.
+</Aside>
+
+### Eliminar con subconsultas
+
+```sql
+-- Eliminar registros basados en datos de otra tabla
+DELETE FROM pedidos
+WHERE cliente_id IN (
+    SELECT id_cliente
+    FROM clientes
+    WHERE fecha_ultima_compra < '2020-01-01'
+);
+```
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Eliminar con JOIN
+    DELETE p
+    FROM pedidos p
+    JOIN clientes c ON p.cliente_id = c.id_cliente
+    WHERE c.fecha_ultima_compra < '2020-01-01';
+    
+    -- Eliminar con límite
+    DELETE FROM registros_log
+    ORDER BY fecha_registro
+    LIMIT 1000;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Eliminar con subconsulta correlacionada
+    DELETE FROM pedidos p
+    WHERE EXISTS (
+        SELECT 1 FROM clientes c
+        WHERE p.cliente_id = c.id_cliente
+        AND c.fecha_ultima_compra < TO_DATE('2020-01-01', 'YYYY-MM-DD')
+    );
+    
+    -- Eliminar con ROWNUM (similar a LIMIT)
+    DELETE FROM (
+        SELECT * FROM registros_log
+        ORDER BY fecha_registro
+    )
+    WHERE ROWNUM <= 1000;
+    ```
+  </TabItem>
+</Tabs>
+
+### Diferencias entre DELETE y TRUNCATE
+
+<Tabs>
+  <TabItem label="DELETE">
+    - Es una operación DML (Data Manipulation Language)
+    - Puede usar cláusula WHERE para eliminar registros específicos
+    - Registra cada eliminación en el log de transacciones
+    - Se puede hacer rollback
+    - Activa disparadores (triggers)
+    - No reinicia contadores de secuencia/autoincremento
+    - Más lento para eliminar todos los registros
+  </TabItem>
+  <TabItem label="TRUNCATE">
+    - Es una operación DDL (Data Definition Language)
+    - Elimina todos los registros (no permite WHERE)
+    - Mínima escritura en el log de transacciones
+    - No se puede hacer rollback (en la mayoría de SGBD)
+    - No activa disparadores
+    - Reinicia contadores de secuencia/autoincremento
+    - Más rápido para eliminar todos los registros
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Para operaciones de eliminación masiva, considere usar TRUNCATE si necesita eliminar todos los registros de una tabla. Para eliminaciones selectivas o cuando necesite mantener la integridad referencial, use DELETE.
+</Aside>
+
+### Eliminación lógica vs. física
+
+En muchas aplicaciones empresariales, es común implementar una "eliminación lógica" en lugar de eliminar físicamente los registros:
+
+```sql
+-- Estructura de tabla con columna para eliminación lógica
+CREATE TABLE clientes (
+    id_cliente INT PRIMARY KEY,
+    nombre VARCHAR(100),
+    activo BOOLEAN DEFAULT TRUE,  -- o bit, tinyint, etc.
+    fecha_eliminacion DATETIME NULL
+);
+
+-- "Eliminar" lógicamente un cliente
+UPDATE clientes
+SET 
+    activo = FALSE,
+    fecha_eliminacion = CURRENT_TIMESTAMP
+WHERE id_cliente = 1001;
+
+-- Consultar solo clientes activos
+SELECT * FROM clientes WHERE activo = TRUE;
+```
+
+<Aside type="note">
+  La eliminación lógica permite "recuperar" registros eliminados y mantener un historial completo. Sin embargo, puede complicar las consultas y afectar al rendimiento en tablas muy grandes. Evalúe cuidadosamente si es necesaria para su aplicación.
+</Aside>

@@ -1,0 +1,541 @@
+---
+title: 4. Entrada y Salida en Consola
+description: Aprende sobre la clase Scanner, lectura de datos desde consola, escritura de datos y formateo de salida en Java
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Entrada y Salida en Consola
+
+La entrada y salida de datos es una parte fundamental de cualquier programa. En Java, existen diversas formas de interactuar con el usuario a través de la consola, permitiendo tanto la lectura de datos ingresados como la presentación de resultados.
+
+## 2.3.1 Uso de la clase Scanner
+
+La clase `Scanner` es una de las herramientas más utilizadas para la lectura de datos en Java. Pertenece al paquete `java.util` y proporciona métodos para leer diferentes tipos de datos desde diversas fuentes, como la entrada estándar (teclado), archivos o cadenas de texto.
+
+### Importación y creación de un objeto Scanner
+
+Para utilizar la clase `Scanner`, primero debemos importarla y luego crear una instancia:
+
+<Code code={`import java.util.Scanner;
+
+public class EjemploScanner {
+    public static void main(String[] args) {
+        // Crear un objeto Scanner para leer de la entrada estándar (teclado)
+        Scanner scanner = new Scanner(System.in);
+        
+        // Uso del scanner...
+        
+        // Cerrar el scanner cuando ya no se necesite
+        scanner.close();
+    }
+}`} lang="java" />
+
+<Aside type="caution">
+  Es una buena práctica cerrar el objeto `Scanner` cuando ya no se necesita para liberar recursos. Sin embargo, ten cuidado de no cerrar `System.in` si planeas usarlo más adelante en tu programa.
+</Aside>
+
+### Métodos principales de la clase Scanner
+
+La clase `Scanner` proporciona varios métodos para leer diferentes tipos de datos:
+
+<table>
+  <thead>
+    <tr>
+      <th>Método</th>
+      <th>Descripción</th>
+      <th>Ejemplo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><Code code="nextLine()" lang="java" /></td>
+      <td>Lee una línea completa de texto</td>
+      <td><Code code={`String nombre = scanner.nextLine();`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="next()" lang="java" /></td>
+      <td>Lee la siguiente palabra (hasta encontrar un espacio)</td>
+      <td><Code code={`String palabra = scanner.next();`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="nextInt()" lang="java" /></td>
+      <td>Lee un valor entero</td>
+      <td><Code code={`int edad = scanner.nextInt();`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="nextDouble()" lang="java" /></td>
+      <td>Lee un valor decimal</td>
+      <td><Code code={`double precio = scanner.nextDouble();`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="nextBoolean()" lang="java" /></td>
+      <td>Lee un valor booleano (true/false)</td>
+      <td><Code code={`boolean respuesta = scanner.nextBoolean();`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="nextLong()" lang="java" /></td>
+      <td>Lee un valor entero largo</td>
+      <td><Code code={`long poblacion = scanner.nextLong();`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="nextFloat()" lang="java" /></td>
+      <td>Lee un valor decimal de precisión simple</td>
+      <td><Code code={`float altura = scanner.nextFloat();`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="hasNext()" lang="java" /></td>
+      <td>Verifica si hay más tokens disponibles</td>
+      <td><Code code={`if (scanner.hasNext()) { ... }`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="hasNextInt()" lang="java" /></td>
+      <td>Verifica si el siguiente token es un entero</td>
+      <td><Code code={`if (scanner.hasNextInt()) { ... }`} lang="java" /></td>
+    </tr>
+  </tbody>
+</table>
+
+<Aside type="tip">
+  Los métodos `hasNext...()` son útiles para validar que la entrada sea del tipo esperado antes de intentar leerla, evitando así excepciones por formato incorrecto.
+</Aside>
+
+## 2.3.2 Lectura de datos desde consola
+
+La lectura de datos desde la consola implica capturar la información que el usuario ingresa a través del teclado. Veamos algunos ejemplos prácticos de cómo realizar esta tarea utilizando la clase `Scanner`.
+
+### Ejemplo básico de lectura de diferentes tipos de datos
+
+<Code code={`import java.util.Scanner;
+
+public class LecturaConsola {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        // Lectura de una cadena (nombre)
+        System.out.print("Ingrese su nombre: ");
+        String nombre = scanner.nextLine();
+        
+        // Lectura de un entero (edad)
+        System.out.print("Ingrese su edad: ");
+        int edad = scanner.nextInt();
+        
+        // Consumir el salto de línea pendiente
+        scanner.nextLine();
+        
+        // Lectura de una cadena (dirección)
+        System.out.print("Ingrese su dirección: ");
+        String direccion = scanner.nextLine();
+        
+        // Lectura de un decimal (altura)
+        System.out.print("Ingrese su altura en metros: ");
+        double altura = scanner.nextDouble();
+        
+        // Mostrar los datos ingresados
+        System.out.println("\nDatos ingresados:");
+        System.out.println("Nombre: " + nombre);
+        System.out.println("Edad: " + edad + " años");
+        System.out.println("Dirección: " + direccion);
+        System.out.println("Altura: " + altura + " metros");
+        
+        scanner.close();
+    }
+}`} lang="java" />
+
+<Aside type="note">
+  Observa el uso de `scanner.nextLine()` después de `scanner.nextInt()`. Esto es necesario porque `nextInt()` no consume el carácter de nueva línea (\n) que queda en el buffer después de presionar Enter, lo que podría afectar la siguiente lectura con `nextLine()`.
+</Aside>
+
+### Validación de entrada
+
+Es importante validar la entrada del usuario para evitar errores en tiempo de ejecución:
+
+<Code code={`import java.util.Scanner;
+
+public class ValidacionEntrada {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int edad = 0;
+        boolean entradaValida = false;
+        
+        // Validación de entrada para un entero
+        while (!entradaValida) {
+            System.out.print("Ingrese su edad: ");
+            if (scanner.hasNextInt()) {
+                edad = scanner.nextInt();
+                if (edad > 0 && edad < 120) { // Rango razonable para una edad
+                    entradaValida = true;
+                } else {
+                    System.out.println("Por favor, ingrese una edad válida (1-119).");
+                }
+            } else {
+                System.out.println("Por favor, ingrese un número entero.");
+                scanner.next(); // Descartar la entrada incorrecta
+            }
+        }
+        
+        System.out.println("Edad ingresada: " + edad + " años");
+        scanner.close();
+    }
+}`} lang="java" />
+
+### Manejo de excepciones en la lectura de datos
+
+Otra forma de manejar entradas incorrectas es utilizando bloques try-catch:
+
+<Code code={`import java.util.Scanner;
+
+public class ManejoExcepciones {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int numero = 0;
+        boolean entradaValida = false;
+        
+        while (!entradaValida) {
+            System.out.print("Ingrese un número entero: ");
+            try {
+                numero = Integer.parseInt(scanner.nextLine());
+                entradaValida = true;
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Debe ingresar un número entero válido.");
+            }
+        }
+        
+        System.out.println("Número ingresado: " + numero);
+        scanner.close();
+    }
+}`} lang="java" />
+
+<Aside type="tip">
+  El uso de `Integer.parseInt(scanner.nextLine())` en lugar de `scanner.nextInt()` evita problemas con el buffer de entrada y simplifica el manejo de errores.
+</Aside>
+
+## 2.3.3 Escritura de datos en consola
+
+Java proporciona varias formas de mostrar información en la consola. Las más comunes son a través de los métodos de la clase `System.out`.
+
+### Métodos principales para salida en consola
+
+<table>
+  <thead>
+    <tr>
+      <th>Método</th>
+      <th>Descripción</th>
+      <th>Ejemplo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><Code code="System.out.println()" lang="java" /></td>
+      <td>Imprime el texto y añade un salto de línea al final</td>
+      <td><Code code={`System.out.println("Hola, mundo!");`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="System.out.print()" lang="java" /></td>
+      <td>Imprime el texto sin añadir un salto de línea</td>
+      <td><Code code={`System.out.print("Ingrese su nombre: ");`} lang="java" /></td>
+    </tr>
+    <tr>
+      <td><Code code="System.out.printf()" lang="java" /></td>
+      <td>Imprime texto formateado (similar a printf en C)</td>
+      <td><Code code={`System.out.printf("Pi: %.2f", Math.PI);`} lang="java" /></td>
+    </tr>
+  </tbody>
+</table>
+
+### Ejemplos de uso de print y println
+
+<Code code={`public class EjemploSalida {
+    public static void main(String[] args) {
+        // Uso de println (con salto de línea)
+        System.out.println("Esta es la primera línea");
+        System.out.println("Esta es la segunda línea");
+        
+        // Uso de print (sin salto de línea)
+        System.out.print("Esto se imprime ");
+        System.out.print("en la misma línea\n"); // \n añade un salto de línea manualmente
+        
+        // Combinación de texto y variables
+        String nombre = "Ana";
+        int edad = 25;
+        System.out.println(nombre + " tiene " + edad + " años.");
+        
+        // Impresión de valores numéricos
+        double precio = 19.99;
+        System.out.println("El precio es: $" + precio);
+        
+        // Impresión de caracteres especiales
+        System.out.println("Comillas: \"Hola\"\nNueva línea\tTabulación");
+    }
+}`} lang="java" />
+
+<Aside type="note">
+  Los caracteres especiales como `\n` (nueva línea), `\t` (tabulación), `\"` (comillas dobles) y `\\` (barra invertida) permiten controlar el formato de la salida.
+</Aside>
+
+### Concatenación de cadenas vs StringBuilder
+
+Para la salida de texto extenso o en bucles, es más eficiente usar `StringBuilder` en lugar de concatenación de cadenas:
+
+<Tabs>
+  <TabItem label="Concatenación (menos eficiente)">
+    <Code code={`String resultado = "";
+for (int i = 1; i <= 5; i++) {
+    resultado += "Número " + i + "\n";
+}
+System.out.println(resultado);`} lang="java" />
+  </TabItem>
+  <TabItem label="StringBuilder (más eficiente)">
+    <Code code={`StringBuilder sb = new StringBuilder();
+for (int i = 1; i <= 5; i++) {
+    sb.append("Número ").append(i).append("\n");
+}
+System.out.println(sb.toString());`} lang="java" />
+  </TabItem>
+</Tabs>
+
+## 2.3.4 Formateo de salida (printf, println)
+
+El formateo de salida permite presentar datos de manera más estructurada y legible. Java ofrece varias opciones para dar formato a la salida de texto.
+
+### Uso de System.out.printf
+
+El método `printf` permite formatear texto utilizando especificadores de formato, similar a C/C++:
+
+<Code code={`public class FormateoSalida {
+    public static void main(String[] args) {
+        String nombre = "Carlos";
+        int edad = 30;
+        double altura = 1.75;
+        
+        // Formateo básico
+        System.out.printf("Nombre: %s, Edad: %d, Altura: %.2f metros\n", nombre, edad, altura);
+        
+        // Alineación y ancho de campo
+        System.out.printf("%-10s | %5d | %6.2f\n", "Nombre", "Edad", "Altura");
+        System.out.printf("%-10s | %5d | %6.2f\n", nombre, edad, altura);
+        
+        // Formateo de números
+        double precio = 1250.75;
+        System.out.printf("Precio: $%,.2f\n", precio); // Con separador de miles y 2 decimales
+        
+        // Porcentajes
+        double porcentaje = 0.8523;
+        System.out.printf("Porcentaje: %.2f%%\n", porcentaje * 100); // 85.23%
+        
+        // Fechas (requiere java.time)
+        System.out.printf("Fecha actual: %tD\n", java.time.LocalDate.now());
+    }
+}`} lang="java" />
+
+### Especificadores de formato comunes
+
+<table>
+  <thead>
+    <tr>
+      <th>Especificador</th>
+      <th>Tipo de dato</th>
+      <th>Ejemplo</th>
+      <th>Resultado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><Code code="%s" lang="java" /></td>
+      <td>String</td>
+      <td><Code code={`System.out.printf("%s", "Hola");`} lang="java" /></td>
+      <td>Hola</td>
+    </tr>
+    <tr>
+      <td><Code code="%d" lang="java" /></td>
+      <td>Entero (int, long)</td>
+      <td><Code code={`System.out.printf("%d", 42);`} lang="java" /></td>
+      <td>42</td>
+    </tr>
+    <tr>
+      <td><Code code="%f" lang="java" /></td>
+      <td>Decimal (float, double)</td>
+      <td><Code code={`System.out.printf("%f", 3.14);`} lang="java" /></td>
+      <td>3.140000</td>
+    </tr>
+    <tr>
+      <td><Code code="%.2f" lang="java" /></td>
+      <td>Decimal con precisión</td>
+      <td><Code code={`System.out.printf("%.2f", 3.14159);`} lang="java" /></td>
+      <td>3.14</td>
+    </tr>
+    <tr>
+      <td><Code code="%c" lang="java" /></td>
+      <td>Carácter</td>
+      <td><Code code={`System.out.printf("%c", 'A');`} lang="java" /></td>
+      <td>A</td>
+    </tr>
+    <tr>
+      <td><Code code="%b" lang="java" /></td>
+      <td>Booleano</td>
+      <td><Code code={`System.out.printf("%b", true);`} lang="java" /></td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td><Code code="%n" lang="java" /></td>
+      <td>Salto de línea</td>
+      <td><Code code={`System.out.printf("Linea 1%nLinea 2");`} lang="java" /></td>
+      <td>Linea 1<br/>Linea 2</td>
+    </tr>
+    <tr>
+      <td><Code code="%x" lang="java" /></td>
+      <td>Entero en hexadecimal</td>
+      <td><Code code={`System.out.printf("%x", 255);`} lang="java" /></td>
+      <td>ff</td>
+    </tr>
+    <tr>
+      <td><Code code="%o" lang="java" /></td>
+      <td>Entero en octal</td>
+      <td><Code code={`System.out.printf("%o", 8);`} lang="java" /></td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td><Code code="%e" lang="java" /></td>
+      <td>Notación científica</td>
+      <td><Code code={`System.out.printf("%e", 1000.0);`} lang="java" /></td>
+      <td>1.000000e+03</td>
+    </tr>
+  </tbody>
+</table>
+
+### Modificadores de formato
+
+Los especificadores de formato pueden incluir modificadores para controlar la presentación:
+
+<table>
+  <thead>
+    <tr>
+      <th>Modificador</th>
+      <th>Descripción</th>
+      <th>Ejemplo</th>
+      <th>Resultado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><Code code="%5d" lang="java" /></td>
+      <td>Ancho mínimo (alineado a la derecha)</td>
+      <td><Code code={`System.out.printf("%5d", 42);`} lang="java" /></td>
+      <td>"   42" (con 3 espacios)</td>
+    </tr>
+    <tr>
+      <td><Code code="%-5d" lang="java" /></td>
+      <td>Ancho mínimo (alineado a la izquierda)</td>
+      <td><Code code={`System.out.printf("%-5d", 42);`} lang="java" /></td>
+      <td>"42   " (con 3 espacios)</td>
+    </tr>
+    <tr>
+      <td><Code code="%05d" lang="java" /></td>
+      <td>Relleno con ceros</td>
+      <td><Code code={`System.out.printf("%05d", 42);`} lang="java" /></td>
+      <td>"00042"</td>
+    </tr>
+    <tr>
+      <td><Code code="%,d" lang="java" /></td>
+      <td>Separador de miles</td>
+      <td><Code code={`System.out.printf("%,d", 1000000);`} lang="java" /></td>
+      <td>"1,000,000"</td>
+    </tr>
+    <tr>
+      <td><Code code="%+d" lang="java" /></td>
+      <td>Mostrar siempre el signo</td>
+      <td><Code code={`System.out.printf("%+d", 42);`} lang="java" /></td>
+      <td>"+42"</td>
+    </tr>
+    <tr>
+      <td><Code code="%(.2f" lang="java" /></td>
+      <td>Negativos entre paréntesis</td>
+      <td><Code code={`System.out.printf("%(f", -3.14);`} lang="java" /></td>
+      <td>"(3.140000)"</td>
+    </tr>
+  </tbody>
+</table>
+
+### Clase String.format
+
+Además de `System.out.printf`, puedes usar `String.format()` para crear cadenas formateadas:
+
+<Code code={`String mensaje = String.format("Hola, %s. Tienes %d años.", "Juan", 25);
+System.out.println(mensaje); // Imprime: Hola, Juan. Tienes 25 años.`} lang="java" />
+
+### Ejemplo completo de formateo
+
+<Code code={`import java.util.Date;
+
+public class EjemploFormateoCompleto {
+    public static void main(String[] args) {
+        // Datos para formatear
+        String nombre = "María López";
+        int edad = 28;
+        double salario = 2567.89;
+        Date fecha = new Date();
+        
+        System.out.println("=== Informe de Empleado ===");
+        
+        // Formateo de texto y números
+        System.out.printf("Nombre: %-15s | Edad: %3d años\n", nombre, edad);
+        
+        // Formateo de valores monetarios
+        System.out.printf("Salario: $%,.2f\n", salario);
+        System.out.printf("Salario anual: $%,.2f\n", salario * 12);
+        
+        // Formateo de porcentajes
+        double impuesto = 0.22;
+        System.out.printf("Impuesto aplicado: %.1f%%\n", impuesto * 100);
+        System.out.printf("Salario neto: $%,.2f\n", salario * (1 - impuesto));
+        
+        // Formateo de fechas
+        System.out.printf("Fecha de informe: %tA, %td de %tB de %tY\n", fecha, fecha, fecha, fecha);
+        System.out.printf("Hora de generación: %tH:%tM:%tS\n", fecha, fecha, fecha);
+        
+        // Tabla formateada
+        System.out.println("\n=== Desglose de Pagos ===");
+        System.out.printf("%-15s | %10s | %10s\n", "Concepto", "Monto", "Porcentaje");
+        System.out.printf("%-15s | %10.2f | %10.2f%%\n", "Salario base", salario, 100.0);
+        System.out.printf("%-15s | %10.2f | %10.2f%%\n", "Impuestos", salario * impuesto, impuesto * 100);
+        System.out.printf("%-15s | %10.2f | %10.2f%%\n", "Salario neto", salario * (1 - impuesto), (1 - impuesto) * 100);
+    }
+}`} lang="java" />
+
+<Aside type="tip">
+  Para formatear fechas, Java ofrece la clase `DateTimeFormatter` del paquete `java.time.format` que proporciona más opciones y es más flexible que los especificadores de formato de `printf`.
+</Aside>
+
+### Formateo de salida con la clase MessageFormat
+
+Para casos más complejos o cuando necesitas reutilizar el mismo patrón de formato, puedes usar la clase `MessageFormat`:
+
+<Code code={`import java.text.MessageFormat;
+
+public class EjemploMessageFormat {
+    public static void main(String[] args) {
+        String patron = "El {0} cuesta {1,number,currency} y fue fabricado el {2,date,long}.";
+        
+        Object[] valores = {
+            "teléfono",
+            1299.99,
+            new java.util.Date()
+        };
+        
+        String mensaje = MessageFormat.format(patron, valores);
+        System.out.println(mensaje);
+        
+        // Reutilizando el mismo patrón con diferentes valores
+        Object[] otrosValores = {"laptop", 2499.99, new java.util.Date()};
+        String otroMensaje = MessageFormat.format(patron, otrosValores);
+        System.out.println(otroMensaje);
+    }
+}`} lang="java" />
+
+<Aside type="note">
+  La clase `MessageFormat` es especialmente útil para la internacionalización (i18n) de aplicaciones, ya que permite adaptar los mensajes a diferentes idiomas manteniendo el mismo formato.
+</Aside>

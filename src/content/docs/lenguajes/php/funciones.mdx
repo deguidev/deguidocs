@@ -1,0 +1,510 @@
+---
+title: 4. Funciones
+description: Aprende a definir y utilizar funciones, parámetros, retorno y funciones anónimas en PHP
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Funciones en PHP
+
+Las funciones son bloques de código que realizan tareas específicas y pueden ser reutilizados en diferentes partes de una aplicación. El uso de funciones mejora la organización del código, facilita su mantenimiento y evita la repetición de código.
+
+## Definición de Funciones
+
+En PHP, una función se define utilizando la palabra clave `function`, seguida del nombre de la función y paréntesis que pueden contener parámetros. El cuerpo de la función se encierra entre llaves `{}`.
+
+<Code code={`<?php
+    // Función básica sin parámetros
+    function saludar() {
+        echo "Hola, bienvenido a PHP!";
+    }
+    
+    // Llamada a la función
+    saludar(); // Muestra: Hola, bienvenido a PHP!
+?>`} lang="php" />
+
+### Convenciones de Nomenclatura
+
+Al nombrar funciones en PHP, es importante seguir estas convenciones:
+
+- Los nombres de funciones son insensibles a mayúsculas y minúsculas, pero se recomienda mantener consistencia.
+- Los nombres deben comenzar con una letra o un guión bajo, seguido de letras, números o guiones bajos.
+- Se recomienda usar nombres descriptivos que indiquen lo que hace la función.
+- La convención común es usar camelCase (primera palabra en minúsculas, siguientes palabras con la primera letra en mayúsculas).
+
+<Code code={`<?php
+    // Ejemplos de nombres de funciones siguiendo convenciones
+    function calcularTotal() { /* ... */ }
+    function obtenerUsuarioPorId($id) { /* ... */ }
+    function _funcionInterna() { /* ... */ }
+    
+    // Aunque funciona, no es recomendable usar nombres inconsistentes
+    function CALCULAR_DESCUENTO() { /* ... */ }
+    function Mezcla_De_Estilos() { /* ... */ }
+?>`} lang="php" />
+
+### Ámbito de las Funciones
+
+Las funciones en PHP tienen su propio ámbito (scope). Las variables definidas dentro de una función son locales a esa función y no son accesibles desde fuera.
+
+<Code code={`<?php
+    function ejemploAmbito() {
+        $variableLocal = "Solo visible dentro de la función";
+        echo $variableLocal;
+    }
+    
+    ejemploAmbito(); // Muestra: Solo visible dentro de la función
+    
+    // Intentar acceder a la variable fuera de la función generará un error
+    // echo $variableLocal; // Error: Undefined variable
+    
+    // Variables globales
+    $variableGlobal = "Variable global";
+    
+    function usarVariableGlobal() {
+        global $variableGlobal; // Declarar que usaremos la variable global
+        echo $variableGlobal;
+    }
+    
+    usarVariableGlobal(); // Muestra: Variable global
+?>`} lang="php" />
+
+<Aside type="caution">
+  El uso excesivo de variables globales puede hacer que el código sea difícil de mantener y propenso a errores. Es mejor pasar datos a las funciones mediante parámetros y devolver resultados mediante valores de retorno.
+</Aside>
+
+## Parámetros y Retorno
+
+Las funciones pueden recibir datos mediante parámetros y devolver resultados mediante la declaración `return`.
+
+### Parámetros de Funciones
+
+Los parámetros son variables que se pasan a una función cuando se llama. Permiten que las funciones trabajen con datos externos.
+
+<Code code={`<?php
+    // Función con un parámetro
+    function saludarPersona($nombre) {
+        echo "Hola, $nombre!";
+    }
+    
+    saludarPersona("María"); // Muestra: Hola, María!
+    saludarPersona("Juan");  // Muestra: Hola, Juan!
+    
+    // Función con múltiples parámetros
+    function calcularArea($base, $altura) {
+        $area = $base * $altura;
+        echo "El área es: $area";
+    }
+    
+    calcularArea(5, 3); // Muestra: El área es: 15
+?>`} lang="php" />
+
+### Parámetros Opcionales y Valores Predeterminados
+
+Puedes definir parámetros opcionales asignándoles valores predeterminados. Estos parámetros pueden omitirse al llamar a la función.
+
+<Code code={`<?php
+    // Función con parámetros opcionales
+    function saludar($nombre, $saludo = "Hola") {
+        echo "$saludo, $nombre!";
+    }
+    
+    saludar("Ana");             // Muestra: Hola, Ana!
+    saludar("Pedro", "Buenos días"); // Muestra: Buenos días, Pedro!
+    
+    // Los parámetros opcionales deben estar al final
+    function configurarPerfil($usuario, $edad = 30, $ciudad = "Madrid") {
+        echo "Usuario: $usuario, Edad: $edad, Ciudad: $ciudad";
+    }
+    
+    configurarPerfil("laura123");                // Usuario: laura123, Edad: 30, Ciudad: Madrid
+    configurarPerfil("carlos99", 25);           // Usuario: carlos99, Edad: 25, Ciudad: Madrid
+    configurarPerfil("maria22", 28, "Barcelona"); // Usuario: maria22, Edad: 28, Ciudad: Barcelona
+?>`} lang="php" />
+
+### Parámetros con Nombre (PHP 8+)
+
+A partir de PHP 8, puedes usar parámetros con nombre al llamar a una función, lo que hace que el código sea más legible y permite omitir parámetros opcionales en cualquier orden.
+
+<Code code={`<?php
+    // Solo funciona en PHP 8 o superior
+    function crearUsuario($nombre, $email, $edad = 30, $activo = true) {
+        return [
+            'nombre' => $nombre,
+            'email' => $email,
+            'edad' => $edad,
+            'activo' => $activo
+        ];
+    }
+    
+    // Llamada tradicional
+    $usuario1 = crearUsuario("Ana López", "ana@ejemplo.com", 25, false);
+    
+    // Llamada con parámetros con nombre (PHP 8+)
+    $usuario2 = crearUsuario(
+        nombre: "Carlos Ruiz",
+        email: "carlos@ejemplo.com",
+        activo: false
+        // edad se omite y usará el valor predeterminado 30
+    );
+?>`} lang="php" />
+
+### Retorno de Valores
+
+Las funciones pueden devolver valores usando la declaración `return`. Una función termina su ejecución cuando encuentra una declaración `return`.
+
+<Code code={`<?php
+    // Función que devuelve un valor
+    function sumar($a, $b) {
+        return $a + $b;
+    }
+    
+    $resultado = sumar(5, 3);
+    echo "La suma es: $resultado"; // Muestra: La suma es: 8
+    
+    // Función que devuelve diferentes valores según una condición
+    function calificar($puntuacion) {
+        if ($puntuacion >= 90) {
+            return "A";
+        } elseif ($puntuacion >= 80) {
+            return "B";
+        } elseif ($puntuacion >= 70) {
+            return "C";
+        } elseif ($puntuacion >= 60) {
+            return "D";
+        } else {
+            return "F";
+        }
+    }
+    
+    echo "Tu calificación es: " . calificar(85); // Muestra: Tu calificación es: B
+?>`} lang="php" />
+
+### Retorno de Múltiples Valores
+
+PHP no permite devolver múltiples valores directamente, pero puedes usar arrays o objetos para lograr este efecto.
+
+<Code code={`<?php
+    // Devolver múltiples valores usando un array
+    function obtenerDimensiones($radio) {
+        $diametro = $radio * 2;
+        $circunferencia = 2 * M_PI * $radio;
+        $area = M_PI * $radio * $radio;
+        
+        return [
+            'diametro' => $diametro,
+            'circunferencia' => $circunferencia,
+            'area' => $area
+        ];
+    }
+    
+    $circulo = obtenerDimensiones(5);
+    echo "Diámetro: {$circulo['diametro']}<br>";
+    echo "Circunferencia: {$circulo['circunferencia']}<br>";
+    echo "Area: {$circulo['area']}";
+    
+    // Usando la sintaxis de desestructuración (PHP 7.1+)
+    ['diametro' => $d, 'circunferencia' => $c, 'area' => $a] = obtenerDimensiones(5);
+    echo "Diámetro: $d, Circunferencia: $c, Area: $a";
+?>`} lang="php" />
+
+### Declaraciones de Tipo (Type Hinting)
+
+A partir de PHP 7, puedes especificar tipos para los parámetros y valores de retorno de las funciones, lo que ayuda a prevenir errores y mejora la legibilidad del código.
+
+<Code code={`<?php
+    // Declaración de tipos para parámetros y valor de retorno
+    function multiplicar(float $a, float $b): float {
+        return $a * $b;
+    }
+    
+    echo multiplicar(2.5, 3.0); // Muestra: 7.5
+    
+    // Tipos escalares: bool, int, float, string
+    // Tipos compuestos: array, object, callable, iterable
+    // Clases e interfaces: DateTime, ArrayObject, etc.
+    
+    // Ejemplo con múltiples tipos
+    function procesarDatos(array $datos): string {
+        return implode(", ", $datos);
+    }
+    
+    echo procesarDatos(['manzana', 'banana', 'naranja']); // Muestra: manzana, banana, naranja
+    
+    // Tipo de retorno void (PHP 7.1+)
+    function registrarActividad(string $accion): void {
+        // Esta función no devuelve ningún valor
+        echo "Actividad registrada: $accion";
+        // No es necesario return;
+    }
+    
+    // Tipo de retorno nullable (PHP 7.1+)
+    function buscarUsuario(int $id): ?array {
+        // Puede devolver un array o null
+        if ($id > 0) {
+            return ['id' => $id, 'nombre' => 'Usuario ' . $id];
+        }
+        return null;
+    }
+?>`} lang="php" />
+
+<Aside type="tip">
+  El uso de declaraciones de tipo hace que tu código sea más robusto y autoexplicativo. Es una buena práctica utilizarlas siempre que sea posible, especialmente en proyectos grandes o cuando trabajas en equipo.
+</Aside>
+
+## Funciones Predefinidas
+
+PHP incluye una amplia biblioteca de funciones predefinidas que puedes utilizar para realizar tareas comunes sin tener que escribir el código desde cero.
+
+### Categorías de Funciones Predefinidas
+
+PHP tiene miles de funciones predefinidas organizadas en categorías. Aquí hay algunos ejemplos de las categorías más utilizadas:
+
+#### Funciones de Cadenas (String)
+
+<Code code={`<?php
+    // Longitud de una cadena
+    echo strlen("Hola Mundo"); // Muestra: 10
+    
+    // Convertir a mayúsculas/minúsculas
+    echo strtoupper("hola mundo"); // Muestra: HOLA MUNDO
+    echo strtolower("HOLA MUNDO"); // Muestra: hola mundo
+    
+    // Reemplazar texto
+    echo str_replace("mundo", "PHP", "Hola mundo"); // Muestra: Hola PHP
+    
+    // Extraer parte de una cadena
+    echo substr("Hola Mundo", 0, 4); // Muestra: Hola
+?>`} lang="php" />
+
+#### Funciones de Arrays
+
+<Code code={`<?php
+    $frutas = ["manzana", "banana", "naranja", "uva"];
+    
+    // Contar elementos
+    echo count($frutas); // Muestra: 4
+    
+    // Ordenar arrays
+    sort($frutas);
+    print_r($frutas); // Array ( [0] => banana [1] => manzana [2] => naranja [3] => uva )
+    
+    // Agregar/eliminar elementos
+    array_push($frutas, "pera");
+    $ultima = array_pop($frutas); // $ultima contiene "pera"
+    
+    // Buscar en arrays
+    echo in_array("manzana", $frutas) ? "Sí" : "No"; // Muestra: Sí
+    $posicion = array_search("naranja", $frutas); // $posicion contiene el índice
+?>`} lang="php" />
+
+#### Funciones Matemáticas
+
+<Code code={`<?php
+    // Redondeo
+    echo round(3.7); // Muestra: 4
+    echo floor(3.7); // Muestra: 3 (redondeo hacia abajo)
+    echo ceil(3.2);  // Muestra: 4 (redondeo hacia arriba)
+    
+    // Números aleatorios
+    echo rand(1, 10); // Número aleatorio entre 1 y 10
+    
+    // Potencia
+    echo pow(2, 3); // Muestra: 8 (2 elevado a 3)
+    
+    // Raíz cuadrada
+    echo sqrt(16); // Muestra: 4
+?>`} lang="php" />
+
+#### Funciones de Fecha y Hora
+
+<Code code={`<?php
+    // Fecha y hora actual
+    echo date("Y-m-d H:i:s"); // Formato: 2025-08-06 17:30:00
+    
+    // Timestamp actual
+    echo time(); // Segundos desde el 1 de enero de 1970
+    
+    // Crear una fecha específica
+    $fecha = mktime(0, 0, 0, 1, 1, 2023); // 1 de enero de 2023
+    echo date("d/m/Y", $fecha); // Muestra: 01/01/2023
+    
+    // Diferencia entre fechas
+    $fecha1 = strtotime("2023-01-01");
+    $fecha2 = strtotime("2023-02-01");
+    $diferencia = $fecha2 - $fecha1;
+    echo "Diferencia en días: " . floor($diferencia / (60 * 60 * 24));
+?>`} lang="php" />
+
+#### Funciones de Archivos
+
+<Code code={`<?php
+    // Leer un archivo completo
+    $contenido = file_get_contents("ejemplo.txt");
+    echo $contenido;
+    
+    // Escribir en un archivo
+    file_put_contents("nuevo.txt", "Este es el contenido del archivo");
+    
+    // Verificar si un archivo existe
+    if (file_exists("config.php")) {
+        echo "El archivo existe";
+    }
+    
+    // Obtener información del archivo
+    $info = pathinfo("documentos/informe.pdf");
+    echo "Extensión: " . $info['extension']; // Muestra: pdf
+?>`} lang="php" />
+
+<Aside type="note">
+  PHP tiene más de 1000 funciones predefinidas. Puedes consultar la documentación oficial de PHP para obtener información detallada sobre todas las funciones disponibles: [php.net/manual/es/funcref.php](https://www.php.net/manual/es/funcref.php)
+</Aside>
+
+## Funciones Anónimas
+
+Las funciones anónimas, también conocidas como closures, son funciones sin nombre que pueden ser asignadas a variables o pasadas como argumentos a otras funciones.
+
+### Sintaxis Básica
+
+<Code code={`<?php
+    // Función anónima asignada a una variable
+    $saludar = function($nombre) {
+        return "Hola, $nombre!";
+    };
+    
+    // Llamar a la función anónima
+    echo $saludar("Carlos"); // Muestra: Hola, Carlos!
+    
+    // Función anónima como argumento
+    $numeros = [1, 2, 3, 4, 5];
+    
+    $duplicados = array_map(function($numero) {
+        return $numero * 2;
+    }, $numeros);
+    
+    print_r($duplicados); // Array ( [0] => 2 [1] => 4 [2] => 6 [3] => 8 [4] => 10 )
+?>`} lang="php" />
+
+### Uso de Variables Externas (use)
+
+Las funciones anónimas pueden acceder a variables del ámbito padre utilizando la palabra clave `use`.
+
+<Code code={`<?php
+    $mensaje = "Bienvenido";
+    
+    $saludar = function($nombre) use ($mensaje) {
+        return "$mensaje, $nombre!";
+    };
+    
+    echo $saludar("Ana"); // Muestra: Bienvenido, Ana!
+    
+    // Modificar variables por referencia
+    $total = 0;
+    
+    $sumar = function($valor) use (&$total) {
+        $total += $valor;
+    };
+    
+    $sumar(5);
+    $sumar(10);
+    $sumar(15);
+    
+    echo "Total: $total"; // Muestra: Total: 30
+?>`} lang="php" />
+
+### Arrow Functions (PHP 7.4+)
+
+PHP 7.4 introdujo las arrow functions (funciones flecha), que son una sintaxis más concisa para funciones anónimas simples.
+
+<Code code={`<?php
+    // Función anónima tradicional
+    $cuadrado = function($x) {
+        return $x * $x;
+    };
+    
+    // Equivalente con arrow function
+    $cuadrado = fn($x) => $x * $x;
+    
+    echo $cuadrado(5); // Muestra: 25
+    
+    // Las arrow functions capturan automáticamente las variables del ámbito padre
+    $factor = 2;
+    
+    $multiplicar = fn($x) => $x * $factor;
+    
+    echo $multiplicar(5); // Muestra: 10
+    
+    // Uso en funciones de array
+    $numeros = [1, 2, 3, 4, 5];
+    $pares = array_filter($numeros, fn($n) => $n % 2 === 0);
+    
+    print_r($pares); // Array ( [1] => 2 [3] => 4 )
+?>`} lang="php" />
+
+<Aside type="tip">
+  Las arrow functions son ideales para operaciones simples de una sola línea. Para lógica más compleja, es mejor usar funciones anónimas tradicionales o funciones con nombre.
+</Aside>
+
+### Callbacks
+
+Los callbacks son funciones que se pasan como argumentos a otras funciones para ser ejecutadas en un momento específico.
+
+<Code code={`<?php
+    // Función que acepta un callback
+    function procesarArray($array, $callback) {
+        $resultado = [];
+        foreach ($array as $item) {
+            $resultado[] = $callback($item);
+        }
+        return $resultado;
+    }
+    
+    $numeros = [1, 2, 3, 4, 5];
+    
+    // Usar una función anónima como callback
+    $cuadrados = procesarArray($numeros, function($n) {
+        return $n * $n;
+    });
+    
+    print_r($cuadrados); // Array ( [0] => 1 [1] => 4 [2] => 9 [3] => 16 [4] => 25 )
+    
+    // Usar una función con nombre como callback
+    function cubo($n) {
+        return $n * $n * $n;
+    }
+    
+    $cubos = procesarArray($numeros, 'cubo');
+    
+    print_r($cubos); // Array ( [0] => 1 [1] => 8 [2] => 27 [3] => 64 [4] => 125 )
+    
+    // Funciones de PHP que usan callbacks
+    $filtrados = array_filter($numeros, function($n) {
+        return $n > 2;
+    });
+    
+    print_r($filtrados); // Array ( [2] => 3 [3] => 4 [4] => 5 )
+?>`} lang="php" />
+
+### Closures Recursivas
+
+Las funciones anónimas pueden ser recursivas, pero necesitan ser asignadas a una variable antes de llamarse a sí mismas.
+
+<Code code={`<?php
+    // Función anónima recursiva para calcular el factorial
+    $factorial = function($n) use (&$factorial) {
+        if ($n <= 1) {
+            return 1;
+        }
+        return $n * $factorial($n - 1);
+    };
+    
+    echo $factorial(5); // Muestra: 120 (5*4*3*2*1)
+?>`} lang="php" />
+
+<Aside type="caution">
+  Ten cuidado con las funciones recursivas, ya que pueden consumir mucha memoria si no se implementan correctamente. Asegúrate de tener una condición de salida clara para evitar bucles infinitos.
+</Aside>

@@ -1,0 +1,1471 @@
+---
+title: 5. Vistas, Procedimientos y Funciones
+description: Aprende a crear y utilizar vistas, procedimientos almacenados y funciones en SQL
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Vistas, Procedimientos y Funciones
+
+Las vistas, procedimientos almacenados y funciones son objetos de base de datos que permiten encapsular lógica, mejorar la seguridad y reutilizar código SQL. Estos objetos son fundamentales para el desarrollo de aplicaciones empresariales robustas y mantenibles.
+
+## 5.1. Crear vistas (CREATE VIEW)
+
+Una vista es una tabla virtual basada en el resultado de una consulta SQL. Las vistas permiten simplificar consultas complejas, restringir el acceso a datos y presentar datos de manera personalizada.
+
+### Sintaxis básica
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    CREATE [OR REPLACE] 
+    [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+    [DEFINER = { usuario | CURRENT_USER }]
+    [SQL SECURITY { DEFINER | INVOKER }]
+    VIEW nombre_vista [(columna1, columna2, ...)] AS
+    consulta_select
+    [WITH [CASCADED | LOCAL] CHECK OPTION];
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    CREATE [OR REPLACE] [FORCE | NOFORCE] 
+    [EDITIONING | NONEDITIONABLE] 
+    VIEW nombre_vista [(columna1, columna2, ...)] AS
+    consulta_select
+    [WITH READ ONLY | CHECK OPTION [CONSTRAINT nombre_restriccion]];
+    ```
+  </TabItem>
+</Tabs>
+
+### Ejemplos básicos de vistas
+
+```sql
+-- Vista simple para mostrar empleados con sus departamentos
+CREATE VIEW vista_empleados_departamentos AS
+SELECT 
+    e.id_empleado,
+    e.nombre,
+    e.apellido,
+    d.nombre_departamento
+FROM empleados e
+JOIN departamentos d ON e.departamento_id = d.id_departamento;
+
+-- Vista con cálculos
+CREATE VIEW resumen_ventas_mensuales AS
+SELECT 
+    YEAR(fecha_venta) AS anio,
+    MONTH(fecha_venta) AS mes,
+    SUM(cantidad * precio) AS total_ventas,
+    COUNT(DISTINCT id_cliente) AS num_clientes
+FROM ventas
+GROUP BY YEAR(fecha_venta), MONTH(fecha_venta);
+```
+
+### Vistas con columnas renombradas
+
+```sql
+-- Vista con nombres de columnas personalizados
+CREATE VIEW info_clientes (
+    id, 
+    nombre_completo, 
+    contacto, 
+    estado_cuenta
+) AS
+SELECT 
+    id_cliente,
+    CONCAT(nombre, ' ', apellido),
+    email,
+    CASE 
+        WHEN saldo > 0 THEN 'Positivo'
+        WHEN saldo < 0 THEN 'Negativo'
+        ELSE 'Neutro'
+    END
+FROM clientes;
+```
+
+### Vistas con CHECK OPTION
+
+La opción CHECK OPTION garantiza que las operaciones de INSERT o UPDATE a través de la vista cumplan con la condición de la vista.
+
+```sql
+-- Vista con CHECK OPTION
+CREATE VIEW empleados_ventas AS
+SELECT id_empleado, nombre, apellido, salario, departamento_id
+FROM empleados
+WHERE departamento_id = 3  -- Departamento de ventas
+WITH CHECK OPTION;
+```
+
+Con esta vista, cualquier intento de insertar o actualizar un empleado con un departamento_id diferente de 3 generará un error.
+
+### Vistas complejas
+
+```sql
+-- Vista con subconsultas y joins múltiples
+CREATE VIEW analisis_rendimiento_productos AS
+SELECT 
+    p.id_producto,
+    p.nombre AS producto,
+    p.precio_lista,
+    c.nombre AS categoria,
+    SUM(v.cantidad) AS unidades_vendidas,
+    SUM(v.cantidad * v.precio) AS ingresos_totales,
+    AVG(v.precio) AS precio_promedio_venta,
+    (SELECT AVG(r.calificacion) 
+     FROM resenas r 
+     WHERE r.id_producto = p.id_producto) AS calificacion_promedio
+FROM productos p
+JOIN categorias c ON p.categoria_id = c.id_categoria
+LEFT JOIN ventas v ON p.id_producto = v.id_producto
+GROUP BY p.id_producto, p.nombre, p.precio_lista, c.nombre;
+```
+
+### Ventajas de las vistas
+
+<Aside type="tip">
+  <strong>Beneficios de usar vistas:</strong>
+  <ul>
+    <li><strong>Simplificación:</strong> Ocultan la complejidad de consultas con joins múltiples o subconsultas.</li>
+    <li><strong>Seguridad:</strong> Permiten restringir el acceso a columnas o filas específicas.</li>
+    <li><strong>Consistencia:</strong> Garantizan que todos los usuarios accedan a los datos de la misma manera.</li>
+    <li><strong>Independencia de datos:</strong> Protegen a las aplicaciones de cambios en la estructura de las tablas subyacentes.</li>
+    <li><strong>Rendimiento:</strong> Algunas vistas pueden mejorar el rendimiento al precalcular resultados complejos.</li>
+  </ul>
+</Aside>
+
+### Limitaciones de las vistas
+
+<Aside type="caution">
+  <ul>
+    <li>No todas las vistas son actualizables. Las vistas que contienen funciones de agregación, DISTINCT, GROUP BY, HAVING o UNION generalmente no permiten operaciones DML.</li>
+    <li>Las vistas pueden afectar negativamente al rendimiento si se basan en consultas muy complejas.</li>
+    <li>En Oracle, las vistas materializadas (que almacenan físicamente los resultados) pueden ser más eficientes para consultas complejas frecuentes.</li>
+  </ul>
+</Aside>
+
+## 5.2. Actualizar vistas (CREATE OR REPLACE VIEW)
+
+La cláusula `OR REPLACE` permite modificar una vista existente sin tener que eliminarla primero.
+
+### Sintaxis básica
+
+```sql
+CREATE OR REPLACE VIEW nombre_vista AS
+consulta_select;
+```
+
+### Ejemplos de actualización de vistas
+
+```sql
+-- Actualizar una vista existente
+CREATE OR REPLACE VIEW vista_empleados_departamentos AS
+SELECT 
+    e.id_empleado,
+    e.nombre,
+    e.apellido,
+    e.email,  -- Columna añadida
+    d.nombre_departamento,
+    d.ubicacion  -- Columna añadida
+FROM empleados e
+JOIN departamentos d ON e.departamento_id = d.id_departamento;
+```
+
+### Modificar vistas con ALTER VIEW
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Cambiar características de la vista sin modificar la consulta
+    ALTER VIEW vista_empleados_departamentos
+    ALGORITHM = MERGE
+    SQL SECURITY DEFINER;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Oracle no soporta ALTER VIEW para modificar la definición
+    -- Se debe usar CREATE OR REPLACE VIEW
+    CREATE OR REPLACE VIEW vista_empleados_departamentos AS
+    SELECT /* Nueva definición */
+    FROM /* ... */;
+    ```
+  </TabItem>
+</Tabs>
+
+### Eliminar vistas
+
+```sql
+-- Eliminar una vista
+DROP VIEW [IF EXISTS] nombre_vista;
+```
+
+### Vistas actualizables
+
+Las vistas pueden ser actualizables si cumplen ciertos requisitos:
+
+<Tabs>
+  <TabItem label="MySQL">
+    Para que una vista sea actualizable en MySQL, generalmente debe:
+    
+    - No contener DISTINCT, GROUP BY, HAVING, UNION, agregaciones
+    - No usar subconsultas en la lista SELECT o cláusula WHERE que se refieran a la tabla en la cláusula FROM
+    - No usar tablas de solo lectura en la consulta
+    
+    ```sql
+    -- Vista actualizable
+    CREATE OR REPLACE VIEW empleados_marketing AS
+    SELECT id_empleado, nombre, apellido, email, salario
+    FROM empleados
+    WHERE departamento_id = 2;
+    
+    -- Actualizar a través de la vista
+    UPDATE empleados_marketing
+    SET salario = salario * 1.1
+    WHERE id_empleado = 101;
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    Oracle tiene reglas similares para vistas actualizables, pero ofrece más flexibilidad con triggers INSTEAD OF.
+    
+    ```sql
+    -- Vista actualizable
+    CREATE OR REPLACE VIEW empleados_marketing AS
+    SELECT id_empleado, nombre, apellido, email, salario
+    FROM empleados
+    WHERE departamento_id = 2;
+    
+    -- Actualizar a través de la vista
+    UPDATE empleados_marketing
+    SET salario = salario * 1.1
+    WHERE id_empleado = 101;
+    ```
+  </TabItem>
+</Tabs>
+
+### Vistas materializadas (Oracle)
+
+Oracle soporta vistas materializadas, que almacenan físicamente los resultados de la consulta y pueden actualizarse periódicamente.
+
+```sql
+-- Crear vista materializada en Oracle
+CREATE MATERIALIZED VIEW resumen_ventas
+BUILD IMMEDIATE
+REFRESH COMPLETE ON DEMAND
+AS
+SELECT 
+    producto_id,
+    SUM(cantidad) AS total_unidades,
+    SUM(cantidad * precio) AS ingresos_totales
+FROM ventas
+GROUP BY producto_id;
+
+-- Actualizar vista materializada
+EXECUTE DBMS_MVIEW.REFRESH('resumen_ventas', 'C');
+```
+
+<Aside type="note">
+  MySQL no tiene vistas materializadas nativas, pero se pueden simular con tablas temporales o tablas de resumen que se actualizan mediante eventos programados.
+</Aside>
+
+## 5.3. Procedimientos almacenados (CREATE PROCEDURE)
+
+Los procedimientos almacenados son conjuntos de instrucciones SQL que se almacenan en la base de datos y pueden ser invocados por aplicaciones, usuarios u otros procedimientos. Permiten encapsular lógica de negocio compleja y mejorar el rendimiento al reducir el tráfico de red.
+
+### Sintaxis básica
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    DELIMITER //
+    
+    CREATE PROCEDURE nombre_procedimiento([parámetro1 [IN|OUT|INOUT] tipo_dato, ...])
+    [características...]
+    BEGIN
+        -- Declaraciones y lógica del procedimiento
+        -- Puede incluir variables locales, control de flujo, cursores, etc.
+    END //
+    
+    DELIMITER ;
+    ```
+  </TabItem>
+  <TabItem label="Oracle PL/SQL">
+    ```sql
+    CREATE [OR REPLACE] PROCEDURE nombre_procedimiento
+    (
+        parámetro1 [IN|OUT|IN OUT] tipo_dato [:= valor_defecto],
+        ...
+    )
+    [AUTHID {DEFINER | CURRENT_USER}]
+    IS|AS
+        -- Declaración de variables, cursores, excepciones, etc.
+    BEGIN
+        -- Cuerpo del procedimiento
+        -- Instrucciones PL/SQL
+    [EXCEPTION
+        -- Manejo de excepciones]
+    END [nombre_procedimiento];
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+### Procedimiento simple
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    DELIMITER //
+    
+    CREATE PROCEDURE actualizar_salario(
+        IN p_empleado_id INT,
+        IN p_porcentaje DECIMAL(5,2)
+    )
+    BEGIN
+        UPDATE empleados
+        SET salario = salario * (1 + p_porcentaje/100)
+        WHERE id_empleado = p_empleado_id;
+        
+        SELECT CONCAT('Salario actualizado con un incremento del ', 
+                     p_porcentaje, '%') AS mensaje;
+    END //
+    
+    DELIMITER ;
+    
+    -- Llamar al procedimiento
+    CALL actualizar_salario(101, 10.5);
+    ```
+  </TabItem>
+  <TabItem label="Oracle PL/SQL">
+    ```sql
+    CREATE OR REPLACE PROCEDURE actualizar_salario(
+        p_empleado_id IN NUMBER,
+        p_porcentaje IN NUMBER
+    )
+    IS
+    BEGIN
+        UPDATE empleados
+        SET salario = salario * (1 + p_porcentaje/100)
+        WHERE id_empleado = p_empleado_id;
+        
+        COMMIT;
+        DBMS_OUTPUT.PUT_LINE('Salario actualizado con un incremento del ' || 
+                           p_porcentaje || '%');
+    END actualizar_salario;
+    /
+    
+    -- Llamar al procedimiento
+    BEGIN
+        actualizar_salario(101, 10.5);
+    END;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+### Procedimiento con parámetros de salida
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    DELIMITER //
+    
+    CREATE PROCEDURE obtener_info_empleado(
+        IN p_empleado_id INT,
+        OUT p_nombre VARCHAR(100),
+        OUT p_salario DECIMAL(10,2),
+        OUT p_antiguedad INT
+    )
+    BEGIN
+        SELECT 
+            CONCAT(nombre, ' ', apellido),
+            salario,
+            TIMESTAMPDIFF(YEAR, fecha_contratacion, CURDATE())
+        INTO
+            p_nombre, p_salario, p_antiguedad
+        FROM empleados
+        WHERE id_empleado = p_empleado_id;
+    END //
+    
+    DELIMITER ;
+    
+    -- Llamar al procedimiento con variables de sesión
+    SET @nombre = '';
+    SET @salario = 0;
+    SET @antiguedad = 0;
+    
+    CALL obtener_info_empleado(101, @nombre, @salario, @antiguedad);
+    
+    SELECT @nombre, @salario, @antiguedad;
+    ```
+  </TabItem>
+  <TabItem label="Oracle PL/SQL">
+    ```sql
+    CREATE OR REPLACE PROCEDURE obtener_info_empleado(
+        p_empleado_id IN NUMBER,
+        p_nombre OUT VARCHAR2,
+        p_salario OUT NUMBER,
+        p_antiguedad OUT NUMBER
+    )
+    IS
+    BEGIN
+        SELECT 
+            nombre || ' ' || apellido,
+            salario,
+            TRUNC(MONTHS_BETWEEN(SYSDATE, fecha_contratacion)/12)
+        INTO
+            p_nombre, p_salario, p_antiguedad
+        FROM empleados
+        WHERE id_empleado = p_empleado_id;
+    END obtener_info_empleado;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  <strong>Ventajas de los procedimientos almacenados:</strong>
+  <ul>
+    <li><strong>Rendimiento:</strong> Se compilan y almacenan en la base de datos, reduciendo el tráfico de red.</li>
+    <li><strong>Seguridad:</strong> Permiten controlar el acceso a los datos a nivel de procedimiento.</li>
+    <li><strong>Mantenibilidad:</strong> Centralizan la lógica de negocio en la base de datos.</li>
+    <li><strong>Reutilización:</strong> Pueden ser llamados desde múltiples aplicaciones.</li>
+  </ul>
+</Aside>
+
+## 5.4. Funciones definidas por el usuario (CREATE FUNCTION)
+
+Las funciones definidas por el usuario son similares a los procedimientos almacenados, pero están diseñadas para devolver un valor único. Se utilizan principalmente en expresiones SQL como parte de consultas, cláusulas WHERE, o en otras funciones y procedimientos.
+
+### Sintaxis básica
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    DELIMITER //
+    
+    CREATE FUNCTION nombre_funcion(parámetro1 tipo_dato, parámetro2 tipo_dato, ...)
+    RETURNS tipo_dato_retorno
+    [características...]
+    BEGIN
+        -- Declaraciones y lógica de la función
+        RETURN valor;
+    END //
+    
+    DELIMITER ;
+    ```
+  </TabItem>
+  <TabItem label="Oracle PL/SQL">
+    ```sql
+    CREATE [OR REPLACE] FUNCTION nombre_funcion
+    (
+        parámetro1 [IN] tipo_dato [:= valor_defecto],
+        ...
+    )
+    RETURN tipo_dato_retorno
+    [AUTHID {DEFINER | CURRENT_USER}]
+    [DETERMINISTIC]
+    [PARALLEL_ENABLE]
+    [RESULT_CACHE]
+    IS|AS
+        -- Declaración de variables, cursores, excepciones, etc.
+    BEGIN
+        -- Cuerpo de la función
+        -- Instrucciones PL/SQL
+        RETURN valor;
+    [EXCEPTION
+        -- Manejo de excepciones]
+    END [nombre_funcion];
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+### Función simple
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    DELIMITER //
+    
+    CREATE FUNCTION calcular_edad(fecha_nacimiento DATE)
+    RETURNS INT
+    DETERMINISTIC
+    BEGIN
+        RETURN TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE());
+    END //
+    
+    DELIMITER ;
+    
+    -- Usar la función en una consulta
+    SELECT 
+        nombre,
+        apellido,
+        fecha_nacimiento,
+        calcular_edad(fecha_nacimiento) AS edad
+    FROM personas;
+    ```
+  </TabItem>
+  <TabItem label="Oracle PL/SQL">
+    ```sql
+    CREATE OR REPLACE FUNCTION calcular_edad(
+        fecha_nacimiento IN DATE
+    )
+    RETURN NUMBER
+    DETERMINISTIC
+    IS
+    BEGIN
+        RETURN TRUNC(MONTHS_BETWEEN(SYSDATE, fecha_nacimiento)/12);
+    END calcular_edad;
+    /
+    
+    -- Usar la función en una consulta
+    SELECT 
+        nombre,
+        apellido,
+        fecha_nacimiento,
+        calcular_edad(fecha_nacimiento) AS edad
+    FROM personas;
+    ```
+  </TabItem>
+</Tabs>
+
+### Función con lógica compleja
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    DELIMITER //
+    
+    CREATE FUNCTION calcular_impuesto(salario DECIMAL(10,2))
+    RETURNS DECIMAL(10,2)
+    DETERMINISTIC
+    BEGIN
+        DECLARE impuesto DECIMAL(10,2);
+        
+        IF salario <= 10000 THEN
+            SET impuesto = salario * 0.05;
+        ELSEIF salario <= 20000 THEN
+            SET impuesto = 500 + (salario - 10000) * 0.1;
+        ELSEIF salario <= 40000 THEN
+            SET impuesto = 1500 + (salario - 20000) * 0.15;
+        ELSE
+            SET impuesto = 4500 + (salario - 40000) * 0.2;
+        END IF;
+        
+        RETURN impuesto;
+    END //
+    
+    DELIMITER ;
+    
+    -- Usar la función
+    SELECT 
+        id_empleado,
+        nombre,
+        salario,
+        calcular_impuesto(salario) AS impuesto,
+        salario - calcular_impuesto(salario) AS salario_neto
+    FROM empleados
+    ORDER BY salario DESC;
+    ```
+  </TabItem>
+  <TabItem label="Oracle PL/SQL">
+    ```sql
+    CREATE OR REPLACE FUNCTION calcular_impuesto(
+        salario IN NUMBER
+    )
+    RETURN NUMBER
+    DETERMINISTIC
+    IS
+        impuesto NUMBER;
+    BEGIN
+        IF salario <= 10000 THEN
+            impuesto := salario * 0.05;
+        ELSIF salario <= 20000 THEN
+            impuesto := 500 + (salario - 10000) * 0.1;
+        ELSIF salario <= 40000 THEN
+            impuesto := 1500 + (salario - 20000) * 0.15;
+        ELSE
+            impuesto := 4500 + (salario - 40000) * 0.2;
+        END IF;
+        
+        RETURN impuesto;
+    END calcular_impuesto;
+    /
+    
+    -- Usar la función
+    SELECT 
+        id_empleado,
+        nombre,
+        salario,
+        calcular_impuesto(salario) AS impuesto,
+        salario - calcular_impuesto(salario) AS salario_neto
+    FROM empleados
+    ORDER BY salario DESC;
+    ```
+  </TabItem>
+</Tabs>
+
+### Función que utiliza consultas SQL
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    DELIMITER //
+    
+    CREATE FUNCTION obtener_total_ventas(p_empleado_id INT, p_anio INT)
+    RETURNS DECIMAL(12,2)
+    READS SQL DATA
+    BEGIN
+        DECLARE total DECIMAL(12,2);
+        
+        SELECT COALESCE(SUM(monto), 0) INTO total
+        FROM ventas
+        WHERE empleado_id = p_empleado_id
+          AND YEAR(fecha_venta) = p_anio;
+          
+        RETURN total;
+    END //
+    
+    DELIMITER ;
+    
+    -- Usar la función
+    SELECT 
+        e.id_empleado,
+        e.nombre,
+        e.apellido,
+        obtener_total_ventas(e.id_empleado, 2023) AS ventas_2023,
+        obtener_total_ventas(e.id_empleado, 2024) AS ventas_2024
+    FROM empleados e
+    WHERE e.departamento_id = 3
+    ORDER BY ventas_2024 DESC;
+    ```
+  </TabItem>
+  <TabItem label="Oracle PL/SQL">
+    ```sql
+    CREATE OR REPLACE FUNCTION obtener_total_ventas(
+        p_empleado_id IN NUMBER,
+        p_anio IN NUMBER
+    )
+    RETURN NUMBER
+    IS
+        total NUMBER;
+    BEGIN
+        SELECT NVL(SUM(monto), 0) INTO total
+        FROM ventas
+        WHERE empleado_id = p_empleado_id
+          AND EXTRACT(YEAR FROM fecha_venta) = p_anio;
+          
+        RETURN total;
+    END obtener_total_ventas;
+    /
+    
+    -- Usar la función
+    SELECT 
+        e.id_empleado,
+        e.nombre,
+        e.apellido,
+        obtener_total_ventas(e.id_empleado, 2023) AS ventas_2023,
+        obtener_total_ventas(e.id_empleado, 2024) AS ventas_2024
+    FROM empleados e
+    WHERE e.departamento_id = 3
+    ORDER BY ventas_2024 DESC;
+    ```
+  </TabItem>
+</Tabs>
+
+### Modificar y eliminar funciones
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Modificar una función (hay que recrearla)
+    DROP FUNCTION IF EXISTS calcular_edad;
+    
+    DELIMITER //
+    CREATE FUNCTION calcular_edad(fecha_nacimiento DATE)
+    RETURNS INT
+    DETERMINISTIC
+    BEGIN
+        -- Nueva lógica que considera también los meses
+        DECLARE edad INT;
+        DECLARE meses INT;
+        
+        SET edad = TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE());
+        SET meses = TIMESTAMPDIFF(MONTH, fecha_nacimiento, CURDATE()) % 12;
+        
+        -- Si falta más de 6 meses para el próximo cumpleaños, restar 1 año
+        IF meses < 6 THEN
+            SET edad = edad - 1;
+        END IF;
+        
+        RETURN edad;
+    END //
+    DELIMITER ;
+    
+    -- Eliminar una función
+    DROP FUNCTION IF EXISTS nombre_funcion;
+    ```
+  </TabItem>
+  <TabItem label="Oracle PL/SQL">
+    ```sql
+    -- Modificar una función (usando OR REPLACE)
+    CREATE OR REPLACE FUNCTION calcular_edad(
+        fecha_nacimiento IN DATE
+    )
+    RETURN NUMBER
+    DETERMINISTIC
+    IS
+        edad NUMBER;
+        meses NUMBER;
+    BEGIN
+        -- Nueva lógica que considera también los meses
+        edad := TRUNC(MONTHS_BETWEEN(SYSDATE, fecha_nacimiento)/12);
+        meses := MOD(TRUNC(MONTHS_BETWEEN(SYSDATE, fecha_nacimiento)), 12);
+        
+        -- Si falta más de 6 meses para el próximo cumpleaños, restar 1 año
+        IF meses < 6 THEN
+            edad := edad - 1;
+        END IF;
+        
+        RETURN edad;
+    END calcular_edad;
+    /
+    
+    -- Eliminar una función
+    DROP FUNCTION nombre_funcion;
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+  <strong>Diferencias entre procedimientos y funciones:</strong>
+  <ul>
+    <li><strong>Procedimientos:</strong> Pueden devolver múltiples valores a través de parámetros OUT, realizar operaciones DML, y ser invocados como instrucciones independientes.</li>
+    <li><strong>Funciones:</strong> Deben devolver exactamente un valor, tienen restricciones para operaciones DML (especialmente en Oracle), y están diseñadas para ser usadas en expresiones SQL.</li>
+  </ul>
+</Aside>
+
+## 5.5. Paquetes en Oracle (CREATE PACKAGE)
+
+Los paquetes son una característica exclusiva de Oracle PL/SQL que permite agrupar tipos, variables, constantes, procedimientos, funciones y otros objetos relacionados en una única unidad lógica. Los paquetes constan de dos partes: la especificación (interfaz pública) y el cuerpo (implementación).
+
+### Sintaxis básica
+
+```sql
+-- Especificación del paquete
+CREATE [OR REPLACE] PACKAGE nombre_paquete
+[AUTHID {DEFINER | CURRENT_USER}]
+[DEFAULT COLLATION collation_name]
+[ACCESSIBLE BY (programa1, programa2, ...)]
+IS|AS
+    -- Declaración de tipos, variables, constantes públicas
+    -- Declaración de procedimientos y funciones (solo cabeceras)
+END [nombre_paquete];
+/
+
+-- Cuerpo del paquete
+CREATE [OR REPLACE] PACKAGE BODY nombre_paquete
+IS|AS
+    -- Declaración de tipos, variables, constantes privadas
+    -- Implementación de procedimientos y funciones
+    -- Procedimientos y funciones privadas
+BEGIN
+    -- Sección de inicialización (opcional)
+    -- Se ejecuta la primera vez que se referencia el paquete
+END [nombre_paquete];
+/
+```
+
+### Ejemplo de paquete simple
+
+```sql
+-- Especificación del paquete
+CREATE OR REPLACE PACKAGE gestion_empleados
+IS
+    -- Constantes públicas
+    c_departamento_ventas CONSTANT NUMBER := 10;
+    c_departamento_it CONSTANT NUMBER := 20;
+    
+    -- Tipos públicos
+    TYPE t_registro_empleado IS RECORD (
+        id NUMBER,
+        nombre VARCHAR2(100),
+        salario NUMBER
+    );
+    
+    -- Procedimientos y funciones públicas (solo cabeceras)
+    PROCEDURE contratar_empleado(
+        p_nombre IN VARCHAR2,
+        p_apellido IN VARCHAR2,
+        p_departamento IN NUMBER,
+        p_salario IN NUMBER,
+        p_id_empleado OUT NUMBER
+    );
+    
+    FUNCTION calcular_bono(
+        p_empleado_id IN NUMBER,
+        p_factor IN NUMBER DEFAULT 1.0
+    ) RETURN NUMBER;
+    
+    FUNCTION obtener_info_empleado(
+        p_empleado_id IN NUMBER
+    ) RETURN t_registro_empleado;
+END gestion_empleados;
+/
+
+-- Cuerpo del paquete
+CREATE OR REPLACE PACKAGE BODY gestion_empleados
+IS
+    -- Variables privadas
+    v_ultimo_id NUMBER;
+    
+    -- Procedimiento privado
+    PROCEDURE registrar_accion(
+        p_empleado_id IN NUMBER,
+        p_accion IN VARCHAR2
+    )
+    IS
+    BEGIN
+        INSERT INTO log_acciones (empleado_id, accion, fecha)
+        VALUES (p_empleado_id, p_accion, SYSDATE);
+    END registrar_accion;
+    
+    -- Implementación de procedimientos y funciones públicas
+    PROCEDURE contratar_empleado(
+        p_nombre IN VARCHAR2,
+        p_apellido IN VARCHAR2,
+        p_departamento IN NUMBER,
+        p_salario IN NUMBER,
+        p_id_empleado OUT NUMBER
+    )
+    IS
+    BEGIN
+        -- Obtener el siguiente ID
+        SELECT NVL(MAX(id_empleado), 0) + 1
+        INTO p_id_empleado
+        FROM empleados;
+        
+        -- Insertar el nuevo empleado
+        INSERT INTO empleados (
+            id_empleado, nombre, apellido, 
+            departamento_id, salario, fecha_contratacion
+        )
+        VALUES (
+            p_id_empleado, p_nombre, p_apellido, 
+            p_departamento, p_salario, SYSDATE
+        );
+        
+        -- Registrar la acción
+        registrar_accion(p_id_empleado, 'CONTRATACIÓN');
+        
+        -- Actualizar la variable privada
+        v_ultimo_id := p_id_empleado;
+        
+        COMMIT;
+    END contratar_empleado;
+    
+    FUNCTION calcular_bono(
+        p_empleado_id IN NUMBER,
+        p_factor IN NUMBER DEFAULT 1.0
+    ) RETURN NUMBER
+    IS
+        v_salario NUMBER;
+        v_antiguedad NUMBER;
+        v_bono NUMBER;
+    BEGIN
+        -- Obtener datos del empleado
+        SELECT 
+            salario,
+            TRUNC(MONTHS_BETWEEN(SYSDATE, fecha_contratacion)/12)
+        INTO
+            v_salario, v_antiguedad
+        FROM empleados
+        WHERE id_empleado = p_empleado_id;
+        
+        -- Calcular bono según antigüedad
+        IF v_antiguedad < 2 THEN
+            v_bono := v_salario * 0.05 * p_factor;
+        ELSIF v_antiguedad < 5 THEN
+            v_bono := v_salario * 0.1 * p_factor;
+        ELSIF v_antiguedad < 10 THEN
+            v_bono := v_salario * 0.15 * p_factor;
+        ELSE
+            v_bono := v_salario * 0.2 * p_factor;
+        END IF;
+        
+        RETURN v_bono;
+    END calcular_bono;
+    
+    FUNCTION obtener_info_empleado(
+        p_empleado_id IN NUMBER
+    ) RETURN t_registro_empleado
+    IS
+        v_empleado t_registro_empleado;
+    BEGIN
+        SELECT id_empleado, nombre || ' ' || apellido, salario
+        INTO v_empleado
+        FROM empleados
+        WHERE id_empleado = p_empleado_id;
+        
+        RETURN v_empleado;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            v_empleado.id := NULL;
+            v_empleado.nombre := 'NO ENCONTRADO';
+            v_empleado.salario := 0;
+            RETURN v_empleado;
+    END obtener_info_empleado;
+
+BEGIN
+    -- Sección de inicialización (se ejecuta la primera vez que se referencia el paquete)
+    SELECT NVL(MAX(id_empleado), 0)
+    INTO v_ultimo_id
+    FROM empleados;
+    
+    DBMS_OUTPUT.PUT_LINE('Paquete gestion_empleados inicializado. Último ID: ' || v_ultimo_id);
+END gestion_empleados;
+/
+```
+
+### Uso del paquete
+
+```sql
+-- Declarar variables
+DECLARE
+    v_id_empleado NUMBER;
+    v_bono NUMBER;
+    v_info gestion_empleados.t_registro_empleado;
+BEGIN
+    -- Llamar a un procedimiento del paquete
+    gestion_empleados.contratar_empleado(
+        'Juan', 'Pérez', 
+        gestion_empleados.c_departamento_ventas, 
+        3000, 
+        v_id_empleado
+    );
+    
+    DBMS_OUTPUT.PUT_LINE('Empleado contratado con ID: ' || v_id_empleado);
+    
+    -- Llamar a una función del paquete
+    v_bono := gestion_empleados.calcular_bono(v_id_empleado, 1.2);
+    DBMS_OUTPUT.PUT_LINE('Bono calculado: ' || v_bono);
+    
+    -- Usar un tipo definido en el paquete
+    v_info := gestion_empleados.obtener_info_empleado(v_id_empleado);
+    DBMS_OUTPUT.PUT_LINE('Información: ' || v_info.nombre || ', Salario: ' || v_info.salario);
+END;
+/
+```
+
+### Ventajas de los paquetes
+
+Los paquetes ofrecen numerosas ventajas:
+
+1. **Encapsulación**: Ocultan detalles de implementación y exponen solo la interfaz pública.
+2. **Modularidad**: Agrupan objetos relacionados, mejorando la organización del código.
+3. **Rendimiento**: Los objetos del paquete se cargan en memoria la primera vez que se referencian y permanecen allí para futuras llamadas.
+4. **Mantenibilidad**: Facilitan el mantenimiento al separar la interfaz (especificación) de la implementación (cuerpo).
+5. **Reutilización**: Promueven la reutilización de código.
+6. **Sobrecarga**: Permiten la sobrecarga de procedimientos y funciones (mismo nombre, diferentes parámetros).
+
+### Modificar y eliminar paquetes
+
+```sql
+-- Modificar un paquete (usando OR REPLACE)
+CREATE OR REPLACE PACKAGE gestion_empleados
+IS
+    -- Nueva especificación
+END gestion_empleados;
+/
+
+CREATE OR REPLACE PACKAGE BODY gestion_empleados
+IS
+    -- Nueva implementación
+END gestion_empleados;
+/
+
+-- Eliminar un paquete
+DROP PACKAGE BODY gestion_empleados;  -- Elimina solo el cuerpo
+DROP PACKAGE gestion_empleados;       -- Elimina la especificación y el cuerpo si existe
+```
+
+<Aside type="note">
+  <strong>Nota:</strong> Los paquetes son una característica exclusiva de Oracle PL/SQL. MySQL no tiene un concepto equivalente, aunque se puede lograr cierta organización similar utilizando esquemas separados o prefijos de nombres para agrupar objetos relacionados.
+</Aside>
+
+## 5.6. Ejemplos prácticos en ambos motores
+
+A continuación, se presentan ejemplos prácticos que combinan vistas, procedimientos y funciones para resolver problemas comunes en aplicaciones de bases de datos.
+
+### Sistema de gestión de inventario
+
+Este ejemplo implementa un sistema básico de gestión de inventario con funcionalidades para:
+- Consultar el stock actual mediante vistas
+- Registrar movimientos de inventario mediante procedimientos
+- Calcular valores y estadísticas mediante funciones
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Crear tablas base
+    CREATE TABLE productos (
+        id_producto INT PRIMARY KEY AUTO_INCREMENT,
+        nombre VARCHAR(100) NOT NULL,
+        descripcion TEXT,
+        precio_unitario DECIMAL(10,2) NOT NULL,
+        stock_minimo INT DEFAULT 10,
+        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    
+    CREATE TABLE movimientos (
+        id_movimiento INT PRIMARY KEY AUTO_INCREMENT,
+        id_producto INT NOT NULL,
+        tipo_movimiento ENUM('ENTRADA', 'SALIDA') NOT NULL,
+        cantidad INT NOT NULL,
+        fecha_movimiento TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        usuario VARCHAR(50) NOT NULL,
+        FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+    );
+    
+    -- Vista para consultar el stock actual
+    CREATE VIEW v_stock_actual AS
+    SELECT 
+        p.id_producto,
+        p.nombre,
+        p.descripcion,
+        p.precio_unitario,
+        COALESCE(SUM(CASE WHEN m.tipo_movimiento = 'ENTRADA' THEN m.cantidad ELSE 0 END), 0) -
+        COALESCE(SUM(CASE WHEN m.tipo_movimiento = 'SALIDA' THEN m.cantidad ELSE 0 END), 0) AS stock_actual,
+        p.stock_minimo,
+        CASE 
+            WHEN (COALESCE(SUM(CASE WHEN m.tipo_movimiento = 'ENTRADA' THEN m.cantidad ELSE 0 END), 0) -
+                 COALESCE(SUM(CASE WHEN m.tipo_movimiento = 'SALIDA' THEN m.cantidad ELSE 0 END), 0)) < p.stock_minimo 
+            THEN 'BAJO'
+            ELSE 'OK'
+        END AS estado_stock
+    FROM 
+        productos p
+    LEFT JOIN 
+        movimientos m ON p.id_producto = m.id_producto
+    GROUP BY 
+        p.id_producto, p.nombre, p.descripcion, p.precio_unitario, p.stock_minimo;
+    
+    -- Vista para productos con stock bajo
+    CREATE VIEW v_productos_stock_bajo AS
+    SELECT * FROM v_stock_actual WHERE estado_stock = 'BAJO';
+    
+    -- Procedimiento para registrar entrada de productos
+    DELIMITER //
+    
+    CREATE PROCEDURE registrar_entrada(
+        IN p_id_producto INT,
+        IN p_cantidad INT,
+        IN p_usuario VARCHAR(50),
+        OUT p_resultado VARCHAR(100)
+    )
+    BEGIN
+        DECLARE v_nombre_producto VARCHAR(100);
+        
+        -- Validar que el producto existe
+        SELECT nombre INTO v_nombre_producto FROM productos WHERE id_producto = p_id_producto;
+        
+        IF v_nombre_producto IS NULL THEN
+            SET p_resultado = CONCAT('Error: El producto con ID ', p_id_producto, ' no existe');
+        ELSEIF p_cantidad <= 0 THEN
+            SET p_resultado = 'Error: La cantidad debe ser mayor que cero';
+        ELSE
+            -- Registrar el movimiento
+            INSERT INTO movimientos (id_producto, tipo_movimiento, cantidad, usuario)
+            VALUES (p_id_producto, 'ENTRADA', p_cantidad, p_usuario);
+            
+            SET p_resultado = CONCAT('Entrada registrada: ', p_cantidad, ' unidades de ', v_nombre_producto);
+        END IF;
+    END //
+    
+    DELIMITER ;
+    
+    -- Procedimiento para registrar salida de productos
+    DELIMITER //
+    
+    CREATE PROCEDURE registrar_salida(
+        IN p_id_producto INT,
+        IN p_cantidad INT,
+        IN p_usuario VARCHAR(50),
+        OUT p_resultado VARCHAR(100)
+    )
+    BEGIN
+        DECLARE v_nombre_producto VARCHAR(100);
+        DECLARE v_stock_actual INT;
+        
+        -- Obtener información del producto
+        SELECT 
+            p.nombre,
+            (COALESCE(SUM(CASE WHEN m.tipo_movimiento = 'ENTRADA' THEN m.cantidad ELSE 0 END), 0) -
+             COALESCE(SUM(CASE WHEN m.tipo_movimiento = 'SALIDA' THEN m.cantidad ELSE 0 END), 0)) AS stock
+        INTO 
+            v_nombre_producto, v_stock_actual
+        FROM 
+            productos p
+        LEFT JOIN 
+            movimientos m ON p.id_producto = m.id_producto
+        WHERE 
+            p.id_producto = p_id_producto
+        GROUP BY 
+            p.id_producto, p.nombre;
+        
+        IF v_nombre_producto IS NULL THEN
+            SET p_resultado = CONCAT('Error: El producto con ID ', p_id_producto, ' no existe');
+        ELSEIF p_cantidad <= 0 THEN
+            SET p_resultado = 'Error: La cantidad debe ser mayor que cero';
+        ELSEIF v_stock_actual < p_cantidad THEN
+            SET p_resultado = CONCAT('Error: Stock insuficiente. Stock actual: ', v_stock_actual);
+        ELSE
+            -- Registrar el movimiento
+            INSERT INTO movimientos (id_producto, tipo_movimiento, cantidad, usuario)
+            VALUES (p_id_producto, 'SALIDA', p_cantidad, p_usuario);
+            
+            SET p_resultado = CONCAT('Salida registrada: ', p_cantidad, ' unidades de ', v_nombre_producto);
+        END IF;
+    END //
+    
+    DELIMITER ;
+    
+    -- Función para calcular el valor del inventario
+    DELIMITER //
+    
+    CREATE FUNCTION calcular_valor_inventario()
+    RETURNS DECIMAL(15,2)
+    READS SQL DATA
+    BEGIN
+        DECLARE valor_total DECIMAL(15,2);
+        
+        SELECT SUM(stock_actual * precio_unitario) INTO valor_total
+        FROM v_stock_actual;
+        
+        RETURN COALESCE(valor_total, 0);
+    END //
+    
+    DELIMITER ;
+    
+    -- Función para calcular la rotación de un producto
+    DELIMITER //
+    
+    CREATE FUNCTION calcular_rotacion_producto(p_id_producto INT, p_dias INT)
+    RETURNS DECIMAL(10,2)
+    READS SQL DATA
+    BEGIN
+        DECLARE salidas INT;
+        DECLARE stock_promedio DECIMAL(10,2);
+        DECLARE rotacion DECIMAL(10,2);
+        
+        -- Calcular total de salidas en el período
+        SELECT COALESCE(SUM(cantidad), 0) INTO salidas
+        FROM movimientos
+        WHERE id_producto = p_id_producto
+          AND tipo_movimiento = 'SALIDA'
+          AND fecha_movimiento >= DATE_SUB(CURDATE(), INTERVAL p_dias DAY);
+        
+        -- Calcular stock promedio (simplificado)
+        SELECT AVG(stock_actual) INTO stock_promedio
+        FROM (
+            SELECT 
+                fecha_movimiento,
+                (
+                    SELECT 
+                        COALESCE(SUM(CASE WHEN tipo_movimiento = 'ENTRADA' THEN cantidad ELSE -cantidad END), 0)
+                    FROM 
+                        movimientos m2
+                    WHERE 
+                        m2.id_producto = p_id_producto
+                        AND m2.fecha_movimiento <= m1.fecha_movimiento
+                ) AS stock_actual
+            FROM 
+                movimientos m1
+            WHERE 
+                m1.id_producto = p_id_producto
+                AND m1.fecha_movimiento >= DATE_SUB(CURDATE(), INTERVAL p_dias DAY)
+            GROUP BY 
+                fecha_movimiento
+        ) AS stocks;
+        
+        -- Calcular rotación (salidas / stock promedio)
+        IF stock_promedio > 0 THEN
+            SET rotacion = salidas / stock_promedio;
+        ELSE
+            SET rotacion = 0;
+        END IF;
+        
+        RETURN rotacion;
+    END //
+    
+    DELIMITER ;
+    ```
+  </TabItem>
+  <TabItem label="Oracle PL/SQL">
+    ```sql
+    -- Crear tablas base
+    CREATE TABLE productos (
+        id_producto NUMBER PRIMARY KEY,
+        nombre VARCHAR2(100) NOT NULL,
+        descripcion CLOB,
+        precio_unitario NUMBER(10,2) NOT NULL,
+        stock_minimo NUMBER DEFAULT 10,
+        fecha_creacion TIMESTAMP DEFAULT SYSTIMESTAMP
+    );
+    
+    CREATE SEQUENCE seq_productos START WITH 1 INCREMENT BY 1;
+    
+    CREATE TABLE movimientos (
+        id_movimiento NUMBER PRIMARY KEY,
+        id_producto NUMBER NOT NULL,
+        tipo_movimiento VARCHAR2(10) CHECK (tipo_movimiento IN ('ENTRADA', 'SALIDA')),
+        cantidad NUMBER NOT NULL,
+        fecha_movimiento TIMESTAMP DEFAULT SYSTIMESTAMP,
+        usuario VARCHAR2(50) NOT NULL,
+        CONSTRAINT fk_movimientos_productos FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+    );
+    
+    CREATE SEQUENCE seq_movimientos START WITH 1 INCREMENT BY 1;
+    
+    -- Vista para consultar el stock actual
+    CREATE OR REPLACE VIEW v_stock_actual AS
+    SELECT 
+        p.id_producto,
+        p.nombre,
+        p.descripcion,
+        p.precio_unitario,
+        NVL(SUM(CASE WHEN m.tipo_movimiento = 'ENTRADA' THEN m.cantidad ELSE 0 END), 0) -
+        NVL(SUM(CASE WHEN m.tipo_movimiento = 'SALIDA' THEN m.cantidad ELSE 0 END), 0) AS stock_actual,
+        p.stock_minimo,
+        CASE 
+            WHEN (NVL(SUM(CASE WHEN m.tipo_movimiento = 'ENTRADA' THEN m.cantidad ELSE 0 END), 0) -
+                 NVL(SUM(CASE WHEN m.tipo_movimiento = 'SALIDA' THEN m.cantidad ELSE 0 END), 0)) < p.stock_minimo 
+            THEN 'BAJO'
+            ELSE 'OK'
+        END AS estado_stock
+    FROM 
+        productos p
+    LEFT JOIN 
+        movimientos m ON p.id_producto = m.id_producto
+    GROUP BY 
+        p.id_producto, p.nombre, p.descripcion, p.precio_unitario, p.stock_minimo;
+    
+    -- Vista para productos con stock bajo
+    CREATE OR REPLACE VIEW v_productos_stock_bajo AS
+    SELECT * FROM v_stock_actual WHERE estado_stock = 'BAJO';
+    
+    -- Paquete para gestión de inventario
+    CREATE OR REPLACE PACKAGE gestion_inventario AS
+        -- Procedimientos
+        PROCEDURE registrar_entrada(
+            p_id_producto IN NUMBER,
+            p_cantidad IN NUMBER,
+            p_usuario IN VARCHAR2,
+            p_resultado OUT VARCHAR2
+        );
+        
+        PROCEDURE registrar_salida(
+            p_id_producto IN NUMBER,
+            p_cantidad IN NUMBER,
+            p_usuario IN VARCHAR2,
+            p_resultado OUT VARCHAR2
+        );
+        
+        -- Funciones
+        FUNCTION calcular_valor_inventario RETURN NUMBER;
+        
+        FUNCTION calcular_rotacion_producto(
+            p_id_producto IN NUMBER,
+            p_dias IN NUMBER
+        ) RETURN NUMBER;
+    END gestion_inventario;
+    /
+    
+    CREATE OR REPLACE PACKAGE BODY gestion_inventario AS
+        -- Implementación de procedimientos
+        PROCEDURE registrar_entrada(
+            p_id_producto IN NUMBER,
+            p_cantidad IN NUMBER,
+            p_usuario IN VARCHAR2,
+            p_resultado OUT VARCHAR2
+        ) IS
+            v_nombre_producto productos.nombre%TYPE;
+        BEGIN
+            -- Validar que el producto existe
+            BEGIN
+                SELECT nombre INTO v_nombre_producto 
+                FROM productos 
+                WHERE id_producto = p_id_producto;
+            EXCEPTION
+                WHEN NO_DATA_FOUND THEN
+                    p_resultado := 'Error: El producto con ID ' || p_id_producto || ' no existe';
+                    RETURN;
+            END;
+            
+            IF p_cantidad <= 0 THEN
+                p_resultado := 'Error: La cantidad debe ser mayor que cero';
+                RETURN;
+            END IF;
+            
+            -- Registrar el movimiento
+            INSERT INTO movimientos (
+                id_movimiento, id_producto, tipo_movimiento, cantidad, usuario
+            )
+            VALUES (
+                seq_movimientos.NEXTVAL, p_id_producto, 'ENTRADA', p_cantidad, p_usuario
+            );
+            
+            COMMIT;
+            
+            p_resultado := 'Entrada registrada: ' || p_cantidad || ' unidades de ' || v_nombre_producto;
+        END registrar_entrada;
+        
+        PROCEDURE registrar_salida(
+            p_id_producto IN NUMBER,
+            p_cantidad IN NUMBER,
+            p_usuario IN VARCHAR2,
+            p_resultado OUT VARCHAR2
+        ) IS
+            v_nombre_producto productos.nombre%TYPE;
+            v_stock_actual NUMBER;
+        BEGIN
+            -- Obtener información del producto
+            BEGIN
+                SELECT 
+                    p.nombre,
+                    (NVL(SUM(CASE WHEN m.tipo_movimiento = 'ENTRADA' THEN m.cantidad ELSE 0 END), 0) -
+                     NVL(SUM(CASE WHEN m.tipo_movimiento = 'SALIDA' THEN m.cantidad ELSE 0 END), 0)) AS stock
+                INTO 
+                    v_nombre_producto, v_stock_actual
+                FROM 
+                    productos p
+                LEFT JOIN 
+                    movimientos m ON p.id_producto = m.id_producto
+                WHERE 
+                    p.id_producto = p_id_producto
+                GROUP BY 
+                    p.id_producto, p.nombre;
+            EXCEPTION
+                WHEN NO_DATA_FOUND THEN
+                    p_resultado := 'Error: El producto con ID ' || p_id_producto || ' no existe';
+                    RETURN;
+            END;
+            
+            IF p_cantidad <= 0 THEN
+                p_resultado := 'Error: La cantidad debe ser mayor que cero';
+                RETURN;
+            ELSIF v_stock_actual < p_cantidad THEN
+                p_resultado := 'Error: Stock insuficiente. Stock actual: ' || v_stock_actual;
+                RETURN;
+            END IF;
+            
+            -- Registrar el movimiento
+            INSERT INTO movimientos (
+                id_movimiento, id_producto, tipo_movimiento, cantidad, usuario
+            )
+            VALUES (
+                seq_movimientos.NEXTVAL, p_id_producto, 'SALIDA', p_cantidad, p_usuario
+            );
+            
+            COMMIT;
+            
+            p_resultado := 'Salida registrada: ' || p_cantidad || ' unidades de ' || v_nombre_producto;
+        END registrar_salida;
+        
+        -- Implementación de funciones
+        FUNCTION calcular_valor_inventario RETURN NUMBER IS
+            valor_total NUMBER;
+        BEGIN
+            SELECT NVL(SUM(stock_actual * precio_unitario), 0) INTO valor_total
+            FROM v_stock_actual;
+            
+            RETURN valor_total;
+        END calcular_valor_inventario;
+        
+        FUNCTION calcular_rotacion_producto(
+            p_id_producto IN NUMBER,
+            p_dias IN NUMBER
+        ) RETURN NUMBER IS
+            salidas NUMBER;
+            stock_promedio NUMBER;
+            rotacion NUMBER;
+        BEGIN
+            -- Calcular total de salidas en el período
+            SELECT NVL(SUM(cantidad), 0) INTO salidas
+            FROM movimientos
+            WHERE id_producto = p_id_producto
+              AND tipo_movimiento = 'SALIDA'
+              AND fecha_movimiento >= SYSTIMESTAMP - INTERVAL '1' DAY * p_dias;
+            
+            -- Calcular stock promedio (simplificado)
+            SELECT AVG(stock_actual) INTO stock_promedio
+            FROM (
+                SELECT 
+                    fecha_movimiento,
+                    (
+                        SELECT 
+                            NVL(SUM(CASE WHEN tipo_movimiento = 'ENTRADA' THEN cantidad ELSE -cantidad END), 0)
+                        FROM 
+                            movimientos m2
+                        WHERE 
+                            m2.id_producto = p_id_producto
+                            AND m2.fecha_movimiento <= m1.fecha_movimiento
+                    ) AS stock_actual
+                FROM 
+                    movimientos m1
+                WHERE 
+                    m1.id_producto = p_id_producto
+                    AND m1.fecha_movimiento >= SYSTIMESTAMP - INTERVAL '1' DAY * p_dias
+                GROUP BY 
+                    fecha_movimiento
+            );
+            
+            -- Calcular rotación (salidas / stock promedio)
+            IF stock_promedio > 0 THEN
+                rotacion := salidas / stock_promedio;
+            ELSE
+                rotacion := 0;
+            END IF;
+            
+            RETURN rotacion;
+        END calcular_rotacion_producto;
+    END gestion_inventario;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+### Análisis de las diferencias en la implementación
+
+Este ejemplo muestra las principales diferencias entre MySQL y Oracle PL/SQL al implementar un sistema de gestión de inventario:
+
+1. **Organización del código**:
+   - MySQL: Utiliza procedimientos y funciones independientes.
+   - Oracle: Agrupa la funcionalidad en un paquete (`gestion_inventario`), mejorando la organización y encapsulación.
+
+2. **Manejo de secuencias**:
+   - MySQL: Utiliza AUTO_INCREMENT para generar IDs automáticamente.
+   - Oracle: Requiere secuencias explícitas (SEQ_PRODUCTOS, SEQ_MOVIMIENTOS) y NEXTVAL.
+
+3. **Tipos de datos**:
+   - MySQL: Utiliza ENUM para restringir valores ('ENTRADA', 'SALIDA').
+   - Oracle: Utiliza CHECK CONSTRAINT para la misma restricción.
+
+4. **Funciones de fecha**:
+   - MySQL: Utiliza DATE_SUB() y CURDATE().
+   - Oracle: Utiliza SYSTIMESTAMP e INTERVAL.
+
+5. **Funciones de agregación**:
+   - MySQL: Utiliza COALESCE() para manejar valores NULL.
+   - Oracle: Utiliza NVL() para la misma funcionalidad.
+
+6. **Manejo de excepciones**:
+   - MySQL: Utiliza validaciones explícitas con IF/ELSE.
+   - Oracle: Aprovecha el manejo de excepciones con bloques BEGIN/EXCEPTION/END.
+
+Este ejemplo demuestra cómo se pueden implementar soluciones equivalentes en ambos motores, aprovechando las características específicas de cada uno para lograr el mismo resultado funcional.

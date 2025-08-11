@@ -1,0 +1,1072 @@
+---
+title: 7. Manejo de Arreglos y Colecciones
+description: Aprende sobre arreglos simples y multidimensionales, ArrayList, LinkedList, HashMap, HashSet y Generics en Java
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## Introducción
+
+El manejo eficiente de datos es fundamental en cualquier aplicación. Java ofrece diversas estructuras para almacenar y manipular conjuntos de datos, desde los arreglos tradicionales hasta las colecciones del Framework de Colecciones de Java (JCF). En este capítulo, exploraremos estas estructuras, sus características, ventajas y casos de uso.
+
+## 7.1 Arreglos (simples y multidimensionales)
+
+Los arreglos son estructuras de datos que permiten almacenar múltiples valores del mismo tipo bajo un solo nombre de variable. En Java, los arreglos son objetos y tienen una longitud fija que se establece al momento de su creación.
+
+### 7.1.1 Arreglos unidimensionales
+
+#### Declaración e inicialización
+
+Existen varias formas de declarar e inicializar arreglos en Java:
+
+<Tabs>
+  <TabItem label="Declaración y asignación separadas">
+    <Code code={`// Declaración (solo crea la referencia)
+int[] numeros;
+
+// Asignación (crea el arreglo en memoria)
+numeros = new int[5]; // Arreglo de 5 enteros inicializados a 0`} lang="java" />
+  </TabItem>
+  <TabItem label="Declaración y asignación combinadas">
+    <Code code={`// Declaración y asignación en una sola línea
+int[] numeros = new int[5]; // Arreglo de 5 enteros inicializados a 0
+String[] nombres = new String[3]; // Arreglo de 3 strings inicializados a null`} lang="java" />
+  </TabItem>
+  <TabItem label="Inicialización con valores">
+    <Code code={`// Inicialización con valores específicos
+int[] numeros = {10, 20, 30, 40, 50}; // Arreglo de 5 enteros con valores asignados
+String[] dias = {"Lunes", "Martes", "Miércoles", "Jueves", "Viernes"}; // Arreglo de 5 strings`} lang="java" />
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  En Java, puedes colocar los corchetes `[]` tanto después del tipo de dato como después del nombre de la variable: `int[] numeros` o `int numeros[]`. Sin embargo, la primera forma es la recomendada por convención.
+</Aside>
+
+#### Acceso y modificación de elementos
+
+Los elementos de un arreglo se acceden mediante índices que comienzan en 0:
+
+<Code code={`int[] numeros = {10, 20, 30, 40, 50};
+
+// Acceso a elementos
+int primerNumero = numeros[0]; // 10
+int tercerNumero = numeros[2]; // 30
+
+// Modificación de elementos
+numeros[1] = 25; // Cambia el segundo elemento a 25
+numeros[4] = 55; // Cambia el último elemento a 55
+
+// Error en tiempo de ejecución: ArrayIndexOutOfBoundsException
+// numeros[5] = 60; // ¡El índice 5 está fuera de los límites del arreglo!`} lang="java" />
+
+#### Longitud de un arreglo
+
+La propiedad `length` devuelve el tamaño de un arreglo:
+
+<Code code={`int[] numeros = {10, 20, 30, 40, 50};
+int longitud = numeros.length; // 5
+
+// Recorrer un arreglo usando su longitud
+for (int i = 0; i < numeros.length; i++) {
+    System.out.println("Elemento " + i + ": " + numeros[i]);
+}`} lang="java" />
+
+#### Recorrido de arreglos
+
+Existen varias formas de recorrer un arreglo en Java:
+
+<Tabs>
+  <TabItem label="Bucle for tradicional">
+    <Code code={`int[] numeros = {10, 20, 30, 40, 50};
+
+// Usando un bucle for tradicional
+for (int i = 0; i < numeros.length; i++) {
+    System.out.println(numeros[i]);
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Bucle for-each">
+    <Code code={`int[] numeros = {10, 20, 30, 40, 50};
+
+// Usando un bucle for-each (enhanced for)
+for (int numero : numeros) {
+    System.out.println(numero);
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Usando Arrays.stream (Java 8+)">
+    <Code code={`int[] numeros = {10, 20, 30, 40, 50};
+
+// Usando streams (Java 8+)
+import java.util.Arrays;
+
+Arrays.stream(numeros).forEach(System.out::println);
+
+// O con operaciones más complejas
+int suma = Arrays.stream(numeros).sum(); // 150
+int max = Arrays.stream(numeros).max().getAsInt(); // 50`} lang="java" />
+  </TabItem>
+</Tabs>
+
+#### Operaciones comunes con arreglos
+
+La clase `java.util.Arrays` proporciona métodos útiles para trabajar con arreglos:
+
+<Code code={`import java.util.Arrays;
+
+int[] numeros = {30, 10, 50, 20, 40};
+
+// Ordenar un arreglo
+Arrays.sort(numeros);
+System.out.println(Arrays.toString(numeros)); // [10, 20, 30, 40, 50]
+
+// Buscar un elemento (en un arreglo ordenado)
+int indice = Arrays.binarySearch(numeros, 30); // 2
+
+// Comparar arreglos
+int[] otrosNumeros = {10, 20, 30, 40, 50};
+boolean sonIguales = Arrays.equals(numeros, otrosNumeros); // true
+
+// Llenar un arreglo
+int[] masNumeros = new int[5];
+Arrays.fill(masNumeros, 7);
+System.out.println(Arrays.toString(masNumeros)); // [7, 7, 7, 7, 7]
+
+// Copiar un arreglo
+int[] copiaNumeros = Arrays.copyOf(numeros, numeros.length);
+int[] primerosTres = Arrays.copyOf(numeros, 3); // [10, 20, 30]
+int[] subArreglo = Arrays.copyOfRange(numeros, 1, 4); // [20, 30, 40]`} lang="java" />
+
+### 7.1.2 Arreglos multidimensionales
+
+Java soporta arreglos multidimensionales, que son arreglos de arreglos. Los más comunes son los arreglos bidimensionales (matrices).
+
+#### Declaración e inicialización
+
+<Tabs>
+  <TabItem label="Declaración y asignación separadas">
+    <Code code={`// Declaración
+int[][] matriz;
+
+// Asignación
+matriz = new int[3][4]; // Matriz de 3 filas y 4 columnas`} lang="java" />
+  </TabItem>
+  <TabItem label="Declaración y asignación combinadas">
+    <Code code={`// Declaración y asignación en una sola línea
+int[][] matriz = new int[3][4]; // Matriz de 3 filas y 4 columnas`} lang="java" />
+  </TabItem>
+  <TabItem label="Inicialización con valores">
+    <Code code={`// Inicialización con valores específicos
+int[][] matriz = {
+    {1, 2, 3, 4},
+    {5, 6, 7, 8},
+    {9, 10, 11, 12}
+}; // Matriz de 3 filas y 4 columnas con valores asignados`} lang="java" />
+  </TabItem>
+</Tabs>
+
+#### Arreglos irregulares (jagged arrays)
+
+En Java, cada fila de un arreglo multidimensional puede tener diferente longitud:
+
+<Code code={`// Arreglo irregular (jagged array)
+int[][] irregular = new int[3][];
+irregular[0] = new int[2]; // Primera fila con 2 columnas
+irregular[1] = new int[4]; // Segunda fila con 4 columnas
+irregular[2] = new int[3]; // Tercera fila con 3 columnas
+
+// O directamente
+int[][] irregular2 = {
+    {1, 2},
+    {3, 4, 5, 6},
+    {7, 8, 9}
+};`} lang="java" />
+
+#### Acceso y modificación de elementos
+
+<Code code={`int[][] matriz = {
+    {1, 2, 3},
+    {4, 5, 6},
+    {7, 8, 9}
+};
+
+// Acceso a elementos
+int elemento = matriz[1][2]; // 6 (fila 1, columna 2)
+
+// Modificación de elementos
+matriz[0][1] = 20; // Cambia el elemento en la fila 0, columna 1 a 20`} lang="java" />
+
+#### Recorrido de arreglos multidimensionales
+
+<Code code={`int[][] matriz = {
+    {1, 2, 3},
+    {4, 5, 6},
+    {7, 8, 9}
+};
+
+// Usando bucles for anidados
+for (int i = 0; i < matriz.length; i++) {
+    for (int j = 0; j < matriz[i].length; j++) {
+        System.out.print(matriz[i][j] + " ");
+    }
+    System.out.println(); // Nueva línea después de cada fila
+}
+
+// Usando bucles for-each anidados
+for (int[] fila : matriz) {
+    for (int elemento : fila) {
+        System.out.print(elemento + " ");
+    }
+    System.out.println();
+}`} lang="java" />
+
+### 7.1.3 Limitaciones de los arreglos
+
+Los arreglos en Java tienen varias limitaciones:
+
+1. **Tamaño fijo**: Una vez creado, el tamaño no puede cambiar.
+2. **Tipo homogéneo**: Todos los elementos deben ser del mismo tipo.
+3. **Operaciones limitadas**: No proporcionan métodos para insertar o eliminar elementos.
+4. **Sin información de tamaño actual**: No hay forma de saber cuántos elementos "útiles" contiene un arreglo parcialmente lleno.
+
+<Aside type="tip">
+  Para superar estas limitaciones, Java proporciona el Framework de Colecciones, que ofrece estructuras de datos dinámicas y más flexibles.
+</Aside>
+
+### 7.1.4 Casos de uso para arreglos
+
+- Cuando se conoce el tamaño exacto de antemano
+- Para estructuras de datos de tamaño fijo (por ejemplo, días de la semana)
+- Para operaciones de alto rendimiento donde la simplicidad es crucial
+- Para representar datos multidimensionales como matrices o tensores
+- Cuando se trabaja con APIs que requieren arreglos
+
+## 7.2 ArrayList y LinkedList
+
+El Framework de Colecciones de Java proporciona implementaciones dinámicas de listas que superan las limitaciones de los arreglos tradicionales. Las dos implementaciones más comunes son `ArrayList` y `LinkedList`.
+
+### 7.2.1 ArrayList
+
+`ArrayList` es una implementación redimensionable de la interfaz `List` que utiliza un arreglo dinámico internamente. Es similar a un arreglo tradicional, pero puede crecer o reducirse según sea necesario.
+
+#### Creación e inicialización
+
+<Code code={`import java.util.ArrayList;
+import java.util.List;
+
+// Creación de ArrayList vacío
+ArrayList<String> nombres = new ArrayList<>();
+
+// Creación con capacidad inicial (optimización de rendimiento)
+ArrayList<Integer> numeros = new ArrayList<>(20);
+
+// Usando la interfaz List (recomendado para mejor diseño)
+List<Double> precios = new ArrayList<>();
+
+// Inicialización con elementos
+List<String> frutas = new ArrayList<>();
+frutas.add("Manzana");
+frutas.add("Banana");
+frutas.add("Naranja");
+
+// Inicialización usando List.of (Java 9+, crea lista inmutable)
+List<String> colores = List.of("Rojo", "Verde", "Azul");
+
+// Convertir a ArrayList (para hacerla mutable)
+List<String> coloresMutables = new ArrayList<>(colores);`} lang="java" />
+
+#### Operaciones básicas
+
+<Code code={`List<String> frutas = new ArrayList<>();
+
+// Añadir elementos
+frutas.add("Manzana"); // Añade al final
+frutas.add(1, "Banana"); // Añade en posición específica
+
+// Acceder a elementos
+String primeraFruta = frutas.get(0); // "Manzana"
+
+// Modificar elementos
+frutas.set(1, "Pera"); // Reemplaza "Banana" con "Pera"
+
+// Eliminar elementos
+frutas.remove("Manzana"); // Elimina por objeto
+frutas.remove(0); // Elimina por índice
+
+// Verificar si contiene un elemento
+boolean contienePera = frutas.contains("Pera");
+
+// Tamaño
+int tamaño = frutas.size();
+
+// Verificar si está vacía
+boolean estaVacia = frutas.isEmpty();
+
+// Limpiar todos los elementos
+frutas.clear();`} lang="java" />
+
+#### Recorrido de ArrayList
+
+<Tabs>
+  <TabItem label="Bucle for tradicional">
+    <Code code={`List<String> frutas = new ArrayList<>();
+frutas.add("Manzana");
+frutas.add("Banana");
+frutas.add("Naranja");
+
+// Usando un bucle for tradicional
+for (int i = 0; i < frutas.size(); i++) {
+    System.out.println(frutas.get(i));
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Bucle for-each">
+    <Code code={`List<String> frutas = new ArrayList<>();
+frutas.add("Manzana");
+frutas.add("Banana");
+frutas.add("Naranja");
+
+// Usando un bucle for-each
+for (String fruta : frutas) {
+    System.out.println(fruta);
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Iterator">
+    <Code code={`import java.util.Iterator;
+
+List<String> frutas = new ArrayList<>();
+frutas.add("Manzana");
+frutas.add("Banana");
+frutas.add("Naranja");
+
+// Usando Iterator
+Iterator<String> iterador = frutas.iterator();
+while (iterador.hasNext()) {
+    String fruta = iterador.next();
+    System.out.println(fruta);
+    
+    // Podemos eliminar elementos durante la iteración
+    if (fruta.equals("Banana")) {
+        iterador.remove(); // Forma segura de eliminar durante la iteración
+    }
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Stream API (Java 8+)">
+    <Code code={`List<String> frutas = new ArrayList<>();
+frutas.add("Manzana");
+frutas.add("Banana");
+frutas.add("Naranja");
+
+// Usando Stream API
+frutas.stream().forEach(System.out::println);
+
+// Con operaciones más complejas
+frutas.stream()
+      .filter(f -> f.startsWith("M"))
+      .map(String::toUpperCase)
+      .forEach(System.out::println); // MANZANA`} lang="java" />
+  </TabItem>
+</Tabs>
+
+#### Operaciones avanzadas
+
+<Code code={`import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+List<String> frutas = new ArrayList<>();
+frutas.add("Manzana");
+frutas.add("Banana");
+frutas.add("Naranja");
+frutas.add("Pera");
+
+// Ordenar
+Collections.sort(frutas); // ["Banana", "Manzana", "Naranja", "Pera"]
+
+// Ordenar en reversa
+Collections.reverse(frutas); // ["Pera", "Naranja", "Manzana", "Banana"]
+
+// Mezclar
+Collections.shuffle(frutas); // Orden aleatorio
+
+// Convertir a array
+String[] frutasArray = frutas.toArray(new String[0]);
+
+// Sublista (vista de la lista original)
+List<String> subLista = frutas.subList(1, 3); // Desde índice 1 (inclusive) hasta 3 (exclusive)
+
+// Buscar
+int indice = frutas.indexOf("Naranja");
+int ultimoIndice = frutas.lastIndexOf("Naranja"); // Útil si hay duplicados
+
+// Añadir todos los elementos de otra colección
+List<String> masFrutas = new ArrayList<>();
+masFrutas.add("Uva");
+masFrutas.add("Kiwi");
+frutas.addAll(masFrutas); // Añade al final
+frutas.addAll(1, masFrutas); // Añade desde el índice 1`} lang="java" />
+
+### 7.2.2 LinkedList
+
+`LinkedList` es una implementación de lista doblemente enlazada de las interfaces `List` y `Deque`. Cada elemento (nodo) contiene una referencia al elemento anterior y siguiente.
+
+#### Creación e inicialización
+
+<Code code={`import java.util.LinkedList;
+import java.util.List;
+import java.util.Deque;
+
+// Creación de LinkedList vacía
+LinkedList<String> nombres = new LinkedList<>();
+
+// Como implementación de List
+List<Integer> numeros = new LinkedList<>();
+
+// Como implementación de Deque (cola doble)
+Deque<Double> precios = new LinkedList<>();
+
+// Inicialización con elementos
+LinkedList<String> frutas = new LinkedList<>();
+frutas.add("Manzana");
+frutas.add("Banana");
+frutas.add("Naranja");`} lang="java" />
+
+#### Operaciones específicas de LinkedList
+
+Además de las operaciones de `List`, `LinkedList` proporciona métodos adicionales para operaciones de cola y pila:
+
+<Code code={`LinkedList<String> frutas = new LinkedList<>();
+frutas.add("Banana");
+frutas.add("Naranja");
+
+// Operaciones de cola (Queue)
+frutas.offer("Manzana");   // Añade al final (similar a add)
+String primera = frutas.poll(); // Obtiene y elimina el primer elemento
+String cabeza = frutas.peek();  // Obtiene sin eliminar el primer elemento
+
+// Operaciones de pila (Stack)
+frutas.push("Pera");       // Añade al principio
+String superior = frutas.pop(); // Obtiene y elimina el primer elemento
+
+// Operaciones de Deque (cola doble)
+frutas.addFirst("Uva");    // Añade al principio
+frutas.addLast("Kiwi");     // Añade al final
+String primera2 = frutas.removeFirst(); // Elimina y devuelve el primer elemento
+String ultima = frutas.removeLast();   // Elimina y devuelve el último elemento
+String primeraVista = frutas.getFirst(); // Obtiene sin eliminar el primer elemento
+String ultimaVista = frutas.getLast();   // Obtiene sin eliminar el último elemento`} lang="java" />
+
+### 7.2.3 ArrayList vs LinkedList
+
+<table>
+  <thead>
+    <tr>
+      <th>Característica</th>
+      <th>ArrayList</th>
+      <th>LinkedList</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Estructura interna</td>
+      <td>Arreglo dinámico</td>
+      <td>Lista doblemente enlazada</td>
+    </tr>
+    <tr>
+      <td>Acceso aleatorio</td>
+      <td>O(1) - Constante</td>
+      <td>O(n) - Lineal</td>
+    </tr>
+    <tr>
+      <td>Inserción/eliminación al principio/medio</td>
+      <td>O(n) - Requiere desplazar elementos</td>
+      <td>O(1) - Solo actualiza referencias</td>
+    </tr>
+    <tr>
+      <td>Inserción/eliminación al final</td>
+      <td>O(1) amortizado</td>
+      <td>O(1)</td>
+    </tr>
+    <tr>
+      <td>Uso de memoria</td>
+      <td>Menor (solo almacena elementos)</td>
+      <td>Mayor (almacena elementos y referencias)</td>
+    </tr>
+    <tr>
+      <td>Iteración</td>
+      <td>Más rápida</td>
+      <td>Más lenta</td>
+    </tr>
+    <tr>
+      <td>Funcionalidad adicional</td>
+      <td>Solo operaciones de lista</td>
+      <td>Operaciones de lista, cola y pila</td>
+    </tr>
+  </tbody>
+</table>
+
+#### ¿Cuándo usar cada una?
+
+<Aside type="tip">
+  <p><strong>Usa ArrayList cuando:</strong></p>
+  <ul>
+    <li>Necesites acceso aleatorio frecuente a elementos por índice</li>
+    <li>Principalmente agregues/elimines elementos al final de la lista</li>
+    <li>Necesites iterar sobre la colección frecuentemente</li>
+    <li>Quieras minimizar el uso de memoria</li>
+  </ul>
+  
+  <p><strong>Usa LinkedList cuando:</strong></p>
+  <ul>
+    <li>Necesites insertar/eliminar frecuentemente al principio o en medio de la lista</li>
+    <li>Necesites implementar una cola, pila o cola doble</li>
+    <li>No necesites acceso aleatorio frecuente por índice</li>
+    <li>El tamaño de la colección cambie frecuentemente</li>
+  </ul>
+</Aside>
+
+<Code code={`import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+// Ejemplo de uso apropiado de ArrayList
+List<Integer> numeros = new ArrayList<>();
+// Añadir muchos elementos al final es eficiente
+for (int i = 0; i < 100000; i++) {
+    numeros.add(i);
+}
+// Acceso aleatorio es eficiente
+int numero = numeros.get(50000); // O(1)
+
+// Ejemplo de uso apropiado de LinkedList
+LinkedList<String> historial = new LinkedList<>();
+// Añadir al principio es eficiente
+historial.addFirst("Página 3");
+historial.addFirst("Página 2");
+historial.addFirst("Página 1");
+// Implementar navegación adelante/atrás
+String paginaActual = historial.removeFirst(); // "Página 1"
+String siguientePagina = historial.removeFirst(); // "Página 2"`} lang="java" />
+
+## 7.3 HashMap y HashSet
+
+Las colecciones basadas en hash utilizan tablas hash para almacenar elementos, lo que permite un acceso, inserción y eliminación muy eficientes. Las dos implementaciones más comunes son `HashMap` y `HashSet`.
+
+### 7.3.1 HashMap
+
+`HashMap` implementa la interfaz `Map` y almacena pares clave-valor, donde cada clave es única. Proporciona acceso en tiempo constante O(1) para operaciones básicas.
+
+#### Creación e inicialización
+
+<Code code={`import java.util.HashMap;
+import java.util.Map;
+
+// Creación de HashMap vacío
+HashMap<String, Integer> edades = new HashMap<>();
+
+// Creación con capacidad inicial y factor de carga
+HashMap<String, Double> precios = new HashMap<>(100, 0.75f);
+
+// Usando la interfaz Map (recomendado)
+Map<Integer, String> empleados = new HashMap<>();
+
+// Inicialización con elementos
+Map<String, String> capitales = new HashMap<>();
+capitales.put("España", "Madrid");
+capitales.put("Francia", "París");
+capitales.put("Italia", "Roma");
+
+// Inicialización usando Map.of (Java 9+, crea mapa inmutable)
+Map<String, Integer> poblacion = Map.of(
+    "Madrid", 3223000,
+    "Barcelona", 1620000,
+    "Valencia", 791000
+);
+
+// Convertir a HashMap (para hacerlo mutable)
+Map<String, Integer> poblacionMutable = new HashMap<>(poblacion);`} lang="java" />
+
+#### Operaciones básicas
+
+<Code code={`Map<String, String> capitales = new HashMap<>();
+
+// Añadir elementos
+capitales.put("España", "Madrid");
+capitales.put("Francia", "París");
+
+// Acceder a elementos
+String capitalEspaña = capitales.get("España"); // "Madrid"
+String capitalAlemania = capitales.get("Alemania"); // null
+
+// Acceder con valor por defecto si no existe
+String capitalPortugal = capitales.getOrDefault("Portugal", "Desconocida"); // "Desconocida"
+
+// Verificar si contiene una clave o valor
+boolean contieneEspaña = capitales.containsKey("España"); // true
+boolean contieneLondres = capitales.containsValue("Londres"); // false
+
+// Modificar elementos
+capitales.put("Francia", "París"); // Sobrescribe el valor existente
+
+// Insertar solo si la clave no existe
+capitales.putIfAbsent("Italia", "Roma"); // Añade Italia->Roma
+capitales.putIfAbsent("España", "Barcelona"); // No hace nada, España ya existe
+
+// Eliminar elementos
+capitales.remove("Francia"); // Elimina Francia->París
+capitales.remove("Italia", "Milán"); // No elimina nada, el valor no coincide
+
+// Tamaño
+int tamaño = capitales.size(); // 1
+
+// Verificar si está vacío
+boolean estaVacio = capitales.isEmpty(); // false
+
+// Limpiar todos los elementos
+capitales.clear(); // Elimina todos los elementos`} lang="java" />
+
+#### Recorrido de HashMap
+
+<Tabs>
+  <TabItem label="Recorrer claves">
+    <Code code={`Map<String, String> capitales = new HashMap<>();
+capitales.put("España", "Madrid");
+capitales.put("Francia", "París");
+capitales.put("Italia", "Roma");
+
+// Recorrer las claves
+for (String pais : capitales.keySet()) {
+    System.out.println("País: " + pais);
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Recorrer valores">
+    <Code code={`Map<String, String> capitales = new HashMap<>();
+capitales.put("España", "Madrid");
+capitales.put("Francia", "París");
+capitales.put("Italia", "Roma");
+
+// Recorrer los valores
+for (String capital : capitales.values()) {
+    System.out.println("Capital: " + capital);
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Recorrer pares clave-valor">
+    <Code code={`Map<String, String> capitales = new HashMap<>();
+capitales.put("España", "Madrid");
+capitales.put("Francia", "París");
+capitales.put("Italia", "Roma");
+
+// Recorrer pares clave-valor
+for (Map.Entry<String, String> entrada : capitales.entrySet()) {
+    System.out.println(entrada.getKey() + " -> " + entrada.getValue());
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Usando forEach (Java 8+)">
+    <Code code={`Map<String, String> capitales = new HashMap<>();
+capitales.put("España", "Madrid");
+capitales.put("Francia", "París");
+capitales.put("Italia", "Roma");
+
+// Usando forEach con expresión lambda
+capitales.forEach((pais, capital) -> {
+    System.out.println(pais + " -> " + capital);
+});`} lang="java" />
+  </TabItem>
+</Tabs>
+
+#### Operaciones avanzadas
+
+<Code code={`Map<String, Integer> poblacion = new HashMap<>();
+poblacion.put("Madrid", 3223000);
+poblacion.put("Barcelona", 1620000);
+poblacion.put("Valencia", 791000);
+
+// Computar un valor basado en la clave actual
+poblacion.compute("Madrid", (ciudad, habitantes) -> habitantes + 10000);
+
+// Computar un valor solo si la clave existe
+poblacion.computeIfPresent("Barcelona", (ciudad, habitantes) -> habitantes * 2);
+
+// Computar un valor solo si la clave no existe
+poblacion.computeIfAbsent("Sevilla", ciudad -> 688000);
+
+// Fusionar valores
+poblacion.merge("Valencia", 5000, (valorAntiguo, valorNuevo) -> valorAntiguo + valorNuevo);
+
+// Reemplazar valores
+poblacion.replace("Madrid", 3300000);
+poblacion.replace("Barcelona", 1620000, 1650000); // Solo reemplaza si el valor actual coincide
+
+// Operaciones en masa
+Map<String, Integer> masCiudades = new HashMap<>();
+masCiudades.put("Zaragoza", 675000);
+masCiudades.put("Málaga", 571000);
+
+// Añadir todos los elementos de otro mapa
+poblacion.putAll(masCiudades);`} lang="java" />
+
+### 7.3.2 HashSet
+
+`HashSet` implementa la interfaz `Set` y almacena elementos únicos sin duplicados. Utiliza un `HashMap` internamente para almacenar los elementos como claves (con un objeto ficticio como valor).
+
+#### Creación e inicialización
+
+<Code code={`import java.util.HashSet;
+import java.util.Set;
+
+// Creación de HashSet vacío
+HashSet<String> nombres = new HashSet<>();
+
+// Creación con capacidad inicial
+HashSet<Integer> numeros = new HashSet<>(100);
+
+// Usando la interfaz Set (recomendado)
+Set<String> colores = new HashSet<>();
+
+// Inicialización con elementos
+Set<String> frutas = new HashSet<>();
+frutas.add("Manzana");
+frutas.add("Banana");
+frutas.add("Naranja");
+
+// Inicialización usando Set.of (Java 9+, crea conjunto inmutable)
+Set<String> dias = Set.of("Lunes", "Martes", "Miércoles", "Jueves", "Viernes");
+
+// Convertir a HashSet (para hacerlo mutable)
+Set<String> diasMutables = new HashSet<>(dias);
+
+// Inicialización desde otra colección
+import java.util.Arrays;
+import java.util.List;
+
+List<String> listaPaises = Arrays.asList("España", "Francia", "Italia", "España");
+Set<String> paises = new HashSet<>(listaPaises); // Elimina duplicados automáticamente`} lang="java" />
+
+#### Operaciones básicas
+
+<Code code={`Set<String> colores = new HashSet<>();
+
+// Añadir elementos
+colores.add("Rojo"); // Devuelve true
+colores.add("Verde");
+boolean agregado = colores.add("Rojo"); // Devuelve false, ya existe
+
+// Verificar si contiene un elemento
+boolean contieneAzul = colores.contains("Azul"); // false
+
+// Eliminar elementos
+boolean eliminado = colores.remove("Verde"); // true
+boolean eliminado2 = colores.remove("Amarillo"); // false, no existe
+
+// Tamaño
+int tamaño = colores.size(); // 1
+
+// Verificar si está vacío
+boolean estaVacio = colores.isEmpty(); // false
+
+// Limpiar todos los elementos
+colores.clear();`} lang="java" />
+
+#### Recorrido de HashSet
+
+<Tabs>
+  <TabItem label="Bucle for-each">
+    <Code code={`Set<String> colores = new HashSet<>();
+colores.add("Rojo");
+colores.add("Verde");
+colores.add("Azul");
+
+// Usando un bucle for-each
+for (String color : colores) {
+    System.out.println(color);
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Iterator">
+    <Code code={`import java.util.Iterator;
+
+Set<String> colores = new HashSet<>();
+colores.add("Rojo");
+colores.add("Verde");
+colores.add("Azul");
+
+// Usando Iterator
+Iterator<String> iterador = colores.iterator();
+while (iterador.hasNext()) {
+    String color = iterador.next();
+    System.out.println(color);
+    
+    // Podemos eliminar elementos durante la iteración
+    if (color.equals("Verde")) {
+        iterador.remove();
+    }
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Stream API (Java 8+)">
+    <Code code={`Set<String> colores = new HashSet<>();
+colores.add("Rojo");
+colores.add("Verde");
+colores.add("Azul");
+
+// Usando Stream API
+colores.stream().forEach(System.out::println);
+
+// Con operaciones más complejas
+colores.stream()
+       .filter(c -> c.length() > 4)
+       .map(String::toUpperCase)
+       .forEach(System.out::println); // VERDE`} lang="java" />
+  </TabItem>
+</Tabs>
+
+#### Operaciones de conjuntos
+
+<Code code={`import java.util.HashSet;
+import java.util.Set;
+
+Set<String> frutas1 = new HashSet<>();
+frutas1.add("Manzana");
+frutas1.add("Banana");
+frutas1.add("Naranja");
+
+Set<String> frutas2 = new HashSet<>();
+frutas2.add("Naranja");
+frutas2.add("Pera");
+frutas2.add("Uva");
+
+// Unión (modificando frutas1)
+Set<String> union = new HashSet<>(frutas1);
+union.addAll(frutas2); // [Manzana, Banana, Naranja, Pera, Uva]
+
+// Intersección (elementos comunes)
+Set<String> interseccion = new HashSet<>(frutas1);
+interseccion.retainAll(frutas2); // [Naranja]
+
+// Diferencia (elementos en frutas1 pero no en frutas2)
+Set<String> diferencia = new HashSet<>(frutas1);
+diferencia.removeAll(frutas2); // [Manzana, Banana]
+
+// Diferencia simétrica (elementos que están en uno u otro conjunto, pero no en ambos)
+Set<String> difSimetrica = new HashSet<>(frutas1);
+difSimetrica.addAll(frutas2); // Unión
+Set<String> temp = new HashSet<>(frutas1);
+temp.retainAll(frutas2); // Intersección
+difSimetrica.removeAll(temp); // [Manzana, Banana, Pera, Uva]`} lang="java" />
+
+### 7.3.3 HashMap vs HashSet
+
+<table>
+  <thead>
+    <tr>
+      <th>Característica</th>
+      <th>HashMap</th>
+      <th>HashSet</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Interfaz implementada</td>
+      <td>Map</td>
+      <td>Set</td>
+    </tr>
+    <tr>
+      <td>Almacena</td>
+      <td>Pares clave-valor</td>
+      <td>Valores únicos</td>
+    </tr>
+    <tr>
+      <td>Duplicados</td>
+      <td>No permite claves duplicadas</td>
+      <td>No permite elementos duplicados</td>
+    </tr>
+    <tr>
+      <td>Valor nulo</td>
+      <td>Permite una clave nula y múltiples valores nulos</td>
+      <td>Permite un elemento nulo</td>
+    </tr>
+    <tr>
+      <td>Implementación interna</td>
+      <td>Tabla hash</td>
+      <td>HashMap (usa HashMap internamente)</td>
+    </tr>
+    <tr>
+      <td>Uso común</td>
+      <td>Almacenar asociaciones clave-valor</td>
+      <td>Almacenar conjuntos de elementos únicos</td>
+    </tr>
+  </tbody>
+</table>
+
+<Aside type="tip">
+  <p><strong>Usa HashMap cuando:</strong></p>
+  <ul>
+    <li>Necesites almacenar y recuperar datos usando una clave</li>
+    <li>Necesites asociar valores con identificadores únicos</li>
+    <li>Quieras implementar cachés o diccionarios</li>
+  </ul>
+  
+  <p><strong>Usa HashSet cuando:</strong></p>
+  <ul>
+    <li>Necesites almacenar elementos únicos sin duplicados</li>
+    <li>Necesites realizar operaciones de conjuntos (unión, intersección, etc.)</li>
+    <li>Solo te importe si un elemento existe o no en la colección</li>
+  </ul>
+</Aside>
+
+## 7.4 Generics en colecciones
+
+Los genéricos (Generics) permiten crear clases, interfaces y métodos que operan con tipos parametrizados. En el contexto de colecciones, los genéricos proporcionan seguridad de tipos en tiempo de compilación.
+
+### 7.4.1 Beneficios de los Generics
+
+1. **Seguridad de tipos**: Detecta errores de tipo en tiempo de compilación en lugar de en tiempo de ejecución
+2. **Eliminación de castings**: No es necesario hacer casting al recuperar elementos
+3. **Código más legible**: Especifica claramente qué tipos de objetos contiene una colección
+4. **Reutilización de código**: Permite escribir algoritmos genéricos que funcionan con diferentes tipos
+
+### 7.4.2 Uso de Generics con colecciones
+
+<Code code={`// Sin generics (antes de Java 5)
+List listaAntigua = new ArrayList();
+listaAntigua.add("Hola");
+listaAntigua.add(123); // Permitido, pero no seguro
+String texto = (String) listaAntigua.get(0); // Casting necesario
+// ClassCastException en tiempo de ejecución si intentamos:
+// String numero = (String) listaAntigua.get(1);
+
+// Con generics (Java 5+)
+List<String> listaModerna = new ArrayList<>();
+listaModerna.add("Hola");
+// listaModerna.add(123); // Error de compilación
+String texto2 = listaModerna.get(0); // No necesita casting`} lang="java" />
+
+### 7.4.3 Comodines (Wildcards)
+
+Los comodines permiten mayor flexibilidad al trabajar con genéricos.
+
+#### Comodín desconocido (?)
+
+<Code code={`// Lista de tipo desconocido
+List<?> listaDesconocida;
+
+// Puede asignarse cualquier tipo de lista
+listaDesconocida = new ArrayList<String>();
+listaDesconocida = new ArrayList<Integer>();
+
+// Pero solo se puede leer Object
+Object obj = listaDesconocida.get(0);
+
+// Y no se puede añadir nada (excepto null)
+// listaDesconocida.add("Hola"); // Error de compilación
+listaDesconocida.add(null); // Permitido`} lang="java" />
+
+#### Comodín con límite superior (? extends T)
+
+<Code code={`import java.util.ArrayList;
+import java.util.List;
+
+// Clase base y subclases
+class Animal {}
+class Gato extends Animal {}
+class Perro extends Animal {}
+
+// Método que acepta listas de Animal o cualquier subclase de Animal
+void procesarAnimales(List<? extends Animal> animales) {
+    // Podemos leer elementos como Animal
+    for (Animal animal : animales) {
+        System.out.println(animal);
+    }
+    
+    // Pero no podemos añadir elementos
+    // animales.add(new Animal()); // Error de compilación
+    // animales.add(new Gato());  // Error de compilación
+}
+
+// Uso
+List<Animal> listaAnimales = new ArrayList<>();
+List<Gato> listaGatos = new ArrayList<>();
+List<Perro> listaPerros = new ArrayList<>();
+
+procesarAnimales(listaAnimales); // OK
+procesarAnimales(listaGatos);    // OK
+procesarAnimales(listaPerros);   // OK`} lang="java" />
+
+#### Comodín con límite inferior (? super T)
+
+<Code code={`import java.util.ArrayList;
+import java.util.List;
+
+class Animal {}
+class Gato extends Animal {}
+class GatoSiames extends Gato {}
+
+// Método que acepta listas de Gato o cualquier superclase de Gato
+void agregarGatos(List<? super Gato> destino) {
+    // Podemos añadir Gatos o subclases de Gato
+    destino.add(new Gato());
+    destino.add(new GatoSiames());
+    
+    // Pero no podemos añadir superclases
+    // destino.add(new Animal()); // Error de compilación
+    
+    // Y solo podemos leer como Object
+    Object obj = destino.get(0); // Solo podemos leer como Object
+}
+
+// Uso
+List<Animal> listaAnimales = new ArrayList<>();
+List<Gato> listaGatos = new ArrayList<>();
+List<GatoSiames> listaGatosSiameses = new ArrayList<>();
+
+agregarGatos(listaAnimales); // OK
+agregarGatos(listaGatos);    // OK
+// agregarGatos(listaGatosSiameses); // Error, GatoSiames no es superclase de Gato`} lang="java" />
+
+### 7.4.4 Principio PECS (Producer Extends, Consumer Super)
+
+Una regla útil para recordar cuándo usar cada tipo de comodín:
+
+- Usa `<? extends T>` cuando solo necesites **leer** de una colección (la colección actúa como productor)
+- Usa `<? super T>` cuando solo necesites **escribir** en una colección (la colección actúa como consumidor)
+- Usa `T` exacto cuando necesites tanto leer como escribir
+
+<Code code={`import java.util.ArrayList;
+import java.util.List;
+
+// Ejemplo del principio PECS
+public void copiarElementos(List<? extends Number> origen, List<? super Number> destino) {
+    for (Number numero : origen) {
+        destino.add(numero);
+    }
+}
+
+// Uso
+List<Integer> enteros = new ArrayList<>();
+enteros.add(1);
+enteros.add(2);
+
+List<Number> numeros = new ArrayList<>();
+List<Object> objetos = new ArrayList<>();
+
+copiarElementos(enteros, numeros); // OK
+copiarElementos(enteros, objetos); // OK
+// copiarElementos(objetos, numeros); // Error, Object no es subclase de Number`} lang="java" />
+
+## Resumen
+
+En este capítulo, hemos explorado las principales estructuras para almacenar y manipular conjuntos de datos en Java:
+
+1. **Arreglos**: Estructuras de tamaño fijo que ofrecen acceso directo a elementos mediante índices.
+
+2. **ArrayList y LinkedList**: Implementaciones dinámicas de la interfaz `List` que permiten almacenar elementos ordenados con diferentes características de rendimiento.
+
+3. **HashMap y HashSet**: Colecciones basadas en tablas hash que ofrecen acceso eficiente a elementos mediante claves o almacenamiento de elementos únicos.
+
+4. **Generics**: Mecanismo que proporciona seguridad de tipos en tiempo de compilación y mayor flexibilidad al trabajar con colecciones.
+
+La elección de la estructura de datos adecuada depende de los requisitos específicos de la aplicación, como el tipo de acceso a los datos, la frecuencia de modificaciones y las operaciones más comunes que se realizarán.
+
+<Aside type="tip">
+  Para profundizar en el tema, explora otras implementaciones de colecciones como `TreeMap`, `TreeSet`, `LinkedHashMap`, `LinkedHashSet`, `PriorityQueue`, y las colecciones concurrentes y sincronizadas disponibles en el paquete `java.util.concurrent`.
+</Aside>

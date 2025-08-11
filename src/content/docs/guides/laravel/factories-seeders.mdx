@@ -1,0 +1,657 @@
+---
+title: 10. Factories y Seeders en Laravel
+description: Aprende a crear factories y seeders en Laravel
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Introducción
+
+Los **Seeders** y **Factories** son herramientas fundamentales en Laravel para poblar bases de datos con información de prueba o inicial. Mientras que los seeders permiten insertar datos predefinidos, las factories generan datos aleatorios siguiendo un patrón, lo que resulta especialmente útil para pruebas y desarrollo.
+
+<Aside type="tip">
+  Utiliza seeders para datos iniciales que tu aplicación necesita para funcionar correctamente, y factories para generar grandes cantidades de datos de prueba.
+</Aside>
+
+## Seeders en Laravel
+
+### Crear un Seeder con Artisan
+
+Para crear un nuevo seeder, utiliza el comando `make:seeder` de Artisan:
+
+```bash
+php artisan make:seeder UserSeeder
+```
+
+Este comando generará una nueva clase en el directorio `database/seeders` con la siguiente estructura básica:
+
+```php
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+
+class UserSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        //
+    }
+}
+```
+
+### Ejecutar Seeders
+
+Hay varias formas de ejecutar los seeders:
+
+#### Ejecutar todos los seeders
+
+```bash
+php artisan db:seed
+```
+
+Este comando ejecuta los seeders sin modificar la estructura de la base de datos, por lo que es seguro para usar en entornos con datos existentes.
+
+#### Ejecutar un seeder específico
+
+```bash
+php artisan db:seed --class=UserSeeder
+```
+
+#### Usar DatabaseSeeder como punto central
+
+El archivo `DatabaseSeeder.php` actúa como un punto central para organizar todos tus seeders:
+
+```php
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // Llama a otros seeders
+        $this->call([
+            UserSeeder::class,
+            ProductSeeder::class,
+            CategorySeeder::class,
+        ]);
+    }
+}
+```
+
+### Insertar Datos Manualmente desde un Seeder
+
+Puedes insertar datos directamente en la base de datos desde un seeder de varias formas:
+
+<Tabs>
+  <TabItem label="Usando el modelo">
+  ```php
+  use App\Models\User;
+  
+  public function run(): void
+  {
+      User::create([
+          'name' => 'Admin User',
+          'email' => 'admin@example.com',
+          'password' => bcrypt('password'),
+          'role' => 'admin',
+      ]);
+  }
+  ```
+  </TabItem>
+  
+  <TabItem label="Usando Query Builder">
+  ```php
+  use Illuminate\Support\Facades\DB;
+  
+  public function run(): void
+  {
+      DB::table('users')->insert([
+          'name' => 'Admin User',
+          'email' => 'admin@example.com',
+          'password' => bcrypt('password'),
+          'created_at' => now(),
+          'updated_at' => now(),
+      ]);
+  }
+  ```
+  </TabItem>
+</Tabs>
+
+## Factories en Laravel
+
+### ¿Qué es un Factory y cómo funciona?
+
+Un **Factory** es una clase que define cómo se deben generar los datos ficticios para un modelo específico. Laravel utiliza la biblioteca [Faker](https://github.com/FakerPHP/Faker) para generar datos aleatorios realistas como nombres, correos electrónicos, direcciones, etc.
+
+<Aside type="note">
+  Los factories son especialmente útiles para pruebas automatizadas y para generar grandes cantidades de datos de prueba de manera rápida.
+</Aside>
+
+### Crear un Factory
+
+Para crear un nuevo factory, utiliza el comando `make:factory` de Artisan:
+
+```bash
+php artisan make:factory ProductFactory
+```
+
+Si quieres asociar el factory a un modelo específico:
+
+```bash
+php artisan make:factory ProductFactory --model=Product
+```
+
+Esto generará una clase en el directorio `database/factories` con la siguiente estructura:
+
+```php
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Product;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class ProductFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Product::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            //
+        ];
+    }
+}
+```
+
+### Definir atributos aleatorios con Faker
+
+Faker proporciona muchos métodos para generar diferentes tipos de datos aleatorios:
+
+```php
+public function definition(): array
+{
+    return [
+        'name' => $this->faker->productName(),
+        'description' => $this->faker->paragraph(),
+        'price' => $this->faker->randomFloat(2, 10, 1000),
+        'stock' => $this->faker->numberBetween(0, 100),
+        'category_id' => $this->faker->numberBetween(1, 5),
+        'is_active' => $this->faker->boolean(80), // 80% de probabilidad de ser true
+        'created_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
+    ];
+}
+```
+
+<Aside type="tip">
+  Puedes ver todos los métodos disponibles de Faker en la [documentación oficial de Faker](https://fakerphp.github.io/).
+</Aside>
+
+### Funciones más utilizadas de Faker
+
+Faker ofrece una amplia variedad de métodos para generar datos falsos realistas. Aquí tienes una lista de las funciones más comunes organizadas por categoría:
+
+<Tabs>
+  <TabItem label="Datos personales">
+  ```php
+  // Nombres y datos personales
+  $this->faker->name();                    // 'Dr. Zane Stroman'
+  $this->faker->firstName();               // 'Lucy'
+  $this->faker->lastName();                // 'Cechtelar'
+  $this->faker->title($gender = null);     // 'Ms.', 'Dr.', etc.
+  $this->faker->suffix();                  // 'Jr.', 'Sr.', etc.
+  $this->faker->userName();                // 'leone.fahey'
+  $this->faker->password();                // 'k&|X+a45*2['
+  
+  // Contacto
+  $this->faker->email();                   // 'tkshlerin@collins.com'
+  $this->faker->safeEmail();               // 'king.alford@example.org'
+  $this->faker->phoneNumber();             // '201-886-0269 x3767'
+  $this->faker->phoneNumberWithExtension(); // '201-886-0269 x3767'
+  
+  // Documentos de identidad
+  $this->faker->uuid();                    // '7e57d004-2b97-0e7a-b45f-5387367791cd'
+  $this->faker->ean13();                   // '4006381333931'
+  $this->faker->ean8();                    // '73513537'
+  ```
+  </TabItem>
+  
+  <TabItem label="Direcciones">
+  ```php
+  // Direcciones
+  $this->faker->address();                 // '8888 Cummings Vista Apt. 101, Susanbury, NY 95473'
+  $this->faker->streetAddress();           // '439 Karley Loaf Suite 897'
+  $this->faker->streetName();              // 'Kuhic Island'
+  $this->faker->city();                    // 'West Judge'
+  $this->faker->state();                   // 'South Dakota'
+  $this->faker->stateAbbr();               // 'DC'
+  $this->faker->postcode();                // '17916'
+  $this->faker->country();                 // 'Falkland Islands (Malvinas)'
+  $this->faker->countryCode();             // 'TR'
+  $this->faker->latitude();                // '77.147489'
+  $this->faker->longitude();               // '86.211205'
+  ```
+  </TabItem>
+  
+  <TabItem label="Fechas y horas">
+  ```php
+  // Fechas y horas
+  $this->faker->unixTime();                // 58781813
+  $this->faker->dateTime();                // DateTime('2008-04-25 08:37:17')
+  $this->faker->dateTimeThisMonth();       // DateTime('2023-06-11 16:26:37')
+  $this->faker->dateTimeThisYear();        // DateTime('2023-03-22 20:52:14')
+  $this->faker->date($format = 'Y-m-d');   // '2008-04-25'
+  $this->faker->time($format = 'H:i:s');   // '20:49:42'
+  $this->faker->dayOfWeek();               // 'Friday'
+  $this->faker->monthName();               // 'January'
+  
+  // Rangos de fechas
+  $this->faker->dateTimeBetween('-30 years', 'now'); // DateTime entre hace 30 años y ahora
+  $this->faker->dateTimeBetween('-1 week', '+1 week'); // DateTime entre la semana pasada y la próxima
+  ```
+  </TabItem>
+  
+  <TabItem label="Textos y contenido">
+  ```php
+  // Textos
+  $this->faker->word();                    // 'aut'
+  $this->faker->words(3, true);            // 'porro quos voluptatem' (como string)
+  $this->faker->sentence();                // 'Sit vitae voluptas sint non voluptates.'
+  $this->faker->sentences(3, true);        // 'Optio quos qui illo error. Laborum vero a officia id corporis. Nostrum perspiciatis nisi consequatur.' (como string)
+  $this->faker->paragraph();               // 'Nihil aut in explicabo...'
+  $this->faker->paragraphs(3, true);       // múltiples párrafos como string
+  $this->faker->text(200);                 // texto de 200 caracteres
+  
+  // Contenido web
+  $this->faker->url();                     // 'http://www.parker.com/'
+  $this->faker->domainName();              // 'hayes.net'
+  $this->faker->ipv4();                    // '109.133.32.252'
+  $this->faker->userAgent();               // 'Mozilla/5.0 (Windows CE) AppleWebKit/5350 (KHTML, like Gecko)...'
+  $this->faker->slug();                    // 'aut-repellat-commodi-vel-itaque-nihil-id-saepe-nostrum'
+  $this->faker->emoji();                   // '😀'
+  ```
+  </TabItem>
+  
+  <TabItem label="Números y finanzas">
+  ```php
+  // Números
+  $this->faker->randomDigit();             // 7
+  $this->faker->randomDigitNotNull();      // 5
+  $this->faker->randomNumber(5, true);     // 79907 (número de 5 dígitos)
+  $this->faker->numberBetween(1000, 9000); // 8567
+  $this->faker->randomFloat(2, 0, 100);    // 79.32 (2 decimales entre 0 y 100)
+  
+  // Finanzas
+  $this->faker->currencyCode();            // 'EUR'
+  $this->faker->creditCardType();          // 'MasterCard'
+  $this->faker->creditCardNumber();        // '4485480221084675'
+  $this->faker->creditCardExpirationDate(); // DateTime object
+  $this->faker->iban();                    // 'IT31A8497112740YZ575DJ28BP4'
+  $this->faker->swiftBicNumber();          // 'RZTIAT22263'
+  ```
+  </TabItem>
+  
+  <TabItem label="Colores e imágenes">
+  ```php
+  // Colores
+  $this->faker->hexColor();                // '#fa3cc2'
+  $this->faker->rgbColor();                // '0,255,122'
+  $this->faker->rgbColorAsArray();         // [0, 255, 122]
+  $this->faker->rgbCssColor();             // 'rgb(0,255,122)'
+  $this->faker->safeColorName();           // 'fuchsia', 'olive'
+  
+  // Imágenes
+  $this->faker->imageUrl(640, 480);        // 'https://via.placeholder.com/640x480.png'
+  $this->faker->imageUrl(640, 480, 'cats'); // imagen de gatos
+  $this->faker->imageUrl(640, 480, 'cats', true, 'Faker'); // con texto 'Faker'
+  ```
+  </TabItem>
+  
+  <TabItem label="Datos específicos">
+  ```php
+  // Datos específicos para aplicaciones
+  $this->faker->company();                 // 'Bogan-Treutel'
+  $this->faker->companySuffix();           // 'y Asociados'
+  $this->faker->jobTitle();                // 'Desarrollador Web'
+  
+  // Datos para e-commerce
+  $this->faker->isbn13();                  // '9781391945446'
+  $this->faker->isbn10();                  // '4881416324'
+  $this->faker->realText(200);             // texto más realista de 200 caracteres
+  
+  // Localizaciones específicas
+  // Requiere instalar locales adicionales: $faker = Faker\Factory::create('es_ES');
+  $this->faker->dni();                     // '77446565E' (específico para España)
+  $this->faker->nif();                     // Número de identificación fiscal
+  ```
+  </TabItem>
+  
+  <TabItem label="Modificadores">
+  ```php
+  // Modificadores útiles
+  $this->faker->unique()->safeEmail();     // Asegura que no se repitan valores
+  $this->faker->optional(0.7)->firstName(); // 70% de probabilidad de generar un nombre, 30% de retornar null
+  $this->faker->valid(function($value) {   // Genera valores hasta que la función de validación retorne true
+      return $value > 0;
+  })->randomNumber();
+  
+  // Personalización
+  $values = ['A', 'B', 'C'];
+  $this->faker->randomElement($values);    // 'B' (un elemento aleatorio del array)
+  $this->faker->randomElements($values, 2); // ['A', 'C'] (varios elementos aleatorios)
+  $this->faker->shuffleArray($values);     // ['C', 'A', 'B'] (array mezclado)
+  ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Para usar Faker con datos localizados en español, puedes configurarlo así:
+  ```php
+  // En tu Factory
+  public function definition()
+  {
+      $this->faker = \Faker\Factory::create('es_ES');
+      
+      return [
+          'nombre' => $this->faker->name(),
+          // Otros campos
+      ];
+  }
+  ```
+</Aside>
+
+### Usar Factories en Seeders
+
+Puedes utilizar factories dentro de tus seeders para generar datos aleatorios:
+
+```php
+use App\Models\User;
+
+public function run(): void
+{
+    // Crear un único registro
+    User::factory()->create();
+    
+    // Crear un registro con atributos específicos
+    User::factory()->create([
+        'name' => 'Admin User',
+        'email' => 'admin@example.com',
+    ]);
+}
+```
+
+### Generar múltiples registros con Factories
+
+Puedes generar múltiples registros fácilmente con el método `count`:
+
+```php
+// Crear 50 usuarios
+User::factory()->count(50)->create();
+
+// Crear 10 usuarios activos
+User::factory()->count(10)->state(['is_active' => true])->create();
+```
+
+### Relacionar modelos dentro de Factories
+
+Laravel permite establecer relaciones entre modelos dentro de los factories:
+
+<Tabs>
+  <TabItem label="Relación uno a uno">
+  ```php
+  // En UserFactory
+  public function definition(): array
+  {
+      return [
+          'name' => $this->faker->name(),
+          'email' => $this->faker->unique()->safeEmail(),
+          // otros campos
+      ];
+  }
+  
+  // Crear un usuario con un perfil
+  public function withProfile(): static
+  {
+      return $this->has(Profile::factory(), 'profile');
+  }
+  
+  // Uso:
+  $user = User::factory()->withProfile()->create();
+  ```
+  </TabItem>
+  
+  <TabItem label="Relación uno a muchos">
+  ```php
+  // En UserFactory
+  public function withPosts(int $count = 3): static
+  {
+      return $this->has(Post::factory()->count($count), 'posts');
+  }
+  
+  // Uso:
+  $user = User::factory()->withPosts(5)->create(); // Usuario con 5 posts
+  ```
+  </TabItem>
+  
+  <TabItem label="Relación muchos a muchos">
+  ```php
+  // En PostFactory
+  public function withTags(int $count = 3): static
+  {
+      return $this->hasAttached(
+          Tag::factory()->count($count),
+          ['created_at' => now()] // Datos de la tabla pivote
+      );
+  }
+  
+  // Uso:
+  $post = Post::factory()->withTags(4)->create(); // Post con 4 tags
+  ```
+  </TabItem>
+</Tabs>
+
+### Ejecutar solo seeders o factories en entornos con datos existentes
+
+Cuando trabajas en un entorno con datos existentes y solo necesitas añadir datos adicionales sin modificar la estructura de la base de datos, puedes usar los siguientes comandos:
+
+```bash
+# Ejecutar todos los seeders sin rehacer migraciones
+php artisan db:seed
+
+# Ejecutar un seeder específico sin rehacer migraciones
+php artisan db:seed --class=UserSeeder
+
+# Ejecutar un factory directamente desde tinker
+php artisan tinker
+>>> App\Models\User::factory()->count(10)->create(); // Crear 10 usuarios
+>>> exit
+```
+
+<Aside type="tip">
+  Los factories no tienen un comando Artisan dedicado para ejecutarlos directamente (como `db:seed`). Para ejecutar factories sin escribir seeders, puedes usar Laravel Tinker o crear un comando Artisan personalizado.
+</Aside>
+
+### Integrar seeders con el comando migrate
+
+Puedes combinar migraciones y seeders en un solo comando, lo que es especialmente útil durante el desarrollo:
+
+```bash
+# Refresca la base de datos y ejecuta los seeders
+php artisan migrate:fresh --seed
+
+# Ejecuta migraciones pendientes y luego los seeders (no elimina datos existentes)
+php artisan migrate --seed
+
+# Refresca solo algunas tablas y ejecuta los seeders
+php artisan migrate:fresh --seed --path=database/migrations/2023_*
+```
+
+## Mejores prácticas
+
+1. **Organiza tus seeders**: Usa el `DatabaseSeeder` como punto central y organiza los seeders en un orden lógico considerando las dependencias entre tablas.
+
+2. **Usa estados en factories**: Define estados para casos especiales:
+
+```php
+// En UserFactory
+public function admin(): static
+{
+    return $this->state([
+        'role' => 'admin',
+        'is_admin' => true,
+    ]);
+}
+
+// Uso:
+User::factory()->admin()->create();
+```
+
+3. **Datos consistentes**: Asegúrate de que los datos generados sean consistentes y cumplan con las restricciones de tu base de datos.
+
+4. **Separación de entornos**: Considera tener seeders específicos para diferentes entornos (desarrollo, pruebas, producción).
+
+<Aside type="caution">
+  Nunca ejecutes seeders en producción a menos que estés seguro de lo que estás haciendo. Los seeders pueden sobrescribir o duplicar datos existentes.
+</Aside>
+
+## Ejemplo completo
+
+A continuación se muestra un ejemplo completo de cómo usar factories y seeders juntos:
+
+<Tabs>
+  <TabItem label="ProductFactory.php">
+  ```php
+  <?php
+  
+  namespace Database\Factories;
+  
+  use App\Models\Category;
+  use App\Models\Product;
+  use Illuminate\Database\Eloquent\Factories\Factory;
+  
+  class ProductFactory extends Factory
+  {
+      protected $model = Product::class;
+  
+      public function definition(): array
+      {
+          return [
+              'name' => $this->faker->words(3, true),
+              'description' => $this->faker->paragraph(),
+              'price' => $this->faker->randomFloat(2, 10, 1000),
+              'stock' => $this->faker->numberBetween(0, 100),
+              'is_active' => true,
+          ];
+      }
+  
+      public function inactive(): static
+      {
+          return $this->state(['is_active' => false]);
+      }
+  
+      public function featured(): static
+      {
+          return $this->state([
+              'is_featured' => true,
+              'discount_percentage' => $this->faker->numberBetween(10, 30),
+          ]);
+      }
+  }
+  ```
+  </TabItem>
+  
+  <TabItem label="ProductSeeder.php">
+  ```php
+  <?php
+  
+  namespace Database\Seeders;
+  
+  use App\Models\Category;
+  use App\Models\Product;
+  use Illuminate\Database\Seeder;
+  
+  class ProductSeeder extends Seeder
+  {
+      public function run(): void
+      {
+          // Crear categorías primero
+          $categories = Category::factory()->count(5)->create();
+          
+          // Crear 50 productos activos distribuidos entre las categorías
+          foreach ($categories as $category) {
+              Product::factory()
+                  ->count(10)
+                  ->for($category)
+                  ->create();
+          }
+          
+          // Crear algunos productos destacados
+          Product::factory()
+              ->count(5)
+              ->featured()
+              ->for($categories->random())
+              ->create();
+              
+          // Crear algunos productos inactivos
+          Product::factory()
+              ->count(10)
+              ->inactive()
+              ->for($categories->random())
+              ->create();
+      }
+  }
+  ```
+  </TabItem>
+  
+  <TabItem label="DatabaseSeeder.php">
+  ```php
+  <?php
+  
+  namespace Database\Seeders;
+  
+  use Illuminate\Database\Seeder;
+  
+  class DatabaseSeeder extends Seeder
+  {
+      public function run(): void
+      {
+          $this->call([
+              UserSeeder::class,
+              CategorySeeder::class,
+              ProductSeeder::class,
+              OrderSeeder::class,
+          ]);
+      }
+  }
+  ```
+  </TabItem>
+</Tabs>
+
+## Conclusión
+
+Los factories y seeders son herramientas poderosas en Laravel que te permiten generar datos de prueba de manera eficiente. Utilízalos para crear un entorno de desarrollo robusto, realizar pruebas efectivas y proporcionar datos iniciales para tu aplicación.

@@ -1,0 +1,304 @@
+---
+title: 03. Reactividad
+description: ref(), reactive(), readonly(), shallowRef(), shallowReactive(), toRef(), toRefs(), unref(), isRef(), isReactive(), isReadonly()
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Sistema de Reactividad en Vue 3
+
+El sistema de reactividad de Vue 3 ha sido completamente reescrito utilizando las capacidades modernas de JavaScript, especialmente los Proxies de ES6. Esto permite un seguimiento de dependencias más preciso y eficiente que en Vue 2.
+
+<Aside type="tip">
+La reactividad es el corazón de Vue. Permite que la interfaz de usuario se actualice automáticamente cuando cambian los datos subyacentes.
+</Aside>
+
+## ref()
+
+La función `ref()` crea un objeto reactivo para valores primitivos (string, number, boolean) y objetos. Envuelve el valor en un objeto con una propiedad `.value`.
+
+<Code code={`import { ref } from 'vue'
+
+// Para valores primitivos
+const count = ref(0)
+const name = ref('Vue 3')
+const isActive = ref(true)
+
+// Para objetos
+const user = ref({ id: 1, name: 'John' })
+
+// Acceso y modificación
+console.log(count.value) // 0
+count.value++ // 1
+
+// Con objetos, la propiedad sigue siendo reactiva
+console.log(user.value.name) // 'John'
+user.value.name = 'Jane' // Reactivo
+
+// También se puede reemplazar todo el objeto
+user.value = { id: 2, name: 'Alice' } // Reactivo`} lang="js" title="Uso de ref()" />
+
+### ¿Cuándo usar ref()?
+
+- Para valores primitivos (siempre)
+- Para objetos cuando necesitas reemplazar toda la referencia
+- Cuando necesitas pasar la referencia reactiva a funciones
+
+<Aside type="note">
+En los templates de Vue, no es necesario usar `.value` - Vue lo maneja automáticamente: `<div>{{ count }}</div>`
+</Aside>
+
+## reactive()
+
+La función `reactive()` convierte un objeto en un proxy reactivo. A diferencia de `ref()`, no requiere acceder a una propiedad `.value`, pero solo funciona con objetos y arrays.
+
+<Code code={`import { reactive } from 'vue'
+
+// Crear un objeto reactivo
+const state = reactive({
+  count: 0,
+  user: {
+    name: 'John',
+    age: 30
+  },
+  items: ['apple', 'banana']
+})
+
+// Acceso directo (sin .value)
+console.log(state.count) // 0
+state.count++ // 1
+
+// Las propiedades anidadas también son reactivas
+state.user.age++ // 31
+state.items.push('orange') // Reactivo`} lang="js" title="Uso de reactive()" />
+
+### Limitaciones de reactive()
+
+1. **Solo funciona con objetos**: No puede hacer reactivos valores primitivos
+2. **Pierde reactividad con desestructuración**:
+
+```js
+const state = reactive({ count: 0 })
+
+// Esto rompe la reactividad
+const { count } = state
+// 'count' ya no es reactivo
+```
+
+3. **No se puede reasignar la variable**:
+
+```js
+let state = reactive({ count: 0 })
+
+// Esto rompe la reactividad
+state = reactive({ count: 1 })
+```
+
+### ¿Cuándo usar reactive()?
+
+- Para objetos complejos con muchas propiedades anidadas
+- Cuando prefieres una sintaxis más limpia sin `.value`
+- Cuando no necesitas reemplazar toda la referencia
+
+## readonly()
+
+La función `readonly()` crea una versión de solo lectura de un objeto reactivo (creado con `ref()` o `reactive()`).
+
+<Code code={`import { ref, reactive, readonly } from 'vue'
+
+// Con ref
+const original = ref({ count: 0 })
+const copy = readonly(original)
+
+// Con reactive
+const state = reactive({ count: 0 })
+const readonlyState = readonly(state)
+
+// Intentar modificar genera una advertencia
+copy.value.count++ // Advertencia en consola
+readonlyState.count++ // Advertencia en consola
+
+// El original sigue siendo modificable
+original.value.count++ // Funciona y actualiza copy`} lang="js" title="Uso de readonly()" />
+
+### Casos de uso para readonly()
+
+- Pasar datos a componentes hijos que no deben modificarlos
+- Crear una copia inmutable de un estado para prevenir modificaciones accidentales
+- Implementar patrones de flujo de datos unidireccional
+
+## shallowRef() y shallowReactive()
+
+Estas versiones "superficiales" de `ref()` y `reactive()` solo hacen reactivo el nivel superior del objeto, no sus propiedades anidadas.
+
+<Tabs>
+  <TabItem label="shallowRef()">
+    ```js
+    import { shallowRef } from 'vue'
+    
+    const state = shallowRef({ count: 0, user: { name: 'John' } })
+    
+    // Esto es reactivo
+    state.value = { count: 1, user: { name: 'Jane' } }
+    
+    // Esto NO es reactivo (no desencadena actualizaciones)
+    state.value.count++
+    state.value.user.name = 'Jane'
+    ```
+  </TabItem>
+  <TabItem label="shallowReactive()">
+    ```js
+    import { shallowReactive } from 'vue'
+    
+    const state = shallowReactive({ count: 0, user: { name: 'John' } })
+    
+    // Esto es reactivo
+    state.count++
+    
+    // Esto NO es reactivo (no desencadena actualizaciones)
+    state.user.name = 'Jane'
+    ```
+  </TabItem>
+</Tabs>
+
+### ¿Cuándo usar las versiones shallow?
+
+- Para mejorar el rendimiento con objetos grandes y complejos
+- Cuando solo necesitas reactividad en el primer nivel
+- Para objetos que contienen datos que no deben ser reactivos (como bibliotecas externas)
+
+<Aside type="caution">
+Usa las versiones shallow con precaución, ya que pueden llevar a comportamientos inesperados si olvidas que las propiedades anidadas no son reactivas.
+</Aside>
+
+## toRef() y toRefs()
+
+Estas funciones ayudan a mantener la reactividad cuando necesitas desestructurar propiedades de objetos reactivos.
+
+### toRef()
+
+Crea una referencia reactiva a una propiedad específica de un objeto reactivo.
+
+```js
+import { reactive, toRef } from 'vue'
+
+const state = reactive({ count: 0, name: 'Vue' })
+
+// Crear una referencia a state.count
+const count = toRef(state, 'count')
+
+// Ambas formas actualizan el estado y son reactivas
+count.value++
+state.count++ // Ambos son 2
+```
+
+### toRefs()
+
+Convierte un objeto reactivo en un objeto normal donde cada propiedad es una referencia reactiva.
+
+<Code code={`import { reactive, toRefs } from 'vue'
+
+const state = reactive({ count: 0, name: 'Vue' })
+
+// Convertir todas las propiedades a refs
+const stateRefs = toRefs(state)
+
+// Ahora podemos desestructurar manteniendo la reactividad
+const { count, name } = stateRefs
+
+// Ambas formas actualizan el estado y son reactivas
+count.value++
+state.count++ // Ambos son 2`} lang="js" title="Uso de toRefs()" />
+
+### Caso de uso común: retornar estado de composables
+
+```js
+function useFeature() {
+  const state = reactive({
+    count: 0,
+    name: 'Feature'
+  })
+  
+  function increment() {
+    state.count++
+  }
+  
+  // Permite desestructurar manteniendo reactividad
+  return {
+    ...toRefs(state),
+    increment
+  }
+}
+
+// En un componente
+const { count, name, increment } = useFeature()
+```
+
+## unref()
+
+La función `unref()` extrae el valor interno de un ref, o devuelve el argumento tal cual si no es un ref.
+
+```js
+import { ref, unref } from 'vue'
+
+const count = ref(0)
+const plainNumber = 1
+
+console.log(unref(count))     // 0 (extrae el valor)
+console.log(unref(plainNumber)) // 1 (devuelve tal cual)
+```
+
+Es equivalente a: `isRef(val) ? val.value : val`
+
+### Casos de uso para unref()
+
+- Funciones que aceptan tanto refs como valores normales
+- Simplificar código que maneja diferentes tipos de entrada
+
+## Funciones de verificación: isRef(), isReactive(), isReadonly()
+
+Estas funciones permiten comprobar el tipo de un valor reactivo.
+
+<Code code={`import { ref, reactive, readonly, isRef, isReactive, isReadonly } from 'vue'
+
+const num = ref(0)
+const obj = reactive({count: 0})
+const readonlyObj = readonly(obj)
+const plainObj = { count: 0 }
+
+// Verificaciones
+console.log(isRef(num))          // true
+console.log(isRef(plainObj))      // false
+
+console.log(isReactive(obj))      // true
+console.log(isReactive(num))      // false
+console.log(isReactive(num.value)) // false
+console.log(isReactive(plainObj))  // false
+
+console.log(isReadonly(readonlyObj)) // true
+console.log(isReadonly(obj))         // false`} lang="js" title="Funciones de verificación" />
+
+### Casos de uso
+
+- Funciones que necesitan comportarse de manera diferente según el tipo de entrada
+- Depuración y verificación de tipos
+- Implementación de lógica condicional basada en el tipo de reactividad
+
+<Aside type="tip">
+También existe `isProxy()` para verificar si un objeto es un proxy creado por `reactive()` o `readonly()`.
+</Aside>
+
+## Tabla comparativa de APIs de reactividad
+
+| API | Tipo de valor | Requiere .value | Reactividad anidada | Uso principal |
+|-----|--------------|----------------|-------------------|---------------|
+| `ref()` | Cualquiera | Sí | Sí | Valores primitivos y objetos que necesitan ser reemplazados |
+| `reactive()` | Solo objetos | No | Sí | Objetos complejos con propiedades anidadas |
+| `readonly()` | Refs u objetos | Depende del origen | Sí | Prevenir modificaciones |
+| `shallowRef()` | Cualquiera | Sí | No | Mejora de rendimiento, objetos grandes |
+| `shallowReactive()` | Solo objetos | No | No | Mejora de rendimiento, objetos grandes |
+| `toRef()` | Propiedad de objeto | Sí | Sí | Mantener reactividad de una propiedad específica |
+| `toRefs()` | Objeto | Sí | Sí | Desestructurar manteniendo reactividad |

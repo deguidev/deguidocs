@@ -1,0 +1,266 @@
+---
+title: Bulma
+description: Guía de integración y configuración de Bulma CSS en tu proyecto
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Bulma CSS <Badge text="Configuración" variant="success" />
+
+## Instalación <Badge text="Paso 1" variant="note" />
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    npm install bulma
+    ```
+  </TabItem>
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    ```
+  </TabItem>
+</Tabs>
+
+## Integración Básica <Badge text="Paso 2" variant="note" />
+
+### HTML
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="path/to/bulma.min.css">
+</head>
+<body>
+  <div class="container">
+    <button class="button is-primary">Botón Bulma</button>
+  </div>
+</body>
+</html>
+```
+
+### Vue.js
+```vue
+<!-- App.vue -->
+<template>
+  <div class="container">
+    <button class="button is-primary">Botón Bulma</button>
+  </div>
+</template>
+
+<style>
+@import 'bulma/css/bulma.min.css';
+</style>
+```
+
+### Angular
+
+Primero, importa los estilos en tu archivo CSS global:
+```css
+/* styles.css */
+@import 'bulma/css/bulma.min.css';
+```
+
+Luego, crea tu plantilla HTML:
+```html
+<!-- app.component.html -->
+<div class="container">
+  <button class="button is-primary">Botón Bulma</button>
+</div>
+```
+
+Finalmente, configura Angular para incluir los estilos:
+```json
+{
+  "projects": {
+    "your-app": {
+      "architect": {
+        "build": {
+          "options": {
+            "styles": [
+              "node_modules/bulma/css/bulma.min.css"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## Personalización con SASS <Badge text="Paso 3" variant="note" />
+
+### Estructura de archivos
+<Code code={`// styles/custom-bulma.scss
+
+// 1. Importar variables iniciales de Bulma
+@import "bulma/sass/utilities/initial-variables";
+@import "bulma/sass/utilities/functions";
+
+// 2. Personalizar variables
+$primary: #1a365d;
+$primary-light: findLightColor($primary);
+$primary-dark: findDarkColor($primary);
+
+$link: #485fc7;
+$info: #3e8ed0;
+$success: #48c78e;
+$warning: #ffe08a;
+$danger: #f14668;
+
+// 3. Personalizar componentes
+$body-background-color: #fafafa;
+$body-size: 16px;
+
+// 4. Importar el resto de Bulma
+@import "bulma/bulma";`} lang="scss" />
+
+## Componentes Principales <Badge text="Paso 4" variant="note" />
+
+### Columnas
+```html
+<div class="columns">
+  <div class="column">Primera columna</div>
+  <div class="column">Segunda columna</div>
+  <div class="column">Tercera columna</div>
+</div>
+
+<!-- Columnas responsivas -->
+<div class="columns is-mobile">
+  <div class="column is-half-mobile is-one-third-tablet is-one-quarter-desktop">
+    Contenido responsivo
+  </div>
+</div>
+```
+
+### Botones
+```html
+<button class="button is-primary">Primario</button>
+<button class="button is-link">Enlace</button>
+<button class="button is-info">Info</button>
+<button class="button is-success">Éxito</button>
+<button class="button is-warning">Advertencia</button>
+<button class="button is-danger">Peligro</button>
+```
+
+### Formularios
+<Code code={`<div class="field">
+  <label class="label">Nombre</label>
+  <div class="control">
+    <input class="input" type="text" placeholder="Tu nombre">
+  </div>
+</div>
+
+<div class="field">
+  <label class="label">Mensaje</label>
+  <div class="control">
+    <textarea class="textarea" placeholder="Tu mensaje"></textarea>
+  </div>
+</div>
+
+<div class="field">
+  <div class="control">
+    <button class="button is-primary">Enviar</button>
+  </div>
+</div>`} lang="html" />
+
+## Optimización <Badge text="Paso 5" variant="caution" />
+
+### Importar solo lo necesario
+<Code code={`// styles/minimal-bulma.scss
+
+// Utilities
+@import "bulma/sass/utilities/_all";
+
+// Base
+@import "bulma/sass/base/minireset";
+@import "bulma/sass/base/generic";
+
+// Components que necesitas
+@import "bulma/sass/elements/button";
+@import "bulma/sass/elements/container";
+@import "bulma/sass/elements/title";
+@import "bulma/sass/form/_all";
+@import "bulma/sass/components/navbar";
+@import "bulma/sass/layout/section";
+@import "bulma/sass/grid/columns";`} lang="scss" />
+
+## Mejores Prácticas <Badge text="Recomendado" variant="success" />
+
+### 1. Estructura de Componentes
+<Code code={`<!-- ✅ Bueno: Estructura semántica -->
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="/">
+      <img src="logo.png" alt="Logo">
+    </a>
+  </div>
+</nav>
+
+<main>
+  <section class="section">
+    <div class="container">
+      <div class="columns">
+        <div class="column is-three-quarters">
+          <!-- Contenido principal -->
+        </div>
+        <div class="column">
+          <!-- Barra lateral -->
+        </div>
+      </div>
+    </div>
+  </section>
+</main>`} lang="html" />
+
+### 2. Modificadores de Utilidad
+```html
+<!-- Espaciado -->
+<div class="mt-4 mb-4 px-2">
+  Contenido con márgenes y padding
+</div>
+
+<!-- Flexbox -->
+<div class="is-flex is-justify-content-center is-align-items-center">
+  Contenido centrado
+</div>
+
+<!-- Responsive helpers -->
+<div class="is-hidden-mobile">
+  Solo visible en tablet y desktop
+</div>
+```
+
+### 3. Componentes Personalizados
+<Code code={`// styles/components.scss
+.card-custom {
+  background: $white;
+  border-radius: $radius-large;
+  box-shadow: $shadow-medium;
+  
+  .card-header {
+    border-bottom: 1px solid $border-light;
+    padding: 1.5rem;
+  }
+  
+  .card-content {
+    padding: 2rem;
+  }
+}
+
+// Uso de variables de color
+.has-text-custom {
+  color: $primary;
+  
+  &:hover {
+    color: $primary-dark;
+  }
+}`} lang="scss" />
+
+<Aside type="tip">
+  Para más detalles y documentación completa, visita la [documentación oficial de Bulma](https://bulma.io/documentation/).
+</Aside>

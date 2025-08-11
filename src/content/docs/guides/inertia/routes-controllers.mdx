@@ -1,0 +1,357 @@
+---
+title: 3. Rutas y controladores en Laravel
+description: Aprende a trabajar con rutas y controladores de Laravel en aplicaciones Inertia.js
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Rutas y controladores en Laravel
+
+En una aplicación Inertia.js, la integración entre Laravel y Vue se realiza a través de rutas y controladores que renderizan componentes Vue. Esta sección explica cómo configurar correctamente estas conexiones.
+
+## Rutas web con Route::inertia()
+
+Inertia.js proporciona un método de ayuda `Route::inertia()` que simplifica la creación de rutas que renderizan componentes Vue. Este método es un atajo que combina la definición de la ruta y el renderizado del componente en una sola línea.
+
+<Code code={`Route::inertia('/about', 'About');`} lang="php" title="routes/web.php" />
+
+Este código hace dos cosas:
+
+1. Define una ruta GET para la URL `/about`
+2. Renderiza el componente Vue ubicado en `resources/js/Pages/About.vue`
+
+Puedes pasar datos (props) directamente en la definición de la ruta:
+
+<Code code={`Route::inertia('/users', 'Users/Index', [
+    'users' => User::all()
+]);`} lang="php" title="routes/web.php" />
+
+## Rutas tipo resource con Inertia
+
+Las rutas de tipo resource son muy comunes en aplicaciones Laravel para operaciones CRUD. Con Inertia, puedes seguir usando este patrón y conectarlo con componentes Vue correspondientes.
+
+<Code code={`// Definir rutas resource
+Route::resource('users', UserController::class);`} lang="php" title="routes/web.php" />
+
+Esto generará las siguientes rutas que deberán corresponder con métodos en tu controlador:
+
+<Aside type="note">
+
+### Rutas generadas por Route::resource
+
+**Listado de usuarios**
+- **Método:** GET
+- **URI:** `/users`
+- **Nombre:** `users.index`
+- **Acción:** `index()`
+- **Componente Vue:** `Users/Index.vue`
+
+**Formulario de creación**
+- **Método:** GET
+- **URI:** `/users/create`
+- **Nombre:** `users.create`
+- **Acción:** `create()`
+- **Componente Vue:** `Users/Create.vue`
+
+**Guardar nuevo usuario**
+- **Método:** POST
+- **URI:** `/users`
+- **Nombre:** `users.store`
+- **Acción:** `store(Request $request)`
+- **Componente Vue:** No aplica (procesa y redirecciona)
+
+**Ver detalle de usuario**
+- **Método:** GET
+- **URI:** `/users/{user}`
+- **Nombre:** `users.show`
+- **Acción:** `show(User $user)`
+- **Componente Vue:** `Users/Show.vue`
+
+**Formulario de edición**
+- **Método:** GET
+- **URI:** `/users/{user}/edit`
+- **Nombre:** `users.edit`
+- **Acción:** `edit(User $user)`
+- **Componente Vue:** `Users/Edit.vue`
+
+**Actualizar usuario**
+- **Método:** PUT/PATCH
+- **URI:** `/users/{user}`
+- **Nombre:** `users.update`
+- **Acción:** `update(Request $request, User $user)`
+- **Componente Vue:** No aplica (procesa y redirecciona)
+
+**Eliminar usuario**
+- **Método:** DELETE
+- **URI:** `/users/{user}`
+- **Nombre:** `users.destroy`
+- **Acción:** `destroy(User $user)`
+- **Componente Vue:** No aplica (procesa y redirecciona)
+
+</Aside>
+
+<Aside type="tip">
+  Es una buena práctica organizar tus componentes Vue en carpetas que correspondan a los recursos de tu aplicación, como se muestra en la tabla anterior.
+</Aside>
+
+## Controladores que retornan Inertia::render()
+
+Para renderizar componentes Vue desde un controlador Laravel, usamos el método `Inertia::render()`:
+
+<Code code={`<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Inertia\Inertia;
+use Illuminate\Http\Request;
+
+class UserController extends Controller
+{
+    public function index()
+    {
+        return Inertia::render('Users/Index', [
+            'users' => User::all()
+        ]);
+    }
+
+    public function show(User $user)
+    {
+        return Inertia::render('Users/Show', [
+            'user' => $user
+        ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('Users/Create');
+    }
+
+    public function edit(User $user)
+    {
+        return Inertia::render('Users/Edit', [
+            'user' => $user
+        ]);
+    }
+
+    // Otros métodos del controlador...
+}`} lang="php" title="app/Http/Controllers/UserController.php" />
+
+El método `Inertia::render()` acepta dos parámetros:
+
+1. El nombre del componente Vue a renderizar (relativo a tu directorio de páginas)
+2. Un array asociativo de datos (props) que se pasarán al componente Vue
+
+## Paso de props desde Laravel a Vue
+
+Una de las características más potentes de Inertia.js es la facilidad para pasar datos desde el backend (Laravel) al frontend (Vue). Estos datos se conocen como "props".
+
+### Datos simples
+
+<Code code={`return Inertia::render('Dashboard', [
+    'name' => 'John Doe',
+    'email' => 'john@example.com',
+]);`} lang="php" title="app/Http/Controllers/DashboardController.php" />
+
+### Modelos Eloquent
+
+Puedes pasar modelos Eloquent directamente. Inertia los convertirá automáticamente a arrays/objetos JSON:
+
+<Code code={`return Inertia::render('Users/Show', [
+    'user' => User::find($id)
+]);`} lang="php" title="app/Http/Controllers/UserController.php" />
+
+### Colecciones
+
+Las colecciones también se serializan automáticamente:
+
+<Code code={`return Inertia::render('Users/Index', [
+    'users' => User::all()
+]);`} lang="php" />
+
+### Paginación
+
+La paginación funciona perfectamente con Inertia:
+
+<Code code={`return Inertia::render('Users/Index', [
+    'users' => User::paginate(10)
+]);`} lang="php" title="app/Http/Controllers/UserController.php" />
+
+### Acceso a props en componentes Vue
+
+En tus componentes Vue con Composition API, puedes acceder a estas props fácilmente:
+
+<Code code={`<script setup>
+import { defineProps } from 'vue';
+
+// Definir y acceder a las props
+const props = defineProps({
+  user: Object,
+});
+
+console.log(props.user.name);
+</script>
+
+<template>
+  <div>
+    <h1>{{ user.name }}</h1>
+    <p>{{ user.email }}</p>
+  </div>
+</template>`} lang="vue" title="resources/js/Pages/Users/Show.vue" />
+
+## COMPONENTES EN VUE 3 CON COMPOSITION API
+
+Inertia.js funciona perfectamente con Vue 3 y la Composition API, permitiéndote aprovechar todas sus características modernas. Aquí hay algunos conceptos clave para trabajar con componentes Vue 3 usando Composition API en aplicaciones Inertia:
+
+### Estructura básica de un componente con Composition API
+
+<Code code={`<script setup>
+import { ref, onMounted } from 'vue';
+import Layout from '@/Layouts/MainLayout.vue';
+import { Head } from '@inertiajs/vue3';
+
+// Define props
+const props = defineProps({
+  users: Array,
+});
+
+// Estado reactivo
+const counter = ref(0);
+
+// Métodos
+const increment = () => {
+  counter.value++;
+};
+
+// Hooks de ciclo de vida
+onMounted(() => {
+  console.log('Componente montado');
+});
+</script>
+
+<template>
+  <Head title="Lista de usuarios" />
+  <Layout>
+    <h1>Usuarios ({{ users.length }})</h1>
+    <ul>
+      <li v-for="user in users" :key="user.id">
+        {{ user.name }}
+      </li>
+    </ul>
+    <div>
+      <p>Contador: {{ counter }}</p>
+      <button @click="increment">Incrementar</button>
+    </div>
+  </Layout>
+</template>`} lang="vue" title="resources/js/Pages/Users/Index.vue" />
+
+### Layouts en Inertia con Vue 3
+
+Inertia recomienda usar layouts persistentes para mejorar la experiencia del usuario:
+
+<Code code={`<script setup>
+import { Head } from '@inertiajs/vue3';
+import Navbar from '@/Components/Navbar.vue';
+import Footer from '@/Components/Footer.vue';
+</script>
+
+<template>
+  <div class="layout">
+    <Navbar />
+    <main>
+      <slot></slot>
+    </main>
+    <Footer />
+  </div>
+</template>`} lang="vue" title="resources/js/Layouts/MainLayout.vue" />
+
+### Navegación con Inertia en Vue 3
+
+Inertia proporciona un componente `Link` y una función `router` para la navegación entre páginas sin recargar completamente:
+
+<Code code={`<script setup>
+import { Link } from '@inertiajs/vue3';
+</script>
+
+<template>
+  <div>
+    <!-- Navegación con el componente Link -->
+    <Link href="/users" class="btn">Ver usuarios</Link>
+    <Link :href="\`/users/\${userId}\`" class="btn">Ver usuario</Link>
+    
+    <!-- Con parámetros adicionales -->
+    <Link 
+      href="/users" 
+      :data="{ search: 'John' }" 
+      :only="['users']"
+      preserve-scroll
+    >
+      Buscar usuarios
+    </Link>
+  </div>
+</template>`} lang="vue" />
+
+También puedes usar el router programáticamente:
+
+<Code code={`<script setup>
+import { router } from '@inertiajs/vue3';
+
+const goToUsers = () => {
+  router.visit('/users');
+};
+
+const createUser = (userData) => {
+  router.post('/users', userData, {
+    onSuccess: () => {
+      alert('Usuario creado con éxito');
+    },
+    preserveScroll: true,
+  });
+};
+</script>`} lang="vue" />
+
+### Acceso global a datos compartidos
+
+Inertia permite compartir datos globalmente en toda la aplicación usando la propiedad `$page`:
+
+<Code code={`<script setup>
+import { computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+
+// Acceder a datos compartidos
+const page = usePage();
+const user = computed(() => page.props.auth.user);
+const isAdmin = computed(() => user.value?.role === 'admin');
+</script>
+
+<template>
+  <div>
+    <p v-if="user">Bienvenido, {{ user.name }}</p>
+    <div v-if="isAdmin" class="admin-panel">
+      <!-- Panel de administración -->
+    </div>
+  </div>
+</template>`} lang="vue" />
+
+En Laravel, puedes compartir estos datos en el middleware `HandleInertiaRequests`:
+
+<Code code={`public function share(Request $request): array
+{
+    return [
+        'auth' => [
+            'user' => $request->user() ? [
+                'id' => $request->user()->id,
+                'name' => $request->user()->name,
+                'email' => $request->user()->email,
+                'role' => $request->user()->role,
+            ] : null,
+        ],
+        'flash' => [
+            'message' => fn () => $request->session()->get('message'),
+            'error' => fn () => $request->session()->get('error'),
+        ],
+    ];
+}`} lang="php" title="app/Http/Middleware/HandleInertiaRequests.php" />

@@ -1,0 +1,332 @@
+---
+title: Fetch API y Manejo de APIs
+description: Aprende a realizar peticiones HTTP y manejar APIs RESTful usando la Fetch API de JavaScript.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Fetch API y Manejo de APIs <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  La Fetch API proporciona una interfaz para realizar peticiones HTTP y manejar respuestas de manera asíncrona.
+</Aside>
+
+## Peticiones básicas <Badge text="Básico" variant="note" />
+
+### GET
+<Code code={`// Petición GET simple
+fetch('https://api.ejemplo.com/datos')
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
+
+// Con async/await
+async function obtenerDatos() {
+    try {
+        const response = await fetch('https://api.ejemplo.com/datos');
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}`} lang="javascript" />
+
+### POST
+<Code code={`// Petición POST con datos
+const datos = {
+    nombre: 'Juan',
+    edad: 25
+};
+
+fetch('https://api.ejemplo.com/usuarios', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(datos)
+})
+    .then(response => response.json())
+    .then(data => console.log('Success:', data))
+    .catch(error => console.error('Error:', error));`} lang="javascript" />
+
+## Opciones de configuración <Badge text="Importante" variant="danger" />
+
+### Headers y opciones
+<Code code={`const opciones = {
+    method: 'POST',  // GET, POST, PUT, DELETE, etc.
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer tu-token-aqui',
+        'Accept': 'application/json'
+    },
+    body: JSON.stringify(datos),
+    mode: 'cors',  // no-cors, cors, same-origin
+    cache: 'no-cache',  // default, no-cache, reload, force-cache
+    credentials: 'same-origin',  // include, same-origin, omit
+    redirect: 'follow',  // manual, follow, error
+    referrerPolicy: 'no-referrer'  // no-referrer, origin, same-origin
+};
+
+fetch('https://api.ejemplo.com/endpoint', opciones);`} lang="javascript" />
+
+## Manejo de respuestas <Badge text="Importante" variant="note" />
+
+### Verificación de estado
+<Code code={`async function hacerPeticion(url) {
+    try {
+        const response = await fetch(url);
+        
+        // Verificar si la petición fue exitosa
+        if (!response.ok) {
+            throw new Error(\`HTTP error! status: \${response.status}\`);
+        }
+        
+        // Verificar el tipo de contenido
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new TypeError('La respuesta no es JSON');
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}`} lang="javascript" />
+
+### Diferentes tipos de respuesta
+<Code code={`// JSON
+const jsonData = await response.json();
+
+// Texto plano
+const texto = await response.text();
+
+// Blob (archivos)
+const blob = await response.blob();
+
+// FormData
+const formData = await response.formData();
+
+// ArrayBuffer
+const arrayBuffer = await response.arrayBuffer();`} lang="javascript" />
+
+## Cliente API reutilizable <Badge text="Avanzado" variant="success" />
+
+### Clase APIClient
+<Code code={`class APIClient {
+    constructor(baseURL) {
+        this.baseURL = baseURL;
+    }
+
+    async request(endpoint, options = {}) {
+        const url = \`\${this.baseURL}\${endpoint}\`;
+        const headers = {
+            'Content-Type': 'application/json',
+            ...options.headers
+        };
+
+        try {
+            const response = await fetch(url, {
+                ...options,
+                headers
+            });
+
+            if (!response.ok) {
+                throw new APIError(
+                    'Error en la petición',
+                    response.status,
+                    await response.text()
+                );
+            }
+
+            return await response.json();
+        } catch (error) {
+            if (error instanceof APIError) {
+                throw error;
+            }
+            throw new APIError('Error de red', 0, error.message);
+        }
+    }
+
+    // Métodos de conveniencia
+    async get(endpoint, options = {}) {
+        return this.request(endpoint, { ...options, method: 'GET' });
+    }
+
+    async post(endpoint, data, options = {}) {
+        return this.request(endpoint, {
+            ...options,
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
+
+    async put(endpoint, data, options = {}) {
+        return this.request(endpoint, {
+            ...options,
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+
+    async delete(endpoint, options = {}) {
+        return this.request(endpoint, { ...options, method: 'DELETE' });
+    }
+}
+
+// Uso
+const api = new APIClient('https://api.ejemplo.com');
+
+// GET
+const usuarios = await api.get('/usuarios');
+
+// POST
+const nuevoUsuario = await api.post('/usuarios', {
+    nombre: 'Juan',
+    edad: 25
+});`} lang="javascript" />
+
+## Interceptores y middleware <Badge text="Avanzado" variant="note" />
+
+### Implementación de interceptores
+<Code code={`class APIClientConInterceptores {
+    constructor() {
+        this.interceptors = {
+            request: [],
+            response: []
+        };
+    }
+
+    addRequestInterceptor(interceptor) {
+        this.interceptors.request.push(interceptor);
+    }
+
+    addResponseInterceptor(interceptor) {
+        this.interceptors.response.push(interceptor);
+    }
+
+    async fetch(url, options = {}) {
+        let config = { url, ...options };
+
+        // Aplicar interceptores de petición
+        for (const interceptor of this.interceptors.request) {
+            config = await interceptor(config);
+        }
+
+        try {
+            let response = await fetch(config.url, config);
+
+            // Aplicar interceptores de respuesta
+            for (const interceptor of this.interceptors.response) {
+                response = await interceptor(response);
+            }
+
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
+}
+
+// Uso
+const client = new APIClientConInterceptores();
+
+// Agregar token de autenticación
+client.addRequestInterceptor(async (config) => {
+    config.headers = {
+        ...config.headers,
+        'Authorization': \`Bearer \${await getToken()}\`
+    };
+    return config;
+});
+
+// Manejar errores
+client.addResponseInterceptor(async (response) => {
+    if (!response.ok) {
+        if (response.status === 401) {
+            // Renovar token y reintentar
+            await renovarToken();
+        }
+        throw new Error('Error en la petición');
+    }
+    return response;
+});`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+### Manejo de errores
+<Code code={`// ❌ Malo
+fetch(url).then(res => res.json());
+
+// ✅ Bueno
+async function fetchConManejo(url) {
+    try {
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new HTTPError(response.status, response.statusText);
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof HTTPError) {
+            // Manejar errores HTTP
+            manejarErrorHTTP(error);
+        } else {
+            // Manejar errores de red
+            manejarErrorRed(error);
+        }
+        throw error;
+    }
+}`} lang="javascript" />
+
+### Cancelación de peticiones
+<Code code={`function fetchConTimeout(url, timeout = 5000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    return fetch(url, { signal: controller.signal })
+        .then(response => response.json())
+        .catch(error => {
+            if (error.name === 'AbortError') {
+                throw new Error('Petición cancelada por timeout');
+            }
+            throw error;
+        })
+        .finally(() => clearTimeout(timeoutId));
+}`} lang="javascript" />
+
+### Cache y reintento
+<Code code={`class APIClientConCache {
+    constructor() {
+        this.cache = new Map();
+    }
+
+    async fetchConCache(url, options = {}) {
+        const cacheKey = \`\${url}-\${JSON.stringify(options)}\`;
+        
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+
+        const response = await this.fetchConReintento(url, options);
+        this.cache.set(cacheKey, response);
+        
+        return response;
+    }
+
+    async fetchConReintento(url, options, maxRetries = 3) {
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                return await fetch(url, options);
+            } catch (error) {
+                if (i === maxRetries - 1) throw error;
+                await new Promise(r => setTimeout(r, 1000 * Math.pow(2, i)));
+            }
+        }
+    }
+}`} lang="javascript" />

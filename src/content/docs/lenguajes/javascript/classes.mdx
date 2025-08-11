@@ -1,0 +1,273 @@
+---
+title: Clases y POO
+description: Aprende sobre Programación Orientada a Objetos (POO) y el uso de clases en JavaScript.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Clases y POO <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Las clases en JavaScript proporcionan una sintaxis más clara para implementar programación orientada a objetos.
+</Aside>
+
+## Definición de clases <Badge text="Básico" variant="note" />
+
+### Sintaxis básica
+<Code code={`class Persona {
+    constructor(nombre, edad) {
+        this.nombre = nombre;
+        this.edad = edad;
+    }
+
+    saludar() {
+        return \`Hola, soy \${this.nombre}\`;
+    }
+}
+
+const persona = new Persona('Juan', 25);
+console.log(persona.saludar()); // "Hola, soy Juan"`} lang="javascript" />
+
+### Propiedades y métodos
+<Code code={`class Cuenta {
+    // Propiedad privada
+    #saldo = 0;
+    
+    // Propiedad pública
+    titular;
+    
+    constructor(titular, saldoInicial = 0) {
+        this.titular = titular;
+        this.#saldo = saldoInicial;
+    }
+    
+    // Método público
+    depositar(cantidad) {
+        if (cantidad > 0) {
+            this.#saldo += cantidad;
+            return true;
+        }
+        return false;
+    }
+    
+    // Getter
+    get saldo() {
+        return this.#saldo;
+    }
+    
+    // Setter
+    set saldo(nuevo) {
+        if (nuevo >= 0) {
+            this.#saldo = nuevo;
+        }
+    }
+}`} lang="javascript" />
+
+## Herencia <Badge text="Importante" variant="danger" />
+
+### Extender clases
+<Code code={`class Animal {
+    constructor(nombre) {
+        this.nombre = nombre;
+    }
+    
+    hablar() {
+        return 'El animal hace un sonido';
+    }
+}
+
+class Perro extends Animal {
+    constructor(nombre, raza) {
+        super(nombre);
+        this.raza = raza;
+    }
+    
+    hablar() {
+        return 'Guau guau!';
+    }
+}
+
+const miPerro = new Perro('Max', 'Labrador');
+console.log(miPerro.hablar()); // "Guau guau!"`} lang="javascript" />
+
+### Métodos estáticos
+<Code code={`class MathUtils {
+    static PI = 3.14159;
+    
+    static sumar(a, b) {
+        return a + b;
+    }
+    
+    static distancia(x1, y1, x2, y2) {
+        return Math.sqrt(
+            Math.pow(x2 - x1, 2) + 
+            Math.pow(y2 - y1, 2)
+        );
+    }
+}
+
+console.log(MathUtils.PI);
+console.log(MathUtils.sumar(5, 3));`} lang="javascript" />
+
+## Patrones de diseño <Badge text="Avanzado" variant="note" />
+
+### Singleton
+<Code code={`class Singleton {
+    static #instancia;
+    
+    constructor() {
+        if (Singleton.#instancia) {
+            return Singleton.#instancia;
+        }
+        Singleton.#instancia = this;
+    }
+    
+    static getInstance() {
+        if (!Singleton.#instancia) {
+            Singleton.#instancia = new Singleton();
+        }
+        return Singleton.#instancia;
+    }
+}
+
+const instancia1 = new Singleton();
+const instancia2 = new Singleton();
+console.log(instancia1 === instancia2); // true`} lang="javascript" />
+
+### Factory
+<Code code={`class ProductoFactory {
+    static crearProducto(tipo, nombre, precio) {
+        switch(tipo) {
+            case 'libro':
+                return new Libro(nombre, precio);
+            case 'electronico':
+                return new Electronico(nombre, precio);
+            default:
+                throw new Error('Tipo de producto no válido');
+        }
+    }
+}
+
+const libro = ProductoFactory.crearProducto('libro', 'Don Quijote', 29.99);`} lang="javascript" />
+
+## Composición vs Herencia <Badge text="Concepto" variant="success" />
+
+### Composición
+<Code code={`class Motor {
+    arrancar() {
+        return 'Motor arrancado';
+    }
+}
+
+class Radio {
+    encender() {
+        return 'Radio encendida';
+    }
+}
+
+class Coche {
+    constructor() {
+        this.motor = new Motor();
+        this.radio = new Radio();
+    }
+    
+    iniciar() {
+        return [
+            this.motor.arrancar(),
+            this.radio.encender()
+        ];
+    }
+}`} lang="javascript" />
+
+## Mixins <Badge text="Avanzado" variant="note" />
+
+### Implementación de mixins
+<Code code={`// Mixin
+const ConEventos = {
+    on(evento, callback) {
+        if (!this.eventos) this.eventos = {};
+        if (!this.eventos[evento]) this.eventos[evento] = [];
+        this.eventos[evento].push(callback);
+    },
+    
+    emit(evento, data) {
+        if (!this.eventos || !this.eventos[evento]) return;
+        this.eventos[evento].forEach(callback => callback(data));
+    }
+};
+
+// Uso del mixin
+class Usuario {
+    constructor(nombre) {
+        this.nombre = nombre;
+    }
+}
+
+// Aplicar mixin
+Object.assign(Usuario.prototype, ConEventos);
+
+// Uso
+const usuario = new Usuario('Juan');
+usuario.on('login', () => console.log('Usuario logueado'));
+usuario.emit('login');`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+### Encapsulación
+<Code code={`// ❌ Malo
+class Usuario {
+    constructor(nombre) {
+        this.nombre = nombre;
+        this.historial = [];
+    }
+}
+
+// ✅ Bueno
+class Usuario {
+    #historial = [];
+    
+    constructor(nombre) {
+        this.nombre = nombre;
+    }
+    
+    agregarHistorial(entrada) {
+        this.#historial.push(entrada);
+    }
+    
+    obtenerHistorial() {
+        return [...this.#historial];
+    }
+}`} lang="javascript" />
+
+### Principio de responsabilidad única
+<Code code={`// ❌ Malo
+class Usuario {
+    constructor(nombre) {
+        this.nombre = nombre;
+    }
+    
+    guardarEnDB() { /* ... */ }
+    enviarEmail() { /* ... */ }
+    generarReporte() { /* ... */ }
+}
+
+// ✅ Bueno
+class Usuario {
+    constructor(nombre) {
+        this.nombre = nombre;
+    }
+}
+
+class UsuarioRepositorio {
+    guardarUsuario(usuario) { /* ... */ }
+}
+
+class EmailService {
+    enviarEmail(usuario, mensaje) { /* ... */ }
+}
+
+class ReporteService {
+    generarReporte(usuario) { /* ... */ }
+}`} lang="javascript" />

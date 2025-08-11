@@ -1,0 +1,168 @@
+---
+title: Arrays
+description: Aprende a trabajar con arrays en JavaScript, desde la creación básica hasta métodos avanzados.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Arrays <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Los arrays son estructuras de datos fundamentales que permiten almacenar colecciones ordenadas de elementos.
+</Aside>
+
+## Creación y acceso <Badge text="Básico" variant="note" />
+
+### Crear arrays
+<Code code={`// Array literal
+const frutas = ['manzana', 'banana', 'naranja'];
+
+// Constructor Array
+const numeros = new Array(1, 2, 3, 4, 5);
+
+// Array vacío
+const vacio = [];
+
+// Array con diferentes tipos de datos
+const mixto = [1, 'texto', true, { nombre: 'Juan' }, [1, 2, 3]];`} lang="javascript" />
+
+### Acceso a elementos
+<Code code={`const frutas = ['manzana', 'banana', 'naranja'];
+
+// Acceso por índice
+console.log(frutas[0]); // 'manzana'
+
+// Último elemento
+console.log(frutas[frutas.length - 1]); // 'naranja'
+
+// Índice fuera de rango
+console.log(frutas[10]); // undefined`} lang="javascript" />
+
+## Métodos básicos <Badge text="Importante" variant="danger" />
+
+<Aside type="tip">
+  Estos métodos son esenciales para manipular arrays en JavaScript.
+</Aside>
+
+### Agregar y eliminar elementos
+<Code code={`const frutas = ['manzana', 'banana'];
+
+// Agregar al final
+frutas.push('naranja');          // ['manzana', 'banana', 'naranja']
+
+// Eliminar del final
+frutas.pop();                    // ['manzana', 'banana']
+
+// Agregar al inicio
+frutas.unshift('fresa');         // ['fresa', 'manzana', 'banana']
+
+// Eliminar del inicio
+frutas.shift();                  // ['manzana', 'banana']
+
+// Eliminar/agregar en cualquier posición
+frutas.splice(1, 1, 'kiwi');     // ['manzana', 'kiwi']`} lang="javascript" />
+
+## Métodos de orden superior <Badge text="Avanzado" variant="note" />
+
+### map
+<Code code={`const numeros = [1, 2, 3, 4];
+const duplicados = numeros.map(num => num * 2);
+// [2, 4, 6, 8]`} lang="javascript" />
+
+### filter
+<Code code={`const numeros = [1, 2, 3, 4, 5, 6];
+const pares = numeros.filter(num => num % 2 === 0);
+// [2, 4, 6]`} lang="javascript" />
+
+### reduce
+<Code code={`const numeros = [1, 2, 3, 4];
+const suma = numeros.reduce((total, num) => total + num, 0);
+// 10`} lang="javascript" />
+
+### forEach
+<Code code={`const frutas = ['manzana', 'banana', 'naranja'];
+frutas.forEach((fruta, index) => {
+    console.log(\`\${index}: \${fruta}\`);
+});`} lang="javascript" />
+
+## Desestructuración de arrays <Badge text="Moderno" variant="success" />
+
+<Aside type="tip">
+  La desestructuración permite extraer valores de arrays de forma más elegante.
+</Aside>
+
+<Code code={`// Desestructuración básica
+const [primero, segundo] = [1, 2, 3];
+console.log(primero);  // 1
+console.log(segundo);  // 2
+
+// Omitir elementos
+const [a, , c] = [1, 2, 3];
+console.log(a, c);  // 1, 3
+
+// Con rest operator
+const [head, ...tail] = [1, 2, 3, 4];
+console.log(head);  // 1
+console.log(tail);  // [2, 3, 4]
+
+// Valores por defecto
+const [x = 1, y = 2] = [];
+console.log(x, y);  // 1, 2`} lang="javascript" />
+
+## Métodos útiles adicionales <Badge text="Complementario" variant="note" />
+
+### Búsqueda y comprobación
+<Code code={`const numeros = [1, 2, 3, 4, 5];
+
+// Encontrar un elemento
+numeros.find(num => num > 3);        // 4
+
+// Comprobar si existe
+numeros.includes(3);                 // true
+
+// Encontrar índice
+numeros.indexOf(3);                  // 2
+
+// Comprobar si alguno cumple
+numeros.some(num => num > 4);        // true
+
+// Comprobar si todos cumplen
+numeros.every(num => num > 0);       // true`} lang="javascript" />
+
+### Ordenación y manipulación
+<Code code={`const letras = ['c', 'a', 'b'];
+
+// Ordenar
+letras.sort();                       // ['a', 'b', 'c']
+
+// Invertir
+letras.reverse();                    // ['c', 'b', 'a']
+
+// Unir arrays
+const array1 = [1, 2];
+const array2 = [3, 4];
+const unidos = [...array1, ...array2]; // [1, 2, 3, 4]`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+### Usar métodos inmutables cuando sea posible
+<Code code={`// ❌ Malo
+const numeros = [1, 2, 3];
+numeros.push(4);
+
+// ✅ Bueno
+const numeros = [1, 2, 3];
+const nuevosNumeros = [...numeros, 4];`} lang="javascript" />
+
+### Evitar modificar arrays en bucles
+<Code code={`// ❌ Malo
+const array = [1, 2, 3];
+for(let i = 0; i < array.length; i++) {
+    array[i] = array[i] * 2;
+}
+
+// ✅ Bueno
+const array = [1, 2, 3];
+const resultado = array.map(num => num * 2);`} lang="javascript" />

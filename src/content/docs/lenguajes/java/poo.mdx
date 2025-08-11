@@ -1,0 +1,1628 @@
+---
+title: 6. Programación Orientada a Objetos
+description: Aprende sobre clases, objetos, encapsulamiento, herencia, polimorfismo, abstracción e interfaces en Java
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Programación Orientada a Objetos
+
+La Programación Orientada a Objetos (POO) es un paradigma de programación que utiliza "objetos" para modelar entidades del mundo real. Java es un lenguaje fundamentalmente orientado a objetos, diseñado desde sus inicios con este paradigma en mente. La POO se basa en cuatro pilares principales: encapsulamiento, herencia, polimorfismo y abstracción.
+
+## 4.1 Clases y objetos
+
+En Java, las clases son plantillas o "planos" que definen la estructura y comportamiento de los objetos. Los objetos son instancias de estas clases, representaciones concretas que ocupan espacio en memoria.
+
+### Definición de una clase
+
+Una clase en Java se define utilizando la palabra clave `class`, seguida del nombre de la clase y un bloque de código delimitado por llaves `{}` que contiene sus miembros (atributos y métodos).
+
+<Code code={`public class Persona {
+    // Atributos (variables de instancia)
+    String nombre;
+    int edad;
+    double altura;
+    
+    // Constructor
+    public Persona(String nombre, int edad, double altura) {
+        this.nombre = nombre;
+        this.edad = edad;
+        this.altura = altura;
+    }
+    
+    // Métodos
+    public void saludar() {
+        System.out.println("Hola, mi nombre es " + nombre);
+    }
+    
+    public void cumplirAnios() {
+        edad++;
+        System.out.println(nombre + " ahora tiene " + edad + " años.");
+    }
+}`} lang="java" />
+
+### Creación de objetos
+
+Para crear un objeto (instancia) de una clase, se utiliza el operador `new` seguido del constructor de la clase:
+
+<Code code={`// Creación de objetos Persona
+Persona persona1 = new Persona("Ana", 25, 1.65);
+Persona persona2 = new Persona("Carlos", 30, 1.78);
+
+// Uso de los objetos
+persona1.saludar(); // Imprime: Hola, mi nombre es Ana
+persona2.saludar(); // Imprime: Hola, mi nombre es Carlos
+
+persona1.cumplirAnios(); // Imprime: Ana ahora tiene 26 años.`} lang="java" />
+
+### Constructores
+
+Los constructores son métodos especiales que se llaman automáticamente cuando se crea un objeto. Su propósito principal es inicializar los atributos del objeto.
+
+<Code code={`public class Estudiante {
+    String nombre;
+    int edad;
+    String carrera;
+    
+    // Constructor por defecto (sin parámetros)
+    public Estudiante() {
+        nombre = "Sin nombre";
+        edad = 18;
+        carrera = "No especificada";
+    }
+    
+    // Constructor con parámetros
+    public Estudiante(String nombre, int edad, String carrera) {
+        this.nombre = nombre;
+        this.edad = edad;
+        this.carrera = carrera;
+    }
+    
+    // Constructor con algunos parámetros (sobrecarga de constructores)
+    public Estudiante(String nombre, int edad) {
+        this.nombre = nombre;
+        this.edad = edad;
+        this.carrera = "No especificada";
+    }
+}`} lang="java" />
+
+<Aside type="note">
+  Una clase puede tener múltiples constructores con diferentes parámetros, lo que se conoce como "sobrecarga de constructores". Java determina cuál constructor usar basándose en los argumentos proporcionados al crear el objeto.
+</Aside>
+
+### La palabra clave this
+
+La palabra clave `this` se refiere al objeto actual y se utiliza principalmente para:
+
+1. Diferenciar entre variables de instancia y parámetros con el mismo nombre
+2. Llamar a otros constructores de la misma clase
+3. Pasar el objeto actual como argumento a otro método
+
+<Code code={`public class Rectangulo {
+    double ancho;
+    double alto;
+    
+    // Uso de this para diferenciar variables
+    public Rectangulo(double ancho, double alto) {
+        this.ancho = ancho; // this.ancho se refiere al atributo, ancho al parámetro
+        this.alto = alto;
+    }
+    
+    // Uso de this para llamar a otro constructor
+    public Rectangulo() {
+        this(1.0, 1.0); // Llama al constructor con parámetros
+    }
+    
+    // Uso de this para pasar el objeto actual
+    public void compararCon(Rectangulo otro) {
+        Comparador.comparar(this, otro);
+    }
+}`} lang="java" />
+
+### Ciclo de vida de los objetos
+
+El ciclo de vida de un objeto en Java consta de tres fases principales:
+
+1. **Creación**: Se asigna memoria para el objeto cuando se usa el operador `new`
+2. **Uso**: El objeto se utiliza a través de sus referencias
+3. **Destrucción**: El recolector de basura de Java (Garbage Collector) libera la memoria cuando el objeto ya no es accesible
+
+<Code code={`public class EjemploCicloVida {
+    public static void main(String[] args) {
+        // Creación
+        Persona persona = new Persona("Juan", 28, 1.75);
+        
+        // Uso
+        persona.saludar();
+        persona.cumplirAnios();
+        
+        // Destrucción (implícita)
+        persona = null; // Elimina la referencia al objeto
+        // El recolector de basura eventualmente liberará la memoria
+    }
+}`} lang="java" />
+
+<Aside type="tip">
+  En Java, no es necesario (ni posible) destruir objetos manualmente como en otros lenguajes. El recolector de basura se encarga automáticamente de liberar la memoria de los objetos que ya no son accesibles.
+</Aside>
+
+## 4.2 Métodos y atributos
+
+Los atributos (también llamados campos o variables de instancia) representan el estado de un objeto, mientras que los métodos definen su comportamiento.
+
+### Atributos
+
+Los atributos pueden tener diferentes modificadores de acceso y pueden ser inicializados en su declaración o en constructores.
+
+<Code code={`public class Producto {
+    // Atributos con diferentes modificadores de acceso
+    public String nombre;           // Accesible desde cualquier clase
+    private double precio;          // Accesible solo dentro de esta clase
+    protected String categoria;     // Accesible en esta clase y sus subclases
+    int stock;                      // Accesible en el mismo paquete (default)
+    
+    // Atributo constante (final)
+    public final String codigo;
+    
+    // Atributo de clase (static)
+    public static int cantidadProductos = 0;
+    
+    public Producto(String nombre, double precio, String categoria, int stock, String codigo) {
+        this.nombre = nombre;
+        this.precio = precio;
+        this.categoria = categoria;
+        this.stock = stock;
+        this.codigo = codigo;
+        cantidadProductos++;
+    }
+}`} lang="java" />
+
+#### Tipos de atributos
+
+<table>
+  <thead>
+    <tr>
+      <th>Tipo</th>
+      <th>Descripción</th>
+      <th>Ejemplo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Variables de instancia</td>
+      <td>Pertenecen a cada objeto individual</td>
+      <td><Code code="String nombre;" lang="java" /></td>
+    </tr>
+    <tr>
+      <td>Variables de clase (static)</td>
+      <td>Compartidas por todas las instancias de la clase</td>
+      <td><Code code="static int contador;" lang="java" /></td>
+    </tr>
+    <tr>
+      <td>Constantes (final)</td>
+      <td>No pueden cambiar después de su inicialización</td>
+      <td><Code code="final double PI = 3.14159;" lang="java" /></td>
+    </tr>
+    <tr>
+      <td>Constantes de clase (static final)</td>
+      <td>Constantes compartidas por todas las instancias</td>
+      <td><Code code="static final int MAX_USUARIOS = 100;" lang="java" /></td>
+    </tr>
+  </tbody>
+</table>
+
+### Métodos
+
+Los métodos definen el comportamiento de los objetos y pueden tener diferentes modificadores, parámetros y valores de retorno.
+
+<Code code={`public class Calculadora {
+    // Método simple sin parámetros ni valor de retorno
+    public void mostrarMensaje() {
+        System.out.println("Calculadora lista para usar");
+    }
+    
+    // Método con parámetros y valor de retorno
+    public int sumar(int a, int b) {
+        return a + b;
+    }
+    
+    // Método con parámetros variables (varargs)
+    public double promedio(double... numeros) {
+        double suma = 0;
+        for (double num : numeros) {
+            suma += num;
+        }
+        return numeros.length > 0 ? suma / numeros.length : 0;
+    }
+    
+    // Método estático (de clase)
+    public static double elevarAlCuadrado(double numero) {
+        return numero * numero;
+    }
+    
+    // Método sobrecargado (mismo nombre, diferentes parámetros)
+    public double multiplicar(double a, double b) {
+        return a * b;
+    }
+    
+    public double multiplicar(double a, double b, double c) {
+        return a * b * c;
+    }
+}`} lang="java" />
+
+<Aside type="note">
+  La sobrecarga de métodos permite definir múltiples métodos con el mismo nombre pero diferentes parámetros. Java determina cuál método llamar basándose en los argumentos proporcionados.
+</Aside>
+
+#### Tipos de métodos
+
+<table>
+  <thead>
+    <tr>
+      <th>Tipo</th>
+      <th>Descripción</th>
+      <th>Ejemplo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Métodos de instancia</td>
+      <td>Operan sobre una instancia específica</td>
+      <td><Code code="public void saludar() { ... }" lang="java" /></td>
+    </tr>
+    <tr>
+      <td>Métodos de clase (static)</td>
+      <td>Pertenecen a la clase, no a instancias específicas</td>
+      <td><Code code="public static double raizCuadrada(double n) { ... }" lang="java" /></td>
+    </tr>
+    <tr>
+      <td>Métodos de acceso (getters)</td>
+      <td>Devuelven el valor de un atributo</td>
+      <td><Code code="public double getPrecio() { return precio; }" lang="java" /></td>
+    </tr>
+    <tr>
+      <td>Métodos modificadores (setters)</td>
+      <td>Modifican el valor de un atributo</td>
+      <td><Code code="public void setPrecio(double precio) { this.precio = precio; }" lang="java" /></td>
+    </tr>
+    <tr>
+      <td>Constructores</td>
+      <td>Inicializan objetos cuando se crean</td>
+      <td><Code code="public Persona(String nombre) { this.nombre = nombre; }" lang="java" /></td>
+    </tr>
+  </tbody>
+</table>
+
+### 4.2.3 Métodos void (sin retorno)
+
+Los métodos `void` son aquellos que no devuelven ningún valor. Se utilizan principalmente para realizar acciones o modificar el estado de un objeto sin necesidad de retornar información.
+
+<Code code={`public class Impresora {
+    private String modelo;
+    private int nivelTinta;
+    private boolean encendida;
+    
+    public Impresora(String modelo) {
+        this.modelo = modelo;
+        this.nivelTinta = 100;
+        this.encendida = false;
+    }
+    
+    // Método void que modifica el estado del objeto
+    public void encender() {
+        encendida = true;
+        System.out.println("Impresora " + modelo + " encendida.");
+    }
+    
+    // Método void que modifica el estado del objeto
+    public void apagar() {
+        encendida = false;
+        System.out.println("Impresora " + modelo + " apagada.");
+    }
+    
+    // Método void con parámetros
+    public void imprimir(String documento) {
+        if (!encendida) {
+            System.out.println("Error: La impresora está apagada.");
+            return; // Salida temprana del método
+        }
+        
+        if (nivelTinta <= 0) {
+            System.out.println("Error: No hay tinta suficiente.");
+            return;
+        }
+        
+        System.out.println("Imprimiendo: " + documento);
+        nivelTinta -= 10; // Reduce el nivel de tinta
+    }
+    
+    // Método con retorno para comparación
+    public int obtenerNivelTinta() {
+        return nivelTinta;
+    }
+}`} lang="java" />
+
+#### Características de los métodos void
+
+1. **Declaración**: Se declaran con la palabra clave `void` como tipo de retorno
+2. **No usan `return` con valor**: Si utilizan `return`, lo hacen sin valor para salir del método prematuramente
+3. **Propósito**: Realizar acciones, modificar estado o mostrar información
+4. **Uso común**: Setters, métodos de inicialización, métodos de visualización
+
+<Aside type="tip">
+  Los métodos void son ideales cuando la acción que realiza el método es más importante que cualquier valor que pudiera devolver. Por ejemplo, métodos como `guardarEnBaseDeDatos()`, `enviarEmail()` o `actualizarInterfaz()` suelen ser void.
+</Aside>
+
+### 4.2.4 Métodos static
+
+Los métodos `static` (o métodos de clase) pertenecen a la clase en lugar de a instancias específicas. Pueden ser llamados sin necesidad de crear un objeto de la clase.
+
+<Code code={`public class Matematicas {
+    // Constante estática
+    public static final double PI = 3.14159;
+    
+    // Método estático
+    public static double calcularAreaCirculo(double radio) {
+        return PI * radio * radio;
+    }
+    
+    // Método estático
+    public static double calcularPerimetroCirculo(double radio) {
+        return 2 * PI * radio;
+    }
+    
+    // Método estático con múltiples parámetros
+    public static double calcularDistancia(double x1, double y1, double x2, double y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    }
+    
+    // Método estático que utiliza otros métodos estáticos
+    public static double calcularAreaSector(double radio, double angulo) {
+        return (angulo / 360) * calcularAreaCirculo(radio);
+    }
+}`} lang="java" />
+
+#### Uso de métodos static
+
+<Code code={`// Llamada a métodos estáticos sin crear instancias
+double area = Matematicas.calcularAreaCirculo(5);
+double perimetro = Matematicas.calcularPerimetroCirculo(5);
+double distancia = Matematicas.calcularDistancia(0, 0, 3, 4); // 5.0
+
+// Acceso a constantes estáticas
+System.out.println("El valor de PI es: " + Matematicas.PI);
+
+// Ejemplo de métodos estáticos de la clase Math
+double raiz = Math.sqrt(16);    // 4.0
+int maximo = Math.max(10, 20);  // 20
+double aleatorio = Math.random(); // Número aleatorio entre 0.0 y 1.0`} lang="java" />
+
+#### Características de los métodos static
+
+1. **Pertenecen a la clase**: No requieren una instancia para ser llamados
+2. **No pueden acceder a variables de instancia**: Solo pueden acceder directamente a otros miembros estáticos
+3. **No pueden usar `this` o `super`**: Ya que no operan sobre una instancia específica
+4. **Memoria**: Se cargan en memoria cuando la clase se carga, no cuando se crean objetos
+5. **Uso común**: Funciones de utilidad, operaciones independientes del estado del objeto, fábricas de objetos
+
+<Aside type="caution">
+  Los métodos estáticos no pueden acceder directamente a variables de instancia o llamar a métodos no estáticos. Si necesitan interactuar con estado de instancia, deben recibir objetos como parámetros.
+</Aside>
+
+<Code code={`public class EjemploStatic {
+    private int contador = 0;  // Variable de instancia
+    private static int contadorGlobal = 0;  // Variable de clase
+    
+    public void incrementarContador() {
+        contador++;
+        contadorGlobal++;
+    }
+    
+    // Método estático correcto
+    public static void mostrarContadorGlobal() {
+        System.out.println("Contador global: " + contadorGlobal);
+        // Error de compilación: System.out.println(contador);
+    }
+    
+    // Método estático que recibe un objeto para acceder a sus variables de instancia
+    public static void mostrarContadorInstancia(EjemploStatic objeto) {
+        System.out.println("Contador de instancia: " + objeto.contador);
+    }
+}`} lang="java" />
+
+#### Casos de uso comunes para métodos static
+
+1. **Funciones de utilidad**: Métodos que realizan operaciones independientes del estado del objeto
+2. **Operaciones matemáticas**: Como en la clase `Math` de Java
+3. **Fábricas de objetos**: Métodos que crean y devuelven instancias de la clase
+4. **Constantes compartidas**: Combinados con `final` para definir constantes de clase
+5. **Contadores globales**: Para llevar un registro compartido entre todas las instancias
+
+### Paso de parámetros en Java
+
+Java utiliza el paso de parámetros por valor, lo que significa que:
+
+- Para tipos primitivos, se pasa una copia del valor
+- Para objetos, se pasa una copia de la referencia (no el objeto en sí)
+
+<Tabs>
+  <TabItem label="Tipos primitivos">
+    <Code code={`public void incrementar(int numero) {
+    numero += 10; // Modifica la copia local, no el original
+}
+
+int x = 5;
+incrementar(x);
+System.out.println(x); // Imprime 5, no 15`} lang="java" />
+  </TabItem>
+  <TabItem label="Objetos">
+    <Code code={`public void modificarPersona(Persona p) {
+    p.nombre = "Nuevo nombre"; // Modifica el objeto original
+}
+
+Persona persona = new Persona("Original", 30, 1.75);
+modificarPersona(persona);
+System.out.println(persona.nombre); // Imprime "Nuevo nombre"`} lang="java" />
+  </TabItem>
+</Tabs>
+
+## 4.3 Encapsulamiento
+
+El encapsulamiento es uno de los principios fundamentales de la POO que consiste en ocultar los detalles de implementación de una clase y exponer solo lo necesario. Esto se logra principalmente mediante el uso de modificadores de acceso y métodos getter y setter.
+
+### Modificadores de acceso
+
+Java proporciona cuatro niveles de control de acceso:
+
+<table>
+  <thead>
+    <tr>
+      <th>Modificador</th>
+      <th>Clase</th>
+      <th>Paquete</th>
+      <th>Subclase</th>
+      <th>Cualquier lugar</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><Code code="private" lang="java" /></td>
+      <td>✓</td>
+      <td>✗</td>
+      <td>✗</td>
+      <td>✗</td>
+    </tr>
+    <tr>
+      <td><Code code="default" lang="java" /> (sin modificador)</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✗</td>
+      <td>✗</td>
+    </tr>
+    <tr>
+      <td><Code code="protected" lang="java" /></td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✗</td>
+    </tr>
+    <tr>
+      <td><Code code="public" lang="java" /></td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+      <td>✓</td>
+    </tr>
+  </tbody>
+</table>
+
+### Implementación del encapsulamiento
+
+El patrón común para implementar el encapsulamiento es:
+
+1. Declarar los atributos como `private`
+2. Proporcionar métodos `public` getter y setter para acceder y modificar los atributos
+
+<Code code={`public class CuentaBancaria {
+    // Atributos encapsulados (privados)
+    private String numeroCuenta;
+    private double saldo;
+    private String titular;
+    
+    // Constructor
+    public CuentaBancaria(String numeroCuenta, String titular) {
+        this.numeroCuenta = numeroCuenta;
+        this.titular = titular;
+        this.saldo = 0.0;
+    }
+    
+    // Getters (métodos de acceso)
+    public String getNumeroCuenta() {
+        return numeroCuenta;
+    }
+    
+    public double getSaldo() {
+        return saldo;
+    }
+    
+    public String getTitular() {
+        return titular;
+    }
+    
+    // Setters (métodos modificadores)
+    public void setTitular(String titular) {
+        this.titular = titular;
+    }
+    
+    // No hay setter para numeroCuenta (no se puede cambiar)
+    // El saldo solo se modifica a través de métodos específicos
+    
+    // Métodos específicos para operaciones
+    public void depositar(double cantidad) {
+        if (cantidad > 0) {
+            saldo += cantidad;
+            System.out.println("Depósito de " + cantidad + " realizado. Nuevo saldo: " + saldo);
+        } else {
+            System.out.println("La cantidad a depositar debe ser positiva");
+        }
+    }
+    
+    public void retirar(double cantidad) {
+        if (cantidad > 0) {
+            if (saldo >= cantidad) {
+                saldo -= cantidad;
+                System.out.println("Retiro de " + cantidad + " realizado. Nuevo saldo: " + saldo);
+            } else {
+                System.out.println("Saldo insuficiente");
+            }
+        } else {
+            System.out.println("La cantidad a retirar debe ser positiva");
+        }
+    }
+}`} lang="java" />
+
+<Aside type="tip">
+  El encapsulamiento permite validar datos antes de modificar atributos, cambiar la implementación interna sin afectar el código cliente, y proporcionar un nivel de abstracción que oculta los detalles innecesarios.
+</Aside>
+
+### Beneficios del encapsulamiento
+
+1. **Control de acceso**: Limita qué partes del programa pueden acceder a los datos
+2. **Validación de datos**: Permite verificar los datos antes de modificar atributos
+3. **Flexibilidad**: Permite cambiar la implementación interna sin afectar el código cliente
+4. **Mantenimiento**: Facilita la depuración y el mantenimiento del código
+
+## 4.4 Herencia
+
+La herencia es un mecanismo que permite a una clase adquirir propiedades y comportamientos de otra clase. La clase que hereda se denomina "subclase" o "clase hija", mientras que la clase de la que se hereda se llama "superclase" o "clase padre".
+
+### Sintaxis básica
+
+En Java, la herencia se implementa utilizando la palabra clave `extends`:
+
+<Code code={`// Clase padre
+public class Animal {
+    protected String nombre;
+    protected int edad;
+    
+    public Animal(String nombre, int edad) {
+        this.nombre = nombre;
+        this.edad = edad;
+    }
+    
+    public void comer() {
+        System.out.println(nombre + " está comiendo.");
+    }
+    
+    public void dormir() {
+        System.out.println(nombre + " está durmiendo.");
+    }
+}
+
+// Clase hija que hereda de Animal
+public class Perro extends Animal {
+    private String raza;
+    
+    public Perro(String nombre, int edad, String raza) {
+        super(nombre, edad); // Llama al constructor de la clase padre
+        this.raza = raza;
+    }
+    
+    public void ladrar() {
+        System.out.println(nombre + " está ladrando: ¡Guau, guau!");
+    }
+}`} lang="java" />
+
+### La palabra clave super
+
+La palabra clave `super` se utiliza para:
+
+1. Llamar al constructor de la clase padre
+2. Acceder a métodos o atributos de la clase padre que han sido sobrescritos en la clase hija
+
+<Code code={`public class Gato extends Animal {
+    private int vidasRestantes;
+    
+    public Gato(String nombre, int edad, int vidasRestantes) {
+        super(nombre, edad); // Llama al constructor de Animal
+        this.vidasRestantes = vidasRestantes;
+    }
+    
+    // Sobrescribe el método dormir de la clase padre
+    @Override
+    public void dormir() {
+        // Llama al método dormir de la clase padre
+        super.dormir();
+        System.out.println(nombre + " ronronea mientras duerme.");
+    }
+    
+    public void maullar() {
+        System.out.println(nombre + " está maullando: ¡Miau!");
+    }
+}`} lang="java" />
+
+### Tipos de herencia
+
+<table>
+  <thead>
+    <tr>
+      <th>Tipo</th>
+      <th>Descripción</th>
+      <th>Soporte en Java</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Herencia simple</td>
+      <td>Una clase hereda de una sola clase</td>
+      <td>Soportado</td>
+    </tr>
+    <tr>
+      <td>Herencia múltiple</td>
+      <td>Una clase hereda de múltiples clases</td>
+      <td>No soportado directamente (se puede simular con interfaces)</td>
+    </tr>
+    <tr>
+      <td>Herencia multinivel</td>
+      <td>Una clase hereda de otra clase que a su vez hereda de otra</td>
+      <td>Soportado</td>
+    </tr>
+    <tr>
+      <td>Herencia jerárquica</td>
+      <td>Múltiples clases heredan de una sola clase</td>
+      <td>Soportado</td>
+    </tr>
+  </tbody>
+</table>
+
+### Ejemplo de herencia multinivel
+
+<Code code={`public class Animal {
+    protected String nombre;
+    
+    public void comer() {
+        System.out.println("El animal come.");
+    }
+}
+
+public class Mamifero extends Animal {
+    public void amamantar() {
+        System.out.println("El mamífero amamanta a sus crías.");
+    }
+}
+
+public class Perro extends Mamifero {
+    public void ladrar() {
+        System.out.println("El perro ladra.");
+    }
+}
+
+// Uso
+Perro miPerro = new Perro();
+miPerro.nombre = "Rex"; // Heredado de Animal
+miPerro.comer();       // Heredado de Animal
+miPerro.amamantar();   // Heredado de Mamifero
+miPerro.ladrar();      // Definido en Perro`} lang="java" />
+
+### Modificador final
+
+El modificador `final` puede aplicarse a clases, métodos y atributos:
+
+- **Clase final**: No puede ser heredada
+- **Método final**: No puede ser sobrescrito en subclases
+- **Atributo final**: No puede ser modificado después de su inicialización
+
+<Code code={`// Clase que no puede ser heredada
+public final class Utilidades {
+    // Método que no puede ser sobrescrito
+    public final static double calcularImpuesto(double monto) {
+        return monto * 0.16;
+    }
+}
+
+public class Matematicas {
+    // Constante que no puede ser modificada
+    public final double PI = 3.14159;
+    
+    // Método que no puede ser sobrescrito
+    public final double calcularAreaCirculo(double radio) {
+        return PI * radio * radio;
+    }
+}`} lang="java" />
+
+### Herencia vs. Composición
+
+Existen dos formas principales de reutilizar código en POO: herencia y composición.
+
+<Tabs>
+  <TabItem label="Herencia">
+    <Code code={`public class Vehiculo {
+    protected String marca;
+    protected String modelo;
+    
+    public void arrancar() {
+        System.out.println("El vehículo arranca.");
+    }
+}
+
+public class Coche extends Vehiculo {
+    private int numeroPuertas;
+    
+    public void acelerar() {
+        System.out.println("El coche acelera.");
+    }
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Composición">
+    <Code code={`public class Motor {
+    private String tipo;
+    
+    public Motor(String tipo) {
+        this.tipo = tipo;
+    }
+    
+    public void encender() {
+        System.out.println("Motor " + tipo + " encendido.");
+    }
+}
+
+public class Coche {
+    private String marca;
+    private String modelo;
+    private Motor motor; // Composición
+    
+    public Coche(String marca, String modelo, String tipoMotor) {
+        this.marca = marca;
+        this.modelo = modelo;
+        this.motor = new Motor(tipoMotor);
+    }
+    
+    public void arrancar() {
+        System.out.println("Coche arrancando...");
+        motor.encender();
+    }
+}`} lang="java" />
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Una regla práctica común es "Favorece la composición sobre la herencia". La composición suele crear sistemas más flexibles y menos acoplados, mientras que la herencia crea un acoplamiento fuerte entre las clases.
+</Aside>
+
+### Cuándo usar herencia
+
+La herencia es más apropiada cuando:
+
+1. Existe una relación "es un" clara entre las clases (un perro "es un" animal)
+2. La subclase es una versión especializada de la superclase
+3. La subclase reutiliza y extiende el comportamiento de la superclase sin modificarlo drásticamente
+
+## 4.5 Polimorfismo
+
+El polimorfismo es la capacidad de los objetos de diferentes clases para responder al mismo mensaje o método de diferentes maneras. En Java, el polimorfismo se implementa principalmente a través de la sobrescritura de métodos y el uso de referencias de tipo superclase para objetos de tipo subclase.
+
+### Sobrescritura de métodos (Override)
+
+La sobrescritura de métodos ocurre cuando una subclase proporciona una implementación específica para un método que ya está definido en su superclase.
+
+<Code code={`public class Figura {
+    public double calcularArea() {
+        return 0; // Implementación por defecto
+    }
+    
+    public void dibujar() {
+        System.out.println("Dibujando una figura");
+    }
+}
+
+public class Circulo extends Figura {
+    private double radio;
+    
+    public Circulo(double radio) {
+        this.radio = radio;
+    }
+    
+    @Override // Anotación que indica sobrescritura
+    public double calcularArea() {
+        return Math.PI * radio * radio;
+    }
+    
+    @Override
+    public void dibujar() {
+        System.out.println("Dibujando un círculo");
+    }
+}
+
+public class Rectangulo extends Figura {
+    private double base;
+    private double altura;
+    
+    public Rectangulo(double base, double altura) {
+        this.base = base;
+        this.altura = altura;
+    }
+    
+    @Override
+    public double calcularArea() {
+        return base * altura;
+    }
+    
+    @Override
+    public void dibujar() {
+        System.out.println("Dibujando un rectángulo");
+    }
+}`} lang="java" />
+
+<Aside type="note">
+  La anotación `@Override` es opcional pero recomendada. Ayuda al compilador a verificar que realmente estás sobrescribiendo un método de la superclase y no creando uno nuevo por error (por ejemplo, debido a un error tipográfico en el nombre).
+</Aside>
+
+### Polimorfismo en acción
+
+El polimorfismo permite tratar objetos de diferentes clases a través de una interfaz común (una superclase o interfaz):
+
+<Code code={`public class EjemploPolimorfismo {
+    public static void main(String[] args) {
+        // Creación de objetos
+        Figura figura1 = new Circulo(5.0);
+        Figura figura2 = new Rectangulo(4.0, 6.0);
+        
+        // Polimorfismo en acción
+        System.out.println("Area de figura1: " + figura1.calcularArea()); // Llama a Circulo.calcularArea()
+        System.out.println("Area de figura2: " + figura2.calcularArea()); // Llama a Rectangulo.calcularArea()
+        
+        figura1.dibujar(); // Llama a Circulo.dibujar()
+        figura2.dibujar(); // Llama a Rectangulo.dibujar()
+        
+        // Array polimórfico
+        Figura[] figuras = new Figura[3];
+        figuras[0] = new Circulo(3.0);
+        figuras[1] = new Rectangulo(2.0, 4.0);
+        figuras[2] = new Circulo(7.0);
+        
+        // Procesamiento polimórfico
+        for (Figura f : figuras) {
+            System.out.println("Area: " + f.calcularArea());
+            f.dibujar();
+        }
+    }
+}`} lang="java" />
+
+### Enlace dinámico (Dynamic Binding)
+
+El enlace dinámico es el mecanismo por el cual Java determina en tiempo de ejecución qué método invocar cuando hay sobrescritura. Java utiliza el tipo real del objeto, no el tipo de la referencia, para decidir qué método llamar.
+
+<Code code={`Figura f = new Circulo(5.0);
+f.calcularArea(); // Llama a Circulo.calcularArea(), no a Figura.calcularArea()`} lang="java" />
+
+### Casting de objetos
+
+A veces es necesario convertir una referencia de un tipo a otro:
+
+<Code code={`Figura f = new Circulo(5.0);
+
+// Downcasting (de superclase a subclase)
+if (f instanceof Circulo) {
+    Circulo c = (Circulo) f; // Casting seguro
+    // Ahora podemos acceder a métodos específicos de Circulo
+}
+
+// Upcasting (de subclase a superclase)
+Circulo c = new Circulo(3.0);
+Figura f2 = c; // Upcasting implícito, no requiere sintaxis especial`} lang="java" />
+
+<Aside type="caution">
+  El downcasting puede provocar una `ClassCastException` si el objeto no es realmente del tipo al que se está convirtiendo. Siempre verifica con `instanceof` antes de hacer downcasting.
+</Aside>
+
+### Sobrecarga vs. Sobrescritura
+
+<table>
+  <thead>
+    <tr>
+      <th>Característica</th>
+      <th>Sobrecarga (Overloading)</th>
+      <th>Sobrescritura (Overriding)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Definición</td>
+      <td>Múltiples métodos con el mismo nombre pero diferentes parámetros</td>
+      <td>Redefinir un método heredado en una subclase</td>
+    </tr>
+    <tr>
+      <td>Ocurre en</td>
+      <td>Misma clase o clase hija</td>
+      <td>Clase hija</td>
+    </tr>
+    <tr>
+      <td>Parámetros</td>
+      <td>Diferentes (tipo, número o ambos)</td>
+      <td>Iguales</td>
+    </tr>
+    <tr>
+      <td>Tipo de retorno</td>
+      <td>Puede ser diferente</td>
+      <td>Debe ser igual o un subtipo (covariante)</td>
+    </tr>
+    <tr>
+      <td>Modificadores de acceso</td>
+      <td>Pueden ser diferentes</td>
+      <td>Igual o menos restrictivo</td>
+    </tr>
+    <tr>
+      <td>Excepciones</td>
+      <td>Pueden ser diferentes</td>
+      <td>Iguales o subtipos de las declaradas en el método original</td>
+    </tr>
+    <tr>
+      <td>Resolución</td>
+      <td>En tiempo de compilación</td>
+      <td>En tiempo de ejecución (enlace dinámico)</td>
+    </tr>
+  </tbody>
+</table>
+
+### Ejemplo completo de polimorfismo
+
+<Code code={`// Clase base
+public abstract class Empleado {
+    protected String nombre;
+    protected double salarioBase;
+    
+    public Empleado(String nombre, double salarioBase) {
+        this.nombre = nombre;
+        this.salarioBase = salarioBase;
+    }
+    
+    // Método que será sobrescrito
+    public abstract double calcularSalario();
+    
+    public void mostrarDetalles() {
+        System.out.println("Nombre: " + nombre);
+        System.out.println("Salario: " + calcularSalario());
+    }
+}
+
+// Subclase 1
+public class EmpleadoTiempoCompleto extends Empleado {
+    private double bono;
+    
+    public EmpleadoTiempoCompleto(String nombre, double salarioBase, double bono) {
+        super(nombre, salarioBase);
+        this.bono = bono;
+    }
+    
+    @Override
+    public double calcularSalario() {
+        return salarioBase + bono;
+    }
+    
+    @Override
+    public void mostrarDetalles() {
+        super.mostrarDetalles();
+        System.out.println("Tipo: Tiempo Completo");
+        System.out.println("Bono: " + bono);
+    }
+}
+
+// Subclase 2
+public class EmpleadoTiempoParcial extends Empleado {
+    private int horasTrabajadas;
+    private double tarifaPorHora;
+    
+    public EmpleadoTiempoParcial(String nombre, double salarioBase, 
+                                int horasTrabajadas, double tarifaPorHora) {
+        super(nombre, salarioBase);
+        this.horasTrabajadas = horasTrabajadas;
+        this.tarifaPorHora = tarifaPorHora;
+    }
+    
+    @Override
+    public double calcularSalario() {
+        return salarioBase + (horasTrabajadas * tarifaPorHora);
+    }
+    
+    @Override
+    public void mostrarDetalles() {
+        super.mostrarDetalles();
+        System.out.println("Tipo: Tiempo Parcial");
+        System.out.println("Horas trabajadas: " + horasTrabajadas);
+        System.out.println("Tarifa por hora: " + tarifaPorHora);
+    }
+}
+
+// Uso del polimorfismo
+public class SistemaNomina {
+    public static void main(String[] args) {
+        // Array polimórfico
+        Empleado[] empleados = new Empleado[3];
+        empleados[0] = new EmpleadoTiempoCompleto("Juan Pérez", 2000, 500);
+        empleados[1] = new EmpleadoTiempoParcial("María López", 1000, 20, 15);
+        empleados[2] = new EmpleadoTiempoCompleto("Carlos Gómez", 2500, 300);
+        
+        // Cálculo de nómina usando polimorfismo
+        double totalNomina = 0;
+        for (Empleado emp : empleados) {
+            emp.mostrarDetalles(); // Llamada polimórfica
+            System.out.println("-------------------");
+            totalNomina += emp.calcularSalario(); // Llamada polimórfica
+        }
+        
+        System.out.println("Total nómina: " + totalNomina);
+    }
+}`} lang="java" />
+
+## 4.6 Abstracción
+
+La abstracción es el proceso de ocultar los detalles de implementación y mostrar solo la funcionalidad al usuario. En Java, la abstracción se logra mediante clases abstractas e interfaces.
+
+### Clases abstractas
+
+Una clase abstracta es una clase que no puede ser instanciada directamente y que puede contener métodos abstractos (métodos sin implementación) y métodos concretos (con implementación).
+
+<Code code={`// Clase abstracta
+public abstract class Vehiculo {
+    // Atributos
+    protected String marca;
+    protected String modelo;
+    protected int anio;
+    
+    // Constructor
+    public Vehiculo(String marca, String modelo, int anio) {
+        this.marca = marca;
+        this.modelo = modelo;
+        this.anio = anio;
+    }
+    
+    // Método abstracto (sin implementación)
+    public abstract void acelerar();
+    
+    // Método abstracto
+    public abstract void frenar();
+    
+    // Método concreto (con implementación)
+    public void encender() {
+        System.out.println("El vehículo " + marca + " " + modelo + " ha sido encendido.");
+    }
+    
+    // Método concreto
+    public void apagar() {
+        System.out.println("El vehículo " + marca + " " + modelo + " ha sido apagado.");
+    }
+    
+    // Getters y setters
+    public String getMarca() {
+        return marca;
+    }
+    
+    public String getModelo() {
+        return modelo;
+    }
+    
+    public int getAnio() {
+        return anio;
+    }
+}`} lang="java" />
+
+### Implementación de clases abstractas
+
+Las clases que heredan de una clase abstracta deben implementar todos sus métodos abstractos, a menos que la subclase también sea abstracta.
+
+<Code code={`// Subclase concreta que implementa la clase abstracta Vehiculo
+public class Coche extends Vehiculo {
+    private int numeroPuertas;
+    
+    public Coche(String marca, String modelo, int anio, int numeroPuertas) {
+        super(marca, modelo, anio);
+        this.numeroPuertas = numeroPuertas;
+    }
+    
+    // Implementación de métodos abstractos
+    @Override
+    public void acelerar() {
+        System.out.println("El coche " + marca + " " + modelo + " está acelerando.");
+    }
+    
+    @Override
+    public void frenar() {
+        System.out.println("El coche " + marca + " " + modelo + " está frenando.");
+    }
+    
+    // Método específico de Coche
+    public void abrirPuertas() {
+        System.out.println("Abriendo las " + numeroPuertas + " puertas del coche.");
+    }
+}`} lang="java" />
+
+### Características de las clases abstractas
+
+1. No pueden ser instanciadas directamente (`new Vehiculo()` no está permitido)
+2. Pueden tener constructores y bloques de inicialización
+3. Pueden tener métodos abstractos y concretos
+4. Pueden tener atributos, métodos estáticos y finales
+5. Una clase abstracta puede extender otra clase y puede implementar interfaces
+6. Si una clase tiene al menos un método abstracto, la clase debe ser declarada como abstracta
+
+<Aside type="note">
+  Las clases abstractas son útiles cuando quieres definir una plantilla común para un grupo de subclases relacionadas, pero parte de la implementación debe ser específica para cada subclase.
+</Aside>
+
+### Ejemplo de uso de clases abstractas
+
+<Code code={`public abstract class Forma {
+    // Método abstracto
+    public abstract double calcularArea();
+    
+    // Método concreto
+    public void mostrarArea() {
+        System.out.println("El área es: " + calcularArea());
+    }
+}
+
+public class Cuadrado extends Forma {
+    private double lado;
+    
+    public Cuadrado(double lado) {
+        this.lado = lado;
+    }
+    
+    @Override
+    public double calcularArea() {
+        return lado * lado;
+    }
+}
+
+public class Triangulo extends Forma {
+    private double base;
+    private double altura;
+    
+    public Triangulo(double base, double altura) {
+        this.base = base;
+        this.altura = altura;
+    }
+    
+    @Override
+    public double calcularArea() {
+        return (base * altura) / 2;
+    }
+}
+
+// Uso
+public class PruebaFormas {
+    public static void main(String[] args) {
+        Forma cuadrado = new Cuadrado(5);
+        Forma triangulo = new Triangulo(4, 3);
+        
+        cuadrado.mostrarArea();   // El área es: 25.0
+        triangulo.mostrarArea();  // El área es: 6.0
+    }
+}`} lang="java" />
+
+## 4.7 Interfaces
+
+Una interfaz en Java es una colección de métodos abstractos (sin implementación) y constantes. A partir de Java 8, las interfaces también pueden incluir métodos default y estáticos con implementación.
+
+### Definición de una interfaz
+
+<Code code={`public interface Dibujable {
+    // Constante (implicitamente public, static y final)
+    String HERRAMIENTA = "Lápiz";
+    
+    // Método abstracto (implícitamente public y abstract)
+    void dibujar();
+    
+    // Método abstracto
+    void cambiarColor(String color);
+    
+    // Método default (Java 8+)
+    default void mostrarInformacion() {
+        System.out.println("Dibujando con " + HERRAMIENTA);
+    }
+    
+    // Método estático (Java 8+)
+    static void describirInterfaz() {
+        System.out.println("Esta interfaz define objetos que pueden ser dibujados.");
+    }
+}`} lang="java" />
+
+### Implementación de interfaces
+
+Una clase implementa una interfaz utilizando la palabra clave `implements`. La clase debe proporcionar implementaciones para todos los métodos abstractos de la interfaz.
+
+<Code code={`public class Circulo implements Dibujable {
+    private double radio;
+    private String color;
+    
+    public Circulo(double radio) {
+        this.radio = radio;
+        this.color = "Negro"; // Color por defecto
+    }
+    
+    // Implementación de los métodos de la interfaz
+    @Override
+    public void dibujar() {
+        System.out.println("Dibujando un círculo de radio " + radio + " en color " + color);
+    }
+    
+    @Override
+    public void cambiarColor(String color) {
+        this.color = color;
+        System.out.println("Color cambiado a " + color);
+    }
+    
+    // No es necesario sobrescribir mostrarInformacion() porque tiene una implementación default
+}`} lang="java" />
+
+### Múltiples interfaces
+
+Una clase puede implementar múltiples interfaces, lo que permite una forma de "herencia múltiple" de comportamiento.
+
+<Code code={`public interface Redimensionable {
+    void redimensionar(double factor);
+}
+
+public interface Rotable {
+    void rotar(double grados);
+}
+
+// Implementación de múltiples interfaces
+public class Rectangulo implements Dibujable, Redimensionable, Rotable {
+    private double ancho;
+    private double alto;
+    private String color;
+    private double rotacion;
+    
+    public Rectangulo(double ancho, double alto) {
+        this.ancho = ancho;
+        this.alto = alto;
+        this.color = "Negro";
+        this.rotacion = 0;
+    }
+    
+    // Implementación de Dibujable
+    @Override
+    public void dibujar() {
+        System.out.println("Dibujando un rectángulo de " + ancho + "x" + alto + 
+                           " en color " + color + " con rotación " + rotacion + " grados");
+    }
+    
+    @Override
+    public void cambiarColor(String color) {
+        this.color = color;
+    }
+    
+    // Implementación de Redimensionable
+    @Override
+    public void redimensionar(double factor) {
+        ancho *= factor;
+        alto *= factor;
+        System.out.println("Rectángulo redimensionado a " + ancho + "x" + alto);
+    }
+    
+    // Implementación de Rotable
+    @Override
+    public void rotar(double grados) {
+        this.rotacion = (this.rotacion + grados) % 360;
+        System.out.println("Rectángulo rotado a " + rotacion + " grados");
+    }
+}`} lang="java" />
+
+### Interfaces vs. Clases abstractas
+
+<table>
+  <thead>
+    <tr>
+      <th>Característica</th>
+      <th>Interfaz</th>
+      <th>Clase abstracta</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Métodos</td>
+      <td>Abstractos, default, estáticos</td>
+      <td>Abstractos y concretos</td>
+    </tr>
+    <tr>
+      <td>Variables</td>
+      <td>Solo constantes (public static final)</td>
+      <td>Cualquier tipo de variable</td>
+    </tr>
+    <tr>
+      <td>Constructores</td>
+      <td>No permitidos</td>
+      <td>Permitidos</td>
+    </tr>
+    <tr>
+      <td>Herencia múltiple</td>
+      <td>Una clase puede implementar múltiples interfaces</td>
+      <td>Una clase solo puede extender una clase abstracta</td>
+    </tr>
+    <tr>
+      <td>Acceso a miembros</td>
+      <td>Implícitamente public</td>
+      <td>Cualquier modificador de acceso</td>
+    </tr>
+    <tr>
+      <td>Uso principal</td>
+      <td>Definir comportamientos que pueden ser implementados por clases no relacionadas</td>
+      <td>Proporcionar una base común para subclases relacionadas</td>
+    </tr>
+  </tbody>
+</table>
+
+### Cuándo usar interfaces vs. clases abstractas
+
+**Usa interfaces cuando:**
+
+1. Quieres definir un contrato que múltiples clases no relacionadas deben cumplir
+2. Necesitas simular herencia múltiple
+3. Esperas que las clases que implementan la interfaz tengan implementaciones completamente diferentes
+4. Quieres especificar el comportamiento de un tipo particular, pero no te preocupa quién lo implementa
+
+**Usa clases abstractas cuando:**
+
+1. Quieres compartir código entre varias clases estrechamente relacionadas
+2. Necesitas acceso a modificadores que no sean public
+3. Quieres declarar campos no estáticos o no finales
+4. Necesitas proporcionar una implementación base común para todos los métodos
+
+### Interfaces funcionales y expresiones lambda (Java 8+)
+
+Una interfaz funcional es una interfaz que contiene exactamente un método abstracto. Estas interfaces pueden ser implementadas mediante expresiones lambda.
+
+<Code code={`// Interfaz funcional (anotación opcional pero recomendada)
+@FunctionalInterface
+public interface Calculadora {
+    // Único método abstracto
+    double operar(double a, double b);
+    
+    // Métodos default no cuentan para la definición de interfaz funcional
+    default double operarAbsoluto(double a, double b) {
+        return Math.abs(operar(a, b));
+    }
+}
+
+public class PruebaLambda {
+    public static void main(String[] args) {
+        // Implementación tradicional con clase anónima
+        Calculadora suma = new Calculadora() {
+            @Override
+            public double operar(double a, double b) {
+                return a + b;
+            }
+        };
+        
+        // Implementación con expresión lambda
+        Calculadora resta = (a, b) -> a - b;
+        Calculadora multiplicacion = (a, b) -> a * b;
+        Calculadora division = (a, b) -> a / b;
+        
+        // Uso
+        System.out.println("Suma: " + suma.operar(5, 3));           // 8.0
+        System.out.println("Resta: " + resta.operar(5, 3));         // 2.0
+        System.out.println("Multiplicación: " + multiplicacion.operar(5, 3)); // 15.0
+        System.out.println("División: " + division.operar(6, 3));   // 2.0
+        
+        // Uso de método default
+        System.out.println("Resta absoluta: " + resta.operarAbsoluto(3, 5)); // 2.0
+    }
+}`} lang="java" />
+
+### Herencia entre interfaces
+
+Las interfaces pueden extender una o más interfaces utilizando la palabra clave `extends`.
+
+<Code code={`public interface Vehiculo {
+    void acelerar();
+    void frenar();
+}
+
+public interface VehiculoElectrico extends Vehiculo {
+    void cargar();
+    int getNivelBateria();
+}
+
+public class CocheElectrico implements VehiculoElectrico {
+    private int nivelBateria = 100;
+    
+    @Override
+    public void acelerar() {
+        System.out.println("Acelerando coche eléctrico");
+        nivelBateria -= 5;
+    }
+    
+    @Override
+    public void frenar() {
+        System.out.println("Frenando coche eléctrico");
+        nivelBateria -= 1;
+    }
+    
+    @Override
+    public void cargar() {
+        nivelBateria = 100;
+        System.out.println("Batería cargada al 100%");
+    }
+    
+    @Override
+    public int getNivelBateria() {
+        return nivelBateria;
+    }
+}`} lang="java" />
+
+### Ejemplo completo: Combinando interfaces y clases abstractas
+
+<Code code={`// Interfaz base
+public interface Reproducible {
+    void reproducir();
+    void pausar();
+    void detener();
+}
+
+// Clase abstracta que implementa parcialmente la interfaz
+public abstract class DispositivoMultimedia implements Reproducible {
+    protected String nombre;
+    protected boolean encendido;
+    
+    public DispositivoMultimedia(String nombre) {
+        this.nombre = nombre;
+        this.encendido = false;
+    }
+    
+    // Métodos concretos
+    public void encender() {
+        encendido = true;
+        System.out.println(nombre + " encendido.");
+    }
+    
+    public void apagar() {
+        encendido = false;
+        System.out.println(nombre + " apagado.");
+    }
+    
+    // Implementación parcial de la interfaz
+    @Override
+    public void pausar() {
+        if (encendido) {
+            System.out.println(nombre + " en pausa.");
+        } else {
+            System.out.println("El dispositivo está apagado.");
+        }
+    }
+    
+    @Override
+    public void detener() {
+        if (encendido) {
+            System.out.println(nombre + " detenido.");
+        } else {
+            System.out.println("El dispositivo está apagado.");
+        }
+    }
+    
+    // Método abstracto adicional
+    public abstract void mostrarInformacion();
+}
+
+// Interfaz adicional
+public interface Conectable {
+    void conectar();
+    void desconectar();
+    boolean estaConectado();
+}
+
+// Clase concreta que extiende la clase abstracta e implementa otra interfaz
+public class ReproductorMP3 extends DispositivoMultimedia implements Conectable {
+    private boolean conectado;
+    private String[] canciones;
+    private int cancionActual;
+    
+    public ReproductorMP3(String nombre, String[] canciones) {
+        super(nombre);
+        this.canciones = canciones;
+        this.cancionActual = 0;
+        this.conectado = false;
+    }
+    
+    // Implementación del método abstracto de DispositivoMultimedia
+    @Override
+    public void mostrarInformacion() {
+        System.out.println("Reproductor MP3: " + nombre);
+        System.out.println("Estado: " + (encendido ? "Encendido" : "Apagado"));
+        System.out.println("Conexión: " + (conectado ? "Conectado" : "Desconectado"));
+        System.out.println("Canciones disponibles: " + canciones.length);
+    }
+    
+    // Implementación del método restante de Reproducible
+    @Override
+    public void reproducir() {
+        if (encendido) {
+            System.out.println("Reproduciendo: " + canciones[cancionActual]);
+        } else {
+            System.out.println("El dispositivo está apagado.");
+        }
+    }
+    
+    // Implementación de los métodos de Conectable
+    @Override
+    public void conectar() {
+        conectado = true;
+        System.out.println(nombre + " conectado al sistema.");
+    }
+    
+    @Override
+    public void desconectar() {
+        conectado = false;
+        System.out.println(nombre + " desconectado del sistema.");
+    }
+    
+    @Override
+    public boolean estaConectado() {
+        return conectado;
+    }
+    
+    // Métodos adicionales específicos
+    public void siguienteCancion() {
+        if (encendido) {
+            cancionActual = (cancionActual + 1) % canciones.length;
+            System.out.println("Siguiente canción: " + canciones[cancionActual]);
+        } else {
+            System.out.println("El dispositivo está apagado.");
+        }
+    }
+    
+    public void cancionAnterior() {
+        if (encendido) {
+            cancionActual = (cancionActual - 1 + canciones.length) % canciones.length;
+            System.out.println("Canción anterior: " + canciones[cancionActual]);
+        } else {
+            System.out.println("El dispositivo está apagado.");
+        }
+    }
+}
+
+// Uso
+public class PruebaMultimedia {
+    public static void main(String[] args) {
+        String[] canciones = {"Canción 1", "Canción 2", "Canción 3", "Canción 4"};
+        ReproductorMP3 reproductor = new ReproductorMP3("Mi Reproductor", canciones);
+        
+        reproductor.encender();
+        reproductor.conectar();
+        reproductor.mostrarInformacion();
+        reproductor.reproducir();
+        reproductor.siguienteCancion();
+        reproductor.reproducir();
+        reproductor.pausar();
+        reproductor.siguienteCancion();
+        reproductor.reproducir();
+        reproductor.detener();
+        reproductor.desconectar();
+        reproductor.apagar();
+    }
+}`} lang="java" />

@@ -1,0 +1,817 @@
+---
+title: 9. Migraciones y Base de Datos en Laravel
+description: Aprende a crear migraciones, seeders, factories y trabajar con bases de datos en Laravel
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Introducción
+
+Laravel proporciona un conjunto robusto de herramientas para trabajar con bases de datos, facilitando tareas como la creación de esquemas, la inserción de datos de prueba y la consulta de información. En esta guía, exploraremos las principales características que Laravel ofrece para gestionar bases de datos de manera eficiente.
+
+## Crear y ejecutar migraciones
+
+Las migraciones son como un sistema de control de versiones para tu base de datos, permitiéndote definir y modificar el esquema de la base de datos de forma programática y compartirlo con tu equipo.
+
+### Crear una migración
+
+Para crear una nueva migración, utiliza el comando Artisan `make:migration`:
+
+<Code code={`php artisan make:migration create_users_table`} lang="bash" />
+
+Este comando generará un archivo de migración en el directorio `database/migrations` con un prefijo de fecha y hora para mantener el orden correcto de ejecución.
+
+Para crear una migración para una tabla existente:
+
+<Code code={`php artisan make:migration add_phone_to_users_table --table=users`} lang="bash" />
+
+Para crear una migración que cree una nueva tabla:
+
+<Code code={`php artisan make:migration create_products_table --create=products`} lang="bash" />
+
+### Estructura de una migración
+
+Una migración contiene dos métodos principales: `up()` para aplicar los cambios y `down()` para revertirlos.
+
+<Code code={`<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->decimal('price', 8, 2);
+            $table->integer('stock')->default(0);
+            $table->boolean('active')->default(true);
+            $table->foreignId('category_id')->constrained();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('products');
+    }
+};`} lang="php" />
+
+### Tipos de columnas comunes
+
+Laravel proporciona una amplia variedad de tipos de columnas que puedes utilizar en tus migraciones:
+
+<Code code={`// Tipos de columnas básicos
+$table->id();                     // BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY
+$table->bigInteger('votes');      // BIGINT
+$table->binary('data');           // BLOB
+$table->boolean('confirmed');     // BOOLEAN
+$table->char('code', 4);          // CHAR con longitud específica
+$table->date('created_date');     // DATE
+$table->dateTime('created_at');   // DATETIME
+$table->decimal('amount', 8, 2);  // DECIMAL con precisión y escala
+$table->double('amount', 8, 2);   // DOUBLE con precisión y escala
+$table->enum('level', ['easy', 'medium', 'hard']); // ENUM
+$table->float('amount', 8, 2);    // FLOAT con precisión y escala
+$table->integer('votes');         // INTEGER
+$table->json('options');          // JSON
+$table->jsonb('options');         // JSONB (solo PostgreSQL)
+$table->longText('description');  // LONGTEXT
+$table->mediumInteger('votes');   // MEDIUMINT
+$table->mediumText('description'); // MEDIUMTEXT
+$table->morphs('taggable');       // Crea columnas taggable_id y taggable_type
+$table->smallInteger('votes');    // SMALLINT
+$table->string('name', 100);      // VARCHAR con longitud opcional
+$table->text('description');      // TEXT
+$table->time('sunrise');          // TIME
+$table->timestamp('added_at');    // TIMESTAMP
+$table->timestamps();             // Crea columnas created_at y updated_at
+$table->tinyInteger('votes');     // TINYINT
+$table->tinyText('notes');        // TINYTEXT
+$table->unsignedBigInteger('votes'); // BIGINT UNSIGNED
+$table->unsignedInteger('votes'); // INTEGER UNSIGNED
+$table->uuid('id');               // UUID`} lang="php" />
+
+### Modificadores de columnas
+
+Puedes aplicar varios modificadores a las columnas:
+
+<Code code={`$table->string('email')->unique();       // Crea un índice único
+$table->integer('votes')->default(0);    // Establece un valor predeterminado
+$table->string('name')->nullable();      // Permite valores NULL
+$table->timestamp('created_at')->useCurrent(); // Usa CURRENT_TIMESTAMP
+$table->timestamp('updated_at')->useCurrentOnUpdate(); // Actualiza con CURRENT_TIMESTAMP
+$table->string('slug')->index();         // Crea un índice
+$table->text('description')->fulltext(); // Crea un índice de texto completo (MySQL/PostgreSQL)
+$table->integer('user_id')->unsigned();  // UNSIGNED (MySQL)
+$table->integer('votes')->comment('Número de votos'); // Agrega un comentario a la columna`} lang="php" />
+
+### Ejecutar migraciones
+
+Para ejecutar todas las migraciones pendientes:
+
+<Code code={`php artisan migrate`} lang="bash" />
+
+Para ejecutar migraciones en un entorno de producción sin confirmación:
+
+<Code code={`php artisan migrate --force`} lang="bash" />
+
+### Revertir migraciones
+
+Para revertir la última operación de migración:
+
+<Code code={`php artisan migrate:rollback`} lang="bash" />
+
+Para revertir un número específico de migraciones:
+
+<Code code={`php artisan migrate:rollback --step=5`} lang="bash" />
+
+Para revertir todas las migraciones:
+
+<Code code={`php artisan migrate:reset`} lang="bash" />
+
+### Refrescar migraciones
+
+Para revertir todas las migraciones y luego ejecutarlas de nuevo (útil durante el desarrollo):
+
+<Code code={`php artisan migrate:refresh`} lang="bash" />
+
+Para eliminar todas las tablas y ejecutar todas las migraciones:
+
+<Code code={`php artisan migrate:fresh`} lang="bash" />
+
+<Aside type="caution">
+  ¡Cuidado! Los comandos `migrate:refresh` y `migrate:fresh` eliminarán datos. Nunca los uses en un entorno de producción con datos reales.
+</Aside>
+
+### Estado de las migraciones
+
+Para ver el estado de las migraciones:
+
+<Code code={`php artisan migrate:status`} lang="bash" />
+
+## Seeders y factories
+
+Los seeders y factories te permiten poblar tu base de datos con datos de prueba, lo que es especialmente útil durante el desarrollo y las pruebas.
+
+### Seeders
+
+Los seeders son clases que te permiten insertar datos en tus tablas de manera programática.
+
+#### Crear un seeder
+
+<Code code={`php artisan make:seeder UserSeeder`} lang="bash" />
+
+Este comando generará una clase en el directorio `database/seeders`.
+
+#### Estructura de un seeder
+
+<Code code={`<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+
+class UserSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+        ]);
+        
+        User::create([
+            'name' => 'Regular User',
+            'email' => 'user@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'user',
+        ]);
+    }
+}`} lang="php" />
+
+#### Ejecutar seeders
+
+Para ejecutar todos los seeders:
+
+<Code code={`php artisan db:seed`} lang="bash" />
+
+Para ejecutar un seeder específico:
+
+<Code code={`php artisan db:seed --class=UserSeeder`} lang="bash" />
+
+Para ejecutar migraciones y seeders en un solo comando:
+
+<Code code={`php artisan migrate --seed`} lang="bash" />
+
+Para refrescar la base de datos y ejecutar seeders:
+
+<Code code={`php artisan migrate:refresh --seed`} lang="bash" />
+
+### Factories
+
+Las factories utilizan la biblioteca Faker para generar grandes cantidades de datos de prueba realistas.
+
+#### Crear una factory
+
+<Code code={`php artisan make:factory ProductFactory --model=Product`} lang="bash" />
+
+Este comando generará una clase en el directorio `database/factories`.
+
+#### Estructura de una factory
+
+<Code code={`<?php
+
+namespace Database\Factories;
+
+use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class ProductFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Product::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => $this->faker->words(3, true),
+            'description' => $this->faker->paragraph(),
+            'price' => $this->faker->randomFloat(2, 10, 1000),
+            'stock' => $this->faker->numberBetween(0, 100),
+            'active' => $this->faker->boolean(80), // 80% de probabilidad de ser true
+            'category_id' => Category::inRandomOrder()->first()->id,
+        ];
+    }
+    
+    /**
+     * Indicate that the product is featured.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    public function featured(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'featured' => true,
+                'price' => $this->faker->randomFloat(2, 100, 2000),
+            ];
+        });
+    }
+}`} lang="php" />
+
+#### Usar factories
+
+Puedes usar factories en tus seeders o directamente en pruebas:
+
+<Code code={`<?php
+
+namespace Database\Seeders;
+
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // Crear 10 usuarios
+        User::factory(10)->create();
+        
+        // Crear 5 usuarios administradores
+        User::factory(5)
+            ->state(['role' => 'admin'])
+            ->create();
+        
+        // Crear 20 productos
+        Product::factory(20)->create();
+        
+        // Crear 5 productos destacados
+        Product::factory(5)
+            ->featured()
+            ->create();
+            
+        // Crear productos para una categoría específica
+        Product::factory(3)
+            ->state(['category_id' => 1])
+            ->create();
+            
+        // Crear un usuario con productos relacionados
+        User::factory()
+            ->has(Product::factory()->count(3))
+            ->create();
+    }
+}`} lang="php" />
+
+### Faker
+
+Laravel utiliza la biblioteca Faker para generar datos aleatorios. Algunos ejemplos de métodos útiles:
+
+<Code code={`// Datos personales
+$faker->name();              // 'Dr. Zane Stroman'
+$faker->firstName();         // 'Maynard'
+$faker->lastName();          // 'Zulauf'
+$faker->email();             // 'king.alford@example.org'
+$faker->phoneNumber();       // '201-886-0269 x3767'
+$faker->address();           // '309 Wisoky Throughway Suite 360\nRodriguezburgh, SC 04892'
+$faker->city();              // 'West Judge'
+$faker->country();           // 'Falkland Islands (Malvinas)'
+$faker->postcode();          // '17916'
+
+// Texto
+$faker->word();              // 'aut'
+$faker->words(3, true);      // 'labore molestiae distinctio'
+$faker->sentence();          // 'Sit vitae voluptas sint non voluptates.'
+$faker->paragraph();         // 'Voluptatem aliquam expedita...'
+
+// Fechas
+$faker->date();              // '1979-06-09'
+$faker->time();              // '20:49:42'
+$faker->dateTime();          // DateTime object
+$faker->dateTimeBetween('-2 years', '+1 month'); // DateTime entre dos fechas
+
+// Números
+$faker->randomDigit();       // 7
+$faker->numberBetween(10, 99); // 84
+$faker->randomFloat(2, 0, 100); // 79.32
+
+// Internet
+$faker->url();               // 'http://www.kemmer.com/'
+$faker->ipv4();              // '109.133.32.252'
+$faker->userAgent();         // 'Mozilla/5.0...'
+$faker->image();             // 'https://via.placeholder.com/640x480.png/00ff77?text=animals+omnis'
+
+// Otros
+$faker->boolean();           // true o false
+$faker->uuid();              // '7fab8389-...'
+$faker->randomElement(['a', 'b', 'c']); // 'b'
+$faker->shuffleArray(['a', 'b', 'c']);  // ['c', 'a', 'b']
+$faker->hexColor();          // '#fa3cc2'`} lang="php" />
+
+
+## Query Builder vs Eloquent
+
+Laravel ofrece dos formas principales de interactuar con la base de datos: Query Builder y Eloquent ORM. Cada uno tiene sus ventajas y casos de uso ideales.
+
+### Query Builder
+
+El Query Builder proporciona una interfaz fluida para crear y ejecutar consultas de base de datos sin necesidad de escribir SQL directamente.
+
+#### Consultas básicas
+
+<Code code={`// Seleccionar todos los registros
+$users = DB::table('users')->get();
+
+// Seleccionar columnas específicas
+$names = DB::table('users')->select('name', 'email')->get();
+
+// Seleccionar un solo registro
+$user = DB::table('users')->where('id', 1)->first();
+
+// Seleccionar un solo valor
+$email = DB::table('users')->where('id', 1)->value('email');
+
+// Contar registros
+$count = DB::table('users')->count();
+
+// Valores máximos, mínimos y promedio
+$max = DB::table('orders')->max('price');
+$min = DB::table('orders')->min('price');
+$avg = DB::table('orders')->avg('price');`} lang="php" />
+
+#### Cláusulas where
+
+<Code code={`// Where básico
+$users = DB::table('users')->where('votes', '=', 100)->get();
+$users = DB::table('users')->where('votes', 100)->get(); // Igual que el anterior
+
+// Operadores de comparación
+$users = DB::table('users')->where('votes', '>=', 100)->get();
+$users = DB::table('users')->where('name', 'like', 'T%')->get();
+
+// Where con múltiples condiciones
+$users = DB::table('users')
+            ->where('status', 'active')
+            ->where('subscribed', true)
+            ->get();
+            
+// Where con OR
+$users = DB::table('users')
+            ->where('votes', '>', 100)
+            ->orWhere('name', 'John')
+            ->get();
+            
+// Where con agrupación
+$users = DB::table('users')
+            ->where('name', 'John')
+            ->orWhere(function($query) {
+                $query->where('votes', '>', 100)
+                      ->where('title', 'Admin');
+            })
+            ->get();
+            
+// WhereIn, WhereNotIn
+$users = DB::table('users')
+            ->whereIn('id', [1, 2, 3])
+            ->get();
+            
+// WhereNull, WhereNotNull
+$users = DB::table('users')
+            ->whereNull('updated_at')
+            ->get();
+            
+// WhereBetween
+$users = DB::table('users')
+            ->whereBetween('votes', [1, 100])
+            ->get();`} lang="php" />
+
+#### Ordenar, agrupar y limitar
+
+<Code code={`// Ordenar resultados
+$users = DB::table('users')
+            ->orderBy('name', 'desc')
+            ->get();
+            
+// Ordenar por múltiples columnas
+$users = DB::table('users')
+            ->orderBy('name', 'desc')
+            ->orderBy('email', 'asc')
+            ->get();
+            
+// Ordenar aleatoriamente
+$randomUser = DB::table('users')
+                ->inRandomOrder()
+                ->first();
+                
+// Agrupar resultados
+$users = DB::table('users')
+            ->groupBy('account_id')
+            ->having('account_id', '>', 100)
+            ->get();
+            
+// Limitar resultados
+$users = DB::table('users')
+            ->offset(10)
+            ->limit(5)
+            ->get();`} lang="php" />
+
+#### Joins
+
+<Code code={`// Inner join
+$users = DB::table('users')
+            ->join('contacts', 'users.id', '=', 'contacts.user_id')
+            ->select('users.*', 'contacts.phone')
+            ->get();
+            
+// Left join
+$users = DB::table('users')
+            ->leftJoin('posts', 'users.id', '=', 'posts.user_id')
+            ->get();
+            
+// Right join
+$users = DB::table('users')
+            ->rightJoin('posts', 'users.id', '=', 'posts.user_id')
+            ->get();
+            
+// Cross join
+$users = DB::table('sizes')
+            ->crossJoin('colors')
+            ->get();`} lang="php" />
+
+#### Insertar, actualizar y eliminar
+
+<Code code={`// Insertar un registro
+DB::table('users')->insert([
+    'name' => 'John',
+    'email' => 'john@example.com',
+]);
+
+// Insertar múltiples registros
+DB::table('users')->insert([
+    ['name' => 'John', 'email' => 'john@example.com'],
+    ['name' => 'Jane', 'email' => 'jane@example.com']
+]);
+
+// Insertar y obtener ID
+$id = DB::table('users')->insertGetId(
+    ['name' => 'John', 'email' => 'john@example.com']
+);
+
+// Actualizar registros
+DB::table('users')
+    ->where('id', 1)
+    ->update(['votes' => 10]);
+    
+// Incrementar/decrementar valores
+DB::table('users')->increment('votes');
+DB::table('users')->increment('votes', 5);
+DB::table('users')->decrement('votes');
+DB::table('users')->decrement('votes', 5);
+
+// Eliminar registros
+DB::table('users')->delete();
+DB::table('users')->where('votes', '>', 100)->delete();
+
+// Truncar tabla (eliminar todos los registros)
+DB::table('users')->truncate();`} lang="php" />
+
+#### Transacciones
+
+<Code code={`DB::transaction(function () {
+    DB::table('users')->update(['votes' => 1]);
+    DB::table('posts')->delete();
+});
+
+// Manejo manual de transacciones
+try {
+    DB::beginTransaction();
+    
+    DB::table('users')->update(['votes' => 1]);
+    DB::table('posts')->delete();
+    
+    DB::commit();
+} catch (\Exception $e) {
+    DB::rollBack();
+    
+    throw $e;
+}`} lang="php" />
+
+### Eloquent ORM
+
+Eloquent es el ORM (Object-Relational Mapping) de Laravel que permite interactuar con la base de datos a través de modelos elegantes y expresivos.
+
+<Aside type="note">
+  Para una guía completa sobre Eloquent, consulta la sección específica de Eloquent en esta documentación.
+</Aside>
+
+#### Consultas básicas con Eloquent
+
+<Code code={`// Obtener todos los registros
+$users = User::all();
+
+// Filtrar registros
+$activeUsers = User::where('active', true)->get();
+
+// Ordenar registros
+$users = User::orderBy('name')->get();
+
+// Limitar resultados
+$users = User::take(10)->get();
+
+// Encontrar por ID
+$user = User::find(1);
+
+// Encontrar por ID o fallar
+$user = User::findOrFail(1); // Lanza una excepción si no se encuentra
+
+// Obtener el primer registro
+$user = User::where('active', true)->first();
+
+// Contar registros
+$count = User::where('active', true)->count();`} lang="php" />
+
+#### Crear, actualizar y eliminar con Eloquent
+
+<Code code={`// Crear un nuevo registro
+$user = new User;
+$user->name = 'John';
+$user->email = 'john@example.com';
+$user->save();
+
+// Crear con asignación masiva
+$user = User::create([
+    'name' => 'John',
+    'email' => 'john@example.com',
+]);
+
+// Actualizar un registro existente
+$user = User::find(1);
+$user->name = 'Jane';
+$user->save();
+
+// Actualizar con asignación masiva
+$user->update([
+    'name' => 'Jane',
+    'email' => 'jane@example.com',
+]);
+
+// Eliminar un registro
+$user = User::find(1);
+$user->delete();
+
+// Eliminar por ID
+User::destroy(1);
+User::destroy([1, 2, 3]);
+
+// Eliminar por consulta
+User::where('active', false)->delete();`} lang="php" />
+
+#### Relaciones con Eloquent
+
+<Code code={`// Obtener registros relacionados
+$posts = User::find(1)->posts;
+
+// Cargar relaciones
+$user = User::with('posts')->find(1);
+
+// Filtrar por relaciones
+$users = User::has('posts')->get();
+$users = User::has('posts', '>=', 3)->get();
+$users = User::whereHas('posts', function ($query) {
+    $query->where('active', true);
+})->get();
+
+// Contar relaciones
+$users = User::withCount('posts')->get();
+foreach ($users as $user) {
+    echo $user->name . ' has ' . $user->posts_count . ' posts.';
+}`} lang="php" />
+
+### Comparación: Query Builder vs Eloquent
+
+<Tabs>
+  <TabItem label="Query Builder">
+    **Ventajas:**
+    - Mejor rendimiento en consultas complejas o con grandes conjuntos de datos
+    - Control más preciso sobre las consultas SQL generadas
+    - No requiere definir modelos
+    - Ideal para consultas simples o de una sola vez
+    
+    **Desventajas:**
+    - No proporciona características como relaciones, eventos o mutadores
+    - Código menos expresivo y más verboso para operaciones complejas
+    - No tiene sistema de caché integrado
+  </TabItem>
+  <TabItem label="Eloquent">
+    **Ventajas:**
+    - API más expresiva y orientada a objetos
+    - Soporte para relaciones complejas entre modelos
+    - Eventos y observadores para hooks del ciclo de vida
+    - Mutadores y accesores para transformar datos
+    - Caché de consultas integrado
+    - Soporte para soft deletes, casting de atributos, etc.
+    
+    **Desventajas:**
+    - Ligera sobrecarga de rendimiento comparado con Query Builder
+    - Puede ser excesivo para consultas muy simples
+    - Curva de aprendizaje más pronunciada
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  En la práctica, muchos desarrolladores utilizan ambos enfoques según el caso de uso. Eloquent para la mayoría de las operaciones CRUD y relaciones, y Query Builder para consultas complejas o de alto rendimiento.
+</Aside>
+
+## Tinker: REPL de Laravel
+
+Tinker es una poderosa herramienta de consola REPL (Read-Eval-Print Loop) que te permite interactuar con tu aplicación Laravel directamente desde la línea de comandos. Es extremadamente útil para probar código, depurar, manipular datos y explorar tu aplicación sin necesidad de crear controladores o vistas.
+
+### Iniciar Tinker
+
+Para iniciar Tinker, simplemente ejecuta:
+
+<Code code={`php artisan tinker`} lang="bash" />
+
+Esto te dará acceso a un shell interactivo donde puedes ejecutar código PHP con acceso completo a tu aplicación Laravel.
+
+### Ejemplos de uso de Tinker
+
+#### Trabajar con modelos
+
+<Code code={`// Crear un nuevo usuario
+$user = new App\Models\User;
+$user->name = 'John Doe';
+$user->email = 'john@example.com';
+$user->password = Hash::make('password');
+$user->save();
+
+// Consultar usuarios
+App\Models\User::all();
+App\Models\User::where('email', 'john@example.com')->first();
+
+// Actualizar un registro
+$user = App\Models\User::find(1);
+$user->name = 'Jane Doe';
+$user->save();
+
+// Eliminar un registro
+App\Models\User::find(2)->delete();`} lang="php" />
+
+#### Trabajar con relaciones
+
+<Code code={`// Obtener posts de un usuario
+$user = App\Models\User::find(1);
+$user->posts;
+
+// Crear un post para un usuario
+$post = new App\Models\Post(['title' => 'Mi primer post', 'content' => 'Contenido del post']);
+$user->posts()->save($post);`} lang="php" />
+
+#### Usar Query Builder
+
+<Code code={`// Consultas con Query Builder
+DB::table('users')->where('active', true)->get();
+DB::table('posts')->count();`} lang="php" />
+
+#### Probar helpers y funciones
+
+<Code code={`// Helpers de Laravel
+str('Hello World')->upper();
+now()->addDays(5);
+collect([1, 2, 3])->sum();
+
+// Probar eventos
+event(new App\Events\UserRegistered($user));`} lang="php" />
+
+#### Importar clases
+
+Tinker importa automáticamente muchas clases comunes, pero puedes importar clases adicionales con:
+
+<Code code={`use App\Models\Product;
+use Carbon\Carbon;
+
+// Ahora puedes usar estas clases directamente
+$product = Product::find(1);
+$date = Carbon::now();`} lang="php" />
+
+### Comandos útiles en Tinker
+
+<Code code={`// Limpiar la pantalla
+clear
+
+// Salir de Tinker
+exit
+
+// Ver la documentación de una clase (requiere psysh)
+help(App\Models\User::class)
+
+// Ver el código fuente (requiere psysh)
+show(App\Models\User::class)`} lang="bash" />
+
+### Consejos para Tinker
+
+<Aside type="tip">
+  - Usa la tecla de flecha hacia arriba para acceder al historial de comandos.
+  - Tinker tiene autocompletado: presiona Tab para ver las opciones disponibles.
+  - Puedes definir funciones y variables que persisten durante toda la sesión.
+  - Usa `dump()` en lugar de `dd()` para evitar salir de Tinker.
+</Aside>
+
+### Tinker en producción
+
+<Aside type="caution">
+  Ten cuidado al usar Tinker en entornos de producción. Cualquier cambio que hagas afectará a tu base de datos real. Considera usar el flag `--read-only` para evitar modificaciones accidentales:
+  
+  ```bash
+  php artisan tinker --read-only
+  ```
+</Aside>
+
+## Conclusión
+
+Laravel ofrece un conjunto completo de herramientas para trabajar con bases de datos, desde migraciones para gestionar la estructura, seeders y factories para poblar con datos de prueba, hasta Query Builder y Eloquent para interactuar con los datos. Estas herramientas te permiten construir aplicaciones robustas con un código limpio y mantenible.
+
+Al dominar estos conceptos, podrás:
+
+- Mantener un historial de cambios en la estructura de tu base de datos
+- Sincronizar esquemas entre diferentes entornos de desarrollo
+- Generar datos de prueba realistas y consistentes
+- Interactuar con la base de datos de forma segura y eficiente
+- Modelar relaciones complejas entre entidades
+- Probar rápidamente ideas y consultas con Tinker
+
+Recuerda siempre seguir las mejores prácticas al trabajar con bases de datos, como usar migraciones para todos los cambios de esquema, mantener tus seeders actualizados, y elegir entre Query Builder y Eloquent según las necesidades específicas de cada caso.

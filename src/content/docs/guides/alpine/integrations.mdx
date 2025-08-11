@@ -1,0 +1,64 @@
+---
+title: Integración con otras librerías
+description: Cómo integrar Alpine.js con otras librerías y frameworks.
+---
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+
+# Integración con otras librerías
+
+Alpine.js puede convivir fácilmente con otras librerías como Tailwind CSS, Laravel, y más.
+
+## Integración con Tailwind CSS
+
+Alpine.js y Tailwind CSS funcionan perfectamente juntos. Usa las utilidades de Tailwind para estilos y Alpine para la lógica:
+<Code code={`<button x-data="{ activo: false }" @click="activo = !activo" :class="activo ? 'bg-blue-500 text-white' : 'bg-gray-200'">
+  Cambiar color
+</button>`} lang="html" title="Alpine.js + Tailwind CSS" />
+
+## Integración con Laravel Blade
+
+Puedes usar Alpine.js en vistas Blade de Laravel para agregar interactividad sin JavaScript adicional:
+<Code code={`<!-- resources/views/welcome.blade.php -->
+<div x-data="{ abierto: false }">
+  <button @click="abierto = !abierto">Abrir/Cerrar</button>
+  <div x-show="abierto">Contenido dinámico</div>
+</div>`} lang="html" title="Alpine.js en Blade" />
+
+## Integración con Livewire
+
+Alpine.js y Livewire se complementan para crear interfaces reactivas en Laravel. Livewire actualiza el DOM y Alpine mantiene la reactividad local:
+<Code code={`<div x-data="{ abierto: @entangle('abierto') }">
+  <button @click="abierto = !abierto">Abrir/Cerrar</button>
+  <div x-show="abierto">Contenido Livewire + Alpine</div>
+</div>`} lang="html" title="Alpine.js + Livewire" />
+
+## Integración con frameworks de UI (ejemplo: Bootstrap)
+
+Puedes usar Alpine.js para controlar componentes de Bootstrap sin depender de jQuery:
+<Code code={`<button x-data="{ show: false }" @click="show = !show" class="btn btn-primary">
+  Mostrar alerta
+</button>
+<div x-show="show" class="alert alert-success mt-2">
+  ¡Alerta con Alpine y Bootstrap!
+</div>`} lang="html" title="Alpine.js + Bootstrap" />
+
+## Integración con librerías de animación (ejemplo: AOS)
+
+Puedes combinar Alpine.js con librerías como AOS (Animate On Scroll):
+<Code code={`<div x-data aos-init aos-animate data-aos="fade-up">
+  Elemento animado al hacer scroll
+</div>`} lang="html" title="Alpine.js + AOS" />
+
+## Buenas prácticas de integración
+
+- Usa <code>x-ignore</code> para evitar conflictos con otros frameworks.
+- Inicializa Alpine después de cargar otras librerías si modifican el DOM.
+- Aprovecha los hooks de Alpine para coordinar con otras herramientas.
+
+<Aside type="tip">
+Consulta la <a href="https://alpinejs.dev" target="_blank">documentación oficial</a> para más ejemplos de integración con otras tecnologías.
+</Aside>

@@ -1,0 +1,339 @@
+---
+title: 1. Introducción a SQL
+description: Aprende los fundamentos de SQL, diferencias entre motores y configuración inicial
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## 1.1. ¿Qué es SQL?
+
+SQL (Structured Query Language) es un lenguaje estándar para almacenar, manipular y recuperar datos en bases de datos relacionales. A diferencia de otros lenguajes de programación, SQL es un lenguaje declarativo, lo que significa que especificas qué datos quieres obtener en lugar de cómo obtenerlos.
+
+### Características principales
+
+- **Estandarizado**: SQL es un estándar ANSI/ISO, aunque cada motor de base de datos puede tener sus propias extensiones.
+- **Declarativo**: Describes qué datos quieres, no cómo obtenerlos.
+- **No sensible a mayúsculas/minúsculas** para palabras clave (SELECT = select), pero puede serlo para nombres de objetos según la configuración.
+- **Versátil**: Permite definir, consultar, manipular y controlar datos.
+
+### Historia y evolución
+
+- **1970**: Edgar F. Codd propone el modelo relacional.
+- **1974**: IBM desarrolla SEQUEL (Structured English Query Language).
+- **1979**: Oracle lanza la primera implementación comercial de SQL.
+- **1986**: ANSI publica el primer estándar SQL.
+- **1992**: SQL-92, una revisión importante del estándar.
+- **1999**: SQL:1999 introduce características orientadas a objetos.
+- **2003-2016**: Actualizaciones posteriores (SQL:2003, SQL:2008, SQL:2011, SQL:2016) añaden XML, funciones analíticas, expresiones regulares, etc.
+
+### Componentes principales de SQL
+
+SQL se divide en varios sublenguajes:
+
+<Tabs>
+  <TabItem label="DDL">
+    **Data Definition Language**: Define la estructura de la base de datos.
+    
+    Comandos principales: `CREATE`, `ALTER`, `DROP`, `TRUNCATE`
+    
+    Ejemplo:
+    ```sql
+    CREATE TABLE empleados (
+        id INT PRIMARY KEY,
+        nombre VARCHAR(50),
+        salario DECIMAL(10,2)
+    );
+    ```
+  </TabItem>
+  <TabItem label="DML">
+    **Data Manipulation Language**: Manipula los datos almacenados.
+    
+    Comandos principales: `SELECT`, `INSERT`, `UPDATE`, `DELETE`
+    
+    Ejemplo:
+    ```sql
+    SELECT nombre, salario 
+    FROM empleados 
+    WHERE salario > 50000;
+    ```
+  </TabItem>
+  <TabItem label="DCL">
+    **Data Control Language**: Controla los permisos y accesos.
+    
+    Comandos principales: `GRANT`, `REVOKE`
+    
+    Ejemplo:
+    ```sql
+    GRANT SELECT, INSERT ON empleados TO usuario_rh;
+    ```
+  </TabItem>
+  <TabItem label="TCL">
+    **Transaction Control Language**: Gestiona las transacciones.
+    
+    Comandos principales: `COMMIT`, `ROLLBACK`, `SAVEPOINT`
+    
+    Ejemplo:
+    ```sql
+    BEGIN TRANSACTION;
+    UPDATE cuentas SET saldo = saldo - 1000 WHERE id = 1;
+    UPDATE cuentas SET saldo = saldo + 1000 WHERE id = 2;
+    COMMIT;
+    ```
+  </TabItem>
+</Tabs>
+
+## 1.2. Diferencias entre MySQL, Oracle y otros motores
+
+<Tabs>
+  <TabItem label="MySQL">
+    - **Licencia**: Código abierto (Community Edition) y comercial (Enterprise Edition)
+    - **Rendimiento**: Excelente para aplicaciones web y operaciones de lectura
+    - **Sintaxis**: Más simple y flexible
+    - **Plataformas**: Multiplataforma (Windows, Linux, macOS)
+    - **Características distintivas**: Fácil de usar, ideal para aplicaciones web
+    - **Limitaciones**: Menos funcionalidades avanzadas que Oracle
+    - **Casos de uso**: Aplicaciones web, blogs, CMS, e-commerce
+  </TabItem>
+  <TabItem label="Oracle">
+    - **Licencia**: Comercial (con versión Express gratuita limitada)
+    - **Rendimiento**: Superior para grandes volúmenes de datos y transacciones complejas
+    - **Sintaxis**: Más estricta, con extensiones PL/SQL potentes
+    - **Plataformas**: Multiplataforma con optimizaciones específicas
+    - **Características distintivas**: Alta escalabilidad, seguridad robusta, PL/SQL avanzado
+    - **Limitaciones**: Costo elevado, curva de aprendizaje más pronunciada
+    - **Casos de uso**: Grandes empresas, sistemas bancarios, ERP, aplicaciones críticas
+  </TabItem>
+  <TabItem label="SQL Server">
+    - **Licencia**: Comercial (Microsoft) con versión Express gratuita
+    - **Rendimiento**: Bueno para entornos empresariales Windows
+    - **Sintaxis**: T-SQL (Transact-SQL)
+    - **Plataformas**: Principalmente Windows (versiones recientes para Linux)
+    - **Características distintivas**: Integración con productos Microsoft, herramientas de BI
+    - **Limitaciones**: Mejor rendimiento en entornos Windows
+    - **Casos de uso**: Empresas con ecosistema Microsoft, aplicaciones .NET
+  </TabItem>
+  <TabItem label="PostgreSQL">
+    - **Licencia**: Código abierto
+    - **Rendimiento**: Excelente para operaciones complejas y datos estructurados
+    - **Sintaxis**: Estándar SQL con extensiones
+    - **Plataformas**: Multiplataforma
+    - **Características distintivas**: Altamente extensible, soporte para JSON, tipos de datos personalizados
+    - **Limitaciones**: Configuración inicial más compleja que MySQL
+    - **Casos de uso**: Aplicaciones geoespaciales, sistemas analíticos, startups
+  </TabItem>
+</Tabs>
+
+### Comparativa de características
+
+| Característica | MySQL | Oracle | SQL Server | PostgreSQL |
+|---------------|-------|--------|------------|------------|
+| Tipos de datos JSON | Sí (5.7+) | Sí | Sí | Sí |
+| Procedimientos almacenados | Sí | Sí (PL/SQL) | Sí (T-SQL) | Sí (PL/pgSQL) |
+| Particionamiento | Sí | Sí (avanzado) | Sí | Sí |
+| Replicación | Maestro-esclavo | Avanzada | Avanzada | Lógica/Streaming |
+| Índices espaciales | Sí | Sí | Sí | Sí (PostGIS) |
+| Vistas materializadas | No (solo vistas) | Sí | Sí | Sí |
+| Soporte para XML | Limitado | Completo | Completo | Sí |
+
+<Aside type="note">
+  La elección del motor de base de datos debe basarse en los requisitos específicos del proyecto, presupuesto, experiencia del equipo y escalabilidad necesaria.
+</Aside>
+
+## 1.3. Instalación y configuración (MySQL Workbench, Oracle SQL Developer)
+
+<Tabs>
+  <TabItem label="MySQL Workbench">
+    <Steps>
+      1. Descarga MySQL Workbench y MySQL Server desde [mysql.com](https://dev.mysql.com/downloads/)
+      2. Ejecuta el instalador de MySQL Server
+         - Selecciona "Developer Default" para una instalación típica
+         - Configura la contraseña del usuario root
+         - Completa la instalación con las opciones predeterminadas
+      3. Instala MySQL Workbench
+      4. Abre MySQL Workbench y conecta con tu servidor local
+    </Steps>
+
+    ### Configuración recomendada
+
+    ```ini
+    # Configuración básica de rendimiento para MySQL (my.ini o my.cnf)
+    [mysqld]
+    # Tamaño del buffer de consultas
+    query_cache_size = 64M
+    # Tamaño del buffer de InnoDB
+    innodb_buffer_pool_size = 1G
+    # Tamaño máximo de conexiones
+    max_connections = 200
+    # Conjunto de caracteres por defecto
+    character-set-server = utf8mb4
+    collation-server = utf8mb4_unicode_ci
+    ```
+
+    <Aside type="tip">
+      MySQL Workbench proporciona una interfaz gráfica completa para administración, diseño, desarrollo y mantenimiento de bases de datos MySQL.
+    </Aside>
+  </TabItem>
+  <TabItem label="Oracle SQL Developer">
+    <Steps>
+      1. Descarga Oracle Database XE (Express Edition) desde [oracle.com](https://www.oracle.com/database/technologies/xe-downloads.html)
+      2. Instala Oracle Database XE
+         - Sigue el asistente de instalación
+         - Configura la contraseña para los usuarios SYS y SYSTEM
+      3. Descarga e instala SQL Developer desde [oracle.com](https://www.oracle.com/database/technologies/appdev/sqldeveloper-landing.html)
+      4. Abre SQL Developer y crea una nueva conexión:
+         - Nombre: Conexión local
+         - Usuario: SYSTEM
+         - Contraseña: La que configuraste durante la instalación
+         - Nombre del host: localhost
+         - Puerto: 1521
+         - SID/Servicio: XE (o XEPDB1 para versiones más recientes)
+    </Steps>
+
+    ### Configuración recomendada
+
+    ```sql
+    -- Configuración básica para Oracle Database
+    -- Aumentar el tamaño de los procesos
+    ALTER SYSTEM SET processes=300 SCOPE=SPFILE;
+    
+    -- Configurar el conjunto de caracteres
+    ALTER SYSTEM SET NLS_CHARACTERSET=AL32UTF8 SCOPE=SPFILE;
+    
+    -- Configurar la zona horaria
+    ALTER SYSTEM SET timezone_region='America/Mexico_City' SCOPE=SPFILE;
+    
+    -- Reiniciar la base de datos para aplicar cambios
+    SHUTDOWN IMMEDIATE;
+    STARTUP;
+    ```
+
+    <Aside type="tip">
+      Oracle SQL Developer es una herramienta gráfica gratuita que simplifica el desarrollo y gestión de bases de datos Oracle.
+    </Aside>
+  </TabItem>
+</Tabs>
+
+## 1.4. Conexión y ejecución de consultas en ambos motores
+
+### Conexión a MySQL
+
+```sql
+-- Desde línea de comandos
+mysql -u root -p
+
+-- Desde código (ejemplo en PHP)
+$conexion = new mysqli('localhost', 'usuario', 'contraseña', 'basedatos');
+
+-- Desde código (ejemplo en Python con pymysql)
+import pymysql
+conn = pymysql.connect(
+    host='localhost',
+    user='usuario',
+    password='contraseña',
+    database='basedatos'
+)
+```
+
+### Conexión a Oracle
+
+```sql
+-- Desde línea de comandos (SQLPlus)
+sqlplus usuario/contraseña@//localhost:1521/XE
+
+-- Desde código (ejemplo en Java con JDBC)
+Connection conn = DriverManager.getConnection(
+    "jdbc:oracle:thin:@localhost:1521:XE", "usuario", "contraseña");
+
+-- Desde código (ejemplo en Python con cx_Oracle)
+import cx_Oracle
+conn = cx_Oracle.connect(
+    "usuario/contraseña@localhost:1521/XE"
+)
+```
+
+### Ejecutando tu primera consulta
+
+<Tabs>
+  <TabItem label="MySQL">
+    ```sql
+    -- Crear una base de datos
+    CREATE DATABASE miprimerabd;
+    
+    -- Usar la base de datos
+    USE miprimerabd;
+    
+    -- Crear una tabla
+    CREATE TABLE usuarios (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nombre VARCHAR(50) NOT NULL,
+        email VARCHAR(100) UNIQUE,
+        fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    
+    -- Insertar datos
+    INSERT INTO usuarios (nombre, email) VALUES ('Ana López', 'ana@ejemplo.com');
+    INSERT INTO usuarios (nombre, email) VALUES ('Carlos Gómez', 'carlos@ejemplo.com');
+    
+    -- Consultar datos
+    SELECT * FROM usuarios;
+    
+    -- Consulta con filtro
+    SELECT nombre, email FROM usuarios WHERE nombre LIKE 'Ana%';
+    ```
+  </TabItem>
+  <TabItem label="Oracle">
+    ```sql
+    -- Conectarse como usuario con privilegios
+    -- Ya deberías estar conectado con SQL Developer o SQLPlus
+    
+    -- Crear un usuario/esquema (equivalente a base de datos en MySQL)
+    CREATE USER miprimerabd IDENTIFIED BY contraseña;
+    GRANT CONNECT, RESOURCE TO miprimerabd;
+    ALTER USER miprimerabd QUOTA UNLIMITED ON USERS;
+    
+    -- Conectarse al nuevo esquema
+    -- En SQL Developer: crear nueva conexión con el usuario miprimerabd
+    
+    -- Crear una tabla
+    CREATE TABLE usuarios (
+        id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+        nombre VARCHAR2(50) NOT NULL,
+        email VARCHAR2(100) CONSTRAINT email_unico UNIQUE,
+        fecha_registro TIMESTAMP DEFAULT SYSTIMESTAMP
+    );
+    
+    -- Insertar datos
+    INSERT INTO usuarios (nombre, email) VALUES ('Ana López', 'ana@ejemplo.com');
+    INSERT INTO usuarios (nombre, email) VALUES ('Carlos Gómez', 'carlos@ejemplo.com');
+    
+    -- Confirmar cambios (necesario en Oracle)
+    COMMIT;
+    
+    -- Consultar datos
+    SELECT * FROM usuarios;
+    
+    -- Consulta con filtro
+    SELECT nombre, email FROM usuarios WHERE nombre LIKE 'Ana%';
+    ```
+  </TabItem>
+</Tabs>
+
+### Diferencias en la sintaxis de consultas
+
+| Operación | MySQL | Oracle |
+|-----------|-------|--------|
+| Limitar resultados | `LIMIT 10` | `FETCH FIRST 10 ROWS ONLY` |
+| Paginación | `LIMIT 10 OFFSET 20` | `OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY` |
+| Fecha actual | `NOW()`, `CURRENT_TIMESTAMP` | `SYSDATE`, `SYSTIMESTAMP` |
+| Concatenación | `CONCAT(a, b)` o `a || b` | `a || b` |
+| Subcadena | `SUBSTRING(str, pos, len)` | `SUBSTR(str, pos, len)` |
+| Autoincremento | `AUTO_INCREMENT` | `GENERATED ALWAYS AS IDENTITY` |
+| Formato de fecha | `DATE_FORMAT(fecha, '%Y-%m-%d')` | `TO_CHAR(fecha, 'YYYY-MM-DD')` |
+
+<Aside type="caution">
+  Recuerda siempre usar contraseñas seguras para tus bases de datos y nunca compartir credenciales de producción. Considera utilizar variables de entorno o archivos de configuración seguros para almacenar credenciales en aplicaciones reales.
+</Aside>

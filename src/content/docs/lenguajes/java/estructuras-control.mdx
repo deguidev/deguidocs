@@ -1,0 +1,557 @@
+---
+title: 5. Estructuras de Control
+description: Aprende sobre sentencias condicionales, bucles y control de flujo en Java
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Estructuras de Control
+
+Las estructuras de control son fundamentales en cualquier lenguaje de programación, ya que permiten controlar el flujo de ejecución de un programa. En Java, estas estructuras se dividen principalmente en tres categorías: sentencias condicionales, bucles y control de flujo.
+
+## 3.1 Sentencias condicionales (if, else, switch)
+
+Las sentencias condicionales permiten ejecutar diferentes bloques de código dependiendo de si una condición se cumple o no.
+
+### Sentencia if-else
+
+La sentencia `if-else` es la estructura condicional más básica en Java. Permite ejecutar un bloque de código si una condición es verdadera, y opcionalmente otro bloque si la condición es falsa.
+
+#### Sintaxis básica
+
+<Code code={`if (condicion) {
+    // Código a ejecutar si la condición es verdadera
+} else {
+    // Código a ejecutar si la condición es falsa
+}`} lang="java" />
+
+#### Ejemplo simple
+
+<Code code={`int edad = 18;
+
+if (edad >= 18) {
+    System.out.println("Eres mayor de edad");
+} else {
+    System.out.println("Eres menor de edad");
+}`} lang="java" />
+
+#### if-else-if
+
+Para evaluar múltiples condiciones en secuencia, se utiliza la estructura `if-else-if`:
+
+<Code code={`int calificacion = 85;
+
+if (calificacion >= 90) {
+    System.out.println("Sobresaliente");
+} else if (calificacion >= 80) {
+    System.out.println("Notable");
+} else if (calificacion >= 70) {
+    System.out.println("Bien");
+} else if (calificacion >= 60) {
+    System.out.println("Suficiente");
+} else {
+    System.out.println("Insuficiente");
+}`} lang="java" />
+
+<Aside type="tip">
+  En una cadena `if-else-if`, las condiciones se evalúan en orden. Una vez que se encuentra una condición verdadera, se ejecuta su bloque de código y se omiten las demás condiciones.
+</Aside>
+
+#### Operador ternario
+
+El operador ternario es una forma abreviada de escribir una sentencia `if-else` simple:
+
+<Code code={`// Sintaxis: condicion ? valorSiVerdadero : valorSiFalso
+
+int edad = 20;
+String mensaje = (edad >= 18) ? "Mayor de edad" : "Menor de edad";
+System.out.println(mensaje); // Imprime: Mayor de edad`} lang="java" />
+
+<Aside type="caution">
+  Aunque el operador ternario puede hacer el código más conciso, su uso excesivo o anidado puede reducir la legibilidad. Utilízalo solo para casos simples.
+</Aside>
+
+### Sentencia switch
+
+La sentencia `switch` es útil cuando se necesita comparar una variable con múltiples valores posibles. Es una alternativa más clara a una larga cadena de `if-else-if` cuando todas las comparaciones se hacen sobre la misma variable.
+
+#### Sintaxis básica
+
+<Code code={`switch (expresion) {
+    case valor1:
+        // Código a ejecutar si expresion == valor1
+        break;
+    case valor2:
+        // Código a ejecutar si expresion == valor2
+        break;
+    // Más casos...
+    default:
+        // Código a ejecutar si ninguno de los casos anteriores coincide
+}`} lang="java" />
+
+#### Ejemplo con días de la semana
+
+<Code code={`int diaSemana = 3;
+String nombreDia;
+
+switch (diaSemana) {
+    case 1:
+        nombreDia = "Lunes";
+        break;
+    case 2:
+        nombreDia = "Martes";
+        break;
+    case 3:
+        nombreDia = "Miércoles";
+        break;
+    case 4:
+        nombreDia = "Jueves";
+        break;
+    case 5:
+        nombreDia = "Viernes";
+        break;
+    case 6:
+        nombreDia = "Sábado";
+        break;
+    case 7:
+        nombreDia = "Domingo";
+        break;
+    default:
+        nombreDia = "Día inválido";
+}
+
+System.out.println("Hoy es " + nombreDia); // Imprime: Hoy es Miércoles`} lang="java" />
+
+<Aside type="note">
+  La sentencia `break` es crucial en cada caso para evitar la "caída" (fall-through) a los siguientes casos. Sin `break`, la ejecución continuará con el siguiente caso, independientemente de si su valor coincide o no.
+</Aside>
+
+#### Switch con cadenas (Java 7+)
+
+Desde Java 7, la sentencia `switch` también puede trabajar con cadenas de texto:
+
+<Code code={`String fruta = "manzana";
+
+switch (fruta.toLowerCase()) {
+    case "manzana":
+        System.out.println("Las manzanas son rojas o verdes");
+        break;
+    case "plátano":
+        System.out.println("Los plátanos son amarillos");
+        break;
+    case "naranja":
+        System.out.println("Las naranjas son anaranjadas");
+        break;
+    default:
+        System.out.println("No conozco ese tipo de fruta");
+}`} lang="java" />
+
+#### Switch con expresiones (Java 12+)
+
+Desde Java 12, se introdujo el switch con expresiones, que permite un estilo más conciso:
+
+<Code code={`// Java 12+
+int diaSemana = 3;
+String tipoDia = switch (diaSemana) {
+    case 1, 2, 3, 4, 5 -> "Día laborable";
+    case 6, 7 -> "Fin de semana";
+    default -> "Día inválido";
+};
+
+System.out.println(tipoDia); // Imprime: Día laborable`} lang="java" />
+
+<Aside type="tip">
+  En el switch con expresiones, la flecha (`->`) reemplaza los dos puntos y el `break`, haciendo el código más conciso. Además, permite agrupar múltiples casos que comparten el mismo resultado.
+</Aside>
+
+#### Switch con yield (Java 13+)
+
+Desde Java 13, se puede usar `yield` para devolver valores en bloques de código más complejos:
+
+<Code code={`// Java 13+
+int mes = 4;
+String estacion = switch (mes) {
+    case 12, 1, 2 -> {
+        System.out.println("Hace frío");
+        yield "Invierno";
+    }
+    case 3, 4, 5 -> {
+        System.out.println("Las flores florecen");
+        yield "Primavera";
+    }
+    case 6, 7, 8 -> {
+        System.out.println("Hace calor");
+        yield "Verano";
+    }
+    case 9, 10, 11 -> {
+        System.out.println("Las hojas caen");
+        yield "Otoño";
+    }
+    default -> {
+        System.out.println("Mes inválido");
+        yield "Desconocido";
+    }
+};
+
+System.out.println("Estamos en " + estacion); // Imprime: Las flores florecen
+                                            // Imprime: Estamos en Primavera`} lang="java" />
+
+## 3.2 Bucles (for, while, do-while)
+
+Los bucles permiten ejecutar un bloque de código repetidamente mientras se cumpla una condición. Java ofrece varios tipos de bucles para diferentes situaciones.
+
+### Bucle for
+
+El bucle `for` es ideal cuando se conoce de antemano el número de iteraciones que se desean realizar.
+
+#### Sintaxis básica
+
+<Code code={`for (inicializacion; condicion; incremento) {
+    // Código a ejecutar en cada iteración
+}`} lang="java" />
+
+#### Ejemplo simple
+
+<Code code={`// Imprimir números del 1 al 5
+for (int i = 1; i <= 5; i++) {
+    System.out.println("Número: " + i);
+}`} lang="java" />
+
+#### Bucle for con múltiples variables
+
+<Code code={`// Contar hacia adelante y hacia atrás simultáneamente
+for (int i = 1, j = 10; i <= 5; i++, j--) {
+    System.out.println("i = " + i + ", j = " + j);
+}`} lang="java" />
+
+### Bucle for-each (enhanced for)
+
+El bucle `for-each`, introducido en Java 5, simplifica la iteración sobre arrays y colecciones.
+
+#### Sintaxis básica
+
+<Code code={`for (tipo elemento : coleccion) {
+    // Código a ejecutar para cada elemento
+}`} lang="java" />
+
+#### Ejemplo con array
+
+<Code code={`String[] frutas = {"Manzana", "Banana", "Naranja", "Fresa"};
+
+for (String fruta : frutas) {
+    System.out.println("Me gusta la " + fruta);
+}`} lang="java" />
+
+<Aside type="note">
+  El bucle `for-each` es más legible y menos propenso a errores que el bucle `for` tradicional cuando se trabaja con colecciones, pero no permite modificar la colección durante la iteración ni acceder al índice actual.
+</Aside>
+
+### Bucle while
+
+El bucle `while` ejecuta un bloque de código mientras una condición sea verdadera. Es útil cuando no se sabe de antemano cuántas iteraciones se necesitarán.
+
+#### Sintaxis básica
+
+<Code code={`while (condicion) {
+    // Código a ejecutar mientras la condición sea verdadera
+}`} lang="java" />
+
+#### Ejemplo simple
+
+<Code code={`int contador = 1;
+
+while (contador <= 5) {
+    System.out.println("Contador: " + contador);
+    contador++;
+}`} lang="java" />
+
+#### Ejemplo con entrada de usuario
+
+<Code code={`import java.util.Scanner;
+
+public class EjemploWhile {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String entrada = "";
+        
+        while (!entrada.equalsIgnoreCase("salir")) {
+            System.out.print("Escribe algo (o 'salir' para terminar): ");
+            entrada = scanner.nextLine();
+            
+            if (!entrada.equalsIgnoreCase("salir")) {
+                System.out.println("Has escrito: " + entrada);
+            }
+        }
+        
+        System.out.println("Programa finalizado");
+        scanner.close();
+    }
+}`} lang="java" />
+
+### Bucle do-while
+
+El bucle `do-while` es similar al bucle `while`, pero garantiza que el bloque de código se ejecute al menos una vez, ya que la condición se evalúa al final de cada iteración.
+
+#### Sintaxis básica
+
+<Code code={`do {
+    // Código a ejecutar al menos una vez
+} while (condicion);`} lang="java" />
+
+#### Ejemplo simple
+
+<Code code={`int contador = 1;
+
+do {
+    System.out.println("Contador: " + contador);
+    contador++;
+} while (contador <= 5);`} lang="java" />
+
+#### Ejemplo con validación de entrada
+
+<Code code={`import java.util.Scanner;
+
+public class ValidacionEntrada {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int numero;
+        
+        do {
+            System.out.print("Ingresa un número positivo: ");
+            numero = scanner.nextInt();
+            
+            if (numero <= 0) {
+                System.out.println("Error: El número debe ser positivo.");
+            }
+        } while (numero <= 0);
+        
+        System.out.println("Has ingresado el número positivo: " + numero);
+        scanner.close();
+    }
+}`} lang="java" />
+
+<Aside type="tip">
+  El bucle `do-while` es especialmente útil para validar entradas de usuario, ya que siempre se solicita la entrada al menos una vez antes de validarla.
+</Aside>
+
+### Comparación de bucles
+
+<table>
+  <thead>
+    <tr>
+      <th>Tipo de bucle</th>
+      <th>Cuándo usarlo</th>
+      <th>Características</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><Code code="for" lang="java" /></td>
+      <td>Cuando se conoce el número de iteraciones</td>
+      <td>Inicialización, condición e incremento en una línea</td>
+    </tr>
+    <tr>
+      <td><Code code="for-each" lang="java" /></td>
+      <td>Para recorrer colecciones o arrays completos</td>
+      <td>Más simple y legible, sin acceso al índice</td>
+    </tr>
+    <tr>
+      <td><Code code="while" lang="java" /></td>
+      <td>Cuando la condición de terminación no es predecible</td>
+      <td>Evalúa la condición antes de cada iteración</td>
+    </tr>
+    <tr>
+      <td><Code code="do-while" lang="java" /></td>
+      <td>Cuando el bloque debe ejecutarse al menos una vez</td>
+      <td>Evalúa la condición después de cada iteración</td>
+    </tr>
+  </tbody>
+</table>
+
+## 3.3 Control de flujo (break, continue, return)
+
+Las sentencias de control de flujo permiten alterar la ejecución normal de los bucles y métodos.
+
+### Sentencia break
+
+La sentencia `break` se utiliza para salir inmediatamente de un bucle o un switch.
+
+#### Break en bucles
+
+<Code code={`// Salir del bucle cuando i es 3
+for (int i = 1; i <= 5; i++) {
+    if (i == 3) {
+        System.out.println("Encontrado el número 3, saliendo del bucle");
+        break;
+    }
+    System.out.println("Número: " + i);
+}
+System.out.println("Fuera del bucle");`} lang="java" />
+
+#### Break con etiquetas
+
+Java permite etiquetar bucles y usar `break` con una etiqueta para salir de bucles anidados:
+
+<Code code={`bucleExterno: for (int i = 1; i <= 3; i++) {
+    for (int j = 1; j <= 3; j++) {
+        System.out.println("i = " + i + ", j = " + j);
+        
+        if (i == 2 && j == 2) {
+            System.out.println("Saliendo de ambos bucles");
+            break bucleExterno;
+        }
+    }
+}
+System.out.println("Fuera de todos los bucles");`} lang="java" />
+
+<Aside type="caution">
+  Aunque las etiquetas son útiles en algunos casos, su uso excesivo puede hacer que el código sea difícil de seguir. Considera refactorizar el código en métodos separados como alternativa.
+</Aside>
+
+### Sentencia continue
+
+La sentencia `continue` salta a la siguiente iteración del bucle, omitiendo el resto del código en la iteración actual.
+
+#### Ejemplo básico
+
+<Code code={`// Imprimir solo números impares
+for (int i = 1; i <= 10; i++) {
+    if (i % 2 == 0) {
+        continue; // Salta los números pares
+    }
+    System.out.println("Número impar: " + i);
+}`} lang="java" />
+
+#### Continue con etiquetas
+
+Al igual que `break`, `continue` también puede usarse con etiquetas en bucles anidados:
+
+<Code code={`bucleExterno: for (int i = 1; i <= 3; i++) {
+    for (int j = 1; j <= 3; j++) {
+        if (i == 2 && j == 2) {
+            System.out.println("Saltando a la siguiente iteración del bucle externo");
+            continue bucleExterno;
+        }
+        System.out.println("i = " + i + ", j = " + j);
+    }
+}`} lang="java" />
+
+### Sentencia return
+
+La sentencia `return` se utiliza para salir de un método y, opcionalmente, devolver un valor.
+
+#### Retorno de valores
+
+<Code code={`public int sumar(int a, int b) {
+    return a + b; // Devuelve la suma y sale del método
+}`} lang="java" />
+
+#### Retorno anticipado
+
+<Code code={`public String verificarEdad(int edad) {
+    if (edad < 0) {
+        return "Edad inválida"; // Retorno anticipado para casos de error
+    }
+    
+    if (edad >= 18) {
+        return "Mayor de edad";
+    } else {
+        return "Menor de edad";
+    }
+}`} lang="java" />
+
+#### Uso de return para salir de un método void
+
+<Code code={`public void procesarDatos(int[] datos) {
+    if (datos == null || datos.length == 0) {
+        System.out.println("No hay datos para procesar");
+        return; // Sale del método sin devolver valor
+    }
+    
+    // Procesar los datos...
+    for (int dato : datos) {
+        System.out.println("Procesando: " + dato);
+    }
+}`} lang="java" />
+
+### Ejemplo completo de control de flujo
+
+El siguiente ejemplo muestra cómo se pueden combinar diferentes estructuras de control:
+
+<Code code={`import java.util.Scanner;
+
+public class ControlFlujoCompleto {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("=== Calculadora Simple ===\n");
+        
+        while (true) {
+            System.out.println("\nOpciones:");
+            System.out.println("1. Sumar");
+            System.out.println("2. Restar");
+            System.out.println("3. Multiplicar");
+            System.out.println("4. Dividir");
+            System.out.println("5. Salir");
+            
+            System.out.print("\nSelecciona una opción (1-5): ");
+            int opcion = scanner.nextInt();
+            
+            if (opcion == 5) {
+                System.out.println("\n¡Gracias por usar la calculadora!");
+                break; // Sale del bucle while
+            }
+            
+            if (opcion < 1 || opcion > 4) {
+                System.out.println("Opción inválida. Inténtalo de nuevo.");
+                continue; // Salta a la siguiente iteración
+            }
+            
+            // Solicitar números
+            System.out.print("Ingresa el primer número: ");
+            double num1 = scanner.nextDouble();
+            
+            System.out.print("Ingresa el segundo número: ");
+            double num2 = scanner.nextDouble();
+            
+            // Realizar operación según la opción seleccionada
+            switch (opcion) {
+                case 1:
+                    System.out.printf("%.2f + %.2f = %.2f\n", num1, num2, num1 + num2);
+                    break;
+                case 2:
+                    System.out.printf("%.2f - %.2f = %.2f\n", num1, num2, num1 - num2);
+                    break;
+                case 3:
+                    System.out.printf("%.2f * %.2f = %.2f\n", num1, num2, num1 * num2);
+                    break;
+                case 4:
+                    if (num2 == 0) {
+                        System.out.println("Error: No se puede dividir por cero.");
+                    } else {
+                        System.out.printf("%.2f / %.2f = %.2f\n", num1, num2, num1 / num2);
+                    }
+                    break;
+            }
+        }
+        
+        scanner.close();
+    }
+}`} lang="java" />
+
+### Buenas prácticas en el control de flujo
+
+<Aside type="tip">
+  <ul>
+    <li>Evita bucles anidados profundos, ya que dificultan la legibilidad y el mantenimiento.</li>
+    <li>Usa nombres descriptivos para las etiquetas cuando sea necesario utilizarlas.</li>
+    <li>Prefiere `return` temprano para casos de error o condiciones especiales.</li>
+    <li>Evita el uso excesivo de `break` y `continue`, especialmente en bucles complejos.</li>
+    <li>Considera extraer bloques de código complejos en métodos separados para mejorar la legibilidad.</li>
+    <li>Asegúrate de que todos los bucles tengan una condición de salida clara para evitar bucles infinitos.</li>
+  </ul>
+</Aside>

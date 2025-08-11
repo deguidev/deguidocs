@@ -1,0 +1,781 @@
+---
+title: 6. Formularios y Métodos HTTP
+description: Aprende sobre formularios con GET y POST, validación de datos y variables superglobales en PHP
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Formularios y Métodos HTTP en PHP
+
+Los formularios web son una parte fundamental de las aplicaciones web interactivas, permitiendo a los usuarios enviar datos al servidor. PHP ofrece herramientas robustas para procesar estos datos y responder adecuadamente. En esta sección, exploraremos cómo trabajar con formularios, los diferentes métodos HTTP y las variables superglobales que PHP proporciona para acceder a estos datos.
+
+## Formularios con GET y POST
+
+Los dos métodos principales para enviar datos de formularios en PHP son GET y POST. Cada uno tiene sus propios usos, ventajas y limitaciones.
+
+### Método GET
+
+El método GET envía los datos del formulario como parámetros en la URL. Es visible para el usuario y tiene limitaciones de longitud.
+
+<Code code={`<!-- Formulario usando método GET -->
+<form action="procesar.php" method="get">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre">
+    
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email">
+    
+    <input type="submit" value="Enviar">
+</form>`} lang="html" />
+
+Cuando este formulario se envía, la URL resultante sería algo como:
+`procesar.php?nombre=Juan&email=juan@ejemplo.com`
+
+En el archivo `procesar.php`, podemos acceder a estos datos usando la variable superglobal `$_GET`:
+
+<Code code={`<?php
+// procesar.php
+$nombre = $_GET['nombre'] ?? '';
+$email = $_GET['email'] ?? '';
+
+echo "Nombre recibido: $nombre<br>";
+echo "Email recibido: $email";
+?>`} lang="php" />
+
+<Aside type="caution">
+  El método GET tiene limitaciones importantes:
+  - Los datos son visibles en la URL (no usar para información sensible)
+  - La longitud máxima de una URL está limitada (generalmente a 2048 caracteres)
+  - Los datos quedan en el historial del navegador
+  - No es adecuado para enviar archivos
+</Aside>
+
+### Método POST
+
+El método POST envía los datos en el cuerpo de la solicitud HTTP, no en la URL. Es más seguro y no tiene las mismas limitaciones de longitud que GET.
+
+<Code code={`<!-- Formulario usando método POST -->
+<form action="procesar.php" method="post">
+    <label for="usuario">Usuario:</label>
+    <input type="text" id="usuario" name="usuario">
+    
+    <label for="password">Contraseña:</label>
+    <input type="password" id="password" name="password">
+    
+    <input type="submit" value="Iniciar Sesión">
+</form>`} lang="html" />
+
+En el archivo `procesar.php`, accedemos a los datos usando la variable superglobal `$_POST`:
+
+<Code code={`<?php
+// procesar.php
+$usuario = $_POST['usuario'] ?? '';
+$password = $_POST['password'] ?? '';
+
+// Nunca mostrar contraseñas en producción, esto es solo un ejemplo
+echo "Usuario recibido: $usuario<br>";
+echo "Contraseña recibida: $password";
+?>`} lang="php" />
+
+<Aside type="tip">
+  El método POST es preferible cuando:
+  - Se envían datos sensibles (aunque siempre use HTTPS para mayor seguridad)
+  - Se envían grandes cantidades de datos
+  - Se suben archivos
+  - Se modifican datos en el servidor (siguiendo el principio RESTful)
+</Aside>
+
+### Formulario con Múltiples Tipos de Campos
+
+Los formularios pueden contener diversos tipos de campos. Aquí hay un ejemplo más completo:
+
+<Code code={`<form action="procesar_completo.php" method="post">
+    <!-- Campos de texto -->
+    <div>
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required>
+    </div>
+    
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+    </div>
+    
+    <!-- Selección única -->
+    <div>
+        <label>Género:</label>
+        <input type="radio" id="masculino" name="genero" value="M">
+        <label for="masculino">Masculino</label>
+        
+        <input type="radio" id="femenino" name="genero" value="F">
+        <label for="femenino">Femenino</label>
+        
+        <input type="radio" id="otro" name="genero" value="O">
+        <label for="otro">Otro</label>
+    </div>
+    
+    <!-- Selección múltiple -->
+    <div>
+        <label>Intereses:</label>
+        <input type="checkbox" id="deportes" name="intereses[]" value="deportes">
+        <label for="deportes">Deportes</label>
+        
+        <input type="checkbox" id="musica" name="intereses[]" value="musica">
+        <label for="musica">Música</label>
+        
+        <input type="checkbox" id="tecnologia" name="intereses[]" value="tecnologia">
+        <label for="tecnologia">Tecnología</label>
+    </div>
+    
+    <!-- Lista desplegable -->
+    <div>
+        <label for="pais">País:</label>
+        <select id="pais" name="pais">
+            <option value="">Seleccione un país</option>
+            <option value="es">España</option>
+            <option value="mx">México</option>
+            <option value="ar">Argentina</option>
+            <option value="co">Colombia</option>
+        </select>
+    </div>
+    
+    <!-- Área de texto -->
+    <div>
+        <label for="comentarios">Comentarios:</label>
+        <textarea id="comentarios" name="comentarios" rows="4" cols="50"></textarea>
+    </div>
+    
+    <!-- Campo oculto -->
+    <input type="hidden" name="origen" value="formulario_registro">
+    
+    <!-- Botón de envío -->
+    <div>
+        <input type="submit" value="Enviar Datos">
+        <input type="reset" value="Limpiar Formulario">
+    </div>
+</form>`} lang="html" />
+
+Procesamiento en PHP:
+
+<Code code={`<?php
+// procesar_completo.php
+
+// Campos de texto
+$nombre = $_POST['nombre'] ?? '';
+$email = $_POST['email'] ?? '';
+
+// Selección única (radio button)
+$genero = $_POST['genero'] ?? '';
+
+// Selección múltiple (checkbox)
+$intereses = $_POST['intereses'] ?? [];
+
+// Lista desplegable
+$pais = $_POST['pais'] ?? '';
+
+// Área de texto
+$comentarios = $_POST['comentarios'] ?? '';
+
+// Campo oculto
+$origen = $_POST['origen'] ?? '';
+
+// Mostrar los datos recibidos
+echo "<h2>Datos recibidos:</h2>";
+echo "<p><strong>Nombre:</strong> $nombre</p>";
+echo "<p><strong>Email:</strong> $email</p>";
+echo "<p><strong>Género:</strong> $genero</p>";
+
+echo "<p><strong>Intereses:</strong> ";
+if (!empty($intereses)) {
+    echo implode(", ", $intereses);
+} else {
+    echo "Ninguno seleccionado";
+}
+echo "</p>";
+
+echo "<p><strong>País:</strong> $pais</p>";
+echo "<p><strong>Comentarios:</strong> $comentarios</p>";
+echo "<p><strong>Origen:</strong> $origen</p>";
+?>`} lang="php" />
+
+<Aside type="note">
+  Observe el uso de `intereses[]` en los checkboxes. Los corchetes indican a PHP que debe tratar estos valores como un array, ya que se pueden seleccionar múltiples opciones.
+</Aside>
+
+### Subida de Archivos
+
+PHP también permite la subida de archivos a través de formularios. Para ello, es necesario usar el método POST y el atributo `enctype="multipart/form-data"`.
+
+<Code code={`<form action="subir_archivo.php" method="post" enctype="multipart/form-data">
+    <label for="archivo">Seleccionar archivo:</label>
+    <input type="file" id="archivo" name="archivo">
+    
+    <!-- Para permitir múltiples archivos -->
+    <label for="multiples">Seleccionar múltiples archivos:</label>
+    <input type="file" id="multiples" name="archivos[]" multiple>
+    
+    <input type="submit" value="Subir Archivo">
+</form>`} lang="html" />
+
+Procesamiento en PHP:
+
+<Code code={`<?php
+// subir_archivo.php
+
+// Procesar un solo archivo
+if (isset($_FILES['archivo']) && $_FILES['archivo']['error'] === UPLOAD_ERR_OK) {
+    $nombre_temporal = $_FILES['archivo']['tmp_name'];
+    $nombre_archivo = $_FILES['archivo']['name'];
+    $tipo_archivo = $_FILES['archivo']['type'];
+    $tamano_archivo = $_FILES['archivo']['size'];
+    
+    // Directorio donde se guardará el archivo
+    $directorio_destino = 'uploads/';
+    
+    // Mover el archivo desde la ubicación temporal al destino final
+    if (move_uploaded_file($nombre_temporal, $directorio_destino . $nombre_archivo)) {
+        echo "Archivo subido con éxito.<br>";
+        echo "Nombre: $nombre_archivo<br>";
+        echo "Tipo: $tipo_archivo<br>";
+        echo "Tamaño: $tamano_archivo bytes";
+    } else {
+        echo "Error al subir el archivo.";
+    }
+}
+
+// Procesar múltiples archivos
+if (isset($_FILES['archivos'])) {
+    $total_archivos = count($_FILES['archivos']['name']);
+    
+    for ($i = 0; $i < $total_archivos; $i++) {
+        if ($_FILES['archivos']['error'][$i] === UPLOAD_ERR_OK) {
+            $nombre_temporal = $_FILES['archivos']['tmp_name'][$i];
+            $nombre_archivo = $_FILES['archivos']['name'][$i];
+            
+            // Mover el archivo
+            move_uploaded_file($nombre_temporal, 'uploads/' . $nombre_archivo);
+            echo "Archivo $nombre_archivo subido correctamente.<br>";
+        }
+    }
+}
+?>`} lang="php" />
+
+<Aside type="caution">
+  Al permitir la subida de archivos, siempre verifique:
+  - El tipo de archivo (para evitar archivos maliciosos)
+  - El tamaño del archivo (para evitar sobrecargar el servidor)
+  - Renombre los archivos para evitar sobrescrituras y problemas de seguridad
+  - Establezca los permisos adecuados en el directorio de destino
+</Aside>
+
+## Validación de Datos
+
+La validación de datos es crucial para garantizar la seguridad y la integridad de las aplicaciones web. PHP ofrece varias formas de validar los datos recibidos de los formularios.
+
+### Validación Básica
+
+<Code code={`<?php
+// validacion_basica.php
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $errores = [];
+    
+    // Validar que los campos requeridos no estén vacíos
+    if (empty($_POST['nombre'])) {
+        $errores[] = "El nombre es obligatorio";
+    }
+    
+    if (empty($_POST['email'])) {
+        $errores[] = "El email es obligatorio";
+    } elseif (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+        $errores[] = "El formato del email no es válido";
+    }
+    
+    // Validar longitud
+    if (strlen($_POST['password']) < 8) {
+        $errores[] = "La contraseña debe tener al menos 8 caracteres";
+    }
+    
+    // Validar número
+    if (!is_numeric($_POST['edad']) || $_POST['edad'] < 18) {
+        $errores[] = "La edad debe ser un número mayor o igual a 18";
+    }
+    
+    // Si no hay errores, procesar el formulario
+    if (empty($errores)) {
+        echo "Formulario validado correctamente";
+        // Procesar los datos...
+    } else {
+        // Mostrar errores
+        echo "<h3>Errores encontrados:</h3>";
+        echo "<ul>";
+        foreach ($errores as $error) {
+            echo "<li>$error</li>";
+        }
+        echo "</ul>";
+    }
+}
+?>`} lang="php" />
+
+### Funciones de Filtrado
+
+PHP proporciona la extensión Filter para validar y filtrar datos de manera más eficiente:
+
+<Code code={`<?php
+// validacion_con_filtros.php
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Validar email
+    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    if ($email === false) {
+        echo "Email inválido<br>";
+    }
+    
+    // Validar entero con rango
+    $edad = filter_input(INPUT_POST, 'edad', FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 18, 'max_range' => 120]
+    ]);
+    if ($edad === false) {
+        echo "Edad inválida (debe ser un número entre 18 y 120)<br>";
+    }
+    
+    // Validar URL
+    $sitio_web = filter_input(INPUT_POST, 'sitio_web', FILTER_VALIDATE_URL);
+    if ($sitio_web === false) {
+        echo "URL inválida<br>";
+    }
+    
+    // Sanitizar (limpiar) datos
+    $nombre = filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_STRING);
+    $comentarios = filter_input(INPUT_POST, 'comentarios', FILTER_SANITIZE_STRING);
+    
+    echo "Datos validados y sanitizados:<br>";
+    echo "Nombre: $nombre<br>";
+    echo "Email: $email<br>";
+    echo "Edad: $edad<br>";
+    echo "Sitio web: $sitio_web<br>";
+    echo "Comentarios: $comentarios";
+}
+?>`} lang="php" />
+
+<Aside type="note">
+  A partir de PHP 8.1, `FILTER_SANITIZE_STRING` está obsoleto. Se recomienda usar `htmlspecialchars()` para escapar datos que se mostrarán en HTML.
+</Aside>
+
+### Expresiones Regulares para Validación
+
+Las expresiones regulares son una herramienta poderosa para validar patrones complejos:
+
+<Code code={`<?php
+// validacion_regex.php
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $telefono = $_POST['telefono'] ?? '';
+    $codigo_postal = $_POST['codigo_postal'] ?? '';
+    $dni = $_POST['dni'] ?? '';
+    
+    // Validar formato de teléfono (ejemplo para España: 123-456-789)
+    if (!preg_match('/^\d{3}-\d{3}-\d{3}$/', $telefono)) {
+        echo "Formato de teléfono inválido. Use: 123-456-789<br>";
+    }
+    
+    // Validar código postal (5 dígitos)
+    if (!preg_match('/^\d{5}$/', $codigo_postal)) {
+        echo "Código postal inválido. Debe tener 5 dígitos.<br>";
+    }
+    
+    // Validar DNI español (8 dígitos seguidos de una letra)
+    if (!preg_match('/^\d{8}[A-Z]$/', strtoupper($dni))) {
+        echo "DNI inválido. Formato: 12345678A<br>";
+    }
+}
+?>`} lang="php" />
+
+### Validación del Lado del Cliente vs. Servidor
+
+<Tabs>
+  <TabItem label="Cliente (JavaScript)">
+    <Code code={`<form id="miFormulario" onsubmit="return validarFormulario()" action="procesar.php" method="post">
+    <div>
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre">
+        <span id="error-nombre" class="error"></span>
+    </div>
+    
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+        <span id="error-email" class="error"></span>
+    </div>
+    
+    <div>
+        <input type="submit" value="Enviar">
+    </div>
+</form>
+
+<script>
+function validarFormulario() {
+    let esValido = true;
+    const nombre = document.getElementById('nombre').value;
+    const email = document.getElementById('email').value;
+    
+    // Resetear mensajes de error
+    document.getElementById('error-nombre').textContent = '';
+    document.getElementById('error-email').textContent = '';
+    
+    // Validar nombre
+    if (nombre.trim() === '') {
+        document.getElementById('error-nombre').textContent = 'El nombre es obligatorio';
+        esValido = false;
+    }
+    
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        document.getElementById('error-email').textContent = 'Email inválido';
+        esValido = false;
+    }
+    
+    return esValido;
+}
+</script>`} lang="html" />
+  </TabItem>
+  
+  <TabItem label="Servidor (PHP)">
+    <Code code={`<?php
+// procesar.php
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $errores = [];
+    
+    // Validar nombre
+    $nombre = trim($_POST['nombre'] ?? '');
+    if (empty($nombre)) {
+        $errores[] = "El nombre es obligatorio";
+    }
+    
+    // Validar email
+    $email = $_POST['email'] ?? '';
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errores[] = "Email inválido";
+    }
+    
+    // Procesar o mostrar errores
+    if (empty($errores)) {
+        // Procesar datos válidos
+        echo "Datos válidos, procesando...";
+    } else {
+        // Mostrar errores
+        foreach ($errores as $error) {
+            echo "$error<br>";
+        }
+    }
+}
+?>`} lang="php" />
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  <strong>Mejores prácticas de validación:</strong>
+  <ul>
+    <li>Siempre valide los datos tanto en el cliente como en el servidor</li>
+    <li>La validación del cliente mejora la experiencia del usuario</li>
+    <li>La validación del servidor es obligatoria para la seguridad</li>
+    <li>Nunca confíe en los datos enviados por el usuario</li>
+    <li>Sanitice los datos antes de almacenarlos o mostrarlos</li>
+  </ul>
+</Aside>
+
+## Variables Superglobales en PHP
+
+Las variables superglobales son arrays predefinidos en PHP que están disponibles en todos los ámbitos del script. Estas variables contienen información del servidor, del entorno, de las peticiones HTTP y más.
+
+### $_GET
+
+Contiene todos los datos enviados al script a través de parámetros de URL (método GET).
+
+<Code code={`<?php
+// URL: pagina.php?id=123&categoria=libros
+
+// Acceder a los parámetros de la URL
+$id = $_GET['id'] ?? 'no especificado'; // 123
+$categoria = $_GET['categoria'] ?? 'general'; // libros
+
+// Verificar si existe un parámetro
+if (isset($_GET['ordenar'])) {
+    $ordenar = $_GET['ordenar'];
+} else {
+    $ordenar = 'nombre';
+}
+
+// Alternativa usando el operador de fusión null (PHP 7+)
+$ordenar = $_GET['ordenar'] ?? 'nombre';
+
+// Mostrar todos los parámetros GET
+echo "<pre>";
+print_r($_GET);
+echo "</pre>";
+// Resultado:
+// Array
+// (
+//     [id] => 123
+//     [categoria] => libros
+// )
+?>`} lang="php" />
+
+### $_POST
+
+Contiene todos los datos enviados al script a través del cuerpo de la petición HTTP (método POST).
+
+<Code code={`<?php
+// Formulario enviado con method="post"
+
+// Acceder a los datos del formulario
+$usuario = $_POST['usuario'] ?? '';
+$password = $_POST['password'] ?? '';
+
+// Verificar si el formulario ha sido enviado
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Procesar el formulario
+    if (isset($_POST['enviar'])) {
+        echo "Formulario enviado con éxito";
+    }
+}
+
+// Mostrar todos los datos POST
+echo "<pre>";
+print_r($_POST);
+echo "</pre>";
+// Resultado si se envía un formulario con campos usuario y password:
+// Array
+// (
+//     [usuario] => juan123
+//     [password] => ********
+//     [enviar] => Enviar
+// )
+?>`} lang="php" />
+
+### $_REQUEST
+
+Combina los datos de $_GET, $_POST y $_COOKIE. Es útil cuando no se sabe exactamente cómo se envían los datos, pero se debe usar con precaución debido a posibles conflictos de nombres.
+
+<Code code={`<?php
+// $_REQUEST contiene datos de GET, POST y COOKIE
+
+// Acceder a datos sin importar cómo fueron enviados
+$busqueda = $_REQUEST['busqueda'] ?? '';
+
+// Esto funcionará tanto si busqueda viene por GET o por POST
+echo "Búsqueda: $busqueda";
+
+// Mostrar todos los datos en $_REQUEST
+echo "<pre>";
+print_r($_REQUEST);
+echo "</pre>";
+?>`} lang="php" />
+
+<Aside type="caution">
+  Usar $_REQUEST puede llevar a comportamientos inesperados si el mismo nombre de variable existe en diferentes fuentes (GET, POST, COOKIE). Es mejor usar $_GET o $_POST específicamente cuando se conoce el origen de los datos.
+</Aside>
+
+### $_SERVER
+
+Contiene información sobre el servidor web, el entorno y la petición actual.
+
+<Code code={`<?php
+// Información sobre la petición
+echo "Método HTTP: " . $_SERVER['REQUEST_METHOD'] . "<br>"; // GET, POST, etc.
+echo "URL solicitada: " . $_SERVER['REQUEST_URI'] . "<br>";
+echo "Ruta del script: " . $_SERVER['SCRIPT_NAME'] . "<br>";
+echo "Directorio raíz: " . $_SERVER['DOCUMENT_ROOT'] . "<br>";
+
+// Información del cliente
+echo "IP del cliente: " . $_SERVER['REMOTE_ADDR'] . "<br>";
+echo "Navegador: " . $_SERVER['HTTP_USER_AGENT'] . "<br>";
+
+// Información del servidor
+echo "Nombre del servidor: " . $_SERVER['SERVER_NAME'] . "<br>";
+echo "Software del servidor: " . $_SERVER['SERVER_SOFTWARE'] . "<br>";
+
+// Verificar si es una petición AJAX
+$esAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+          $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
+
+echo "Es petición AJAX: " . ($esAjax ? 'Sí' : 'No') . "<br>";
+
+// Obtener la URL completa actual
+function obtenerUrlCompleta() {
+    $protocolo = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $uri = $_SERVER['REQUEST_URI'];
+    return "$protocolo://$host$uri";
+}
+
+echo "URL completa: " . obtenerUrlCompleta();
+?>`} lang="php" />
+
+### Otras Variables Superglobales
+
+<Tabs>
+  <TabItem label="$_FILES">
+    <Code code={`<?php
+// Contiene información sobre archivos subidos
+if (isset($_FILES['archivo'])) {
+    echo "Nombre del archivo: " . $_FILES['archivo']['name'] . "<br>";
+    echo "Tipo MIME: " . $_FILES['archivo']['type'] . "<br>";
+    echo "Tamaño: " . $_FILES['archivo']['size'] . " bytes<br>";
+    echo "Ubicación temporal: " . $_FILES['archivo']['tmp_name'] . "<br>";
+    echo "Código de error: " . $_FILES['archivo']['error'] . "<br>";
+}
+?>`} lang="php" />
+  </TabItem>
+  
+  <TabItem label="$_COOKIE">
+    <Code code={`<?php
+// Establecer una cookie
+setcookie('usuario', 'juan123', time() + 3600, '/', '', false, true); // Dura 1 hora
+
+// Acceder a cookies
+$usuario = $_COOKIE['usuario'] ?? 'invitado';
+echo "Usuario: $usuario<br>";
+
+// Eliminar una cookie
+setcookie('usuario', '', time() - 3600, '/');
+?>`} lang="php" />
+  </TabItem>
+  
+  <TabItem label="$_SESSION">
+    <Code code={`<?php
+// Iniciar sesión
+session_start();
+
+// Guardar datos en la sesión
+$_SESSION['usuario_id'] = 123;
+$_SESSION['nombre'] = 'María';
+$_SESSION['logueado'] = true;
+
+// Acceder a datos de sesión
+if (isset($_SESSION['logueado']) && $_SESSION['logueado']) {
+    echo "Bienvenido/a, " . $_SESSION['nombre'] . "<br>";
+}
+
+// Eliminar una variable de sesión
+unset($_SESSION['nombre']);
+
+// Destruir toda la sesión
+session_destroy();
+?>`} lang="php" />
+  </TabItem>
+  
+  <TabItem label="$_ENV">
+    <Code code={`<?php
+// Variables de entorno
+echo "Ruta del sistema: " . $_ENV['PATH'] ?? 'No disponible' . "<br>";
+
+// Alternativa usando getenv()
+$homeDir = getenv('HOME') ?: 'No disponible';
+echo "Directorio home: $homeDir<br>";
+?>`} lang="php" />
+  </TabItem>
+</Tabs>
+
+### Ejemplo Completo: Procesamiento de Formulario
+
+<Code code={`<?php
+// procesar_formulario.php
+
+// Iniciar sesión para mensajes flash
+session_start();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Validar y sanitizar datos
+    $nombre = filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_SPECIAL_CHARS);
+    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    $edad = filter_input(INPUT_POST, 'edad', FILTER_VALIDATE_INT, [
+        'options' => ['min_range' => 18, 'max_range' => 120]
+    ]);
+    
+    $errores = [];
+    
+    // Validación
+    if (!$nombre) {
+        $errores[] = "El nombre es obligatorio";
+    }
+    
+    if (!$email) {
+        $errores[] = "Email inválido";
+    }
+    
+    if ($edad === false) {
+        $errores[] = "La edad debe ser un número entre 18 y 120";
+    }
+    
+    // Procesar archivo si existe
+    $archivo_subido = false;
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+        $tipos_permitidos = ['image/jpeg', 'image/png', 'image/gif'];
+        
+        if (in_array($_FILES['foto']['type'], $tipos_permitidos)) {
+            $nombre_archivo = time() . '_' . basename($_FILES['foto']['name']);
+            $ruta_destino = 'uploads/' . $nombre_archivo;
+            
+            if (move_uploaded_file($_FILES['foto']['tmp_name'], $ruta_destino)) {
+                $archivo_subido = true;
+            } else {
+                $errores[] = "Error al subir el archivo";
+            }
+        } else {
+            $errores[] = "Tipo de archivo no permitido";
+        }
+    }
+    
+    // Procesar el formulario si no hay errores
+    if (empty($errores)) {
+        // Guardar en base de datos, enviar email, etc.
+        
+        // Guardar mensaje de éxito en la sesión
+        $_SESSION['mensaje'] = "Formulario procesado con éxito";
+        $_SESSION['tipo_mensaje'] = "success";
+        
+        // Redireccionar
+        header("Location: gracias.php");
+        exit;
+    } else {
+        // Guardar errores en la sesión
+        $_SESSION['errores'] = $errores;
+        $_SESSION['datos_antiguos'] = $_POST; // Para repoblar el formulario
+        
+        // Redireccionar de vuelta al formulario
+        header("Location: formulario.php");
+        exit;
+    }
+} else {
+    // Si no es POST, redireccionar al formulario
+    header("Location: formulario.php");
+    exit;
+}
+?>`} lang="php" />
+
+<Aside type="note">
+  <strong>Seguridad con variables superglobales:</strong>
+  <ul>
+    <li>Nunca confíe en los datos de entrada del usuario</li>
+    <li>Siempre valide y sanitice los datos antes de usarlos</li>
+    <li>Use sentencias preparadas para consultas SQL para prevenir inyecciones</li>
+    <li>Considere usar frameworks que manejen automáticamente la seguridad de los formularios</li>
+  </ul>
+</Aside>
+
+## Resumen
+
+- Los formularios web permiten a los usuarios enviar datos al servidor PHP.
+- El método GET envía datos a través de la URL, mientras que POST los envía en el cuerpo de la petición.
+- La validación de datos es esencial para la seguridad y la integridad de las aplicaciones web.
+- PHP ofrece varias variables superglobales ($_GET, $_POST, $_REQUEST, $_SERVER, etc.) para acceder a los datos de la petición.
+- Siempre sanitice y valide los datos de entrada antes de procesarlos o mostrarlos.
+
+Dominar el manejo de formularios y la validación de datos es fundamental para desarrollar aplicaciones web seguras y robustas con PHP.

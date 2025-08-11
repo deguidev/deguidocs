@@ -1,0 +1,136 @@
+---
+title: Sintaxis y estructura básica
+description: Aprende la sintaxis fundamental y las reglas básicas de JavaScript.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Sintaxis y estructura básica <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Una buena comprensión de la sintaxis básica es esencial para escribir código JavaScript efectivo.
+</Aside>
+
+## Comentarios <Badge text="Básico" variant="note" />
+
+En JavaScript existen dos tipos de comentarios:
+
+```javascript
+// Comentario de una línea
+
+/*
+  Comentario
+  de múltiples
+  líneas
+*/
+```
+
+## Instrucciones y bloques de código
+
+Las instrucciones en JavaScript terminan con punto y coma (opcional pero recomendado):
+
+```javascript
+let nombre = "Juan";
+console.log(nombre);
+
+// Los bloques de código se delimitan con llaves {}
+if (true) {
+    let x = 1;
+    console.log(x);
+}
+```
+
+## Reglas de nombres y estilo
+
+### Identificadores válidos
+
+- Deben comenzar con letra, $ o _
+- Pueden contener números, pero no al inicio
+- Son case-sensitive (sensibles a mayúsculas/minúsculas)
+
+```javascript
+// Válidos
+let nombre;
+let $precio;
+let _valor;
+let usuario123;
+
+// No válidos
+let 123usuario;
+let mi-variable;
+let @correo;
+```
+
+### Convenciones de nombrado
+
+1. **camelCase** (recomendado para variables y funciones)
+```javascript
+let nombreUsuario;
+function calcularTotal() { }
+```
+
+2. **PascalCase** (para clases)
+```javascript
+class Usuario { }
+class CarritoCompra { }
+```
+
+3. **SNAKE_CASE** (para constantes)
+```javascript
+const MAX_INTENTOS = 3;
+const API_URL = "https://api.ejemplo.com";
+```
+
+## Palabras reservadas
+
+Algunas palabras no pueden usarse como identificadores:
+
+```javascript
+break     case      catch     class     const
+continue  debugger  default   delete    do
+else      export    extends   finally   for
+function  if        import    in        instanceof
+new       return    super     switch    this
+throw     try       typeof    var       void
+while     with      yield
+```
+
+## Sensibilidad a mayúsculas/minúsculas
+
+JavaScript distingue entre mayúsculas y minúsculas:
+
+```javascript
+let color = "rojo";
+let Color = "azul";
+// color y Color son variables diferentes
+```
+
+## Indentación y formato
+
+Se recomienda usar una indentación consistente (2 o 4 espacios):
+
+```javascript
+function ejemplo() {
+    if (true) {
+        console.log("Indentado correctamente");
+    }
+}
+```
+
+## Buenas prácticas
+
+1. Usar nombres descriptivos
+2. Mantener consistencia en el estilo
+3. Usar indentación adecuada
+4. Agregar comentarios cuando sea necesario
+5. Seguir las convenciones de la comunidad
+
+## Herramientas de formato
+
+- ESLint
+- Prettier
+- EditorConfig
+
+Estas herramientas ayudan a mantener un código limpio y consistente en todo el proyecto.

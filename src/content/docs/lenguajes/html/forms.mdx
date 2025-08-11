@@ -1,0 +1,361 @@
+---
+title: Formularios
+description: Cómo crear y gestionar formularios en HTML.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Formularios en HTML
+
+## Introducción a los formularios <Badge text="Interactividad" variant="success" />
+
+Los formularios HTML son elementos fundamentales para recopilar datos de los usuarios. Permiten la interacción entre el usuario y el sitio web o aplicación, facilitando el envío de información al servidor.
+
+<Aside>
+  Los formularios son la base de casi todas las aplicaciones web interactivas, desde inicios de sesión hasta compras en línea y búsquedas.
+</Aside>
+
+## Estructura básica de un formulario
+
+### Elemento `<form>`
+
+El elemento `<form>` es el contenedor principal para todos los controles del formulario:
+
+<Code code={`<form action="/procesar" method="post">
+  <!-- Controles del formulario -->
+  <button type="submit">Enviar</button>
+</form>`} lang="html" title="Estructura básica de un formulario" />
+
+#### Atributos principales de `<form>`
+
+| Atributo | Descripción |
+|----------|-------------|
+| `action` | URL donde se envían los datos del formulario |
+| `method` | Método HTTP para enviar datos (`get` o `post`) |
+| `enctype` | Cómo se codifican los datos (importante para subida de archivos) |
+| `autocomplete` | Activa/desactiva el autocompletado del navegador |
+| `novalidate` | Desactiva la validación automática del navegador |
+
+<Aside type="tip">
+  Usa `method="post"` y `enctype="multipart/form-data"` cuando necesites enviar archivos a través del formulario.
+</Aside>
+
+### Elemento `<label>` <Badge text="Accesibilidad" variant="note" />
+
+Las etiquetas `<label>` asocian texto descriptivo con controles de formulario, mejorando la accesibilidad y la experiencia del usuario:
+
+<Code code={`<label for="nombre">Nombre:</label>
+<input type="text" id="nombre" name="nombre">`} lang="html" />
+
+El atributo `for` debe coincidir con el `id` del control de formulario asociado. Esto permite que al hacer clic en la etiqueta, se active el control correspondiente.
+
+<Aside>
+  Las etiquetas son esenciales para la accesibilidad. Los lectores de pantalla las utilizan para identificar los controles de formulario.
+</Aside>
+
+### Elemento `<input>` <Badge text="Fundamental" variant="success" />
+
+El elemento `<input>` es el control de formulario más versátil y común. Su comportamiento cambia según el valor del atributo `type`:
+
+<Code code={`<input type="text" name="usuario" placeholder="Ingrese su nombre de usuario">`} lang="html" />
+
+#### Tipos de input comunes
+
+##### Texto (`type="text"`)
+
+<Code code={`<input type="text" name="nombre" placeholder="Escriba su nombre">`} lang="html" />
+
+Campo de texto de una sola línea para entrada de texto general.
+
+##### Correo electrónico (`type="email"`)
+
+<Code code={`<input type="email" name="correo" placeholder="ejemplo@dominio.com" required>`} lang="html" />
+
+Para direcciones de correo electrónico. Los navegadores modernos validan automáticamente el formato.
+
+##### Contraseña (`type="password"`)
+
+<Code code={`<input type="password" name="clave" placeholder="Contraseña" minlength="8">`} lang="html" />
+
+Oculta los caracteres ingresados para proteger información sensible.
+
+##### Número (`type="number"`)
+
+<Code code={`<input type="number" name="edad" min="18" max="100" step="1">`} lang="html" />
+
+Permite solo entradas numéricas y proporciona controles para incrementar/decrementar.
+
+##### Fecha (`type="date"`)
+
+<Code code={`<input type="date" name="fecha_nacimiento" min="1950-01-01" max="2025-12-31">`} lang="html" />
+
+Muestra un selector de fecha en navegadores compatibles.
+
+##### Archivo (`type="file"`)
+
+<Code code={`<input type="file" name="documento" accept=".pdf,.docx,image/*" multiple>`} lang="html" />
+
+Permite al usuario seleccionar archivos para cargar. El atributo `accept` limita los tipos de archivos permitidos y `multiple` permite seleccionar varios archivos.
+
+<Aside type="caution">
+  Recuerda usar `enctype="multipart/form-data"` en el formulario cuando incluyas campos de tipo archivo.
+</Aside>
+
+##### Casilla de verificación (`type="checkbox"`)
+
+<Code code={`<input type="checkbox" id="acepto" name="acepto" value="si">
+<label for="acepto">Acepto los términos y condiciones</label>`} lang="html" />
+
+Permite al usuario seleccionar o deseleccionar una opción.
+
+##### Botón de radio (`type="radio"`)
+
+<Code code={`<input type="radio" id="opcion1" name="plan" value="basico">
+<label for="opcion1">Plan Básico</label>
+
+<input type="radio" id="opcion2" name="plan" value="premium">
+<label for="opcion2">Plan Premium</label>`} lang="html" />
+
+Permite al usuario seleccionar una única opción de un grupo. Los botones de radio con el mismo atributo `name` forman un grupo.
+
+##### Envío (`type="submit"`)
+
+<Code code={`<input type="submit" value="Enviar formulario">`} lang="html" />
+
+Botón que envía el formulario cuando se hace clic en él.
+
+##### Oculto (`type="hidden"`)
+
+<Code code={`<input type="hidden" name="id_usuario" value="12345">`} lang="html" />
+
+Campo invisible para el usuario que envía datos adicionales con el formulario.
+
+#### Atributos comunes de `<input>` <Badge text="Validación" variant="note" />
+
+| Atributo | Descripción |
+|----------|-------------|
+| `required` | Hace que el campo sea obligatorio |
+| `placeholder` | Texto de ejemplo que aparece cuando el campo está vacío |
+| `readonly` | Hace que el campo sea de solo lectura (no editable pero se envía) |
+| `disabled` | Desactiva el campo (no editable y no se envía) |
+| `pattern` | Expresión regular para validar el contenido |
+| `maxlength` | Número máximo de caracteres permitidos |
+| `min` / `max` | Valores mínimo y máximo para campos numéricos o de fecha |
+| `step` | Incremento para campos numéricos |
+| `autocomplete` | Controla el autocompletado del navegador para este campo |
+
+<Code code={`<input type="text" name="codigo" pattern="[A-Z]{3}[0-9]{4}" title="Tres letras mayúsculas seguidas de 4 números" required>`} lang="html" title="Ejemplo de validación con pattern" />
+
+<Aside type="tip">
+  El atributo `title` proporciona un mensaje de ayuda cuando la validación falla.
+</Aside>
+
+### Elemento `<textarea>` <Badge text="Texto largo" variant="note" />
+
+El elemento `<textarea>` crea un campo de texto multilínea para entrada de texto extenso:
+
+<Code code={`<label for="comentario">Comentarios:</label>
+<textarea id="comentario" name="comentario" rows="5" cols="40" placeholder="Escribe tu comentario aquí..."></textarea>`} lang="html" />
+
+#### Atributos principales de `<textarea>`
+
+| Atributo | Descripción |
+|----------|-------------|
+| `rows` | Número de líneas visibles |
+| `cols` | Ancho visible en caracteres |
+| `maxlength` | Número máximo de caracteres permitidos |
+| `placeholder` | Texto de ejemplo cuando el campo está vacío |
+| `wrap` | Cómo se envían los saltos de línea (`soft`, `hard`) |
+
+<Aside>
+  A diferencia de `<input>`, el valor inicial de un `<textarea>` se coloca entre las etiquetas de apertura y cierre, no como un atributo `value`.
+</Aside>
+
+### Elementos `<select>` y `<option>` <Badge text="Listas" variant="success" />
+
+El elemento `<select>` crea una lista desplegable o un cuadro de selección múltiple:
+
+<Code code={`<label for="pais">País:</label>
+<select id="pais" name="pais">
+  <option value="">Seleccione un país</option>
+  <option value="es">España</option>
+  <option value="mx">México</option>
+  <option value="ar">Argentina</option>
+  <option value="co">Colombia</option>
+  <option value="pe">Perú</option>
+</select>`} lang="html" />
+
+#### Atributos principales de `<select>`
+
+| Atributo | Descripción |
+|----------|-------------|
+| `multiple` | Permite selección múltiple |
+| `size` | Número de opciones visibles |
+| `required` | Hace que la selección sea obligatoria |
+| `disabled` | Desactiva el control completo |
+
+#### Atributos de `<option>`
+
+| Atributo | Descripción |
+|----------|-------------|
+| `value` | Valor que se enviará al servidor |
+| `selected` | Marca la opción como seleccionada por defecto |
+| `disabled` | Desactiva esta opción específica |
+
+#### Agrupación de opciones con `<optgroup>`
+
+<Code code={`<select name="vehiculo">
+  <optgroup label="Coches">
+    <option value="sedan">Sedán</option>
+    <option value="suv">SUV</option>
+  </optgroup>
+  <optgroup label="Motocicletas">
+    <option value="deportiva">Deportiva</option>
+    <option value="scooter">Scooter</option>
+  </optgroup>
+</select>`} lang="html" />
+
+### Elementos `<fieldset>` y `<legend>` <Badge text="Organización" variant="note" />
+
+Los elementos `<fieldset>` y `<legend>` ayudan a organizar y agrupar controles relacionados en un formulario:
+
+<Code code={`<fieldset>
+  <legend>Información personal</legend>
+  
+  <label for="nombre">Nombre:</label>
+  <input type="text" id="nombre" name="nombre" required>
+  
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" required>
+</fieldset>
+
+<fieldset>
+  <legend>Preferencias</legend>
+  
+  <input type="checkbox" id="noticias" name="noticias" value="si">
+  <label for="noticias">Recibir noticias</label>
+  
+  <input type="checkbox" id="ofertas" name="ofertas" value="si">
+  <label for="ofertas">Recibir ofertas</label>
+</fieldset>`} lang="html" />
+
+<Aside type="tip">
+  Los elementos `<fieldset>` y `<legend>` mejoran la accesibilidad al agrupar lógicamente los controles relacionados, especialmente para usuarios de lectores de pantalla.
+</Aside>
+
+## Botones
+
+### Elemento `<button>`
+
+El elemento `<button>` es más flexible que `<input type="submit">` ya que puede contener HTML:
+
+<Code code={`<button type="submit">Enviar <span class="icon">✓</span></button>
+<button type="reset">Limpiar formulario</button>
+<button type="button" onclick="mostrarAyuda()">Ayuda</button>`} lang="html" />
+
+#### Tipos de botones
+
+| Valor de `type` | Descripción |
+|----------|-------------|
+| `submit` | Envía el formulario (comportamiento predeterminado) |
+| `reset` | Restablece todos los controles a sus valores iniciales |
+| `button` | No hace nada por sí solo, se usa con JavaScript |
+
+## Ejemplo de formulario completo
+
+<Code code={`<form action="/procesar" method="post" enctype="multipart/form-data">
+  <fieldset>
+    <legend>Datos personales</legend>
+    
+    <div>
+      <label for="nombre">Nombre completo:</label>
+      <input type="text" id="nombre" name="nombre" required>
+    </div>
+    
+    <div>
+      <label for="email">Correo electrónico:</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+    
+    <div>
+      <label for="telefono">Teléfono:</label>
+      <input type="tel" id="telefono" name="telefono" pattern="[0-9]{9}">
+    </div>
+  </fieldset>
+  
+  <fieldset>
+    <legend>Detalles del pedido</legend>
+    
+    <div>
+      <label for="producto">Producto:</label>
+      <select id="producto" name="producto" required>
+        <option value="">Seleccione un producto</option>
+        <option value="1">Producto A</option>
+        <option value="2">Producto B</option>
+        <option value="3">Producto C</option>
+      </select>
+    </div>
+    
+    <div>
+      <label for="cantidad">Cantidad:</label>
+      <input type="number" id="cantidad" name="cantidad" min="1" max="10" value="1">
+    </div>
+    
+    <div>
+      <label>Opciones:</label>
+      <input type="checkbox" id="opcion1" name="opciones[]" value="extra1">
+      <label for="opcion1">Opción extra 1</label>
+      
+      <input type="checkbox" id="opcion2" name="opciones[]" value="extra2">
+      <label for="opcion2">Opción extra 2</label>
+    </div>
+  </fieldset>
+  
+  <fieldset>
+    <legend>Comentarios adicionales</legend>
+    
+    <div>
+      <label for="comentarios">Comentarios:</label>
+      <textarea id="comentarios" name="comentarios" rows="4" cols="50"></textarea>
+    </div>
+    
+    <div>
+      <label for="archivo">Adjuntar archivo:</label>
+      <input type="file" id="archivo" name="archivo" accept=".pdf,.jpg,.png">
+    </div>
+  </fieldset>
+  
+  <div>
+    <input type="checkbox" id="terminos" name="terminos" value="acepto" required>
+    <label for="terminos">Acepto los términos y condiciones</label>
+  </div>
+  
+  <div>
+    <button type="submit">Enviar pedido</button>
+    <button type="reset">Limpiar formulario</button>
+  </div>
+</form>`} lang="html" title="Formulario completo con múltiples elementos" />
+
+## Mejores prácticas para formularios
+
+1. **Usa etiquetas adecuadamente**: Siempre asocia `<label>` con sus controles correspondientes mediante el atributo `for`.
+
+2. **Agrupa campos relacionados**: Utiliza `<fieldset>` y `<legend>` para agrupar y describir secciones del formulario.
+
+3. **Proporciona validación**: Usa atributos como `required`, `pattern`, `min`/`max` para validación del lado del cliente.
+
+4. **Incluye mensajes de error claros**: Usa el atributo `title` para proporcionar mensajes de error descriptivos.
+
+5. **Diseña para dispositivos móviles**: Asegúrate de que los controles sean lo suficientemente grandes para interactuar en pantallas táctiles.
+
+6. **Mantén los formularios simples**: Solicita solo la información necesaria para mejorar las tasas de conversión.
+
+7. **Proporciona retroalimentación**: Informa al usuario cuando el formulario se ha enviado correctamente o si hay errores.
+
+8. **Considera la accesibilidad**: Asegúrate de que el formulario sea navegable con teclado y compatible con lectores de pantalla.
+
+<Aside type="caution">
+  Recuerda que la validación del lado del cliente (HTML) es conveniente para el usuario, pero siempre debe complementarse con validación del lado del servidor por razones de seguridad.
+</Aside>

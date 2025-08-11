@@ -1,0 +1,197 @@
+---
+title: Funciones
+description: Aprende a crear y utilizar funciones en JavaScript, incluyendo funciones flecha, closures y más.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Funciones <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Las funciones son bloques de código reutilizables que nos permiten organizar y estructurar nuestro código.
+</Aside>
+
+## Declaración y expresión <Badge text="Básico" variant="note" />
+
+### Declaración de función
+<Code code={`// Declaración de función
+function saludar(nombre) {
+    return "Hola " + nombre;
+}
+
+// Llamada a la función
+saludar("María"); // "Hola María"`} lang="javascript" />
+
+### Expresión de función
+<Code code={`// Expresión de función
+const saludar = function(nombre) {
+    return "Hola " + nombre;
+};
+
+// Función anónima
+const suma = function(a, b) { return a + b; };`} lang="javascript" />
+
+## Funciones flecha <Badge text="Moderno" variant="success" />
+
+<Aside type="tip">
+  Las funciones flecha proporcionan una sintaxis más concisa y manejan el this de manera diferente.
+</Aside>
+
+<Code code={`// Función flecha básica
+const sumar = (a, b) => a + b;
+
+// Con bloque de código
+const saludar = nombre => {
+    const mensaje = "Hola " + nombre;
+    return mensaje;
+};
+
+// Sin parámetros
+const saludo = () => "Hola Mundo";
+
+// Un solo parámetro
+const cuadrado = x => x * x;`} lang="javascript" />
+
+## Parámetros por defecto y rest <Badge text="Avanzado" variant="note" />
+
+### Parámetros por defecto
+<Code code={`function saludar(nombre = "Usuario") {
+    return "Hola " + nombre;
+}
+
+saludar(); // "Hola Usuario"
+saludar("María"); // "Hola María"`} lang="javascript" />
+
+### Parámetros rest
+<Code code={`function sumar(...numeros) {
+    return numeros.reduce((total, num) => total + num, 0);
+}
+
+sumar(1, 2, 3, 4); // 10`} lang="javascript" />
+
+### Parámetros opcionales
+<Code code={`function configurar(opciones) {
+    // Si opciones es undefined o null, se usa un objeto vacío
+    const config = opciones ?? {};
+    
+    // Acceso seguro a propiedades que podrían no existir
+    const puerto = config?.puerto ?? 8080;
+    const host = config?.host ?? 'localhost';
+    
+    return { puerto, host };
+}
+
+// Ejemplos de uso
+console.log(configurar()); // { puerto: 8080, host: 'localhost' }
+console.log(configurar({ puerto: 3000 })); // { puerto: 3000, host: 'localhost' }
+console.log(configurar({ host: '127.0.0.1' })); // { puerto: 8080, host: '127.0.0.1' }`} lang="javascript" />
+
+## Closures <Badge text="Avanzado" variant="danger" />
+
+<Aside type="caution">
+  Los closures son un concepto avanzado pero muy poderoso en JavaScript.
+</Aside>
+
+<Code code={`function crearContador() {
+    let contador = 0;
+    return {
+        incrementar: () => ++contador,
+        obtenerValor: () => contador
+    };
+}
+
+const contador = crearContador();
+contador.incrementar(); // 1
+contador.incrementar(); // 2
+contador.obtenerValor(); // 2`} lang="javascript" />
+
+## IIFE (Immediately Invoked Function Expression) <Badge text="Avanzado" variant="note" />
+
+<Aside type="tip">
+  Las IIFE son útiles para crear un scope aislado y ejecutar código inmediatamente.
+</Aside>
+
+<Code code={`(function() {
+    const mensaje = "Este código se ejecuta inmediatamente";
+    console.log(mensaje);
+})();
+
+// Versión con arrow function
+(() => {
+    const config = {
+        api: "https://api.ejemplo.com",
+        version: "1.0"
+    };
+    // Hacer algo con la configuración
+})();`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+### Nombres descriptivos
+<Code code={`// ❌ Malo
+function fn(x, y) {
+    return x + y;
+}
+
+// ✅ Bueno
+function sumarNumeros(numero1, numero2) {
+    return numero1 + numero2;
+}`} lang="javascript" />
+
+### Una función, una tarea
+<Code code={`// ❌ Malo
+function procesarUsuario(usuario) {
+    validarDatos(usuario);
+    guardarEnDB(usuario);
+    enviarEmail(usuario);
+}
+
+// ✅ Bueno
+function validarUsuario(usuario) {
+    return usuario.nombre && usuario.email;
+}
+
+function guardarUsuario(usuario) {
+    return db.usuarios.save(usuario);
+}
+
+function notificarUsuario(usuario) {
+    return enviarEmail(usuario.email, 'Bienvenido');
+}`} lang="javascript" />
+
+### Argumentos claros
+<Code code={`// ❌ Malo
+function configurar(x, y, z) {
+    // ¿Qué significan x, y, z?
+}
+
+// ✅ Bueno
+function configurarAplicacion({ 
+    puerto = 8080,
+    entorno = 'desarrollo',
+    debug = false
+} = {}) {
+    // Configuración con parámetros nombrados
+}`} lang="javascript" />
+
+### Evitar efectos secundarios
+<Code code={`// ❌ Malo
+let total = 0;
+function sumar(numero) {
+    total += numero; // Modifica variable externa
+}
+
+// ✅ Bueno
+function sumar(total, numero) {
+    return total + numero; // Sin efectos secundarios
+}`} lang="javascript" />
+
+### Manejo de errores
+<Code code={`function dividir(a, b) {
+    if (b === 0) {
+        throw new Error("No se puede dividir por cero");
+    }
+    return a / b;
+}`} lang="javascript" />

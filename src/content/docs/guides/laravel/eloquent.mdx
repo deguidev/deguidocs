@@ -1,0 +1,1981 @@
+---
+title: 6. Eloquent ORM en Laravel
+description: Aprende a utilizar Eloquent ORM para modelos, consultas, relaciones y más
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Eloquent ORM en Laravel
+
+Eloquent es el ORM (Object-Relational Mapper) incluido en Laravel que proporciona una implementación activa del patrón ActiveRecord para trabajar con tu base de datos. Cada tabla de la base de datos tiene un "Modelo" correspondiente que se utiliza para interactuar con esa tabla.
+
+
+## Consultas básicas y avanzadas
+
+Eloquent proporciona una interfaz fluida para construir consultas SQL. Puedes utilizar métodos encadenados para construir consultas complejas de manera legible.
+
+### Recuperando registros
+
+#### Obtener todos los registros
+
+<Code code={`// Obtener todos los productos
+$productos = Producto::all();`} lang="php" />
+
+#### Obtener el primer registro
+
+<Code code={`// Obtener el primer producto
+$producto = Producto::first();
+
+// Obtener el primer producto o lanzar una excepción si no existe
+$producto = Producto::firstOrFail();`} lang="php" />
+
+#### Obtener por clave primaria
+
+<Code code={`// Obtener producto con ID 1
+$producto = Producto::find(1);
+
+// Obtener producto con ID 1 o lanzar una excepción si no existe
+$producto = Producto::findOrFail(1);
+
+// Obtener productos con IDs 1, 2 y 3
+$productos = Producto::find([1, 2, 3]);`} lang="php" />
+
+### Cláusulas where
+
+#### Condiciones básicas
+
+<Code code={`// Productos con precio igual a 100
+$productos = Producto::where('precio', 100)->get();
+
+// Productos con precio mayor a 100
+$productos = Producto::where('precio', '>', 100)->get();
+
+// Productos con precio entre 100 y 200
+$productos = Producto::whereBetween('precio', [100, 200])->get();
+
+// Productos con IDs en un array
+$productos = Producto::whereIn('id', [1, 2, 3])->get();
+
+// Productos que tienen una descripción
+$productos = Producto::whereNotNull('descripcion')->get();`} lang="php" />
+
+#### Múltiples condiciones
+
+<Code code={`// Productos con precio > 100 Y stock > 0
+$productos = Producto::where('precio', '>', 100)
+                ->where('stock', '>', 0)
+                ->get();
+                
+// Productos con precio > 100 O stock = 0
+$productos = Producto::where('precio', '>', 100)
+                ->orWhere('stock', 0)
+                ->get();
+                
+// Agrupación de condiciones
+$productos = Producto::where('activo', true)
+                ->where(function($query) {
+                    $query->where('precio', '>', 100)
+                          ->orWhere('destacado', true);
+                })
+                ->get();`} lang="php" />
+
+### Ordenamiento y límites
+
+<Code code={`// Ordenar productos por precio ascendente
+$productos = Producto::orderBy('precio', 'asc')->get();
+
+// Ordenar por múltiples columnas
+$productos = Producto::orderBy('categoria_id', 'asc')
+                ->orderBy('precio', 'desc')
+                ->get();
+                
+// Ordenar aleatoriamente
+$productos = Producto::inRandomOrder()->get();
+
+// Limitar resultados
+$productos = Producto::limit(10)->get();
+
+// Saltar y limitar (para paginación manual)
+$productos = Producto::skip(10)->take(5)->get();`} lang="php" />
+
+### Consultas avanzadas
+
+#### Seleccionar columnas específicas
+
+<Code code={`// Seleccionar solo algunas columnas
+$productos = Producto::select('id', 'nombre', 'precio')->get();
+
+// Seleccionar con alias
+$productos = Producto::select('id', 'nombre', 'precio as valor')->get();`} lang="php" />
+
+#### Agregaciones
+
+<Code code={`// Contar productos
+$total = Producto::count();
+
+// Suma de precios
+$suma = Producto::sum('precio');
+
+// Precio promedio
+$promedio = Producto::avg('precio');
+
+// Precio máximo
+$maximo = Producto::max('precio');
+
+// Precio mínimo
+$minimo = Producto::min('precio');`} lang="php" />
+
+#### Agrupación
+
+<Code code={`// Agrupar productos por categoría y contar
+$porCategoria = Producto::select('categoria_id', DB::raw('count(*) as total'))
+                    ->groupBy('categoria_id')
+                    ->get();
+                    
+// Agrupar con condiciones having
+$porCategoria = Producto::select('categoria_id', DB::raw('avg(precio) as precio_promedio'))
+                    ->groupBy('categoria_id')
+                    ->having('precio_promedio', '>', 100)
+                    ->get();`} lang="php" />
+
+### Consultas SQL personalizadas
+
+#### Expresiones SQL sin procesar
+
+<Code code={`// Usar expresiones SQL sin procesar
+$productos = Producto::select('nombre', DB::raw('precio * 1.16 as precio_con_iva'))
+                ->where(DB::raw('YEAR(created_at)'), '=', '2023')
+                ->get();`} lang="php" />
+
+#### Consultas SQL directas
+
+<Code code={`// Ejecutar consulta SQL directamente
+$productos = DB::select('SELECT * FROM productos WHERE precio > ?', [100]);
+
+// Consulta preparada con múltiples parámetros
+$productos = DB::select(
+    'SELECT * FROM productos WHERE categoria_id = ? AND precio > ?', 
+    [1, 100]
+);`} lang="php" />
+
+### Subconsultas
+
+<Code code={`// Subconsulta en select
+$usuarios = Usuario::select('id', 'nombre', function($query) {
+                $query->selectRaw('COUNT(*)')
+                      ->from('pedidos')
+                      ->whereColumn('pedidos.usuario_id', 'usuarios.id')
+                      ->as('total_pedidos');
+            })->get();
+            
+// Subconsulta en where
+$productos = Producto::whereExists(function($query) {
+                $query->select(DB::raw(1))
+                      ->from('categorias')
+                      ->whereColumn('categorias.id', 'productos.categoria_id')
+                      ->where('categorias.activa', true);
+            })->get();`} lang="php" />
+
+### Consultas con relaciones
+
+#### Eager loading (carga ansiosa)
+
+<Code code={`// Cargar productos con su categoría
+$productos = Producto::with('categoria')->get();
+
+// Cargar múltiples relaciones
+$productos = Producto::with(['categoria', 'comentarios', 'etiquetas'])->get();
+
+// Cargar relaciones anidadas
+$productos = Producto::with('categoria.departamento')->get();
+
+// Cargar relaciones con condiciones
+$productos = Producto::with(['comentarios' => function($query) {
+                $query->where('aprobado', true);
+            }])->get();`} lang="php" />
+
+#### Lazy loading (carga perezosa)
+
+<Code code={`// Cargar relaciones bajo demanda
+$producto = Producto::find(1);
+$categoria = $producto->categoria; // Ejecuta una consulta adicional`} lang="php" />
+
+<Aside type="caution">
+El lazy loading puede llevar al problema N+1, donde se ejecuta una consulta adicional por cada modelo cargado. Usa eager loading (<Code code="with()" lang="php" inline />) cuando necesites acceder a relaciones para múltiples modelos.
+</Aside>
+
+### Consultas con JSON
+
+<Code code={`// Consultar campos JSON
+$usuarios = Usuario::where('preferencias->tema', 'oscuro')->get();
+
+// Consultar arrays JSON
+$productos = Producto::whereJsonContains('etiquetas', 'oferta')->get();`} lang="php" />
+
+### Consultas con fechas
+
+<Code code={`// Productos creados hoy
+$productos = Producto::whereDate('created_at', Carbon::today())->get();
+
+// Productos creados en los últimos 7 días
+$productos = Producto::where('created_at', '>=', Carbon::now()->subDays(7))->get();
+
+// Productos creados en un mes específico
+$productos = Producto::whereMonth('created_at', '12')->get();
+
+// Productos creados en un año específico
+$productos = Producto::whereYear('created_at', '2023')->get();`} lang="php" />
+
+### Consultas con soft deletes
+
+Si tu modelo utiliza el trait <Code code="SoftDeletes" lang="php" inline />:
+
+<Code code={`// Incluir registros eliminados
+$productos = Producto::withTrashed()->get();
+
+// Obtener solo registros eliminados
+$productos = Producto::onlyTrashed()->get();
+
+// Restaurar registros eliminados
+$producto = Producto::onlyTrashed()->find(1);
+$producto->restore();`} lang="php" />
+
+### Consultas con scopes globales y locales
+
+<Code code={`// Usando un scope local definido en el modelo
+$productosActivos = Producto::activos()->get();
+
+// Combinando scopes
+$productosDestacadosConStock = Producto::destacados()->conStock()->get();`} lang="php" />
+
+## Creación y actualización de registros
+
+Eloquent proporciona métodos intuitivos para crear, actualizar y eliminar registros en la base de datos.
+
+## Creando registros
+
+### Método create
+
+El método `create` permite crear un nuevo registro en la base de datos utilizando un array de atributos. Para que este método funcione, es necesario definir la propiedad `$fillable` o `$guarded` en el modelo para especificar qué atributos pueden ser asignados masivamente.
+
+<Tabs>
+<TabItem label="Modelo">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Producto extends Model
+{
+    /**
+     * Los atributos que son asignables masivamente.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'nombre',
+        'descripcion',
+        'precio',
+        'categoria_id',
+        'stock'
+    ];
+}
+```
+
+</TabItem>
+<TabItem label="Uso">
+
+```php
+// Crear un producto con el método create
+$producto = Producto::create([
+    'nombre' => 'Nuevo Producto',
+    'descripcion' => 'Descripción del producto',
+    'precio' => 99.99,
+    'categoria_id' => 1,
+    'stock' => 100
+]);
+
+// El ID del nuevo producto está disponible
+echo $producto->id;
+```
+
+</TabItem>
+</Tabs>
+
+## Instanciando un modelo
+
+También puedes crear un modelo instanciándolo primero y luego llamando al método `save`:
+
+<Code code={`// Crear una instancia del modelo
+$producto = new Producto;
+
+// Asignar atributos
+$producto->nombre = 'Nuevo Producto';
+$producto->descripcion = 'Descripción del producto';
+$producto->precio = 99.99;
+$producto->categoria_id = 1;
+$producto->stock = 100;
+
+// Guardar el modelo en la base de datos
+$producto->save();`} lang="php" />
+
+### Asignación masiva con fill
+
+El método `fill` permite asignar múltiples atributos a la vez:
+
+<Code code={`$producto = new Producto;
+
+// Asignar múltiples atributos a la vez
+$producto->fill([
+    'nombre' => 'Nuevo Producto',
+    'descripcion' => 'Descripción del producto',
+    'precio' => 99.99,
+    'categoria_id' => 1,
+    'stock' => 100
+]);
+
+$producto->save();`} lang="php" />
+
+### Método firstOrCreate
+
+Busca un registro con los atributos dados o lo crea si no existe:
+
+<Code code={`// Buscar por nombre o crear si no existe
+$producto = Producto::firstOrCreate(
+    ['nombre' => 'Producto Único'], // Atributos para buscar
+    [
+        'descripcion' => 'Descripción por defecto',
+        'precio' => 99.99,
+        'categoria_id' => 1,
+        'stock' => 100
+    ] // Atributos adicionales si se crea
+);`} lang="php" />
+
+### Método firstOrNew
+
+Similar a `firstOrCreate`, pero no guarda automáticamente el modelo:
+
+<Code code={`// Buscar por nombre o crear una instancia si no existe
+$producto = Producto::firstOrNew(
+    ['nombre' => 'Producto Único'], // Atributos para buscar
+    [
+        'descripcion' => 'Descripción por defecto',
+        'precio' => 99.99,
+        'categoria_id' => 1,
+        'stock' => 100
+    ] // Atributos adicionales si se crea
+);
+
+// El modelo debe guardarse manualmente si es nuevo
+if ($producto->wasRecentlyCreated) {
+    // Realizar operaciones adicionales antes de guardar
+    $producto->save();
+}`} lang="php" />
+
+### Método updateOrCreate
+
+Actualiza un registro existente o crea uno nuevo si no existe:
+
+<Code code={`// Actualizar si existe o crear si no
+$producto = Producto::updateOrCreate(
+    ['nombre' => 'Producto Único'], // Atributos para buscar
+    [
+        'descripcion' => 'Descripción actualizada',
+        'precio' => 129.99,
+        'stock' => 50
+    ] // Atributos para actualizar o crear
+);`} lang="php" />
+
+## Actualizando registros
+
+### Actualizar un modelo existente
+
+<Code code={`// Obtener un producto existente
+$producto = Producto::find(1);
+
+// Actualizar atributos
+$producto->precio = 149.99;
+$producto->stock = 75;
+
+// Guardar los cambios
+$producto->save();`} lang="php" />
+
+### Actualización masiva
+
+El método `update` permite actualizar múltiples registros que coincidan con una consulta:
+
+<Code code={`// Actualizar todos los productos de una categoría
+Producto::where('categoria_id', 1)
+    ->update(['destacado' => true]);
+
+// Incrementar el precio de todos los productos en un 10%
+Producto::where('precio', '<', 100)
+    ->update([
+        'precio' => DB::raw('precio * 1.1')
+    ]);`} lang="php" />
+
+### Métodos de incremento y decremento
+
+Para campos numéricos, puedes usar los métodos `increment` y `decrement`:
+
+<Code code={`// Incrementar el stock en 5
+$producto = Producto::find(1);
+$producto->increment('stock', 5);
+
+// Decrementar el precio en 10 y actualizar campos adicionales
+$producto->decrement('precio', 10, [
+    'actualizado_por' => Auth::id()
+]);`} lang="php" />
+
+### Actualizar solo ciertos campos
+
+El método `only` permite seleccionar solo algunos campos para actualizar:
+
+<Code code={`$input = $request->all();
+
+// Actualizar solo los campos permitidos
+$producto = Producto::find(1);
+$producto->fill($input)->only(['nombre', 'descripcion'])->save();`} lang="php" />
+
+## Eliminando registros
+
+### Eliminar un modelo
+
+<Code code={`// Obtener y eliminar un producto
+$producto = Producto::find(1);
+$producto->delete();
+
+// Eliminar directamente por ID
+Producto::destroy(1);
+
+// Eliminar múltiples registros por ID
+Producto::destroy([1, 2, 3]);
+Producto::destroy(1, 2, 3);`} lang="php" />
+
+### Eliminación masiva
+
+<Code code={`// Eliminar todos los productos agotados
+Producto::where('stock', 0)->delete();`} lang="php" />
+
+### Soft Deletes (Eliminación suave)
+
+La eliminación suave permite "eliminar" registros sin borrarlos realmente de la base de datos:
+
+<Tabs>
+<TabItem label="Migración">
+
+```php
+Schema::create('productos', function (Blueprint $table) {
+    $table->id();
+    $table->string('nombre');
+    $table->text('descripcion')->nullable();
+    $table->decimal('precio', 8, 2);
+    $table->integer('stock')->default(0);
+    $table->timestamps();
+    $table->softDeletes(); // Añade la columna deleted_at
+});
+```
+
+</TabItem>
+<TabItem label="Modelo">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Producto extends Model
+{
+    use SoftDeletes;
+    
+    protected $fillable = [
+        'nombre',
+        'descripcion',
+        'precio',
+        'stock'
+    ];
+}
+```
+
+</TabItem>
+<TabItem label="Uso">
+
+```php
+// Eliminar suavemente (establece deleted_at)
+$producto = Producto::find(1);
+$producto->delete();
+
+// Restaurar un producto eliminado suavemente
+$producto = Producto::withTrashed()->find(1);
+$producto->restore();
+
+// Eliminar permanentemente
+$producto->forceDelete();
+```
+
+</TabItem>
+</Tabs>
+
+### Eventos del modelo
+
+Eloquent dispara varios eventos durante el ciclo de vida de un modelo, que puedes utilizar para ejecutar código adicional:
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Producto extends Model
+{
+    /**
+     * Los atributos asignables masivamente.
+     */
+    protected $fillable = [
+        'nombre', 'precio', 'stock'
+    ];
+    
+    /**
+     * El método "booted" del modelo.
+     */
+    protected static function booted()
+    {
+        // Antes de crear un producto
+        static::creating(function ($producto) {
+            // Generar un SKU único
+            $producto->sku = 'PROD-' . strtoupper(uniqid());
+        });
+        
+        // Después de crear un producto
+        static::created(function ($producto) {
+            // Registrar actividad
+            Activity::log('Producto creado: ' . $producto->nombre);
+        });
+        
+        // Antes de actualizar
+        static::updating(function ($producto) {
+            // Validaciones adicionales
+            if ($producto->precio < 0) {
+                return false; // Cancelar la actualización
+            }
+        });
+        
+        // Después de actualizar
+        static::updated(function ($producto) {
+            // Limpiar caché
+            Cache::forget('producto:' . $producto->id);
+        });
+        
+        // Antes de eliminar
+        static::deleting(function ($producto) {
+            // Verificar si se puede eliminar
+            if ($producto->pedidos()->count() > 0) {
+                return false; // Cancelar la eliminación
+            }
+        });
+    }
+}`} lang="php" />
+
+Los eventos disponibles son:
+- `retrieved`: Después de obtener un modelo existente de la base de datos
+- `creating` / `created`: Antes/después de crear un nuevo modelo
+- `updating` / `updated`: Antes/después de actualizar un modelo existente
+- `saving` / `saved`: Antes/después de crear o actualizar un modelo
+- `deleting` / `deleted`: Antes/después de eliminar un modelo
+- `restoring` / `restored`: Antes/después de restaurar un modelo con soft delete
+- `replicating`: Antes de replicar un modelo
+
+## Relaciones en Eloquent
+
+Las relaciones en Eloquent permiten definir conexiones entre modelos. Laravel soporta varios tipos de relaciones:
+
+### One To One (Uno a Uno)
+
+Una relación uno a uno es la más básica. Por ejemplo, un `Usuario` puede tener un `Perfil`.
+
+#### Definiendo la relación
+
+<Tabs>
+<TabItem label="Modelo Usuario">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Usuario extends Model
+{
+    /**
+     * Obtener el perfil asociado con el usuario.
+     */
+    public function perfil()
+    {
+        return $this->hasOne(Perfil::class);
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Modelo Perfil">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Perfil extends Model
+{
+    /**
+     * Obtener el usuario dueño del perfil.
+     */
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class);
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+#### Personalizando claves
+
+Por defecto, Eloquent buscará una columna `usuario_id` en la tabla `perfiles`. Puedes personalizar esto:
+
+<Code code={`// Personalizar la clave foránea
+public function perfil()
+{
+    return $this->hasOne(Perfil::class, 'user_id');
+}
+
+// Personalizar la clave local
+public function perfil()
+{
+    return $this->hasOne(Perfil::class, 'user_id', 'id_usuario');
+}`} lang="php" />
+
+#### Usando la relación
+
+<Code code={`// Acceder al perfil de un usuario
+$usuario = Usuario::find(1);
+$perfil = $usuario->perfil;
+
+// Acceder al usuario desde un perfil
+$perfil = Perfil::find(1);
+$usuario = $perfil->usuario;`} lang="php" />
+
+### One To Many (Uno a Muchos)
+
+Una relación uno a muchos se utiliza cuando un modelo puede tener múltiples instancias de otro modelo. Por ejemplo, un `Usuario` puede tener múltiples `Publicaciones`.
+
+#### Definiendo la relación
+
+<Tabs>
+<TabItem label="Modelo Usuario">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Usuario extends Model
+{
+    /**
+     * Obtener las publicaciones del usuario.
+     */
+    public function publicaciones()
+    {
+        return $this->hasMany(Publicacion::class);
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Modelo Publicacion">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Publicacion extends Model
+{
+    /**
+     * Obtener el usuario que escribió la publicación.
+     */
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class);
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+#### Usando la relación
+
+<Code code={`// Obtener todas las publicaciones de un usuario
+$usuario = Usuario::find(1);
+$publicaciones = $usuario->publicaciones;
+
+// Contar las publicaciones
+$cantidadPublicaciones = $usuario->publicaciones()->count();
+
+// Filtrar publicaciones
+$publicacionesRecientes = $usuario->publicaciones()
+                                ->where('created_at', '>=', now()->subDays(7))
+                                ->get();`} lang="php" />
+
+### Many To Many (Muchos a Muchos)
+
+Las relaciones muchos a muchos son más complejas y requieren una tabla pivote. Por ejemplo, un `Usuario` puede pertenecer a múltiples `Rol`es, y un `Rol` puede tener múltiples `Usuario`s.
+
+#### Definiendo la relación
+
+<Tabs>
+<TabItem label="Modelo Usuario">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Usuario extends Model
+{
+    /**
+     * Los roles que pertenecen al usuario.
+     */
+    public function roles()
+    {
+        return $this->belongsToMany(Rol::class);
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Modelo Rol">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Rol extends Model
+{
+    /**
+     * Los usuarios que pertenecen al rol.
+     */
+    public function usuarios()
+    {
+        return $this->belongsToMany(Usuario::class);
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+#### Personalizando la tabla pivote
+
+Por defecto, Eloquent usará los nombres de los modelos en orden alfabético para la tabla pivote (en este caso, `rol_usuario`). Puedes personalizar esto:
+
+<Code code={`// Personalizar nombre de tabla pivote
+public function roles()
+{
+    return $this->belongsToMany(Rol::class, 'usuario_roles');
+}
+
+// Personalizar claves
+public function roles()
+{
+    return $this->belongsToMany(
+        Rol::class, 
+        'usuario_roles', 
+        'usuario_id', // Clave foránea del modelo actual
+        'rol_id'      // Clave foránea del modelo relacionado
+    );
+}`} lang="php" />
+
+#### Datos adicionales en la tabla pivote
+
+A veces necesitas almacenar datos adicionales en la tabla pivote:
+
+<Code code={`// Definir la relación con datos pivote
+public function roles()
+{
+    return $this->belongsToMany(Rol::class)
+                ->withPivot('asignado_por', 'fecha_asignacion')
+                ->withTimestamps();
+}`} lang="php" />
+
+#### Usando la relación
+
+<Code code={`// Obtener todos los roles de un usuario
+$usuario = Usuario::find(1);
+$roles = $usuario->roles;
+
+// Acceder a datos de la tabla pivote
+foreach ($usuario->roles as $rol) {
+    echo $rol->pivot->fecha_asignacion;
+}
+
+// Adjuntar roles a un usuario
+$usuario->roles()->attach(1); // Adjuntar rol con ID 1
+$usuario->roles()->attach([1, 2, 3]); // Adjuntar múltiples roles
+$usuario->roles()->attach(1, ['asignado_por' => 5]); // Con datos pivote
+
+// Desvincular roles
+$usuario->roles()->detach(1); // Desvincular rol con ID 1
+$usuario->roles()->detach(); // Desvincular todos los roles
+
+// Sincronizar roles (elimina los existentes y agrega los nuevos)
+$usuario->roles()->sync([1, 2, 3]);
+
+// Sincronizar sin desvincular
+$usuario->roles()->syncWithoutDetaching([1, 2, 3]);`} lang="php" />
+
+### Has One Through (Tiene Uno A Través)
+
+Esta relación proporciona un atajo para acceder a modelos distantes a través de una relación intermedia. Por ejemplo, un `Pais` tiene muchos `Usuario`s, y cada `Usuario` tiene un `Pasaporte`. A través de `hasOneThrough`, puedes acceder directamente al `Pasaporte` desde el `Pais`.
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Pais extends Model
+{
+    /**
+     * Obtener el pasaporte del usuario del país.
+     */
+    public function pasaporte()
+    {
+        return $this->hasOneThrough(
+            Pasaporte::class, // Modelo final
+            Usuario::class,   // Modelo intermedio
+            'pais_id',        // Clave foránea en el modelo intermedio
+            'usuario_id',     // Clave foránea en el modelo final
+            'id',             // Clave local
+            'id'              // Clave local del modelo intermedio
+        );
+    }
+}`} lang="php" />
+
+### Has Many Through (Tiene Muchos A Través)
+
+Similar a `hasOneThrough`, pero para relaciones uno a muchos. Por ejemplo, un `Pais` tiene muchos `Publicaciones` a través de sus `Usuario`s.
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Pais extends Model
+{
+    /**
+     * Obtener todas las publicaciones de los usuarios del país.
+     */
+    public function publicaciones()
+    {
+        return $this->hasManyThrough(
+            Publicacion::class, // Modelo final
+            Usuario::class,     // Modelo intermedio
+            'pais_id',          // Clave foránea en el modelo intermedio
+            'usuario_id',       // Clave foránea en el modelo final
+            'id',               // Clave local
+            'id'                // Clave local del modelo intermedio
+        );
+    }
+}`} lang="php" />
+
+### Relaciones polimórficas
+
+Las relaciones polimórficas permiten que un modelo pertenezca a más de un tipo de modelo. Por ejemplo, un modelo `Comentario` puede pertenecer tanto a `Publicacion` como a `Video`.
+
+#### One To One Polimórfica
+
+<Tabs>
+<TabItem label="Modelo Imagen">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Imagen extends Model
+{
+    /**
+     * Obtener el modelo dueño de la imagen.
+     */
+    public function imageable()
+    {
+        return $this->morphTo();
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Modelo Usuario">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Usuario extends Model
+{
+    /**
+     * Obtener la imagen del usuario.
+     */
+    public function imagen()
+    {
+        return $this->morphOne(Imagen::class, 'imageable');
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Modelo Producto">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Producto extends Model
+{
+    /**
+     * Obtener la imagen del producto.
+     */
+    public function imagen()
+    {
+        return $this->morphOne(Imagen::class, 'imageable');
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+La tabla `imagenes` necesitará columnas para almacenar la información polimórfica:
+
+<Code code={`Schema::create('imagenes', function (Blueprint $table) {
+    $table->id();
+    $table->string('url');
+    $table->unsignedBigInteger('imageable_id');
+    $table->string('imageable_type');
+    $table->timestamps();
+});`} lang="php" />
+
+#### One To Many Polimórfica
+
+<Tabs>
+<TabItem label="Modelo Comentario">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Comentario extends Model
+{
+    /**
+     * Obtener el modelo dueño del comentario.
+     */
+    public function comentable()
+    {
+        return $this->morphTo();
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Modelo Publicacion">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Publicacion extends Model
+{
+    /**
+     * Obtener los comentarios de la publicación.
+     */
+    public function comentarios()
+    {
+        return $this->morphMany(Comentario::class, 'comentable');
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Modelo Video">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Video extends Model
+{
+    /**
+     * Obtener los comentarios del video.
+     */
+    public function comentarios()
+    {
+        return $this->morphMany(Comentario::class, 'comentable');
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+#### Many To Many Polimórfica
+
+Por ejemplo, implementando un sistema de etiquetas para múltiples tipos de contenido:
+
+<Tabs>
+<TabItem label="Modelo Etiqueta">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Etiqueta extends Model
+{
+    /**
+     * Obtener todas las publicaciones con esta etiqueta.
+     */
+    public function publicaciones()
+    {
+        return $this->morphedByMany(Publicacion::class, 'etiquetable');
+    }
+    
+    /**
+     * Obtener todos los videos con esta etiqueta.
+     */
+    public function videos()
+    {
+        return $this->morphedByMany(Video::class, 'etiquetable');
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Modelo Publicacion">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Publicacion extends Model
+{
+    /**
+     * Obtener todas las etiquetas de la publicación.
+     */
+    public function etiquetas()
+    {
+        return $this->morphToMany(Etiqueta::class, 'etiquetable');
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Modelo Video">
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Video extends Model
+{
+    /**
+     * Obtener todas las etiquetas del video.
+     */
+    public function etiquetas()
+    {
+        return $this->morphToMany(Etiqueta::class, 'etiquetable');
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Cargando relaciones
+
+#### Eager Loading
+
+Para evitar el problema N+1, usa eager loading:
+
+<Code code={`// Cargar una relación
+$usuarios = Usuario::with('perfil')->get();
+
+// Cargar múltiples relaciones
+$usuarios = Usuario::with(['perfil', 'publicaciones'])->get();
+
+// Cargar relaciones anidadas
+$usuarios = Usuario::with('publicaciones.comentarios')->get();
+
+// Cargar relaciones con condiciones
+$usuarios = Usuario::with(['publicaciones' => function ($query) {
+    $query->where('activo', true);
+}])->get();`} lang="php" />
+
+#### Lazy Eager Loading
+
+Cargar relaciones después de que el modelo ya ha sido recuperado:
+
+<Code code={`$usuario = Usuario::find(1);
+
+// Más tarde en el código, decidimos cargar relaciones
+$usuario->load('publicaciones');
+
+// Con condiciones
+$usuario->load(['publicaciones' => function ($query) {
+    $query->where('activo', true);
+}]);`} lang="php" />
+
+### Contando relaciones
+
+Puedes contar relaciones sin cargarlas completamente:
+
+<Code code={`// Contar publicaciones para cada usuario
+$usuarios = Usuario::withCount('publicaciones')->get();
+foreach ($usuarios as $usuario) {
+    echo $usuario->publicaciones_count;
+}
+
+// Contar múltiples relaciones
+$usuarios = Usuario::withCount(['publicaciones', 'comentarios'])->get();
+
+// Contar con condiciones
+$usuarios = Usuario::withCount([
+    'publicaciones', 
+    'publicacionesActivas' => function ($query) {
+        $query->where('activo', true);
+    }
+])->get();`} lang="php" />
+
+## Mutadores y Accesores
+
+Los mutadores y accesores permiten transformar los datos cuando se asignan o recuperan de un modelo Eloquent.
+
+### Accesores
+
+Los accesores te permiten dar formato a los atributos de un modelo cuando los recuperas de la base de datos.
+
+#### Definiendo accesores (Laravel 8+)
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
+class Usuario extends Model
+{
+    /**
+     * Obtener el nombre completo del usuario.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function nombreCompleto(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, $attributes) => $attributes['nombre'] . ' ' . $attributes['apellido'],
+        );
+    }
+}`} lang="php" />
+
+#### Definiendo accesores (Laravel 7 y anteriores)
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Usuario extends Model
+{
+    /**
+     * Obtener el nombre completo del usuario.
+     *
+     * @return string
+     */
+    public function getNombreCompletoAttribute()
+    {
+        return "{$this->nombre} {$this->apellido}";
+    }
+}`} lang="php" />
+
+#### Usando accesores
+
+<Code code={`$usuario = Usuario::find(1);
+
+// Acceder al atributo como si fuera una propiedad
+echo $usuario->nombre_completo; // "Juan Pérez"`} lang="php" />
+
+### Mutadores
+
+Los mutadores te permiten dar formato a los atributos de un modelo antes de guardarlos en la base de datos.
+
+#### Definiendo mutadores (Laravel 8+)
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
+class Usuario extends Model
+{
+    /**
+     * Interactuar con el email del usuario.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+            set: fn ($value) => strtolower($value),
+        );
+    }
+}`} lang="php" />
+
+#### Definiendo mutadores (Laravel 7 y anteriores)
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Usuario extends Model
+{
+    /**
+     * Establecer el email del usuario.
+     *
+     * @param  string  $value
+     * @return void
+     */
+    public function setEmailAttribute($value)
+    {
+        $this->attributes['email'] = strtolower($value);
+    }
+}`} lang="php" />
+
+#### Usando mutadores
+
+<Code code={`$usuario = Usuario::find(1);
+
+// El mutador se ejecutará automáticamente
+$usuario->email = 'EJEMPLO@CORREO.COM';
+$usuario->save();
+
+// El email se guardará como 'ejemplo@correo.com'`} lang="php" />
+
+### Mutadores y accesores combinados (Laravel 8+)
+
+Puedes definir ambos en un solo método:
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
+class Usuario extends Model
+{
+    /**
+     * Interactuar con el nombre del usuario.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function nombre(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ucfirst($value),
+            set: fn ($value) => strtolower($value),
+        );
+    }
+}`} lang="php" />
+
+### Cast de atributos
+
+Los casts permiten convertir automáticamente atributos entre tipos de datos PHP y formatos de almacenamiento.
+
+#### Definiendo casts
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Producto extends Model
+{
+    /**
+     * Los atributos que deben ser convertidos.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'precio' => 'float',
+        'activo' => 'boolean',
+        'opciones' => 'array',
+        'fecha_lanzamiento' => 'datetime',
+        'descuento' => 'decimal:2',
+        'metadata' => 'collection',
+        'etiquetas' => 'json',
+    ];
+}`} lang="php" />
+
+#### Tipos de cast disponibles
+
+- `integer` / `int`
+- `real` / `float` / `double`
+- `decimal:<decimales>`
+- `string`
+- `boolean` / `bool`
+- `object`
+- `array` / `json`
+- `collection`
+- `date` / `datetime` / `custom_datetime:<formato>`
+- `timestamp`
+- `encrypted`
+- `encrypted:array` / `encrypted:collection` / `encrypted:object` / `encrypted:json`
+
+#### Usando atributos con cast
+
+<Code code={`$producto = Producto::find(1);
+
+// El precio se convierte automáticamente a float
+$precio = $producto->precio + 10.5;
+
+// Las opciones se convierten automáticamente de JSON a array
+$opciones = $producto->opciones;
+$opciones['color'] = 'rojo';
+$producto->opciones = $opciones;
+$producto->save();`} lang="php" />
+
+### Cast personalizados
+
+Puedes crear tus propios tipos de cast personalizados:
+
+<Code code={`<?php
+
+namespace App\Casts;
+
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+
+class Moneda implements CastsAttributes
+{
+    /**
+     * Cast del valor de la base de datos.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  array  $attributes
+     * @return mixed
+     */
+    public function get($model, string $key, $value, array $attributes)
+    {
+        return new \App\ValueObjects\Moneda($value);
+    }
+
+    /**
+     * Preparar el valor para almacenamiento.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  array  $attributes
+     * @return mixed
+     */
+    public function set($model, string $key, $value, array $attributes)
+    {
+        return $value instanceof \App\ValueObjects\Moneda
+                    ? $value->getValor()
+                    : $value;
+    }
+}`} lang="php" />
+
+#### Usando cast personalizados
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use App\Casts\Moneda;
+use Illuminate\Database\Eloquent\Model;
+
+class Producto extends Model
+{
+    /**
+     * Los atributos que deben ser convertidos.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'precio' => Moneda::class,
+    ];
+}`} lang="php" />
+
+## Scopes
+
+Los scopes permiten encapsular lógica de consulta común para reutilizarla en tus modelos.
+
+### Scopes locales
+
+Los scopes locales permiten definir consultas comunes que puedes encadenar en tus consultas Eloquent.
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+
+class Producto extends Model
+{
+    /**
+     * Scope para productos activos.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActivos(Builder $query): Builder
+    {
+        return $query->where('activo', true);
+    }
+
+    /**
+     * Scope para productos populares.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  int  $minimo
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopePopulares(Builder $query, int $minimo = 100): Builder
+    {
+        return $query->where('visitas', '>=', $minimo);
+    }
+
+    /**
+     * Scope para productos de una categoría.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  int  $categoriaId
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeDeCategoria(Builder $query, int $categoriaId): Builder
+    {
+        return $query->where('categoria_id', $categoriaId);
+    }
+}`} lang="php" />
+
+#### Usando scopes locales
+
+<Code code={`// Usar un solo scope
+$productosActivos = Producto::activos()->get();
+
+// Encadenar múltiples scopes
+$productosPopularesActivos = Producto::activos()
+                                    ->populares()
+                                    ->get();
+                                    
+// Scope con parámetros
+$productosPopulares = Producto::populares(200)->get();
+
+// Combinar scopes con otras condiciones
+$productos = Producto::activos()
+                ->deCategoria(5)
+                ->where('precio', '<', 100)
+                ->orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get();`} lang="php" />
+
+### Scopes globales
+
+Los scopes globales permiten añadir restricciones a todas las consultas para un modelo determinado.
+
+#### Definiendo un scope global usando una clase
+
+<Code code={`<?php
+
+namespace App\Scopes;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Scope;
+
+class ActivoScope implements Scope
+{
+    /**
+     * Aplicar el scope a una consulta Eloquent.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return void
+     */
+    public function apply(Builder $builder, Model $model)
+    {
+        $builder->where('activo', true);
+    }
+}`} lang="php" />
+
+#### Aplicando el scope global
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use App\Scopes\ActivoScope;
+use Illuminate\Database\Eloquent\Model;
+
+class Producto extends Model
+{
+    /**
+     * El método "booted" del modelo.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::addGlobalScope(new ActivoScope);
+    }
+}`} lang="php" />
+
+#### Scope global anónimo
+
+<Code code={`<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+
+class Producto extends Model
+{
+    /**
+     * El método "booted" del modelo.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::addGlobalScope('activo', function (Builder $builder) {
+            $builder->where('activo', true);
+        });
+    }
+}`} lang="php" />
+
+#### Removiendo scopes globales
+
+<Code code={`// Remover un scope global por su clase
+$productos = Producto::withoutGlobalScope(ActivoScope::class)->get();
+
+// Remover un scope global anónimo por su nombre
+$productos = Producto::withoutGlobalScope('activo')->get();
+
+// Remover múltiples scopes globales
+$productos = Producto::withoutGlobalScopes([
+    ActivoScope::class, 
+    'activo',
+    EliminadoScope::class
+])->get();
+
+// Remover todos los scopes globales
+$productos = Producto::withoutGlobalScopes()->get();`} lang="php" />
+
+## API Resources
+
+Los API Resources proporcionan una capa de transformación entre tus modelos Eloquent y las respuestas JSON que tu API devuelve. Esto te permite formatear y estructurar tus datos de manera consistente.
+
+### Creando resources
+
+Puedes crear un resource usando Artisan:
+
+<Code code={`php artisan make:resource ProductoResource`} lang="bash" />
+
+Esto creará una clase en `app/Http/Resources`:
+
+<Code code={`<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class ProductoResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id,
+            'nombre' => $this->nombre,
+            'descripcion' => $this->descripcion,
+            'precio' => $this->precio,
+            'categoria_id' => $this->categoria_id,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
+    }
+}`} lang="php" />
+
+### Personalizando la transformación
+
+Puedes personalizar cómo se transforman los datos:
+
+<Code code={`<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class ProductoResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id,
+            'nombre' => $this->nombre,
+            'descripcion' => $this->when(!$request->is('api/productos-simplificados'), $this->descripcion),
+            'precio_formateado' => "$" . number_format($this->precio, 2),
+            'en_stock' => $this->stock > 0,
+            'categoria' => new CategoriaResource($this->whenLoaded('categoria')),
+            'url' => route('productos.show', $this->id),
+            'created_at' => $this->created_at->format('Y-m-d'),
+        ];
+    }
+    
+    /**
+     * Get additional data that should be returned with the resource array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function with($request)
+    {
+        return [
+            'meta' => [
+                'version' => '1.0.0',
+            ],
+        ];
+    }
+}`} lang="php" />
+
+### Métodos condicionales
+
+Eloquent Resources proporciona métodos para incluir datos condicionalmente:
+
+- `when($condition, $value)`: Incluye un valor solo si la condición es verdadera
+- `whenLoaded($relationship)`: Incluye una relación solo si ya ha sido cargada
+- `whenNotNull($value)`: Incluye un valor solo si no es nulo
+- `whenCounted($countedRelationship)`: Incluye un conteo de relación si ya ha sido cargado
+
+<Code code={`return [
+    // Incluir solo si el usuario es administrador
+    'costo' => $this->when($request->user()->isAdmin(), $this->costo),
+    
+    // Incluir relación solo si ya está cargada
+    'comentarios' => ComentarioResource::collection($this->whenLoaded('comentarios')),
+    
+    // Incluir conteo solo si ya está cargado
+    'comentarios_count' => $this->whenCounted('comentarios'),
+    
+    // Incluir solo si no es nulo
+    'ultima_venta' => $this->whenNotNull($this->ultima_venta_at),
+];`} lang="php" />
+
+### Usando resources en controladores
+
+<Code code={`<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Resources\ProductoResource;
+use App\Http\Resources\ProductoCollection;
+use App\Models\Producto;
+use Illuminate\Http\Request;
+
+class ProductoController extends Controller
+{
+    /**
+     * Mostrar un listado de productos.
+     *
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function index()
+    {
+        $productos = Producto::with('categoria')->get();
+        
+        return ProductoResource::collection($productos);
+    }
+    
+    /**
+     * Mostrar un producto específico.
+     *
+     * @param  \App\Models\Producto  $producto
+     * @return \App\Http\Resources\ProductoResource
+     */
+    public function show(Producto $producto)
+    {
+        return new ProductoResource($producto->load('categoria', 'comentarios'));
+    }
+}`} lang="php" />
+
+### Resource collections
+
+Para personalizar la colección de resources, puedes crear una clase de colección:
+
+<Code code={`php artisan make:resource ProductoCollection`} lang="bash" />
+
+<Code code={`<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\ResourceCollection;
+
+class ProductoCollection extends ResourceCollection
+{
+    /**
+     * Transform the resource collection into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        return [
+            'data' => $this->collection,
+            'links' => [
+                'self' => route('productos.index'),
+            ],
+            'meta' => [
+                'productos_count' => $this->collection->count(),
+                'filtros_aplicados' => $request->query(),
+            ],
+        ];
+    }
+}`} lang="php" />
+
+## Paginación
+
+Eloquent ofrece métodos convenientes para paginar resultados de consultas.
+
+### Paginación básica
+
+<Code code={`// Paginar con 15 elementos por página
+$productos = Producto::paginate(15);
+
+// Paginar resultados filtrados
+$productos = Producto::where('categoria_id', 1)
+                ->orderBy('created_at', 'desc')
+                ->paginate(15);`} lang="php" />
+
+### Paginación simple
+
+La paginación simple es más eficiente cuando no necesitas saber el número total de páginas:
+
+<Code code={`$productos = Producto::simplePaginate(15);`} lang="php" />
+
+### Paginación por cursor
+
+La paginación por cursor es más eficiente para conjuntos de datos grandes:
+
+<Code code={`$productos = Producto::orderBy('id')->cursorPaginate(15);`} lang="php" />
+
+### Personalizando la paginación
+
+<Code code={`// Personalizar el nombre del parámetro de consulta (por defecto es "page")
+$productos = Producto::paginate(15, ['*'], 'pagina');
+
+// Personalizar la URL base para los enlaces de paginación
+Paginator::currentPathResolver(function () {
+    return url('/custom/url');
+});
+
+// Personalizar el resolvedor de página actual
+Paginator::currentPageResolver(function ($pageName = 'page') {
+    return $_GET[$pageName] ?? 1;
+});`} lang="php" />
+
+### Mostrando resultados paginados en vistas
+
+<Tabs>
+<TabItem label="Blade">
+
+```php
+<div class="productos">
+    @foreach ($productos as $producto)
+        <div class="producto">
+            <h3>{{ $producto->nombre }}</h3>
+            <p>{{ $producto->descripcion }}</p>
+        </div>
+    @endforeach
+</div>
+
+{{ $productos->links() }}
+```
+
+</TabItem>
+<TabItem label="Personalizado">
+
+```php
+<div class="productos">
+    @foreach ($productos as $producto)
+        <div class="producto">
+            <h3>{{ $producto->nombre }}</h3>
+            <p>{{ $producto->descripcion }}</p>
+        </div>
+    @endforeach
+</div>
+
+<div class="paginacion">
+    @if ($productos->onFirstPage())
+        <span class="deshabilitado">&laquo; Anterior</span>
+    @else
+        <a href="{{ $productos->previousPageUrl() }}">&laquo; Anterior</a>
+    @endif
+
+    <span>Página {{ $productos->currentPage() }} de {{ $productos->lastPage() }}</span>
+
+    @if ($productos->hasMorePages())
+        <a href="{{ $productos->nextPageUrl() }}">Siguiente &raquo;</a>
+    @else
+        <span class="deshabilitado">Siguiente &raquo;</span>
+    @endif
+</div>
+```
+
+</TabItem>
+</Tabs>
+
+### Paginación con API Resources
+
+Puedes combinar paginación con API Resources para crear APIs RESTful:
+
+<Code code={`<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Resources\ProductoResource;
+use App\Models\Producto;
+use Illuminate\Http\Request;
+
+class ProductoController extends Controller
+{
+    /**
+     * Mostrar un listado paginado de productos.
+     *
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function index()
+    {
+        $productos = Producto::with('categoria')
+                        ->orderBy('created_at', 'desc')
+                        ->paginate(15);
+        
+        return ProductoResource::collection($productos);
+    }
+}`} lang="php" />
+
+Esto generará una respuesta JSON con metadatos de paginación:
+
+<Code code={`{
+    "data": [
+        {
+            "id": 1,
+            "nombre": "Producto 1",
+            // ... otros atributos
+        },
+        // ... más productos
+    ],
+    "links": {
+        "first": "http://ejemplo.com/api/productos?page=1",
+        "last": "http://ejemplo.com/api/productos?page=5",
+        "prev": null,
+        "next": "http://ejemplo.com/api/productos?page=2"
+    },
+    "meta": {
+        "current_page": 1,
+        "from": 1,
+        "last_page": 5,
+        "links": [
+            // ... enlaces de paginación
+        ],
+        "path": "http://ejemplo.com/api/productos",
+        "per_page": 15,
+        "to": 15,
+        "total": 75
+    }
+}`} lang="json" />
+
+<Aside type="tip">
+Cuando trabajas con APIs, puedes personalizar la estructura de paginación usando el método <Code code="withQueryString()" lang="php" inline /> para preservar otros parámetros de consulta o <Code code="withPath('api/custom-path')" lang="php" inline /> para especificar una ruta personalizada.
+</Aside>

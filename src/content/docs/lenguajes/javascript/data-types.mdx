@@ -1,0 +1,176 @@
+---
+title: Tipos de datos
+description: Explora los diferentes tipos de datos disponibles en JavaScript.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Tipos de datos <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Comprender los tipos de datos es esencial para trabajar efectivamente con JavaScript.
+</Aside>
+
+## Tipos primitivos <Badge text="Básico" variant="note" />
+
+### String
+```javascript
+let nombre = "Juan";
+let apellido = 'Pérez';
+let mensaje = `Hola ${nombre}`; // Template literal
+```
+
+### Number
+```javascript
+let entero = 42;
+let decimal = 3.14;
+let infinito = Infinity;
+let noEsNumero = NaN;
+```
+
+### Boolean
+```javascript
+let verdadero = true;
+let falso = false;
+```
+
+### Null y Undefined
+```javascript
+let valorNulo = null;
+let valorIndefinido = undefined;
+```
+
+### Symbol
+```javascript
+let simbolo = Symbol('descripción');
+let simboloUnico = Symbol.for('clave');
+```
+
+### BigInt
+```javascript
+let numeroGrande = 9007199254740991n;
+let otroBigInt = BigInt("9007199254740991");
+```
+
+## Tipos estructurados
+
+### Objetos
+```javascript
+let persona = {
+    nombre: "María",
+    edad: 25,
+    saludar() {
+        return `Hola, soy ${this.nombre}`;
+    }
+};
+```
+
+### Arrays
+```javascript
+let numeros = [1, 2, 3, 4, 5];
+let mixto = ["texto", 42, true, null];
+```
+
+## Verificación de tipos
+
+### typeof
+```javascript
+typeof "Hola"          // "string"
+typeof 42              // "number"
+typeof true            // "boolean"
+typeof undefined       // "undefined"
+typeof null            // "object" (¡esto es un bug histórico!)
+typeof {}              // "object"
+typeof []              // "object"
+typeof Symbol()        // "symbol"
+typeof 42n             // "bigint"
+```
+
+### instanceof
+```javascript
+[] instanceof Array            // true
+new Date() instanceof Date     // true
+/regex/ instanceof RegExp      // true
+```
+
+## Conversión de tipos
+
+### Conversión a String
+```javascript
+String(123)           // "123"
+(123).toString()      // "123"
+123 + ""             // "123"
+```
+
+### Conversión a Number
+```javascript
+Number("123")        // 123
+parseInt("123")      // 123
+parseFloat("3.14")   // 3.14
++"123"              // 123
+```
+
+### Conversión a Boolean
+```javascript
+Boolean(1)           // true
+Boolean("")          // false
+Boolean([])          // true
+!!""                // false
+```
+
+## Valores falsy
+- false
+- 0
+- ""
+- null
+- undefined
+- NaN
+
+```javascript
+if ("") {
+    console.log("Esto no se ejecuta");
+}
+```
+
+## Valores truthy
+- Todo lo demás es truthy
+```javascript
+if ("texto") {
+    console.log("Esto sí se ejecuta");
+}
+```
+
+## Coerción de tipos
+```javascript
+"5" + 3      // "53" (string)
+"5" - 3      // 2 (number)
+"5" * "3"    // 15 (number)
+[] + {}      // "[object Object]"
+```
+
+## Mejores prácticas
+
+1. Usar comparación estricta
+```javascript
+// ❌ Malo
+5 == "5"    // true
+
+// ✅ Bueno
+5 === "5"   // false
+```
+
+2. Verificar tipos explícitamente
+```javascript
+// ✅ Bueno
+if (typeof variable === "string") {
+    // hacer algo
+}
+```
+
+3. Manejar valores nulos/indefinidos
+```javascript
+// ✅ Bueno
+const valor = obtenerValor() ?? valorPorDefecto;
+```

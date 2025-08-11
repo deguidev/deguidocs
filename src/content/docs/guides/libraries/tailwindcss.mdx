@@ -1,0 +1,548 @@
+---
+title: Tailwind CSS
+description: Guía completa de Tailwind CSS - Framework de utilidades CSS first
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Tailwind CSS <Badge text="Framework CSS" variant="success" />
+
+<Aside type="tip">
+Tailwind CSS es un framework CSS utility-first que te permite construir rápidamente interfaces modernas sin salir de tu HTML.
+</Aside>
+
+## Instalación <Badge text="Paso 1" variant="note" />
+
+<Tabs>
+  <TabItem label="npm">
+    ```bash
+    # Instalar Tailwind CSS y sus dependencias
+    npm install -D tailwindcss postcss autoprefixer
+    
+    # Generar archivos de configuración
+    npx tailwindcss init -p
+    ```
+  </TabItem>
+  <TabItem label="CDN">
+    ```html
+    <!-- Última versión de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Versión específica -->
+    <script src="https://cdn.tailwindcss.com?v=3.4.0"></script>
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+El CDN es excelente para desarrollo y prototipado, pero para producción se recomienda la instalación local con npm.
+</Aside>
+
+## Configuración <Badge text="Paso 2" variant="note" />
+
+### tailwind.config.js
+```javascript
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  // Archivos donde se buscarán clases de Tailwind
+  content: [
+    "./src/**/*.{html,js,jsx,ts,tsx,vue,astro}",
+    "./public/**/*.html"
+  ],
+  theme: {
+    // Sobreescribir valores por defecto
+    screens: {
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+    },
+    // Extender el tema por defecto
+    extend: {
+      colors: {
+        'primary': {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+        },
+      },
+      spacing: {
+        '128': '32rem',
+      },
+      fontFamily: {
+        'sans': ['Inter', 'system-ui', 'sans-serif'],
+      },
+    },
+  },
+  // Plugins oficiales y de la comunidad
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+  ],
+}
+```
+
+### Archivo CSS principal
+```css
+/* src/styles/main.css */
+@tailwind base; /* Estilos base y reset */
+@tailwind components; /* Clases de componentes */
+@tailwind utilities; /* Clases de utilidad */
+
+/* Definir componentes personalizados */
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-600 text-white
+           hover:bg-primary-700
+           focus:outline-none focus:ring-2 focus:ring-primary-500;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md
+           focus:outline-none focus:ring-2 focus:ring-primary-500;
+  }
+}
+
+/* Modificar estilos base */
+@layer base {
+  h1 {
+    @apply text-4xl font-bold mb-4;
+  }
+  h2 {
+    @apply text-2xl font-semibold mb-3;
+  }
+}
+```
+
+## Integración <Badge text="Paso 3" variant="note" />
+
+### HTML y JavaScript Vanilla
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind CSS Demo</title>
+  <link href="./dist/output.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+  <!-- Header con navegación responsive -->
+  <header class="bg-white shadow">
+    <nav class="container mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+        <h1 class="text-xl font-bold text-primary-600">Mi App</h1>
+        <button class="md:hidden p-2" id="menuBtn">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M4 6h16M4 12h16m-16 6h16"></path>
+          </svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="container mx-auto px-4 py-8">
+    <section class="max-w-2xl mx-auto">
+      <h2 class="text-3xl font-bold text-gray-900 mb-6">
+        ¡Bienvenido a Tailwind CSS!
+      </h2>
+      
+      <!-- Card con hover y transición -->
+      <div class="
+        bg-white rounded-lg shadow-md p-6
+        transform transition-all duration-300
+        hover:shadow-lg hover:-translate-y-1
+      ">
+        <p class="text-gray-600 mb-4">
+          Este es un ejemplo de diseño moderno usando Tailwind CSS.
+        </p>
+        <button class="btn-primary">
+          Empezar
+        </button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
+```
+
+### Vue.js (Composition API)
+```vue
+<!-- App.vue -->
+<script setup>
+import { ref } from 'vue'
+
+const isMenuOpen = ref(false)
+const toggleMenu = () => isMenuOpen.value = !isMenuOpen.value
+</script>
+
+<template>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Navbar responsive -->
+    <nav class="bg-white shadow">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+          <h1 class="text-xl font-bold text-primary-600">Vue + Tailwind</h1>
+          
+          <!-- Botón móvil -->
+          <button @click="toggleMenu" class="md:hidden p-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path :d="isMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16m-16 6h16'"></path>
+            </svg>
+          </button>
+
+          <!-- Menú desktop -->
+          <div class="hidden md:flex space-x-4">
+            <a href="#" class="text-gray-600 hover:text-primary-600">Inicio</a>
+            <a href="#" class="text-gray-600 hover:text-primary-600">Acerca</a>
+          </div>
+        </div>
+
+        <!-- Menú móvil -->
+        <div v-show="isMenuOpen" class="md:hidden py-4">
+          <a href="#" class="block py-2 text-gray-600 hover:text-primary-600">Inicio</a>
+          <a href="#" class="block py-2 text-gray-600 hover:text-primary-600">Acerca</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Contenido -->
+    <main class="container mx-auto px-4 py-8">
+      <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+        <div class="md:flex">
+          <div class="p-8">
+            <div class="text-sm font-semibold text-primary-600">Ejemplo</div>
+            <h2 class="mt-2 text-xl font-bold">Vue.js + Tailwind CSS</h2>
+            <p class="mt-4 text-gray-500">
+              Una combinación perfecta para crear interfaces modernas.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</template>
+```
+
+### Angular (v17+)
+```typescript
+// app.component.ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  template: `
+    <div class="min-h-screen bg-gray-50">
+      <!-- Header -->
+      <header class="bg-white shadow">
+        <nav class="container mx-auto px-4 py-3">
+          <div class="flex items-center justify-between">
+            <h1 class="text-xl font-bold text-primary-600">Angular + Tailwind</h1>
+            
+            <!-- Menú desktop -->
+            <div class="hidden md:flex space-x-4">
+              <a href="#" class="
+                text-gray-600 hover:text-primary-600
+                transition-colors duration-200
+              ">Inicio</a>
+              <a href="#" class="
+                text-gray-600 hover:text-primary-600
+                transition-colors duration-200
+              ">Acerca</a>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      <!-- Contenido principal -->
+      <main class="container mx-auto px-4 py-8">
+        <section class="
+          max-w-md mx-auto
+          bg-white rounded-lg shadow-md
+          p-6 md:p-8
+        ">
+          <h2 class="text-2xl font-bold mb-4">¡Bienvenido!</h2>
+          <p class="text-gray-600 mb-6">
+            Este es un ejemplo de Angular con Tailwind CSS.
+          </p>
+          
+          <!-- Grid responsivo -->
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="
+              p-4 rounded-lg
+              bg-primary-50 text-primary-700
+              hover:bg-primary-100
+              transition-colors duration-200
+            ">
+              <h3 class="font-semibold mb-2">Características</h3>
+              <p class="text-sm">Diseño moderno y responsive</p>
+            </div>
+            
+            <div class="
+              p-4 rounded-lg
+              bg-primary-50 text-primary-700
+              hover:bg-primary-100
+              transition-colors duration-200
+            ">
+              <h3 class="font-semibold mb-2">Beneficios</h3>
+              <p class="text-sm">Desarrollo rápido y eficiente</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  `,
+})
+export class AppComponent {}
+```
+
+## Comandos de Desarrollo <Badge text="Paso 4" variant="note" />
+
+### Scripts de NPM
+```json
+// package.json
+{
+  "scripts": {
+    "dev": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify",
+    "build:prod": "cross-env NODE_ENV=production tailwindcss -i ./src/input.css -o ./dist/output.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.31",
+    "autoprefixer": "^10.4.16",
+    "cross-env": "^7.0.3"
+  }
+}
+```
+
+### Comandos Útiles
+```bash
+# Iniciar modo desarrollo con recarga en vivo
+npm run dev
+
+# Construir para producción con optimizaciones
+npm run build:prod
+
+# Crear nueva configuración de Tailwind
+npx tailwindcss init --full
+```
+
+## Optimización para Producción <Badge text="Paso 5" variant="caution" />
+
+### 1. Purgar CSS no Utilizado
+```javascript
+// tailwind.config.js
+module.exports = {
+  content: [
+    // Archivos de React/Next.js
+    './src/**/*.{js,jsx,ts,tsx}',
+    // Archivos de Vue
+    './src/**/*.vue',
+    // Archivos de Angular
+    './src/**/*.{html,ts}',
+    // Archivos de Astro
+    './src/**/*.astro',
+    // Archivos HTML estáticos
+    './public/**/*.html',
+  ],
+  // Modo JIT para mejor optimización
+  mode: 'jit',
+}
+```
+
+### 2. Minificación y PostCSS
+```javascript
+// postcss.config.js
+module.exports = {
+  plugins: {
+    'tailwindcss': {},
+    'autoprefixer': {},
+    ...process.env.NODE_ENV === 'production' ? {
+      'cssnano': {
+        preset: ['default', {
+          discardComments: {
+            removeAll: true,
+          },
+          normalizeWhitespace: false,
+        }]
+      }
+    } : {}
+  }
+}
+```
+
+### 3. Separación de Capas
+```css
+/* Separar en archivos diferentes para mejor caching */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Capa personalizada */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+```
+
+## Mejores Prácticas <Badge text="Recomendado" variant="success" />
+
+### 1. Organización de Clases
+```html
+<!-- ✅ BUENO: Clases agrupadas por funcionalidad -->
+<button class="
+  /* Layout */
+  flex items-center justify-center
+  w-full md:w-auto
+  
+  /* Espaciado */
+  px-6 py-3 my-2
+  
+  /* Fondo y bordes */
+  bg-primary-600
+  hover:bg-primary-700
+  rounded-lg
+  
+  /* Tipografía */
+  text-white
+  font-semibold
+  
+  /* Transiciones */
+  transition-all
+  duration-200
+  
+  /* Estados */
+  focus:outline-none
+  focus:ring-2
+  focus:ring-primary-500
+  disabled:opacity-50
+">
+  Botón Principal
+</button>
+
+<!-- ❌ MALO: Clases desordenadas -->
+<button class="text-white bg-blue-500 p-4 hover:bg-blue-600 flex rounded-lg my-2 items-center justify-center font-bold shadow-md">
+  Botón Desordenado
+</button>
+```
+
+### 2. Componentes Reutilizables
+```javascript
+// components/Button.js
+export function Button({ variant = 'primary', size = 'md', children, ...props }) {
+  const baseClasses = 'inline-flex items-center justify-center rounded-lg transition-colors duration-200';
+  
+  const variants = {
+    primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500',
+    secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
+    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
+  };
+  
+  const sizes = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-base',
+    lg: 'px-6 py-3 text-lg'
+  };
+  
+  return (
+    <button
+      className={`
+        ${baseClasses}
+        ${variants[variant]}
+        ${sizes[size]}
+        focus:outline-none focus:ring-2
+        disabled:opacity-50
+      `}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+```
+
+### 3. Patrones Responsivos
+```html
+<!-- Diseño Grid Responsivo -->
+<div class="
+  grid
+  gap-4
+  grid-cols-1
+  sm:grid-cols-2
+  md:grid-cols-3
+  lg:grid-cols-4
+  xl:grid-cols-5
+">
+  <!-- Tarjetas con diferentes tamaños según viewport -->
+  <div class="
+    /* Base (mobile) */
+    w-full p-4
+    
+    /* Tablet */
+    sm:w-auto sm:p-6
+    
+    /* Desktop */
+    lg:p-8
+    
+    /* Contenedor */
+    bg-white
+    rounded-lg shadow-md
+    hover:shadow-lg
+    transition-shadow
+    duration-300
+  ">
+    <h3 class="
+      text-lg sm:text-xl lg:text-2xl
+      font-semibold
+      mb-2
+    ">
+      Título Responsivo
+    </h3>
+    <p class="text-gray-600">
+      Contenido que se adapta a diferentes tamaños de pantalla
+    </p>
+  </div>
+</div>
+```
+
+### 4. Dark Mode
+```javascript
+// tailwind.config.js
+module.exports = {
+  darkMode: 'class', // o 'media' para usar preferencias del sistema
+  // ...
+}
+
+// Uso en HTML
+<div class="
+  bg-white dark:bg-gray-800
+  text-gray-900 dark:text-gray-100
+">
+  Contenido que se adapta al modo oscuro
+</div>
+```
+
+<Aside type="tip">
+  **Recursos Útiles:**
+  - [Documentación oficial de Tailwind CSS](https://tailwindcss.com/docs)
+  - [Tailwind UI](https://tailwindui.com/) - Componentes premium
+  - [Headless UI](https://headlessui.dev/) - Componentes accesibles
+  - [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss) - Extensión VS Code
+</Aside>

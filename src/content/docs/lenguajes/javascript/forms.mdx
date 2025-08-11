@@ -1,0 +1,258 @@
+---
+title: Formularios y Validación
+description: Aprende a trabajar con formularios HTML y a implementar validaciones usando JavaScript.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Formularios y Validación <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Los formularios son una parte esencial de las aplicaciones web. La validación asegura que los datos ingresados sean correctos.
+</Aside>
+
+## Acceso a formularios <Badge text="Básico" variant="note" />
+
+### Selección de elementos
+<Code code={`// Obtener formulario
+const form = document.querySelector('#miFormulario');
+
+// Obtener elementos por name
+const email = form.elements['email'];
+const password = form.elements['password'];
+
+// Obtener elementos por ID
+const nombre = document.getElementById('nombre');`} lang="javascript" />
+
+### Valores de campos
+<Code code={`// Texto y números
+const valor = input.value;
+
+// Checkbox
+const checked = checkbox.checked;
+
+// Radio buttons
+const seleccionado = radioButton.checked;
+
+// Select
+const opcionSeleccionada = select.value;
+const indiceSeleccionado = select.selectedIndex;
+
+// Files
+const archivo = fileInput.files[0];`} lang="javascript" />
+
+## Validación básica <Badge text="Importante" variant="danger" />
+
+### Validación en tiempo real
+<Code code={`const form = document.querySelector('#miFormulario');
+const email = form.querySelector('#email');
+
+email.addEventListener('input', (e) => {
+    if (email.validity.typeMismatch) {
+        email.setCustomValidity('Por favor, introduce un email válido');
+    } else {
+        email.setCustomValidity('');
+    }
+});`} lang="javascript" />
+
+### Validación al enviar
+<Code code={`form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    if (!email.value.includes('@')) {
+        mostrarError(email, 'Email inválido');
+        return;
+    }
+    
+    if (password.value.length < 8) {
+        mostrarError(password, 'La contraseña debe tener al menos 8 caracteres');
+        return;
+    }
+    
+    // Si todo es válido, enviar formulario
+    form.submit();
+});
+
+function mostrarError(input, mensaje) {
+    const errorDiv = input.nextElementSibling;
+    errorDiv.textContent = mensaje;
+    errorDiv.classList.add('error-activo');
+}`} lang="javascript" />
+
+## Validación avanzada <Badge text="Avanzado" variant="note" />
+
+### Expresiones regulares
+<Code code={`const patterns = {
+    email: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
+    telefono: /^[0-9]{9}$/,
+    password: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
+};
+
+function validar(campo, pattern) {
+    return pattern.test(campo.value);
+}`} lang="javascript" />
+
+### API de validación de restricciones
+<Code code={`const input = document.querySelector('#miInput');
+
+// Comprobar validez
+console.log(input.validity.valid);
+
+// Tipos específicos de error
+console.log({
+    valueMissing: input.validity.valueMissing,
+    typeMismatch: input.validity.typeMismatch,
+    patternMismatch: input.validity.patternMismatch,
+    tooLong: input.validity.tooLong,
+    tooShort: input.validity.tooShort,
+    rangeUnderflow: input.validity.rangeUnderflow,
+    rangeOverflow: input.validity.rangeOverflow,
+    stepMismatch: input.validity.stepMismatch,
+    badInput: input.validity.badInput,
+    customError: input.validity.customError
+});`} lang="javascript" />
+
+## Feedback visual <Badge text="UX" variant="success" />
+
+### Estilos de validación
+<Code code={`// CSS
+const styles = \`
+.input-error {
+    border-color: red;
+}
+
+.input-success {
+    border-color: green;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 5px;
+}\`;
+
+// JavaScript
+function validarCampo(input) {
+    const esValido = input.validity.valid;
+    
+    input.classList.remove('input-error', 'input-success');
+    input.classList.add(esValido ? 'input-success' : 'input-error');
+    
+    const errorMessage = input.nextElementSibling;
+    errorMessage.textContent = esValido ? '' : input.validationMessage;
+}`} lang="javascript" />
+
+## Ejemplo completo <Badge text="Práctica" variant="tip" />
+
+### Formulario de registro
+<Code code={`const form = document.querySelector('#registroForm');
+
+class FormValidator {
+    constructor(form) {
+        this.form = form;
+        this.errors = [];
+        
+        this.validaciones = {
+            nombre: (value) => value.length >= 2,
+            email: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+            password: (value) => value.length >= 8,
+            telefono: (value) => /^[0-9]{9}$/.test(value)
+        };
+        
+        this.mensajes = {
+            nombre: 'El nombre debe tener al menos 2 caracteres',
+            email: 'Email inválido',
+            password: 'La contraseña debe tener al menos 8 caracteres',
+            telefono: 'Teléfono inválido'
+        };
+        
+        this.inicializar();
+    }
+    
+    inicializar() {
+        this.form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (this.validarTodo()) {
+                this.enviarFormulario();
+            }
+        });
+        
+        // Validación en tiempo real
+        this.form.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', () => {
+                this.validarCampo(input);
+            });
+        });
+    }
+    
+    validarCampo(input) {
+        const { name, value } = input;
+        const validacion = this.validaciones[name];
+        const esValido = validacion ? validacion(value) : true;
+        
+        this.mostrarError(input, esValido ? '' : this.mensajes[name]);
+        return esValido;
+    }
+    
+    validarTodo() {
+        let esValido = true;
+        this.form.querySelectorAll('input').forEach(input => {
+            if (!this.validarCampo(input)) {
+                esValido = false;
+            }
+        });
+        return esValido;
+    }
+    
+    mostrarError(input, mensaje) {
+        const errorDiv = input.nextElementSibling;
+        input.classList.toggle('input-error', mensaje !== '');
+        input.classList.toggle('input-success', mensaje === '');
+        errorDiv.textContent = mensaje;
+    }
+    
+    async enviarFormulario() {
+        try {
+            const data = new FormData(this.form);
+            const response = await fetch('/api/registro', {
+                method: 'POST',
+                body: data
+            });
+            
+            if (response.ok) {
+                alert('Registro exitoso');
+                this.form.reset();
+            } else {
+                throw new Error('Error en el registro');
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+}
+
+// Inicializar validador
+new FormValidator(form);`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+### Validación progresiva
+<Code code={`// ✅ Bueno
+input.addEventListener('input', validarEnTiempoReal);
+input.addEventListener('blur', validarCompleto);
+form.addEventListener('submit', validarTodo);`} lang="javascript" />
+
+### Mensajes de error claros
+<Code code={`// ❌ Malo
+mostrarError('Error en el campo');
+
+// ✅ Bueno
+mostrarError('La contraseña debe tener al menos una letra mayúscula y un número');`} lang="javascript" />
+
+### Accesibilidad
+<Code code={`// ✅ Bueno
+input.setAttribute('aria-invalid', !esValido);
+input.setAttribute('aria-describedby', 'error-mensaje');
+errorDiv.setAttribute('role', 'alert');`} lang="javascript" />

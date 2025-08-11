@@ -1,0 +1,907 @@
+---
+title: 5. Vistas con Blade en Laravel
+description: Aprende a utilizar el motor de plantillas Blade, directivas, componentes y layouts
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Vistas con Blade en Laravel
+
+Blade es el motor de plantillas incluido con Laravel. A diferencia de otros motores de plantillas PHP, Blade no te restringe de usar código PHP plano en tus vistas. De hecho, todas las vistas Blade se compilan en código PHP plano y se almacenan en caché hasta que sean modificadas, lo que significa que Blade añade esencialmente cero sobrecarga a tu aplicación.
+
+Las vistas Blade utilizan la extensión de archivo <Code code=".blade.php" lang="php" inline /> y se almacenan en el directorio <Code code="resources/views" lang="php" inline />.
+
+## Creación de vistas y componentes
+
+Laravel proporciona varios comandos Artisan para crear vistas y componentes Blade rápidamente:
+
+### Crear vistas
+
+Aunque puedes crear archivos de vista manualmente, Laravel ofrece un comando para generarlas:
+
+<Code code="php artisan make:view nombre-vista" lang="bash" />
+
+Esto creará un archivo <Code code="nombre-vista.blade.php" lang="php" inline /> en el directorio <Code code="resources/views" lang="php" inline />.
+
+Para crear una vista en un subdirectorio:
+
+<Code code="php artisan make:view carpeta.nombre-vista" lang="bash" />
+
+Esto generará <Code code="resources/views/carpeta/nombre-vista.blade.php" lang="php" inline />.
+
+### Crear componentes
+
+Para crear un componente Blade de clase:
+
+<Code code="php artisan make:component NombreComponente" lang="bash" />
+
+Este comando genera:
+- Una clase PHP en <Code code="app/View/Components/NombreComponente.php" lang="php" inline />
+- Una plantilla Blade en <Code code="resources/views/components/nombre-componente.blade.php" lang="php" inline />
+
+Para crear un componente en un subdirectorio:
+
+<Code code="php artisan make:component Admin/AlertaAdmin" lang="bash" />
+
+Esto generará el componente en <Code code="app/View/Components/Admin/AlertaAdmin.php" lang="php" inline /> y la vista en <Code code="resources/views/components/admin/alerta-admin.blade.php" lang="php" inline />.
+
+### Componentes anónimos
+
+Si solo necesitas la plantilla sin la clase PHP:
+
+<Code code="php artisan make:component forms.input --view" lang="bash" />
+
+Esto creará únicamente <Code code="resources/views/components/forms/input.blade.php" lang="php" inline /> sin generar una clase PHP.
+
+### Componentes en línea
+
+Para crear un componente que renderiza su contenido directamente desde el método render() sin una vista separada:
+
+<Code code="php artisan make:component Alert --inline" lang="bash" />
+
+Esto generará solo la clase PHP con un método render() que devuelve una cadena HTML.
+
+<Aside type="tip">
+Puedes personalizar la ubicación de los componentes modificando el método <Code code="boot()" lang="php" inline /> en <Code code="App\Providers\AppServiceProvider" lang="php" inline />:
+
+```php
+use Illuminate\Support\Facades\Blade;
+
+Blade::componentNamespace('App\View\Components\Custom', 'custom');
+```
+
+Esto permitiría usar componentes como <Code code="<x-custom::alert />" lang="blade" inline />.
+</Aside>
+
+## Sintaxis Blade básica
+
+Blade proporciona una sintaxis limpia y elegante para trabajar con datos y estructuras de control en tus vistas. Vamos a explorar las directivas básicas de Blade.
+
+### Mostrar datos
+
+Puedes mostrar datos pasados a tu vista Blade utilizando llaves dobles:
+
+<Code code={`<!-- Mostrar una variable -->
+{{ $variable }}
+
+<!-- Mostrar el resultado de una función -->
+{{ time() }}
+
+<!-- Mostrar una variable con escape HTML desactivado (cuidado con XSS) -->
+{!! $contenidoHtml !!}`} lang="blade" />
+
+<Aside type="caution">
+Utiliza <Code code="{{ $variable }}" lang="blade" inline /> para escapar automáticamente el contenido HTML y prevenir ataques XSS. Usa <Code code="{!! $variable !!}" lang="blade" inline /> solo cuando estés seguro de que el contenido es seguro.
+</Aside>
+
+### Comentarios
+
+Puedes añadir comentarios en tus plantillas Blade que no serán visibles en el HTML resultante:
+
+<Code code={`{{-- Este comentario no aparecerá en el HTML --}}`} lang="blade" />
+
+### Estructuras de control
+
+Blade proporciona directivas convenientes para las estructuras de control comunes de PHP:
+
+#### Condicionales
+
+<Code code={`<!-- Directiva @if -->
+@if($usuario->tipo === 'admin')
+    <p>Este usuario es administrador</p>
+@elseif($usuario->tipo === 'editor')
+    <p>Este usuario es editor</p>
+@else
+    <p>Este usuario es miembro regular</p>
+@endif
+
+<!-- Directiva @unless (inverso de @if) -->
+@unless($usuarios->isEmpty())
+    <p>Hay usuarios disponibles</p>
+@endunless
+
+<!-- Directiva @isset -->
+@isset($usuario)
+    <p>La variable usuario está definida</p>
+@endisset
+
+<!-- Directiva @empty -->
+@empty($usuarios)
+    <p>No hay usuarios disponibles</p>
+@endempty`} lang="blade" />
+
+#### Operador ternario
+
+<Code code={`<!-- Sintaxis estándar -->
+{{ $esActivo ? 'Activo' : 'Inactivo' }}
+
+<!-- Sintaxis abreviada -->
+{{ $nombre ?? 'Invitado' }}`} lang="blade" />
+
+#### Bucles
+
+<Code code={`<!-- Bucle @foreach -->
+@foreach($usuarios as $usuario)
+    <p>{{ $usuario->nombre }}</p>
+@endforeach
+
+<!-- Bucle @forelse (con caso vacío) -->
+@forelse($usuarios as $usuario)
+    <p>{{ $usuario->nombre }}</p>
+@empty
+    <p>No hay usuarios registrados</p>
+@endforelse
+
+<!-- Bucle @for -->
+@for($i = 0; $i < 10; $i++)
+    <p>Valor: {{ $i }}</p>
+@endfor
+
+<!-- Bucle @while -->
+@while($condicion)
+    <p>Bucle while en ejecución</p>
+@endwhile`} lang="blade" />
+
+#### Variables de bucle
+
+Dentro de un bucle <Code code="@foreach" lang="blade" inline /> o <Code code="@forelse" lang="blade" inline />, puedes acceder a variables especiales:
+
+<Code code={`@foreach($usuarios as $usuario)
+    @if($loop->first)
+        <p>Este es el primer usuario</p>
+    @endif
+    
+    <p>{{ $loop->iteration }} / {{ $loop->count }}</p>
+    
+    @if($loop->last)
+        <p>Este es el último usuario</p>
+    @endif
+@endforeach`} lang="blade" />
+
+Las propiedades disponibles en la variable <Code code="$loop" lang="blade" inline /> son:
+
+- <Code code="$loop->index" lang="blade" inline />: Índice del bucle actual (comienza en 0)
+- <Code code="$loop->iteration" lang="blade" inline />: Iteración actual (comienza en 1)
+- <Code code="$loop->remaining" lang="blade" inline />: Iteraciones restantes
+- <Code code="$loop->count" lang="blade" inline />: Total de elementos
+- <Code code="$loop->first" lang="blade" inline />: Si es la primera iteración
+- <Code code="$loop->last" lang="blade" inline />: Si es la última iteración
+- <Code code="$loop->even" lang="blade" inline />: Si es una iteración par
+- <Code code="$loop->odd" lang="blade" inline />: Si es una iteración impar
+- <Code code="$loop->depth" lang="blade" inline />: Nivel de anidamiento del bucle
+- <Code code="$loop->parent" lang="blade" inline />: En bucles anidados, accede a la variable loop del padre
+
+### Directivas de autenticación
+
+Blade proporciona directivas convenientes para verificar el estado de autenticación del usuario:
+
+<Code code={`@auth
+    <!-- El usuario está autenticado -->
+    <p>Bienvenido, {{ Auth::user()->name }}</p>
+@endauth
+
+@guest
+    <!-- El usuario NO está autenticado -->
+    <p>Por favor inicia sesión</p>
+@endguest
+
+<!-- Verificar un guard específico -->
+@auth('admin')
+    <!-- El usuario está autenticado en el guard 'admin' -->
+@endauth`} lang="blade" />
+
+### Directivas de verificación de roles
+
+Puedes crear directivas personalizadas para verificar roles o permisos:
+
+<Code code={`@can('editar', $post)
+    <a href="/posts/{{ $post->id }}/edit">Editar post</a>
+@elsecan('ver', $post)
+    <a href="/posts/{{ $post->id }}">Ver post</a>
+@endcan
+
+@cannot('eliminar', $post)
+    <p>No tienes permiso para eliminar este post</p>
+@endcannot`} lang="blade" />
+
+## Herencia de plantillas
+
+Blade proporciona un poderoso sistema de herencia de plantillas que te permite crear un diseño base que contiene todas las secciones comunes de tu sitio y definir "bloques" que las plantillas hijas pueden sobrescribir.
+
+### @extends
+
+La directiva <Code code="@extends" lang="blade" inline /> se utiliza para especificar qué plantilla debe "extender" la vista actual:
+
+<Code code={`<!-- resources/views/child.blade.php -->
+@extends('layouts.app')`} lang="blade" />
+
+Esto indica que la vista actual extiende la plantilla ubicada en <Code code="resources/views/layouts/app.blade.php" lang="php" inline />.
+
+### @section y @yield
+
+Las directivas <Code code="@section" lang="blade" inline /> y <Code code="@yield" lang="blade" inline /> trabajan juntas para implementar la herencia de plantillas:
+
+<Tabs>
+<TabItem label="Layout principal">
+
+```blade
+<!-- resources/views/layouts/app.blade.php -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@yield('title', 'Mi Sitio')</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/app.css">
+    @yield('styles')
+</head>
+<body>
+    <header>
+        @include('partials.nav')
+    </header>
+
+    <main>
+        @yield('content')
+    </main>
+
+    <footer>
+        @include('partials.footer')
+    </footer>
+
+    <script src="/js/app.js"></script>
+    @yield('scripts')
+</body>
+</html>
+```
+
+</TabItem>
+<TabItem label="Vista hija">
+
+```blade
+<!-- resources/views/home.blade.php -->
+@extends('layouts.app')
+
+@section('title', 'Página de inicio')
+
+@section('styles')
+    <link rel="stylesheet" href="/css/home.css">
+@endsection
+
+@section('content')
+    <div class="container">
+        <h1>Bienvenido a mi sitio</h1>
+        <p>Este es el contenido de la página de inicio.</p>
+    </div>
+@endsection
+
+@section('scripts')
+    <script src="/js/home.js"></script>
+@endsection
+```
+
+</TabItem>
+</Tabs>
+
+En este ejemplo:
+
+- <Code code="@yield('title', 'Mi Sitio')" lang="blade" inline /> define un espacio llamado "title" con un valor predeterminado "Mi Sitio".
+- <Code code="@section('title', 'Página de inicio')" lang="blade" inline /> en la vista hija proporciona contenido para ese espacio.
+- Para secciones más grandes, usamos <Code code="@section('content') ... @endsection" lang="blade" inline />.
+
+### @show y @parent
+
+La directiva <Code code="@show" lang="blade" inline /> es similar a <Code code="@endsection" lang="blade" inline />, pero además de finalizar la sección, también la renderiza inmediatamente:
+
+<Code code={`<!-- Layout -->
+@section('sidebar')
+    <p>Contenido del sidebar principal</p>
+@show
+
+<!-- Vista hija -->
+@section('sidebar')
+    @parent
+    <p>Contenido adicional del sidebar</p>
+@endsection`} lang="blade" />
+
+La directiva <Code code="@parent" lang="blade" inline /> permite incluir el contenido de la sección padre dentro de una sección sobrescrita.
+
+### @include
+
+La directiva <Code code="@include" lang="blade" inline /> te permite incluir una vista Blade dentro de otra vista:
+
+<Code code={`<!-- Incluir una vista simple -->
+@include('partials.header')
+
+<!-- Incluir una vista y pasar datos -->
+@include('partials.error', ['mensaje' => 'Error en el formulario'])
+
+<!-- Incluir una vista si existe -->
+@includeIf('partials.sidebar', ['algunaVariable' => 'valor'])
+
+<!-- Incluir una vista si una condición es verdadera -->
+@includeWhen($usuario->esAdmin, 'partials.admin-panel')
+
+<!-- Incluir una vista si una condición es falsa -->
+@includeUnless($usuario->esAdmin, 'partials.user-panel')
+
+<!-- Incluir la primera vista que exista de un array -->
+@includeFirst(['custom.admin', 'admin'], ['algunaVariable' => 'valor'])`} lang="blade" />
+
+### @each
+
+La directiva <Code code="@each" lang="blade" inline /> combina las funcionalidades de bucle e inclusión en una sola directiva:
+
+<Code code={`<!-- Sintaxis: @each('vista.a.renderizar', $datos, 'variable', 'vista.si.vacio') -->
+@each('partials.usuario', $usuarios, 'usuario', 'partials.no-usuarios')`} lang="blade" />
+
+Esto renderizará la vista <Code code="partials.usuario" lang="blade" inline /> para cada elemento en <Code code="$usuarios" lang="blade" inline />, pasando cada elemento como la variable <Code code="$usuario" lang="blade" inline />. Si <Code code="$usuarios" lang="blade" inline /> está vacío, se renderizará <Code code="partials.no-usuarios" lang="blade" inline />.
+
+## Componentes y layouts
+
+Los componentes Blade proporcionan un enfoque modular para construir interfaces de usuario. Laravel ofrece dos tipos de componentes: componentes de clase y componentes anónimos.
+
+### Componentes de clase
+
+Los componentes de clase son componentes Blade respaldados por una clase PHP. Para crear un componente de clase, puedes usar el comando Artisan:
+
+<Code code="php artisan make:component Alert" lang="bash" />
+
+Este comando creará dos archivos:
+
+1. Una clase de componente en <Code code="app/View/Components/Alert.php" lang="php" inline />
+2. Una plantilla Blade en <Code code="resources/views/components/alert.blade.php" lang="php" inline />
+
+<Tabs>
+<TabItem label="Clase del componente">
+
+```php
+<?php
+
+namespace App\View\Components;
+
+use Illuminate\View\Component;
+
+class Alert extends Component
+{
+    public $type;
+    public $message;
+
+    /**
+     * Crear una nueva instancia del componente.
+     *
+     * @param  string  $type
+     * @param  string  $message
+     * @return void
+     */
+    public function __construct($type = 'info', $message = null)
+    {
+        $this->type = $type;
+        $this->message = $message;
+    }
+
+    /**
+     * Métodos adicionales disponibles en la plantilla.
+     */
+    public function classes()
+    {
+        return ["alert", "alert-{$this->type}"];
+    }
+
+    /**
+     * Obtener la vista / contenido que representa el componente.
+     *
+     * @return \Illuminate\Contracts\View\View|\Closure|string
+     */
+    public function render()
+    {
+        return view('components.alert');
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Plantilla del componente">
+
+```blade
+<!-- resources/views/components/alert.blade.php -->
+<div {{ $attributes->merge(['class' => implode(' ', $classes())]) }}>
+    <div class="alert-icon">
+        @if($type === 'success')
+            <svg><!-- Ícono de éxito --></svg>
+        @elseif($type === 'warning')
+            <svg><!-- Ícono de advertencia --></svg>
+        @elseif($type === 'error')
+            <svg><!-- Ícono de error --></svg>
+        @else
+            <svg><!-- Ícono de info --></svg>
+        @endif
+    </div>
+
+    <div class="alert-content">
+        @if($title)
+            <div class="alert-title">{{ $title }}</div>
+        @endif
+
+        <div class="alert-body">
+            {{ $message ?? $slot }}
+        </div>
+    </div>
+
+    @if($dismissible)
+        <button type="button" class="alert-close" aria-label="Cerrar">
+            &times;
+        </button>
+    @endif
+</div>
+```
+
+</TabItem>
+<TabItem label="Uso del componente">
+
+```blade
+<!-- Uso básico -->
+<x-alert type="success" message="Operación completada con éxito" />
+
+<!-- Con contenido en slot -->
+<x-alert type="error">
+    <strong>Error:</strong> No se pudo procesar la solicitud.
+</x-alert>
+
+<!-- Con atributos adicionales -->
+<x-alert 
+    type="warning" 
+    class="mt-4 mb-4" 
+    id="my-alert" 
+    data-auto-close="5000"
+>
+    Esta alerta se cerrará automáticamente.
+</x-alert>
+```
+
+</TabItem>
+</Tabs>
+
+### Componentes anónimos
+
+Los componentes anónimos son componentes Blade que no tienen una clase asociada. Son útiles para componentes simples que no requieren lógica adicional:
+
+<Code code={`<!-- resources/views/components/input.blade.php -->
+<div class="form-group">
+    <label for="{{ $id }}" class="form-label">{{ $label }}</label>
+    <input 
+        type="{{ $type ?? 'text' }}" 
+        id="{{ $id }}" 
+        name="{{ $name ?? $id }}" 
+        value="{{ $value ?? old($name ?? $id) }}" 
+        {{ $attributes->merge(['class' => 'form-control']) }}
+    >
+    @error($name ?? $id)
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>`} lang="blade" />
+
+Para usar este componente:
+
+<Code code={`<x-input 
+    id="email" 
+    label="Correo electrónico" 
+    type="email" 
+    required 
+    placeholder="ejemplo@correo.com" 
+/>`} lang="blade" />
+
+### Atributos y slots
+
+Los componentes Blade pueden recibir atributos y contenido a través de slots:
+
+#### Atributos
+
+Puedes acceder a los atributos pasados al componente mediante la variable <Code code="$attributes" lang="blade" inline />:
+
+<Code code={`<!-- En el componente -->
+<div {{ $attributes }}>
+    <!-- Contenido -->
+</div>
+
+<!-- Fusionar clases -->
+<div {{ $attributes->merge(['class' => 'default-class']) }}>
+    <!-- Contenido -->
+</div>
+
+<!-- Filtrar atributos -->
+<div {{ $attributes->filter(fn ($value, $key) => $key === 'class') }}>
+    <!-- Contenido -->
+</div>`} lang="blade" />
+
+#### Slots
+
+Los componentes pueden tener un slot principal y slots con nombre:
+
+<Code code={`<!-- En el componente -->
+<div class="card">
+    <div class="card-header">
+        {{ $header ?? 'Encabezado predeterminado' }}
+    </div>
+    <div class="card-body">
+        {{ $slot }}
+    </div>
+    <div class="card-footer">
+        {{ $footer ?? '' }}
+    </div>
+</div>
+
+<!-- Uso del componente -->
+<x-card>
+    <x-slot:header>
+        Mi encabezado personalizado
+    </x-slot:header>
+    
+    Contenido principal de la tarjeta
+    
+    <x-slot:footer>
+        <button>Guardar</button>
+    </x-slot:footer>
+</x-card>`} lang="blade" />
+
+### Layouts usando componentes
+
+Puedes crear layouts utilizando componentes, lo que proporciona una alternativa moderna a <Code code="@extends" lang="blade" inline />:
+
+<Tabs>
+<TabItem label="Componente de layout">
+
+```blade
+<!-- resources/views/components/layouts/app.blade.php -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $title ?? 'Mi aplicación' }}</title>
+    <link rel="stylesheet" href="/css/app.css">
+    {{ $styles ?? '' }}
+</head>
+<body>
+    <header>
+        <x-navigation />
+    </header>
+    
+    <main>
+        {{ $slot }}
+    </main>
+    
+    <footer>
+        <x-footer />
+    </footer>
+    
+    <script src="/js/app.js"></script>
+    {{ $scripts ?? '' }}
+</body>
+</html>
+```
+
+</TabItem>
+<TabItem label="Uso del layout">
+
+```blade
+<!-- resources/views/dashboard.blade.php -->
+<x-layouts.app>
+    <x-slot:title>Panel de control</x-slot:title>
+    
+    <x-slot:styles>
+        <link rel="stylesheet" href="/css/dashboard.css">
+    </x-slot:styles>
+    
+    <div class="dashboard">
+        <h1>Panel de control</h1>
+        <p>Bienvenido a tu panel de control</p>
+        
+        <x-stats-card :stats="$stats" />
+    </div>
+    
+    <x-slot:scripts>
+        <script src="/js/dashboard.js"></script>
+    </x-slot:scripts>
+</x-layouts.app>
+```
+
+</TabItem>
+</Tabs>
+
+### Componentes dinámicos
+
+Puedes renderizar componentes dinámicamente utilizando una variable para el nombre del componente:
+
+<Code code={`@php
+    $componentName = $tipo === 'admin' ? 'admin-panel' : 'user-panel';
+@endphp
+
+<x-dynamic-component :component="$componentName" :data="$data" />`} lang="blade" />
+
+<Aside type="tip">
+Los componentes Blade son una excelente manera de crear interfaces de usuario reutilizables y mantenibles. Considera usar componentes para elementos de UI que se repiten en tu aplicación, como formularios, tarjetas, alertas, etc.
+</Aside>
+
+## Uso de stacks (@push, @stack)
+
+Las stacks en Blade te permiten insertar contenido en secciones específicas de tus plantillas desde cualquier vista hija. Esto es especialmente útil para recursos como scripts o estilos CSS que necesitas incluir desde diferentes vistas pero quieres renderizarlos en un lugar específico de tu layout.
+
+### @stack y @push
+
+La directiva <Code code="@stack" lang="blade" inline /> define un lugar donde se renderizará el contenido "empujado" con <Code code="@push" lang="blade" inline />:
+
+<Tabs>
+<TabItem label="Layout principal">
+
+```blade
+<!-- resources/views/layouts/app.blade.php -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@yield('title')</title>
+    <link rel="stylesheet" href="/css/app.css">
+    @stack('styles')
+</head>
+<body>
+    <main>
+        @yield('content')
+    </main>
+    
+    <script src="/js/app.js"></script>
+    @stack('scripts')
+</body>
+</html>
+```
+
+</TabItem>
+<TabItem label="Vista hija">
+
+```blade
+<!-- resources/views/home.blade.php -->
+@extends('layouts.app')
+
+@section('title', 'Página de inicio')
+
+@section('content')
+    <h1>Bienvenido</h1>
+    <p>Contenido de la página de inicio</p>
+@endsection
+
+@push('styles')
+    <link rel="stylesheet" href="/css/home.css">
+@endpush
+
+@push('scripts')
+    <script src="/js/home.js"></script>
+@endpush
+```
+
+</TabItem>
+<TabItem label="Otra vista hija">
+
+```blade
+<!-- resources/views/dashboard.blade.php -->
+@extends('layouts.app')
+
+@section('title', 'Panel de control')
+
+@section('content')
+    <h1>Panel de control</h1>
+    <div id="chart"></div>
+@endsection
+
+@push('styles')
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/charts.css">
+@endpush
+
+@push('scripts')
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/charts.js"></script>
+@endpush
+```
+
+</TabItem>
+</Tabs>
+
+En este ejemplo, cada vista hija "empuja" sus propios estilos y scripts a las stacks definidas en el layout principal. Cuando se renderiza la vista, todo el contenido empujado a cada stack se incluirá en el orden en que fue empujado.
+
+### @prepend
+
+Si necesitas añadir contenido al principio de una stack en lugar de al final, puedes usar <Code code="@prepend" lang="blade" inline />:
+
+<Code code={`@prepend('scripts')
+    <script src="/js/first-script.js"></script>
+@endprepend`} lang="blade" />
+
+### @once
+
+Para asegurarte de que un bloque de código solo se incluya una vez, incluso si la vista que lo contiene se incluye múltiples veces, puedes usar <Code code="@once" lang="blade" inline />:
+
+<Code code={`@once
+    @push('scripts')
+        <script>
+            // Este script solo se incluirá una vez
+            console.log('Cargado una sola vez');
+        </script>
+    @endpush
+@endonce`} lang="blade" />
+
+<Aside type="tip">
+Las stacks son especialmente útiles cuando trabajas con layouts compartidos y necesitas incluir recursos específicos de cada página sin modificar el layout principal.
+</Aside>
+
+## Inyección de servicios en vistas (@inject)
+
+La directiva <Code code="@inject" lang="blade" inline /> te permite recuperar un servicio del contenedor de servicios de Laravel directamente en tu vista Blade. Esto puede ser útil cuando necesitas acceder a un servicio sin tener que pasarlo explícitamente desde tu controlador.
+
+### Sintaxis básica
+
+La sintaxis de <Code code="@inject" lang="blade" inline /> es la siguiente:
+
+<Code code={`@inject('nombreVariable', 'NombreClaseServicio')`} lang="blade" />
+
+Donde:
+- <Code code="nombreVariable" lang="blade" inline /> es el nombre de la variable que contendrá la instancia del servicio en tu vista.
+- <Code code="NombreClaseServicio" lang="blade" inline /> es el nombre de la clase o el alias del servicio que quieres inyectar.
+
+### Ejemplo práctico
+
+Supongamos que tienes un servicio <Code code="MenuService" lang="php" inline /> que proporciona elementos de menú para tu aplicación:
+
+<Tabs>
+<TabItem label="Definición del servicio">
+
+```php
+<?php
+
+namespace App\Services;
+
+class MenuService
+{
+    public function getMainMenu()
+    {
+        return [
+            ['title' => 'Inicio', 'url' => '/'],
+            ['title' => 'Productos', 'url' => '/productos'],
+            ['title' => 'Servicios', 'url' => '/servicios'],
+            ['title' => 'Contacto', 'url' => '/contacto'],
+        ];
+    }
+    
+    public function getUserMenu($user)
+    {
+        $menu = [
+            ['title' => 'Mi perfil', 'url' => '/perfil'],
+        ];
+        
+        if ($user->isAdmin()) {
+            $menu[] = ['title' => 'Panel de administración', 'url' => '/admin'];
+        }
+        
+        $menu[] = ['title' => 'Cerrar sesión', 'url' => '/logout'];
+        
+        return $menu;
+    }
+}
+```
+
+</TabItem>
+<TabItem label="Registro del servicio">
+
+```php
+// En un Service Provider
+public function register()
+{
+    $this->app->singleton(MenuService::class);
+}
+```
+
+</TabItem>
+<TabItem label="Uso en vista Blade">
+
+```blade
+<!-- resources/views/partials/navigation.blade.php -->
+@inject('menu', 'App\Services\MenuService')
+
+<nav class="main-nav">
+    <ul>
+        @foreach($menu->getMainMenu() as $item)
+            <li><a href="{{ $item['url'] }}">{{ $item['title'] }}</a></li>
+        @endforeach
+    </ul>
+</nav>
+
+@auth
+    <nav class="user-nav">
+        <ul>
+            @foreach($menu->getUserMenu(Auth::user()) as $item)
+                <li><a href="{{ $item['url'] }}">{{ $item['title'] }}</a></li>
+            @endforeach
+        </ul>
+    </nav>
+@endauth
+```
+
+</TabItem>
+</Tabs>
+
+### Consideraciones sobre el uso de @inject
+
+<Aside type="caution">
+Aunque <Code code="@inject" lang="blade" inline /> es conveniente, debe usarse con moderación por las siguientes razones:
+
+1. **Acoplamiento**: Crea un acoplamiento directo entre tus vistas y servicios, lo que puede dificultar las pruebas.
+2. **Ocultamiento de dependencias**: Las dependencias no son obvias cuando se revisa el controlador.
+3. **Rendimiento**: Si el servicio realiza operaciones pesadas, podría afectar el rendimiento de la vista.
+</Aside>
+
+En general, es mejor pasar datos a las vistas desde los controladores cuando sea posible. Sin embargo, <Code code="@inject" lang="blade" inline /> puede ser útil para servicios que:
+
+- Son utilizados en múltiples vistas (como navegación, configuración, etc.)
+- No dependen del contexto específico de la solicitud actual
+- Son ligeros y no realizan operaciones pesadas
+
+### Alternativas a @inject
+
+Una alternativa a <Code code="@inject" lang="blade" inline /> es crear un [View Composer](https://laravel.com/docs/views#view-composers), que te permite adjuntar datos a una vista cada vez que se renderiza:
+
+<Code code={`<?php
+
+namespace App\Providers;
+
+use App\Services\MenuService;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
+
+class ViewServiceProvider extends ServiceProvider
+{
+    public function boot()
+    {
+        // Compartir con todas las vistas
+        View::share('siteName', 'Mi Sitio Web');
+        
+        // Compartir solo con vistas específicas
+        View::composer(
+            ['layouts.app', 'partials.navigation'],
+            function ($view) {
+                $view->with('menu', app(MenuService::class));
+            }
+        );
+    }
+}`} lang="php" />
+
+## Conclusión
+
+Blade es un motor de plantillas potente y flexible que ofrece numerosas características para crear vistas dinámicas y reutilizables en Laravel. Desde la sintaxis básica hasta componentes avanzados, herencia de plantillas, stacks e inyección de servicios, Blade proporciona todas las herramientas necesarias para construir interfaces de usuario modernas y mantenibles.
+
+Recuerda que las mejores prácticas incluyen:
+
+- Mantener las vistas simples y enfocadas en la presentación
+- Utilizar componentes para elementos de UI reutilizables
+- Aprovechar la herencia de plantillas para mantener un diseño consistente
+- Usar stacks para organizar recursos como scripts y estilos
+- Limitar el uso de <Code code="@inject" lang="blade" inline /> a casos específicos donde realmente sea necesario

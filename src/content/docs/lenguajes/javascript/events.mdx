@@ -1,0 +1,205 @@
+---
+title: Eventos
+description: Aprende a manejar eventos en JavaScript para crear interacciones dinámicas en tus aplicaciones web.
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Eventos <Badge text="Fundamental" variant="success" />
+
+<Aside type="tip">
+  Los eventos son acciones o sucesos que ocurren en un documento web y pueden ser detectados por JavaScript.
+</Aside>
+
+## Eventos básicos <Badge text="Básico" variant="note" />
+
+### Eventos del mouse
+<Code code={`const boton = document.querySelector('#miBoton');
+
+// Click
+boton.addEventListener('click', () => {
+    console.log('Botón clickeado');
+});
+
+// Doble click
+boton.addEventListener('dblclick', () => {
+    console.log('Doble click');
+});
+
+// Hover
+boton.addEventListener('mouseenter', () => {
+    console.log('Mouse entró');
+});
+
+boton.addEventListener('mouseleave', () => {
+    console.log('Mouse salió');
+});`} lang="javascript" />
+
+### Eventos del teclado
+<Code code={`const input = document.querySelector('#miInput');
+
+// Tecla presionada
+input.addEventListener('keydown', (evento) => {
+    console.log(\`Tecla presionada: \${evento.key}\`);
+});
+
+// Tecla liberada
+input.addEventListener('keyup', (evento) => {
+    console.log(\`Tecla liberada: \${evento.key}\`);
+});
+
+// Entrada de texto
+input.addEventListener('input', (evento) => {
+    console.log(\`Valor actual: \${evento.target.value}\`);
+});`} lang="javascript" />
+
+## El objeto Event <Badge text="Importante" variant="danger" />
+
+### Propiedades principales
+<Code code={`document.addEventListener('click', (evento) => {
+    // Tipo de evento
+    console.log(evento.type);  // 'click'
+    
+    // Elemento que disparó el evento
+    console.log(evento.target);
+    
+    // Coordenadas del mouse
+    console.log(evento.clientX, evento.clientY);
+    
+    // Teclas presionadas
+    console.log(evento.ctrlKey, evento.shiftKey);
+});`} lang="javascript" />
+
+### Prevenir comportamiento por defecto
+<Code code={`const form = document.querySelector('form');
+
+form.addEventListener('submit', (evento) => {
+    // Prevenir envío del formulario
+    evento.preventDefault();
+    
+    // Código de validación aquí
+});
+
+const enlace = document.querySelector('a');
+enlace.addEventListener('click', (evento) => {
+    // Prevenir navegación
+    evento.preventDefault();
+});`} lang="javascript" />
+
+## Propagación de eventos <Badge text="Avanzado" variant="note" />
+
+### Burbujeo y captura
+<Code code={`// Burbujeo (por defecto)
+elemento.addEventListener('click', (evento) => {
+    console.log('Fase de burbujeo');
+});
+
+// Captura
+elemento.addEventListener('click', (evento) => {
+    console.log('Fase de captura');
+}, true);
+
+// Detener propagación
+elemento.addEventListener('click', (evento) => {
+    evento.stopPropagation();
+    console.log('Este evento no se propagará');
+});`} lang="javascript" />
+
+### Delegación de eventos
+<Code code={`const lista = document.querySelector('#lista');
+
+lista.addEventListener('click', (evento) => {
+    if (evento.target.matches('li')) {
+        console.log('Click en elemento li:', evento.target.textContent);
+    }
+});`} lang="javascript" />
+
+## Eventos personalizados <Badge text="Avanzado" variant="note" />
+
+### Crear y disparar eventos
+<Code code={`// Crear evento personalizado
+const eventoPersonalizado = new CustomEvent('miEvento', {
+    detail: {
+        mensaje: 'Hola desde evento personalizado'
+    }
+});
+
+// Escuchar evento personalizado
+elemento.addEventListener('miEvento', (evento) => {
+    console.log(evento.detail.mensaje);
+});
+
+// Disparar evento
+elemento.dispatchEvent(eventoPersonalizado);`} lang="javascript" />
+
+## Eventos comunes <Badge text="Referencia" variant="tip" />
+
+### Eventos del documento
+<Code code={`// DOM cargado
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM está listo');
+});
+
+// Página completamente cargada
+window.addEventListener('load', () => {
+    console.log('Página completamente cargada');
+});
+
+// Antes de cerrar la página
+window.addEventListener('beforeunload', (evento) => {
+    evento.preventDefault();
+    evento.returnValue = '';
+});`} lang="javascript" />
+
+### Eventos de formulario
+<Code code={`const form = document.querySelector('form');
+const input = document.querySelector('input');
+
+// Envío de formulario
+form.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    console.log('Formulario enviado');
+});
+
+// Cambio en input
+input.addEventListener('change', () => {
+    console.log('Valor cambiado');
+});
+
+// Durante la escritura
+input.addEventListener('input', () => {
+    console.log('Escribiendo...');
+});`} lang="javascript" />
+
+## Mejores prácticas <Badge text="Recomendado" variant="tip" />
+
+### Usar delegación de eventos
+<Code code={`// ❌ Malo
+document.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', handleClick);
+});
+
+// ✅ Bueno
+document.addEventListener('click', (evento) => {
+    if (evento.target.matches('button')) {
+        handleClick(evento);
+    }
+});`} lang="javascript" />
+
+### Remover event listeners cuando no se necesiten
+<Code code={`const handleClick = () => console.log('Click');
+
+// Agregar evento
+elemento.addEventListener('click', handleClick);
+
+// Remover cuando ya no se necesite
+elemento.removeEventListener('click', handleClick);`} lang="javascript" />
+
+### Usar opciones de addEventListener
+<Code code={`elemento.addEventListener('click', handleClick, {
+    once: true,      // Se ejecuta solo una vez
+    passive: true,   // Mejora el rendimiento del scroll
+    capture: false   // Fase de burbujeo (default)
+});`} lang="javascript" />

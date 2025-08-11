@@ -1,0 +1,785 @@
+---
+title: 2. Tipos de Datos y Variables
+description: Aprende sobre tipos de datos primitivos, variables, constantes, conversión de tipos y ámbito de variables en Java
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Tipos de Datos y Variables
+
+En Java, los tipos de datos y las variables son conceptos fundamentales que definen cómo se almacena y manipula la información en un programa. Java es un lenguaje fuertemente tipado, lo que significa que todas las variables deben declararse con un tipo de dato específico antes de ser utilizadas.
+
+## 2.1 Tipos de datos en Java
+
+Java clasifica los tipos de datos en dos categorías principales:
+
+1. **Tipos primitivos**: Almacenan valores simples y están predefinidos en el lenguaje.
+2. **Tipos de referencia**: Almacenan referencias a objetos y pueden ser clases, interfaces o arrays.
+
+### 2.1.1 Tipos de datos primitivos
+
+Java proporciona ocho tipos de datos primitivos, que se dividen en cuatro grupos:
+
+#### Tipos enteros
+
+Los tipos enteros almacenan números enteros (sin parte decimal) de diferentes tamaños:
+
+<Tabs>
+  <TabItem label="byte">
+    <ul>
+      <li><strong>Tamaño:</strong> 8 bits (1 byte)</li>
+      <li><strong>Rango:</strong> -128 a 127</li>
+      <li><strong>Valor por defecto:</strong> 0</li>
+      <li><strong>Uso:</strong> Ahorro de memoria en arrays grandes o cuando se sabe que el valor estará dentro de su rango.</li>
+      <li><strong>Ejemplo:</strong> <Code code="byte edad = 25;" lang="java" /></li>
+    </ul>
+  </TabItem>
+  <TabItem label="short">
+    <ul>
+      <li><strong>Tamaño:</strong> 16 bits (2 bytes)</li>
+      <li><strong>Rango:</strong> -32,768 a 32,767</li>
+      <li><strong>Valor por defecto:</strong> 0</li>
+      <li><strong>Uso:</strong> Cuando el rango de byte es insuficiente pero se quiere ahorrar memoria.</li>
+      <li><strong>Ejemplo:</strong> <Code code="short temperatura = -200;" lang="java" /></li>
+    </ul>
+  </TabItem>
+  <TabItem label="int">
+    <ul>
+      <li><strong>Tamaño:</strong> 32 bits (4 bytes)</li>
+      <li><strong>Rango:</strong> -2,147,483,648 a 2,147,483,647</li>
+      <li><strong>Valor por defecto:</strong> 0</li>
+      <li><strong>Uso:</strong> Es el tipo más común para valores enteros. Java utiliza int como tipo predeterminado para literales enteros.</li>
+      <li><strong>Ejemplo:</strong> <Code code="int poblacion = 1000000;" lang="java" /></li>
+    </ul>
+  </TabItem>
+  <TabItem label="long">
+    <ul>
+      <li><strong>Tamaño:</strong> 64 bits (8 bytes)</li>
+      <li><strong>Rango:</strong> -9,223,372,036,854,775,808 a 9,223,372,036,854,775,807</li>
+      <li><strong>Valor por defecto:</strong> 0L</li>
+      <li><strong>Uso:</strong> Para valores enteros muy grandes, como identificadores únicos o timestamps.</li>
+      <li><strong>Ejemplo:</strong> <Code code="long poblacionMundial = 7800000000L;" lang="java" /></li>
+      <li><strong>Nota:</strong> El sufijo 'L' indica que es un literal de tipo long.</li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+#### Tipos de punto flotante
+
+Los tipos de punto flotante almacenan números con parte decimal:
+
+<Tabs>
+  <TabItem label="float">
+    <ul>
+      <li><strong>Tamaño:</strong> 32 bits (4 bytes)</li>
+      <li><strong>Rango:</strong> Aproximadamente ±3.40282347E+38F (6-7 dígitos significativos)</li>
+      <li><strong>Valor por defecto:</strong> 0.0f</li>
+      <li><strong>Uso:</strong> Cuando se necesita precisión decimal con menor uso de memoria.</li>
+      <li><strong>Ejemplo:</strong> <Code code="float precio = 19.99f;" lang="java" /></li>
+      <li><strong>Nota:</strong> El sufijo 'f' indica que es un literal de tipo float.</li>
+    </ul>
+  </TabItem>
+  <TabItem label="double">
+    <ul>
+      <li><strong>Tamaño:</strong> 64 bits (8 bytes)</li>
+      <li><strong>Rango:</strong> Aproximadamente ±1.79769313486231570E+308 (15 dígitos significativos)</li>
+      <li><strong>Valor por defecto:</strong> 0.0d</li>
+      <li><strong>Uso:</strong> Es el tipo predeterminado para valores decimales en Java. Ofrece mayor precisión que float.</li>
+      <li><strong>Ejemplo:</strong> <Code code="double pi = 3.14159265359;" lang="java" /></li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+  Los tipos de punto flotante pueden tener problemas de precisión en cálculos financieros o cuando se requiere exactitud decimal. Para estos casos, se recomienda usar la clase <code>BigDecimal</code>.
+</Aside>
+
+#### Tipo caracter
+
+<Tabs>
+  <TabItem label="char">
+    <ul>
+      <li><strong>Tamaño:</strong> 16 bits (2 bytes)</li>
+      <li><strong>Rango:</strong> 0 a 65,535 (representa caracteres Unicode)</li>
+      <li><strong>Valor por defecto:</strong> '\u0000' (carácter nulo)</li>
+      <li><strong>Uso:</strong> Almacena un único carácter Unicode.</li>
+      <li><strong>Ejemplo:</strong> <Code code="char letra = 'A';" lang="java" /></li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+<Code code={`// Ejemplos de caracteres especiales y Unicode
+char nuevaLinea = '\n';
+char tabulacion = '\t';
+char comillaSimple = '\'';
+char comillaDoble = '\"';
+char caracterUnicode = '\u00D1';  // Representa la letra Ñ (Ñ)`} lang="java" />
+
+#### Tipo booleano
+
+<Tabs>
+  <TabItem label="boolean">
+    <ul>
+      <li><strong>Tamaño:</strong> 1 bit (aunque la implementación JVM puede variar)</li>
+      <li><strong>Valores posibles:</strong> true o false</li>
+      <li><strong>Valor por defecto:</strong> false</li>
+      <li><strong>Uso:</strong> Representa valores de verdad, utilizado en expresiones condicionales.</li>
+      <li><strong>Ejemplo:</strong> <Code code="boolean esActivo = true;" lang="java" /></li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+#### Tabla comparativa de tipos primitivos
+
+| Tipo | Tamaño | Rango | Valor por defecto |
+|------|---------|-------|-------------------|
+| byte | 8 bits | -128 a 127 | 0 |
+| short | 16 bits | -32,768 a 32,767 | 0 |
+| int | 32 bits | -2,147,483,648 a 2,147,483,647 | 0 |
+| long | 64 bits | -9,223,372,036,854,775,808 a 9,223,372,036,854,775,807 | 0L |
+| float | 32 bits | ±3.40282347E+38F (6-7 dígitos) | 0.0f |
+| double | 64 bits | ±1.79769313486231570E+308 (15 dígitos) | 0.0d |
+| char | 16 bits | 0 a 65,535 (Unicode) | '\u0000' |
+| boolean | 1 bit* | true o false | false |
+
+<Aside type="note">
+  * El tamaño real de boolean puede variar según la implementación de la JVM.
+</Aside>
+
+### 2.1.2 Tipos de datos de referencia
+
+Los tipos de datos de referencia son aquellos que almacenan referencias (direcciones de memoria) a objetos en lugar de almacenar los valores directamente. A diferencia de los tipos primitivos, los tipos de referencia se crean utilizando la palabra clave `new` (con algunas excepciones como String).
+
+#### String
+
+El tipo `String` es uno de los tipos de referencia más utilizados en Java. Representa una secuencia de caracteres y, aunque es técnicamente una clase, Java proporciona soporte especial para su uso:
+
+<Tabs>
+  <TabItem label="Características">
+    <ul>
+      <li><strong>Inmutabilidad:</strong> Los objetos String son inmutables, lo que significa que su contenido no puede cambiar después de ser creados.</li>
+      <li><strong>Pool de Strings:</strong> Java mantiene un pool de strings para optimizar el uso de memoria.</li>
+      <li><strong>Valor por defecto:</strong> null (como todos los tipos de referencia)</li>
+      <li><strong>Ejemplo:</strong> <Code code={`String nombre = "María";`} lang="java" /></li>
+    </ul>
+  </TabItem>
+  <TabItem label="Creación">
+    <p>Hay dos formas principales de crear un String:</p>
+    <Code code={`// Usando literal de string (recomendado)
+String nombre = "Juan";
+
+// Usando el constructor (crea un nuevo objeto en el heap)
+String apellido = new String("Pérez");`} lang="java" />
+  </TabItem>
+  <TabItem label="Métodos comunes">
+    <ul>
+      <li><Code code="length()" lang="java" /> - Devuelve la longitud del string</li>
+      <li><Code code="charAt(int index)" lang="java" /> - Devuelve el carácter en la posición especificada</li>
+      <li><Code code="substring(int beginIndex, int endIndex)" lang="java" /> - Extrae una subcadena</li>
+      <li><Code code="equals(Object obj)" lang="java" /> - Compara el contenido con otro string</li>
+      <li><Code code="toLowerCase()" lang="java" /> y <Code code="toUpperCase()" lang="java" /> - Convierte a minúsculas/mayúsculas</li>
+      <li><Code code="concat(String str)" lang="java" /> - Concatena strings</li>
+      <li><Code code="trim()" lang="java" /> - Elimina espacios en blanco al inicio y final</li>
+    </ul>
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Para comparar strings, siempre use el método <Code code="equals()" lang="java" /> en lugar del operador <Code code="==" lang="java" />. El operador <Code code="==" lang="java" /> compara referencias de memoria, mientras que <Code code="equals()" lang="java" /> compara el contenido.
+</Aside>
+
+#### Arrays
+
+Los arrays son estructuras de datos que almacenan múltiples valores del mismo tipo:
+
+<Tabs>
+  <TabItem label="Características">
+    <ul>
+      <li><strong>Tamaño fijo:</strong> Una vez creado, el tamaño del array no puede cambiar.</li>
+      <li><strong>Indexación:</strong> Los elementos se acceden mediante índices que comienzan en 0.</li>
+      <li><strong>Valor por defecto:</strong> null para arrays de objetos, 0 para arrays numéricos, false para arrays de boolean.</li>
+    </ul>
+  </TabItem>
+  <TabItem label="Declaración e inicialización">
+    <Code code={`// Declaración
+int[] numeros;  // Forma preferida
+String nombres[];  // Forma alternativa
+
+// Inicialización
+numeros = new int[5];  // Array de 5 enteros
+nombres = new String[3];  // Array de 3 strings
+
+// Declaración e inicialización combinadas
+int[] primos = {2, 3, 5, 7, 11};
+String[] dias = {"Lunes", "Martes", "Miércoles"};`} lang="java" />
+  </TabItem>
+  <TabItem label="Acceso y manipulación">
+    <Code code={`// Acceso a elementos
+int primerNumero = numeros[0];
+String segundoDia = dias[1];
+
+// Modificación de elementos
+numeros[2] = 42;
+dias[0] = "Monday";
+
+// Longitud del array
+int longitud = numeros.length;`} lang="java" />
+  </TabItem>
+</Tabs>
+
+#### Clases y objetos
+
+Las clases son plantillas para crear objetos, que son instancias de esas clases:
+
+<Code code={`// Definición de una clase
+public class Persona {
+    // Atributos
+    private String nombre;
+    private int edad;
+    
+    // Constructor
+    public Persona(String nombre, int edad) {
+        this.nombre = nombre;
+        this.edad = edad;
+    }
+    
+    // Métodos
+    public String getNombre() {
+        return nombre;
+    }
+}
+
+// Creación de objetos
+Persona persona1 = new Persona("Ana", 30);
+Persona persona2 = new Persona("Carlos", 25);`} lang="java" />
+
+#### Wrappers (Clases envoltorio)
+
+Java proporciona clases wrapper para cada tipo primitivo, permitiendo usarlos como objetos:
+
+| Tipo primitivo | Clase wrapper |
+|---------------|---------------|
+| byte | Byte |
+| short | Short |
+| int | Integer |
+| long | Long |
+| float | Float |
+| double | Double |
+| char | Character |
+| boolean | Boolean |
+
+<Code code={`// Autoboxing (conversión automática de primitivo a wrapper)
+Integer num = 100;  // Equivalente a: Integer num = Integer.valueOf(100);
+
+// Unboxing (conversión automática de wrapper a primitivo)
+int valor = num;  // Equivalente a: int valor = num.intValue();
+
+// Métodos útiles de las clases wrapper
+String numStr = Integer.toString(42);  // Convierte int a String
+int numInt = Integer.parseInt("42");  // Convierte String a int
+Integer max = Integer.MAX_VALUE;  // Valor máximo de int`} lang="java" />
+
+### 2.1.3 Variables y constantes
+
+Las variables son espacios de memoria que almacenan valores que pueden cambiar durante la ejecución del programa. Las constantes, por otro lado, son valores que no pueden modificarse una vez definidos.
+
+#### Declaración de variables
+
+En Java, las variables deben declararse antes de usarse, especificando su tipo y nombre:
+
+<Code code={`// Sintaxis básica
+tipo nombreVariable;
+
+// Ejemplos
+int edad;
+String nombre;
+double salario;`} lang="java" />
+
+#### Inicialización de variables
+
+Las variables pueden inicializarse en el momento de la declaración o posteriormente:
+
+<Code code={`// Inicialización en la declaración
+int edad = 25;
+String nombre = "Juan";
+
+// Inicialización posterior
+double salario;
+salario = 2500.50;`} lang="java" />
+
+#### Convenciones de nomenclatura
+
+Java sigue ciertas convenciones para nombrar variables:
+
+<Tabs>
+  <TabItem label="Reglas obligatorias">
+    <ul>
+      <li>Los nombres deben comenzar con una letra, un signo de dólar ($) o un guión bajo (_).</li>
+      <li>Después del primer carácter, pueden contener letras, dígitos, signos de dólar y guiones bajos.</li>
+      <li>No se pueden usar palabras reservadas de Java como nombres de variables.</li>
+      <li>Java distingue entre mayúsculas y minúsculas (case-sensitive).</li>
+    </ul>
+  </TabItem>
+  <TabItem label="Convenciones recomendadas">
+    <ul>
+      <li>Usar camelCase para nombres de variables (primera letra en minúscula, primera letra de cada palabra subsiguiente en mayúscula).</li>
+      <li>Los nombres deben ser descriptivos y reflejar el propósito de la variable.</li>
+      <li>Evitar nombres de una sola letra, excepto para variables temporales como índices de bucles.</li>
+    </ul>
+    <Code code={`// Ejemplos de nombres siguiendo convenciones
+int edadUsuario;
+String nombreCompleto;
+double tasaDeInteres;
+boolean esActivo;`} lang="java" />
+  </TabItem>
+</Tabs>
+
+#### Declaración de constantes
+
+En Java, las constantes se declaran usando las palabras clave `final` y generalmente `static` (para constantes de clase):
+
+<Code code={`// Constante local
+final double PI = 3.14159;
+
+// Constante de clase (estática)
+public static final int DIAS_SEMANA = 7;
+
+// Constantes en una interfaz (implícitamente public, static y final)
+interface Constantes {
+    double GRAVEDAD = 9.8;
+    String EMPRESA = "Mi Empresa S.A.";
+}`} lang="java" />
+
+<Aside type="tip">
+  Por convención, los nombres de las constantes se escriben en mayúsculas con palabras separadas por guiones bajos (SNAKE_CASE).
+</Aside>
+
+#### Variables de instancia vs. variables de clase
+
+<Tabs>
+  <TabItem label="Variables de instancia">
+    <p>Pertenecen a un objeto específico (instancia de una clase).</p>
+    <Code code={`public class Persona {
+    // Variables de instancia
+    private String nombre;
+    private int edad;
+    
+    // Constructor
+    public Persona(String nombre, int edad) {
+        this.nombre = nombre;
+        this.edad = edad;
+    }
+}`} lang="java" />
+  </TabItem>
+  <TabItem label="Variables de clase (estáticas)">
+    <p>Pertenecen a la clase en sí, no a instancias específicas. Se comparten entre todas las instancias.</p>
+    <Code code={`public class Contador {
+    // Variable de clase (estática)
+    private static int contadorGlobal = 0;
+    
+    // Variable de instancia
+    private int contadorLocal;
+    
+    public Contador() {
+        contadorGlobal++;
+        contadorLocal = contadorGlobal;
+    }
+    
+    public static int getContadorGlobal() {
+        return contadorGlobal;
+    }
+    
+    public int getContadorLocal() {
+        return contadorLocal;
+    }
+}`} lang="java" />
+  </TabItem>
+</Tabs>
+
+### 2.1.3 Conversión de tipos (casting)
+
+La conversión de tipos en Java permite cambiar un valor de un tipo de dato a otro. Hay dos tipos principales de conversiones:
+
+#### Conversión implícita (widening)
+
+Ocurre automáticamente cuando se asigna un valor de un tipo de menor tamaño a uno de mayor tamaño, sin pérdida de información:
+
+<Code code={`byte valorByte = 10;
+short valorShort = valorByte;  // Conversión implícita de byte a short
+int valorInt = valorShort;     // Conversión implícita de short a int
+long valorLong = valorInt;     // Conversión implícita de int a long
+float valorFloat = valorLong;  // Conversión implícita de long a float
+double valorDouble = valorFloat; // Conversión implícita de float a double`} lang="java" />
+
+<Aside type="note">
+  El orden de conversión implícita es: byte → short → int → long → float → double
+</Aside>
+
+#### Conversión explícita (narrowing)
+
+Se requiere cuando se asigna un valor de un tipo de mayor tamaño a uno de menor tamaño, con posible pérdida de información. Se realiza mediante un operador de casting:
+
+<Code code={`double valorDouble = 9.78;
+float valorFloat = (float) valorDouble;  // Conversión explícita de double a float
+long valorLong = (long) valorFloat;      // Conversión explícita de float a long
+int valorInt = (int) valorLong;          // Conversión explícita de long a int
+short valorShort = (short) valorInt;     // Conversión explícita de int a short
+byte valorByte = (byte) valorShort;      // Conversión explícita de short a byte`} lang="java" />
+
+<Aside type="caution">
+  La conversión explícita puede resultar en pérdida de información o precisión. Por ejemplo, al convertir un double a int, se pierde la parte decimal.
+</Aside>
+
+#### Ejemplos prácticos de casting
+
+<Tabs>
+  <TabItem label="Conversión numérica">
+    <Code code={`// Truncamiento de decimales
+double precio = 23.56;
+int precioRedondeado = (int) precio;  // precioRedondeado = 23
+
+// Posible pérdida de información
+int numeroGrande = 130;
+byte numeroPequeno = (byte) numeroGrande;  // numeroPequeno = -126 (desbordamiento)`} lang="java" />
+  </TabItem>
+  <TabItem label="Conversión char-int">
+    <Code code={`// Char a int (obtiene el valor Unicode)
+char letra = 'A';
+int valorUnicode = letra;  // valorUnicode = 65
+
+// Int a char (convierte el valor numérico a su carácter Unicode)
+int codigo = 66;
+char caracter = (char) codigo;  // caracter = 'B'`} lang="java" />
+  </TabItem>
+  <TabItem label="Conversión con String">
+    <Code code={`// Conversión de String a tipos primitivos
+String edadTexto = "25";
+int edad = Integer.parseInt(edadTexto);  // edad = 25
+
+double salario = Double.parseDouble("2500.50");  // salario = 2500.50
+boolean activo = Boolean.parseBoolean("true");  // activo = true
+
+// Conversión de tipos primitivos a String
+String edadComoTexto = String.valueOf(30);  // edadComoTexto = "30"
+String precioComoTexto = Double.toString(45.75);  // precioComoTexto = "45.75"`} lang="java" />
+  </TabItem>
+</Tabs>
+
+#### Métodos de conversión en Java
+
+Java proporciona varios métodos para convertir entre diferentes tipos de datos. Estos métodos son especialmente útiles cuando se trabaja con tipos de referencia y primitivos:
+
+<Tabs>
+  <TabItem label="Métodos parse*">
+    <p>Convierten un String a un tipo primitivo:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Método</th>
+          <th>Descripción</th>
+          <th>Ejemplo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><Code code="Integer.parseInt(String s)" lang="java" /></td>
+          <td>Convierte un String a int</td>
+          <td><Code code={`int num = Integer.parseInt("42");`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Double.parseDouble(String s)" lang="java" /></td>
+          <td>Convierte un String a double</td>
+          <td><Code code={`double d = Double.parseDouble("3.14");`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Float.parseFloat(String s)" lang="java" /></td>
+          <td>Convierte un String a float</td>
+          <td><Code code={`float f = Float.parseFloat("2.5f");`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Long.parseLong(String s)" lang="java" /></td>
+          <td>Convierte un String a long</td>
+          <td><Code code={`long l = Long.parseLong("9876543210");`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Short.parseShort(String s)" lang="java" /></td>
+          <td>Convierte un String a short</td>
+          <td><Code code={`short s = Short.parseShort("128");`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Byte.parseByte(String s)" lang="java" /></td>
+          <td>Convierte un String a byte</td>
+          <td><Code code={`byte b = Byte.parseByte("120");`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Boolean.parseBoolean(String s)" lang="java" /></td>
+          <td>Convierte un String a boolean</td>
+          <td><Code code={`boolean bool = Boolean.parseBoolean("true");`} lang="java" /></td>
+        </tr>
+      </tbody>
+    </table>
+    <Aside type="caution">
+      Los métodos parse* lanzan <Code code="NumberFormatException" lang="java" /> si el String no tiene el formato adecuado.
+    </Aside>
+  </TabItem>
+  <TabItem label="Métodos valueOf">
+    <p>Convierten un valor (primitivo o String) a su correspondiente objeto wrapper:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Método</th>
+          <th>Descripción</th>
+          <th>Ejemplo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><Code code="Integer.valueOf(String s)" lang="java" /></td>
+          <td>Convierte un String a objeto Integer</td>
+          <td><Code code={`Integer num = Integer.valueOf("42");`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Integer.valueOf(int i)" lang="java" /></td>
+          <td>Convierte un int a objeto Integer</td>
+          <td><Code code={`Integer num = Integer.valueOf(42);`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Double.valueOf(String s)" lang="java" /></td>
+          <td>Convierte un String a objeto Double</td>
+          <td><Code code={`Double d = Double.valueOf("3.14");`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Boolean.valueOf(String s)" lang="java" /></td>
+          <td>Convierte un String a objeto Boolean</td>
+          <td><Code code={`Boolean b = Boolean.valueOf("true");`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Character.valueOf(char c)" lang="java" /></td>
+          <td>Convierte un char a objeto Character</td>
+          <td><Code code="Character c = Character.valueOf('A');" lang="java" /></td>
+        </tr>
+      </tbody>
+    </table>
+    <Aside type="tip">
+      Los métodos valueOf son preferibles a los constructores de las clases wrapper, ya que pueden reutilizar objetos existentes (caché) para mejorar el rendimiento.
+    </Aside>
+  </TabItem>
+  <TabItem label="Métodos toString">
+    <p>Convierten valores a su representación en String:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Método</th>
+          <th>Descripción</th>
+          <th>Ejemplo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><Code code="String.valueOf(tipo)" lang="java" /></td>
+          <td>Método estático que convierte cualquier tipo a String</td>
+          <td><Code code="String s = String.valueOf(42);" lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Integer.toString(int i)" lang="java" /></td>
+          <td>Convierte un int a String</td>
+          <td><Code code="String s = Integer.toString(42);" lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Double.toString(double d)" lang="java" /></td>
+          <td>Convierte un double a String</td>
+          <td><Code code="String s = Double.toString(3.14);" lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="objeto.toString()" lang="java" /></td>
+          <td>Método de instancia que devuelve una representación en String del objeto</td>
+          <td><Code code="String s = new Integer(42).toString();" lang="java" /></td>
+        </tr>
+      </tbody>
+    </table>
+  </TabItem>
+  <TabItem label="Conversiones especiales">
+    <p>Otros métodos útiles para conversiones específicas:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Método</th>
+          <th>Descripción</th>
+          <th>Ejemplo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><Code code="Integer.toHexString(int i)" lang="java" /></td>
+          <td>Convierte un int a su representación hexadecimal</td>
+          <td><Code code={`String hex = Integer.toHexString(255); // "ff"`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Integer.toBinaryString(int i)" lang="java" /></td>
+          <td>Convierte un int a su representación binaria</td>
+          <td><Code code={`String bin = Integer.toBinaryString(10); // "1010"`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Integer.toOctalString(int i)" lang="java" /></td>
+          <td>Convierte un int a su representación octal</td>
+          <td><Code code={`String oct = Integer.toOctalString(10); // "12"`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="Character.getNumericValue(char ch)" lang="java" /></td>
+          <td>Obtiene el valor numérico de un carácter</td>
+          <td><Code code={`int val = Character.getNumericValue('5'); // 5`} lang="java" /></td>
+        </tr>
+        <tr>
+          <td><Code code="String.format()" lang="java" /></td>
+          <td>Formatea valores en un String</td>
+          <td><Code code={`String s = String.format("%.2f", 3.14159); // "3.14"`} lang="java" /></td>
+        </tr>
+      </tbody>
+    </table>
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Al trabajar con conversiones, siempre verifica que los valores estén dentro del rango del tipo de destino para evitar pérdida de datos o excepciones.
+</Aside>
+
+### 2.1.4 Ámbito de variables
+
+El ámbito (scope) de una variable define dónde es accesible dentro del código. Java tiene varios niveles de ámbito:
+
+#### Ámbito de bloque
+
+Las variables declaradas dentro de un bloque de código (entre llaves `{}`) solo son accesibles dentro de ese bloque:
+
+<Code code={`public void ejemploAmbitoBloque() {
+    // Inicio del bloque externo
+    int x = 10;
+    
+    if (x > 5) {
+        // Inicio del bloque interno
+        int y = 20;  // Variable de ámbito de bloque
+        System.out.println(x);  // Accesible (x está en un bloque externo)
+        System.out.println(y);  // Accesible
+    }  // Fin del bloque interno
+    
+    System.out.println(x);  // Accesible
+    // System.out.println(y);  // Error: y no es accesible aquí
+}  // Fin del bloque externo`} lang="java" />
+
+#### Ámbito de método
+
+Las variables declaradas dentro de un método (variables locales) solo son accesibles dentro de ese método:
+
+<Code code={`public class EjemploAmbito {
+    public void metodo1() {
+        int a = 10;  // Variable local al método1
+        System.out.println(a);  // Accesible
+    }
+    
+    public void metodo2() {
+        // System.out.println(a);  // Error: a no es accesible aquí
+        int b = 20;  // Variable local al método2
+    }
+}`} lang="java" />
+
+#### Ámbito de clase
+
+Las variables declaradas a nivel de clase (campos o atributos) son accesibles desde cualquier método dentro de la clase, dependiendo de su modificador de acceso:
+
+<Code code={`public class Estudiante {
+    // Variables de instancia (nivel de clase)
+    private String nombre;  // Accesible solo dentro de esta clase
+    protected int edad;     // Accesible en esta clase y sus subclases
+    public String curso;    // Accesible desde cualquier parte
+    
+    public void establecerDatos(String nuevoNombre, int nuevaEdad) {
+        nombre = nuevoNombre;  // Accesible
+        edad = nuevaEdad;      // Accesible
+        System.out.println(curso);  // Accesible
+    }
+    
+    public void mostrarDatos() {
+        System.out.println(nombre);  // Accesible
+        System.out.println(edad);    // Accesible
+    }
+}`} lang="java" />
+
+#### Variables estáticas vs. variables de instancia
+
+<Tabs>
+  <TabItem label="Variables estáticas">
+    <p>Pertenecen a la clase, no a instancias específicas. Son compartidas por todas las instancias de la clase.</p>
+    <Code code={`public class Contador {
+    // Variable estática (compartida por todas las instancias)
+    private static int contador = 0;
+    
+    public Contador() {
+        contador++;
+    }
+    
+    public static int getContador() {
+        return contador;
+    }
+}`} lang="java" />
+    <p>Uso:</p>
+    <Code code={`Contador c1 = new Contador();  // contador = 1
+Contador c2 = new Contador();  // contador = 2
+System.out.println(Contador.getContador());  // Imprime 2`} lang="java" />
+  </TabItem>
+  <TabItem label="Variables de instancia">
+    <p>Cada instancia de la clase tiene su propia copia de estas variables.</p>
+    <Code code={`public class Persona {
+    // Variables de instancia (cada objeto tiene su propia copia)
+    private String nombre;
+    private int edad;
+    
+    public Persona(String nombre, int edad) {
+        this.nombre = nombre;
+        this.edad = edad;
+    }
+}`} lang="java" />
+    <p>Uso:</p>
+    <Code code={`Persona p1 = new Persona("Ana", 25);
+Persona p2 = new Persona("Carlos", 30);
+// p1 y p2 tienen diferentes valores para nombre y edad`} lang="java" />
+  </TabItem>
+</Tabs>
+
+#### Sombreado de variables (Variable Shadowing)
+
+Ocurre cuando una variable declarada en un ámbito interno tiene el mismo nombre que una variable en un ámbito externo:
+
+<Code code={`public class EjemploSombreado {
+    private int x = 10;  // Variable de instancia
+    
+    public void metodo() {
+        int x = 20;  // Variable local que sombrea la variable de instancia
+        System.out.println(x);  // Imprime 20 (variable local)
+        System.out.println(this.x);  // Imprime 10 (variable de instancia)
+    }
+    
+    public void otroMetodo(int x) {  // Parámetro que sombrea la variable de instancia
+        System.out.println(x);  // Imprime el valor del parámetro
+        System.out.println(this.x);  // Imprime 10 (variable de instancia)
+    }
+}`} lang="java" />
+
+<Aside type="caution">
+  El sombreado de variables puede hacer que el código sea confuso y propenso a errores. Es una buena práctica usar nombres diferentes para evitar este problema.
+</Aside>
+
+## Resumen
+
+- Java es un lenguaje fuertemente tipado con ocho tipos de datos primitivos: byte, short, int, long, float, double, char y boolean.
+- Las variables deben declararse con un tipo específico antes de usarse y pueden ser locales, de instancia o estáticas.
+- Las constantes se declaran con la palabra clave `final` y por convención se nombran en mayúsculas.
+- La conversión de tipos puede ser implícita (automática) cuando se convierte de un tipo menor a uno mayor, o explícita (mediante casting) cuando se convierte de un tipo mayor a uno menor.
+- El ámbito de una variable determina dónde es accesible en el código, y puede ser de bloque, de método o de clase.
+
+<Aside type="tip">
+  Comprender bien los tipos de datos y el ámbito de las variables es fundamental para escribir código Java eficiente y libre de errores. Presta especial atención a las conversiones explícitas para evitar pérdidas de datos inesperadas.
+</Aside>

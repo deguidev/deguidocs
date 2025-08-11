@@ -1,0 +1,467 @@
+---
+title: 8. Autenticación y Autorización en Laravel
+description: Aprende a implementar autenticación, autorización, políticas y gates en Laravel
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Introducción
+
+La autenticación y autorización son aspectos fundamentales en cualquier aplicación web moderna. Laravel ofrece un sistema robusto y flexible para gestionar estos procesos de manera segura y eficiente. En esta guía, exploraremos las diferentes opciones que Laravel proporciona para implementar autenticación y autorización en nuestras aplicaciones.
+
+## Laravel Breeze, Jetstream y Fortify
+
+Laravel ofrece tres paquetes principales para implementar autenticación de manera rápida y segura.
+
+### Laravel Breeze
+
+Breeze es una implementación mínima y sencilla del sistema de autenticación de Laravel, ideal para proyectos nuevos o pequeños.
+
+<Code code={`composer require laravel/breeze --dev
+php artisan breeze:install`} lang="bash" />
+
+**Características principales:**
+
+- Implementación ligera con Blade y Tailwind CSS
+- Registro y login de usuarios
+- Verificación de email
+- Restablecimiento de contraseña
+- Fácil de personalizar y extender
+
+<Aside type="tip">
+  Laravel Breeze también ofrece stacks para React, Vue y API, que puedes instalar con los comandos:
+  <Code code={`php artisan breeze:install react
+php artisan breeze:install vue
+php artisan breeze:install api`} lang="bash" />
+</Aside>
+
+### Laravel Jetstream
+
+Jetstream proporciona una implementación más robusta con características avanzadas para aplicaciones que requieren mayor seguridad y funcionalidad.
+
+<Code code={`composer require laravel/jetstream
+php artisan jetstream:install livewire`} lang="bash" />
+
+**Características principales:**
+
+- Dos stacks de frontend: Livewire (Blade) o Inertia (Vue/React)
+- Autenticación de dos factores
+- Gestión de sesiones del navegador
+- Soporte para equipos y permisos
+- Verificación de email
+- Gestión de perfil con foto
+- Términos y condiciones
+
+<Code code={`// Instalar con soporte para equipos
+php artisan jetstream:install livewire --teams
+
+// O con Inertia.js
+php artisan jetstream:install inertia --teams`} lang="bash" />
+
+### Laravel Fortify
+
+Fortify es un backend de autenticación sin interfaz de usuario, ideal para proyectos donde se necesita un control total sobre el frontend.
+
+<Code code={`composer require laravel/fortify
+php artisan vendor:publish --provider="Laravel\\Fortify\\FortifyServiceProvider"`} lang="bash" />
+
+**Características principales:**
+
+- Backend de autenticación sin opiniones sobre el frontend
+- Registro y login de usuarios
+- Autenticación de dos factores
+- Actualización de perfil y contraseña
+- Restablecimiento de contraseña
+- Verificación de email
+
+<Code code={`// En config/app.php, agregar el proveedor de servicios
+'providers' => [
+    // ...
+    App\Providers\FortifyServiceProvider::class,
+],`} lang="php" />
+
+<Aside>
+  Fortify es el backend que utiliza Jetstream internamente. Si necesitas un control total sobre el frontend pero quieres la robustez del backend de autenticación de Laravel, Fortify es la opción ideal.
+</Aside>
+
+## Registro, login y logout
+
+Independientemente del paquete que elijas, Laravel proporciona una API consistente para manejar la autenticación de usuarios.
+
+### Registro de usuarios
+
+En una aplicación con Breeze o Jetstream, el registro ya está implementado. Si necesitas personalizarlo o implementarlo manualmente:
+
+<Code code={`// En un controlador
+public function register(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8|confirmed',
+    ]);
+
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+    ]);
+
+    // Autenticar al usuario inmediatamente después del registro
+    Auth::login($user);
+
+    return redirect()->intended('dashboard');
+}`} lang="php" />
+
+### Login de usuarios
+
+El proceso de login verifica las credenciales del usuario y crea una sesión:
+
+<Code code={`// En un controlador
+public function login(Request $request)
+{
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+
+    if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $request->session()->regenerate();
+        return redirect()->intended('dashboard');
+    }
+
+    return back()->withErrors([
+        'email' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
+    ]);
+}`} lang="php" />
+
+### Logout de usuarios
+
+Para cerrar la sesión de un usuario:
+
+<Code code={`// En un controlador
+public function logout(Request $request)
+{
+    Auth::logout();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/login');
+}`} lang="php" />
+
+<Aside type="tip">
+  Laravel proporciona el helper `auth()` para acceder al usuario autenticado: `auth()->user()` o `Auth::user()`.
+</Aside>
+
+## Middleware auth, guest y can
+
+Laravel utiliza middleware para proteger rutas y controlar el acceso a diferentes partes de la aplicación.
+
+### Middleware auth
+
+El middleware `auth` asegura que solo los usuarios autenticados puedan acceder a ciertas rutas:
+
+<Code code={`// En routes/web.php
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    });
+    
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+});
+
+// O en un solo endpoint
+Route::get('/settings', function () {
+    // Solo usuarios autenticados
+})->middleware('auth');`} lang="php" />
+
+### Middleware guest
+
+El middleware `guest` redirige a los usuarios ya autenticados, útil para páginas como login o registro:
+
+<Code code={`// En routes/web.php
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+});
+
+// Si un usuario autenticado intenta acceder a estas rutas, será redirigido a la ruta definida en RouteServiceProvider::HOME`} lang="php" />
+
+### Middleware can
+
+El middleware `can` verifica si un usuario tiene un permiso específico:
+
+<Code code={`// En routes/web.php
+Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->middleware('can:update,post');
+
+// También puedes usarlo en grupos
+Route::middleware(['auth', 'can:manage-posts'])->group(function () {
+    Route::get('/posts/create', [PostController::class, 'create']);
+    Route::post('/posts', [PostController::class, 'store']);
+});
+
+// O con un Gate
+Route::get('/admin/reports', function () {
+    // Solo usuarios con permiso para ver reportes
+})->middleware('can:view-reports');`} lang="php" />
+
+## Políticas (make:policy)
+
+Las políticas en Laravel son clases que organizan la lógica de autorización para un modelo o recurso específico.
+
+### Crear una política
+
+<Code code={`php artisan make:policy PostPolicy --model=Post`} lang="bash" />
+
+Esto generará una clase `PostPolicy` en `app/Policies` con métodos para cada acción CRUD.
+
+### Estructura de una política
+
+<Code code={`<?php
+
+namespace App\Policies;
+
+use App\Models\Post;
+use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
+
+class PostPolicy
+{
+    use HandlesAuthorization;
+    
+    /**
+     * Determine if the user can view any posts.
+     */
+    public function viewAny(User $user): bool
+    {
+        return true; // Todos los usuarios autenticados pueden ver posts
+    }
+    
+    /**
+     * Determine if the user can view the post.
+     */
+    public function view(User $user, Post $post): bool
+    {
+        return true; // Todos los usuarios autenticados pueden ver un post específico
+    }
+    
+    /**
+     * Determine if the user can create posts.
+     */
+    public function create(User $user): bool
+    {
+        return true; // Todos los usuarios autenticados pueden crear posts
+    }
+    
+    /**
+     * Determine if the user can update the post.
+     */
+    public function update(User $user, Post $post): bool
+    {
+        return $user->id === $post->user_id; // Solo el autor puede actualizar
+    }
+    
+    /**
+     * Determine if the user can delete the post.
+     */
+    public function delete(User $user, Post $post): bool
+    {
+        return $user->id === $post->user_id || $user->isAdmin(); // Autor o admin
+    }
+    
+    /**
+     * Determine if the user can restore the post.
+     */
+    public function restore(User $user, Post $post): bool
+    {
+        return $user->isAdmin(); // Solo admin puede restaurar
+    }
+    
+    /**
+     * Determine if the user can permanently delete the post.
+     */
+    public function forceDelete(User $user, Post $post): bool
+    {
+        return $user->isAdmin(); // Solo admin puede eliminar permanentemente
+    }
+}`} lang="php" />
+
+### Registrar políticas
+
+Las políticas se registran en el `AuthServiceProvider`:
+
+<Code code={`<?php
+
+namespace App\Providers;
+
+use App\Models\Post;
+use App\Policies\PostPolicy;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+
+class AuthServiceProvider extends ServiceProvider
+{
+    /**
+     * The policy mappings for the application.
+     *
+     * @var array<class-string, class-string>
+     */
+    protected $policies = [
+        Post::class => PostPolicy::class,
+    ];
+    
+    /**
+     * Register any authentication / authorization services.
+     */
+    public function boot(): void
+    {
+        $this->registerPolicies();
+        
+        // Definir Gates aquí si es necesario
+    }
+}`} lang="php" />
+
+### Usar políticas en controladores
+
+<Code code={`public function update(Request $request, Post $post)
+{
+    // Autorizar la acción
+    $this->authorize('update', $post);
+    
+    // Continuar con la actualización si está autorizado
+    $post->update($request->validated());
+    
+    return redirect()->route('posts.show', $post);
+}`} lang="php" />
+
+<Aside>
+  Si el usuario no está autorizado, Laravel lanzará automáticamente una excepción `AuthorizationException` que se traduce en una respuesta HTTP 403.
+</Aside>
+
+## Gates (Gate::define)
+
+Los Gates son cierres simples que determinan si un usuario está autorizado a realizar una acción específica. Son útiles para lógica de autorización que no está necesariamente vinculada a un modelo.
+
+### Definir Gates
+
+Los Gates se definen en el método `boot` del `AuthServiceProvider`:
+
+<Code code={`<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+
+class AuthServiceProvider extends ServiceProvider
+{
+    // ...
+    
+    public function boot(): void
+    {
+        $this->registerPolicies();
+        
+        // Gate simple
+        Gate::define('view-dashboard', function ($user) {
+            return $user->is_admin || $user->is_staff;
+        });
+        
+        // Gate con parámetros adicionales
+        Gate::define('update-post', function ($user, $post) {
+            return $user->id === $post->user_id;
+        });
+        
+        // Gate usando una clase y método
+        Gate::define('moderate-posts', [PostModerationService::class, 'canModerate']);
+        
+        // Gate con respuesta personalizada
+        Gate::define('publish-article', function ($user, $article) {
+            if (! $article->isComplete()) {
+                return $this->deny('El artículo no está completo.');
+            }
+            
+            return $user->hasRole('editor');
+        });
+        
+        // Gate para superadmin que puede hacer todo
+        Gate::before(function ($user, $ability) {
+            if ($user->isSuperAdmin()) {
+                return true;
+            }
+        });
+    }
+}`} lang="php" />
+
+### Usar Gates
+
+Puedes verificar Gates de varias formas:
+
+<Code code={`// En controladores
+public function viewDashboard()
+{
+    if (Gate::allows('view-dashboard')) {
+        // Usuario autorizado
+    }
+    
+    if (Gate::denies('view-dashboard')) {
+        // Usuario no autorizado
+    }
+    
+    // Lanzar excepción si no está autorizado
+    Gate::authorize('view-dashboard');
+    
+    // Con parámetros adicionales
+    if (Gate::allows('update-post', $post)) {
+        // Usuario puede actualizar este post
+    }
+}
+
+// En Blade
+@if (Gate::allows('view-dashboard'))
+    <a href="/dashboard">Ver Dashboard</a>
+@endif
+
+@can('update-post', $post)
+    <a href="/posts/{{ $post->id }}/edit">Editar</a>
+@endcan
+
+// Con el helper can()
+if (auth()->user()->can('view-dashboard')) {
+    // Usuario autorizado
+}
+
+// O con el helper cannot()
+if (auth()->user()->cannot('delete-post', $post)) {
+    // Usuario no autorizado
+}`} lang="php" />
+
+## Combinando Políticas y Gates
+
+Puedes combinar políticas y gates para crear un sistema de autorización completo:
+
+<Code code={`// En AuthServiceProvider
+public function boot(): void
+{
+    $this->registerPolicies();
+    
+    // Gates para permisos generales
+    Gate::define('access-admin', function ($user) {
+        return $user->hasRole('admin');
+    });
+    
+    Gate::define('manage-users', function ($user) {
+        return $user->hasPermission('users.manage');
+    });
+    
+    // Las políticas se encargan de los permisos específicos de modelos
+    // PostPolicy, UserPolicy, etc.
+}`} lang="php" />
+
+## Conclusión
+
+Laravel ofrece un sistema de autenticación y autorización completo y flexible que se adapta a las necesidades de cualquier aplicación. Desde soluciones rápidas como Breeze hasta implementaciones más robustas como Jetstream, pasando por el control total con Fortify, Laravel proporciona las herramientas necesarias para proteger tu aplicación y gestionar permisos de usuario de manera eficiente.
+
+Recuerda que la seguridad es un aspecto fundamental de cualquier aplicación web, y Laravel te ayuda a implementarla de manera correcta y segura.

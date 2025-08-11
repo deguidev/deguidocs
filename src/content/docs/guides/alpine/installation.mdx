@@ -1,0 +1,38 @@
+---
+title: Instalación y configuración
+description: Cómo instalar y configurar Alpine.js en tu proyecto.
+---
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+# Instalación y configuración
+
+Puedes instalar Alpine.js mediante CDN o npm. Para comenzar rápidamente, agrega el siguiente script a tu HTML:
+<Aside type="note">
+Si solo necesitas Alpine.js para funcionalidades básicas y prototipos, la opción de CDN es la más sencilla.
+</Aside>
+
+<Tabs>
+    <TabItem label="CDN">
+        <Code code={`<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>`} lang="html" />
+        Esto cargará Alpine.js directamente desde un CDN. Coloca la etiqueta <code>&lt;script&gt;</code> antes del cierre de <code>&lt;/body&gt;</code> en tu archivo HTML.
+    </TabItem>
+    <TabItem label="npm">
+        <Code code={`npm install alpinejs`} lang="bash" />
+        Luego, importa Alpine.js en tu archivo JavaScript principal:
+        <Code code={`import Alpine from 'alpinejs';\nwindow.Alpine = Alpine;\nAlpine.start();`} lang="js" />
+    </TabItem>
+</Tabs>
+
+<Code code={`<div x-data="{ open: false }">
+  <button @click="open = !open">Mostrar/Ocultar</button>
+  <div x-show="open">
+    ¡Hola desde Alpine.js!
+  </div>
+</div>`} lang="html" title="Ejemplo básico de Alpine.js" />
+
+<Aside type="tip">
+Consulta la <a href="https://alpinejs.dev/start-here" target="_blank">documentación oficial de Alpine.js</a> para más detalles y opciones avanzadas de configuración.
+</Aside>

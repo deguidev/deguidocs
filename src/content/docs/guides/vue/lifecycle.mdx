@@ -1,0 +1,243 @@
+---
+title: 06. Ciclo de Vida
+description: onMounted(), onUpdated(), onUnmounted(), onBeforeMount(), onBeforeUpdate(), onBeforeUnmount()
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Hooks del Ciclo de Vida en Vue
+
+Los hooks del ciclo de vida permiten ejecutar código en momentos específicos durante la vida de un componente. En la Composition API, estos hooks se importan desde Vue y se llaman directamente dentro de `<script setup>` o en la función `setup()`.
+
+<Aside>
+Todos los hooks de ciclo de vida deben ser registrados **sincrónicamente** durante la fase de `setup` del componente.
+</Aside>
+
+## Diagrama del Ciclo de Vida
+
+```
+Creación → onBeforeMount → onMounted → onBeforeUpdate → onUpdated → onBeforeUnmount → onUnmounted
+```
+
+## `onBeforeMount()`
+
+Se ejecuta justo antes de que el componente se monte en el DOM.
+
+```vue
+<script setup>
+import { ref, onBeforeMount } from 'vue'
+
+const message = ref('Cargando...')
+
+onBeforeMount(() => {
+  console.log('El componente está a punto de montarse')
+  // El DOM aún no está disponible aquí
+  // Ideal para configuraciones finales antes del montaje
+})
+</script>
+
+<template>
+  <div>{{ message }}</div>
+</template>
+```
+
+<Aside type="note">
+En este punto, el componente ha completado la configuración de su estado reactivo, pero aún no se ha creado ningún nodo del DOM.
+</Aside>
+
+## `onMounted()`
+
+Se ejecuta después de que el componente ha sido montado en el DOM.
+
+```vue
+<script setup>
+import { ref, onMounted } from 'vue'
+
+const el = ref(null)
+const message = ref('Cargando...')
+
+onMounted(() => {
+  console.log('El componente ha sido montado')
+  console.log('Elemento referenciado:', el.value) // Ahora el DOM está disponible
+  message.value = 'Componente montado'
+  
+  // Ideal para:
+  // - Acceder al DOM renderizado
+  // - Inicializar bibliotecas externas
+  // - Realizar peticiones de datos
+})
+</script>
+
+<template>
+  <div ref="el">{{ message }}</div>
+</template>
+```
+
+<Aside type="tip">
+Este es el hook más utilizado y es ideal para inicializar bibliotecas externas, realizar peticiones de datos o acceder a elementos del DOM.
+</Aside>
+
+## `onBeforeUpdate()`
+
+Se ejecuta justo antes de que Vue actualice el DOM debido a un cambio en el estado reactivo.
+
+```vue
+<script setup>
+import { ref, onBeforeUpdate } from 'vue'
+
+const count = ref(0)
+
+onBeforeUpdate(() => {
+  console.log('El componente está a punto de actualizarse')
+  console.log('Valor actual en el DOM:', document.getElementById('counter').textContent)
+  console.log('Nuevo valor en el estado:', count.value)
+  // Útil para capturar el estado del DOM antes de una actualización
+})
+</script>
+
+<template>
+  <div>
+    <p id="counter">{{ count }}</p>
+    <button @click="count++">Incrementar</button>
+  </div>
+</template>
+```
+
+<Aside>
+Este hook te permite acceder al estado del DOM justo antes de que Vue lo actualice, lo que puede ser útil para comparar valores.
+</Aside>
+
+## `onUpdated()`
+
+Se ejecuta después de que Vue ha actualizado el DOM debido a un cambio en el estado reactivo.
+
+```vue
+<script setup>
+import { ref, onUpdated } from 'vue'
+
+const count = ref(0)
+
+onUpdated(() => {
+  console.log('El componente ha sido actualizado')
+  console.log('DOM actualizado con nuevo valor:', document.getElementById('counter').textContent)
+  // El DOM ya refleja el nuevo estado
+})
+</script>
+
+<template>
+  <div>
+    <p id="counter">{{ count }}</p>
+    <button @click="count++">Incrementar</button>
+  </div>
+</template>
+```
+
+<Aside type="caution">
+Evita modificar el estado reactivo dentro de `onUpdated()` ya que podría causar un bucle infinito de actualizaciones.
+</Aside>
+
+## `onBeforeUnmount()`
+
+Se ejecuta justo antes de que un componente sea desmontado y destruido.
+
+```vue
+<script setup>
+import { onBeforeUnmount } from 'vue'
+
+let intervalId = null
+
+// Configurar un intervalo
+intervalId = setInterval(() => {
+  console.log('Intervalo ejecutándose')
+}, 1000)
+
+onBeforeUnmount(() => {
+  console.log('El componente está a punto de desmontarse')
+  // Ideal para limpiar recursos que no serán recogidos automáticamente
+  clearInterval(intervalId) // Limpiar el intervalo antes de desmontar
+})
+</script>
+```
+
+<Aside>
+Este hook es útil para limpiar recursos como temporizadores, suscripciones a eventos o conexiones a WebSockets antes de que el componente sea destruido.
+</Aside>
+
+## `onUnmounted()`
+
+Se ejecuta después de que el componente ha sido desmontado y destruido.
+
+```vue
+<script setup>
+import { onUnmounted } from 'vue'
+
+onUnmounted(() => {
+  console.log('El componente ha sido desmontado')
+  // El componente ya no existe en el DOM
+  // Todas las directivas y listeners de eventos han sido desvinculados
+  // Todos los componentes hijos también han sido desmontados
+})
+</script>
+```
+
+<Aside type="note">
+En este punto, todas las directivas del componente han sido desvinculadas, todos los event listeners han sido removidos, y todos los componentes hijos también han sido desmontados.
+</Aside>
+
+## Ejemplo Completo
+
+```vue
+<script setup>
+import { ref, onBeforeMount, onMounted, onBeforeUpdate, onUpdated, onBeforeUnmount, onUnmounted } from 'vue'
+
+const count = ref(0)
+const mounted = ref(false)
+
+onBeforeMount(() => {
+  console.log('1. onBeforeMount: Componente a punto de montarse')
+})
+
+onMounted(() => {
+  console.log('2. onMounted: Componente montado')
+  mounted.value = true
+})
+
+onBeforeUpdate(() => {
+  console.log('3. onBeforeUpdate: Componente a punto de actualizarse')
+})
+
+onUpdated(() => {
+  console.log('4. onUpdated: Componente actualizado')
+})
+
+onBeforeUnmount(() => {
+  console.log('5. onBeforeUnmount: Componente a punto de desmontarse')
+})
+
+onUnmounted(() => {
+  console.log('6. onUnmounted: Componente desmontado')
+})
+</script>
+
+<template>
+  <div>
+    <p>Contador: {{ count }}</p>
+    <button @click="count++">Incrementar</button>
+    <p v-if="mounted">¡Componente montado!</p>
+  </div>
+</template>
+```
+
+## Tabla Comparativa
+
+| Hook | Momento de ejecución | Caso de uso común |
+|------|---------------------|-------------------|
+| `onBeforeMount` | Antes de insertar el componente en el DOM | Configuración final antes del montaje |
+| `onMounted` | Después de insertar el componente en el DOM | Acceso al DOM, inicialización de bibliotecas, peticiones de datos |
+| `onBeforeUpdate` | Antes de actualizar el DOM por cambios reactivos | Capturar el estado del DOM antes de una actualización |
+| `onUpdated` | Después de actualizar el DOM por cambios reactivos | Acceder al DOM actualizado |
+| `onBeforeUnmount` | Justo antes de desmontar el componente | Limpieza de recursos (timers, event listeners) |
+| `onUnmounted` | Después de desmontar el componente | Confirmación de limpieza completa |
