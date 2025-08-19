@@ -1,0 +1,1231 @@
+---
+title: 11. Programación con PL/SQL
+description: Aprende a desarrollar procedimientos y funciones con PL/SQL en Oracle
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## Introducción a PL/SQL
+
+PL/SQL (Procedural Language/SQL) es el lenguaje de programación procedural de Oracle que extiende SQL con estructuras de control, variables, manejo de excepciones y otras características de los lenguajes de programación tradicionales. Permite desarrollar aplicaciones complejas y robustas directamente en la base de datos.
+
+### ¿Qué es PL/SQL?
+
+PL/SQL es un lenguaje de programación de Oracle que combina:
+
+- La potencia de SQL para manipular datos
+- Estructuras procedurales como condiciones, bucles y subprogramas
+- Manejo de excepciones para control de errores
+- Capacidades de programación modular
+
+<Aside type="note">
+  PL/SQL se ejecuta directamente en el motor de base de datos Oracle, lo que reduce significativamente el tráfico de red y mejora el rendimiento de las aplicaciones.
+</Aside>
+
+### Características principales
+
+- **Integración con SQL**: Permite ejecutar múltiples sentencias SQL como una sola unidad
+- **Rendimiento optimizado**: Reduce el tráfico de red al procesar la lógica en el servidor
+- **Portabilidad**: El código PL/SQL funciona en cualquier sistema operativo donde se ejecute Oracle
+- **Modularidad**: Permite organizar el código en procedimientos, funciones y paquetes reutilizables
+- **Manejo de excepciones**: Proporciona un mecanismo robusto para el tratamiento de errores
+- **Seguridad**: Permite implementar lógica de negocio y validaciones a nivel de base de datos
+
+### Estructura básica de un bloque PL/SQL
+
+Un bloque PL/SQL tiene la siguiente estructura:
+
+```sql
+[DECLARE -- Sección de declaración (opcional)
+    -- Declaración de variables, constantes, cursores, etc.
+    variable1 tipo1;
+    variable2 tipo2 := valor_inicial;]
+    
+BEGIN -- Sección ejecutable (obligatoria)
+    -- Instrucciones PL/SQL y SQL
+    -- Sentencias de control, asignaciones, etc.
+    
+[EXCEPTION -- Sección de manejo de excepciones (opcional)
+    -- Manejo de errores
+    WHEN excepcion1 THEN
+        -- Acciones para manejar excepcion1
+    WHEN OTHERS THEN
+        -- Acciones para manejar otras excepciones]
+        
+END; -- Fin del bloque (obligatorio)
+/
+```
+
+### Tipos de bloques PL/SQL
+
+<Tabs>
+  <TabItem label="Bloque anónimo">
+    ```sql
+    -- Bloque anónimo (no se guarda en la base de datos)
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Hola, mundo!');
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="Procedimiento">
+    ```sql
+    -- Procedimiento (se guarda en la base de datos)
+    CREATE OR REPLACE PROCEDURE saludar(
+        p_nombre IN VARCHAR2
+    ) AS
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Hola, ' || p_nombre || '!');
+    END saludar;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="Función">
+    ```sql
+    -- Función (se guarda en la base de datos y devuelve un valor)
+    CREATE OR REPLACE FUNCTION obtener_saludo(
+        p_nombre IN VARCHAR2
+    ) RETURN VARCHAR2 AS
+    BEGIN
+        RETURN 'Hola, ' || p_nombre || '!';
+    END obtener_saludo;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="Trigger">
+    ```sql
+    -- Trigger (se ejecuta automáticamente ante un evento)
+    CREATE OR REPLACE TRIGGER log_cambios_empleados
+    AFTER UPDATE ON empleados
+    FOR EACH ROW
+    BEGIN
+        INSERT INTO log_cambios (tabla, operacion, fecha, usuario)
+        VALUES ('EMPLEADOS', 'UPDATE', SYSDATE, USER);
+    END;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+### Ejecución de código PL/SQL
+
+Para ejecutar código PL/SQL en Oracle, puede utilizar:
+
+- **SQL*Plus**: Cliente de línea de comandos de Oracle
+- **SQL Developer**: Entorno de desarrollo integrado (IDE) de Oracle
+- **Otras herramientas**: Toad, PL/SQL Developer, DBeaver, etc.
+
+```sql
+-- Configurar la salida en SQL*Plus o SQL Developer
+SET SERVEROUTPUT ON;
+
+-- Ejecutar un bloque anónimo
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Ejecutando PL/SQL...');
+END;
+/
+
+-- Ejecutar un procedimiento
+EXECUTE saludar('Juan');
+-- o
+BEGIN
+    saludar('Juan');
+END;
+/
+
+-- Ejecutar una función
+SELECT obtener_saludo('María') FROM dual;
+-- o
+DECLARE
+    v_saludo VARCHAR2(100);
+BEGIN
+    v_saludo := obtener_saludo('María');
+    DBMS_OUTPUT.PUT_LINE(v_saludo);
+END;
+/
+```
+
+<Aside type="tip">
+  Para ver la salida de DBMS_OUTPUT.PUT_LINE, debe ejecutar SET SERVEROUTPUT ON antes de ejecutar el código PL/SQL.
+</Aside>
+
+## Variables y estructuras de control
+
+### Declaración de variables
+
+Las variables en PL/SQL se declaran en la sección DECLARE y pueden ser inicializadas en el momento de la declaración.
+
+```sql
+DECLARE
+    -- Declaración simple
+    v_nombre VARCHAR2(100);
+    
+    -- Declaración con inicialización
+    v_edad NUMBER(3) := 25;
+    
+    -- Declaración usando %TYPE (hereda el tipo de una columna)
+    v_salario empleados.salario%TYPE;
+    
+    -- Declaración usando %ROWTYPE (hereda la estructura de una fila)
+    v_empleado empleados%ROWTYPE;
+    
+    -- Constantes
+    c_pi CONSTANT NUMBER := 3.14159;
+    
+    -- Variables de tipo registro personalizado
+    TYPE t_persona IS RECORD (
+        nombre VARCHAR2(100),
+        edad NUMBER,
+        ciudad VARCHAR2(50)
+    );
+    v_persona t_persona;
+    
+    -- Arrays asociativos (colecciones indexadas)
+    TYPE t_numeros IS TABLE OF NUMBER INDEX BY PLS_INTEGER;
+    v_numeros t_numeros;
+BEGIN
+    -- Asignación de valores
+    v_nombre := 'Juan Pérez';
+    v_salario := 5000.50;
+    
+    -- Asignación a un registro
+    v_persona.nombre := 'María López';
+    v_persona.edad := 30;
+    v_persona.ciudad := 'Madrid';
+    
+    -- Asignación a un array asociativo
+    v_numeros(1) := 100;
+    v_numeros(2) := 200;
+    
+    -- Asignación a un %ROWTYPE
+    SELECT * INTO v_empleado
+    FROM empleados
+    WHERE empleado_id = 101;
+    
+    -- Mostrar valores
+    DBMS_OUTPUT.PUT_LINE('Nombre: ' || v_nombre);
+    DBMS_OUTPUT.PUT_LINE('Salario: ' || v_salario);
+    DBMS_OUTPUT.PUT_LINE('Persona: ' || v_persona.nombre || ', ' || v_persona.edad || ' años');
+    DBMS_OUTPUT.PUT_LINE('Número 1: ' || v_numeros(1));
+    DBMS_OUTPUT.PUT_LINE('Empleado: ' || v_empleado.nombre || ', Departamento: ' || v_empleado.departamento_id);
+END;
+/
+```
+
+### Tipos de datos en PL/SQL
+
+| Tipo de dato | Descripción | Ejemplo |
+|-------------|-------------|--------|
+| VARCHAR2(n) | Cadena de caracteres de longitud variable | v_nombre VARCHAR2(100) := 'Juan'; |
+| CHAR(n) | Cadena de caracteres de longitud fija | v_codigo CHAR(5) := 'ABC12'; |
+| NUMBER(p,s) | Número con precisión p y escala s | v_salario NUMBER(8,2) := 1250.75; |
+| DATE | Fecha y hora | v_fecha DATE := SYSDATE; |
+| TIMESTAMP | Fecha y hora con fracciones de segundo | v_ts TIMESTAMP := SYSTIMESTAMP; |
+| BOOLEAN | Valor lógico (TRUE, FALSE, NULL) | v_activo BOOLEAN := TRUE; |
+| CLOB | Character Large Object | v_texto_largo CLOB; |
+| BLOB | Binary Large Object | v_datos_binarios BLOB; |
+| %TYPE | Hereda el tipo de una columna o variable | v_sal empleados.salario%TYPE; |
+| %ROWTYPE | Hereda la estructura de una tabla o cursor | v_emp empleados%ROWTYPE; |
+
+### Estructuras de control
+
+#### Estructuras condicionales
+
+<Tabs>
+  <TabItem label="IF-THEN-ELSE">
+    ```sql
+    DECLARE
+        v_nota NUMBER := 75;
+        v_resultado VARCHAR2(20);
+    BEGIN
+        IF v_nota >= 90 THEN
+            v_resultado := 'Sobresaliente';
+        ELSIF v_nota >= 70 THEN
+            v_resultado := 'Notable';
+        ELSIF v_nota >= 50 THEN
+            v_resultado := 'Aprobado';
+        ELSE
+            v_resultado := 'Suspenso';
+        END IF;
+        
+        DBMS_OUTPUT.PUT_LINE('Calificación: ' || v_resultado);
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="CASE">
+    ```sql
+    DECLARE
+        v_dia NUMBER := TO_CHAR(SYSDATE, 'D'); -- Día de la semana (1-7)
+        v_nombre_dia VARCHAR2(20);
+    BEGIN
+        -- CASE simple
+        CASE v_dia
+            WHEN 1 THEN v_nombre_dia := 'Domingo';
+            WHEN 2 THEN v_nombre_dia := 'Lunes';
+            WHEN 3 THEN v_nombre_dia := 'Martes';
+            WHEN 4 THEN v_nombre_dia := 'Miércoles';
+            WHEN 5 THEN v_nombre_dia := 'Jueves';
+            WHEN 6 THEN v_nombre_dia := 'Viernes';
+            WHEN 7 THEN v_nombre_dia := 'Sábado';
+            ELSE v_nombre_dia := 'Día inválido';
+        END CASE;
+        
+        DBMS_OUTPUT.PUT_LINE('Hoy es: ' || v_nombre_dia);
+        
+        -- CASE buscado
+        v_nombre_dia := CASE
+            WHEN v_dia IN (1, 7) THEN 'Fin de semana'
+            WHEN v_dia BETWEEN 2 AND 6 THEN 'Día laborable'
+            ELSE 'Día inválido'
+        END;
+        
+        DBMS_OUTPUT.PUT_LINE('Tipo de día: ' || v_nombre_dia);
+    END;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+#### Estructuras iterativas
+
+<Tabs>
+  <TabItem label="LOOP simple">
+    ```sql
+    DECLARE
+        v_contador NUMBER := 1;
+    BEGIN
+        LOOP
+            DBMS_OUTPUT.PUT_LINE('Iteración: ' || v_contador);
+            v_contador := v_contador + 1;
+            EXIT WHEN v_contador > 5;
+        END LOOP;
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="WHILE LOOP">
+    ```sql
+    DECLARE
+        v_contador NUMBER := 1;
+    BEGIN
+        WHILE v_contador <= 5 LOOP
+            DBMS_OUTPUT.PUT_LINE('Iteración: ' || v_contador);
+            v_contador := v_contador + 1;
+        END LOOP;
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="FOR LOOP">
+    ```sql
+    BEGIN
+        -- Bucle FOR con rango numérico
+        FOR i IN 1..5 LOOP
+            DBMS_OUTPUT.PUT_LINE('Iteración: ' || i);
+        END LOOP;
+        
+        -- Bucle FOR con rango inverso
+        FOR i IN REVERSE 1..5 LOOP
+            DBMS_OUTPUT.PUT_LINE('Iteración inversa: ' || i);
+        END LOOP;
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="FOR LOOP con cursor">
+    ```sql
+    BEGIN
+        -- Bucle FOR con cursor implícito
+        FOR emp_rec IN (SELECT empleado_id, nombre FROM empleados WHERE departamento_id = 10) LOOP
+            DBMS_OUTPUT.PUT_LINE('Empleado: ' || emp_rec.nombre || ' (ID: ' || emp_rec.empleado_id || ')');
+        END LOOP;
+    END;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+### Operadores en PL/SQL
+
+#### Operadores aritméticos
+
+| Operador | Descripción | Ejemplo |
+|----------|-------------|--------|
+| + | Suma | a + b |
+| - | Resta | a - b |
+| * | Multiplicación | a * b |
+| / | División | a / b |
+| ** | Potencia | a ** b |
+
+#### Operadores de comparación
+
+| Operador | Descripción | Ejemplo |
+|----------|-------------|--------|
+| = | Igual | a = b |
+| &lt;&gt; o != | Distinto | a &lt;&gt; b |
+| &lt; | Menor que | a &lt; b |
+| &gt; | Mayor que | a &gt; b |
+| &lt;= | Menor o igual que | a &lt;= b |
+| &gt;= | Mayor o igual que | a &gt;= b |
+| IS NULL | Es nulo | a IS NULL |
+| IS NOT NULL | No es nulo | a IS NOT NULL |
+| LIKE | Coincide con patrón | a LIKE 'B%' |
+| BETWEEN | Entre dos valores | a BETWEEN 10 AND 20 |
+| IN | En un conjunto de valores | a IN (1, 2, 3) |
+
+#### Operadores lógicos
+
+| Operador | Descripción | Ejemplo |
+|----------|-------------|--------|
+| AND | Y lógico | a > 0 AND b > 0 |
+| OR | O lógico | a > 0 OR b > 0 |
+| NOT | Negación | NOT (a = b) |
+
+<Aside type="caution">
+  A diferencia de SQL estándar, PL/SQL utiliza := para asignación y = para comparación. Confundir estos operadores es un error común.
+</Aside>
+
+## Manejo de excepciones
+
+El manejo de excepciones en PL/SQL permite capturar y gestionar errores durante la ejecución, evitando que el programa termine abruptamente y proporcionando mecanismos para responder adecuadamente a situaciones inesperadas.
+
+### Estructura del manejo de excepciones
+
+```sql
+DECLARE
+    -- Declaraciones
+BEGIN
+    -- Código ejecutable
+EXCEPTION
+    WHEN excepcion1 THEN
+        -- Código para manejar excepcion1
+    WHEN excepcion2 THEN
+        -- Código para manejar excepcion2
+    WHEN OTHERS THEN
+        -- Código para manejar cualquier otra excepción
+END;
+/
+```
+
+### Tipos de excepciones
+
+<Tabs>
+  <TabItem label="Excepciones predefinidas">
+    Son excepciones que Oracle define automáticamente. Algunas de las más comunes:
+    
+    | Excepción | Código Oracle | Descripción |
+    |-----------|---------------|-------------|
+    | NO_DATA_FOUND | ORA-01403 | SELECT no devuelve filas |
+    | TOO_MANY_ROWS | ORA-01422 | SELECT devuelve más de una fila |
+    | ZERO_DIVIDE | ORA-01476 | División por cero |
+    | DUP_VAL_ON_INDEX | ORA-00001 | Violación de restricción única |
+    | VALUE_ERROR | ORA-06502 | Error aritmético, conversión o truncamiento |
+    | INVALID_NUMBER | ORA-01722 | Fallo al convertir cadena a número |
+    | CURSOR_ALREADY_OPEN | ORA-06511 | Intento de abrir un cursor ya abierto |
+    
+    ```sql
+    DECLARE
+        v_resultado NUMBER;
+    BEGIN
+        -- Intento de división por cero
+        v_resultado := 100 / 0;
+        DBMS_OUTPUT.PUT_LINE('Resultado: ' || v_resultado);
+    EXCEPTION
+        WHEN ZERO_DIVIDE THEN
+            DBMS_OUTPUT.PUT_LINE('Error: División por cero');
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error inesperado: ' || SQLERRM);
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="Excepciones definidas por el usuario">
+    Son excepciones personalizadas que el programador define para manejar situaciones específicas.
+    
+    ```sql
+    DECLARE
+        -- Declaración de excepciones personalizadas
+        e_edad_invalida EXCEPTION;
+        e_salario_excesivo EXCEPTION;
+        
+        -- Asociar un código de error Oracle a una excepción personalizada
+        PRAGMA EXCEPTION_INIT(e_salario_excesivo, -20999);
+        
+        v_edad NUMBER := 15;
+        v_salario NUMBER := 50000;
+    BEGIN
+        -- Lanzar una excepción personalizada basada en una condición
+        IF v_edad < 18 THEN
+            RAISE e_edad_invalida;
+        END IF;
+        
+        -- Lanzar una excepción con mensaje personalizado
+        IF v_salario > 30000 THEN
+            RAISE_APPLICATION_ERROR(-20999, 'El salario excede el límite permitido');
+        END IF;
+        
+        DBMS_OUTPUT.PUT_LINE('Edad y salario válidos');
+    EXCEPTION
+        WHEN e_edad_invalida THEN
+            DBMS_OUTPUT.PUT_LINE('Error: La edad debe ser mayor o igual a 18');
+        WHEN e_salario_excesivo THEN
+            DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error inesperado: ' || SQLERRM);
+    END;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+### Funciones de error en PL/SQL
+
+| Función | Descripción | Ejemplo |
+|---------|-------------|--------|
+| SQLCODE | Devuelve el código de error Oracle | DBMS_OUTPUT.PUT_LINE('Código de error: ' || SQLCODE); |
+| SQLERRM | Devuelve el mensaje de error asociado | DBMS_OUTPUT.PUT_LINE('Mensaje: ' || SQLERRM); |
+| DBMS_UTILITY.FORMAT_ERROR_STACK | Devuelve la pila de errores completa | DBMS_OUTPUT.PUT_LINE(DBMS_UTILITY.FORMAT_ERROR_STACK); |
+| DBMS_UTILITY.FORMAT_ERROR_BACKTRACE | Devuelve la traza de la pila de llamadas | DBMS_OUTPUT.PUT_LINE(DBMS_UTILITY.FORMAT_ERROR_BACKTRACE); |
+
+### Propagación de excepciones
+
+Las excepciones se propagan hacia arriba en la jerarquía de bloques PL/SQL si no son manejadas en el bloque donde se producen.
+
+```sql
+DECLARE
+    e_personalizada EXCEPTION;
+    
+    -- Procedimiento anidado
+    PROCEDURE proc_interno IS
+    BEGIN
+        RAISE e_personalizada; -- Lanza la excepción
+        -- Esta línea nunca se ejecuta
+        DBMS_OUTPUT.PUT_LINE('Dentro del procedimiento interno');
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN -- No maneja e_personalizada
+            DBMS_OUTPUT.PUT_LINE('No se encontraron datos');
+    END;
+    
+BEGIN
+    -- Llamada al procedimiento
+    proc_interno;
+    -- Esta línea no se ejecuta si hay una excepción no manejada en proc_interno
+    DBMS_OUTPUT.PUT_LINE('Después de llamar al procedimiento');
+EXCEPTION
+    WHEN e_personalizada THEN -- Maneja la excepción propagada
+        DBMS_OUTPUT.PUT_LINE('Excepción personalizada capturada en el bloque principal');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Otra excepción: ' || SQLERRM);
+END;
+/
+```
+
+<Aside type="tip">
+  Es una buena práctica incluir siempre una sección WHEN OTHERS para capturar excepciones inesperadas, especialmente en código de producción.
+</Aside>
+
+### Mejores prácticas para el manejo de excepciones
+
+1. **Especificidad**: Maneje primero las excepciones específicas y luego las más generales.
+2. **Registro**: Registre información detallada sobre las excepciones para facilitar la depuración.
+3. **Granularidad**: Use bloques de excepción más pequeños para un manejo más preciso.
+4. **Reutilización**: Centralice el manejo de excepciones comunes en procedimientos o funciones.
+5. **Información**: Proporcione mensajes de error claros y útiles.
+
+```sql
+DECLARE
+    v_empleado_id empleados.empleado_id%TYPE := 999; -- ID que no existe
+    v_nombre empleados.nombre%TYPE;
+    
+    -- Procedimiento para registrar errores
+    PROCEDURE registrar_error(
+        p_codigo IN NUMBER,
+        p_mensaje IN VARCHAR2,
+        p_procedimiento IN VARCHAR2
+    ) IS
+    BEGIN
+        INSERT INTO log_errores (codigo, mensaje, procedimiento, fecha)
+        VALUES (p_codigo, p_mensaje, p_procedimiento, SYSDATE);
+        COMMIT;
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Si falla el registro, al menos mostrar en consola
+            DBMS_OUTPUT.PUT_LINE('Error al registrar el error: ' || SQLERRM);
+    END;
+    
+BEGIN
+    -- Intentar obtener datos de un empleado
+    BEGIN
+        SELECT nombre INTO v_nombre
+        FROM empleados
+        WHERE empleado_id = v_empleado_id;
+        
+        DBMS_OUTPUT.PUT_LINE('Nombre del empleado: ' || v_nombre);
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('No se encontró el empleado con ID ' || v_empleado_id);
+            registrar_error(-20001, 'Empleado no encontrado: ' || v_empleado_id, 'CONSULTA_EMPLEADO');
+        WHEN TOO_MANY_ROWS THEN
+            DBMS_OUTPUT.PUT_LINE('Se encontraron múltiples empleados con el mismo ID');
+            registrar_error(-20002, 'Múltiples empleados con ID ' || v_empleado_id, 'CONSULTA_EMPLEADO');
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error inesperado: ' || SQLERRM);
+            registrar_error(SQLCODE, SQLERRM, 'CONSULTA_EMPLEADO');
+    END;
+    
+    -- Continuar con otras operaciones
+    DBMS_OUTPUT.PUT_LINE('Continuando con el proceso...');
+END;
+/
+```
+
+## Cursores explícitos e implícitos
+
+Los cursores en PL/SQL son estructuras que permiten procesar múltiples filas devueltas por una consulta SQL. Oracle proporciona dos tipos de cursores: implícitos y explícitos.
+
+### Cursores implícitos
+
+Oracle crea automáticamente un cursor implícito cada vez que se ejecuta una sentencia SQL que no devuelve explícitamente un conjunto de resultados a un cursor definido por el usuario.
+
+#### Atributos de cursores implícitos
+
+Se accede a ellos mediante la palabra clave `SQL`:
+
+| Atributo | Descripción | Ejemplo |
+|----------|-------------|--------|
+| %FOUND | TRUE si la última sentencia SQL afectó al menos una fila | IF SQL%FOUND THEN ... |
+| %NOTFOUND | TRUE si la última sentencia SQL no afectó ninguna fila | IF SQL%NOTFOUND THEN ... |
+| %ROWCOUNT | Número de filas afectadas por la última sentencia SQL | DBMS_OUTPUT.PUT_LINE('Filas afectadas: ' || SQL%ROWCOUNT); |
+| %ISOPEN | Siempre FALSE para cursores implícitos (Oracle los cierra automáticamente) | IF SQL%ISOPEN THEN ... -- Siempre FALSE |
+
+```sql
+BEGIN
+    -- Actualizar salarios
+    UPDATE empleados
+    SET salario = salario * 1.10
+    WHERE departamento_id = 20;
+    
+    -- Usar atributos de cursor implícito
+    IF SQL%FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Se actualizaron ' || SQL%ROWCOUNT || ' empleados');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('No se actualizó ningún empleado');
+    END IF;
+    
+    -- Eliminar departamentos sin empleados
+    DELETE FROM departamentos
+    WHERE departamento_id NOT IN (SELECT departamento_id FROM empleados);
+    
+    DBMS_OUTPUT.PUT_LINE('Departamentos eliminados: ' || SQL%ROWCOUNT);
+    
+    COMMIT;
+END;
+/
+```
+
+### Cursores explícitos
+
+Los cursores explícitos son declarados por el programador para procesar múltiples filas devueltas por una consulta. Permiten un mayor control sobre el procesamiento de los resultados.
+
+#### Ciclo de vida de un cursor explícito
+
+1. **Declaración**: Definir el cursor y su consulta SQL asociada
+2. **Apertura**: Ejecutar la consulta y preparar el conjunto de resultados
+3. **Recuperación**: Obtener las filas una por una
+4. **Cierre**: Liberar los recursos del cursor
+
+<Tabs>
+  <TabItem label="Cursor básico">
+    ```sql
+    DECLARE
+        -- 1. Declaración del cursor
+        CURSOR c_empleados IS
+            SELECT empleado_id, nombre, salario
+            FROM empleados
+            WHERE departamento_id = 10
+            ORDER BY salario DESC;
+            
+        -- Variables para almacenar los datos del cursor
+        v_empleado_id empleados.empleado_id%TYPE;
+        v_nombre empleados.nombre%TYPE;
+        v_salario empleados.salario%TYPE;
+    BEGIN
+        -- 2. Apertura del cursor
+        OPEN c_empleados;
+        
+        -- 3. Recuperación de datos
+        LOOP
+            FETCH c_empleados INTO v_empleado_id, v_nombre, v_salario;
+            EXIT WHEN c_empleados%NOTFOUND;
+            
+            DBMS_OUTPUT.PUT_LINE('Empleado: ' || v_nombre || ', Salario: ' || v_salario);
+        END LOOP;
+        
+        -- 4. Cierre del cursor
+        CLOSE c_empleados;
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="Cursor con parámetros">
+    ```sql
+    DECLARE
+        -- Cursor con parámetros
+        CURSOR c_empleados_dept(p_dept_id NUMBER) IS
+            SELECT empleado_id, nombre, salario
+            FROM empleados
+            WHERE departamento_id = p_dept_id
+            ORDER BY salario DESC;
+            
+        v_empleado_id empleados.empleado_id%TYPE;
+        v_nombre empleados.nombre%TYPE;
+        v_salario empleados.salario%TYPE;
+    BEGIN
+        -- Usar el cursor con un valor de parámetro
+        OPEN c_empleados_dept(20);
+        
+        DBMS_OUTPUT.PUT_LINE('Empleados del departamento 20:');
+        LOOP
+            FETCH c_empleados_dept INTO v_empleado_id, v_nombre, v_salario;
+            EXIT WHEN c_empleados_dept%NOTFOUND;
+            
+            DBMS_OUTPUT.PUT_LINE('  ' || v_nombre || ': ' || v_salario);
+        END LOOP;
+        
+        CLOSE c_empleados_dept;
+        
+        -- Reutilizar el cursor con otro valor de parámetro
+        OPEN c_empleados_dept(30);
+        
+        DBMS_OUTPUT.PUT_LINE('Empleados del departamento 30:');
+        LOOP
+            FETCH c_empleados_dept INTO v_empleado_id, v_nombre, v_salario;
+            EXIT WHEN c_empleados_dept%NOTFOUND;
+            
+            DBMS_OUTPUT.PUT_LINE('  ' || v_nombre || ': ' || v_salario);
+        END LOOP;
+        
+        CLOSE c_empleados_dept;
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="FOR LOOP con cursor">
+    ```sql
+    DECLARE
+        -- Declaración del cursor
+        CURSOR c_empleados IS
+            SELECT empleado_id, nombre, salario
+            FROM empleados
+            WHERE departamento_id = 10
+            ORDER BY salario DESC;
+    BEGIN
+        -- FOR LOOP automáticamente abre, recorre y cierra el cursor
+        FOR emp_rec IN c_empleados LOOP
+            DBMS_OUTPUT.PUT_LINE('Empleado: ' || emp_rec.nombre || ', Salario: ' || emp_rec.salario);
+        END LOOP;
+        -- No es necesario cerrar el cursor, se hace automáticamente
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="Cursor con subconsulta">
+    ```sql
+    BEGIN
+        -- Cursor definido directamente en el bucle FOR
+        FOR dept_rec IN (
+            SELECT departamento_id, nombre, ubicacion
+            FROM departamentos
+            WHERE num_empleados > 10
+            ORDER BY departamento_id
+        ) LOOP
+            DBMS_OUTPUT.PUT_LINE('Departamento: ' || dept_rec.nombre || ' (' || dept_rec.ubicacion || ')');
+            
+            -- Cursor anidado para empleados del departamento
+            FOR emp_rec IN (
+                SELECT nombre, puesto
+                FROM empleados
+                WHERE departamento_id = dept_rec.departamento_id
+                ORDER BY nombre
+            ) LOOP
+                DBMS_OUTPUT.PUT_LINE('  - ' || emp_rec.nombre || ', ' || emp_rec.puesto);
+            END LOOP;
+        END LOOP;
+    END;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+#### Atributos de cursores explícitos
+
+| Atributo | Descripción | Ejemplo |
+|----------|-------------|--------|
+| %FOUND | TRUE si la última operación FETCH recuperó una fila | IF c_empleados%FOUND THEN ... |
+| %NOTFOUND | TRUE si la última operación FETCH no recuperó ninguna fila | EXIT WHEN c_empleados%NOTFOUND; |
+| %ROWCOUNT | Número de filas recuperadas hasta el momento | DBMS_OUTPUT.PUT_LINE('Filas procesadas: ' || c_empleados%ROWCOUNT); |
+| %ISOPEN | TRUE si el cursor está abierto | IF NOT c_empleados%ISOPEN THEN OPEN c_empleados; END IF; |
+
+### Cursores con FOR UPDATE
+
+Permiten bloquear las filas seleccionadas para evitar que otros usuarios las modifiquen mientras se procesan.
+
+```sql
+DECLARE
+    CURSOR c_empleados_update IS
+        SELECT empleado_id, nombre, salario
+        FROM empleados
+        WHERE departamento_id = 20
+        FOR UPDATE;
+        
+    v_aumento NUMBER := 1.15; -- 15% de aumento
+BEGIN
+    FOR emp_rec IN c_empleados_update LOOP
+        -- Actualizar el salario de cada empleado
+        UPDATE empleados
+        SET salario = emp_rec.salario * v_aumento
+        WHERE CURRENT OF c_empleados_update;
+        
+        DBMS_OUTPUT.PUT_LINE('Actualizado: ' || emp_rec.nombre || ', Nuevo salario: ' || 
+                            (emp_rec.salario * v_aumento));
+    END LOOP;
+    
+    COMMIT;
+END;
+/
+```
+
+### Cursores con variables de enlace (bind variables)
+
+```sql
+DECLARE
+    -- Variables de enlace
+    v_dept_id NUMBER := 10;
+    v_min_sal NUMBER := 5000;
+    
+    -- Cursor que utiliza las variables de enlace
+    CURSOR c_empleados(p_dept_id NUMBER, p_min_sal NUMBER) IS
+        SELECT empleado_id, nombre, salario
+        FROM empleados
+        WHERE departamento_id = p_dept_id
+        AND salario >= p_min_sal
+        ORDER BY salario DESC;
+        
+    -- Registro para almacenar los datos del cursor
+    TYPE r_empleado IS RECORD (
+        empleado_id empleados.empleado_id%TYPE,
+        nombre empleados.nombre%TYPE,
+        salario empleados.salario%TYPE
+    );
+    
+    v_empleado r_empleado;
+    v_contador NUMBER := 0;
+BEGIN
+    OPEN c_empleados(v_dept_id, v_min_sal);
+    
+    LOOP
+        FETCH c_empleados INTO v_empleado;
+        EXIT WHEN c_empleados%NOTFOUND;
+        
+        v_contador := v_contador + 1;
+        DBMS_OUTPUT.PUT_LINE(v_contador || '. ' || v_empleado.nombre || 
+                           ' (ID: ' || v_empleado.empleado_id || 
+                           ', Salario: ' || v_empleado.salario || ')');
+    END LOOP;
+    
+    IF v_contador = 0 THEN
+        DBMS_OUTPUT.PUT_LINE('No se encontraron empleados con salario >= ' || 
+                           v_min_sal || ' en el departamento ' || v_dept_id);
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Total de empleados encontrados: ' || v_contador);
+    END IF;
+    
+    CLOSE c_empleados;
+END;
+/
+```
+
+### Mejores prácticas para el uso de cursores
+
+1. **Preferir cursores FOR LOOP** cuando sea posible, ya que manejan automáticamente la apertura, recuperación y cierre.
+2. **Limitar el conjunto de resultados** con cláusulas WHERE adecuadas para mejorar el rendimiento.
+3. **Usar parámetros en cursores** para hacerlos más flexibles y reutilizables.
+4. **Cerrar siempre los cursores explícitos** cuando ya no se necesiten para liberar recursos.
+5. **Considerar el uso de cursores con FOR UPDATE** solo cuando sea necesario bloquear filas.
+6. **Utilizar %ROWTYPE** para simplificar la declaración de variables que almacenarán los resultados del cursor.
+
+<Aside type="caution">
+  Los cursores consumen recursos de memoria y procesamiento. Evite mantener muchos cursores abiertos simultáneamente y procure cerrarlos tan pronto como sea posible.
+</Aside>
+
+## Paquetes en PL/SQL
+
+Los paquetes son objetos de esquema que agrupan tipos de datos, variables, constantes, cursores, excepciones, procedimientos y funciones relacionados en una única unidad lógica. Proporcionan modularidad, encapsulamiento, reutilización y un mejor rendimiento en aplicaciones PL/SQL.
+
+### Estructura de un paquete
+
+Un paquete consta de dos partes:
+
+1. **Especificación del paquete**: Define la interfaz pública (elementos accesibles desde fuera del paquete)
+2. **Cuerpo del paquete**: Implementa los elementos definidos en la especificación y puede contener elementos privados adicionales
+
+<Tabs>
+  <TabItem label="Especificación">
+    ```sql
+    CREATE OR REPLACE PACKAGE gestion_empleados AS
+        -- Constantes públicas
+        c_aumento_minimo CONSTANT NUMBER := 0.05; -- 5%
+        c_aumento_maximo CONSTANT NUMBER := 0.20; -- 20%
+        
+        -- Tipos públicos
+        TYPE t_registro_empleado IS RECORD (
+            id NUMBER,
+            nombre VARCHAR2(100),
+            salario NUMBER
+        );
+        
+        -- Cursores públicos
+        CURSOR c_empleados_dept(p_dept_id NUMBER) IS
+            SELECT empleado_id, nombre, salario
+            FROM empleados
+            WHERE departamento_id = p_dept_id
+            ORDER BY nombre;
+            
+        -- Excepciones públicas
+        e_salario_invalido EXCEPTION;
+        
+        -- Funciones públicas
+        FUNCTION calcular_aumento(
+            p_salario IN NUMBER,
+            p_porcentaje IN NUMBER DEFAULT c_aumento_minimo
+        ) RETURN NUMBER;
+        
+        FUNCTION obtener_empleado(
+            p_empleado_id IN NUMBER
+        ) RETURN t_registro_empleado;
+        
+        -- Procedimientos públicos
+        PROCEDURE actualizar_salario(
+            p_empleado_id IN NUMBER,
+            p_porcentaje IN NUMBER,
+            p_comentario IN VARCHAR2 DEFAULT NULL
+        );
+        
+        PROCEDURE transferir_empleado(
+            p_empleado_id IN NUMBER,
+            p_nuevo_dept_id IN NUMBER
+        );
+    END gestion_empleados;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="Cuerpo">
+    ```sql
+    CREATE OR REPLACE PACKAGE BODY gestion_empleados AS
+        -- Variables privadas (solo accesibles dentro del paquete)
+        v_ultimo_empleado_id NUMBER;
+        v_contador_operaciones NUMBER := 0;
+        
+        -- Procedimiento privado
+        PROCEDURE registrar_operacion(
+            p_tipo_operacion IN VARCHAR2,
+            p_empleado_id IN NUMBER
+        ) IS
+        BEGIN
+            INSERT INTO log_operaciones (
+                tipo_operacion,
+                empleado_id,
+                usuario,
+                fecha
+            ) VALUES (
+                p_tipo_operacion,
+                p_empleado_id,
+                USER,
+                SYSDATE
+            );
+            
+            v_contador_operaciones := v_contador_operaciones + 1;
+        END registrar_operacion;
+        
+        -- Implementación de la función pública calcular_aumento
+        FUNCTION calcular_aumento(
+            p_salario IN NUMBER,
+            p_porcentaje IN NUMBER DEFAULT c_aumento_minimo
+        ) RETURN NUMBER IS
+            v_porcentaje NUMBER := p_porcentaje;
+        BEGIN
+            -- Validar el porcentaje
+            IF v_porcentaje < c_aumento_minimo THEN
+                v_porcentaje := c_aumento_minimo;
+            ELSIF v_porcentaje > c_aumento_maximo THEN
+                v_porcentaje := c_aumento_maximo;
+            END IF;
+            
+            -- Calcular y devolver el nuevo salario
+            RETURN p_salario * (1 + v_porcentaje);
+        END calcular_aumento;
+        
+        -- Implementación de la función pública obtener_empleado
+        FUNCTION obtener_empleado(
+            p_empleado_id IN NUMBER
+        ) RETURN t_registro_empleado IS
+            v_empleado t_registro_empleado;
+        BEGIN
+            SELECT empleado_id, nombre, salario
+            INTO v_empleado.id, v_empleado.nombre, v_empleado.salario
+            FROM empleados
+            WHERE empleado_id = p_empleado_id;
+            
+            v_ultimo_empleado_id := p_empleado_id;
+            RETURN v_empleado;
+        EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                v_empleado.id := NULL;
+                v_empleado.nombre := 'NO EXISTE';
+                v_empleado.salario := 0;
+                RETURN v_empleado;
+        END obtener_empleado;
+        
+        -- Implementación del procedimiento público actualizar_salario
+        PROCEDURE actualizar_salario(
+            p_empleado_id IN NUMBER,
+            p_porcentaje IN NUMBER,
+            p_comentario IN VARCHAR2 DEFAULT NULL
+        ) IS
+            v_salario_actual empleados.salario%TYPE;
+            v_nuevo_salario NUMBER;
+        BEGIN
+            -- Obtener salario actual
+            SELECT salario INTO v_salario_actual
+            FROM empleados
+            WHERE empleado_id = p_empleado_id;
+            
+            -- Validar el porcentaje
+            IF p_porcentaje < c_aumento_minimo OR p_porcentaje > c_aumento_maximo THEN
+                RAISE e_salario_invalido;
+            END IF;
+            
+            -- Calcular nuevo salario
+            v_nuevo_salario := calcular_aumento(v_salario_actual, p_porcentaje);
+            
+            -- Actualizar salario
+            UPDATE empleados
+            SET salario = v_nuevo_salario,
+                ultima_actualizacion = SYSDATE,
+                comentarios = NVL(comentarios, '') || CHR(10) || p_comentario
+            WHERE empleado_id = p_empleado_id;
+            
+            -- Registrar operación
+            registrar_operacion('ACTUALIZAR_SALARIO', p_empleado_id);
+            
+            COMMIT;
+        EXCEPTION
+            WHEN e_salario_invalido THEN
+                RAISE_APPLICATION_ERROR(-20001, 
+                    'El porcentaje de aumento debe estar entre ' || 
+                    c_aumento_minimo * 100 || '% y ' || 
+                    c_aumento_maximo * 100 || '%');
+            WHEN OTHERS THEN
+                ROLLBACK;
+                RAISE;
+        END actualizar_salario;
+        
+        -- Implementación del procedimiento público transferir_empleado
+        PROCEDURE transferir_empleado(
+            p_empleado_id IN NUMBER,
+            p_nuevo_dept_id IN NUMBER
+        ) IS
+            v_dept_actual empleados.departamento_id%TYPE;
+        BEGIN
+            -- Verificar si el empleado existe
+            SELECT departamento_id INTO v_dept_actual
+            FROM empleados
+            WHERE empleado_id = p_empleado_id;
+            
+            -- Verificar si el departamento destino existe
+            DECLARE
+                v_existe NUMBER;
+            BEGIN
+                SELECT 1 INTO v_existe
+                FROM departamentos
+                WHERE departamento_id = p_nuevo_dept_id;
+            EXCEPTION
+                WHEN NO_DATA_FOUND THEN
+                    RAISE_APPLICATION_ERROR(-20002, 'El departamento destino no existe');
+            END;
+            
+            -- Si es el mismo departamento, no hacer nada
+            IF v_dept_actual = p_nuevo_dept_id THEN
+                RETURN;
+            END IF;
+            
+            -- Transferir empleado
+            UPDATE empleados
+            SET departamento_id = p_nuevo_dept_id,
+                fecha_transferencia = SYSDATE
+            WHERE empleado_id = p_empleado_id;
+            
+            -- Registrar operación
+            registrar_operacion('TRANSFERIR_EMPLEADO', p_empleado_id);
+            
+            COMMIT;
+        EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                RAISE_APPLICATION_ERROR(-20003, 'El empleado no existe');
+            WHEN OTHERS THEN
+                ROLLBACK;
+                RAISE;
+        END transferir_empleado;
+        
+        -- Bloque de inicialización del paquete (se ejecuta una vez al cargar el paquete)
+        BEGIN
+            -- Código de inicialización
+            v_contador_operaciones := 0;
+            
+            -- Registrar carga del paquete
+            INSERT INTO log_sistema (evento, fecha, usuario)
+            VALUES ('CARGA_PAQUETE_GESTION_EMPLEADOS', SYSDATE, USER);
+            
+            COMMIT;
+        END;
+    END gestion_empleados;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+### Uso de paquetes
+
+```sql
+-- Usar elementos del paquete
+DECLARE
+    v_empleado gestion_empleados.t_registro_empleado;
+    v_nuevo_salario NUMBER;
+BEGIN
+    -- Llamar a una función del paquete
+    v_empleado := gestion_empleados.obtener_empleado(101);
+    
+    DBMS_OUTPUT.PUT_LINE('Empleado: ' || v_empleado.nombre);
+    DBMS_OUTPUT.PUT_LINE('Salario actual: ' || v_empleado.salario);
+    
+    -- Calcular nuevo salario con un aumento del 10%
+    v_nuevo_salario := gestion_empleados.calcular_aumento(
+        v_empleado.salario, 0.10);
+    
+    DBMS_OUTPUT.PUT_LINE('Nuevo salario: ' || v_nuevo_salario);
+    
+    -- Llamar a un procedimiento del paquete
+    gestion_empleados.actualizar_salario(
+        v_empleado.id, 0.10, 'Aumento anual');
+    
+    -- Usar un cursor del paquete
+    FOR emp_rec IN gestion_empleados.c_empleados_dept(20) LOOP
+        DBMS_OUTPUT.PUT_LINE('Empleado del dept 20: ' || emp_rec.nombre);
+    END LOOP;
+    
+    -- Manejar una excepción del paquete
+    BEGIN
+        gestion_empleados.actualizar_salario(102, 0.30); -- Excede el máximo
+    EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error: ' || SQLERRM);
+    END;
+END;
+/
+```
+
+### Ventajas de los paquetes
+
+1. **Modularidad**: Agrupan lógicamente objetos relacionados, facilitando el diseño y mantenimiento.
+2. **Encapsulamiento**: Ocultan detalles de implementación y exponen solo la interfaz necesaria.
+3. **Rendimiento**: Los paquetes se cargan en memoria una sola vez y permanecen allí para todos los usuarios.
+4. **Seguridad**: Permiten controlar el acceso a los objetos mediante permisos granulares.
+5. **Sobrecarga**: Permiten definir múltiples subprogramas con el mismo nombre pero diferentes parámetros.
+6. **Estado persistente**: Mantienen variables y cursores en memoria entre llamadas a procedimientos.
+
+### Mejores prácticas para paquetes
+
+1. **Agrupar funcionalidad relacionada**: Diseñar paquetes con un propósito claro y coherente.
+2. **Minimizar dependencias**: Reducir las dependencias entre paquetes para facilitar el mantenimiento.
+3. **Documentar la interfaz**: Incluir comentarios detallados sobre el propósito y uso de cada elemento público.
+4. **Gestionar el estado con cuidado**: Ser consciente de que las variables de paquete mantienen su estado entre llamadas.
+5. **Manejar errores adecuadamente**: Implementar manejo de excepciones robusto en todos los subprogramas.
+6. **Usar inicialización de paquetes**: Aprovechar el bloque de inicialización para configurar el estado inicial.
+
+<Aside type="tip">
+  Los paquetes son ideales para implementar patrones de diseño como el patrón Singleton, Facade o Factory en PL/SQL.
+</Aside>
+
+### Paquetes del sistema Oracle
+
+Oracle proporciona numerosos paquetes del sistema que ofrecen funcionalidad útil para los desarrolladores:
+
+| Paquete | Descripción | Ejemplo de uso |
+|---------|-------------|---------------|
+| DBMS_OUTPUT | Muestra mensajes desde PL/SQL | DBMS_OUTPUT.PUT_LINE('Mensaje'); |
+| DBMS_SQL | Permite ejecutar SQL dinámico | v_cursor := DBMS_SQL.OPEN_CURSOR; |
+| UTL_FILE | Operaciones de lectura/escritura de archivos | UTL_FILE.FOPEN('DIR', 'archivo.txt', 'W'); |
+| DBMS_SCHEDULER | Programación de tareas | DBMS_SCHEDULER.CREATE_JOB(...); |
+| DBMS_CRYPTO | Funciones criptográficas | v_hash := DBMS_CRYPTO.HASH(v_input, DBMS_CRYPTO.HASH_SH1); |
+| UTL_MAIL | Envío de correos electrónicos | UTL_MAIL.SEND(sender, recipients, subject, message); |
+| DBMS_LOB | Manipulación de objetos grandes (LOBs) | DBMS_LOB.WRITE(v_clob, v_amount, v_offset, v_buffer); |
+
+```sql
+-- Ejemplo de uso de paquetes del sistema
+BEGIN
+    -- DBMS_OUTPUT para mostrar mensajes
+    DBMS_OUTPUT.PUT_LINE('Inicio del proceso');
+    
+    -- UTL_FILE para escribir en un archivo
+    DECLARE
+        v_file UTL_FILE.FILE_TYPE;
+    BEGIN
+        v_file := UTL_FILE.FOPEN('MI_DIRECTORIO', 'reporte.txt', 'W');
+        UTL_FILE.PUT_LINE(v_file, 'Reporte generado el ' || TO_CHAR(SYSDATE, 'DD-MON-YYYY'));
+        UTL_FILE.FCLOSE(v_file);
+    END;
+    
+    -- DBMS_SCHEDULER para programar una tarea
+    DBMS_SCHEDULER.CREATE_JOB (
+        job_name => 'ACTUALIZAR_ESTADISTICAS',
+        job_type => 'STORED_PROCEDURE',
+        job_action => 'mi_paquete.actualizar_estadisticas',
+        start_date => SYSTIMESTAMP,
+        repeat_interval => 'FREQ=DAILY; BYHOUR=2',
+        enabled => TRUE,
+        comments => 'Actualiza estadísticas diariamente a las 2 AM'
+    );
+    
+    DBMS_OUTPUT.PUT_LINE('Fin del proceso');
+END;
+/
+```
+
+## Resumen
+
+En este capítulo hemos explorado los fundamentos de la programación con PL/SQL en Oracle, incluyendo:
+
+1. **Introducción a PL/SQL**: Estructura básica, tipos de bloques y ejecución.
+2. **Variables y estructuras de control**: Declaración de variables, tipos de datos, estructuras condicionales e iterativas.
+3. **Manejo de excepciones**: Tipos de excepciones, propagación y mejores prácticas.
+4. **Cursores explícitos e implícitos**: Ciclo de vida, atributos y técnicas de uso.
+5. **Paquetes**: Estructura, ventajas y mejores prácticas.
+
+PL/SQL es una herramienta poderosa para desarrollar lógica de negocio compleja directamente en la base de datos Oracle, aprovechando la proximidad a los datos para lograr un mejor rendimiento y seguridad.

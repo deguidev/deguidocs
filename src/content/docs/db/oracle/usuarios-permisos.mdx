@@ -1,0 +1,678 @@
+---
+title: 8. Administración de Usuarios, Permisos y Roles
+description: Aprende a gestionar usuarios y sus privilegios en Oracle Database
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## Introducción a la administración de usuarios
+
+La administración de usuarios, permisos y roles es un aspecto fundamental en la seguridad de Oracle Database. Un sistema de gestión de usuarios bien diseñado permite controlar quién puede acceder a la base de datos y qué operaciones puede realizar cada usuario, protegiendo así la integridad y confidencialidad de los datos.
+
+### Conceptos clave
+
+- **Usuario**: Cuenta que permite el acceso a la base de datos
+- **Esquema**: Colección de objetos de base de datos (tablas, vistas, procedimientos) asociados a un usuario
+- **Privilegio**: Derecho para ejecutar un tipo específico de sentencia SQL o acceder a objetos de otro usuario
+- **Rol**: Conjunto de privilegios que puede asignarse a usuarios
+- **Perfil**: Conjunto de límites de recursos y políticas de contraseña
+
+<Aside type="note">
+  En Oracle, cada usuario tiene asociado un esquema con el mismo nombre. Sin embargo, es importante entender que un usuario es una cuenta de autenticación, mientras que un esquema es un contenedor lógico de objetos de base de datos.
+</Aside>
+
+## Creación y gestión de usuarios
+
+### CREATE USER - Creación de usuarios
+
+El comando CREATE USER permite crear una nueva cuenta de usuario en la base de datos.
+
+#### Sintaxis básica
+
+```sql
+CREATE USER nombre_usuario
+  IDENTIFIED BY contraseña
+  [DEFAULT TABLESPACE nombre_tablespace]
+  [TEMPORARY TABLESPACE nombre_tablespace_temp]
+  [QUOTA {tamaño | UNLIMITED} ON nombre_tablespace]
+  [PROFILE nombre_perfil]
+  [CONTAINER = {CURRENT | ALL}]
+  [ACCOUNT {LOCK | UNLOCK}];
+```
+
+#### Ejemplos de creación de usuarios
+
+<Tabs>
+  <TabItem label="Usuario básico">
+    ```sql
+    -- Crear un usuario con configuración mínima
+    CREATE USER usuario1 IDENTIFIED BY "Contraseña123";
+    
+    -- Otorgar privilegios mínimos para conectarse
+    GRANT CREATE SESSION TO usuario1;
+    ```
+  </TabItem>
+  
+  <TabItem label="Usuario con tablespaces">
+    ```sql
+    -- Crear usuario especificando tablespaces y cuotas
+    CREATE USER usuario2 IDENTIFIED BY "Contraseña456"
+      DEFAULT TABLESPACE users
+      TEMPORARY TABLESPACE temp
+      QUOTA 100M ON users
+      QUOTA 50M ON data;
+    
+    -- Otorgar privilegios básicos
+    GRANT CREATE SESSION TO usuario2;
+    ```
+  </TabItem>
+  
+  <TabItem label="Usuario con perfil">
+    ```sql
+    -- Crear un perfil con restricciones
+    CREATE PROFILE perfil_desarrollo LIMIT
+      SESSIONS_PER_USER 3
+      CPU_PER_SESSION UNLIMITED
+      PASSWORD_LIFE_TIME 90
+      PASSWORD_REUSE_TIME 365
+      PASSWORD_REUSE_MAX 10
+      FAILED_LOGIN_ATTEMPTS 5
+      PASSWORD_LOCK_TIME 1/24;
+    
+    -- Crear usuario con el perfil
+    CREATE USER usuario3 IDENTIFIED BY "Contraseña789"
+      DEFAULT TABLESPACE users
+      TEMPORARY TABLESPACE temp
+      PROFILE perfil_desarrollo
+      ACCOUNT UNLOCK;
+    ```
+  </TabItem>
+</Tabs>
+
+### ALTER USER - Modificación de usuarios
+
+El comando ALTER USER permite modificar las propiedades de un usuario existente.
+
+#### Sintaxis básica
+
+```sql
+ALTER USER nombre_usuario
+  [IDENTIFIED BY nueva_contraseña [REPLACE antigua_contraseña]]
+  [DEFAULT TABLESPACE nombre_tablespace]
+  [TEMPORARY TABLESPACE nombre_tablespace_temp]
+  [QUOTA {tamaño | UNLIMITED} ON nombre_tablespace]
+  [PROFILE nombre_perfil]
+  [DEFAULT ROLE {rol1, rol2... | ALL | ALL EXCEPT rol1, rol2... | NONE}]
+  [ACCOUNT {LOCK | UNLOCK}];
+```
+
+#### Ejemplos de modificación de usuarios
+
+<Tabs>
+  <TabItem label="Cambiar contraseña">
+    ```sql
+    -- Cambiar la contraseña de un usuario
+    ALTER USER usuario1 IDENTIFIED BY "NuevaContraseña123";
+    
+    -- Cambiar contraseña con verificación de contraseña anterior
+    ALTER USER usuario1 IDENTIFIED BY "NuevaContraseña456" REPLACE "NuevaContraseña123";
+    ```
+  </TabItem>
+  
+  <TabItem label="Modificar tablespaces y cuotas">
+    ```sql
+    -- Cambiar el tablespace por defecto
+    ALTER USER usuario2 DEFAULT TABLESPACE data;
+    
+    -- Modificar cuotas
+    ALTER USER usuario2 QUOTA UNLIMITED ON data;
+    ALTER USER usuario2 QUOTA 200M ON users;
+    
+    -- Revocar acceso a un tablespace
+    ALTER USER usuario2 QUOTA 0 ON temp_data;
+    ```
+  </TabItem>
+  
+  <TabItem label="Gestionar estado de la cuenta">
+    ```sql
+    -- Bloquear una cuenta
+    ALTER USER usuario3 ACCOUNT LOCK;
+    
+    -- Desbloquear una cuenta
+    ALTER USER usuario3 ACCOUNT UNLOCK;
+    
+    -- Cambiar el perfil
+    ALTER USER usuario3 PROFILE perfil_produccion;
+    
+    -- Establecer roles por defecto
+    ALTER USER usuario3 DEFAULT ROLE app_user, report_viewer;
+    ```
+  </TabItem>
+</Tabs>
+
+### DROP USER - Eliminación de usuarios
+
+El comando DROP USER permite eliminar un usuario de la base de datos.
+
+#### Sintaxis básica
+
+```sql
+DROP USER nombre_usuario [CASCADE];
+```
+
+#### Ejemplos de eliminación de usuarios
+
+```sql
+-- Eliminar un usuario sin objetos
+DROP USER usuario_temporal;
+
+-- Eliminar un usuario y todos sus objetos
+DROP USER usuario_obsoleto CASCADE;
+```
+
+<Aside type="caution">
+  La opción CASCADE elimina todos los objetos del esquema del usuario. Esta operación no se puede deshacer, por lo que debe utilizarse con extrema precaución. Considere hacer una copia de seguridad antes de ejecutar este comando.
+</Aside>
+
+## Configuración de contraseñas y cuotas
+
+### Políticas de contraseñas
+
+Las políticas de contraseñas se configuran a través de perfiles de usuario, que definen restricciones y reglas para las contraseñas.
+
+#### Creación y configuración de perfiles
+
+```sql
+-- Crear un perfil con políticas de contraseña
+CREATE PROFILE perfil_seguro LIMIT
+  PASSWORD_LIFE_TIME 60           -- Días de validez de la contraseña
+  PASSWORD_GRACE_TIME 7           -- Días de gracia tras expiración
+  PASSWORD_REUSE_TIME 365         -- Días antes de poder reutilizar una contraseña
+  PASSWORD_REUSE_MAX 5            -- Número de cambios antes de poder reutilizar
+  FAILED_LOGIN_ATTEMPTS 3         -- Intentos fallidos antes de bloqueo
+  PASSWORD_LOCK_TIME 1/24         -- Tiempo de bloqueo (1 hora)
+  PASSWORD_VERIFY_FUNCTION verify_function_11g; -- Función de verificación
+```
+
+#### Asignación de perfiles a usuarios
+
+```sql
+-- Asignar perfil a un usuario nuevo
+CREATE USER usuario_seguro IDENTIFIED BY "Contraseña!123"
+  PROFILE perfil_seguro;
+
+-- Asignar perfil a un usuario existente
+ALTER USER usuario_existente PROFILE perfil_seguro;
+```
+
+#### Funciones de verificación de contraseñas
+
+Oracle proporciona funciones predefinidas para verificar la complejidad de las contraseñas:
+
+```sql
+-- Ver las funciones de verificación disponibles
+SELECT * FROM dba_source 
+  WHERE name LIKE 'VERIFY_FUNCTION%' 
+  AND owner = 'SYS';
+
+-- Crear una función personalizada de verificación
+CREATE OR REPLACE FUNCTION mi_verificacion_contraseña 
+(username VARCHAR2, password VARCHAR2, old_password VARCHAR2) 
+RETURN BOOLEAN IS
+BEGIN
+  -- Verificar longitud mínima
+  IF LENGTH(password) < 12 THEN
+    RAISE_APPLICATION_ERROR(-20001, 'La contraseña debe tener al menos 12 caracteres');
+  END IF;
+  
+  -- Verificar complejidad
+  IF NOT REGEXP_LIKE(password, '[A-Z]') THEN
+    RAISE_APPLICATION_ERROR(-20002, 'La contraseña debe contener al menos una letra mayúscula');
+  END IF;
+  
+  IF NOT REGEXP_LIKE(password, '[a-z]') THEN
+    RAISE_APPLICATION_ERROR(-20003, 'La contraseña debe contener al menos una letra minúscula');
+  END IF;
+  
+  IF NOT REGEXP_LIKE(password, '[0-9]') THEN
+    RAISE_APPLICATION_ERROR(-20004, 'La contraseña debe contener al menos un número');
+  END IF;
+  
+  IF NOT REGEXP_LIKE(password, '[^A-Za-z0-9]') THEN
+    RAISE_APPLICATION_ERROR(-20005, 'La contraseña debe contener al menos un carácter especial');
+  END IF;
+  
+  -- Verificar que no contenga el nombre de usuario
+  IF INSTR(LOWER(password), LOWER(username)) > 0 THEN
+    RAISE_APPLICATION_ERROR(-20006, 'La contraseña no puede contener el nombre de usuario');
+  END IF;
+  
+  RETURN TRUE;
+END;
+/
+
+-- Asignar la función a un perfil
+ALTER PROFILE perfil_seguro LIMIT
+  PASSWORD_VERIFY_FUNCTION mi_verificacion_contraseña;
+```
+
+### Gestión de cuotas de espacio
+
+Las cuotas controlan la cantidad de espacio que un usuario puede utilizar en cada tablespace.
+
+#### Asignación de cuotas
+
+```sql
+-- Asignar cuota ilimitada en un tablespace
+ALTER USER usuario1 QUOTA UNLIMITED ON users;
+
+-- Asignar cuota específica
+ALTER USER usuario2 QUOTA 500M ON data;
+
+-- Revocar acceso a un tablespace
+ALTER USER usuario3 QUOTA 0 ON marketing_data;
+```
+
+#### Monitoreo de uso de espacio
+
+```sql
+-- Ver cuotas asignadas a usuarios
+SELECT * FROM dba_ts_quotas;
+
+-- Ver uso de espacio por usuario y tablespace
+SELECT username, tablespace_name, bytes, max_bytes
+FROM dba_ts_quotas
+ORDER BY username, tablespace_name;
+```
+
+## Asignación de privilegios de sistema y de objeto
+
+### Privilegios de sistema
+
+Los privilegios de sistema permiten a los usuarios realizar acciones específicas en la base de datos.
+
+#### Tipos de privilegios de sistema
+
+| Categoría | Ejemplos de privilegios |
+|-----------|-------------------------|
+| Conexión y sesión | CREATE SESSION, ALTER SESSION |
+| Recursos | CREATE TABLE, CREATE VIEW, CREATE PROCEDURE |
+| DBA | ALTER DATABASE, AUDIT SYSTEM, CREATE USER |
+| Backup y recuperación | BACKUP ANY TABLE, RECOVER ANY TABLE |
+| Seguridad | GRANT ANY PRIVILEGE, AUDIT ANY |
+
+#### Asignación de privilegios de sistema
+
+```sql
+-- Otorgar privilegios individuales
+GRANT CREATE SESSION, CREATE TABLE TO usuario1;
+
+-- Otorgar privilegios con opción de administración
+GRANT CREATE USER, DROP USER TO administrador WITH ADMIN OPTION;
+
+-- Revocar privilegios
+REVOKE CREATE TABLE FROM usuario1;
+```
+
+### Privilegios de objeto
+
+Los privilegios de objeto permiten a los usuarios realizar operaciones específicas sobre objetos de la base de datos.
+
+#### Tipos de privilegios de objeto
+
+| Objeto | Privilegios disponibles |
+|--------|-------------------------|
+| TABLE | SELECT, INSERT, UPDATE, DELETE, ALTER, REFERENCES, INDEX |
+| VIEW | SELECT, INSERT, UPDATE, DELETE |
+| SEQUENCE | SELECT, ALTER |
+| PROCEDURE | EXECUTE |
+| DIRECTORY | READ, WRITE |
+
+#### Asignación de privilegios de objeto
+
+<Tabs>
+  <TabItem label="Privilegios básicos">
+    ```sql
+    -- Otorgar privilegio de lectura en una tabla
+    GRANT SELECT ON empleados TO usuario1;
+    
+    -- Otorgar privilegios múltiples
+    GRANT SELECT, INSERT, UPDATE ON clientes TO usuario2;
+    
+    -- Otorgar privilegio de ejecución
+    GRANT EXECUTE ON calcular_salario TO usuario3;
+    ```
+  </TabItem>
+  
+  <TabItem label="Privilegios con opciones">
+    ```sql
+    -- Otorgar con opción de concesión
+    GRANT SELECT ON productos TO usuario1 WITH GRANT OPTION;
+    
+    -- Otorgar privilegios en columnas específicas
+    GRANT UPDATE (nombre, precio) ON productos TO usuario2;
+    
+    -- Otorgar privilegios a todos los usuarios
+    GRANT SELECT ON informacion_publica TO PUBLIC;
+    ```
+  </TabItem>
+  
+  <TabItem label="Revocación de privilegios">
+    ```sql
+    -- Revocar un privilegio
+    REVOKE DELETE ON clientes FROM usuario1;
+    
+    -- Revocar todos los privilegios sobre un objeto
+    REVOKE ALL ON empleados FROM usuario2;
+    
+    -- Revocar con cascada
+    REVOKE SELECT ON productos FROM usuario1 CASCADE CONSTRAINTS;
+    ```
+  </TabItem>
+</Tabs>
+
+### Consulta de privilegios
+
+```sql
+-- Ver privilegios de sistema otorgados a usuarios
+SELECT * FROM dba_sys_privs;
+
+-- Ver privilegios de objeto otorgados a usuarios
+SELECT * FROM dba_tab_privs;
+
+-- Ver privilegios otorgados al usuario actual
+SELECT * FROM session_privs;
+
+-- Ver privilegios de columna
+SELECT * FROM dba_col_privs;
+```
+
+## Creación y administración de roles
+
+Los roles son colecciones de privilegios que facilitan la administración de seguridad al agrupar privilegios relacionados.
+
+### Creación de roles
+
+```sql
+-- Crear un rol básico
+CREATE ROLE rol_analista;
+
+-- Crear un rol con contraseña (requiere autenticación)
+CREATE ROLE rol_administrador IDENTIFIED BY "RolPassword123";
+
+-- Crear un rol que se autentica externamente
+CREATE ROLE rol_externo IDENTIFIED EXTERNALLY;
+
+-- Crear un rol que se autentica globalmente
+CREATE ROLE rol_global IDENTIFIED GLOBALLY;
+```
+
+### Asignación de privilegios a roles
+
+```sql
+-- Asignar privilegios de sistema a un rol
+GRANT CREATE SESSION, CREATE TABLE, CREATE VIEW TO rol_desarrollador;
+
+-- Asignar privilegios de objeto a un rol
+GRANT SELECT ON hr.empleados TO rol_analista;
+GRANT SELECT, INSERT, UPDATE ON hr.departamentos TO rol_analista;
+
+-- Asignar un rol a otro rol (jerarquía de roles)
+GRANT rol_analista TO rol_gerente;
+```
+
+### Asignación de roles a usuarios
+
+```sql
+-- Asignar un rol a un usuario
+GRANT rol_analista TO usuario1;
+
+-- Asignar múltiples roles
+GRANT rol_desarrollador, rol_tester TO usuario2;
+
+-- Asignar rol con opción de administración
+GRANT rol_departamento TO jefe_departamento WITH ADMIN OPTION;
+```
+
+### Gestión de roles
+
+```sql
+-- Modificar un rol (cambiar contraseña)
+ALTER ROLE rol_administrador IDENTIFIED BY "NuevoPassword456";
+
+-- Eliminar la autenticación de un rol
+ALTER ROLE rol_administrador NOT IDENTIFIED;
+
+-- Eliminar un rol
+DROP ROLE rol_temporal;
+
+-- Habilitar/deshabilitar roles para la sesión actual
+SET ROLE rol_analista, rol_reportes;
+SET ROLE NONE; -- Deshabilitar todos los roles
+SET ROLE ALL; -- Habilitar todos los roles por defecto
+```
+
+### Roles predefinidos en Oracle
+
+Oracle proporciona varios roles predefinidos para tareas comunes:
+
+| Rol | Descripción |
+|-----|-------------|
+| CONNECT | Privilegios básicos para conectarse a la base de datos |
+| RESOURCE | Privilegios para crear objetos en el esquema propio |
+| DBA | Todos los privilegios con opción de administración |
+| SELECT_CATALOG_ROLE | Acceso de lectura a las vistas del diccionario |
+| EXECUTE_CATALOG_ROLE | Privilegios de ejecución en paquetes del sistema |
+| DELETE_CATALOG_ROLE | Privilegios para eliminar registros en tablas de auditoría |
+| EXP_FULL_DATABASE | Privilegios para exportar toda la base de datos |
+| IMP_FULL_DATABASE | Privilegios para importar toda la base de datos |
+
+<Aside type="caution">
+  El rol DBA otorga privilegios administrativos completos. Debe asignarse con extrema precaución y solo a administradores de confianza. En entornos de producción, es mejor crear roles personalizados con privilegios específicos en lugar de usar DBA.
+</Aside>
+
+### Consulta de información sobre roles
+
+```sql
+-- Ver todos los roles de la base de datos
+SELECT * FROM dba_roles;
+
+-- Ver privilegios asignados a roles
+SELECT * FROM role_sys_privs;
+SELECT * FROM role_tab_privs;
+
+-- Ver roles asignados a usuarios
+SELECT * FROM dba_role_privs;
+
+-- Ver jerarquía de roles
+SELECT * FROM role_role_privs;
+
+-- Ver roles habilitados en la sesión actual
+SELECT * FROM session_roles;
+```
+
+## Buenas prácticas de seguridad en Oracle
+
+### Principios fundamentales
+
+<Steps>
+  1. **Principio de privilegio mínimo**
+     - Otorgar solo los privilegios necesarios para realizar las tareas requeridas
+     - Revisar y auditar periódicamente los privilegios asignados
+  
+  2. **Separación de deberes**
+     - Dividir responsabilidades entre diferentes usuarios
+     - Evitar concentrar demasiados privilegios en un solo usuario
+  
+  3. **Defensa en profundidad**
+     - Implementar múltiples capas de seguridad
+     - Combinar seguridad a nivel de base de datos con seguridad a nivel de aplicación
+  
+  4. **Auditoría y monitoreo**
+     - Activar auditoría para acciones críticas
+     - Revisar regularmente los registros de auditoría
+</Steps>
+
+### Recomendaciones para la gestión de usuarios
+
+```sql
+-- 1. Bloquear y expirar cuentas por defecto no utilizadas
+SELECT username, account_status FROM dba_users 
+  WHERE username IN ('SCOTT', 'HR', 'OE', 'SH');
+
+ALTER USER SCOTT ACCOUNT LOCK PASSWORD EXPIRE;
+
+-- 2. Crear usuarios específicos para aplicaciones
+CREATE USER app_usuario IDENTIFIED BY "AppPassword123"
+  DEFAULT TABLESPACE users
+  TEMPORARY TABLESPACE temp
+  PROFILE app_profile
+  QUOTA 500M ON users;
+
+-- 3. Utilizar esquemas proxy para aplicaciones
+ALTER USER app_usuario GRANT CONNECT THROUGH webapp_proxy;
+
+-- 4. Implementar autenticación externa cuando sea posible
+CREATE USER sso_usuario IDENTIFIED GLOBALLY AS 'CN=usuario1,OU=Usuarios,DC=empresa,DC=com';
+```
+
+### Recomendaciones para privilegios y roles
+
+```sql
+-- 1. Crear roles específicos por función
+CREATE ROLE rol_ventas;
+GRANT SELECT ON productos TO rol_ventas;
+GRANT SELECT, INSERT, UPDATE ON pedidos TO rol_ventas;
+GRANT SELECT, INSERT ON clientes TO rol_ventas;
+
+-- 2. Evitar asignar privilegios directamente a usuarios
+-- Incorrecto:
+GRANT SELECT ON hr.empleados TO usuario1;
+
+-- Correcto:
+CREATE ROLE rol_rrhh;
+GRANT SELECT ON hr.empleados TO rol_rrhh;
+GRANT rol_rrhh TO usuario1;
+
+-- 3. Limitar el uso de WITH ADMIN OPTION y WITH GRANT OPTION
+-- Usar con precaución:
+GRANT rol_departamento TO jefe_departamento WITH ADMIN OPTION;
+
+-- 4. Revocar privilegios innecesarios
+REVOKE CREATE ANY TABLE FROM usuario_desarrollo;
+```
+
+### Configuración de seguridad avanzada
+
+<Tabs>
+  <TabItem label="Políticas de contraseñas">
+    ```sql
+    -- Crear perfil con política de contraseñas fuerte
+    CREATE PROFILE secure_profile LIMIT
+      PASSWORD_LIFE_TIME 90
+      PASSWORD_GRACE_TIME 7
+      PASSWORD_REUSE_TIME 365
+      PASSWORD_REUSE_MAX 10
+      FAILED_LOGIN_ATTEMPTS 5
+      PASSWORD_LOCK_TIME 1/24
+      PASSWORD_VERIFY_FUNCTION ora12c_verify_function;
+    
+    -- Aplicar a todos los usuarios
+    ALTER USER usuario1 PROFILE secure_profile;
+    ALTER USER usuario2 PROFILE secure_profile;
+    ```
+  </TabItem>
+  
+  <TabItem label="Auditoría">
+    ```sql
+    -- Configurar auditoría unificada
+    -- Habilitar auditoría
+    AUDIT POLICY admin_actions BY SYSTEM;
+    
+    -- Crear política de auditoría personalizada
+    CREATE AUDIT POLICY data_access_policy
+      ACTIONS SELECT ON hr.empleados,
+              UPDATE ON hr.salarios,
+              DELETE ON hr.empleados;
+    
+    -- Aplicar política
+    AUDIT POLICY data_access_policy BY usuario1, usuario2;
+    ```
+  </TabItem>
+  
+  <TabItem label="Cifrado">
+    ```sql
+    -- Crear llave de cifrado
+    CREATE OR REPLACE DIRECTORY cert_dir AS '/oracle/app/wallet';
+    
+    -- Cifrar columnas sensibles
+    ALTER TABLE clientes MODIFY (
+      numero_tarjeta ENCRYPT USING 'AES256' NO SALT,
+      cvv ENCRYPT
+    );
+    
+    -- Crear índice en columna cifrada
+    CREATE INDEX idx_tarjeta ON clientes(numero_tarjeta) PARAMETERS ('ENCRYPT');
+    ```
+  </TabItem>
+</Tabs>
+
+### Lista de verificación de seguridad
+
+<Steps>
+  1. **Configuración inicial**
+     - Cambiar todas las contraseñas por defecto
+     - Bloquear cuentas no utilizadas
+     - Implementar perfiles de seguridad
+  
+  2. **Gestión de usuarios**
+     - Crear usuarios específicos para cada propósito
+     - Implementar política de contraseñas robusta
+     - Revisar periódicamente las cuentas inactivas
+  
+  3. **Privilegios y roles**
+     - Aplicar principio de privilegio mínimo
+     - Utilizar roles para agrupar privilegios
+     - Auditar privilegios críticos
+  
+  4. **Monitoreo y auditoría**
+     - Configurar auditoría para acciones críticas
+     - Revisar regularmente los registros de auditoría
+     - Implementar alertas para actividades sospechosas
+  
+  5. **Mantenimiento**
+     - Aplicar parches de seguridad regularmente
+     - Realizar evaluaciones de seguridad periódicas
+     - Documentar políticas y procedimientos de seguridad
+</Steps>
+
+### Consultas útiles para auditoría de seguridad
+
+```sql
+-- Usuarios con el rol DBA
+SELECT grantee FROM dba_role_privs WHERE granted_role = 'DBA';
+
+-- Usuarios con privilegios críticos
+SELECT grantee, privilege FROM dba_sys_privs 
+WHERE privilege IN ('ALTER DATABASE', 'ALTER SYSTEM', 'CREATE ANY JOB');
+
+-- Cuentas con contraseñas por defecto
+SELECT username, account_status FROM dba_users 
+WHERE password_versions NOT LIKE '%12%';
+
+-- Usuarios con cuotas ilimitadas
+SELECT username, tablespace_name FROM dba_ts_quotas 
+WHERE max_bytes = -1;
+
+-- Objetos con privilegios concedidos a PUBLIC
+SELECT owner, table_name, privilege FROM dba_tab_privs 
+WHERE grantee = 'PUBLIC';
+```
+
+<Aside type="tip">
+  Considere implementar Oracle Database Vault para proporcionar controles de acceso adicionales y separación de deberes, especialmente en entornos con requisitos de cumplimiento normativo estrictos como PCI DSS, HIPAA o GDPR.
+</Aside>

@@ -1,0 +1,641 @@
+---
+title: 5. DML (Data Manipulation Language)
+description: Aprende a manipular datos en Oracle Database
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## Introducción al DML
+
+El Lenguaje de Manipulación de Datos (Data Manipulation Language o DML) es un subconjunto de SQL utilizado para manipular los datos almacenados en una base de datos Oracle. Los comandos DML permiten insertar, actualizar, eliminar y consultar datos en tablas y vistas.
+
+### Características principales del DML
+
+- **Transaccional**: Los comandos DML forman parte de transacciones que pueden confirmarse (COMMIT) o revertirse (ROLLBACK)
+- **Afecta a los datos**: Modifica el contenido de las tablas, no su estructura
+- **Genera redo/undo**: Oracle registra la información necesaria para rehacer o deshacer los cambios
+- **Puede activar triggers**: Los comandos DML pueden disparar triggers definidos en las tablas
+
+<Aside type="tip">
+  A diferencia de los comandos DDL, los comandos DML no realizan un commit automático. Esto significa que puede agrupar múltiples operaciones DML en una transacción y decidir si confirmarlas o revertirlas como una unidad.
+</Aside>
+
+## INSERT - Inserción de registros
+
+El comando INSERT se utiliza para agregar nuevas filas a una tabla o vista.
+
+### Sintaxis básica
+
+```sql
+-- Sintaxis básica
+INSERT INTO tabla [(columna1, columna2, ...)] 
+VALUES (valor1, valor2, ...);
+
+-- Ejemplo simple
+INSERT INTO empleados (empleado_id, nombre, apellido, email, fecha_contratacion)
+VALUES (1, 'Juan', 'Pérez', 'juan.perez@ejemplo.com', SYSDATE);
+```
+
+### Inserción de múltiples filas
+
+<Tabs>
+  <TabItem label="Inserción múltiple (Oracle 11g+)">
+    ```sql
+    -- Insertar múltiples filas en una sola sentencia
+    INSERT ALL
+      INTO empleados (empleado_id, nombre, apellido) VALUES (1, 'Juan', 'Pérez')
+      INTO empleados (empleado_id, nombre, apellido) VALUES (2, 'María', 'Gómez')
+      INTO empleados (empleado_id, nombre, apellido) VALUES (3, 'Carlos', 'López')
+    SELECT * FROM dual;
+    ```
+  </TabItem>
+  
+  <TabItem label="Inserción condicional">
+    ```sql
+    -- Inserción condicional en diferentes tablas
+    INSERT ALL
+      WHEN salario > 5000 THEN
+        INTO empleados_senior (empleado_id, nombre, salario) VALUES (id, nombre, salario)
+      WHEN salario <= 5000 THEN
+        INTO empleados_junior (empleado_id, nombre, salario) VALUES (id, nombre, salario)
+    SELECT id, nombre, salario FROM candidatos;
+    ```
+  </TabItem>
+</Tabs>
+
+### Inserción basada en consulta
+
+```sql
+-- Insertar datos desde otra tabla
+INSERT INTO empleados_marketing (empleado_id, nombre, apellido, email)
+SELECT empleado_id, nombre, apellido, email
+FROM empleados
+WHERE departamento_id = 20;
+
+-- Insertar con subconsulta para obtener valores
+INSERT INTO salarios (empleado_id, salario, fecha_revision)
+VALUES (
+    (SELECT empleado_id FROM empleados WHERE email = 'juan.perez@ejemplo.com'),
+    5000,
+    ADD_MONTHS(SYSDATE, 6)
+);
+```
+
+### Inserción con valores por defecto y nulos
+
+```sql
+-- Uso de valores por defecto
+INSERT INTO empleados (empleado_id, nombre, apellido)
+VALUES (seq_empleados.NEXTVAL, 'Ana', 'Martínez');
+-- Las columnas no especificadas recibirán NULL o su valor DEFAULT si está definido
+
+-- Especificar NULL explícitamente
+INSERT INTO empleados (empleado_id, nombre, apellido, telefono)
+VALUES (seq_empleados.NEXTVAL, 'Pedro', 'Sánchez', NULL);
+```
+
+<Aside type="note">
+  Si una columna tiene una restricción NOT NULL y no tiene un valor DEFAULT definido, debe incluirse en la lista de columnas del INSERT y proporcionarle un valor no nulo.
+</Aside>
+
+### Errores comunes en INSERT
+
+<Steps>
+  1. **Violación de restricción de unicidad**
+     - Ocurre al intentar insertar un valor duplicado en una columna con restricción UNIQUE o PRIMARY KEY
+     - Error: ORA-00001: unique constraint violated
+  
+  2. **Violación de restricción de integridad referencial**
+     - Ocurre al intentar insertar un valor en una columna con restricción FOREIGN KEY que no existe en la tabla referenciada
+     - Error: ORA-02291: integrity constraint violated - parent key not found
+  
+  3. **Violación de restricción CHECK**
+     - Ocurre al intentar insertar un valor que no cumple con una restricción CHECK
+     - Error: ORA-02290: check constraint violated
+  
+  4. **Columna NOT NULL sin valor**
+     - Ocurre al omitir una columna con restricción NOT NULL sin valor DEFAULT
+     - Error: ORA-01400: cannot insert NULL into column
+</Steps>
+
+## UPDATE - Actualización de datos
+
+El comando UPDATE se utiliza para modificar datos existentes en una tabla o vista.
+
+### Sintaxis básica
+
+```sql
+-- Sintaxis básica
+UPDATE tabla
+SET columna1 = valor1, columna2 = valor2, ...
+[WHERE condición];
+
+-- Ejemplo simple
+UPDATE empleados
+SET salario = 5500
+WHERE empleado_id = 101;
+```
+
+<Aside type="caution">
+  Si se omite la cláusula WHERE, el UPDATE modificará todas las filas de la tabla. Siempre verifique cuidadosamente su cláusula WHERE antes de ejecutar un UPDATE.
+</Aside>
+
+### Actualización con subconsultas
+
+```sql
+-- Actualizar basado en datos de otra tabla
+UPDATE empleados e
+SET e.salario = e.salario * 1.1
+WHERE e.departamento_id IN (
+    SELECT departamento_id
+    FROM departamentos
+    WHERE ubicacion = 'Madrid'
+);
+
+-- Actualizar múltiples columnas con subconsultas
+UPDATE empleados e
+SET (e.salario, e.comision) = (
+    SELECT AVG(salario) * 0.9, AVG(salario) * 0.05
+    FROM empleados
+    WHERE departamento_id = e.departamento_id
+)
+WHERE e.rendimiento = 'En formación';
+```
+
+### Actualización con expresiones
+
+```sql
+-- Actualizar usando valores existentes
+UPDATE productos
+SET precio = precio * 1.05,
+    ultima_actualizacion = SYSDATE,
+    descripcion = UPPER(descripcion)
+WHERE categoria = 'Electrónica';
+
+-- Actualizar con expresiones condicionales
+UPDATE empleados
+SET salario = CASE
+                WHEN antiguedad < 2 THEN salario * 1.03
+                WHEN antiguedad BETWEEN 2 AND 5 THEN salario * 1.05
+                ELSE salario * 1.07
+              END,
+    nivel = CASE
+              WHEN salario * 1.07 > 10000 THEN 'Senior'
+              ELSE nivel
+            END
+WHERE departamento_id = 10;
+```
+
+### Actualización con valores NULL
+
+```sql
+-- Establecer valores a NULL
+UPDATE empleados
+SET telefono = NULL
+WHERE fecha_baja IS NOT NULL;
+
+-- Reemplazar NULL con un valor
+UPDATE empleados
+SET comision = 0
+WHERE comision IS NULL;
+```
+
+## DELETE - Eliminación de registros
+
+El comando DELETE se utiliza para eliminar filas existentes de una tabla o vista.
+
+### Sintaxis básica
+
+```sql
+-- Sintaxis básica
+DELETE FROM tabla
+[WHERE condición];
+
+-- Ejemplo simple
+DELETE FROM empleados
+WHERE empleado_id = 101;
+```
+
+<Aside type="caution">
+  Al igual que con UPDATE, si se omite la cláusula WHERE, el DELETE eliminará todas las filas de la tabla. Siempre verifique su cláusula WHERE antes de ejecutar un DELETE.
+</Aside>
+
+### Eliminación con subconsultas
+
+```sql
+-- Eliminar basado en datos de otra tabla
+DELETE FROM empleados
+WHERE departamento_id IN (
+    SELECT departamento_id
+    FROM departamentos
+    WHERE presupuesto < 50000
+);
+
+-- Eliminar con EXISTS
+DELETE FROM pedidos p
+WHERE EXISTS (
+    SELECT 1
+    FROM clientes c
+    WHERE c.cliente_id = p.cliente_id
+    AND c.estado = 'Inactivo'
+);
+```
+
+### Diferencias entre DELETE y TRUNCATE
+
+| Característica | DELETE | TRUNCATE |
+|----------------|--------|----------|
+| Tipo de comando | DML | DDL |
+| Cláusula WHERE | Permitida | No permitida |
+| Transaccional | Sí | No (commit automático) |
+| Rollback | Posible | No posible |
+| Triggers | Se activan | No se activan |
+| Velocidad | Más lento | Más rápido |
+| Espacio | No libera automáticamente | Libera espacio |
+
+<Aside type="tip">
+  Use DELETE cuando necesite eliminar filas específicas o cuando necesite la capacidad de revertir la operación. Use TRUNCATE cuando necesite eliminar todas las filas de una tabla de manera rápida y eficiente, y no necesite revertir la operación.
+</Aside>
+
+## MERGE - Operaciones de upsert
+
+El comando MERGE combina las operaciones INSERT y UPDATE en una sola sentencia, permitiendo insertar nuevas filas o actualizar filas existentes en función de una condición.
+
+### Sintaxis básica
+
+```sql
+-- Sintaxis básica
+MERGE INTO tabla_destino dest
+USING tabla_origen orig
+ON (condición_de_coincidencia)
+WHEN MATCHED THEN
+    UPDATE SET columna1 = valor1, columna2 = valor2, ...
+    [WHERE condición_update]
+    [DELETE WHERE condición_delete]
+WHEN NOT MATCHED THEN
+    INSERT (columna1, columna2, ...)
+    VALUES (valor1, valor2, ...)
+    [WHERE condición_insert];
+```
+
+### Ejemplo práctico
+
+```sql
+-- Actualizar inventario desde tabla de envíos
+MERGE INTO inventario i
+USING envios e
+ON (i.producto_id = e.producto_id)
+WHEN MATCHED THEN
+    UPDATE SET i.cantidad = i.cantidad + e.cantidad,
+               i.ultima_actualizacion = SYSDATE
+    WHERE e.fecha_envio > i.ultima_actualizacion
+WHEN NOT MATCHED THEN
+    INSERT (producto_id, cantidad, ultima_actualizacion)
+    VALUES (e.producto_id, e.cantidad, SYSDATE)
+    WHERE e.cantidad > 0;
+```
+
+### Casos de uso comunes para MERGE
+
+<Steps>
+  1. **Sincronización de datos**
+     - Actualizar una tabla de destino con datos de una tabla de origen, insertando nuevos registros y actualizando los existentes
+  
+  2. **Carga de datos ETL**
+     - Procesos de extracción, transformación y carga donde se necesita actualizar datos existentes e insertar nuevos
+  
+  3. **Actualización de tablas de dimensiones**
+     - En almacenes de datos, para mantener actualizadas las tablas de dimensiones con nuevos miembros
+  
+  4. **Procesamiento de lotes**
+     - Procesar lotes de transacciones donde algunas son nuevas y otras son actualizaciones
+</Steps>
+
+<Aside type="note">
+  A partir de Oracle 10g, el comando MERGE también puede incluir una cláusula DELETE para eliminar filas que coincidan con ciertos criterios después de la actualización.
+</Aside>
+
+## Consultas básicas con SELECT
+
+El comando SELECT se utiliza para recuperar datos de una o más tablas.
+
+### Sintaxis básica
+
+```sql
+-- Sintaxis básica
+SELECT [DISTINCT] columna1, columna2, ...
+FROM tabla
+[WHERE condición]
+[GROUP BY columnas]
+[HAVING condición_grupo]
+[ORDER BY columnas [ASC|DESC]];
+
+-- Ejemplo simple
+SELECT empleado_id, nombre, apellido, salario
+FROM empleados
+WHERE departamento_id = 10
+ORDER BY salario DESC;
+```
+
+### Proyección: Selección de columnas
+
+```sql
+-- Seleccionar todas las columnas
+SELECT * FROM empleados;
+
+-- Seleccionar columnas específicas
+SELECT nombre, apellido, email FROM empleados;
+
+-- Columnas calculadas
+SELECT 
+    nombre,
+    salario,
+    salario * 1.1 AS nuevo_salario,
+    salario * 12 AS salario_anual
+FROM empleados;
+
+-- Concatenación de columnas
+SELECT 
+    empleado_id,
+    nombre || ' ' || apellido AS nombre_completo,
+    'Empleado: ' || nombre AS descripcion
+FROM empleados;
+```
+
+### Filtrado: Cláusula WHERE
+
+<Tabs>
+  <TabItem label="Operadores de comparación">
+    ```sql
+    -- Igualdad
+    SELECT * FROM empleados WHERE departamento_id = 20;
+    
+    -- Desigualdad
+    SELECT * FROM empleados WHERE salario > 5000;
+    
+    -- Rango
+    SELECT * FROM empleados WHERE salario BETWEEN 3000 AND 6000;
+    
+    -- Lista de valores
+    SELECT * FROM empleados WHERE departamento_id IN (10, 20, 30);
+    
+    -- Patrones
+    SELECT * FROM empleados WHERE nombre LIKE 'J%';
+    ```
+  </TabItem>
+  
+  <TabItem label="Operadores lógicos">
+    ```sql
+    -- AND
+    SELECT * FROM empleados 
+    WHERE departamento_id = 20 AND salario > 5000;
+    
+    -- OR
+    SELECT * FROM empleados 
+    WHERE departamento_id = 10 OR departamento_id = 20;
+    
+    -- NOT
+    SELECT * FROM empleados 
+    WHERE NOT (departamento_id = 30);
+    
+    -- Combinación
+    SELECT * FROM empleados 
+    WHERE (departamento_id = 10 OR departamento_id = 20) 
+    AND salario > 5000;
+    ```
+  </TabItem>
+  
+  <TabItem label="Valores NULL">
+    ```sql
+    -- Buscar valores NULL
+    SELECT * FROM empleados WHERE comision IS NULL;
+    
+    -- Buscar valores no NULL
+    SELECT * FROM empleados WHERE comision IS NOT NULL;
+    ```
+  </TabItem>
+</Tabs>
+
+### Ordenamiento: Cláusula ORDER BY
+
+```sql
+-- Ordenar por una columna ascendente (predeterminado)
+SELECT * FROM empleados ORDER BY apellido;
+
+-- Ordenar por una columna descendente
+SELECT * FROM empleados ORDER BY salario DESC;
+
+-- Ordenar por múltiples columnas
+SELECT * FROM empleados 
+ORDER BY departamento_id, salario DESC;
+
+-- Ordenar por posición de columna
+SELECT empleado_id, nombre, apellido FROM empleados
+ORDER BY 3; -- Ordena por la tercera columna (apellido)
+
+-- Ordenar por expresión
+SELECT empleado_id, nombre, salario FROM empleados
+ORDER BY salario * 12 DESC;
+```
+
+### Eliminación de duplicados: DISTINCT
+
+```sql
+-- Eliminar valores duplicados
+SELECT DISTINCT departamento_id FROM empleados;
+
+-- DISTINCT con múltiples columnas
+SELECT DISTINCT departamento_id, puesto FROM empleados;
+```
+
+### Funciones de fila
+
+<Tabs>
+  <TabItem label="Funciones de caracteres">
+    ```sql
+    -- Mayúsculas y minúsculas
+    SELECT 
+        UPPER(nombre) AS nombre_mayusculas,
+        LOWER(email) AS email_minusculas,
+        INITCAP(apellido) AS apellido_capitalizado
+    FROM empleados;
+    
+    -- Manipulación de cadenas
+    SELECT 
+        SUBSTR(nombre, 1, 3) AS iniciales,
+        LENGTH(nombre) AS longitud_nombre,
+        REPLACE(email, '@ejemplo.com', '@nuevaempresa.com') AS nuevo_email,
+        LPAD(empleado_id, 5, '0') AS id_formateado
+    FROM empleados;
+    ```
+  </TabItem>
+  
+  <TabItem label="Funciones numéricas">
+    ```sql
+    -- Redondeo
+    SELECT 
+        salario,
+        ROUND(salario, -2) AS redondeado_centenas,
+        TRUNC(salario, -3) AS truncado_miles,
+        CEIL(salario) AS techo,
+        FLOOR(salario) AS piso
+    FROM empleados;
+    
+    -- Matemáticas
+    SELECT 
+        ABS(-salario) AS valor_absoluto,
+        POWER(salario, 2) AS salario_cuadrado,
+        SQRT(salario) AS raiz_cuadrada,
+        MOD(salario, 1000) AS resto
+    FROM empleados;
+    ```
+  </TabItem>
+  
+  <TabItem label="Funciones de fecha">
+    ```sql
+    -- Operaciones con fechas
+    SELECT 
+        fecha_contratacion,
+        ADD_MONTHS(fecha_contratacion, 6) AS revision_semestral,
+        ADD_MONTHS(fecha_contratacion, 12) AS revision_anual,
+        LAST_DAY(fecha_contratacion) AS fin_de_mes,
+        NEXT_DAY(fecha_contratacion, 'LUNES') AS proximo_lunes
+    FROM empleados;
+    
+    -- Diferencias entre fechas
+    SELECT 
+        fecha_contratacion,
+        SYSDATE AS fecha_actual,
+        ROUND(MONTHS_BETWEEN(SYSDATE, fecha_contratacion)) AS meses_antiguedad,
+        ROUND((SYSDATE - fecha_contratacion) / 365) AS años_antiguedad
+    FROM empleados;
+    ```
+  </TabItem>
+  
+  <TabItem label="Funciones de conversión">
+    ```sql
+    -- Conversión de tipos
+    SELECT 
+        TO_CHAR(fecha_contratacion, 'DD/MM/YYYY') AS fecha_formato_es,
+        TO_CHAR(fecha_contratacion, 'Month DD, YYYY') AS fecha_larga,
+        TO_CHAR(salario, '$999,999.99') AS salario_formateado,
+        TO_DATE('01-01-2023', 'DD-MM-YYYY') AS fecha_convertida,
+        TO_NUMBER('1,234.56', '9,999.99') AS numero_convertido
+    FROM empleados;
+    ```
+  </TabItem>
+</Tabs>
+
+### Funciones de grupo y agregación
+
+```sql
+-- Funciones de agregación básicas
+SELECT 
+    COUNT(*) AS total_empleados,
+    COUNT(comision) AS empleados_con_comision,
+    SUM(salario) AS suma_salarios,
+    AVG(salario) AS promedio_salario,
+    MIN(salario) AS salario_minimo,
+    MAX(salario) AS salario_maximo,
+    STDDEV(salario) AS desviacion_estandar
+FROM empleados;
+
+-- Agrupación
+SELECT 
+    departamento_id,
+    COUNT(*) AS num_empleados,
+    AVG(salario) AS salario_promedio
+FROM empleados
+GROUP BY departamento_id
+ORDER BY departamento_id;
+
+-- Filtrado de grupos con HAVING
+SELECT 
+    departamento_id,
+    COUNT(*) AS num_empleados,
+    AVG(salario) AS salario_promedio
+FROM empleados
+GROUP BY departamento_id
+HAVING COUNT(*) > 5 AND AVG(salario) > 3000
+ORDER BY salario_promedio DESC;
+```
+
+## Transacciones en DML
+
+Las transacciones son unidades lógicas de trabajo que agrupan una o más operaciones DML.
+
+### Control de transacciones
+
+```sql
+-- Iniciar una transacción (implícito en Oracle)
+-- Realizar operaciones DML
+INSERT INTO departamentos (departamento_id, nombre) VALUES (50, 'Marketing');
+INSERT INTO empleados (empleado_id, nombre, apellido, departamento_id) VALUES (201, 'Ana', 'García', 50);
+UPDATE empleados SET salario = 4000 WHERE empleado_id = 201;
+
+-- Confirmar los cambios
+COMMIT;
+
+-- O revertir los cambios
+-- ROLLBACK;
+```
+
+### Puntos de guardado (Savepoints)
+
+```sql
+-- Iniciar transacción
+INSERT INTO departamentos (departamento_id, nombre) VALUES (60, 'Investigación');
+
+-- Crear un punto de guardado
+SAVEPOINT sp1;
+
+INSERT INTO empleados (empleado_id, nombre, apellido, departamento_id) VALUES (202, 'Carlos', 'Ruiz', 60);
+
+-- Crear otro punto de guardado
+SAVEPOINT sp2;
+
+UPDATE empleados SET salario = 5000 WHERE empleado_id = 202;
+
+-- Revertir hasta el punto de guardado sp2
+ROLLBACK TO SAVEPOINT sp2;
+
+-- Confirmar los cambios restantes
+COMMIT;
+```
+
+<Aside type="tip">
+  Las transacciones en Oracle siguen las propiedades ACID (Atomicidad, Consistencia, Aislamiento y Durabilidad), lo que garantiza la integridad de los datos incluso en caso de fallos del sistema.
+</Aside>
+
+## Mejores prácticas para DML
+
+<Steps>
+  1. **Usar transacciones adecuadamente**
+     - Agrupe operaciones relacionadas en una sola transacción
+     - Mantenga las transacciones lo más cortas posible para evitar bloqueos prolongados
+     - Confirme (COMMIT) o revierta (ROLLBACK) explícitamente las transacciones
+  
+  2. **Optimizar operaciones masivas**
+     - Use INSERT con múltiples filas o INSERT ... SELECT para inserciones masivas
+     - Considere deshabilitar temporalmente índices y restricciones para cargas masivas
+     - Use MERGE para operaciones de upsert en lugar de lógica personalizada
+  
+  3. **Validar condiciones WHERE**
+     - Siempre verifique las condiciones WHERE en UPDATE y DELETE
+     - Considere probar primero con un SELECT para verificar qué filas se verán afectadas
+     - Use transacciones para poder revertir cambios no deseados
+  
+  4. **Manejar errores adecuadamente**
+     - Implemente manejo de excepciones en bloques PL/SQL
+     - Registre errores y realice acciones de recuperación cuando sea posible
+     - Considere usar savepoints para recuperación parcial
+  
+  5. **Considerar el rendimiento**
+     - Evite subconsultas innecesarias en cláusulas WHERE
+     - Use índices apropiados para mejorar el rendimiento de las consultas
+     - Monitoree y optimice consultas lentas
+</Steps>

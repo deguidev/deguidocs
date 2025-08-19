@@ -1,0 +1,683 @@
+---
+title: 12. Objetos Avanzados de Base de Datos
+description: Aprende sobre triggers, secuencias, índices y otros objetos avanzados en Oracle
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## Triggers (disparadores)
+
+Los triggers o disparadores son objetos de base de datos que se ejecutan automáticamente en respuesta a ciertos eventos sobre una tabla o vista. Permiten implementar reglas de negocio complejas, mantener la integridad de los datos y automatizar tareas.
+
+### ¿Qué son los triggers?
+
+Un trigger es un bloque de código PL/SQL asociado a una tabla o vista que se activa automáticamente cuando ocurre un evento específico, como una operación INSERT, UPDATE o DELETE.
+
+<Aside type="note">
+  Los triggers son una herramienta poderosa para implementar reglas de negocio y restricciones complejas que no pueden expresarse fácilmente con restricciones declarativas como PRIMARY KEY o FOREIGN KEY.
+</Aside>
+
+### Tipos de triggers
+
+#### Por nivel de ejecución
+
+<Tabs>
+  <TabItem label="Trigger de fila">
+    Se ejecuta una vez por cada fila afectada por la operación desencadenante.
+    
+    ```sql
+    CREATE OR REPLACE TRIGGER tr_actualizar_stock
+    AFTER INSERT ON pedidos_detalle
+    FOR EACH ROW -- Trigger de fila
+    BEGIN
+        -- Actualizar el stock por cada fila insertada
+        UPDATE productos
+        SET stock = stock - :NEW.cantidad
+        WHERE producto_id = :NEW.producto_id;
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="Trigger de sentencia">
+    Se ejecuta una sola vez por cada sentencia SQL, independientemente del número de filas afectadas.
+    
+    ```sql
+    CREATE OR REPLACE TRIGGER tr_log_cambios_empleados
+    AFTER UPDATE ON empleados
+    -- Sin cláusula FOR EACH ROW, es un trigger de sentencia
+    BEGIN
+        -- Registrar que se realizó una actualización en la tabla empleados
+        INSERT INTO log_operaciones (tabla, operacion, fecha, usuario)
+        VALUES ('EMPLEADOS', 'UPDATE', SYSDATE, USER);
+    END;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+#### Por momento de ejecución
+
+<Tabs>
+  <TabItem label="BEFORE">
+    Se ejecuta antes de que ocurra la operación desencadenante. Útil para validar o modificar datos antes de que se guarden.
+    
+    ```sql
+    CREATE OR REPLACE TRIGGER tr_validar_precio
+    BEFORE INSERT OR UPDATE OF precio ON productos
+    FOR EACH ROW
+    BEGIN
+        -- Validar que el precio no sea negativo
+        IF :NEW.precio < 0 THEN
+            :NEW.precio := 0; -- Corregir el valor antes de insertar/actualizar
+        END IF;
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="AFTER">
+    Se ejecuta después de que ocurra la operación desencadenante. Útil para acciones de seguimiento o cascada.
+    
+    ```sql
+    CREATE OR REPLACE TRIGGER tr_actualizar_total_pedido
+    AFTER INSERT OR UPDATE OR DELETE ON pedidos_detalle
+    FOR EACH ROW
+    BEGIN
+        -- Actualizar el total del pedido después de modificar sus detalles
+        UPDATE pedidos p
+        SET total = (SELECT SUM(cantidad * precio) 
+                     FROM pedidos_detalle 
+                     WHERE pedido_id = p.pedido_id)
+        WHERE pedido_id = CASE
+                           WHEN INSERTING OR UPDATING THEN :NEW.pedido_id
+                           WHEN DELETING THEN :OLD.pedido_id
+                         END;
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="INSTEAD OF">
+    Se utiliza solo con vistas y reemplaza la operación desencadenante por el código del trigger.
+    
+    ```sql
+    -- Vista que combina datos de dos tablas
+    CREATE OR REPLACE VIEW empleados_departamentos AS
+    SELECT e.empleado_id, e.nombre, e.salario, d.nombre AS departamento
+    FROM empleados e
+    JOIN departamentos d ON e.departamento_id = d.departamento_id;
+    
+    -- Trigger para permitir inserción en la vista
+    CREATE OR REPLACE TRIGGER tr_insertar_empleado_dept
+    INSTEAD OF INSERT ON empleados_departamentos
+    FOR EACH ROW
+    DECLARE
+        v_dept_id departamentos.departamento_id%TYPE;
+    BEGIN
+        -- Buscar el ID del departamento
+        SELECT departamento_id INTO v_dept_id
+        FROM departamentos
+        WHERE nombre = :NEW.departamento;
+        
+        -- Insertar en la tabla empleados
+        INSERT INTO empleados (empleado_id, nombre, salario, departamento_id)
+        VALUES (:NEW.empleado_id, :NEW.nombre, :NEW.salario, v_dept_id);
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE_APPLICATION_ERROR(-20001, 'Departamento no encontrado');
+    END;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+#### Por evento desencadenante
+
+<Tabs>
+  <TabItem label="INSERT">
+    Se activa cuando se insertan nuevas filas.
+    
+    ```sql
+    CREATE OR REPLACE TRIGGER tr_nuevo_cliente
+    AFTER INSERT ON clientes
+    FOR EACH ROW
+    BEGIN
+        -- Enviar mensaje de bienvenida al nuevo cliente
+        INSERT INTO mensajes_clientes (cliente_id, mensaje, fecha)
+        VALUES (:NEW.cliente_id, 'Bienvenido a nuestra plataforma', SYSDATE);
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="UPDATE">
+    Se activa cuando se actualizan filas existentes.
+    
+    ```sql
+    CREATE OR REPLACE TRIGGER tr_cambio_salario
+    AFTER UPDATE OF salario ON empleados
+    FOR EACH ROW
+    BEGIN
+        -- Registrar el cambio de salario
+        INSERT INTO historial_salarios (
+            empleado_id, salario_anterior, salario_nuevo, fecha_cambio, usuario
+        ) VALUES (
+            :NEW.empleado_id, :OLD.salario, :NEW.salario, SYSDATE, USER
+        );
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="DELETE">
+    Se activa cuando se eliminan filas.
+    
+    ```sql
+    CREATE OR REPLACE TRIGGER tr_eliminar_empleado
+    BEFORE DELETE ON empleados
+    FOR EACH ROW
+    BEGIN
+        -- Archivar datos del empleado antes de eliminar
+        INSERT INTO empleados_eliminados (
+            empleado_id, nombre, salario, departamento_id, fecha_eliminacion
+        ) VALUES (
+            :OLD.empleado_id, :OLD.nombre, :OLD.salario, 
+            :OLD.departamento_id, SYSDATE
+        );
+    END;
+    /
+    ```
+  </TabItem>
+  
+  <TabItem label="Múltiples eventos">
+    Se activa con cualquiera de los eventos especificados.
+    
+    ```sql
+    CREATE OR REPLACE TRIGGER tr_auditoria_productos
+    AFTER INSERT OR UPDATE OR DELETE ON productos
+    FOR EACH ROW
+    BEGIN
+        IF INSERTING THEN
+            INSERT INTO auditoria (tabla, operacion, id, usuario, fecha)
+            VALUES ('PRODUCTOS', 'INSERT', :NEW.producto_id, USER, SYSDATE);
+        ELSIF UPDATING THEN
+            INSERT INTO auditoria (tabla, operacion, id, usuario, fecha)
+            VALUES ('PRODUCTOS', 'UPDATE', :NEW.producto_id, USER, SYSDATE);
+        ELSIF DELETING THEN
+            INSERT INTO auditoria (tabla, operacion, id, usuario, fecha)
+            VALUES ('PRODUCTOS', 'DELETE', :OLD.producto_id, USER, SYSDATE);
+        END IF;
+    END;
+    /
+    ```
+  </TabItem>
+</Tabs>
+
+### Predicados condicionales
+
+En triggers que manejan múltiples eventos, se pueden usar los predicados INSERTING, UPDATING y DELETING para determinar qué evento activó el trigger.
+
+```sql
+CREATE OR REPLACE TRIGGER tr_control_inventario
+AFTER INSERT OR UPDATE OR DELETE ON pedidos_detalle
+FOR EACH ROW
+BEGIN
+    IF INSERTING THEN
+        -- Reducir stock al crear un nuevo detalle de pedido
+        UPDATE productos
+        SET stock = stock - :NEW.cantidad
+        WHERE producto_id = :NEW.producto_id;
+    ELSIF UPDATING THEN
+        -- Ajustar stock al modificar un detalle de pedido
+        UPDATE productos
+        SET stock = stock + :OLD.cantidad - :NEW.cantidad
+        WHERE producto_id = :NEW.producto_id;
+    ELSIF DELETING THEN
+        -- Aumentar stock al eliminar un detalle de pedido
+        UPDATE productos
+        SET stock = stock + :OLD.cantidad
+        WHERE producto_id = :OLD.producto_id;
+    END IF;
+END;
+/
+```
+
+### Variables de correlación
+
+En los triggers de fila, se pueden usar las variables de correlación `:NEW` y `:OLD` para acceder a los valores de la fila antes y después de la operación.
+
+| Variable | Descripción | INSERT | UPDATE | DELETE |
+|----------|-------------|--------|--------|--------|
+| :NEW | Nuevos valores de la fila | Disponible | Disponible | No disponible |
+| :OLD | Valores anteriores de la fila | No disponible | Disponible | Disponible |
+
+### Cláusula WHEN
+
+Permite especificar una condición adicional para la activación del trigger.
+
+```sql
+CREATE OR REPLACE TRIGGER tr_alerta_stock_bajo
+AFTER UPDATE OF stock ON productos
+FOR EACH ROW
+WHEN (NEW.stock < NEW.stock_minimo)
+BEGIN
+    -- Generar alerta solo cuando el stock cae por debajo del mínimo
+    INSERT INTO alertas (producto_id, mensaje, fecha)
+    VALUES (:NEW.producto_id, 'Stock por debajo del mínimo', SYSDATE);
+END;
+/
+```
+
+### Gestión de triggers
+
+```sql
+--- Ver todos los triggers del esquema actual
+SELECT trigger_name, trigger_type, triggering_event, table_name, status
+FROM user_triggers;
+
+--- Deshabilitar un trigger
+ALTER TRIGGER tr_actualizar_stock DISABLE;
+
+--- Habilitar un trigger
+ALTER TRIGGER tr_actualizar_stock ENABLE;
+
+--- Deshabilitar todos los triggers de una tabla
+ALTER TABLE pedidos_detalle DISABLE ALL TRIGGERS;
+
+--- Habilitar todos los triggers de una tabla
+ALTER TABLE pedidos_detalle ENABLE ALL TRIGGERS;
+
+--- Eliminar un trigger
+DROP TRIGGER tr_actualizar_stock;
+```
+
+### Mejores prácticas para el uso de triggers
+
+1. **Mantener los triggers simples**: Evitar lógica compleja que pueda afectar el rendimiento.
+2. **Documentar claramente**: Incluir comentarios que expliquen el propósito y comportamiento del trigger.
+3. **Evitar triggers en cascada**: Limitar situaciones donde un trigger activa otro trigger.
+4. **Manejar excepciones**: Incluir manejo de errores adecuado para evitar fallos en la transacción.
+5. **Considerar el rendimiento**: Recordar que los triggers se ejecutan por cada operación, lo que puede afectar el rendimiento en operaciones masivas.
+6. **Evitar operaciones DML recursivas**: Tener cuidado con triggers que realizan operaciones DML sobre la misma tabla que los activó.
+
+<Aside type="caution">
+  Los triggers pueden hacer que el comportamiento de la base de datos sea menos predecible y más difícil de depurar. Use triggers solo cuando sea necesario y considere alternativas como restricciones declarativas o procedimientos almacenados cuando sea posible.
+</Aside>
+
+### Casos de uso comunes para triggers
+
+1. **Auditoría**: Registrar quién realizó cambios en los datos y cuándo.
+2. **Validación de datos**: Aplicar reglas de negocio complejas que no pueden implementarse con restricciones estándar.
+3. **Valores derivados**: Calcular automáticamente valores basados en otros campos.
+4. **Integridad referencial**: Implementar reglas de integridad más complejas que las restricciones de clave foránea estándar.
+5. **Replicación**: Mantener datos sincronizados entre tablas o bases de datos.
+6. **Notificaciones**: Generar alertas o notificaciones basadas en cambios en los datos.
+
+### Ejemplo completo: Sistema de auditoría
+
+```sql
+--- Tabla para almacenar registros de auditoría
+CREATE TABLE auditoria_datos (
+    auditoria_id NUMBER PRIMARY KEY,
+    tabla VARCHAR2(30),
+    operacion VARCHAR2(10),
+    id_registro NUMBER,
+    columna_modificada VARCHAR2(30),
+    valor_antiguo VARCHAR2(4000),
+    valor_nuevo VARCHAR2(4000),
+    usuario VARCHAR2(30),
+    fecha_hora TIMESTAMP,
+    terminal VARCHAR2(50)
+);
+
+--- Secuencia para la tabla de auditoría
+CREATE SEQUENCE seq_auditoria_id START WITH 1 INCREMENT BY 1;
+
+--- Trigger para auditar cambios en la tabla EMPLEADOS
+CREATE OR REPLACE TRIGGER tr_auditoria_empleados
+AFTER INSERT OR UPDATE OR DELETE ON empleados
+FOR EACH ROW
+DECLARE
+    v_operacion VARCHAR2(10);
+    v_terminal VARCHAR2(50);
+BEGIN
+    -- Determinar la operación realizada
+    IF INSERTING THEN
+        v_operacion := 'INSERT';
+    ELSIF UPDATING THEN
+        v_operacion := 'UPDATE';
+    ELSIF DELETING THEN
+        v_operacion := 'DELETE';
+    END IF;
+    
+    -- Obtener información del terminal
+    SELECT SYS_CONTEXT('USERENV', 'TERMINAL') INTO v_terminal FROM dual;
+    
+    -- Auditar cambios en columnas específicas
+    IF INSERTING OR UPDATING THEN
+        -- Auditar cambios en el nombre
+        IF UPDATING AND :OLD.nombre != :NEW.nombre OR INSERTING THEN
+            INSERT INTO auditoria_datos VALUES (
+                seq_auditoria_id.NEXTVAL,
+                'EMPLEADOS',
+                v_operacion,
+                :NEW.empleado_id,
+                'NOMBRE',
+                CASE WHEN UPDATING THEN :OLD.nombre ELSE NULL END,
+                :NEW.nombre,
+                USER,
+                SYSTIMESTAMP,
+                v_terminal
+            );
+        END IF;
+        
+        -- Auditar cambios en el salario
+        IF UPDATING AND :OLD.salario != :NEW.salario OR INSERTING THEN
+            INSERT INTO auditoria_datos VALUES (
+                seq_auditoria_id.NEXTVAL,
+                'EMPLEADOS',
+                v_operacion,
+                :NEW.empleado_id,
+                'SALARIO',
+                CASE WHEN UPDATING THEN TO_CHAR(:OLD.salario) ELSE NULL END,
+                TO_CHAR(:NEW.salario),
+                USER,
+                SYSTIMESTAMP,
+                v_terminal
+            );
+        END IF;
+    ELSIF DELETING THEN
+        -- Registrar eliminación de empleado
+        INSERT INTO auditoria_datos VALUES (
+            seq_auditoria_id.NEXTVAL,
+            'EMPLEADOS',
+            v_operacion,
+            :OLD.empleado_id,
+            'REGISTRO',
+            'EMPLEADO COMPLETO',
+            NULL,
+            USER,
+            SYSTIMESTAMP,
+            v_terminal
+        );
+    END IF;
+END;
+```
+
+## Secuencias
+
+Las secuencias son objetos de base de datos que generan números enteros únicos en orden ascendente o descendente. Son comúnmente utilizadas para crear valores de clave primaria de forma automática.
+
+### ¿Qué son las secuencias?
+
+Una secuencia es un objeto de esquema que genera valores numéricos secuenciales según una especificación definida. Las secuencias simplifican la programación de aplicaciones al generar automáticamente valores únicos, eliminando la necesidad de escribir código para esta tarea.
+
+<Aside type="note">
+  Las secuencias son especialmente útiles para generar claves primarias únicas de forma automática, evitando así la necesidad de bloquear tablas durante la inserción de nuevos registros.
+</Aside>
+
+### Creación de secuencias
+
+La sintaxis básica para crear una secuencia es:
+
+```sql
+CREATE SEQUENCE nombre_secuencia
+[INCREMENT BY n]
+[START WITH n]
+[MAXVALUE n | NOMAXVALUE]
+[MINVALUE n | NOMINVALUE]
+[CYCLE | NOCYCLE]
+[CACHE n | NOCACHE]
+[ORDER | NOORDER];
+```
+
+#### Parámetros principales
+
+<Tabs>
+  <TabItem label="INCREMENT BY">
+    Define el incremento entre números consecutivos. Puede ser positivo (secuencia ascendente) o negativo (secuencia descendente).
+    
+    ```sql
+    -- Secuencia que incrementa de 10 en 10
+    CREATE SEQUENCE seq_decenas
+    INCREMENT BY 10
+    START WITH 10;
+    ```
+  </TabItem>
+  
+  <TabItem label="START WITH">
+    Define el primer valor que generará la secuencia.
+    
+    ```sql
+    -- Secuencia que comienza en 1000
+    CREATE SEQUENCE seq_facturas
+    START WITH 1000;
+    ```
+  </TabItem>
+  
+  <TabItem label="MAXVALUE/NOMAXVALUE">
+    Define el valor máximo que puede alcanzar la secuencia. NOMAXVALUE permite que la secuencia alcance el máximo valor permitido por Oracle.
+    
+    ```sql
+    -- Secuencia con valor máximo definido
+    CREATE SEQUENCE seq_limitada
+    MAXVALUE 9999;
+    ```
+  </TabItem>
+  
+  <TabItem label="MINVALUE/NOMINVALUE">
+    Define el valor mínimo que puede alcanzar la secuencia. NOMINVALUE permite que la secuencia alcance el mínimo valor permitido por Oracle.
+    
+    ```sql
+    -- Secuencia con valor mínimo definido
+    CREATE SEQUENCE seq_numeracion
+    MINVALUE 1;
+    ```
+  </TabItem>
+  
+  <TabItem label="CYCLE/NOCYCLE">
+    Determina si la secuencia debe reiniciarse cuando alcanza su valor máximo (CYCLE) o generar un error (NOCYCLE).
+    
+    ```sql
+    -- Secuencia cíclica que se reinicia al llegar a 100
+    CREATE SEQUENCE seq_ciclica
+    MAXVALUE 100
+    CYCLE;
+    ```
+  </TabItem>
+  
+  <TabItem label="CACHE/NOCACHE">
+    Especifica cuántos valores de secuencia Oracle preasigna y mantiene en memoria para acceso rápido. NOCACHE deshabilita el almacenamiento en caché.
+    
+    ```sql
+    -- Secuencia con caché de 50 valores
+    CREATE SEQUENCE seq_pedidos
+    CACHE 50;
+    ```
+  </TabItem>
+  
+  <TabItem label="ORDER/NOORDER">
+    Garantiza que los valores se generan en el orden de las solicitudes (ORDER) o no (NOORDER). ORDER es importante en entornos RAC (Real Application Clusters).
+    
+    ```sql
+    -- Secuencia que garantiza orden estricto
+    CREATE SEQUENCE seq_transacciones
+    ORDER;
+    ```
+  </TabItem>
+</Tabs>
+
+### Uso de secuencias
+
+Para obtener el siguiente valor de una secuencia, se utiliza la pseudocolumna `NEXTVAL`. Para obtener el valor actual (el último valor generado en la sesión actual), se utiliza `CURRVAL`.
+
+```sql
+-- Obtener el siguiente valor
+SELECT seq_empleados.NEXTVAL FROM dual;
+
+-- Obtener el valor actual
+SELECT seq_empleados.CURRVAL FROM dual;
+```
+
+#### Uso en instrucciones INSERT
+
+```sql
+-- Insertar un nuevo empleado con ID generado automáticamente
+INSERT INTO empleados (empleado_id, nombre, salario)
+VALUES (seq_empleados.NEXTVAL, 'Juan Pérez', 3000);
+```
+
+#### Uso en instrucciones SELECT
+
+```sql
+-- Asignar números secuenciales a resultados de consulta
+SELECT seq_numeracion.NEXTVAL AS num, nombre
+FROM empleados;
+```
+
+### Gestión de secuencias
+
+```sql
+-- Ver todas las secuencias del esquema actual
+SELECT sequence_name, min_value, max_value, increment_by, last_number, cache_size, cycle_flag
+FROM user_sequences;
+
+-- Modificar una secuencia existente
+ALTER SEQUENCE seq_empleados
+INCREMENT BY 5
+MAXVALUE 10000
+NOCACHE;
+
+-- Eliminar una secuencia
+DROP SEQUENCE seq_empleados;
+```
+
+### Consideraciones importantes
+
+1. **Huecos en la secuencia**: Pueden producirse huecos en los valores generados debido a rollbacks de transacciones, fallos del sistema o valores almacenados en caché que no se utilizan.
+
+2. **Rendimiento**: El uso de CACHE mejora significativamente el rendimiento al reducir los accesos al diccionario de datos.
+
+3. **Concurrencia**: Las secuencias están diseñadas para entornos de alta concurrencia, ya que no requieren bloqueos para generar nuevos valores.
+
+4. **Valores no recuperables**: Una vez que se genera un valor de secuencia, no se puede recuperar, incluso si la transacción que lo utilizó se revierte.
+
+<Aside type="caution">
+  En entornos RAC (Real Application Clusters), considere usar la opción ORDER si necesita garantizar que los valores se asignen en el orden estricto de las solicitudes, aunque esto puede afectar al rendimiento.
+</Aside>
+
+### Ejemplo práctico: Sistema de facturación
+
+```sql
+-- Crear una secuencia para números de factura
+CREATE SEQUENCE seq_num_factura
+START WITH 10000
+INCREMENT BY 1
+MINVALUE 10000
+MAXVALUE 999999
+NOCYCLE
+CACHE 20;
+
+-- Procedimiento para generar una nueva factura
+CREATE OR REPLACE PROCEDURE crear_factura (
+    p_cliente_id IN NUMBER,
+    p_fecha IN DATE,
+    p_factura_id OUT NUMBER
+) AS
+BEGIN
+    -- Obtener nuevo número de factura
+    SELECT seq_num_factura.NEXTVAL INTO p_factura_id FROM dual;
+    
+    -- Crear la factura con el ID generado
+    INSERT INTO facturas (
+        factura_id,
+        cliente_id,
+        fecha,
+        estado
+    ) VALUES (
+        p_factura_id,
+        p_cliente_id,
+        p_fecha,
+        'PENDIENTE'
+    );
+    
+    -- Registrar la creación de la factura
+    INSERT INTO log_sistema (mensaje)
+    VALUES ('Factura ' || p_factura_id || ' creada para cliente ' || p_cliente_id);
+    
+    COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END;
+/
+
+-- Ejemplo de uso del procedimiento
+DECLARE
+    v_factura_id NUMBER;
+BEGIN
+    crear_factura(101, SYSDATE, v_factura_id);
+    DBMS_OUTPUT.PUT_LINE('Factura creada con ID: ' || v_factura_id);
+END;
+/
+```
+
+### Secuencias vs. Identity Columns
+
+Desde Oracle 12c, se introdujo la funcionalidad de columnas de identidad (IDENTITY COLUMNS) como una alternativa a las secuencias tradicionales.
+
+<Tabs>
+  <TabItem label="Secuencia tradicional">
+    ```sql
+    -- Crear secuencia
+    CREATE SEQUENCE seq_productos START WITH 1;
+    
+    -- Crear tabla que usa la secuencia
+    CREATE TABLE productos (
+        producto_id NUMBER PRIMARY KEY,
+        nombre VARCHAR2(100),
+        precio NUMBER(10,2)
+    );
+    
+    -- Insertar usando la secuencia
+    INSERT INTO productos (producto_id, nombre, precio)
+    VALUES (seq_productos.NEXTVAL, 'Laptop', 1200);
+    ```
+  </TabItem>
+  
+  <TabItem label="Columna de identidad">
+    ```sql
+    -- Crear tabla con columna de identidad
+    CREATE TABLE productos (
+        producto_id NUMBER GENERATED ALWAYS AS IDENTITY,
+        nombre VARCHAR2(100),
+        precio NUMBER(10,2),
+        CONSTRAINT pk_productos PRIMARY KEY (producto_id)
+    );
+    
+    -- Insertar sin especificar el ID (se genera automáticamente)
+    INSERT INTO productos (nombre, precio)
+    VALUES ('Laptop', 1200);
+    ```
+  </TabItem>
+</Tabs>
+
+#### Comparación
+
+| Característica | Secuencias | Columnas de identidad |
+|----------------|------------|------------------------|
+| Independencia | Objeto independiente de la tabla | Vinculada directamente a la tabla |
+| Reutilización | Puede usarse en múltiples tablas | Específica para una columna |
+| Control | Mayor control sobre la generación de valores | Configuración más simple |
+| Sintaxis INSERT | Requiere NEXTVAL explícito | No requiere especificar la columna |
+| Personalización | Altamente personalizable | Opciones más limitadas |
+
+<Aside type="tip">
+  Para aplicaciones nuevas en Oracle 12c o superior, considere usar columnas de identidad para simplificar el código. Para aplicaciones que requieren mayor control o compatibilidad con versiones anteriores, las secuencias tradicionales siguen siendo la mejor opción.
+</Aside>

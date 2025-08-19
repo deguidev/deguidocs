@@ -1,0 +1,977 @@
+---
+title: 9. Funciones Oracle
+description: Aprende las funciones de Oracle Database
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## Introducción a las funciones de Oracle
+
+Las funciones en Oracle Database son bloques de código predefinidos que realizan operaciones específicas y devuelven un valor. Estas funciones son herramientas esenciales para manipular datos, realizar cálculos y transformar información dentro de consultas SQL. Oracle proporciona una amplia variedad de funciones integradas que facilitan el procesamiento de diferentes tipos de datos.
+
+### Categorías principales de funciones
+
+- **Funciones de cadena**: Manipulan datos de tipo texto
+- **Funciones numéricas**: Realizan operaciones matemáticas
+- **Funciones de fecha y hora**: Manipulan y calculan valores temporales
+- **Funciones de conversión**: Transforman datos de un tipo a otro
+- **Funciones de grupo**: Realizan cálculos sobre conjuntos de filas
+- **Funciones analíticas**: Realizan cálculos sobre particiones de datos
+
+<Aside type="tip">
+  El dominio de las funciones de Oracle es fundamental para escribir consultas SQL eficientes y expresivas. Conocer las funciones adecuadas puede simplificar significativamente el código y mejorar el rendimiento.
+</Aside>
+
+## Funciones de cadenas
+
+Las funciones de cadena en Oracle permiten manipular datos de tipo VARCHAR2, CHAR, CLOB, NVARCHAR2, NCHAR y NCLOB.
+
+### UPPER, LOWER e INITCAP
+
+Estas funciones modifican la capitalización de las cadenas de texto.
+
+```sql
+-- UPPER: Convierte una cadena a mayúsculas
+SELECT UPPER('Oracle Database') FROM dual;
+-- Resultado: ORACLE DATABASE
+
+-- LOWER: Convierte una cadena a minúsculas
+SELECT LOWER('Oracle DATABASE') FROM dual;
+-- Resultado: oracle database
+
+-- INITCAP: Convierte la primera letra de cada palabra a mayúscula
+SELECT INITCAP('oracle database') FROM dual;
+-- Resultado: Oracle Database
+```
+
+### SUBSTR
+
+Extrae una subcadena de una cadena dada, especificando la posición de inicio y opcionalmente la longitud.
+
+```sql
+-- Sintaxis: SUBSTR(cadena, posición_inicio [, longitud])
+-- Extraer desde la posición 8, 8 caracteres
+SELECT SUBSTR('Oracle Database', 8, 8) FROM dual;
+-- Resultado: Database
+
+-- Extraer desde la posición 1, 6 caracteres
+SELECT SUBSTR('Oracle Database', 1, 6) FROM dual;
+-- Resultado: Oracle
+
+-- Posición negativa (cuenta desde el final)
+SELECT SUBSTR('Oracle Database', -8) FROM dual;
+-- Resultado: Database
+```
+
+### LENGTH
+
+Devuelve el número de caracteres en una cadena.
+
+```sql
+-- Contar caracteres en una cadena
+SELECT LENGTH('Oracle Database') FROM dual;
+-- Resultado: 15
+
+-- Uso en una consulta
+SELECT nombre, LENGTH(nombre) AS longitud 
+FROM empleados 
+WHERE LENGTH(nombre) > 10;
+```
+
+### TRIM, LTRIM y RTRIM
+
+Estas funciones eliminan caracteres específicos (por defecto espacios) del inicio, final o ambos extremos de una cadena.
+
+<Tabs>
+  <TabItem label="TRIM">
+    ```sql
+    -- Eliminar espacios de ambos extremos
+    SELECT TRIM('  Oracle Database  ') FROM dual;
+    -- Resultado: "Oracle Database"
+    
+    -- Eliminar un carácter específico
+    SELECT TRIM('O' FROM 'Oracle Database') FROM dual;
+    -- Resultado: "racle Database"
+    
+    -- Especificar posición (LEADING, TRAILING, BOTH)
+    SELECT TRIM(LEADING 'O' FROM 'Oracle Database') FROM dual;
+    -- Resultado: "racle Database"
+    
+    SELECT TRIM(TRAILING 'e' FROM 'Oracle Database') FROM dual;
+    -- Resultado: "Oracle Databas"
+    ```
+  </TabItem>
+  
+  <TabItem label="LTRIM y RTRIM">
+    ```sql
+    -- LTRIM: Eliminar caracteres del inicio (izquierda)
+    SELECT LTRIM('  Oracle Database') FROM dual;
+    -- Resultado: "Oracle Database"
+    
+    SELECT LTRIM('Oracle Database', 'Ora') FROM dual;
+    -- Resultado: "cle Database"
+    
+    -- RTRIM: Eliminar caracteres del final (derecha)
+    SELECT RTRIM('Oracle Database  ') FROM dual;
+    -- Resultado: "Oracle Database"
+    
+    SELECT RTRIM('Oracle Database', 'base') FROM dual;
+    -- Resultado: "Oracle Data"
+    ```
+  </TabItem>
+</Tabs>
+
+### CONCAT
+
+Concatena dos cadenas. Es equivalente al operador ||.
+
+```sql
+-- Concatenar dos cadenas
+SELECT CONCAT('Oracle ', 'Database') FROM dual;
+-- Resultado: "Oracle Database"
+
+-- Equivalente usando el operador ||
+SELECT 'Oracle ' || 'Database' FROM dual;
+-- Resultado: "Oracle Database"
+
+-- Concatenar múltiples cadenas
+SELECT 'Oracle ' || 'Database ' || 'Version ' || '19c' FROM dual;
+-- Resultado: "Oracle Database Version 19c"
+```
+
+### INSTR
+
+Busca la posición de una subcadena dentro de una cadena.
+
+```sql
+-- Sintaxis: INSTR(cadena, subcadena [, posición_inicio [, ocurrencia]])
+-- Buscar la primera ocurrencia
+SELECT INSTR('Oracle Database Oracle', 'Oracle') FROM dual;
+-- Resultado: 1
+
+-- Buscar desde una posición específica
+SELECT INSTR('Oracle Database Oracle', 'Oracle', 2) FROM dual;
+-- Resultado: 17
+
+-- Buscar la segunda ocurrencia
+SELECT INSTR('Oracle Database Oracle', 'Oracle', 1, 2) FROM dual;
+-- Resultado: 17
+```
+
+### Otras funciones de cadena útiles
+
+| Función | Descripción | Ejemplo |
+|---------|-------------|--------|
+| REPLACE | Reemplaza todas las ocurrencias de una subcadena | `REPLACE('Oracle DB', 'DB', 'Database')` |
+| LPAD | Rellena por la izquierda hasta una longitud | `LPAD('Oracle', 10, '*')` |
+| RPAD | Rellena por la derecha hasta una longitud | `RPAD('Oracle', 10, '*')` |
+| TRANSLATE | Reemplaza caracteres individuales | `TRANSLATE('Oracle', 'Oa', '0@')` |
+| ASCII | Devuelve el código ASCII de un carácter | `ASCII('A')` |
+| CHR | Devuelve el carácter de un código ASCII | `CHR(65)` |
+
+<Aside type="note">
+  Las funciones de cadena son sensibles a mayúsculas y minúsculas. Para búsquedas insensibles a mayúsculas/minúsculas, combine estas funciones con UPPER o LOWER.
+</Aside>
+
+## Funciones numéricas
+
+Las funciones numéricas en Oracle permiten realizar operaciones matemáticas sobre valores numéricos.
+
+### ROUND y TRUNC
+
+Estas funciones redondean o truncan números a un número específico de decimales.
+
+<Tabs>
+  <TabItem label="ROUND">
+    ```sql
+    -- Redondear a 2 decimales
+    SELECT ROUND(123.456, 2) FROM dual;
+    -- Resultado: 123.46
+    
+    -- Redondear a 0 decimales
+    SELECT ROUND(123.567) FROM dual;
+    -- Resultado: 124
+    
+    -- Redondear a negativo (unidades superiores)
+    SELECT ROUND(123.567, -1) FROM dual;
+    -- Resultado: 120
+    
+    SELECT ROUND(123.567, -2) FROM dual;
+    -- Resultado: 100
+    ```
+  </TabItem>
+  
+  <TabItem label="TRUNC">
+    ```sql
+    -- Truncar a 2 decimales
+    SELECT TRUNC(123.456, 2) FROM dual;
+    -- Resultado: 123.45
+    
+    -- Truncar a 0 decimales
+    SELECT TRUNC(123.567) FROM dual;
+    -- Resultado: 123
+    
+    -- Truncar a negativo (unidades superiores)
+    SELECT TRUNC(123.567, -1) FROM dual;
+    -- Resultado: 120
+    
+    SELECT TRUNC(123.567, -2) FROM dual;
+    -- Resultado: 100
+    ```
+  </TabItem>
+</Tabs>
+
+### MOD
+
+Devuelve el resto de una división.
+
+```sql
+-- Sintaxis: MOD(dividendo, divisor)
+SELECT MOD(10, 3) FROM dual;
+-- Resultado: 1
+
+-- Verificar si un número es par o impar
+SELECT 
+  numero,
+  CASE WHEN MOD(numero, 2) = 0 THEN 'Par' ELSE 'Impar' END AS tipo
+FROM numeros;
+```
+
+### POWER y SQRT
+
+Calculan potencias y raíces cuadradas.
+
+```sql
+-- POWER: Eleva un número a una potencia
+SELECT POWER(2, 3) FROM dual;
+-- Resultado: 8
+
+-- SQRT: Calcula la raíz cuadrada
+SELECT SQRT(16) FROM dual;
+-- Resultado: 4
+```
+
+### ABS
+
+Devuelve el valor absoluto de un número.
+
+```sql
+SELECT ABS(-15.5) FROM dual;
+-- Resultado: 15.5
+
+SELECT ABS(15.5) FROM dual;
+-- Resultado: 15.5
+```
+
+### CEIL y FLOOR
+
+Redondean hacia arriba o hacia abajo al entero más cercano.
+
+```sql
+-- CEIL: Redondea hacia arriba
+SELECT CEIL(15.1) FROM dual;
+-- Resultado: 16
+
+SELECT CEIL(-15.1) FROM dual;
+-- Resultado: -15
+
+-- FLOOR: Redondea hacia abajo
+SELECT FLOOR(15.9) FROM dual;
+-- Resultado: 15
+
+SELECT FLOOR(-15.9) FROM dual;
+-- Resultado: -16
+```
+
+### Otras funciones numéricas útiles
+
+| Función | Descripción | Ejemplo |
+|---------|-------------|--------|
+| SIGN | Devuelve el signo de un número (-1, 0, 1) | `SIGN(-10)` |
+| EXP | Devuelve e elevado a una potencia | `EXP(1)` |
+| LN | Logaritmo natural | `LN(10)` |
+| LOG | Logaritmo en una base específica | `LOG(10, 100)` |
+| SIN, COS, TAN | Funciones trigonométricas | `SIN(0)` |
+| ASIN, ACOS, ATAN | Funciones trigonométricas inversas | `ASIN(0)` |
+
+<Aside type="tip">
+  Para cálculos financieros, Oracle proporciona funciones específicas como ROUND para redondear según las reglas contables. Asegúrese de usar el tipo de dato NUMBER con la precisión adecuada para cálculos monetarios.
+</Aside>
+
+## Funciones de fecha y hora
+
+Las funciones de fecha y hora en Oracle permiten manipular valores temporales, realizar cálculos con fechas y extraer componentes específicos.
+
+### SYSDATE y CURRENT_DATE
+
+Devuelven la fecha y hora actuales del sistema.
+
+```sql
+-- SYSDATE: Fecha y hora actuales del servidor de base de datos
+SELECT SYSDATE FROM dual;
+-- Resultado: 18-AGO-25 (formato depende de NLS_DATE_FORMAT)
+
+-- CURRENT_DATE: Fecha y hora actuales en la zona horaria de la sesión
+SELECT CURRENT_DATE FROM dual;
+
+-- Mostrar con formato
+SELECT TO_CHAR(SYSDATE, 'DD-MON-YYYY HH24:MI:SS') AS fecha_actual FROM dual;
+```
+
+<Aside type="note">
+  SYSDATE devuelve la fecha y hora del servidor de base de datos, mientras que CURRENT_DATE devuelve la fecha y hora ajustadas a la zona horaria de la sesión actual.
+</Aside>
+
+### ADD_MONTHS
+
+Añade un número específico de meses a una fecha.
+
+```sql
+-- Añadir 3 meses a la fecha actual
+SELECT ADD_MONTHS(SYSDATE, 3) FROM dual;
+
+-- Restar 2 meses (usando número negativo)
+SELECT ADD_MONTHS(SYSDATE, -2) FROM dual;
+
+-- Calcular la fecha de vencimiento de un contrato
+SELECT 
+  fecha_inicio,
+  ADD_MONTHS(fecha_inicio, duracion_meses) AS fecha_vencimiento
+FROM contratos;
+```
+
+### MONTHS_BETWEEN
+
+Calcula el número de meses entre dos fechas.
+
+```sql
+-- Calcular meses entre dos fechas
+SELECT MONTHS_BETWEEN(
+  TO_DATE('15-08-2025', 'DD-MM-YYYY'),
+  TO_DATE('15-02-2025', 'DD-MM-YYYY')
+) FROM dual;
+-- Resultado: 6
+
+-- Calcular antigüedad de empleados en meses
+SELECT 
+  nombre,
+  fecha_contratacion,
+  ROUND(MONTHS_BETWEEN(SYSDATE, fecha_contratacion), 0) AS meses_antiguedad
+FROM empleados;
+```
+
+### LAST_DAY
+
+Devuelve el último día del mes para una fecha dada.
+
+```sql
+-- Último día del mes actual
+SELECT LAST_DAY(SYSDATE) FROM dual;
+
+-- Último día de febrero de 2024 (año bisiesto)
+SELECT LAST_DAY(TO_DATE('01-02-2024', 'DD-MM-YYYY')) FROM dual;
+-- Resultado: 29-FEB-24
+
+-- Último día de febrero de 2025 (año no bisiesto)
+SELECT LAST_DAY(TO_DATE('01-02-2025', 'DD-MM-YYYY')) FROM dual;
+-- Resultado: 28-FEB-25
+```
+
+### NEXT_DAY
+
+Devuelve la primera fecha posterior a una fecha dada que corresponde a un día de la semana específico.
+
+```sql
+-- Próximo lunes desde la fecha actual
+SELECT NEXT_DAY(SYSDATE, 'LUNES') FROM dual;
+
+-- Próximo viernes desde una fecha específica
+SELECT NEXT_DAY(TO_DATE('15-08-2025', 'DD-MM-YYYY'), 'VIERNES') FROM dual;
+
+-- Nota: El nombre del día debe estar en el idioma configurado en NLS_DATE_LANGUAGE
+```
+
+### EXTRACT
+
+Extrae componentes específicos (año, mes, día, etc.) de una fecha.
+
+```sql
+-- Extraer el año de la fecha actual
+SELECT EXTRACT(YEAR FROM SYSDATE) FROM dual;
+
+-- Extraer el mes
+SELECT EXTRACT(MONTH FROM SYSDATE) FROM dual;
+
+-- Extraer el día
+SELECT EXTRACT(DAY FROM SYSDATE) FROM dual;
+
+-- Extraer la hora
+SELECT EXTRACT(HOUR FROM SYSTIMESTAMP) FROM dual;
+
+-- Extraer el minuto
+SELECT EXTRACT(MINUTE FROM SYSTIMESTAMP) FROM dual;
+```
+
+### Operaciones aritméticas con fechas
+
+Oracle permite realizar operaciones aritméticas directamente con fechas.
+
+```sql
+-- Sumar días a una fecha
+SELECT SYSDATE + 7 AS una_semana_despues FROM dual;
+
+-- Restar días a una fecha
+SELECT SYSDATE - 7 AS una_semana_antes FROM dual;
+
+-- Calcular la diferencia en días entre dos fechas
+SELECT 
+  TO_DATE('31-12-2025', 'DD-MM-YYYY') - TO_DATE('01-01-2025', 'DD-MM-YYYY') 
+  AS dias_en_2025 
+FROM dual;
+-- Resultado: 364
+```
+
+### Funciones de intervalo
+
+Oracle proporciona funciones para trabajar con intervalos de tiempo.
+
+<Tabs>
+  <TabItem label="Intervalos de días">
+    ```sql
+    -- Crear un intervalo de días
+    SELECT INTERVAL '30' DAY AS un_mes FROM dual;
+    
+    -- Sumar un intervalo a una fecha
+    SELECT SYSDATE + INTERVAL '12' HOUR AS doce_horas_despues FROM dual;
+    
+    -- Intervalos complejos
+    SELECT SYSDATE + INTERVAL '2 12:30:45' DAY TO SECOND AS futuro FROM dual;
+    ```
+  </TabItem>
+  
+  <TabItem label="Intervalos de años">
+    ```sql
+    -- Crear un intervalo de años
+    SELECT INTERVAL '2' YEAR AS dos_anos FROM dual;
+    
+    -- Sumar un intervalo a una fecha
+    SELECT ADD_MONTHS(SYSDATE, 12*5) AS cinco_anos_despues FROM dual;
+    -- O usando INTERVAL
+    SELECT SYSDATE + INTERVAL '5' YEAR AS cinco_anos_despues FROM dual;
+    
+    -- Intervalos complejos
+    SELECT SYSDATE + INTERVAL '2-6' YEAR TO MONTH AS futuro FROM dual;
+    ```
+  </TabItem>
+</Tabs>
+
+### Otras funciones de fecha y hora útiles
+
+| Función | Descripción | Ejemplo |
+|---------|-------------|--------|
+| TRUNC(date) | Trunca una fecha a medianoche | `TRUNC(SYSDATE)` |
+| ROUND(date) | Redondea una fecha al día más cercano | `ROUND(SYSDATE)` |
+| SYSTIMESTAMP | Fecha y hora con zona horaria y fracción de segundo | `SYSTIMESTAMP` |
+| NEW_TIME | Convierte hora entre zonas horarias | `NEW_TIME(SYSDATE, 'EST', 'PST')` |
+| TO_YMINTERVAL | Crea un intervalo de año a mes | `TO_YMINTERVAL('01-06')` |
+| TO_DSINTERVAL | Crea un intervalo de día a segundo | `TO_DSINTERVAL('2 12:30:00')` |
+
+<Aside type="caution">
+  Tenga cuidado con los formatos de fecha y las configuraciones regionales (NLS) al trabajar con fechas. Las funciones de fecha pueden comportarse de manera diferente según la configuración NLS_DATE_FORMAT y NLS_DATE_LANGUAGE de la sesión.
+</Aside>
+
+## Funciones de conversión
+
+Las funciones de conversión en Oracle permiten transformar datos de un tipo a otro, facilitando operaciones entre diferentes tipos de datos.
+
+### TO_CHAR
+
+Convierte valores de fecha, numéricos o de intervalo a cadenas de caracteres con formato.
+
+<Tabs>
+  <TabItem label="Fechas a texto">
+    ```sql
+    -- Convertir fecha a texto con formato
+    SELECT TO_CHAR(SYSDATE, 'DD-MM-YYYY HH24:MI:SS') FROM dual;
+    -- Resultado: 18-08-2025 20:44:23
+    
+    -- Formato con nombres de mes y día
+    SELECT TO_CHAR(SYSDATE, 'Day, DD "de" Month "de" YYYY') FROM dual;
+    -- Resultado: Lunes, 18 de Agosto de 2025
+    
+    -- Formato con trimestre y semana del año
+    SELECT TO_CHAR(SYSDATE, 'Q "Trimestre", WW "Semana"') FROM dual;
+    ```
+  </TabItem>
+  
+  <TabItem label="Números a texto">
+    ```sql
+    -- Convertir número a texto con formato
+    SELECT TO_CHAR(1234.56, '9,999.99') FROM dual;
+    -- Resultado: 1,234.56
+    
+    -- Formato con símbolo de moneda
+    SELECT TO_CHAR(1234.56, '$9,999.99') FROM dual;
+    -- Resultado: $1,234.56
+    
+    -- Formato con texto
+    SELECT TO_CHAR(1234.56, '9G999D99 "euros"') FROM dual;
+    -- Resultado: 1,234.56 euros (G y D dependen de NLS_NUMERIC_CHARACTERS)
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Los elementos de formato más comunes para TO_CHAR con fechas son:
+  - YYYY, MM, DD: año, mes, día
+  - HH24, MI, SS: hora (24h), minutos, segundos
+  - DAY, MONTH: nombre del día, nombre del mes
+  - WW, Q: semana del año, trimestre
+  
+  Para números:
+  - 9: posición de dígito
+  - 0: posición de dígito con ceros a la izquierda
+  - $, L: símbolos de moneda
+  - G, D: separadores de grupo y decimal
+</Aside>
+
+### TO_DATE
+
+Convierte una cadena de caracteres a un valor de fecha.
+
+```sql
+-- Convertir texto a fecha
+SELECT TO_DATE('18-08-2025', 'DD-MM-YYYY') FROM dual;
+
+-- Convertir texto con formato complejo
+SELECT TO_DATE('18 de Agosto, 2025', 'DD "de" Month, YYYY') FROM dual;
+
+-- Convertir texto con hora
+SELECT TO_DATE('18-08-2025 14:30:00', 'DD-MM-YYYY HH24:MI:SS') FROM dual;
+
+-- Uso en consultas
+SELECT * 
+FROM pedidos 
+WHERE fecha_pedido BETWEEN 
+  TO_DATE('01-01-2025', 'DD-MM-YYYY') AND 
+  TO_DATE('31-12-2025', 'DD-MM-YYYY');
+```
+
+### TO_NUMBER
+
+Convierte una cadena de caracteres a un valor numérico.
+
+```sql
+-- Convertir texto a número
+SELECT TO_NUMBER('1234.56') FROM dual;
+
+-- Convertir texto con formato
+SELECT TO_NUMBER('1,234.56', '9,999.99') FROM dual;
+
+-- Convertir texto con símbolo de moneda
+SELECT TO_NUMBER('$1,234.56', '$9,999.99') FROM dual;
+
+-- Uso en consultas
+SELECT * 
+FROM productos 
+WHERE precio > TO_NUMBER('1,000.00', '9,999.99');
+```
+
+### CAST
+
+Convierte un valor de un tipo de datos a otro.
+
+```sql
+-- Convertir número a cadena
+SELECT CAST(1234.56 AS VARCHAR2(10)) FROM dual;
+
+-- Convertir cadena a número
+SELECT CAST('1234.56' AS NUMBER(10,2)) FROM dual;
+
+-- Convertir cadena a fecha
+SELECT CAST('18-AUG-25' AS DATE) FROM dual;
+
+-- Convertir entre tipos de datos complejos
+SELECT CAST(fecha_nacimiento AS TIMESTAMP) FROM empleados;
+```
+
+### NVL, NULLIF y COALESCE
+
+Estas funciones ayudan a manejar valores NULL en las consultas.
+
+<Tabs>
+  <TabItem label="NVL">
+    ```sql
+    -- Reemplazar NULL por un valor predeterminado
+    SELECT 
+      nombre,
+      NVL(telefono, 'Sin teléfono') AS telefono_contacto
+    FROM clientes;
+    
+    -- Con valores numéricos
+    SELECT 
+      producto,
+      NVL(precio, 0) AS precio_final
+    FROM productos;
+    ```
+  </TabItem>
+  
+  <TabItem label="NULLIF">
+    ```sql
+    -- Devuelve NULL si los dos valores son iguales
+    SELECT NULLIF(valor1, valor2) FROM tabla;
+    
+    -- Ejemplo: evitar división por cero
+    SELECT 
+      ventas_actuales,
+      ventas_anteriores,
+      ventas_actuales / NULLIF(ventas_anteriores, 0) AS ratio
+    FROM informes_ventas;
+    ```
+  </TabItem>
+  
+  <TabItem label="COALESCE">
+    ```sql
+    -- Devuelve el primer valor no NULL de la lista
+    SELECT 
+      COALESCE(telefono_movil, telefono_fijo, email, 'Sin contacto') AS contacto
+    FROM clientes;
+    
+    -- Ejemplo con múltiples columnas
+    SELECT 
+      producto,
+      COALESCE(precio_oferta, precio_regular) AS precio_final
+    FROM productos;
+    ```
+  </TabItem>
+</Tabs>
+
+### Otras funciones de conversión útiles
+
+| Función | Descripción | Ejemplo |
+|---------|-------------|--------|
+| TO_TIMESTAMP | Convierte texto a timestamp | `TO_TIMESTAMP('18-08-2025 14:30:00.000', 'DD-MM-YYYY HH24:MI:SS.FF')` |
+| TO_CLOB | Convierte a tipo CLOB | `TO_CLOB(texto_largo)` |
+| HEXTORAW | Convierte texto hexadecimal a RAW | `HEXTORAW('7F')` |
+| RAWTOHEX | Convierte RAW a texto hexadecimal | `RAWTOHEX(columna_raw)` |
+| BIN_TO_NUM | Convierte bits a número | `BIN_TO_NUM(1,0,1)` |
+| CONVERT | Convierte entre conjuntos de caracteres | `CONVERT(texto, 'UTF8', 'AL32UTF8')` |
+
+<Aside type="tip">
+  Las funciones de conversión son esenciales para garantizar la compatibilidad de tipos en operaciones y consultas. Utilice TO_CHAR para presentación de datos, TO_DATE y TO_NUMBER para validación de entrada, y NVL/COALESCE para manejar valores NULL de forma elegante.
+</Aside>
+
+## Funciones de grupo (agregación)
+
+Las funciones de grupo en Oracle realizan cálculos sobre conjuntos de filas y devuelven un único resultado por grupo. Se utilizan comúnmente con la cláusula GROUP BY.
+
+### SUM y AVG
+
+Calculan la suma y el promedio de valores numéricos.
+
+```sql
+-- Calcular la suma total de ventas
+SELECT SUM(monto_venta) AS total_ventas FROM ventas;
+
+-- Calcular el promedio de ventas
+SELECT AVG(monto_venta) AS promedio_ventas FROM ventas;
+
+-- Agrupar por departamento
+SELECT 
+  departamento,
+  SUM(salario) AS total_salarios,
+  AVG(salario) AS salario_promedio
+FROM empleados
+GROUP BY departamento;
+```
+
+### MIN y MAX
+
+Encuentran el valor mínimo y máximo en un conjunto de datos.
+
+```sql
+-- Encontrar el precio mínimo y máximo
+SELECT 
+  MIN(precio) AS precio_minimo,
+  MAX(precio) AS precio_maximo
+FROM productos;
+
+-- Agrupar por categoría
+SELECT 
+  categoria,
+  MIN(precio) AS precio_minimo,
+  MAX(precio) AS precio_maximo
+FROM productos
+GROUP BY categoria;
+
+-- También funcionan con fechas y texto
+SELECT 
+  MIN(fecha_contratacion) AS primera_contratacion,
+  MAX(fecha_contratacion) AS ultima_contratacion
+FROM empleados;
+```
+
+### COUNT
+
+Cuenta el número de filas o valores no nulos.
+
+```sql
+-- Contar todas las filas
+SELECT COUNT(*) AS total_empleados FROM empleados;
+
+-- Contar valores no nulos en una columna
+SELECT COUNT(telefono) AS empleados_con_telefono FROM empleados;
+
+-- Contar valores distintos
+SELECT COUNT(DISTINCT departamento) AS numero_departamentos FROM empleados;
+
+-- Agrupar por departamento
+SELECT 
+  departamento,
+  COUNT(*) AS numero_empleados
+FROM empleados
+GROUP BY departamento;
+```
+
+### LISTAGG
+
+Concatena valores de varias filas en una sola cadena.
+
+```sql
+-- Concatenar nombres de empleados por departamento
+SELECT 
+  departamento,
+  LISTAGG(nombre, ', ') WITHIN GROUP (ORDER BY nombre) AS empleados
+FROM empleados
+GROUP BY departamento;
+
+-- Con límite y desbordamiento
+SELECT 
+  departamento,
+  LISTAGG(nombre, ', ' ON OVERFLOW TRUNCATE '...') 
+    WITHIN GROUP (ORDER BY nombre) AS empleados
+FROM empleados
+GROUP BY departamento;
+```
+
+### Cláusulas HAVING
+
+La cláusula HAVING se utiliza para filtrar resultados basados en funciones de grupo.
+
+```sql
+-- Filtrar departamentos con más de 10 empleados
+SELECT 
+  departamento,
+  COUNT(*) AS numero_empleados
+FROM empleados
+GROUP BY departamento
+HAVING COUNT(*) > 10;
+
+-- Filtrar categorías con precio promedio superior a 100
+SELECT 
+  categoria,
+  AVG(precio) AS precio_promedio
+FROM productos
+GROUP BY categoria
+HAVING AVG(precio) > 100;
+```
+
+### Otras funciones de grupo útiles
+
+| Función | Descripción | Ejemplo |
+|---------|-------------|--------|
+| STDDEV | Desviación estándar | `STDDEV(salario)` |
+| VARIANCE | Varianza | `VARIANCE(salario)` |
+| MEDIAN | Mediana | `MEDIAN(salario)` |
+| PERCENTILE_CONT | Percentil continuo | `PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY salario)` |
+| PERCENTILE_DISC | Percentil discreto | `PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY salario)` |
+| GROUP_ID | Identifica filas duplicadas en agrupaciones | `GROUP_ID()` |
+
+<Aside type="note">
+  Las funciones de grupo ignoran los valores NULL, excepto COUNT(*). Si necesita incluir valores NULL en los cálculos, utilice NVL o COALESCE para reemplazarlos por valores predeterminados.
+</Aside>
+
+## Funciones analíticas
+
+Las funciones analíticas realizan cálculos sobre un conjunto de filas relacionadas con la fila actual, sin agrupar las filas en un único resultado como lo hacen las funciones de grupo.
+
+### RANK, DENSE_RANK y ROW_NUMBER
+
+Estas funciones asignan números de clasificación a las filas.
+
+<Tabs>
+  <TabItem label="RANK">
+    ```sql
+    -- Clasificar empleados por salario
+    SELECT 
+      nombre,
+      departamento,
+      salario,
+      RANK() OVER (ORDER BY salario DESC) AS ranking_general,
+      RANK() OVER (PARTITION BY departamento ORDER BY salario DESC) AS ranking_departamento
+    FROM empleados;
+    
+    -- RANK deja huecos en la numeración cuando hay empates
+    -- Ejemplo: 1, 2, 2, 4, 5, ...
+    ```
+  </TabItem>
+  
+  <TabItem label="DENSE_RANK">
+    ```sql
+    -- Clasificar empleados por salario sin huecos
+    SELECT 
+      nombre,
+      departamento,
+      salario,
+      DENSE_RANK() OVER (ORDER BY salario DESC) AS ranking_general,
+      DENSE_RANK() OVER (PARTITION BY departamento ORDER BY salario DESC) AS ranking_departamento
+    FROM empleados;
+    
+    -- DENSE_RANK no deja huecos en la numeración cuando hay empates
+    -- Ejemplo: 1, 2, 2, 3, 4, ...
+    ```
+  </TabItem>
+  
+  <TabItem label="ROW_NUMBER">
+    ```sql
+    -- Asignar números de fila únicos
+    SELECT 
+      nombre,
+      departamento,
+      salario,
+      ROW_NUMBER() OVER (ORDER BY salario DESC) AS numero_fila,
+      ROW_NUMBER() OVER (PARTITION BY departamento ORDER BY salario DESC) AS numero_fila_departamento
+    FROM empleados;
+    
+    -- ROW_NUMBER asigna números únicos incluso en empates
+    -- Ejemplo: 1, 2, 3, 4, 5, ...
+    ```
+  </TabItem>
+</Tabs>
+
+### ROWNUM vs. ROW_NUMBER
+
+ROWNUM es una pseudocolumna que asigna números secuenciales a las filas devueltas por una consulta, mientras que ROW_NUMBER() es una función analítica más flexible.
+
+```sql
+-- ROWNUM: Asigna números antes de ordenar
+SELECT 
+  ROWNUM,
+  nombre,
+  salario
+FROM empleados
+WHERE ROWNUM <= 5;
+
+-- ROW_NUMBER: Permite ordenar primero y luego asignar números
+SELECT * FROM (
+  SELECT 
+    ROW_NUMBER() OVER (ORDER BY salario DESC) AS rn,
+    nombre,
+    salario
+  FROM empleados
+)
+WHERE rn <= 5;
+```
+
+### Funciones de ventana
+
+Las funciones de ventana realizan cálculos sobre un conjunto de filas relacionadas con la fila actual.
+
+```sql
+-- Calcular suma acumulada
+SELECT 
+  fecha,
+  monto,
+  SUM(monto) OVER (ORDER BY fecha) AS suma_acumulada
+FROM ventas;
+
+-- Calcular promedio móvil de 3 días
+SELECT 
+  fecha,
+  monto,
+  AVG(monto) OVER (ORDER BY fecha ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS promedio_movil
+FROM ventas;
+
+-- Calcular porcentaje del total
+SELECT 
+  departamento,
+  salario,
+  salario / SUM(salario) OVER () * 100 AS porcentaje_total,
+  salario / SUM(salario) OVER (PARTITION BY departamento) * 100 AS porcentaje_departamento
+FROM empleados;
+```
+
+### Funciones LAG y LEAD
+
+Acceden a datos de filas anteriores o posteriores sin necesidad de auto-uniones.
+
+```sql
+-- Comparar con el valor anterior
+SELECT 
+  fecha,
+  monto,
+  LAG(monto) OVER (ORDER BY fecha) AS monto_anterior,
+  monto - LAG(monto) OVER (ORDER BY fecha) AS diferencia
+FROM ventas;
+
+-- Comparar con el valor siguiente
+SELECT 
+  fecha,
+  monto,
+  LEAD(monto) OVER (ORDER BY fecha) AS monto_siguiente,
+  monto - LEAD(monto) OVER (ORDER BY fecha) AS diferencia
+FROM ventas;
+
+-- Especificar un valor predeterminado para la primera/última fila
+SELECT 
+  fecha,
+  monto,
+  LAG(monto, 1, 0) OVER (ORDER BY fecha) AS monto_anterior
+FROM ventas;
+```
+
+### Otras funciones analíticas útiles
+
+| Función | Descripción | Ejemplo |
+|---------|-------------|--------|
+| FIRST_VALUE | Primer valor de la ventana | `FIRST_VALUE(salario) OVER (...)` |
+| LAST_VALUE | Último valor de la ventana | `LAST_VALUE(salario) OVER (...)` |
+| NTH_VALUE | Enésimo valor de la ventana | `NTH_VALUE(salario, 2) OVER (...)` |
+| NTILE | Divide las filas en grupos iguales | `NTILE(4) OVER (ORDER BY salario)` |
+| CUME_DIST | Distribución acumulativa | `CUME_DIST() OVER (ORDER BY salario)` |
+| PERCENT_RANK | Rango porcentual | `PERCENT_RANK() OVER (ORDER BY salario)` |
+
+<Aside type="tip">
+  Las funciones analíticas son extremadamente útiles para análisis de datos, informes y tableros de control. Permiten realizar cálculos complejos sin necesidad de múltiples consultas o auto-uniones, mejorando significativamente el rendimiento y la legibilidad del código SQL.
+</Aside>
+
+## Conclusión
+
+Las funciones de Oracle Database son herramientas poderosas que permiten manipular y transformar datos de manera eficiente. Dominar estas funciones es esencial para escribir consultas SQL efectivas y expresivas.
+
+### Resumen de categorías de funciones
+
+- **Funciones de cadena**: Manipulan y transforman datos de texto.
+- **Funciones numéricas**: Realizan operaciones matemáticas y transformaciones.
+- **Funciones de fecha y hora**: Manipulan valores temporales y realizan cálculos con fechas.
+- **Funciones de conversión**: Transforman datos entre diferentes tipos.
+- **Funciones de grupo**: Realizan cálculos sobre conjuntos de filas.
+- **Funciones analíticas**: Realizan cálculos sobre conjuntos de filas relacionadas con la fila actual.
+
+### Recomendaciones para el uso de funciones
+
+<Steps>
+  1. **Elija la función adecuada**: Asegúrese de seleccionar la función que mejor se adapte a su necesidad específica.
+  2. **Considere el rendimiento**: Algunas funciones pueden ser más costosas en términos de rendimiento. Evalúe alternativas si es necesario.
+  3. **Pruebe con datos de ejemplo**: Verifique el comportamiento de las funciones con datos de prueba antes de implementarlas en producción.
+  4. **Documente el uso de funciones complejas**: Especialmente para funciones analíticas o combinaciones complejas de funciones.
+  5. **Mantenga la compatibilidad**: Tenga en cuenta la versión de Oracle Database al utilizar funciones más recientes.
+</Steps>
+
+<Aside type="note">
+  Este documento cubre las funciones más utilizadas en Oracle Database, pero existen muchas más funciones especializadas disponibles. Consulte la documentación oficial de Oracle para obtener información detallada sobre todas las funciones disponibles.
+</Aside>

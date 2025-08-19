@@ -1,0 +1,580 @@
+---
+title: 4. DDL (Data Definition Language)
+description: Aprende a definir y modificar estructuras de datos en Oracle
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## Introducción al DDL
+
+El Lenguaje de Definición de Datos (Data Definition Language o DDL) es un subconjunto de SQL utilizado para definir y gestionar las estructuras de la base de datos Oracle. Los comandos DDL permiten crear, modificar y eliminar objetos como tablas, vistas, índices, secuencias y otros elementos estructurales de la base de datos.
+
+### Características principales del DDL
+
+- **Automático commit**: Los comandos DDL realizan un commit automático antes y después de su ejecución
+- **No se pueden revertir**: Al ejecutar un commit automático, no se pueden deshacer con ROLLBACK
+- **Afectan al diccionario de datos**: Modifican las tablas del sistema que almacenan metadatos
+- **Pueden generar bloqueos**: Durante su ejecución, pueden bloquear objetos relacionados
+
+<Aside type="caution">
+  Los comandos DDL realizan un commit automático. Esto significa que cualquier transacción pendiente se confirmará antes de ejecutar el comando DDL y no podrá revertirse. Asegúrese de confirmar o revertir sus transacciones pendientes antes de ejecutar comandos DDL.
+</Aside>
+
+## CREATE - Creación de objetos
+
+El comando CREATE se utiliza para crear nuevos objetos en la base de datos Oracle.
+
+### CREATE TABLE - Creación de tablas
+
+Las tablas son los objetos fundamentales para almacenar datos en Oracle.
+
+```sql
+-- Sintaxis básica
+CREATE TABLE [schema.]nombre_tabla (
+    columna1 tipo_dato [restricciones],
+    columna2 tipo_dato [restricciones],
+    ...
+    [restricciones_tabla]
+) [opciones_tabla];
+
+-- Ejemplo práctico
+CREATE TABLE empleados (
+    empleado_id NUMBER(6) PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL,
+    apellido VARCHAR2(50) NOT NULL,
+    email VARCHAR2(100) UNIQUE,
+    fecha_contratacion DATE DEFAULT SYSDATE,
+    salario NUMBER(8,2) CHECK (salario > 0),
+    departamento_id NUMBER(4),
+    CONSTRAINT fk_departamento FOREIGN KEY (departamento_id) 
+        REFERENCES departamentos(departamento_id)
+);
+```
+
+#### Opciones avanzadas para CREATE TABLE
+
+<Tabs>
+  <TabItem label="Organización de almacenamiento">
+    ```sql
+    CREATE TABLE ventas (
+        venta_id NUMBER PRIMARY KEY,
+        fecha DATE,
+        cliente_id NUMBER,
+        total NUMBER(10,2)
+    )
+    ORGANIZATION INDEX  -- Tabla organizada por índice
+    TABLESPACE ventas_ts
+    STORAGE (
+        INITIAL 1M
+        NEXT 1M
+        MAXEXTENTS UNLIMITED
+    );
+    ```
+  </TabItem>
+  
+  <TabItem label="Particionamiento">
+    ```sql
+    CREATE TABLE historial_ventas (
+        venta_id NUMBER,
+        fecha DATE,
+        producto_id NUMBER,
+        cantidad NUMBER,
+        precio NUMBER(10,2)
+    )
+    PARTITION BY RANGE (fecha) (
+        PARTITION ventas_2023 VALUES LESS THAN (TO_DATE('01-01-2024', 'DD-MM-YYYY')),
+        PARTITION ventas_2024 VALUES LESS THAN (TO_DATE('01-01-2025', 'DD-MM-YYYY')),
+        PARTITION ventas_futuras VALUES LESS THAN (MAXVALUE)
+    );
+    ```
+  </TabItem>
+  
+  <TabItem label="Tabla temporal">
+    ```sql
+    CREATE GLOBAL TEMPORARY TABLE temp_resultados (
+        id NUMBER,
+        resultado VARCHAR2(100)
+    )
+    ON COMMIT DELETE ROWS;  -- Los datos se eliminan al hacer commit
+    ```
+  </TabItem>
+</Tabs>
+
+### CREATE TABLE AS - Creación basada en consulta
+
+Permite crear una nueva tabla basada en el resultado de una consulta SELECT.
+
+<Code code={`
+-- Crear tabla a partir de una consulta
+CREATE TABLE empleados_marketing
+AS
+SELECT empleado_id, nombre, apellido, email, telefono
+FROM empleados
+WHERE departamento_id = 20;
+
+-- Crear tabla con estructura pero sin datos
+CREATE TABLE estructura_empleados
+AS
+SELECT * FROM empleados
+WHERE 1=2;  -- Condición falsa para no incluir datos
+`} language="sql" />
+
+### CREATE VIEW - Creación de vistas
+
+Las vistas son consultas almacenadas que se comportan como tablas virtuales.
+
+<Code code={`
+-- Vista simple
+CREATE VIEW v_empleados_departamento AS
+SELECT e.empleado_id, e.nombre, e.apellido, d.nombre AS departamento
+FROM empleados e
+JOIN departamentos d ON e.departamento_id = d.departamento_id;
+
+-- Vista con check option
+CREATE VIEW v_empleados_marketing AS
+SELECT * FROM empleados
+WHERE departamento_id = 20
+WITH CHECK OPTION;  -- Garantiza que las filas insertadas/actualizadas cumplan la condición
+
+-- Vista de solo lectura
+CREATE VIEW v_resumen_ventas AS
+SELECT 
+    TO_CHAR(fecha_venta, 'YYYY-MM') AS mes,
+    SUM(total) AS ventas_totales,
+    COUNT(*) AS num_transacciones
+FROM ventas
+GROUP BY TO_CHAR(fecha_venta, 'YYYY-MM')
+WITH READ ONLY;  -- No permite modificaciones a través de la vista
+`} language="sql" />
+
+<Aside type="tip">
+  Las vistas materializadas almacenan físicamente los resultados de una consulta y pueden actualizarse periódicamente. Son útiles para mejorar el rendimiento de consultas complejas o costosas.
+  
+  ```sql
+  CREATE MATERIALIZED VIEW mv_ventas_mensuales
+  REFRESH COMPLETE ON DEMAND
+  AS
+  SELECT 
+      TO_CHAR(fecha_venta, 'YYYY-MM') AS mes,
+      SUM(total) AS ventas_totales
+  FROM ventas
+  GROUP BY TO_CHAR(fecha_venta, 'YYYY-MM');
+  ```
+</Aside>
+
+### CREATE INDEX - Creación de índices
+
+Los índices mejoran el rendimiento de las consultas al proporcionar rutas de acceso rápido a los datos.
+
+<Tabs>
+  <TabItem label="Índice b-tree estándar">
+    ```sql
+    -- Índice simple
+    CREATE INDEX idx_empleados_apellido ON empleados(apellido);
+    
+    -- Índice compuesto
+    CREATE INDEX idx_empleados_nombre_completo ON empleados(apellido, nombre);
+    ```
+  </TabItem>
+  
+  <TabItem label="Índice único">
+    ```sql
+    -- Garantiza valores únicos
+    CREATE UNIQUE INDEX idx_empleados_email ON empleados(email);
+    ```
+  </TabItem>
+  
+  <TabItem label="Índice basado en función">
+    ```sql
+    -- Índice para búsquedas case-insensitive
+    CREATE INDEX idx_empleados_apellido_upper ON empleados(UPPER(apellido));
+    ```
+  </TabItem>
+  
+  <TabItem label="Índice de texto">
+    ```sql
+    -- Para búsqueda de texto completo
+    CREATE INDEX idx_productos_descripcion ON productos(descripcion)
+    INDEXTYPE IS CTXSYS.CONTEXT;
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Los índices mejoran el rendimiento de las consultas pero pueden ralentizar las operaciones de inserción, actualización y eliminación. Cree índices solo en columnas utilizadas frecuentemente en cláusulas WHERE, JOIN o ORDER BY.
+</Aside>
+
+### CREATE SEQUENCE - Creación de secuencias
+
+Las secuencias generan valores numéricos únicos, comúnmente utilizados para claves primarias.
+
+<Code code={`
+-- Secuencia básica
+CREATE SEQUENCE seq_empleados
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+-- Secuencia con opciones avanzadas
+CREATE SEQUENCE seq_facturas
+    START WITH 1000
+    INCREMENT BY 1
+    MINVALUE 1000
+    MAXVALUE 9999999
+    CACHE 20
+    CYCLE;
+
+-- Uso de secuencia en INSERT
+INSERT INTO empleados (empleado_id, nombre, apellido)
+VALUES (seq_empleados.NEXTVAL, 'Juan', 'Pérez');
+
+-- Obtener el valor actual
+SELECT seq_empleados.CURRVAL FROM dual;
+`} language="sql" />
+
+### CREATE SYNONYM - Creación de sinónimos
+
+Los sinónimos proporcionan nombres alternativos para objetos de la base de datos, facilitando el acceso y ocultando la ubicación real.
+
+<Code code={`
+-- Sinónimo privado (solo visible para el usuario que lo crea)
+CREATE SYNONYM emp FOR empleados;
+
+-- Sinónimo público (visible para todos los usuarios)
+CREATE PUBLIC SYNONYM productos FOR inventario.productos;
+
+-- Sinónimo para objeto en otra base de datos (enlace de base de datos)
+CREATE SYNONYM clientes_externos FOR clientes@db_remota;
+`} language="sql" />
+
+<Aside type="tip">
+  Los sinónimos son útiles para:
+  - Simplificar nombres de objetos complejos
+  - Ocultar la ubicación real de los objetos
+  - Facilitar la migración de aplicaciones entre entornos
+  - Proporcionar transparencia de ubicación para objetos remotos
+</Aside>
+
+## ALTER - Modificación de objetos
+
+El comando ALTER permite modificar la estructura de objetos existentes en la base de datos.
+
+### ALTER TABLE - Modificación de tablas
+
+<Tabs>
+  <TabItem label="Agregar columnas">
+    ```sql
+    -- Agregar una columna
+    ALTER TABLE empleados ADD (direccion VARCHAR2(200));
+    
+    -- Agregar múltiples columnas
+    ALTER TABLE empleados ADD (
+        ciudad VARCHAR2(50),
+        codigo_postal VARCHAR2(10),
+        pais VARCHAR2(50) DEFAULT 'España'
+    );
+    ```
+  </TabItem>
+  
+  <TabItem label="Modificar columnas">
+    ```sql
+    -- Cambiar tipo de dato o tamaño
+    ALTER TABLE empleados MODIFY (nombre VARCHAR2(100));
+    
+    -- Cambiar múltiples columnas
+    ALTER TABLE empleados MODIFY (
+        salario NUMBER(10,2),
+        email VARCHAR2(150) NOT NULL
+    );
+    ```
+  </TabItem>
+  
+  <TabItem label="Eliminar columnas">
+    ```sql
+    -- Eliminar una columna
+    ALTER TABLE empleados DROP COLUMN direccion;
+    
+    -- Eliminar múltiples columnas
+    ALTER TABLE empleados DROP (
+        ciudad, codigo_postal, pais
+    );
+    ```
+  </TabItem>
+  
+  <TabItem label="Renombrar columnas">
+    ```sql
+    -- Renombrar una columna
+    ALTER TABLE empleados RENAME COLUMN telefono TO num_contacto;
+    ```
+  </TabItem>
+</Tabs>
+
+### Gestión de restricciones con ALTER TABLE
+
+<Code code={`
+-- Agregar una restricción
+ALTER TABLE empleados ADD CONSTRAINT pk_empleados 
+    PRIMARY KEY (empleado_id);
+
+-- Agregar una clave foránea
+ALTER TABLE empleados ADD CONSTRAINT fk_departamento 
+    FOREIGN KEY (departamento_id) REFERENCES departamentos(departamento_id);
+
+-- Eliminar una restricción
+ALTER TABLE empleados DROP CONSTRAINT fk_departamento;
+
+-- Deshabilitar una restricción
+ALTER TABLE empleados DISABLE CONSTRAINT pk_empleados;
+
+-- Habilitar una restricción
+ALTER TABLE empleados ENABLE CONSTRAINT pk_empleados;
+`} language="sql" />
+
+### Otras operaciones con ALTER TABLE
+
+<Code code={`
+-- Renombrar una tabla
+ALTER TABLE empleados RENAME TO personal;
+
+-- Cambiar el tablespace de una tabla
+ALTER TABLE empleados MOVE TABLESPACE users;
+
+-- Habilitar/deshabilitar todos los triggers de una tabla
+ALTER TABLE empleados DISABLE ALL TRIGGERS;
+ALTER TABLE empleados ENABLE ALL TRIGGERS;
+
+-- Modificar opciones de almacenamiento
+ALTER TABLE empleados STORAGE (
+    NEXT 2M
+    MAXEXTENTS UNLIMITED
+);
+`} language="sql" />
+
+### ALTER INDEX - Modificación de índices
+
+<Code code={`
+-- Reconstruir un índice
+ALTER INDEX idx_empleados_apellido REBUILD;
+
+-- Hacer un índice invisible (el optimizador lo ignora)
+ALTER INDEX idx_empleados_apellido INVISIBLE;
+
+-- Hacer un índice visible
+ALTER INDEX idx_empleados_apellido VISIBLE;
+
+-- Mover un índice a otro tablespace
+ALTER INDEX idx_empleados_apellido REBUILD TABLESPACE indx;
+`} language="sql" />
+
+### ALTER SEQUENCE - Modificación de secuencias
+
+<Code code={`
+-- Modificar el incremento
+ALTER SEQUENCE seq_empleados INCREMENT BY 10;
+
+-- Modificar valores mínimo y máximo
+ALTER SEQUENCE seq_empleados MAXVALUE 999999;
+
+-- Cambiar la opción de caché
+ALTER SEQUENCE seq_empleados CACHE 50;
+
+-- Reiniciar una secuencia
+-- Primero debemos obtener el valor actual
+SELECT seq_empleados.NEXTVAL FROM dual;
+-- Luego incrementamos con un valor negativo para "reiniciar"
+ALTER SEQUENCE seq_empleados INCREMENT BY -1000;
+SELECT seq_empleados.NEXTVAL FROM dual;
+-- Y finalmente restauramos el incremento normal
+ALTER SEQUENCE seq_empleados INCREMENT BY 1;
+`} language="sql" />
+
+### ALTER VIEW - Modificación de vistas
+
+<Code code={`
+-- Recompilar una vista
+ALTER VIEW v_empleados_departamento COMPILE;
+
+-- Modificar una vista
+CREATE OR REPLACE VIEW v_empleados_departamento AS
+SELECT e.empleado_id, e.nombre, e.apellido, d.nombre AS departamento, e.salario
+FROM empleados e
+JOIN departamentos d ON e.departamento_id = d.departamento_id;
+`} language="sql" />
+
+<Aside type="note">
+  Para modificar la definición de una vista, se utiliza CREATE OR REPLACE VIEW en lugar de ALTER VIEW, ya que ALTER VIEW solo permite recompilar la vista sin cambiar su definición.
+</Aside>
+
+## DROP - Eliminación de objetos
+
+El comando DROP elimina objetos de la base de datos de forma permanente.
+
+<Code code={`
+-- Eliminar una tabla
+DROP TABLE empleados [CASCADE CONSTRAINTS];
+
+-- Eliminar una vista
+DROP VIEW v_empleados_departamento;
+
+-- Eliminar un índice
+DROP INDEX idx_empleados_apellido;
+
+-- Eliminar una secuencia
+DROP SEQUENCE seq_empleados;
+
+-- Eliminar un sinónimo
+DROP SYNONYM emp;
+DROP PUBLIC SYNONYM productos;
+
+-- Eliminar restricciones
+ALTER TABLE empleados DROP CONSTRAINT pk_empleados;
+ALTER TABLE empleados DROP CONSTRAINT chk_salario_positivo;
+
+`} language="sql" />
+
+### Opciones de DROP TABLE
+
+<Tabs>
+  <TabItem label="DROP TABLE simple">
+    ```sql
+    DROP TABLE empleados;
+    ```
+    Elimina la tabla si no tiene dependencias. Si otras tablas tienen restricciones de clave foránea que hacen referencia a esta tabla, la operación fallará.
+  </TabItem>
+  
+  <TabItem label="CASCADE CONSTRAINTS">
+    ```sql
+    DROP TABLE empleados CASCADE CONSTRAINTS;
+    ```
+    Elimina la tabla y todas las restricciones que hacen referencia a ella desde otras tablas. Las tablas que hacían referencia a esta tabla permanecen, pero se eliminan sus restricciones de clave foránea.
+  </TabItem>
+  
+  <TabItem label="PURGE">
+    ```sql
+    DROP TABLE empleados PURGE;
+    ```
+    Elimina la tabla y la purga inmediatamente, evitando que se mueva a la papelera de reciclaje (disponible en Oracle 10g y posteriores).
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+  El comando DROP elimina permanentemente los objetos y sus datos. Esta operación no se puede deshacer fácilmente, excepto restaurando desde una copia de seguridad. Utilice con extrema precaución, especialmente en entornos de producción.
+</Aside>
+
+## TRUNCATE - Vaciado rápido de tablas
+
+El comando TRUNCATE elimina rápidamente todos los registros de una tabla sin posibilidad de recuperación.
+
+<Code code={`
+-- Sintaxis básica
+TRUNCATE TABLE empleados;
+
+-- Con opciones
+TRUNCATE TABLE historial_ventas DROP STORAGE;
+
+-- Truncar múltiples tablas
+TRUNCATE TABLE 
+    tabla1, 
+    tabla2, 
+    tabla3 
+CASCADE;
+`} language="sql" />
+
+### Diferencias entre TRUNCATE y DELETE
+
+| Característica | TRUNCATE | DELETE |
+|----------------|----------|--------|
+| Velocidad | Muy rápido | Más lento |
+| Registros en log | Mínimo (solo la operación) | Cada fila eliminada |
+| Rollback | No es posible | Posible antes del commit |
+| Triggers | No se activan | Se activan |
+| WHERE | No permite condiciones | Permite filtrar con WHERE |
+| Espacio | Libera espacio de almacenamiento | No libera espacio automáticamente |
+| Commit | Automático | Manual |
+
+<Aside type="caution">
+  TRUNCATE es un comando DDL que realiza un commit automático y no puede ser revertido. Además, reinicia los valores de las secuencias asociadas a la tabla si existen columnas con la propiedad IDENTITY.
+</Aside>
+
+### Consideraciones de seguridad para TRUNCATE
+
+- Requiere el privilegio DROP en la tabla o el privilegio TRUNCATE TABLE
+- No se puede usar en tablas que participan en una relación de clave foránea (a menos que se use CASCADE)
+- No se puede usar en tablas que son parte de una vista materializada
+
+## Mejores prácticas para DDL
+
+<Steps>
+  1. **Planificar cuidadosamente los cambios estructurales**
+     - Documente los cambios antes de implementarlos
+     - Pruebe los cambios en un entorno de desarrollo antes de aplicarlos en producción
+     - Considere el impacto en el rendimiento y en las aplicaciones existentes
+  
+  2. **Gestionar las transacciones adecuadamente**
+     - Recuerde que los comandos DDL realizan commits automáticos
+     - Complete o revierta todas las transacciones pendientes antes de ejecutar DDL
+     - Evite mezclar comandos DDL y DML en la misma transacción
+  
+  3. **Mantener la integridad referencial**
+     - Defina las restricciones apropiadas al crear tablas
+     - Utilice CASCADE CONSTRAINTS con precaución
+     - Verifique las dependencias antes de eliminar objetos
+  
+  4. **Optimizar el rendimiento**
+     - Cree índices adecuados para mejorar el rendimiento de las consultas
+     - Considere el uso de particiones para tablas grandes
+     - Utilice tablespaces apropiados según el tipo y uso de los datos
+  
+  5. **Implementar una estrategia de respaldo**
+     - Realice copias de seguridad antes de ejecutar operaciones DDL importantes
+     - Documente los cambios realizados para facilitar la recuperación
+     - Considere el uso de Oracle Flashback para operaciones reversibles
+</Steps>
+
+## Consulta del diccionario de datos
+
+Oracle proporciona vistas del diccionario de datos que permiten consultar información sobre los objetos de la base de datos.
+
+<Code code={`
+-- Listar todas las tablas del usuario actual
+SELECT table_name, tablespace_name, status
+FROM user_tables
+ORDER BY table_name;
+
+-- Listar todas las columnas de una tabla
+SELECT column_name, data_type, data_length, nullable
+FROM user_tab_columns
+WHERE table_name = 'EMPLEADOS'
+ORDER BY column_id;
+
+-- Listar todas las restricciones de una tabla
+SELECT constraint_name, constraint_type, status
+FROM user_constraints
+WHERE table_name = 'EMPLEADOS';
+
+-- Listar todos los índices de una tabla
+SELECT index_name, index_type, uniqueness, status
+FROM user_indexes
+WHERE table_name = 'EMPLEADOS';
+
+-- Listar todas las vistas del usuario
+SELECT view_name, text
+FROM user_views;
+
+-- Listar todas las secuencias del usuario
+SELECT sequence_name, min_value, max_value, increment_by, last_number
+FROM user_sequences;
+`} language="sql" />
+
+<Aside type="tip">
+  Las vistas del diccionario de datos son herramientas poderosas para administrar y documentar su base de datos Oracle. Existen tres niveles de vistas:
+  
+  - USER_* - Objetos propios del usuario actual
+  - ALL_* - Objetos a los que el usuario actual tiene acceso
+  - DBA_* - Todos los objetos de la base de datos (requiere privilegios de administrador)
+</Aside>

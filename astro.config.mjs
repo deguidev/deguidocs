@@ -37,6 +37,32 @@ export default defineConfig({
 					label: 'Guías',
 					link: '/guides/'
 				},
+
+				{
+					label: 'Base de datos',
+					collapsed: true,
+					items: [
+						{
+							label: 'Oracle',
+							collapsed: true,
+							items: [
+								{ label: '1. Introducción a Oracle', link: '/db/oracle/introduccion/' },
+								{ label: '2. Tipos de Datos en Oracle', link: '/db/oracle/tipos-datos/' },
+								{ label: '3. Restricciones (Constraints)', link: '/db/oracle/restricciones/' },
+								{ label: '4. DDL (Data Definition Language)', link: '/db/oracle/ddl/' },
+								{ label: '5. DML (Data Manipulation Language)', link: '/db/oracle/dml/' },
+								{ label: '6. DCL (Data Control Language)', link: '/db/oracle/dcl/' },
+								{ label: '7. TCL (Transaction Control Language)', link: '/db/oracle/tcl/' },
+								{ label: '8. Administración de Usuarios, Permisos y Roles', link: '/db/oracle/usuarios-permisos/' },
+								{ label: '9. Funciones Oracle', link: '/db/oracle/funciones/' },
+								{ label: '10. Procesamientos, Funciones y Vistas', link: '/db/oracle/procesamientos-funciones-vistas/' },
+								{ label: '11. Programación con PL/SQL', link: '/db/oracle/plsql/' },
+								{ label: '12. Triggers, secuencias, índices y otros objetos avanzados', link: '/db/oracle/objetos-avanzados/' }
+							]
+						}
+					]
+				},
+				
 				{
 					label: 'Lenguajes de Programación',
 					collapsed: false,
