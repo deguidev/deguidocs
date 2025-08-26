@@ -9,6 +9,281 @@ import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
 
+
+## Secuencias
+
+Las secuencias son objetos de base de datos que generan números enteros únicos en orden ascendente o descendente. Son comúnmente utilizadas para crear valores de clave primaria de forma automática.
+
+### ¿Qué son las secuencias?
+
+Una secuencia es un objeto de esquema que genera valores numéricos secuenciales según una especificación definida. Las secuencias simplifican la programación de aplicaciones al generar automáticamente valores únicos, eliminando la necesidad de escribir código para esta tarea.
+
+<Aside type="note">
+  Las secuencias son especialmente útiles para generar claves primarias únicas de forma automática, evitando así la necesidad de bloquear tablas durante la inserción de nuevos registros.
+</Aside>
+
+### Creación de secuencias
+
+La sintaxis básica para crear una secuencia es:
+
+```sql
+CREATE SEQUENCE nombre_secuencia
+[INCREMENT BY n]
+[START WITH n]
+[MAXVALUE n | NOMAXVALUE]
+[MINVALUE n | NOMINVALUE]
+[CYCLE | NOCYCLE]
+[CACHE n | NOCACHE]
+[ORDER | NOORDER];
+```
+
+#### Parámetros principales
+
+<Tabs>
+  <TabItem label="INCREMENT BY">
+    Define el incremento entre números consecutivos. Puede ser positivo (secuencia ascendente) o negativo (secuencia descendente).
+    
+    ```sql
+    -- Secuencia que incrementa de 10 en 10
+    CREATE SEQUENCE seq_decenas
+    INCREMENT BY 10
+    START WITH 10;
+    ```
+  </TabItem>
+  
+  <TabItem label="START WITH">
+    Define el primer valor que generará la secuencia.
+    
+    ```sql
+    -- Secuencia que comienza en 1000
+    CREATE SEQUENCE seq_facturas
+    START WITH 1000;
+    ```
+  </TabItem>
+  
+  <TabItem label="MAXVALUE/NOMAXVALUE">
+    Define el valor máximo que puede alcanzar la secuencia. NOMAXVALUE permite que la secuencia alcance el máximo valor permitido por Oracle.
+    
+    ```sql
+    -- Secuencia con valor máximo definido
+    CREATE SEQUENCE seq_limitada
+    MAXVALUE 9999;
+    ```
+  </TabItem>
+  
+  <TabItem label="MINVALUE/NOMINVALUE">
+    Define el valor mínimo que puede alcanzar la secuencia. NOMINVALUE permite que la secuencia alcance el mínimo valor permitido por Oracle.
+    
+    ```sql
+    -- Secuencia con valor mínimo definido
+    CREATE SEQUENCE seq_numeracion
+    MINVALUE 1;
+    ```
+  </TabItem>
+  
+  <TabItem label="CYCLE/NOCYCLE">
+    Determina si la secuencia debe reiniciarse cuando alcanza su valor máximo (CYCLE) o generar un error (NOCYCLE).
+    
+    ```sql
+    -- Secuencia cíclica que se reinicia al llegar a 100
+    CREATE SEQUENCE seq_ciclica
+    MAXVALUE 100
+    CYCLE;
+    ```
+  </TabItem>
+  
+  <TabItem label="CACHE/NOCACHE">
+    Especifica cuántos valores de secuencia Oracle preasigna y mantiene en memoria para acceso rápido. NOCACHE deshabilita el almacenamiento en caché.
+    
+    ```sql
+    -- Secuencia con caché de 50 valores
+    CREATE SEQUENCE seq_pedidos
+    CACHE 50;
+    ```
+  </TabItem>
+  
+  <TabItem label="ORDER/NOORDER">
+    Garantiza que los valores se generan en el orden de las solicitudes (ORDER) o no (NOORDER). ORDER es importante en entornos RAC (Real Application Clusters).
+    
+    ```sql
+    -- Secuencia que garantiza orden estricto
+    CREATE SEQUENCE seq_transacciones
+    ORDER;
+    ```
+  </TabItem>
+</Tabs>
+
+### Uso de secuencias
+
+Para obtener el siguiente valor de una secuencia, se utiliza la pseudocolumna `NEXTVAL`. Para obtener el valor actual (el último valor generado en la sesión actual), se utiliza `CURRVAL`.
+
+```sql
+-- Obtener el siguiente valor
+SELECT seq_empleados.NEXTVAL FROM dual;
+
+-- Obtener el valor actual
+SELECT seq_empleados.CURRVAL FROM dual;
+```
+
+#### Uso en instrucciones INSERT
+
+```sql
+-- Insertar un nuevo empleado con ID generado automáticamente
+INSERT INTO empleados (empleado_id, nombre, salario)
+VALUES (seq_empleados.NEXTVAL, 'Juan Pérez', 3000);
+```
+
+#### Uso en instrucciones SELECT
+
+```sql
+-- Asignar números secuenciales a resultados de consulta
+SELECT seq_numeracion.NEXTVAL AS num, nombre
+FROM empleados;
+```
+
+### Gestión de secuencias
+
+```sql
+-- Ver todas las secuencias del esquema actual
+SELECT sequence_name, min_value, max_value, increment_by, last_number, cache_size, cycle_flag
+FROM user_sequences;
+
+-- Modificar una secuencia existente
+ALTER SEQUENCE seq_empleados
+INCREMENT BY 5
+MAXVALUE 10000
+NOCACHE;
+
+-- Eliminar una secuencia
+DROP SEQUENCE seq_empleados;
+```
+
+### Consideraciones importantes
+
+1. **Huecos en la secuencia**: Pueden producirse huecos en los valores generados debido a rollbacks de transacciones, fallos del sistema o valores almacenados en caché que no se utilizan.
+
+2. **Rendimiento**: El uso de CACHE mejora significativamente el rendimiento al reducir los accesos al diccionario de datos.
+
+3. **Concurrencia**: Las secuencias están diseñadas para entornos de alta concurrencia, ya que no requieren bloqueos para generar nuevos valores.
+
+4. **Valores no recuperables**: Una vez que se genera un valor de secuencia, no se puede recuperar, incluso si la transacción que lo utilizó se revierte.
+
+<Aside type="caution">
+  En entornos RAC (Real Application Clusters), considere usar la opción ORDER si necesita garantizar que los valores se asignen en el orden estricto de las solicitudes, aunque esto puede afectar al rendimiento.
+</Aside>
+
+### Ejemplo práctico: Sistema de facturación
+
+```sql
+-- Crear una secuencia para números de factura
+CREATE SEQUENCE seq_num_factura
+START WITH 10000
+INCREMENT BY 1
+MINVALUE 10000
+MAXVALUE 999999
+NOCYCLE
+CACHE 20;
+
+-- Procedimiento para generar una nueva factura
+CREATE OR REPLACE PROCEDURE crear_factura (
+    p_cliente_id IN NUMBER,
+    p_fecha IN DATE,
+    p_factura_id OUT NUMBER
+) AS
+BEGIN
+    -- Obtener nuevo número de factura
+    SELECT seq_num_factura.NEXTVAL INTO p_factura_id FROM dual;
+    
+    -- Crear la factura con el ID generado
+    INSERT INTO facturas (
+        factura_id,
+        cliente_id,
+        fecha,
+        estado
+    ) VALUES (
+        p_factura_id,
+        p_cliente_id,
+        p_fecha,
+        'PENDIENTE'
+    );
+    
+    -- Registrar la creación de la factura
+    INSERT INTO log_sistema (mensaje)
+    VALUES ('Factura ' || p_factura_id || ' creada para cliente ' || p_cliente_id);
+    
+    COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END;
+/
+
+-- Ejemplo de uso del procedimiento
+DECLARE
+    v_factura_id NUMBER;
+BEGIN
+    crear_factura(101, SYSDATE, v_factura_id);
+    DBMS_OUTPUT.PUT_LINE('Factura creada con ID: ' || v_factura_id);
+END;
+/
+```
+
+### Secuencias vs. Identity Columns
+
+Desde Oracle 12c, se introdujo la funcionalidad de columnas de identidad (IDENTITY COLUMNS) como una alternativa a las secuencias tradicionales.
+
+<Tabs>
+  <TabItem label="Secuencia tradicional">
+    ```sql
+    -- Crear secuencia
+    CREATE SEQUENCE seq_productos START WITH 1;
+    
+    -- Crear tabla que usa la secuencia
+    CREATE TABLE productos (
+        producto_id NUMBER PRIMARY KEY,
+        nombre VARCHAR2(100),
+        precio NUMBER(10,2)
+    );
+    
+    -- Insertar usando la secuencia
+    INSERT INTO productos (producto_id, nombre, precio)
+    VALUES (seq_productos.NEXTVAL, 'Laptop', 1200);
+    ```
+  </TabItem>
+  
+  <TabItem label="Columna de identidad">
+    ```sql
+    -- Crear tabla con columna de identidad
+    CREATE TABLE productos (
+        producto_id NUMBER GENERATED ALWAYS AS IDENTITY,
+        nombre VARCHAR2(100),
+        precio NUMBER(10,2),
+        CONSTRAINT pk_productos PRIMARY KEY (producto_id)
+    );
+    
+    -- Insertar sin especificar el ID (se genera automáticamente)
+    INSERT INTO productos (nombre, precio)
+    VALUES ('Laptop', 1200);
+    ```
+  </TabItem>
+</Tabs>
+
+#### Comparación
+
+| Característica | Secuencias | Columnas de identidad |
+|----------------|------------|------------------------|
+| Independencia | Objeto independiente de la tabla | Vinculada directamente a la tabla |
+| Reutilización | Puede usarse en múltiples tablas | Específica para una columna |
+| Control | Mayor control sobre la generación de valores | Configuración más simple |
+| Sintaxis INSERT | Requiere NEXTVAL explícito | No requiere especificar la columna |
+| Personalización | Altamente personalizable | Opciones más limitadas |
+
+<Aside type="tip">
+  Para aplicaciones nuevas en Oracle 12c o superior, considere usar columnas de identidad para simplificar el código. Para aplicaciones que requieren mayor control o compatibilidad con versiones anteriores, las secuencias tradicionales siguen siendo la mejor opción.
+</Aside>
+
+
 ## Triggers (disparadores)
 
 Los triggers o disparadores son objetos de base de datos que se ejecutan automáticamente en respuesta a ciertos eventos sobre una tabla o vista. Permiten implementar reglas de negocio complejas, mantener la integridad de los datos y automatizar tareas.
@@ -409,275 +684,3 @@ BEGIN
 END;
 ```
 
-## Secuencias
-
-Las secuencias son objetos de base de datos que generan números enteros únicos en orden ascendente o descendente. Son comúnmente utilizadas para crear valores de clave primaria de forma automática.
-
-### ¿Qué son las secuencias?
-
-Una secuencia es un objeto de esquema que genera valores numéricos secuenciales según una especificación definida. Las secuencias simplifican la programación de aplicaciones al generar automáticamente valores únicos, eliminando la necesidad de escribir código para esta tarea.
-
-<Aside type="note">
-  Las secuencias son especialmente útiles para generar claves primarias únicas de forma automática, evitando así la necesidad de bloquear tablas durante la inserción de nuevos registros.
-</Aside>
-
-### Creación de secuencias
-
-La sintaxis básica para crear una secuencia es:
-
-```sql
-CREATE SEQUENCE nombre_secuencia
-[INCREMENT BY n]
-[START WITH n]
-[MAXVALUE n | NOMAXVALUE]
-[MINVALUE n | NOMINVALUE]
-[CYCLE | NOCYCLE]
-[CACHE n | NOCACHE]
-[ORDER | NOORDER];
-```
-
-#### Parámetros principales
-
-<Tabs>
-  <TabItem label="INCREMENT BY">
-    Define el incremento entre números consecutivos. Puede ser positivo (secuencia ascendente) o negativo (secuencia descendente).
-    
-    ```sql
-    -- Secuencia que incrementa de 10 en 10
-    CREATE SEQUENCE seq_decenas
-    INCREMENT BY 10
-    START WITH 10;
-    ```
-  </TabItem>
-  
-  <TabItem label="START WITH">
-    Define el primer valor que generará la secuencia.
-    
-    ```sql
-    -- Secuencia que comienza en 1000
-    CREATE SEQUENCE seq_facturas
-    START WITH 1000;
-    ```
-  </TabItem>
-  
-  <TabItem label="MAXVALUE/NOMAXVALUE">
-    Define el valor máximo que puede alcanzar la secuencia. NOMAXVALUE permite que la secuencia alcance el máximo valor permitido por Oracle.
-    
-    ```sql
-    -- Secuencia con valor máximo definido
-    CREATE SEQUENCE seq_limitada
-    MAXVALUE 9999;
-    ```
-  </TabItem>
-  
-  <TabItem label="MINVALUE/NOMINVALUE">
-    Define el valor mínimo que puede alcanzar la secuencia. NOMINVALUE permite que la secuencia alcance el mínimo valor permitido por Oracle.
-    
-    ```sql
-    -- Secuencia con valor mínimo definido
-    CREATE SEQUENCE seq_numeracion
-    MINVALUE 1;
-    ```
-  </TabItem>
-  
-  <TabItem label="CYCLE/NOCYCLE">
-    Determina si la secuencia debe reiniciarse cuando alcanza su valor máximo (CYCLE) o generar un error (NOCYCLE).
-    
-    ```sql
-    -- Secuencia cíclica que se reinicia al llegar a 100
-    CREATE SEQUENCE seq_ciclica
-    MAXVALUE 100
-    CYCLE;
-    ```
-  </TabItem>
-  
-  <TabItem label="CACHE/NOCACHE">
-    Especifica cuántos valores de secuencia Oracle preasigna y mantiene en memoria para acceso rápido. NOCACHE deshabilita el almacenamiento en caché.
-    
-    ```sql
-    -- Secuencia con caché de 50 valores
-    CREATE SEQUENCE seq_pedidos
-    CACHE 50;
-    ```
-  </TabItem>
-  
-  <TabItem label="ORDER/NOORDER">
-    Garantiza que los valores se generan en el orden de las solicitudes (ORDER) o no (NOORDER). ORDER es importante en entornos RAC (Real Application Clusters).
-    
-    ```sql
-    -- Secuencia que garantiza orden estricto
-    CREATE SEQUENCE seq_transacciones
-    ORDER;
-    ```
-  </TabItem>
-</Tabs>
-
-### Uso de secuencias
-
-Para obtener el siguiente valor de una secuencia, se utiliza la pseudocolumna `NEXTVAL`. Para obtener el valor actual (el último valor generado en la sesión actual), se utiliza `CURRVAL`.
-
-```sql
--- Obtener el siguiente valor
-SELECT seq_empleados.NEXTVAL FROM dual;
-
--- Obtener el valor actual
-SELECT seq_empleados.CURRVAL FROM dual;
-```
-
-#### Uso en instrucciones INSERT
-
-```sql
--- Insertar un nuevo empleado con ID generado automáticamente
-INSERT INTO empleados (empleado_id, nombre, salario)
-VALUES (seq_empleados.NEXTVAL, 'Juan Pérez', 3000);
-```
-
-#### Uso en instrucciones SELECT
-
-```sql
--- Asignar números secuenciales a resultados de consulta
-SELECT seq_numeracion.NEXTVAL AS num, nombre
-FROM empleados;
-```
-
-### Gestión de secuencias
-
-```sql
--- Ver todas las secuencias del esquema actual
-SELECT sequence_name, min_value, max_value, increment_by, last_number, cache_size, cycle_flag
-FROM user_sequences;
-
--- Modificar una secuencia existente
-ALTER SEQUENCE seq_empleados
-INCREMENT BY 5
-MAXVALUE 10000
-NOCACHE;
-
--- Eliminar una secuencia
-DROP SEQUENCE seq_empleados;
-```
-
-### Consideraciones importantes
-
-1. **Huecos en la secuencia**: Pueden producirse huecos en los valores generados debido a rollbacks de transacciones, fallos del sistema o valores almacenados en caché que no se utilizan.
-
-2. **Rendimiento**: El uso de CACHE mejora significativamente el rendimiento al reducir los accesos al diccionario de datos.
-
-3. **Concurrencia**: Las secuencias están diseñadas para entornos de alta concurrencia, ya que no requieren bloqueos para generar nuevos valores.
-
-4. **Valores no recuperables**: Una vez que se genera un valor de secuencia, no se puede recuperar, incluso si la transacción que lo utilizó se revierte.
-
-<Aside type="caution">
-  En entornos RAC (Real Application Clusters), considere usar la opción ORDER si necesita garantizar que los valores se asignen en el orden estricto de las solicitudes, aunque esto puede afectar al rendimiento.
-</Aside>
-
-### Ejemplo práctico: Sistema de facturación
-
-```sql
--- Crear una secuencia para números de factura
-CREATE SEQUENCE seq_num_factura
-START WITH 10000
-INCREMENT BY 1
-MINVALUE 10000
-MAXVALUE 999999
-NOCYCLE
-CACHE 20;
-
--- Procedimiento para generar una nueva factura
-CREATE OR REPLACE PROCEDURE crear_factura (
-    p_cliente_id IN NUMBER,
-    p_fecha IN DATE,
-    p_factura_id OUT NUMBER
-) AS
-BEGIN
-    -- Obtener nuevo número de factura
-    SELECT seq_num_factura.NEXTVAL INTO p_factura_id FROM dual;
-    
-    -- Crear la factura con el ID generado
-    INSERT INTO facturas (
-        factura_id,
-        cliente_id,
-        fecha,
-        estado
-    ) VALUES (
-        p_factura_id,
-        p_cliente_id,
-        p_fecha,
-        'PENDIENTE'
-    );
-    
-    -- Registrar la creación de la factura
-    INSERT INTO log_sistema (mensaje)
-    VALUES ('Factura ' || p_factura_id || ' creada para cliente ' || p_cliente_id);
-    
-    COMMIT;
-EXCEPTION
-    WHEN OTHERS THEN
-        ROLLBACK;
-        RAISE;
-END;
-/
-
--- Ejemplo de uso del procedimiento
-DECLARE
-    v_factura_id NUMBER;
-BEGIN
-    crear_factura(101, SYSDATE, v_factura_id);
-    DBMS_OUTPUT.PUT_LINE('Factura creada con ID: ' || v_factura_id);
-END;
-/
-```
-
-### Secuencias vs. Identity Columns
-
-Desde Oracle 12c, se introdujo la funcionalidad de columnas de identidad (IDENTITY COLUMNS) como una alternativa a las secuencias tradicionales.
-
-<Tabs>
-  <TabItem label="Secuencia tradicional">
-    ```sql
-    -- Crear secuencia
-    CREATE SEQUENCE seq_productos START WITH 1;
-    
-    -- Crear tabla que usa la secuencia
-    CREATE TABLE productos (
-        producto_id NUMBER PRIMARY KEY,
-        nombre VARCHAR2(100),
-        precio NUMBER(10,2)
-    );
-    
-    -- Insertar usando la secuencia
-    INSERT INTO productos (producto_id, nombre, precio)
-    VALUES (seq_productos.NEXTVAL, 'Laptop', 1200);
-    ```
-  </TabItem>
-  
-  <TabItem label="Columna de identidad">
-    ```sql
-    -- Crear tabla con columna de identidad
-    CREATE TABLE productos (
-        producto_id NUMBER GENERATED ALWAYS AS IDENTITY,
-        nombre VARCHAR2(100),
-        precio NUMBER(10,2),
-        CONSTRAINT pk_productos PRIMARY KEY (producto_id)
-    );
-    
-    -- Insertar sin especificar el ID (se genera automáticamente)
-    INSERT INTO productos (nombre, precio)
-    VALUES ('Laptop', 1200);
-    ```
-  </TabItem>
-</Tabs>
-
-#### Comparación
-
-| Característica | Secuencias | Columnas de identidad |
-|----------------|------------|------------------------|
-| Independencia | Objeto independiente de la tabla | Vinculada directamente a la tabla |
-| Reutilización | Puede usarse en múltiples tablas | Específica para una columna |
-| Control | Mayor control sobre la generación de valores | Configuración más simple |
-| Sintaxis INSERT | Requiere NEXTVAL explícito | No requiere especificar la columna |
-| Personalización | Altamente personalizable | Opciones más limitadas |
-
-<Aside type="tip">
-  Para aplicaciones nuevas en Oracle 12c o superior, considere usar columnas de identidad para simplificar el código. Para aplicaciones que requieren mayor control o compatibilidad con versiones anteriores, las secuencias tradicionales siguen siendo la mejor opción.
-</Aside>

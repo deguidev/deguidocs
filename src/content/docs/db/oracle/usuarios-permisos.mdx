@@ -73,22 +73,81 @@ CREATE USER nombre_usuario
   
   <TabItem label="Usuario con perfil">
     ```sql
-    -- Crear un perfil con restricciones
-    CREATE PROFILE perfil_desarrollo LIMIT
-      SESSIONS_PER_USER 3
-      CPU_PER_SESSION UNLIMITED
-      PASSWORD_LIFE_TIME 90
-      PASSWORD_REUSE_TIME 365
-      PASSWORD_REUSE_MAX 10
-      FAILED_LOGIN_ATTEMPTS 5
-      PASSWORD_LOCK_TIME 1/24;
+    -- Dos formas de dar permisos en Oracle
     
-    -- Crear usuario con el perfil
+    -- 1) Roles "clásicos" (rápidos)
+    GRANT CONNECT, RESOURCE TO usuario3;
+    
+    -- CONNECT: hoy en día básicamente equivale a CREATE SESSION (poder conectarse).
+    -- RESOURCE: permite crear varios objetos (tablas, procedimientos, triggers, etc.).
+    -- Nota: en versiones antiguas incluía UNLIMITED TABLESPACE; en modernas ya no.
+    -- ✅ Rápido para entornos de práctica.
+    -- ⚠️ Menos control fino (da más de lo que quizás necesitas).
+    
+    -- 2) Privilegios precisos (recomendado en 12c+)
+    -- Otorgas solo lo necesario:
+    GRANT CREATE SESSION TO usuario3;        -- conectarse
+    GRANT CREATE TABLE TO usuario3;          -- crear tablas
+    GRANT CREATE VIEW TO usuario3;           -- crear vistas
+    GRANT CREATE SEQUENCE TO usuario3;       -- crear secuencias
+    GRANT CREATE PROCEDURE TO usuario3;      -- crear procedimientos/funciones
+    GRANT CREATE TRIGGER TO usuario3;        -- crear triggers
+    GRANT CREATE TYPE TO usuario3;           -- (opcional) tipos de objeto/colecciones
+    GRANT CREATE SYNONYM TO usuario3;        -- (opcional) sinónimos privados
+    GRANT CREATE MATERIALIZED VIEW TO usuario3; -- (opcional) MV
+    
+    -- 🔴 Muy importante: Para crear objetos en un tablespace, además de los privilegios de creación, 
+    -- el usuario necesita cuota en el tablespace.
+    ALTER USER usuario3 QUOTA UNLIMITED ON users;
+    -- o una cuota limitada:
+    -- ALTER USER usuario3 QUOTA 200M ON users;
+    
+    -- 🧪 Script recomendado (moderno y completo para desarrollo)
+    -- 1) Crear el usuario
     CREATE USER usuario3 IDENTIFIED BY "Contraseña789"
       DEFAULT TABLESPACE users
       TEMPORARY TABLESPACE temp
       PROFILE perfil_desarrollo
       ACCOUNT UNLOCK;
+    
+    -- 2) Permitir conectarse
+    GRANT CREATE SESSION TO usuario3;
+    
+    -- 3) Permisos para crear objetos en su esquema
+    GRANT CREATE TABLE, CREATE VIEW, CREATE SEQUENCE,
+          CREATE PROCEDURE, CREATE TRIGGER,
+          CREATE TYPE, CREATE SYNONYM,
+          CREATE MATERIALIZED VIEW
+    TO usuario3;
+    
+    -- 4) MUY IMPORTANTE: dar cuota en el tablespace de datos
+    ALTER USER usuario3 QUOTA UNLIMITED ON users;
+    -- (o) ALTER USER usuario3 QUOTA 500M ON users;
+    ```
+  </TabItem>
+  
+  <TabItem label="Crear usuario DEGUIDEV">
+    ```sql
+    -- CREAR UNA BASE DE DATOS MATRICULA EN ORACLE
+    -- Nombre: DEGUIDEV -- PASO 01
+    ALTER SESSION SET "_ORACLE_SCRIPT"=TRUE;
+    
+    -- PASO 02
+    CREATE USER DEGUI IDENTIFIED BY "lipa123456"
+    DEFAULT TABLESPACE "USERS"
+    TEMPORARY TABLESPACE "TEMP";
+    
+    -- PASO 03
+    ALTER USER DEGUI QUOTA UNLIMITED ON USERS;
+    
+    -- PASO 04
+    GRANT CREATE SESSION TO DEGUI;
+    
+    -- PASO 05
+    GRANT "RESOURCE" TO DEGUI;
+    
+    -- PASO 06
+    ALTER USER DEGUI DEFAULT ROLE "RESOURCE";
     ```
   </TabItem>
 </Tabs>
