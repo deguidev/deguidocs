@@ -43,7 +43,7 @@ export default defineConfig({
 					collapsed: true,
 					items: [
 						{
-							label: 'Oracle',
+							label: 'Oracle ❤️',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Oracle', link: '/db/oracle/introduccion/' },
@@ -59,10 +59,32 @@ export default defineConfig({
 								{ label: '11. Programación con PL/SQL', link: '/db/oracle/plsql/' },
 								{ label: '12. Triggers, secuencias, índices y otros objetos avanzados', link: '/db/oracle/objetos-avanzados/' }
 							]
+						},
+						{
+							label: 'MySQL 🤗',
+							collapsed: true,
+							items: []
 						}
 					]
 				},
-				
+				{
+					label: 'Control de Versiones',
+					collapsed: true,
+					items: [
+						{
+							label: 'GitHub 🐈‍⬛',
+							collapsed: true,
+							items: [
+								{ label: '1. Introducción a Git', link: '/versiones/git/introduccion/' },
+								{ label: '2. Comandos básicos', link: '/versiones/git/comandos-basicos/' },
+								{ label: '3. Ramas y fusiones', link: '/versiones/git/ramas-fusiones/' },
+								{ label: '4. Repositorios remotos', link: '/versiones/git/repositorios-remotos/' },
+								{ label: '5. Flujos de trabajo', link: '/versiones/git/flujos-trabajo/' }
+							]
+						},
+					]
+				},
+			
 				{
 					label: 'Lenguajes de Programación',
 					collapsed: false,
@@ -263,7 +285,12 @@ export default defineConfig({
 							label:'Java Swing',
 							collapsed:true,
 							items:[
-								
+								{ label: '1. Introducción a Java y Java Swing', link: '/frameworks/java-swing/introduccion/' },
+								{ label: '2. Componentes Básicos de Swing', link: '/frameworks/java-swing/componentes-basicos/' },
+								{ label: '3. Organización de Interfaces', link: '/frameworks/java-swing/organizacion-interfaces/' },
+								{ label: '4. Tablas y Modelos Personalizados', link: '/frameworks/java-swing/tablas-modelos/' },
+								{ label: '5. CRUD con Base de Datos', link: '/frameworks/java-swing/crud-bd/' },
+								{ label: '6. Patrones de Diseño y Arquitecturas', link: '/frameworks/java-swing/patrones-arquitecturas/' }
 							]
 						},
 						{

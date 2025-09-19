@@ -1,0 +1,340 @@
+---
+title: Introducción a Java y Java Swing
+description: Fundamentos de Java y conceptos básicos de Java Swing
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Módulo 1: Introducción a Java y Java Swing
+
+## ¿Qué es Java y cómo funciona?
+
+Java es un lenguaje de programación de alto nivel, orientado a objetos, que fue desarrollado por Sun Microsystems (ahora propiedad de Oracle) en la década de 1990. Se ha convertido en uno de los lenguajes más populares del mundo debido a su versatilidad y amplia adopción en diversos sectores.
+
+<Aside type="tip">
+  Java sigue el principio de "Write Once, Run Anywhere" (WORA), lo que significa que el código escrito en Java puede ejecutarse en cualquier dispositivo que tenga instalada la Máquina Virtual de Java (JVM).
+</Aside>
+
+### Características principales de Java
+
+- **Orientado a objetos**: Todo en Java es un objeto, lo que facilita la modularidad y reutilización del código.
+- **Independiente de la plataforma**: El bytecode Java puede ejecutarse en cualquier dispositivo con JVM.
+- **Seguro**: Proporciona un entorno de ejecución con múltiples capas de seguridad.
+- **Robusto**: Gestión automática de memoria, verificación estricta de tipos y manejo de excepciones.
+- **Multihilo**: Soporte nativo para programación concurrente.
+- **Distribuido**: Diseñado con capacidades de red integradas.
+
+### ¿Cómo funciona Java?
+
+El proceso de ejecución de un programa Java sigue estos pasos:
+
+<Steps>
+<ol>
+  <li>
+    **Escritura del código fuente**: El desarrollador escribe el código en archivos con extensión `.java`
+  </li>
+  <li>
+    **Compilación**: El compilador de Java (`javac`) convierte el código fuente en bytecode, generando archivos `.class`
+  </li>
+  <li>
+    **Ejecución**: La JVM carga, verifica y ejecuta el bytecode
+  </li>
+</ol>
+</Steps>
+
+<Tabs>
+  <TabItem label="Arquitectura Java">
+    ```
+    +----------------+     +----------------+     +----------------+
+    |                |     |                |     |                |
+    |  Código fuente |---->|    Bytecode    |---->|  Ejecución en  |
+    |    (.java)     |     |    (.class)    |     |      JVM       |
+    |                |     |                |     |                |
+    +----------------+     +----------------+     +----------------+
+           |                      |                      |
+           v                      v                      v
+    Escrito por el        Generado por el        Interpretado por la
+     programador           compilador         JVM específica del SO
+    ```
+  </TabItem>
+  <TabItem label="Componentes de la JVM">
+    - **Class Loader**: Carga las clases en memoria
+    - **Verificador de Bytecode**: Asegura que el código sea seguro
+    - **Intérprete**: Ejecuta las instrucciones bytecode
+    - **JIT Compiler**: Compila el bytecode a código nativo para mejorar rendimiento
+    - **Garbage Collector**: Gestiona automáticamente la memoria
+  </TabItem>
+</Tabs>
+
+## Instalación del JDK y entorno (NetBeans o IntelliJ)
+
+### Instalación del JDK (Java Development Kit)
+
+El JDK es esencial para desarrollar aplicaciones Java, ya que incluye el compilador, herramientas de desarrollo y la JVM.
+
+<Steps>
+<ol>
+  <li>
+    **Descargar el JDK**: Visita [Oracle JDK](https://www.oracle.com/java/technologies/downloads/) o [OpenJDK](https://adoptium.net/) para obtener la versión más reciente
+  </li>
+  <li>
+    **Instalar el JDK**: Ejecuta el instalador y sigue las instrucciones
+  </li>
+  <li>
+    **Configurar variables de entorno**:
+    - JAVA_HOME: Ruta al directorio de instalación del JDK
+    - PATH: Añadir %JAVA_HOME%\bin (Windows) o $JAVA_HOME/bin (Unix/Linux)
+  </li>
+  <li>
+    **Verificar la instalación**: Abre una terminal y ejecuta `java -version` y `javac -version`
+  </li>
+</ol>
+</Steps>
+
+### Configuración de un IDE
+
+Un IDE (Entorno de Desarrollo Integrado) facilita enormemente el desarrollo en Java.
+
+<Tabs>
+  <TabItem label="NetBeans">
+    <Steps>
+<ol>
+      <li>Descarga NetBeans desde [netbeans.apache.org](https://netbeans.apache.org/)</li>
+      <li>Ejecuta el instalador y sigue las instrucciones</li>
+      <li>Durante la instalación, asegúrate de que detecte correctamente el JDK instalado</li>
+      <li>Una vez instalado, puedes crear un nuevo proyecto Java desde File > New Project</li>
+</ol>
+    </Steps>
+    
+    <Aside type="note">
+      NetBeans es especialmente bueno para el desarrollo de aplicaciones Swing, ya que incluye un diseñador visual de interfaces.
+    </Aside>
+  </TabItem>
+  
+  <TabItem label="IntelliJ IDEA">
+    <Steps>
+<ol>
+      <li>Descarga IntelliJ IDEA desde [jetbrains.com/idea](https://www.jetbrains.com/idea/)</li>
+      <li>Está disponible en versión Community (gratuita) y Ultimate (de pago)</li>
+      <li>Ejecuta el instalador y sigue las instrucciones</li>
+      <li>Al iniciar por primera vez, configura el JDK en File > Project Structure > SDKs</li>
+      <li>Crea un nuevo proyecto Java desde File > New > Project</li>
+</ol>
+    </Steps>
+    
+    <Aside type="tip">
+      IntelliJ IDEA ofrece potentes herramientas de refactorización y análisis de código que pueden mejorar significativamente tu productividad.
+    </Aside>
+  </TabItem>
+</Tabs>
+
+## Primer programa con main en Java
+
+Crear un programa "Hola Mundo" es el primer paso tradicional al aprender un nuevo lenguaje de programación.
+
+<Code code={`public class HolaMundo {
+    public static void main(String[] args) {
+        System.out.println("¡Hola, mundo!");
+    }
+}`} lang="java" title="HolaMundo.java" />
+
+### Explicación del código
+
+- `public class HolaMundo`: Define una clase pública llamada HolaMundo
+- `public static void main(String[] args)`: El método principal que se ejecuta al iniciar el programa
+  - `public`: Accesible desde cualquier parte
+  - `static`: Pertenece a la clase, no a una instancia
+  - `void`: No devuelve ningún valor
+  - `main`: Nombre del método (punto de entrada)
+  - `String[] args`: Array de argumentos pasados por línea de comandos
+- `System.out.println("¡Hola, mundo!")`: Imprime el texto en la consola
+
+### Compilación y ejecución
+
+<Tabs>
+  <TabItem label="Desde la línea de comandos">
+    ```bash
+    # Compilar el programa
+    javac HolaMundo.java
+    
+    # Ejecutar el programa
+    java HolaMundo
+    ```
+  </TabItem>
+  
+  <TabItem label="Desde un IDE">
+    1. Crea un nuevo proyecto Java
+    2. Crea una nueva clase llamada HolaMundo
+    3. Escribe el código mostrado anteriormente
+    4. Haz clic en el botón "Run" o presiona Shift+F10 (IntelliJ) o F6 (NetBeans)
+  </TabItem>
+</Tabs>
+
+## ¿Qué es Java Swing?
+
+Java Swing es una biblioteca gráfica para crear interfaces de usuario (GUI) en aplicaciones Java. Forma parte del Java Foundation Classes (JFC) y proporciona componentes más sofisticados y flexibles que su predecesor, el Abstract Window Toolkit (AWT).
+
+<Aside type="note">
+  Swing fue introducido en Java 1.2 (1998) como una mejora significativa sobre AWT, ofreciendo componentes más avanzados y mayor personalización.
+</Aside>
+
+### Características principales de Swing
+
+- **Componentes ligeros (lightweight)**: Dibujados por Java, no por el sistema operativo
+- **Look and Feel personalizable**: Permite cambiar la apariencia de la aplicación
+- **Arquitectura MVC (Modelo-Vista-Controlador)**: Separa la lógica de la presentación
+- **Amplia variedad de componentes**: Botones, tablas, árboles, pestañas, etc.
+- **Gestores de diseño (layout managers)**: Para organizar componentes de forma flexible
+- **Manejo de eventos**: Sistema robusto para responder a acciones del usuario
+
+### Jerarquía de componentes Swing
+
+```
+Object
+  └── Component (AWT)
+       └── Container
+            └── Window
+                 └── Frame
+                      └── JFrame (Swing)
+```
+
+<Badge text="Componentes comunes" variant="default" />
+
+| Componente | Descripción |
+|------------|-------------|
+| JFrame | Ventana principal de la aplicación |
+| JPanel | Contenedor para organizar componentes |
+| JButton | Botón que puede ser presionado |
+| JLabel | Muestra texto o imágenes |
+| JTextField | Campo para entrada de texto |
+| JComboBox | Lista desplegable |
+| JTable | Muestra datos en formato tabular |
+| JScrollPane | Agrega barras de desplazamiento |
+
+## Diferencias entre AWT y Swing
+
+AWT (Abstract Window Toolkit) fue la primera biblioteca GUI para Java, mientras que Swing es su sucesor mejorado.
+
+<Tabs>
+  <TabItem label="Tabla comparativa">
+    | Característica | AWT | Swing |
+    |---------------|-----|-------|
+    | Tipo de componentes | Pesados (dependen del SO) | Ligeros (independientes del SO) |
+    | Rendimiento | Más rápido en sistemas antiguos | Optimizado para sistemas modernos |
+    | Apariencia | Nativa del SO | Personalizable (Look and Feel) |
+    | Prefijo de clases | Sin prefijo específico | Comienzan con "J" (JButton, JFrame) |
+    | Componentes disponibles | Limitados | Extensos y avanzados |
+    | Arquitectura | Simple | MVC (Modelo-Vista-Controlador) |
+    | Doble buffer | No soportado | Soportado (evita parpadeo) |
+    | Personalización | Limitada | Altamente personalizable |
+  </TabItem>
+  
+  <TabItem label="Ventajas de Swing sobre AWT">
+    - **Consistencia visual**: Misma apariencia en todas las plataformas
+    - **Mayor flexibilidad**: Más opciones de personalización
+    - **Componentes avanzados**: Tablas, árboles, pestañas, etc.
+    - **Mejor arquitectura**: Separación de datos y presentación
+    - **Menos bugs**: No depende de la implementación nativa del SO
+    - **Doble buffer**: Elimina el parpadeo al redibujar
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+  Aunque Swing ofrece muchas ventajas, puede ser más lento que AWT en aplicaciones muy grandes o en sistemas con recursos limitados.
+</Aside>
+
+## Estructura básica de una ventana (JFrame)
+
+JFrame es el componente principal para crear ventanas en Swing. Sirve como contenedor de alto nivel para otros componentes.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class VentanaBasica extends JFrame {
+    
+    public VentanaBasica() {
+        // Configuración de la ventana
+        setTitle("Mi Primera Ventana");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null); // Centra la ventana
+        
+        // Crear componentes
+        JLabel etiqueta = new JLabel("¡Bienvenido a Java Swing!");
+        etiqueta.setHorizontalAlignment(JLabel.CENTER);
+        etiqueta.setFont(new Font("Arial", Font.BOLD, 18));
+        
+        JButton boton = new JButton("Haz clic aquí");
+        
+        // Crear panel para organizar componentes
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.add(etiqueta, BorderLayout.CENTER);
+        panel.add(boton, BorderLayout.SOUTH);
+        
+        // Agregar panel a la ventana
+        add(panel);
+        
+        // Hacer visible la ventana
+        setVisible(true);
+    }
+    
+    public static void main(String[] args) {
+        // Ejecutar la aplicación en el EDT (Event Dispatch Thread)
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new VentanaBasica();
+            }
+        });
+    }
+}`} lang="java" title="VentanaBasica.java" />
+
+### Elementos clave de un JFrame
+
+<Steps>
+<ol>
+  <li>
+    **Importaciones necesarias**:
+    - `javax.swing.*`: Para componentes Swing
+    - `java.awt.*`: Para layouts y otros elementos AWT que Swing utiliza
+  </li>
+  <li>
+    **Configuración básica**:
+    - `setTitle()`: Establece el título de la ventana
+    - `setSize()`: Define el tamaño inicial (ancho, alto)
+    - `setDefaultCloseOperation()`: Comportamiento al cerrar (EXIT_ON_CLOSE cierra la aplicación)
+    - `setLocationRelativeTo(null)`: Centra la ventana en la pantalla
+  </li>
+  <li>
+    **Agregar componentes**:
+    - Crear los componentes (JLabel, JButton, etc.)
+    - Organizarlos usando paneles y layouts
+    - Añadirlos a la ventana con `add()`
+  </li>
+  <li>
+    **Hacer visible la ventana**:
+    - `setVisible(true)`: Muestra la ventana en pantalla
+  </li>
+  <li>
+    **Event Dispatch Thread**:
+    - `SwingUtilities.invokeLater()`: Asegura que la interfaz se cree en el hilo adecuado
+  </li>
+</ol>
+</Steps>
+
+<Aside type="note">
+  Siempre crea y manipula componentes Swing en el Event Dispatch Thread (EDT) para evitar problemas de concurrencia. Usa `SwingUtilities.invokeLater()` para asegurarte de que el código se ejecute en el EDT.
+</Aside>
+
+### Ciclo de vida de una aplicación Swing
+
+1. **Inicialización**: Configuración de la ventana y componentes
+2. **Visualización**: Mostrar la interfaz al usuario
+3. **Manejo de eventos**: Responder a las acciones del usuario
+4. **Actualización de la interfaz**: Reflejar cambios en el estado de la aplicación
+5. **Cierre**: Liberar recursos y terminar la aplicación
