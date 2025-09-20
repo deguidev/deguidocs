@@ -1,0 +1,292 @@
+---
+title: 4. Notación UML para Clases
+description: Símbolos y convenciones para representar clases en diagramas UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Notación UML para Clases
+
+La notación UML (Unified Modeling Language) para clases proporciona un conjunto estándar de símbolos y convenciones que permiten representar clases y sus relaciones de manera clara y consistente. Esta notación es esencial para crear diagramas de clases efectivos que comuniquen correctamente la estructura de un sistema orientado a objetos.
+
+## 4.1. Representación gráfica de una clase
+
+En UML, una clase se representa mediante un rectángulo dividido en tres compartimentos o secciones. Cada sección tiene un propósito específico y sigue reglas de notación particulares.
+
+### Estructura básica
+
+<Code code={`[NombreClase]
+-----------------
+| atributos     |
+-----------------
+| operaciones   |
+-----------------`} lang="text" title="Estructura básica de una clase en UML" />
+
+### Compartimentos de una clase
+
+<Tabs>
+  <TabItem label="Compartimento superior">
+    Contiene el **nombre de la clase** con las siguientes características:
+    
+    - Se escribe centrado
+    - La primera letra en mayúscula (convención PascalCase)
+    - Puede incluir el nombre del paquete: `paquete::NombreClase`
+    - Se puede mostrar en **negrita** o *cursiva* para indicar propiedades especiales
+      - *Cursiva*: Clase abstracta
+      - **Negrita**: Clase estática
+  </TabItem>
+  
+  <TabItem label="Compartimento intermedio">
+    Contiene los **atributos** de la clase:
+    
+    - Cada atributo en una línea separada
+    - Incluye visibilidad, nombre, tipo y valores iniciales
+    - Puede omitirse si no es relevante para el diagrama
+    - Puede incluir restricciones y propiedades adicionales
+  </TabItem>
+  
+  <TabItem label="Compartimento inferior">
+    Contiene las **operaciones** (métodos) de la clase:
+    
+    - Cada operación en una línea separada
+    - Incluye visibilidad, nombre, parámetros y tipo de retorno
+    - Puede omitirse si no es relevante para el diagrama
+    - Puede incluir restricciones y propiedades adicionales
+  </TabItem>
+</Tabs>
+
+### Variaciones en la representación
+
+<Code code={`[NombreClase]
+-----------------`} lang="text" title="Clase simplificada (solo nombre)" />
+
+<Code code={`[NombreClase]
+-----------------
+| atributos     |
+-----------------`} lang="text" title="Clase con nombre y atributos" />
+
+<Code code={`[<<interfaz>>]
+[NombreInterfaz]
+-----------------
+| operaciones   |
+-----------------`} lang="text" title="Interfaz en UML" />
+
+<Aside type="tip">
+  En diagramas complejos, es común simplificar la representación de clases mostrando solo la información relevante para el contexto específico. Por ejemplo, en un diagrama que muestra principalmente relaciones, podría omitirse el compartimento de atributos y operaciones.
+</Aside>
+
+## 4.2. Representación de atributos
+
+Los atributos en UML siguen una sintaxis específica que permite expresar diversas propiedades y características.
+
+### Sintaxis completa de un atributo
+
+<Code code={`visibilidad nombre: tipo [multiplicidad] = valorPredeterminado {propiedades}`} lang="text" title="Sintaxis de atributos en UML" />
+
+### Elementos de un atributo
+
+<Tabs>
+  <TabItem label="Visibilidad">
+    <div>
+      <p>Indica el nivel de acceso al atributo:</p>
+      <ul>
+        <li><Badge text="+ Público" variant="success" /> - Accesible desde cualquier clase</li>
+        <li><Badge text="- Privado" variant="danger" /> - Accesible solo desde la propia clase</li>
+        <li><Badge text="# Protegido" variant="default" /> - Accesible desde la clase y sus subclases</li>
+        <li><Badge text="~ Paquete" variant="note" /> - Accesible desde clases del mismo paquete</li>
+      </ul>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Nombre y tipo">
+    <div>
+      <ul>
+        <li><strong>nombre</strong>: Identificador del atributo (generalmente en camelCase)</li>
+        <li><strong>tipo</strong>: Tipo de dato del atributo (String, Integer, Boolean, etc.)</li>
+        <li><strong>multiplicidad</strong>: Indica cuántas instancias puede tener (ej. [0..1], [1..*])</li>
+      </ul>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Valores y propiedades">
+    <div>
+      <ul>
+        <li><strong>valorPredeterminado</strong>: Valor inicial asignado al atributo</li>
+        <li>
+          <strong>propiedades</strong>: Características adicionales entre llaves
+          <ul>
+            <li>{'{readOnly}'} - Atributo de solo lectura</li>
+            <li>{'{unique}'} - Valor único</li>
+            <li>{'{ordered}'} - Colección ordenada</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </TabItem>
+</Tabs>
+
+### Ejemplos de atributos
+
+<Code code={`- nombre: String
++ edad: Integer = 0
+# saldo: Double {readOnly}
+- cuentas: Cuenta[0..*] {ordered}
+~ activo: Boolean = true`} lang="text" title="Ejemplos de atributos en UML" />
+
+<Aside type="note">
+  No es necesario incluir todos los elementos en cada atributo. La notación puede simplificarse según las necesidades del diagrama, mostrando solo la información relevante.
+</Aside>
+
+## 4.3. Representación de operaciones
+
+Las operaciones (métodos) en UML siguen una sintaxis específica que permite expresar parámetros, tipos de retorno y otras propiedades.
+
+### Sintaxis completa de una operación
+
+<Code code={`visibilidad nombre(parametro1: tipo1, ..., parametroN: tipoN): tipoRetorno {propiedades}`} lang="text" title="Sintaxis de operaciones en UML" />
+
+### Elementos de una operación
+
+<Tabs>
+  <TabItem label="Visibilidad y nombre">
+    <div>
+      <ul>
+        <li><strong>visibilidad</strong>: Nivel de acceso (igual que en atributos)</li>
+        <li><strong>nombre</strong>: Identificador del método (generalmente en camelCase)</li>
+      </ul>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Parámetros">
+    <div>
+      <p>Definidos entre paréntesis:</p>
+      <ul>
+        <li>
+          <strong>dirección</strong>: Opcional, indica cómo se pasa el parámetro
+          <ul>
+            <li><code>in</code>: Parámetro de entrada (predeterminado)</li>
+            <li><code>out</code>: Parámetro de salida</li>
+            <li><code>inout</code>: Parámetro de entrada y salida</li>
+          </ul>
+        </li>
+        <li><strong>nombre</strong>: Identificador del parámetro</li>
+        <li><strong>tipo</strong>: Tipo de dato del parámetro</li>
+        <li><strong>valorPredeterminado</strong>: Valor inicial opcional</li>
+      </ul>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Tipo de retorno y propiedades">
+    <div>
+      <ul>
+        <li><strong>tipoRetorno</strong>: Tipo de dato que devuelve la operación</li>
+        <li>
+          <strong>propiedades</strong>: Características adicionales entre llaves
+          <ul>
+            <li>{'{query}'} - No modifica el estado del objeto</li>
+            <li>{'{abstract}'} - Método abstracto (debe implementarse en subclases)</li>
+            <li>{'{static}'} - Método estático (de clase)</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </TabItem>
+</Tabs>
+
+### Ejemplos de operaciones
+
+<Code code={`+ calcularTotal(): Double
+- validarDatos(usuario: String, clave: String): Boolean
+# actualizarSaldo(monto: Double): void
++ obtenerHistorial(): Transaccion[*] {query}
++ crearInstancia(): Producto {static}`} lang="text" title="Ejemplos de operaciones en UML" />
+
+### Representación de constructores y destructores
+
+<Code code={`+ NombreClase(parametros): void  // Constructor
++ ~NombreClase(): void         // Destructor`} lang="text" title="Constructores y destructores en UML" />
+
+<Aside type="caution">
+  En UML, los constructores tienen el mismo nombre que la clase, y los destructores se indican con un tilde (~) antes del nombre de la clase.
+</Aside>
+
+## 4.4. Estereotipos y etiquetas
+
+Los estereotipos y etiquetas permiten extender la notación UML para representar conceptos específicos o propiedades adicionales.
+
+### Estereotipos
+
+Los estereotipos extienden el vocabulario de UML y se representan entre comillas angulares dobles (`<<estereotipo>>`).
+
+<Code code={`[<<interfaz>>]
+[InterfazUsuario]
+-----------------
++ autenticar(): Boolean
++ cerrarSesion(): void
+-----------------`} lang="text" title="Clase con estereotipo de interfaz" />
+
+### Estereotipos comunes
+
+| Estereotipo | Descripción | Aplicación |
+|------------|-------------|------------|
+| `&lt;&lt;interface&gt;&gt;` | Define una interfaz | Clase que solo declara métodos sin implementación |
+| `&lt;&lt;abstract&gt;&gt;` | Clase abstracta | Clase que no puede ser instanciada directamente |
+| `&lt;&lt;entity&gt;&gt;` | Entidad persistente | Clase que representa datos persistentes |
+| `&lt;&lt;control&gt;&gt;` | Clase controladora | Clase que implementa lógica de negocio o control |
+| `&lt;&lt;boundary&gt;&gt;` | Clase límite | Clase que interactúa con actores externos |
+| `&lt;&lt;utility&gt;&gt;` | Clase utilitaria | Clase con métodos estáticos y sin estado |
+
+### Etiquetas (Tagged Values)
+
+Las etiquetas permiten añadir propiedades personalizadas a los elementos UML.
+
+<Code code={`[Producto]
+-----------------
+| - id: String {id}
+| - precio: Double
+-----------------
+{version = 1.0}
+{author = "Juan Pérez"}`} lang="text" title="Clase con etiquetas" />
+
+### Restricciones
+
+Las restricciones especifican condiciones que deben cumplirse y se representan entre llaves.
+
+<Code code={`[Cuenta]
+-----------------
+| - saldo: Double {saldo >= 0}
+-----------------
+| + retirar(monto: Double): Boolean
+-----------------`} lang="text" title="Clase con restricciones" />
+
+<Aside type="tip">
+  Los estereotipos, etiquetas y restricciones son mecanismos de extensión que permiten adaptar UML a dominios específicos o metodologías particulares. Son especialmente útiles cuando se trabaja con herramientas de generación de código o en contextos donde se requiere información adicional no cubierta por la notación estándar.
+</Aside>
+
+### Ejemplo completo de notación UML
+
+<Code code={`[<<entity>>]
+[Cliente]
+-----------------
+| + id: String {id, unique}
+| - nombre: String [1]
+| - apellido: String [1]
+| - email: String [0..1]
+| # fechaRegistro: Date = "hoy" {readOnly}
+| ~ activo: Boolean = true
+-----------------
+| + getNombreCompleto(): String {query}
+| + actualizarDatos(datos: DatosCliente): Boolean
+| + desactivar(): void
+| - validarEmail(email: String): Boolean
+-----------------
+{version = "2.0"}
+{author = "Equipo de Desarrollo"}`} lang="text" title="Ejemplo completo de notación UML" />
+
+<Aside type="note">
+  La notación UML es flexible y permite diferentes niveles de detalle según las necesidades del diagrama. En la práctica, es común omitir detalles que no son relevantes para el propósito específico del diagrama.
+</Aside>

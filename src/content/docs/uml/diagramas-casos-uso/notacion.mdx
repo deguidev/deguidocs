@@ -1,0 +1,469 @@
+---
+title: 4. Notación UML para Casos de Uso
+description: Representación gráfica de actores, casos de uso y relaciones en los diagramas UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Notación UML para Casos de Uso
+
+La notación UML para diagramas de casos de uso proporciona un conjunto estándar de símbolos y convenciones que permiten representar visualmente los actores, casos de uso y sus relaciones. Esta notación estandarizada facilita la comunicación entre los miembros del equipo y los stakeholders.
+
+## 4.1. Representación gráfica de actores
+
+Los actores representan roles que interactúan con el sistema y se dibujan fuera del límite del sistema.
+
+### Símbolo estándar para actores
+
+<Code code={`    👤
+    │
+    │
+ ───┴───
+    │
+    │
+   ┌┴┐
+  ┌┘ └┐
+  │   │
+ ┌┴┐ ┌┴┐
+ │ │ │ │
+ └─┘ └─┘
+   Actor`} lang="text" title="Representación estándar de un actor" />
+
+<div>
+  <ul>
+    <li>Se representa con una figura de "stick person" (figura de palitos)</li>
+    <li>El nombre del actor se coloca debajo de la figura</li>
+    <li>El nombre debe ser un sustantivo que describa el rol (no el nombre de una persona específica)</li>
+  </ul>
+</div>
+
+### Variaciones en la representación de actores
+
+<Tabs>
+  <TabItem label="Actor humano">
+    <div>
+      <Code code={`    👤
+    │
+    │
+ ───┴───
+    │
+    │
+   ┌┴┐
+  ┌┘ └┐
+  │   │
+ ┌┴┐ ┌┴┐
+ │ │ │ │
+ └─┘ └─┘
+ Usuario`} lang="text" title="Actor humano" />
+    </div>
+  </TabItem>
+  
+  <TabItem label="Actor no humano">
+    <div>
+      <Code code={`┌─────────┐
+│         │
+│ Sistema │
+│ Externo │
+│         │
+└─────────┘`} lang="text" title="Actor no humano (sistema externo)" />
+      <p>Los actores no humanos (como sistemas externos) a veces se representan como rectángulos con el estereotipo «actor».</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Notación alternativa">
+    <div>
+      <Code code={`┌─────────┐
+│ «actor» │
+│         │
+│ Cliente │
+│         │
+└─────────┘`} lang="text" title="Notación alternativa para actor" />
+      <p>Algunos modeladores prefieren usar esta notación para todos los actores, especialmente en herramientas donde dibujar figuras humanas es difícil.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+### Estereotipos de actores
+
+Los estereotipos pueden utilizarse para clasificar diferentes tipos de actores:
+
+<div>
+  <ul>
+    <li><strong>«primary»</strong>: Actor que inicia el caso de uso para lograr un objetivo</li>
+    <li><strong>«secondary»</strong>: Actor que proporciona un servicio al sistema</li>
+    <li><strong>«external»</strong>: Actor que representa un sistema externo</li>
+    <li><strong>«timer»</strong>: Actor que representa un temporizador o evento temporal</li>
+  </ul>
+</div>
+
+<Code code={`    👤               👤               ┌─────────┐          ┌─────────┐
+    │                │               │         │          │         │
+    │                │               │«external»│          │«timer»  │
+    │                │               │         │          │         │
+ «primary»        «secondary»        │ Sistema │          │ Reloj   │
+ Cliente          Administrador      │ Pago    │          │ Sistema │
+                                     └─────────┘          └─────────┘`} lang="text" title="Estereotipos de actores" />
+
+<Aside type="note">
+  Los estereotipos son opcionales y no siempre se utilizan en los diagramas de casos de uso. Su uso depende del nivel de detalle requerido y las convenciones del equipo.
+</Aside>
+
+## 4.2. Representación gráfica de casos de uso
+
+Los casos de uso representan funcionalidades que el sistema proporciona a los actores y se dibujan dentro del límite del sistema.
+
+### Símbolo estándar para casos de uso
+
+<Code code={`┌───────────────────┐
+│                   │
+│   Nombre del      │
+│   Caso de Uso     │
+│                   │
+└───────────────────┘`} lang="text" title="Representación estándar de un caso de uso" />
+
+<div>
+  <ul>
+    <li>Se representa con una elipse (aunque en ASCII art usamos un rectángulo con esquinas redondeadas)</li>
+    <li>El nombre del caso de uso se coloca dentro de la elipse</li>
+    <li>El nombre debe ser un verbo en infinitivo seguido de un objeto (ej. "Realizar Compra")</li>
+  </ul>
+</div>
+
+### Variaciones en la representación de casos de uso
+
+<Tabs>
+  <TabItem label="Caso de uso básico">
+    <div>
+      <Code code={`┌───────────────────┐
+│                   │
+│   Realizar        │
+│   Compra          │
+│                   │
+└───────────────────┘`} lang="text" title="Caso de uso básico" />
+    </div>
+  </TabItem>
+  
+  <TabItem label="Caso de uso con estereotipo">
+    <div>
+      <Code code={`┌───────────────────┐
+│   «CRUD»          │
+│                   │
+│   Gestionar       │
+│   Productos       │
+│                   │
+└───────────────────┘`} lang="text" title="Caso de uso con estereotipo" />
+      <p>Los estereotipos pueden utilizarse para clasificar diferentes tipos de casos de uso.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Caso de uso con puntos de extensión">
+    <div>
+      <Code code={`┌───────────────────┐
+│                   │
+│   Realizar        │
+│   Compra          │
+│                   │
+│   Extension points│
+│   - seleccionPago │
+│   - confirmación  │
+└───────────────────┘`} lang="text" title="Caso de uso con puntos de extensión" />
+      <p>Los puntos de extensión indican dónde pueden insertarse comportamientos opcionales.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+### Estereotipos de casos de uso
+
+Los estereotipos pueden utilizarse para clasificar diferentes tipos de casos de uso:
+
+<div>
+  <ul>
+    <li><strong>«CRUD»</strong>: Caso de uso que realiza operaciones básicas de crear, leer, actualizar y eliminar</li>
+    <li><strong>«business»</strong>: Caso de uso que representa un proceso de negocio completo</li>
+    <li><strong>«abstract»</strong>: Caso de uso que no puede ser iniciado directamente (solo a través de herencia)</li>
+    <li><strong>«system»</strong>: Caso de uso iniciado por el sistema, no por un actor</li>
+  </ul>
+</div>
+
+<Aside type="tip">
+  Al nombrar casos de uso, use verbos activos que describan claramente la acción desde la perspectiva del actor. Por ejemplo, "Registrar Usuario" es mejor que "Registro de Usuario" o "El usuario se registra".
+</Aside>
+
+## 4.3. Representación gráfica de relaciones
+
+Las relaciones en los diagramas de casos de uso conectan actores con casos de uso, o casos de uso entre sí.
+
+### Asociación (actor-caso de uso)
+
+<Code code={`    👤
+    │
+    │
+    │
+    ▼
+┌─────────┐
+│ Caso de │
+│   Uso   │
+└─────────┘`} lang="text" title="Asociación entre actor y caso de uso" />
+
+<div>
+  <ul>
+    <li>Se representa con una línea sólida entre el actor y el caso de uso</li>
+    <li>No tiene dirección específica (aunque a veces se usa una flecha para indicar quién inicia la interacción)</li>
+    <li>Puede etiquetarse con un nombre que describa la naturaleza de la interacción (opcional)</li>
+    <li>Puede incluir multiplicidad (opcional)</li>
+  </ul>
+</div>
+
+### Inclusión («include»)
+
+<Code code={`┌───────────────┐     «include»     ┌───────────────┐
+│ Caso de Uso A │- - - - - - - ->│ Caso de Uso B │
+└───────────────┘                └───────────────┘`} lang="text" title="Relación de inclusión" />
+
+<div>
+  <ul>
+    <li>Se representa con una flecha discontinua</li>
+    <li>La flecha apunta hacia el caso de uso incluido</li>
+    <li>Se etiqueta con el estereotipo «include»</li>
+    <li>Indica que el caso de uso A siempre incluye el comportamiento del caso de uso B</li>
+  </ul>
+</div>
+
+### Extensión («extend»)
+
+<Code code={`┌───────────────┐     «extend»     ┌───────────────┐
+│ Caso de Uso A │- - - - - - - ->│ Caso de Uso B │
+└───────────────┘                └───────────────┘
+                                 {Punto de extensión:
+                                  Condición}`} lang="text" title="Relación de extensión" />
+
+<div>
+  <ul>
+    <li>Se representa con una flecha discontinua</li>
+    <li>La flecha va desde el caso de uso que extiende hacia el caso de uso base</li>
+    <li>Se etiqueta con el estereotipo «extend»</li>
+    <li>Puede incluir una nota que especifique el punto de extensión y la condición</li>
+    <li>Indica que el caso de uso A añade comportamiento opcional al caso de uso B bajo ciertas condiciones</li>
+  </ul>
+</div>
+
+### Generalización
+
+<Code code={`┌───────────────┐
+│ Caso de Uso A │
+└───────────────┘
+       ▲
+       │
+       │
+┌──────┴──────┐
+│ Caso de Uso B│
+└─────────────┘`} lang="text" title="Generalización entre casos de uso" />
+
+<div>
+  <ul>
+    <li>Se representa con una flecha con línea continua y punta triangular vacía</li>
+    <li>La flecha apunta hacia el caso de uso general (padre)</li>
+    <li>Indica que el caso de uso B hereda y especializa el comportamiento del caso de uso A</li>
+    <li>Similar a la herencia en programación orientada a objetos</li>
+  </ul>
+</div>
+
+<Code code={`    👤
+    ▲
+    │
+    │
+┌───┴───┐
+│       │
+│       │
+┌─┐     ┌─┐
+│ │     │ │
+└─┘     └─┘
+Actor B`} lang="text" title="Generalización entre actores" />
+
+<div>
+  <ul>
+    <li>La misma notación se utiliza para la generalización entre actores</li>
+    <li>Indica que el actor B hereda las características del actor general</li>
+    <li>El actor B puede interactuar con todos los casos de uso del actor general</li>
+  </ul>
+</div>
+
+## Límite del sistema
+
+El límite del sistema es un rectángulo que engloba todos los casos de uso, representando la frontera entre el sistema y los actores externos.
+
+<Code code={`┌─────────────────────────────────┐
+│           Sistema                │
+│                                  │
+│    ┌──────────────────┐          │
+│    │                  │          │
+│    │   Caso de Uso 1  │◄────────┐
+│    │                  │         │
+│    └──────────────────┘         │
+│                                  │
+│    ┌──────────────────┐         │
+│    │                  │         │
+│    │   Caso de Uso 2  │◄────────┼──── Actor
+│    │                  │         │
+│    └──────────────────┘         │
+│                                  │
+│    ┌──────────────────┐         │
+│    │                  │         │
+│    │   Caso de Uso 3  │◄────────┘
+│    │                  │
+│    └──────────────────┘
+│                                  │
+└─────────────────────────────────┘`} lang="text" title="Límite del sistema en un diagrama de casos de uso" />
+
+<div>
+  <ul>
+    <li>Se representa con un rectángulo que rodea todos los casos de uso</li>
+    <li>El nombre del sistema se coloca en la parte superior del rectángulo</li>
+    <li>Todos los casos de uso deben estar dentro del límite</li>
+    <li>Todos los actores deben estar fuera del límite</li>
+    <li>Las asociaciones cruzan el límite del sistema</li>
+  </ul>
+</div>
+
+<Aside type="note">
+  El límite del sistema es opcional en diagramas pequeños o simples, pero es muy útil en diagramas complejos para clarificar qué está dentro y fuera del alcance del sistema.
+</Aside>
+
+## Paquetes
+
+Los paquetes pueden utilizarse para organizar casos de uso relacionados en grupos lógicos, especialmente en sistemas grandes.
+
+<Code code={`┌─────────────────────────────────┐
+│           Sistema                │
+│                                  │
+│  ┌───────────────────────────┐   │
+│  │     Gestión de Usuarios   │   │
+│  │  ┌─────────────────────┐  │   │
+│  │  │                     │  │   │
+│  │  │  Registrar Usuario  │  │   │
+│  │  │                     │  │   │
+│  │  └─────────────────────┘  │   │
+│  │                           │   │
+│  │  ┌─────────────────────┐  │   │
+│  │  │                     │  │   │
+│  │  │  Modificar Usuario  │  │   │
+│  │  │                     │  │   │
+│  │  └─────────────────────┘  │   │
+│  └───────────────────────────┘   │
+│                                  │
+│  ┌───────────────────────────┐   │
+│  │     Gestión de Pedidos    │   │
+│  │                           │   │
+│  │  ...                      │   │
+│  └───────────────────────────┘   │
+│                                  │
+└─────────────────────────────────┘`} lang="text" title="Uso de paquetes en diagramas de casos de uso" />
+
+<div>
+  <ul>
+    <li>Se representan como carpetas con el nombre en la pestaña superior</li>
+    <li>Contienen casos de uso relacionados funcionalmente</li>
+    <li>Ayudan a organizar diagramas complejos</li>
+    <li>Pueden tener relaciones entre ellos (dependencias, importaciones)</li>
+  </ul>
+</div>
+
+## Notas y restricciones
+
+Las notas pueden añadirse a los diagramas de casos de uso para proporcionar información adicional.
+
+<Code code={`┌───────────────┐     «extend»     ┌───────────────┐
+│ Aplicar       │- - - - - - - ->│ Realizar      │
+│ Descuento     │                │ Compra        │
+└───────────────┘                └───────────────┘
+       │
+       │                ┌─────────────────────────┐
+       └───────────────►│ {Punto de extensión:    │
+                        │  Cuando el cliente      │
+                        │  tiene cupón válido}    │
+                        └─────────────────────────┘`} lang="text" title="Uso de notas en diagramas de casos de uso" />
+
+<div>
+  <ul>
+    <li>Se representan como rectángulos con la esquina superior derecha doblada</li>
+    <li>Se conectan al elemento relacionado mediante una línea discontinua</li>
+    <li>Pueden contener restricciones, aclaraciones o información adicional</li>
+    <li>Las restricciones se escriben entre llaves {}</li>
+  </ul>
+</div>
+
+## Ejemplo completo con notación UML
+
+<Code code={`┌─────────────────────────────────────────────────────────────────────┐
+│                        Sistema de Comercio Electrónico                  │
+│                                                                         │
+│  ┌────────────────────────────────┐    ┌────────────────────────────┐   │
+│  │      Gestión de Usuarios       │    │    Gestión de Compras      │   │
+│  │                                │    │                            │   │
+│  │  ┌────────────────┐            │    │   ┌────────────────┐       │   │
+│  │  │                │            │    │   │                │       │   │
+│  │  │    Registrar   │◄───────────┼────┼───┤    Realizar    │       │   │
+│  │  │    Usuario     │            │    │   │    Compra      │       │   │
+│  │  │                │            │    │   │                │       │   │
+│  │  └────────────────┘            │    │   └────────────────┘       │   │
+│  │                                │    │          ▲                 │   │
+│  │  ┌────────────────┐   «extend» │    │          │                 │   │
+│  │  │                │            │    │          │ «include»       │   │
+│  │  │    Recuperar   │- - - - - - ┼- - ┼- - - - - ┘                 │   │
+│  │  │    Contraseña  │            │    │                            │   │
+│  │  │                │            │    │   ┌────────────────┐       │   │
+│  │  └────────────────┘            │    │   │                │       │   │
+│  │                                │    │   │    Procesar    │◄ ─ ─ ─┼───┼─┐
+│  └────────────────────────────────┘    │   │    Pago        │       │   │ │
+│                                        │   │                │       │   │ │
+│                                        │   └────────────────┘       │   │ │
+│                                        │          ▲                 │   │ │
+│                                        │          │                 │   │ │
+│                                        │          │ «extend»        │   │ │
+│                                        │   ┌────────────────┐       │   │ │
+│                                        │   │                │       │   │ │
+│                                        │   │    Aplicar     │       │   │ │
+│                                        │   │    Descuento   │       │   │ │
+│                                        │   │                │       │   │ │
+│                                        │   └────────────────┘       │   │ │
+│                                        └────────────────────────────┘   │ │
+│                                                                         │ │
+└─────────────────────────────────────────────────────────────────────────┘ │
+                                                                            │
+                   ┌─┐                                         ┌─────────┐  │
+                   │ │                                         │         │  │
+                ───┴─┴──                                       │«external»│  │
+                   │                                           │         │  │
+                   │                                           │ Sistema │  │
+                  ┌┴┐                                          │ Pago    │──┘
+                 ┌┘ └┐                                         │         │
+                 │   │                                         └─────────┘
+                ┌┴┐ ┌┴┐
+                │ │ │ │
+                └─┘ └─┘
+                Cliente`} lang="text" title="Ejemplo completo de diagrama de casos de uso con notación UML" />
+
+<Aside type="tip">
+  Al crear diagramas de casos de uso, recuerde que el objetivo principal es comunicar claramente las funcionalidades del sistema y cómo los usuarios interactúan con ellas. Use la notación UML de manera consistente y evite sobrecargar el diagrama con demasiados detalles.
+</Aside>
+
+## Buenas prácticas en la notación
+
+<div>
+  <ul>
+    <li><strong>Consistencia</strong>: Use la misma notación a lo largo de todo el diagrama y entre diferentes diagramas.</li>
+    <li><strong>Claridad</strong>: Evite cruzar líneas y organice los elementos de manera que el diagrama sea fácil de leer.</li>
+    <li><strong>Simplicidad</strong>: No sobrecargue el diagrama con demasiados detalles. Si es necesario, divida un diagrama complejo en varios más simples.</li>
+    <li><strong>Nombres descriptivos</strong>: Use nombres claros y descriptivos para actores y casos de uso.</li>
+    <li><strong>Uso adecuado de estereotipos</strong>: Use estereotipos solo cuando añadan valor al diagrama.</li>
+    <li><strong>Documentación complementaria</strong>: Recuerde que el diagrama de casos de uso debe complementarse con descripciones detalladas de cada caso de uso.</li>
+  </ul>
+</div>
+
+<Aside type="caution">
+  Los diagramas de casos de uso no son suficientes por sí solos para especificar completamente un sistema. Son una herramienta visual que debe complementarse con especificaciones detalladas de cada caso de uso, incluyendo flujos principales, alternativos y excepcionales.
+</Aside>

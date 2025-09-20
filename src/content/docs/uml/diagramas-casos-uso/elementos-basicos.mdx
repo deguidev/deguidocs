@@ -1,0 +1,285 @@
+---
+title: 2. Elementos Básicos de un Diagrama de Casos de Uso
+description: Actores, casos de uso y relaciones fundamentales en los diagramas de casos de uso UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Elementos Básicos de un Diagrama de Casos de Uso
+
+Los diagramas de casos de uso se componen de tres elementos fundamentales: actores, casos de uso y las relaciones entre ellos. Estos elementos proporcionan una representación visual de cómo los usuarios interactúan con el sistema y qué funcionalidades ofrece este sistema.
+
+## 2.1. Actores (usuarios y sistemas externos)
+
+Los actores representan entidades externas que interactúan con el sistema. Pueden ser personas, organizaciones o incluso otros sistemas informáticos.
+
+### Definición de actor
+
+Un actor es cualquier entidad externa que intercambia información con el sistema. Los actores no forman parte del sistema en sí, sino que representan roles que interactúan con él.
+
+<Code code={`    👤
+    │
+    │
+ ───┴───
+    │
+    │
+   ┌┴┐
+  ┌┘ └┐
+  │   │
+ ┌┴┐ ┌┴┐
+ │ │ │ │
+ └─┘ └─┘`} lang="text" title="Representación de un actor" />
+
+### Tipos de actores
+
+<Tabs>
+  <TabItem label="Actores primarios">
+    <div>
+      <p>Inician la interacción con el sistema para lograr un objetivo específico.</p>
+      <ul>
+        <li>Usuario registrado</li>
+        <li>Administrador</li>
+        <li>Cliente</li>
+      </ul>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Actores secundarios">
+    <div>
+      <p>Proporcionan un servicio al sistema (reactivos).</p>
+      <ul>
+        <li>Sistema de pago</li>
+        <li>Servicio de correo electrónico</li>
+        <li>Base de datos externa</li>
+      </ul>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Actores físicos vs lógicos">
+    <div>
+      <ul>
+        <li><strong>Actores físicos</strong>: Personas reales que interactúan con el sistema (Cliente, Empleado)</li>
+        <li><strong>Actores lógicos</strong>: Roles que pueden ser desempeñados por diferentes personas (Administrador, Usuario)</li>
+      </ul>
+    </div>
+  </TabItem>
+</Tabs>
+
+### Características de los actores
+
+<div>
+  <ul>
+    <li><strong>Externos al sistema</strong>: Los actores siempre están fuera del límite del sistema.</li>
+    <li><strong>Representan roles</strong>: Un actor es un rol, no una persona o entidad específica.</li>
+    <li><strong>Pueden ser humanos o no humanos</strong>: Sistemas externos, dispositivos, sensores, etc.</li>
+    <li><strong>Pueden tener relaciones entre sí</strong>: Principalmente relaciones de generalización/especialización.</li>
+  </ul>
+</div>
+
+<Aside type="tip">
+  Al identificar actores, pregúntese: ¿Quién o qué inicia acciones en el sistema? ¿Quién o qué proporciona o recibe información del sistema?
+</Aside>
+
+## 2.2. Casos de uso (funcionalidades del sistema)
+
+Los casos de uso representan funcionalidades o servicios que el sistema proporciona a sus actores. Cada caso de uso describe una secuencia de acciones que el sistema realiza para producir un resultado observable y valioso para un actor.
+
+### Definición de caso de uso
+
+Un caso de uso es una descripción de una secuencia de interacciones entre el sistema y uno o más actores, que produce un resultado valioso y observable para los actores involucrados.
+
+<Code code={`┌───────────────────┐
+│                   │
+│   Nombre del      │
+│   Caso de Uso     │
+│                   │
+└───────────────────┘`} lang="text" title="Representación de un caso de uso" />
+
+### Características de los casos de uso
+
+<div>
+  <ul>
+    <li><strong>Orientados a objetivos</strong>: Cada caso de uso representa un objetivo específico de un actor.</li>
+    <li><strong>Iniciados por actores</strong>: Generalmente son desencadenados por una acción de un actor.</li>
+    <li><strong>Proporcionan valor</strong>: Deben producir un resultado observable y valioso.</li>
+    <li><strong>Completos</strong>: Describen una funcionalidad completa, desde el inicio hasta el final.</li>
+  </ul>
+</div>
+
+### Niveles de detalle en casos de uso
+
+<Tabs>
+  <TabItem label="Casos de uso de alto nivel">
+    <div>
+      <p>Descripciones breves que capturan la esencia de un caso de uso sin entrar en detalles.</p>
+      <Code code={`Caso de Uso: Retirar Dinero
+Actor Principal: Cliente
+Descripción: El cliente retira dinero de su cuenta bancaria a través del cajero automático.`} lang="text" title="Ejemplo de caso de uso de alto nivel" />
+    </div>
+  </TabItem>
+  
+  <TabItem label="Casos de uso expandidos">
+    <div>
+      <p>Descripciones detalladas que incluyen flujos principales, alternativos y excepcionales.</p>
+      <Code code={`Caso de Uso: Retirar Dinero
+Actor Principal: Cliente
+Precondiciones: Cliente tiene tarjeta válida y cuenta activa
+Flujo Principal:
+1. Cliente inserta tarjeta
+2. Sistema solicita PIN
+3. Cliente introduce PIN
+4. Sistema valida PIN
+5. Sistema muestra opciones
+6. Cliente selecciona "Retirar dinero"
+7. Sistema solicita cantidad
+8. Cliente introduce cantidad
+9. Sistema verifica fondos
+10. Sistema dispensa dinero
+11. Sistema actualiza saldo
+12. Sistema devuelve tarjeta
+
+Flujos Alternativos:
+4a. PIN incorrecto:
+  1. Sistema muestra mensaje de error
+  2. Vuelve al paso 2 (máximo 3 intentos)
+
+9a. Fondos insuficientes:
+  1. Sistema muestra mensaje de error
+  2. Vuelve al paso 7`} lang="text" title="Ejemplo de caso de uso expandido" />
+    </div>
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  En los diagramas de casos de uso UML, solo se representa el nombre del caso de uso. Los detalles se documentan por separado en especificaciones de casos de uso.
+</Aside>
+
+### Límite del sistema
+
+El límite del sistema es un rectángulo que engloba todos los casos de uso, representando la frontera entre el sistema y los actores externos.
+
+<Code code={`┌─────────────────────────────────┐
+│           Sistema                │
+│                                  │
+│    ┌──────────────────┐          │
+│    │                  │          │
+│    │   Caso de Uso 1  │◄────────┐
+│    │                  │         │
+│    └──────────────────┘         │
+│                                  │
+│    ┌──────────────────┐         │
+│    │                  │         │
+│    │   Caso de Uso 2  │◄────────┼──── Actor
+│    │                  │         │
+│    └──────────────────┘         │
+│                                  │
+│    ┌──────────────────┐         │
+│    │                  │         │
+│    │   Caso de Uso 3  │◄────────┘
+│    │                  │
+│    └──────────────────┘
+│                                  │
+└─────────────────────────────────┘`} lang="text" title="Límite del sistema en un diagrama de casos de uso" />
+
+<div>
+  <ul>
+    <li>Define claramente qué está dentro y fuera del sistema.</li>
+    <li>Ayuda a establecer el alcance del sistema.</li>
+    <li>Todos los casos de uso deben estar dentro del límite.</li>
+    <li>Todos los actores deben estar fuera del límite.</li>
+  </ul>
+</div>
+
+## 2.3. Relaciones entre actores y casos de uso
+
+Las relaciones en los diagramas de casos de uso conectan actores con casos de uso, o casos de uso entre sí, mostrando cómo interactúan.
+
+### Asociación (actor-caso de uso)
+
+La asociación es la relación más básica y común, que conecta un actor con un caso de uso indicando que el actor participa en ese caso de uso.
+
+<Code code={`    👤
+    │
+    │
+    │
+    ▼
+┌─────────┐
+│ Caso de │
+│   Uso   │
+└─────────┘`} lang="text" title="Asociación entre actor y caso de uso" />
+
+<div>
+  <ul>
+    <li>Se representa con una línea sólida entre el actor y el caso de uso.</li>
+    <li>Indica que el actor se comunica con el sistema mediante este caso de uso.</li>
+    <li>No tiene dirección específica (aunque a veces se usa una flecha para indicar quién inicia la interacción).</li>
+    <li>Un actor puede asociarse con múltiples casos de uso.</li>
+    <li>Un caso de uso puede asociarse con múltiples actores.</li>
+  </ul>
+</div>
+
+<Aside type="tip">
+  La asociación responde a la pregunta: ¿Qué actor interactúa con qué funcionalidad del sistema?
+</Aside>
+
+### Ejemplo completo de elementos básicos
+
+<Code code={`┌───────────────────────────────────────────────┐
+│                   Sistema Bancario              │
+│                                                 │
+│    ┌───────────────────┐     ┌───────────────┐  │
+│    │                   │     │               │  │
+│    │  Consultar Saldo  │     │ Transferir    │  │
+│    │                   │     │ Fondos        │  │
+│    └───────────────────┘     └───────────────┘  │
+│            ▲                        ▲           │
+│            │                        │           │
+│            │                        │           │
+│    ┌───────┴───────┐                │           │
+│    │               │                │           │
+│    │ Retirar Dinero│◄───────────────┘           │
+│    │               │                            │
+│    └───────────────┘                            │
+│            ▲                                    │
+└────────────┼────────────────────────────────────┘
+             │
+             │
+          ┌──┴──┐
+          │     │
+       ───┴───  │
+          │     │
+          │     │
+         ┌┴┐   ┌┴┐
+         │ │   │ │
+         └─┘   └─┘
+        Cliente`} lang="text" title="Ejemplo completo de un diagrama de casos de uso básico" />
+
+<Aside type="note">
+  Este diagrama muestra un sistema bancario con tres casos de uso (Consultar Saldo, Transferir Fondos y Retirar Dinero) y un actor (Cliente) que interactúa con ellos. El rectángulo representa el límite del sistema.
+</Aside>
+
+## Buenas prácticas al definir elementos básicos
+
+<div>
+  <ul>
+    <li>
+      <strong>Nombrar correctamente</strong>:
+      <ul>
+        <li>Actores: sustantivos que describan roles (Cliente, Administrador)</li>
+        <li>Casos de uso: verbos en infinitivo + objeto (Registrar Usuario, Procesar Pago)</li>
+      </ul>
+    </li>
+    <li><strong>Nivel adecuado de detalle</strong>: Evitar casos de uso demasiado generales o demasiado específicos</li>
+    <li><strong>Enfoque en valor</strong>: Cada caso de uso debe proporcionar un resultado valioso para al menos un actor</li>
+    <li><strong>Claridad en los límites</strong>: Definir claramente qué está dentro y fuera del sistema</li>
+    <li><strong>Evitar diagramas sobrecargados</strong>: Si hay muchos casos de uso, considerar dividirlos en varios diagramas</li>
+  </ul>
+</div>
+
+<Aside type="caution">
+  Un error común es confundir pasos de un caso de uso con casos de uso independientes. Por ejemplo, "Introducir PIN" no debería ser un caso de uso separado, sino un paso dentro del caso de uso "Retirar Dinero".
+</Aside>

@@ -1,0 +1,215 @@
+---
+title: 2. Elementos Básicos de un Diagrama de Clases
+description: Componentes fundamentales que conforman los diagramas de clases UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Elementos Básicos de un Diagrama de Clases
+
+Los diagramas de clases UML se componen de varios elementos fundamentales que permiten representar la estructura estática de un sistema. Conocer estos elementos es esencial para crear y comprender diagramas efectivos.
+
+## 2.1. Clases (atributos y métodos)
+
+La clase es el elemento central de un diagrama de clases y representa un conjunto de objetos que comparten una estructura y comportamiento comunes.
+
+### Representación gráfica de una clase
+
+Una clase se representa como un rectángulo dividido en tres secciones:
+
+<Code code={`+----------------------------+
+|        Nombre Clase        |
++----------------------------+
+| - atributo1: tipo          |
+| # atributo2: tipo          |
+| + atributo3: tipo          |
++----------------------------+
+| - metodo1(param): tipoRet  |
+| # metodo2(param): tipoRet  |
+| + metodo3(param): tipoRet  |
++----------------------------+`} lang="text" title="Representación de una Clase UML" />
+
+<Badge text="+ Público" variant="success" /> <Badge text="- Privado" variant="danger" /> <Badge text="# Protegido" variant="default" /> <Badge text="~ Paquete" variant="note" />
+
+<Aside type="tip">
+  Las secciones de atributos y métodos pueden omitirse si no son relevantes para el diagrama. En diagramas simplificados, a veces se muestra solo el nombre de la clase.
+</Aside>
+
+### Atributos
+
+Los atributos son las propiedades o características que definen a una clase. Representan los datos que almacenan los objetos de esa clase.
+
+<Tabs>
+  <TabItem label="Sintaxis">
+    <Code code={`[visibilidad] nombre: tipo [= valorInicial] [{propiedades}]`} lang="text" title="Sintaxis de Atributos en UML" />
+    
+    <div>
+      <p><strong>Donde:</strong></p>
+      <ul>
+        <li><strong>visibilidad</strong>: + (público), - (privado), # (protegido), ~ (paquete)</li>
+        <li><strong>nombre</strong>: identificador del atributo</li>
+        <li><strong>tipo</strong>: tipo de dato del atributo</li>
+        <li><strong>valorInicial</strong>: valor por defecto (opcional)</li>
+        <li><strong>propiedades</strong>: características adicionales como {'{readonly}'} (opcional)</li>
+      </ul>
+    </div>
+  </TabItem>
+  <TabItem label="Ejemplos">
+    <Code code={`- nombre: String
++ edad: Integer = 0
+# saldo: Double {readonly}
+- fechaNacimiento: Date
++ activo: Boolean = true`} lang="text" title="Ejemplos de Atributos en UML" />
+  </TabItem>
+</Tabs>
+
+### Métodos
+
+Los métodos representan el comportamiento de una clase, es decir, las operaciones que pueden realizar los objetos de esa clase.
+
+<Tabs>
+  <TabItem label="Sintaxis">
+    <Code code={`[visibilidad] nombre(parametro1: tipo1, ..., parametroN: tipoN): tipoRetorno`} lang="text" title="Sintaxis de Métodos en UML" />
+    
+    <div>
+      <p><strong>Donde:</strong></p>
+      <ul>
+        <li><strong>visibilidad</strong>: + (público), - (privado), # (protegido), ~ (paquete)</li>
+        <li><strong>nombre</strong>: identificador del método</li>
+        <li><strong>parametros</strong>: lista de parámetros con sus tipos (opcional)</li>
+        <li><strong>tipoRetorno</strong>: tipo de dato que devuelve el método</li>
+      </ul>
+    </div>
+  </TabItem>
+  <TabItem label="Ejemplos">
+    <Code code={`+ calcularEdad(): Integer
+- validarDatos(usuario: String, clave: String): Boolean
+# actualizarSaldo(monto: Double): void
++ obtenerInformacion(): String
+- procesarPago(tarjeta: TarjetaCredito, monto: Double): Boolean`} lang="text" title="Ejemplos de Métodos en UML" />
+  </TabItem>
+</Tabs>
+
+<Badge text="Constructores y Destructores" variant="note" />
+
+Los constructores y destructores son métodos especiales:
+
+- **Constructor**: Se representa con el mismo nombre de la clase
+  <Code code={`+ NombreClase(parametros): void`} lang="text" title="Constructor en UML" />
+
+- **Destructor**: Se representa con el mismo nombre de la clase precedido por un tilde (~)
+  <Code code={`+ ~NombreClase(): void`} lang="text" title="Destructor en UML" />
+
+## 2.2. Objetos vs. Clases
+
+Entender la diferencia entre clases y objetos es fundamental en el modelado orientado a objetos.
+
+<Tabs>
+  <TabItem label="Clase">
+    - **Definición**: Plantilla o plano que define atributos y comportamientos comunes
+    - **Naturaleza**: Concepto abstracto, existe en tiempo de diseño
+    - **Representación**: Rectángulo con tres secciones (nombre, atributos, métodos)
+    - **Ejemplo**: La clase "Persona" define la estructura para todas las personas
+    - **Creación**: Se define una vez en el código
+  </TabItem>
+  <TabItem label="Objeto">
+    - **Definición**: Instancia concreta de una clase
+    - **Naturaleza**: Entidad real, existe en tiempo de ejecución
+    - **Representación**: Rectángulo con nombre subrayado (formato: nombreObjeto:NombreClase)
+    - **Ejemplo**: "juan:Persona" es un objeto específico de la clase Persona
+    - **Creación**: Se pueden crear múltiples objetos de una misma clase
+  </TabItem>
+</Tabs>
+
+### Representación de objetos en UML
+
+Aunque los objetos se representan principalmente en los diagramas de objetos, a veces aparecen en diagramas de clases para ilustrar instancias específicas:
+
+<Code code={`+------------------------+
+| juan:Persona           |  (subrayado)
++------------------------+
+| nombre = "Juan Pérez" |
+| edad = 30              |
++------------------------+`} lang="text" title="Representación de un objeto (instancia de la clase Persona)" />
+
+<Aside type="note">
+  La diferencia clave entre clases y objetos es que las clases son abstracciones que definen estructura y comportamiento, mientras que los objetos son instancias concretas con valores específicos para sus atributos.
+</Aside>
+
+## 2.3. Visibilidad (público, privado, protegido)
+
+La visibilidad define el nivel de acceso a los atributos y métodos de una clase desde otras clases del sistema.
+
+### Tipos de visibilidad
+<Tabs>
+  <TabItem label="Notación">
+  <Code code={`
+    | Símbolo |   Visibilidad   |                    Descripción                     |
+    |:--------:|:--------------:|:--------------------------------------------------:|
+    |    +     | Público        | Accesible desde cualquier clase del sistema          |
+    |    -     | Privado        | Accesible solo desde la propia clase                |
+    |    #     | Protegido      | Accesible desde la propia clase y todas sus subclases |
+    |    ~     | Paquete        | Accesible desde clases del mismo paquete o módulo   |
+  `} lang="markdown" title="Tipos de Visibilidad en UML" />
+  </TabItem>
+  <TabItem label="Ejemplos">
+    <Code code={`class Persona {
+    + nombre: String        // Accesible desde cualquier clase
+    - DNI: String          // Solo accesible dentro de Persona
+    # edad: Integer        // Accesible en Persona y sus subclases
+    ~ direccion: String    // Accesible en clases del mismo paquete
+    
+    + getNombre(): String  // Método público
+    - validarDNI(): Boolean // Método privado
+    }`} lang="text" title="Ejemplo de Visibilidad en UML" />
+  </TabItem>
+</Tabs>
+
+### Implicaciones de la visibilidad
+
+La elección adecuada de la visibilidad es crucial para el principio de encapsulamiento en la programación orientada a objetos:
+
+<Steps>
+<ol>
+  <li>
+    **Visibilidad pública (+)**
+    - Permite acceso desde cualquier parte del sistema
+    - Adecuada para interfaces y servicios que deben ser accesibles ampliamente
+    - Ejemplo: métodos getter/setter, APIs públicas
+  </li>
+  <li>
+    **Visibilidad privada (-)**
+    - Restringe el acceso solo a la propia clase
+    - Oculta detalles de implementación
+    - Protege la integridad de los datos
+    - Ejemplo: atributos internos, métodos auxiliares
+  </li>
+  <li>
+    **Visibilidad protegida (#)**
+    - Permite acceso desde la clase y sus subclases
+    - Facilita la herencia y extensibilidad
+    - Ejemplo: métodos que deben ser sobrescritos por subclases
+  </li>
+  <li>
+    **Visibilidad de paquete (~)**
+    - Restringe el acceso a clases del mismo paquete
+    - Útil para componentes que colaboran estrechamente
+    - Ejemplo: clases auxiliares dentro de un mismo módulo
+  </li>
+</ol>
+</Steps>
+
+<Aside type="caution">
+  El uso excesivo de miembros públicos puede comprometer el encapsulamiento y hacer que el sistema sea más difícil de mantener. Es recomendable usar la visibilidad más restrictiva posible que permita el funcionamiento correcto del sistema.
+</Aside>
+
+### Buenas prácticas de visibilidad
+
+- Hacer los atributos privados o protegidos y proporcionar métodos públicos (getters/setters) para acceder a ellos cuando sea necesario
+- Usar visibilidad protegida para métodos que deben ser sobrescritos por subclases
+- Limitar la interfaz pública a lo estrictamente necesario
+- Documentar claramente el propósito de los miembros públicos y protegidos

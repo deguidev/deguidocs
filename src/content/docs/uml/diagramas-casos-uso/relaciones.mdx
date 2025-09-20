@@ -1,0 +1,406 @@
+---
+title: 3. Tipos de Relaciones en Casos de Uso
+description: Asociación, inclusión, extensión y generalización en los diagramas de casos de uso UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Tipos de Relaciones en Casos de Uso
+
+Las relaciones en los diagramas de casos de uso permiten mostrar cómo los diferentes elementos interactúan entre sí. Estas relaciones ayudan a estructurar y organizar los casos de uso, reduciendo la redundancia y mejorando la claridad del diagrama.
+
+## 3.1. Asociación (actor–caso de uso)
+
+La asociación es el tipo de relación más básico en los diagramas de casos de uso, conectando actores con los casos de uso con los que interactúan.
+
+### Características de la asociación
+
+<div>
+  <ul>
+    <li>Representa la comunicación entre un actor y un caso de uso</li>
+    <li>Se dibuja como una línea sólida entre el actor y el caso de uso</li>
+    <li>Indica que el actor participa en el caso de uso</li>
+    <li>No tiene dirección específica (aunque a veces se usa una flecha para indicar quién inicia la interacción)</li>
+  </ul>
+</div>
+
+<Code code={`    👤
+    │
+    │
+    │
+    ▼
+┌─────────┐
+│ Realizar│
+│  Compra │
+└─────────┘`} lang="text" title="Asociación entre actor y caso de uso" />
+
+### Multiplicidad en asociaciones
+
+Aunque no es común mostrarla en diagramas de casos de uso, la multiplicidad puede indicarse para representar cuántas instancias de un actor pueden participar en un caso de uso y viceversa.
+
+<Code code={`    👤 1..*
+    │
+    │
+    │
+    ▼ 1
+┌─────────┐
+│ Realizar│
+│  Compra │
+└─────────┘`} lang="text" title="Asociación con multiplicidad" />
+
+<Aside type="note">
+  En el ejemplo anterior, la notación "1..*" indica que uno o más actores pueden participar en una instancia del caso de uso "Realizar Compra".
+</Aside>
+
+## 3.2. Inclusión («include»)
+
+La relación de inclusión se utiliza cuando un caso de uso incorpora el comportamiento de otro caso de uso como parte de su flujo.
+
+### Características de la inclusión
+
+<div>
+  <ul>
+    <li>El caso de uso base <strong>siempre</strong> incluye el comportamiento del caso de uso incluido</li>
+    <li>Se representa con una flecha discontinua con la etiqueta «include»</li>
+    <li>La flecha apunta hacia el caso de uso incluido</li>
+    <li>Permite reutilizar funcionalidades comunes</li>
+    <li>El caso de uso incluido no es independiente (no tiene valor por sí solo)</li>
+  </ul>
+</div>
+
+<Code code={`┌───────────────┐     «include»     ┌───────────────┐
+│ Realizar Pago │- - - - - - - ->│ Autenticar   │
+│               │                │ Usuario      │
+└───────────────┘                └───────────────┘`} lang="text" title="Relación de inclusión" />
+
+### Cuándo usar la relación de inclusión
+
+<div>
+  <ul>
+    <li>Para extraer comportamiento común que se repite en varios casos de uso</li>
+    <li>Para simplificar casos de uso complejos dividiéndolos en partes más manejables</li>
+    <li>Para separar funcionalidades obligatorias que siempre se ejecutan</li>
+  </ul>
+</div>
+
+<Tabs>
+  <TabItem label="Ejemplo correcto">
+    <div>
+      <Code code={`┌────────────────┐     «include»     ┌────────────────┐
+│ Realizar Compra│- - - - - - - ->│ Procesar Pago │
+└────────────────┘                └────────────────┘
+       │                                  │
+       │ «include»                        │ «include»
+       ▼                                  ▼
+┌────────────────┐              ┌────────────────┐
+│ Verificar      │              │ Generar        │
+│ Inventario     │              │ Factura        │
+└────────────────┘              └────────────────┘`} lang="text" title="Uso correcto de la relación de inclusión" />
+      <p>En este ejemplo, "Realizar Compra" siempre incluye verificar el inventario, procesar el pago y generar una factura.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Ejemplo incorrecto">
+    <div>
+      <Code code={`┌────────────────┐     «include»     ┌────────────────┐
+│ Realizar Compra│- - - - - - - ->│ Seleccionar   │
+└────────────────┘                │ Productos     │
+                                  └────────────────┘`} lang="text" title="Uso incorrecto de la relación de inclusión" />
+      <p>Este es un uso incorrecto porque "Seleccionar Productos" no es una funcionalidad separada, sino un paso dentro del caso de uso "Realizar Compra".</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Use la relación de inclusión cuando un caso de uso B siempre forma parte del caso de uso A, y B es lo suficientemente complejo o reutilizable como para justificar su separación.
+</Aside>
+
+## 3.3. Extensión («extend»)
+
+La relación de extensión se utiliza cuando un caso de uso añade comportamiento opcional a otro caso de uso bajo ciertas condiciones.
+
+### Características de la extensión
+
+<div>
+  <ul>
+    <li>El caso de uso base puede funcionar independientemente del caso de uso que lo extiende</li>
+    <li>Se representa con una flecha discontinua con la etiqueta «extend»</li>
+    <li>La flecha va desde el caso de uso que extiende hacia el caso de uso base</li>
+    <li>La extensión ocurre solo bajo ciertas condiciones</li>
+    <li>Define puntos de extensión donde el comportamiento adicional puede insertarse</li>
+  </ul>
+</div>
+
+<Code code={`┌───────────────┐     «extend»     ┌───────────────┐
+│ Aplicar       │- - - - - - - ->│ Realizar      │
+│ Descuento     │                │ Compra        │
+└───────────────┘                └───────────────┘
+                                 {Punto de extensión:
+                                  Cuando el cliente
+                                  tiene cupón}`} lang="text" title="Relación de extensión" />
+
+### Cuándo usar la relación de extensión
+
+<div>
+  <ul>
+    <li>Para representar comportamiento opcional que no siempre ocurre</li>
+    <li>Para manejar flujos alternativos o excepcionales</li>
+    <li>Para añadir funcionalidades a un caso de uso sin modificarlo</li>
+    <li>Para representar variantes de un caso de uso base</li>
+  </ul>
+</div>
+
+<Tabs>
+  <TabItem label="Ejemplo correcto">
+    <div>
+      <Code code={`┌────────────────┐     «extend»     ┌────────────────┐
+│ Solicitar      │- - - - - - - ->│ Crear         │
+│ Aprobación     │                │ Cuenta        │
+└────────────────┘                └────────────────┘
+                                  {Punto de extensión:
+                                   Cuando el monto
+                                   supera el límite}`} lang="text" title="Uso correcto de la relación de extensión" />
+      <p>En este ejemplo, "Solicitar Aprobación" extiende "Crear Cuenta" solo cuando se cumple una condición específica.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Ejemplo incorrecto">
+    <div>
+      <Code code={`┌────────────────┐     «extend»     ┌────────────────┐
+│ Pagar con      │- - - - - - - ->│ Realizar      │
+│ Tarjeta        │                │ Pago          │
+└────────────────┘                └────────────────┘`} lang="text" title="Uso incorrecto de la relación de extensión" />
+      <p>Este es un uso incorrecto porque "Pagar con Tarjeta" es una especialización de "Realizar Pago", no una extensión opcional. Debería modelarse como una generalización.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  La diferencia clave entre «include» y «extend» es que la inclusión es obligatoria y siempre ocurre, mientras que la extensión es opcional y ocurre solo bajo ciertas condiciones.
+</Aside>
+
+## 3.4. Generalización (entre actores o entre casos de uso)
+
+La generalización representa una relación de herencia entre actores o entre casos de uso, similar a la herencia en programación orientada a objetos.
+
+### Generalización entre actores
+
+<div>
+  <ul>
+    <li>Indica que un actor específico hereda las características de un actor más general</li>
+    <li>El actor específico puede interactuar con todos los casos de uso del actor general</li>
+    <li>Se representa con una flecha con línea continua y punta triangular vacía</li>
+    <li>La flecha apunta hacia el actor general (padre)</li>
+  </ul>
+</div>
+
+<Code code={`    👤
+    ▲
+    │
+    │
+┌───┴───┐
+│       │
+│       │
+┌─┐     ┌─┐
+│ │     │ │
+└─┘     └─┘
+Usuario Registrado
+    ▲
+    │
+    │
+┌───┴───┐
+│       │
+│       │
+┌─┐     ┌─┐
+│ │     │ │
+└─┘     └─┘
+Administrador`} lang="text" title="Generalización entre actores" />
+
+### Generalización entre casos de uso
+
+<div>
+  <ul>
+    <li>Indica que un caso de uso específico hereda y especializa el comportamiento de un caso de uso más general</li>
+    <li>El caso de uso hijo puede añadir o sobrescribir comportamiento del padre</li>
+    <li>Se representa con una flecha con línea continua y punta triangular vacía</li>
+    <li>La flecha apunta hacia el caso de uso general (padre)</li>
+  </ul>
+</div>
+
+<Code code={`┌───────────────┐
+│ Realizar Pago │
+└───────────────┘
+       ▲
+       │
+       │
+┌──────┴──────┐     ┌──────────────┐
+│ Pagar con   │     │ Pagar con    │
+│ Tarjeta     │     │ Efectivo     │
+└─────────────┘     └──────────────┘
+       ▲
+       │
+       │
+┌──────┴──────┐     ┌──────────────┐
+│ Pagar con   │     │ Pagar con    │
+│ Crédito     │     │ Débito       │
+└─────────────┘     └──────────────┘`} lang="text" title="Generalización entre casos de uso" />
+
+### Cuándo usar la generalización
+
+<div>
+  <ul>
+    <li>Para representar jerarquías de actores con diferentes niveles de privilegios</li>
+    <li>Para modelar variantes de un caso de uso que comparten comportamiento común</li>
+    <li>Para evitar duplicación al representar comportamientos similares</li>
+  </ul>
+</div>
+
+<Aside type="caution">
+  No abuse de la generalización. Úsela solo cuando realmente exista una relación de "es un tipo de" entre los elementos. Para comportamiento opcional, use «extend» en su lugar.
+</Aside>
+
+## Comparación entre tipos de relaciones
+
+<div>
+  <table>
+    <thead>
+      <tr>
+        <th>Característica</th>
+        <th>Asociación</th>
+        <th>Inclusión («include»)</th>
+        <th>Extensión («extend»)</th>
+        <th>Generalización</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Propósito principal</td>
+        <td>Conectar actores y casos de uso</td>
+        <td>Reutilizar comportamiento obligatorio</td>
+        <td>Añadir comportamiento opcional</td>
+        <td>Representar herencia</td>
+      </tr>
+      <tr>
+        <td>Representación</td>
+        <td>Línea sólida</td>
+        <td>Flecha discontinua</td>
+        <td>Flecha discontinua</td>
+        <td>Flecha sólida con triángulo</td>
+      </tr>
+      <tr>
+        <td>Dirección</td>
+        <td>Sin dirección específica</td>
+        <td>Hacia el caso de uso incluido</td>
+        <td>Hacia el caso de uso base</td>
+        <td>Hacia el elemento general</td>
+      </tr>
+      <tr>
+        <td>Obligatoriedad</td>
+        <td>N/A</td>
+        <td>Siempre ocurre</td>
+        <td>Condicional</td>
+        <td>N/A</td>
+      </tr>
+      <tr>
+        <td>Elementos conectados</td>
+        <td>Actor y caso de uso</td>
+        <td>Caso de uso y caso de uso</td>
+        <td>Caso de uso y caso de uso</td>
+        <td>Actor y actor, o caso de uso y caso de uso</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## Ejemplo completo con diferentes tipos de relaciones
+
+<Code code={`                                                 👤
+                                                 │
+                                                 │ Usuario
+                                                 │
+┌─────────────────────────────────────────────┐  │
+│                 Sistema de Comercio          │  │
+│                                             │  │
+│  ┌───────────────┐      «extend»            │  │
+│  │ Aplicar       │- - - - - - - - - - - -┐  │  │
+│  │ Descuento     │                       │  │  │
+│  └───────────────┘                       │  │  │
+│                                          ▼  │  │
+│  ┌───────────────┐                ┌───────────┐
+│  │ Generar       │◄ - - - - - - - │ Realizar  │◄───
+│  │ Factura       │    «include»   │ Compra    │
+│  └───────────────┘                └───────────┘
+│         ▲                              ▲
+│         │ «include»                    │
+│  ┌──────┴────────┐                     │
+│  │ Calcular      │                     │
+│  │ Impuestos     │                     │
+│  └───────────────┘                     │
+│                                        │
+└────────────────────────────────────────┼─────┐
+                                         │     │
+                                  ┌──────┴───┐ │
+                                  │          │ │
+                                  │          │ │
+                                 ┌┴┐        ┌┴┐│
+                                 │ │        │ ││
+                                 └─┘        └─┘│
+                               Cliente    Vendedor`} lang="text" title="Ejemplo completo con diferentes tipos de relaciones" />
+
+<Aside type="note">
+  En este ejemplo:
+  <ul>
+    <li>Hay una asociación entre los actores (Cliente y Vendedor) y el caso de uso "Realizar Compra"</li>
+    <li>"Aplicar Descuento" extiende "Realizar Compra" (comportamiento opcional)</li>
+    <li>"Realizar Compra" incluye "Generar Factura" (comportamiento obligatorio)</li>
+    <li>"Generar Factura" incluye "Calcular Impuestos" (comportamiento obligatorio)</li>
+    <li>Cliente y Vendedor son especializaciones del actor Usuario (generalización)</li>
+  </ul>
+</Aside>
+
+## Buenas prácticas al usar relaciones
+
+<div>
+  <ul>
+    <li>
+      <strong>Usar «include» para</strong>:
+      <ul>
+        <li>Comportamiento común que se repite en varios casos de uso</li>
+        <li>Funcionalidades obligatorias que siempre ocurren</li>
+        <li>Simplificar casos de uso complejos</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Usar «extend» para</strong>:
+      <ul>
+        <li>Comportamiento opcional que depende de ciertas condiciones</li>
+        <li>Flujos alternativos o excepcionales</li>
+        <li>Funcionalidades que pueden añadirse sin modificar el caso de uso base</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Usar generalización para</strong>:
+      <ul>
+        <li>Jerarquías de actores con diferentes niveles de privilegios</li>
+        <li>Variantes de un caso de uso que comparten comportamiento común</li>
+        <li>Representar relaciones "es un tipo de"</li>
+      </ul>
+    </li>
+    <li>
+      <strong>Evitar</strong>:
+      <ul>
+        <li>Relaciones circulares o redundantes</li>
+        <li>Abuso de relaciones que compliquen innecesariamente el diagrama</li>
+        <li>Mezclar pasos de un caso de uso con casos de uso independientes</li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+<Aside type="tip">
+  Recuerde que el objetivo principal de un diagrama de casos de uso es comunicar claramente las funcionalidades del sistema y cómo los usuarios interactúan con ellas. Use las relaciones para mejorar la claridad, no para complicar el diagrama.
+</Aside>

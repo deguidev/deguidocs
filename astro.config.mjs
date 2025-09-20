@@ -312,6 +312,34 @@ export default defineConfig({
 					],
 				},
 				{
+					label: 'UML',
+					collapsed: true,
+					items: [
+						{ 
+							label: 'Diagramas de Clases',
+							collapsed: true,
+							items: [
+								{ label: '1. Introducción al Diagrama de Clases', link: '/uml/diagramas-clases/introduccion/' },
+								{ label: '2. Elementos Básicos de un Diagrama de Clases', link: '/uml/diagramas-clases/elementos-basicos/' },
+								{ label: '3. Relaciones Entre Clases', link: '/uml/diagramas-clases/relaciones/' },
+								{ label: '4. Notación UML para Clases', link: '/uml/diagramas-clases/notacion/' },
+								{ label: '5. Aplicaciones del Diagrama de Clases', link: '/uml/diagramas-clases/aplicaciones/' }
+							]
+						},
+						{ 
+							label: 'Diagramas de Casos de Uso',
+							collapsed: true,
+							items: [
+								{ label: '1. Introducción al Diagrama de Casos de Uso', link: '/uml/diagramas-casos-uso/introduccion/' },
+								{ label: '2. Elementos Básicos de un Diagrama de Casos de Uso', link: '/uml/diagramas-casos-uso/elementos-basicos/' },
+								{ label: '3. Tipos de Relaciones en Casos de Uso', link: '/uml/diagramas-casos-uso/relaciones/' },
+								{ label: '4. Notación UML para Casos de Uso', link: '/uml/diagramas-casos-uso/notacion/' },
+								{ label: '5. Aplicaciones del Diagrama de Casos de Uso', link: '/uml/diagramas-casos-uso/aplicaciones/' }
+							]
+						}
+					]
+				},
+				{
 					label: 'Utilidades',
 					collapsed: true,
 					items: [

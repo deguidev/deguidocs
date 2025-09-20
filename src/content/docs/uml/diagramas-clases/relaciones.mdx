@@ -1,0 +1,743 @@
+---
+title: 3. Relaciones Entre Clases
+description: Tipos de conexiones y asociaciones entre clases en diagramas UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Relaciones Entre Clases
+
+Las relaciones entre clases son elementos fundamentales en los diagramas UML que representan cómo las clases interactúan, se conectan y dependen unas de otras. Estas relaciones permiten modelar la estructura estática de un sistema con mayor precisión y claridad.
+
+## 3.1. Asociación
+
+La asociación es la relación más básica y común entre clases. Representa una conexión estructural o conceptual entre dos o más clases.
+
+### Características principales
+
+- Se representa mediante una **línea sólida** que conecta las clases relacionadas
+- Puede ser **unidireccional** (con una flecha en un extremo) o **bidireccional** (sin flechas)
+- Puede incluir un **nombre** que describe la naturaleza de la relación
+- Puede mostrar **roles** en cada extremo, indicando el papel que juega cada clase en la relación
+
+### Representación gráfica
+
+<Code code={`[Estudiante] ────────> [Curso]
+             se inscribe`} lang="text" title="Asociación unidireccional" />
+
+<Code code={`[Profesor] <────────> [Curso]
+           imparte    contiene`} lang="text" title="Asociación bidireccional con roles" />
+
+### Ejemplo en contexto
+
+<Tabs>
+  <TabItem label="Diagrama">
+    <Code code={`[Estudiante]                      [Curso]
+-----------------          ---------------
+| -id: String    |          | -codigo: String |
+| -nombre: String |          | -nombre: String |
+-----------------          ---------------
+       |                          |
+       |  1..*                    | 0..*
+       |--------> se inscribe --->|
+`} lang="text" title="Asociación entre Estudiante y Curso" />
+  </TabItem>
+  <TabItem label="Código Java">
+    ```java
+    import java.util.ArrayList;
+    import java.util.List;
+
+    public class Estudiante {
+        private String id;
+        private String nombre;
+        private List<Curso> cursos; // Asociación con Curso
+        
+        public Estudiante(String id, String nombre) {
+            this.id = id;
+            this.nombre = nombre;
+            this.cursos = new ArrayList<>();
+        }
+        
+        public void inscribirEnCurso(Curso curso) {
+            // Asociación bidireccional
+            this.cursos.add(curso);
+            curso.agregarEstudiante(this);
+        }
+        
+        public String getId() { return id; }
+        public String getNombre() { return nombre; }
+        public List<Curso> getCursos() { return cursos; }
+    }
+    
+    public class Curso {
+        private String codigo;
+        private String nombre;
+        private List<Estudiante> estudiantes; // Asociación con Estudiante
+        
+        public Curso(String codigo, String nombre) {
+            this.codigo = codigo;
+            this.nombre = nombre;
+            this.estudiantes = new ArrayList<>();
+        }
+        
+        public void agregarEstudiante(Estudiante estudiante) {
+            // Evitamos duplicados
+            if (!this.estudiantes.contains(estudiante)) {
+                this.estudiantes.add(estudiante);
+            }
+        }
+        
+        public String getCodigo() { return codigo; }
+        public String getNombre() { return nombre; }
+        public List<Estudiante> getEstudiantes() { return estudiantes; }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  La asociación es la relación más flexible y común. Cuando no estés seguro de qué tipo de relación usar, comienza con una asociación simple y refina según sea necesario.
+</Aside>
+
+## 3.2. Multiplicidad
+
+La multiplicidad define cuántos objetos de una clase pueden relacionarse con un objeto de otra clase. Es un aspecto crucial de las asociaciones que especifica las restricciones cuantitativas de la relación.
+
+### Notación de multiplicidad
+
+| Notación | Significado | Ejemplo |
+|---------|------------|--------|
+| `1` | Exactamente uno | Una persona tiene exactamente un número de identificación |
+| `0..1` | Cero o uno (opcional) | Una persona puede tener o no un pasaporte |
+| `*` o `0..*` | Cero o muchos | Un cliente puede realizar cualquier número de pedidos (o ninguno) |
+| `1..*` | Uno o muchos | Un pedido debe contener al menos un producto |
+| `n..m` | De n a m instancias | Un equipo tiene entre 2 y 11 jugadores (2..11) |
+
+### Representación gráfica
+
+<Code code={`[Pedido] 1 ----------> 1..* [LineaPedido]
+          tiene`} lang="text" title="Un pedido tiene una o más líneas de pedido" />
+
+<Code code={`[Estudiante] 0..* ----------> 0..* [Curso]
+                  se inscribe`} lang="text" title="Relación muchos a muchos" />
+
+### Ejemplo en contexto
+
+<Tabs>
+  <TabItem label="Diagrama">
+    <Code code={`[Biblioteca]                    [Libro]
+-----------------          ---------------
+| -nombre       |          | -titulo     |
+| -direccion    | 1        | -autor      |
+-----------------          ---------------
+       |                          |
+       |                          | *
+       |--------> contiene ------>|
+`} lang="text" title="Una biblioteca contiene muchos libros" />
+  </TabItem>
+  <TabItem label="Código Java">
+    ```java
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.Collections;
+
+    public class Biblioteca {
+        private String nombre;
+        private String direccion;
+        private List<Libro> libros;
+        
+        public Biblioteca(String nombre, String direccion) {
+            this.nombre = nombre;
+            this.direccion = direccion;
+            this.libros = new ArrayList<>();  // Multiplicidad: muchos (0..*) libros
+        }
+        
+        public void agregarLibro(Libro libro) {
+            libros.add(libro);
+            libro.setBiblioteca(this);
+        }
+        
+        public List<Libro> getLibros() {
+            return Collections.unmodifiableList(libros);  // Retorna una vista inmutable
+        }
+        
+        public String getNombre() { return nombre; }
+        public String getDireccion() { return direccion; }
+    }
+    
+    public class Libro {
+        private String titulo;
+        private String autor;
+        private Biblioteca biblioteca;  // Multiplicidad: exactamente una (1) biblioteca
+        
+        public Libro(String titulo, String autor) {
+            this.titulo = titulo;
+            this.autor = autor;
+        }
+        
+        // Método para establecer la biblioteca (relación 1 a muchos)
+        public void setBiblioteca(Biblioteca biblioteca) {
+            this.biblioteca = biblioteca;
+        }
+        
+        public String getTitulo() { return titulo; }
+        public String getAutor() { return autor; }
+        public Biblioteca getBiblioteca() { return biblioteca; }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Código Python">
+    ```python
+    class Biblioteca:
+        def __init__(self, nombre, direccion):
+            self.nombre = nombre
+            self.direccion = direccion
+            self.libros = []  # Multiplicidad: muchos libros
+            
+        def agregar_libro(self, libro):
+            self.libros.append(libro)
+    
+    class Libro:
+        def __init__(self, titulo, autor, biblioteca=None):
+            self.titulo = titulo
+            self.autor = autor
+            self.biblioteca = biblioteca  # Multiplicidad: un libro pertenece a una biblioteca
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  La multiplicidad es fundamental para entender las restricciones cuantitativas entre clases y tiene un impacto directo en cómo se implementan las relaciones en el código.
+</Aside>
+
+## 3.3. Agregación
+
+La agregación es un tipo especial de asociación que representa una relación "todo-parte" o "tiene un" donde las partes pueden existir independientemente del todo.
+
+### Características principales
+
+- Se representa mediante una **línea con un diamante vacío** en el extremo de la clase "todo"
+- Indica una **relación débil** entre el todo y sus partes
+- Las partes **pueden existir independientemente** del todo
+- Si el todo se destruye, las partes **pueden seguir existiendo**
+
+### Representación gráfica
+
+<Code code={`[Departamento] <>----------> [Empleado]
+               tiene`} lang="text" title="Agregación: Un departamento tiene empleados" />
+
+### Ejemplo en contexto
+
+<Tabs>
+  <TabItem label="Diagrama">
+    <Code code={`[Equipo]                      [Jugador]
+-----------------          ---------------
+| -nombre       |          | -nombre     |
+| -categoria    | 1        | -posicion   |
+-----------------          ---------------
+       |                          |
+       | <>                        | 1..*
+       |--------> tiene --------->|
+`} lang="text" title="Un equipo tiene jugadores (agregación)" />
+  </TabItem>
+  <TabItem label="Código Java">
+    ```java
+    import java.util.ArrayList;
+    import java.util.List;
+
+    public class Equipo {
+        private String nombre;
+        private String categoria;
+        private List<Jugador> jugadores; // Agregación: el equipo tiene jugadores
+        
+        public Equipo(String nombre, String categoria) {
+            this.nombre = nombre;
+            this.categoria = categoria;
+            this.jugadores = new ArrayList<>();
+        }
+        
+        public void agregarJugador(Jugador jugador) {
+            // En la agregación, el jugador puede existir independientemente
+            jugadores.add(jugador);
+            jugador.setEquipoActual(this);
+        }
+        
+        public void eliminarJugador(Jugador jugador) {
+            // Al eliminar un jugador del equipo, el jugador sigue existiendo
+            jugadores.remove(jugador);
+            jugador.setEquipoActual(null);
+        }
+        
+        public String getNombre() { return nombre; }
+        public String getCategoria() { return categoria; }
+        public List<Jugador> getJugadores() { return new ArrayList<>(jugadores); }
+    }
+    
+    public class Jugador {
+        private String nombre;
+        private String posicion;
+        private Equipo equipoActual; // Un jugador puede existir sin equipo
+        
+        public Jugador(String nombre, String posicion) {
+            this.nombre = nombre;
+            this.posicion = posicion;
+            // No se inicializa equipoActual - puede ser null
+        }
+        
+        public void setEquipoActual(Equipo equipo) {
+            this.equipoActual = equipo;
+        }
+        
+        public String getNombre() { return nombre; }
+        public String getPosicion() { return posicion; }
+        public Equipo getEquipoActual() { return equipoActual; }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Código C#">
+    ```csharp
+    public class Equipo {
+        public string Nombre { get; set; }
+        public string Categoria { get; set; }
+        public List<Jugador> Jugadores { get; set; } = new List<Jugador>();
+        
+        public void AgregarJugador(Jugador jugador) {
+            Jugadores.Add(jugador);
+        }
+    }
+    
+    public class Jugador {
+        public string Nombre { get; set; }
+        public string Posicion { get; set; }
+        // Un jugador puede existir sin pertenecer a un equipo
+        // o puede cambiar de equipo
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Piensa en la agregación como una relación donde las partes pueden "prestarse" a diferentes todos. Por ejemplo, un profesor puede pertenecer a varios departamentos, y si un departamento se elimina, el profesor sigue existiendo.
+</Aside>
+
+## 3.4. Composición
+
+La composición es una forma más fuerte de agregación que representa una relación "todo-parte" donde las partes no pueden existir sin el todo.
+
+### Características principales
+
+- Se representa mediante una **línea con un diamante sólido** en el extremo de la clase "todo"
+- Indica una **relación fuerte** entre el todo y sus partes
+- Las partes **no pueden existir independientemente** del todo
+- Si el todo se destruye, las partes **también se destruyen**
+- Una parte **pertenece solo a un todo** a la vez
+
+### Representación gráfica
+
+<Code code={`[Casa] <*>----------> [Habitacion]
+         contiene`} lang="text" title="Composición: Una casa contiene habitaciones" />
+
+### Ejemplo en contexto
+
+<Tabs>
+  <TabItem label="Diagrama">
+    <Code code={`[Pedido]                      [LineaPedido]
+-----------------          ---------------
+| -fecha        |          | -cantidad   |
+| -total        | 1        | -precio     |
+-----------------          ---------------
+       |                          |
+       | <*>                       | 1..*
+       |--------> contiene ------>|
+`} lang="text" title="Un pedido contiene líneas de pedido (composición)" />
+  </TabItem>
+  <TabItem label="Código Java">
+    ```java
+    import java.util.ArrayList;
+    import java.util.Collections;
+    import java.util.Date;
+    import java.util.List;
+
+    public class Pedido {
+        private Date fecha;
+        private double total;
+        private final List<LineaPedido> lineas; // Composición: las líneas son parte del pedido
+        
+        public Pedido() {
+            this.fecha = new Date();
+            this.total = 0.0;
+            this.lineas = new ArrayList<>();
+        }
+        
+        // Al crear una línea de pedido, está vinculada a este pedido
+        // La línea solo puede ser creada por el pedido (composición)
+        public LineaPedido crearLineaPedido(int cantidad, double precio) {
+            LineaPedido linea = new LineaPedido(this, cantidad, precio);
+            lineas.add(linea);
+            this.total += cantidad * precio;
+            return linea;
+        }
+        
+        // Eliminar una línea del pedido
+        public void eliminarLineaPedido(LineaPedido linea) {
+            if (lineas.contains(linea)) {
+                lineas.remove(linea);
+                this.total -= linea.getSubtotal();
+                // La línea se vuelve inutilizable al eliminarla del pedido
+                linea.invalidar();
+            }
+        }
+        
+        // Si se elimina el pedido, todas sus líneas se eliminan (composición)
+        // Este método sería llamado por el recolector de basura o un método finalize()
+        public void destruir() {
+            for (LineaPedido linea : new ArrayList<>(lineas)) {
+                eliminarLineaPedido(linea);
+            }
+        }
+        
+        public Date getFecha() { return fecha; }
+        public double getTotal() { return total; }
+        public List<LineaPedido> getLineas() { 
+            return Collections.unmodifiableList(lineas); 
+        }
+    }
+    
+    public class LineaPedido {
+        private final Pedido pedido;  // Referencia al todo
+        private int cantidad;
+        private double precio;
+        private boolean valida;
+        
+        // Una línea de pedido solo puede existir como parte de un pedido
+        // Constructor con visibilidad de paquete para que solo Pedido pueda crear instancias
+        LineaPedido(Pedido pedido, int cantidad, double precio) {
+            if (pedido == null) {
+                throw new IllegalArgumentException("Una línea de pedido debe pertenecer a un pedido");
+            }
+            this.pedido = pedido;
+            this.cantidad = cantidad;
+            this.precio = precio;
+            this.valida = true;
+        }
+        
+        // Método para invalidar la línea cuando se elimina del pedido
+        void invalidar() {
+            this.valida = false;
+        }
+        
+        public double getSubtotal() {
+            return cantidad * precio;
+        }
+        
+        public Pedido getPedido() { return pedido; }
+        public int getCantidad() { return cantidad; }
+        public double getPrecio() { return precio; }
+        public boolean isValida() { return valida; }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+  En la composición, el ciclo de vida de las partes está completamente controlado por el todo. Si implementas una relación de composición, asegúrate de que la clase "todo" gestione adecuadamente la creación y destrucción de sus partes.
+</Aside>
+
+## 3.5. Herencia (generalización)
+
+La herencia o generalización representa una relación "es un" entre clases, donde una clase (subclase) hereda atributos y métodos de otra clase (superclase).
+
+### Características principales
+
+- Se representa mediante una **línea con una flecha triangular hueca** apuntando a la superclase
+- Permite la **reutilización de código** y la implementación del principio de sustitución
+- La subclase **hereda todos los miembros** (atributos y métodos) de la superclase
+- La subclase puede **añadir nuevos miembros** o **sobrescribir** los heredados
+
+### Representación gráfica
+
+<Code code={`         [Vehiculo]
+             ^
+             |
+             |
+    +--------+---------+
+    |                  |
+[Automovil]        [Motocicleta]`} lang="text" title="Herencia: Automóvil y Motocicleta heredan de Vehículo" />
+
+### Ejemplo en contexto
+
+<Tabs>
+  <TabItem label="Diagrama">
+    <Code code={`[Persona]
+-----------------
+| -nombre       |
+| -edad         |
+| +saludar()    |
+-----------------
+        ^
+        |
+        |
+[Empleado]
+-----------------
+| -salario      |
+| -puesto       |
+| +trabajar()   |
+-----------------`} lang="text" title="Empleado hereda de Persona" />
+  </TabItem>
+  <TabItem label="Código Java">
+    ```java
+    public class Persona {
+        private String nombre;
+        private int edad;
+        
+        public Persona(String nombre, int edad) {
+            this.nombre = nombre;
+            this.edad = edad;
+        }
+        
+        public String saludar() {
+            return "Hola, soy " + nombre;
+        }
+        
+        // Getters y setters
+        public String getNombre() { return nombre; }
+        public void setNombre(String nombre) { this.nombre = nombre; }
+        public int getEdad() { return edad; }
+        public void setEdad(int edad) { this.edad = edad; }
+    }
+    
+    // Empleado hereda de Persona (relación "es un")
+    public class Empleado extends Persona {
+        private double salario;
+        private String puesto;
+        
+        public Empleado(String nombre, int edad, double salario, String puesto) {
+            // Llamada al constructor de la superclase
+            super(nombre, edad);
+            this.salario = salario;
+            this.puesto = puesto;
+        }
+        
+        // Método específico de Empleado
+        public String trabajar() {
+            return getNombre() + " está trabajando como " + puesto;
+        }
+        
+        // Sobrescritura de método (polimorfismo)
+        @Override
+        public String saludar() {
+            return "Hola, soy " + getNombre() + ", trabajo como " + puesto;
+        }
+        
+        // Getters y setters específicos
+        public double getSalario() { return salario; }
+        public void setSalario(double salario) { this.salario = salario; }
+        public String getPuesto() { return puesto; }
+        public void setPuesto(String puesto) { this.puesto = puesto; }
+    }
+    
+    // Ejemplo de uso
+    public class EjemploHerencia {
+        public static void main(String[] args) {
+            // Crear instancia de la superclase
+            Persona persona = new Persona("Ana", 30);
+            System.out.println(persona.saludar());  // Hola, soy Ana
+            
+            // Crear instancia de la subclase
+            Empleado empleado = new Empleado("Carlos", 35, 45000.0, "Desarrollador");
+            System.out.println(empleado.saludar());  // Hola, soy Carlos, trabajo como Desarrollador
+            System.out.println(empleado.trabajar()); // Carlos está trabajando como Desarrollador
+            
+            // Demostrar polimorfismo
+            Persona personaEmpleado = new Empleado("Elena", 28, 50000.0, "Diseñadora");
+            System.out.println(personaEmpleado.saludar()); // Llama al método sobrescrito
+        }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Código Python">
+    ```python
+    class Persona:
+        def __init__(self, nombre, edad):
+            self.nombre = nombre
+            self.edad = edad
+            
+        def saludar(self):
+            return f"Hola, soy {self.nombre}"
+    
+    class Empleado(Persona):  # Herencia
+        def __init__(self, nombre, edad, salario, puesto):
+            super().__init__(nombre, edad)  # Llamada al constructor de la superclase
+            self.salario = salario
+            self.puesto = puesto
+            
+        def trabajar(self):
+            return f"{self.nombre} está trabajando como {self.puesto}"
+            
+        # Sobrescritura de método
+        def saludar(self):
+            return f"Hola, soy {self.nombre}, trabajo como {self.puesto}"
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  La herencia debe usarse cuando existe una verdadera relación "es un" entre las clases. Si la relación es más del tipo "tiene un" o "usa un", considera usar composición o asociación en su lugar.
+</Aside>
+
+## 3.6. Dependencia
+
+La dependencia es una relación más débil que indica que una clase usa o depende de otra clase, pero sin contener una referencia permanente a ella.
+
+### Características principales
+
+- Se representa mediante una **línea discontinua con una flecha** apuntando a la clase de la que se depende
+- Indica que una clase **usa temporalmente** a otra clase
+- Puede ser a través de **parámetros de métodos**, **variables locales** o **llamadas a métodos estáticos**
+- Es la relación más débil entre clases
+
+### Representación gráfica
+
+<Code code={`[Controlador] - - - - -> [Servicio]
+               usa`} lang="text" title="Dependencia: Controlador usa Servicio" />
+
+### Ejemplo en contexto
+
+<Tabs>
+  <TabItem label="Diagrama">
+    <Code code={`[Impresora]                    [Documento]
+-----------------          ---------------
+| -modelo       |          | -titulo     |
+| +imprimir()   |          | -contenido  |
+-----------------          ---------------
+       |                          |
+       |                          |
+       |-- - - -> usa - - - - - ->|
+`} lang="text" title="Impresora depende de Documento" />
+  </TabItem>
+  <TabItem label="Código Java">
+    ```java
+    public class Documento {
+        private String titulo;
+        private String contenido;
+        
+        public Documento(String titulo, String contenido) {
+            this.titulo = titulo;
+            this.contenido = contenido;
+        }
+        
+        public String getTitulo() { return titulo; }
+        public String getContenido() { return contenido; }
+    }
+    
+    public class Impresora {
+        private String modelo;
+        private boolean encendida;
+        
+        public Impresora(String modelo) {
+            this.modelo = modelo;
+            this.encendida = false;
+        }
+        
+        public void encender() {
+            this.encendida = true;
+            System.out.println("Impresora " + modelo + " encendida");
+        }
+        
+        public void apagar() {
+            this.encendida = false;
+            System.out.println("Impresora " + modelo + " apagada");
+        }
+        
+        // Dependencia: Impresora usa Documento temporalmente
+        // pero no lo almacena como atributo
+        public void imprimir(Documento documento) {
+            if (!encendida) {
+                System.out.println("Error: La impresora está apagada");
+                return;
+            }
+            
+            System.out.println("Imprimiendo: " + documento.getTitulo());
+            System.out.println("Contenido: " + documento.getContenido());
+            System.out.println("Impresión completada en " + modelo);
+        }
+        
+        // Otro ejemplo de dependencia: usa una clase como parámetro
+        public void configurarCalidad(ConfiguracionImpresion config) {
+            System.out.println("Configurando calidad: " + config.getCalidad());
+            // Usa la configuración pero no la almacena
+        }
+    }
+    
+    // Otra clase usada temporalmente
+    public class ConfiguracionImpresion {
+        private String calidad;
+        private boolean dobleCara;
+        
+        public ConfiguracionImpresion(String calidad, boolean dobleCara) {
+            this.calidad = calidad;
+            this.dobleCara = dobleCara;
+        }
+        
+        public String getCalidad() { return calidad; }
+        public boolean isDobleCara() { return dobleCara; }
+    }
+    
+    // Ejemplo de uso
+    public class EjemploDependencia {
+        public static void main(String[] args) {
+            // Crear objetos
+            Impresora impresora = new Impresora("HP LaserJet");
+            Documento documento = new Documento("Informe Anual", "Contenido del informe...");
+            ConfiguracionImpresion config = new ConfiguracionImpresion("Alta", true);
+            
+            // Demostrar dependencia
+            impresora.encender();
+            impresora.configurarCalidad(config);  // Usa ConfiguracionImpresion temporalmente
+            impresora.imprimir(documento);        // Usa Documento temporalmente
+            impresora.apagar();
+            
+            // Después de estas operaciones, no hay referencias permanentes
+            // entre Impresora y Documento o ConfiguracionImpresion
+        }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Código C#">
+    ```csharp
+    public class Documento {
+        public string Titulo { get; set; }
+        public string Contenido { get; set; }
+    }
+    
+    public class Impresora {
+        public string Modelo { get; set; }
+        
+        // La impresora depende temporalmente del documento
+        // pero no lo almacena como atributo
+        public void Imprimir(Documento documento) {
+            Console.WriteLine($"Imprimiendo: {documento.Titulo}");
+            // Lógica de impresión
+        }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  La dependencia es útil para representar relaciones temporales o cuando una clase usa otra sin almacenarla como atributo. Esto ayuda a identificar posibles puntos de acoplamiento en el diseño.
+</Aside>
+
+### Comparación de relaciones
+
+| Relación | Notación | Fuerza | Descripción |
+|----------|----------|--------|-------------|
+| Dependencia | Línea discontinua con flecha | Muy débil | "Usa temporalmente" |
+| Asociación | Línea sólida | Débil | "Conoce a" |
+| Agregación | Línea con diamante vacío | Media | "Tiene un" (partes independientes) |
+| Composición | Línea con diamante sólido | Fuerte | "Contiene" (partes dependientes) |
+| Herencia | Línea con flecha triangular | Muy fuerte | "Es un" |

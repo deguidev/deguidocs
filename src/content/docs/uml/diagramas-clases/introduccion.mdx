@@ -1,0 +1,77 @@
+---
+title: 1. Introducción al Diagrama de Clases
+description: Fundamentos y conceptos básicos de los diagramas de clases UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Introducción al Diagrama de Clases
+
+## 1.1. Definición y propósito
+
+El diagrama de clases es uno de los tipos más importantes de diagramas en UML (Unified Modeling Language). Representa la estructura estática de un sistema orientado a objetos, mostrando:
+
+- Las clases que componen el sistema
+- Los atributos y operaciones de cada clase
+- Las relaciones estructurales entre las clases
+
+<Aside type="tip">
+  Un diagrama de clases sirve como un plano para la implementación de código, facilitando la transición del diseño a la programación.
+</Aside>
+
+El propósito principal de un diagrama de clases es proporcionar una representación visual clara de la estructura del sistema que permita a los desarrolladores:
+
+- Visualizar y diseñar la estructura del sistema antes de escribir código
+- Documentar el diseño para referencia futura
+- Comunicar la arquitectura a otros miembros del equipo
+- Analizar la complejidad y las dependencias del sistema
+
+## 1.2. Importancia en el modelado de software
+
+Los diagramas de clases son fundamentales en el proceso de desarrollo de software por diversas razones:
+
+<Tabs>
+  <TabItem label="Fase de Diseño">
+    - Permiten visualizar la estructura del sistema antes de implementarlo
+    - Facilitan la identificación de clases, atributos y métodos necesarios
+    - Ayudan a establecer una arquitectura sólida y coherente
+    - Permiten evaluar diferentes alternativas de diseño
+  </TabItem>
+  <TabItem label="Documentación">
+    - Sirven como documentación técnica del sistema
+    - Facilitan la comprensión del código para nuevos desarrolladores
+    - Proporcionan una visión general del sistema sin necesidad de revisar el código
+    - Ayudan a mantener la consistencia entre la documentación y la implementación
+  </TabItem>
+  <TabItem label="Mantenimiento">
+    - Facilitan la identificación de componentes que necesitan modificación
+    - Ayudan a evaluar el impacto de los cambios en el sistema
+    - Permiten planificar refactorizaciones y mejoras
+    - Sirven como referencia para entender sistemas complejos
+  </TabItem>
+</Tabs>
+
+## 1.3. Relación con otros diagramas UML
+
+El diagrama de clases se relaciona con otros diagramas UML, complementándose para ofrecer diferentes perspectivas del sistema:
+
+| Diagrama UML | Relación con el Diagrama de Clases |
+|--------------|-----------------------------------|
+| Diagrama de Objetos | Muestra instancias concretas de las clases definidas en el diagrama de clases |
+| Diagrama de Secuencia | Utiliza las clases y operaciones definidas para mostrar interacciones temporales |
+| Diagrama de Actividades | Puede detallar el comportamiento de los métodos definidos en las clases |
+| Diagrama de Estados | Muestra los diferentes estados por los que puede pasar un objeto de una clase |
+| Diagrama de Componentes | Agrupa clases en componentes de mayor nivel |
+| Diagrama de Despliegue | Muestra cómo las clases y componentes se distribuyen en la infraestructura física |
+
+<Aside type="note">
+  Mientras que el diagrama de clases representa la estructura estática del sistema, otros diagramas como los de secuencia o actividad representan aspectos dinámicos y comportamentales.
+</Aside>
+
+<Badge text="Estático vs. Dinámico" variant="note" />
+
+La combinación del diagrama de clases (estructura estática) con diagramas dinámicos (como secuencia o actividad) proporciona una visión completa del sistema, abarcando tanto su estructura como su comportamiento.

@@ -1,0 +1,189 @@
+---
+title: 1. Introducción al Diagrama de Casos de Uso
+description: Definición, propósito e importancia de los diagramas de casos de uso en UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Introducción al Diagrama de Casos de Uso
+
+Los diagramas de casos de uso son una herramienta fundamental en el modelado de sistemas y la ingeniería de requisitos. Representan gráficamente la interacción entre los usuarios (actores) y el sistema, mostrando las funcionalidades que el sistema debe proporcionar y cómo los diferentes tipos de usuarios interactúan con estas funcionalidades.
+
+## 1.1. Definición y propósito
+
+### ¿Qué es un diagrama de casos de uso?
+
+Un diagrama de casos de uso es una representación gráfica de las interacciones entre los usuarios (actores) y el sistema. Forma parte del lenguaje UML (Unified Modeling Language) y se centra en describir cómo se utiliza el sistema desde la perspectiva del usuario.
+
+<Code code={`+---------------------+
+|                     |
+|      Sistema        |
+|                     |
+| +---------------+   |
+| |               |   |
+| | Caso de Uso 1 |<--+--- Actor 1
+| |               |   |
+| +---------------+   |
+|                     |
+| +---------------+   |
+| |               |   |
+| | Caso de Uso 2 |<--+--- Actor 2
+| |               |   |
+| +---------------+   |
+|                     |
++---------------------+`} lang="text" title="Estructura básica de un diagrama de casos de uso" />
+
+### Propósito principal
+
+<div>
+  <ul>
+    <li><strong>Capturar requisitos funcionales</strong>: Identificar qué debe hacer el sistema desde la perspectiva del usuario.</li>
+    <li><strong>Definir el alcance del sistema</strong>: Establecer claramente los límites del sistema y lo que queda fuera de él.</li>
+    <li><strong>Facilitar la comunicación</strong>: Proporcionar un lenguaje común entre usuarios, clientes y desarrolladores.</li>
+    <li><strong>Guiar el desarrollo</strong>: Servir como base para la planificación y el diseño del sistema.</li>
+  </ul>
+</div>
+
+<Aside type="tip">
+  Los diagramas de casos de uso son especialmente útiles en las etapas iniciales del desarrollo, cuando es crucial entender qué necesita hacer el sistema antes de decidir cómo lo hará.
+</Aside>
+
+## 1.2. Importancia en el análisis de requisitos
+
+Los diagramas de casos de uso juegan un papel crucial en el proceso de análisis de requisitos, ofreciendo múltiples beneficios:
+
+### Enfoque centrado en el usuario
+
+<div>
+  <ul>
+    <li>Priorizan las necesidades y expectativas de los usuarios finales.</li>
+    <li>Permiten identificar diferentes tipos de usuarios y sus interacciones específicas con el sistema.</li>
+    <li>Ayudan a validar que el sistema satisfará las necesidades reales de los usuarios.</li>
+  </ul>
+</div>
+
+### Clarificación de requisitos
+
+<div>
+  <ul>
+    <li>Transforman requisitos textuales en representaciones visuales más fáciles de entender.</li>
+    <li>Facilitan la identificación de requisitos incompletos, ambiguos o contradictorios.</li>
+    <li>Permiten descubrir nuevos requisitos durante el proceso de modelado.</li>
+  </ul>
+</div>
+
+### Base para la validación y verificación
+
+<Tabs>
+  <TabItem label="Validación">
+    <div>
+      <p>Los casos de uso permiten verificar con los stakeholders si el sistema propuesto:</p>
+      <ul>
+        <li>Cubre todas las funcionalidades necesarias.</li>
+        <li>Refleja correctamente los procesos de negocio.</li>
+        <li>Satisface las expectativas de los usuarios finales.</li>
+      </ul>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Verificación">
+    <div>
+      <p>Durante el desarrollo y pruebas, los casos de uso sirven para:</p>
+      <ul>
+        <li>Crear casos de prueba que verifiquen cada funcionalidad.</li>
+        <li>Asegurar que todas las interacciones usuario-sistema han sido implementadas.</li>
+        <li>Comprobar que el sistema se comporta según lo especificado.</li>
+      </ul>
+    </div>
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Un buen conjunto de casos de uso debe cubrir todos los requisitos funcionales del sistema, desde las funcionalidades principales hasta los flujos alternativos y excepcionales.
+</Aside>
+
+## 1.3. Relación con otros diagramas UML
+
+Los diagramas de casos de uso no existen de forma aislada, sino que se complementan con otros diagramas UML para proporcionar una visión completa del sistema.
+
+### Relación con diagramas de comportamiento
+
+<div>
+  <table>
+    <thead>
+      <tr>
+        <th>Diagrama UML</th>
+        <th>Relación con casos de uso</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Diagrama de actividades</td>
+        <td>Detalla el flujo de trabajo interno de un caso de uso específico</td>
+      </tr>
+      <tr>
+        <td>Diagrama de secuencia</td>
+        <td>Muestra la interacción entre objetos para implementar un caso de uso</td>
+      </tr>
+      <tr>
+        <td>Diagrama de estados</td>
+        <td>Representa los estados por los que pasa un objeto durante la ejecución de un caso de uso</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+### Relación con diagramas estructurales
+
+<div>
+  <table>
+    <thead>
+      <tr>
+        <th>Diagrama UML</th>
+        <th>Relación con casos de uso</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Diagrama de clases</td>
+        <td>Define las clases necesarias para implementar los casos de uso</td>
+      </tr>
+      <tr>
+        <td>Diagrama de componentes</td>
+        <td>Muestra cómo se organizan los componentes que implementan los casos de uso</td>
+      </tr>
+      <tr>
+        <td>Diagrama de despliegue</td>
+        <td>Especifica la infraestructura física donde se ejecutarán los casos de uso</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+### Flujo de trabajo típico en UML
+
+<Code code={`Requisitos → Casos de Uso → Diagramas de Comportamiento → Diagramas Estructurales → Implementación`} lang="text" title="Flujo de trabajo típico en el modelado UML" />
+
+<Aside type="tip">
+  Aunque este flujo representa una progresión lógica, en la práctica el desarrollo suele ser iterativo, con refinamientos continuos en todos los diagramas a medida que evoluciona el entendimiento del sistema.
+</Aside>
+
+## Beneficios clave de los diagramas de casos de uso
+
+<div>
+  <ul>
+    <li><strong>Simplicidad</strong>: Son fáciles de entender incluso para personas sin conocimientos técnicos.</li>
+    <li><strong>Visión global</strong>: Proporcionan una vista panorámica de las funcionalidades del sistema.</li>
+    <li><strong>Priorización</strong>: Ayudan a identificar las funcionalidades más importantes para los usuarios.</li>
+    <li><strong>Trazabilidad</strong>: Permiten rastrear requisitos desde su origen hasta su implementación.</li>
+    <li><strong>Gestión del alcance</strong>: Facilitan la definición clara de lo que está dentro y fuera del alcance del proyecto.</li>
+  </ul>
+</div>
+
+<Aside type="caution">
+  Los diagramas de casos de uso no son suficientes por sí solos para especificar completamente un sistema. Deben complementarse con descripciones detalladas de cada caso de uso, otros diagramas UML y especificaciones adicionales.
+</Aside>
