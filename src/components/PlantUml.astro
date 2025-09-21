@@ -1,0 +1,7 @@
+---
+import { encode } from "plantuml-encoder";
+const { code, server = "https://www.plantuml.com/plantuml", format = "svg" } = Astro.props;
+// format: "svg" o "png"
+const url = `${server}/${format}/${encode(code)}`;
+---
+<img src={url} alt="Diagrama UML" loading="lazy" style="max-width:100%; height:auto;" />

@@ -1,0 +1,356 @@
+---
+title: 2. Elementos Básicos de un Diagrama de Secuencia
+description: Objetos, líneas de vida, mensajes y activaciones en los diagramas de secuencia UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Elementos Básicos de un Diagrama de Secuencia
+
+Los diagramas de secuencia se componen de varios elementos fundamentales que permiten representar la interacción entre objetos a lo largo del tiempo. Conocer estos elementos es esencial para crear y comprender correctamente estos diagramas.
+
+## 2.1. Objetos y roles participantes
+
+Los objetos representan las instancias de clases que participan en la interacción. Cada objeto tiene un rol específico en el escenario que se está modelando.
+
+<PlantUml code={`@startuml
+actor Usuario
+participant "Interfaz de Usuario" as UI
+participant "Controlador" as Controller
+entity "Producto" as Product
+database "Base de Datos" as DB
+@enduml`} />
+
+<div>
+  <ul>
+    <li><strong>Actor</strong>: Representa un rol externo que interactúa con el sistema (por ejemplo, un usuario).</li>
+    <li><strong>Participante</strong>: Representa un objeto o componente del sistema.</li>
+    <li><strong>Entidad</strong>: Representa un objeto que almacena información persistente.</li>
+    <li><strong>Base de datos</strong>: Representa un sistema de almacenamiento de datos.</li>
+  </ul>
+</div>
+
+<Tabs>
+  <TabItem label="Notación básica">
+    <div>
+      <PlantUml code={`@startuml
+participant "Objeto" as Obj
+@enduml`} />
+      <p>Representación básica de un objeto participante.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Con estereotipos">
+    <div>
+      <PlantUml code={`@startuml
+participant "Interfaz" as UI <<boundary>>
+participant "Controlador" as Controller <<control>>
+participant "Entidad" as Entity <<entity>>
+@enduml`} />
+      <p>Los objetos pueden tener estereotipos que indican su rol en la arquitectura.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Con instancias">
+    <div>
+      <PlantUml code={`@startuml
+participant "c:Cliente" as c
+participant "p:Producto" as p
+@enduml`} />
+      <p>Los objetos pueden representarse como instancias específicas de una clase.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+## 2.2. Línea de vida (lifeline)
+
+La línea de vida representa la existencia de un objeto a lo largo del tiempo. Se dibuja como una línea vertical discontinua que se extiende desde el objeto.
+
+<PlantUml code={`@startuml
+participant "Objeto" as Obj
+
+hnote over Obj : Creación del objeto
+
+Obj -> Obj : operación()
+
+hnote over Obj : Destrucción del objeto
+@enduml`} />
+
+<div>
+  <ul>
+    <li>Representa el tiempo de vida de un objeto durante la interacción.</li>
+    <li>Se extiende verticalmente desde el símbolo del objeto.</li>
+    <li>Puede terminar con un símbolo de destrucción (X) si el objeto es eliminado durante la interacción.</li>
+  </ul>
+</div>
+
+<Aside type="tip">
+  La longitud de la línea de vida no tiene un significado específico en términos de duración real; lo importante es el orden relativo de los mensajes a lo largo de ella.
+</Aside>
+
+## 2.3. Mensajes entre objetos
+
+Los mensajes representan la comunicación entre objetos. Se dibujan como flechas que van de un objeto a otro.
+
+<PlantUml code={`@startuml
+participant "Objeto A" as A
+participant "Objeto B" as B
+
+A -> B : mensaje()
+B --> A : respuesta
+@enduml`} />
+
+<div>
+  <ul>
+    <li>Los mensajes fluyen de un objeto a otro.</li>
+    <li>Cada mensaje tiene un nombre que describe la operación o evento.</li>
+    <li>Los mensajes pueden incluir parámetros.</li>
+    <li>Existen diferentes tipos de mensajes (síncronos, asíncronos, de retorno).</li>
+  </ul>
+</div>
+
+<Tabs>
+  <TabItem label="Sistema de reservas">
+    <div>
+      <PlantUml code={`@startuml
+actor "Cliente" as Cliente
+participant "Interfaz de Reservas" as UI
+participant "GestorReservas" as Gestor
+participant "ValidadorDisponibilidad" as Validador
+database "BaseDeDatos" as DB
+
+Cliente -> UI : buscarDisponibilidad(fecha, personas)
+activate UI
+UI -> Gestor : verificarDisponibilidad(fecha, personas)
+activate Gestor
+Gestor -> Validador : validarParametros(fecha, personas)
+activate Validador
+note right of Validador: Verifica que la fecha sea futura\ny el número de personas válido
+Validador --> Gestor : parametrosValidos(true)
+deactivate Validador
+Gestor -> DB : consultarDisponibilidad(fecha)
+activate DB
+DB --> Gestor : listaMesas[id, capacidad, ubicacion]
+deactivate DB
+Gestor -> Gestor : filtrarMesasAdecuadas(listaMesas, personas)
+activate Gestor #DarkSalmon
+note right of Gestor: Selecciona mesas con capacidad\nsuficiente para el grupo
+deactivate Gestor
+Gestor --> UI : mesasDisponibles(listaMesasFiltrada)
+deactivate Gestor
+UI --> Cliente : mostrarOpciones(listaMesasFiltrada)
+deactivate UI
+
+Cliente -> UI : seleccionarMesa(idMesa)
+activate UI
+UI -> Gestor : reservarMesa(idMesa, fecha, personas, cliente)
+activate Gestor
+Gestor -> DB : verificarDisponibilidadActual(idMesa, fecha)
+activate DB
+DB --> Gestor : mesaDisponible(true)
+deactivate DB
+Gestor -> DB : crearReserva(idMesa, fecha, personas, cliente)
+activate DB
+DB --> Gestor : reservaCreada(idReserva)
+deactivate DB
+Gestor -> Gestor : generarConfirmacion(idReserva)
+Gestor --> UI : confirmacionReserva(idReserva, detalles)
+deactivate Gestor
+UI --> Cliente : mostrarConfirmacion(detalles)
+deactivate UI
+@enduml`} />
+      <p>Este diagrama detallado muestra el proceso completo de reserva en un restaurante, desde la búsqueda de disponibilidad hasta la confirmación de la reserva. Incluye validación de parámetros, consulta a la base de datos, filtrado de resultados y creación de la reserva.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema bancario">
+    <div>
+      <PlantUml code={`@startuml
+actor "Cliente" as Cliente
+participant "InterfazBancaria" as UI
+participant "GestorTransacciones" as Gestor
+participant "ValidadorSeguridad" as Seguridad
+participant "ServicioNotificaciones" as Notificador
+database "BaseDeDatos" as DB
+
+Cliente -> UI : realizarTransferencia(cuentaOrigen, cuentaDestino, monto)
+activate UI
+UI -> Gestor : iniciarTransferencia(cuentaOrigen, cuentaDestino, monto, cliente)
+activate Gestor
+
+Gestor -> Seguridad : validarPermisosCliente(cliente, cuentaOrigen)
+activate Seguridad
+Seguridad -> DB : consultarTitularidad(cliente, cuentaOrigen)
+activate DB
+DB --> Seguridad : esTitular(true)
+deactivate DB
+Seguridad --> Gestor : clienteAutorizado(true)
+deactivate Seguridad
+
+Gestor -> DB : verificarSaldo(cuentaOrigen)
+activate DB
+DB --> Gestor : saldoActual(monto)
+deactivate DB
+
+Gestor -> Gestor : validarSaldoSuficiente(saldoActual, monto)
+activate Gestor #DarkSalmon
+note right of Gestor: Comprueba que el saldo sea\nsuficiente para la transferencia
+deactivate Gestor
+
+alt saldo suficiente
+  Gestor -> DB : registrarMovimiento(cuentaOrigen, -monto, "TRANSFERENCIA SALIENTE")
+  activate DB
+  DB --> Gestor : movimientoRegistrado(idMovimiento1)
+  deactivate DB
+  
+  Gestor -> DB : registrarMovimiento(cuentaDestino, monto, "TRANSFERENCIA ENTRANTE")
+  activate DB
+  DB --> Gestor : movimientoRegistrado(idMovimiento2)
+  deactivate DB
+  
+  Gestor -> DB : actualizarSaldo(cuentaOrigen, nuevoSaldo1)
+  activate DB
+  DB --> Gestor : saldoActualizado(true)
+  deactivate DB
+  
+  Gestor -> DB : actualizarSaldo(cuentaDestino, nuevoSaldo2)
+  activate DB
+  DB --> Gestor : saldoActualizado(true)
+  deactivate DB
+  
+  Gestor -> Notificador : enviarNotificacion(cliente, "Transferencia realizada con éxito")
+  activate Notificador
+  Notificador --> Gestor : notificacionEnviada(true)
+  deactivate Notificador
+  
+  Gestor --> UI : transferenciaExitosa(idMovimiento1)
+  
+else saldo insuficiente
+  Gestor -> Notificador : enviarNotificacion(cliente, "Saldo insuficiente")
+  activate Notificador
+  Notificador --> Gestor : notificacionEnviada(true)
+  deactivate Notificador
+  
+  Gestor --> UI : transferenciaRechazada("SALDO_INSUFICIENTE")
+end
+
+deactivate Gestor
+UI --> Cliente : mostrarResultadoTransferencia(resultado)
+deactivate UI
+@enduml`} />
+      <p>Este ejemplo detallado muestra el proceso de transferencia bancaria, incluyendo validación de permisos, verificación de saldo, registro de movimientos, actualización de saldos y notificaciones. También incluye un fragmento condicional para manejar el caso de saldo insuficiente.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Mensajes con parámetros">
+    <div>
+      <PlantUml code={`@startuml
+participant "Cliente" as C
+participant "Servidor" as S
+
+C -> S : solicitar(id=1234, datos={"nombre":"Juan", "email":"juan@ejemplo.com"})
+S --> C : responder(resultado={"status":"success", "code":200})
+@enduml`} />
+      <p>Los mensajes pueden incluir parámetros complejos para especificar la información que se transmite, como objetos JSON o estructuras de datos.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Mensajes a sí mismo">
+    <div>
+      <PlantUml code={`@startuml
+participant "Procesador" as Proc
+
+Proc -> Proc : validarDatos()
+activate Proc #DarkSalmon
+note right: Validación interna de datos
+Proc -> Proc : normalizarFormato()
+activate Proc #DarkGoldenRod
+note right: Conversión a formato estándar
+deactivate Proc
+Proc -> Proc : aplicarReglas()
+activate Proc #LightBlue
+note right: Aplicación de reglas de negocio
+deactivate Proc
+deactivate Proc
+@enduml`} />
+      <p>Un objeto puede enviarse mensajes a sí mismo, representando operaciones internas complejas con activaciones anidadas para mostrar la secuencia de procesamiento interno.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+## 2.4. Activaciones (bloques de ejecución)
+
+Las activaciones representan el período durante el cual un objeto está ejecutando una operación. Se dibujan como rectángulos delgados sobre la línea de vida.
+
+<PlantUml code={`@startuml
+participant "Objeto A" as A
+participant "Objeto B" as B
+
+activate A
+A -> B : mensaje()
+activate B
+B --> A : respuesta
+deactivate B
+deactivate A
+@enduml`} />
+
+<div>
+  <ul>
+    <li>Indican cuándo un objeto está activo o procesando una operación.</li>
+    <li>Pueden anidarse cuando un objeto llama a otro mientras está activo.</li>
+    <li>Ayudan a visualizar el flujo de control y la concurrencia.</li>
+  </ul>
+</div>
+
+<Tabs>
+  <TabItem label="Activaciones anidadas">
+    <div>
+      <PlantUml code={`@startuml
+participant "Cliente" as C
+participant "Servidor" as S
+
+activate C
+C -> S : solicitud()
+activate S
+S -> S : procesarSolicitud()
+activate S #DarkSalmon
+S -> S : validarDatos()
+activate S #DarkGoldenRod
+deactivate S
+deactivate S
+S --> C : respuesta
+deactivate S
+deactivate C
+@enduml`} />
+      <p>Las activaciones pueden anidarse para mostrar operaciones que se realizan dentro de otras operaciones.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Activación automática">
+    <div>
+      <PlantUml code={`@startuml
+participant "Cliente" as C
+participant "Servidor" as S
+
+C -> S ++ : solicitud()
+S -> S ++ : procesarSolicitud()
+S -> S ++ : validarDatos()
+S --
+S --
+S --> C -- : respuesta
+@enduml`} />
+      <p>Se pueden usar notaciones abreviadas (++ y --) para activar y desactivar objetos automáticamente.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  La combinación adecuada de objetos, líneas de vida, mensajes y activaciones permite representar interacciones complejas de manera clara y estructurada, facilitando la comprensión del comportamiento dinámico del sistema.
+</Aside>
+
+En la siguiente sección, exploraremos en detalle los diferentes tipos de mensajes que pueden utilizarse en un diagrama de secuencia para representar distintos patrones de comunicación entre objetos.

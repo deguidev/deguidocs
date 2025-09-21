@@ -1,0 +1,594 @@
+---
+title: 4. Notación UML para Diagramas de Secuencia
+description: Representación gráfica de objetos, líneas de vida, mensajes y fragmentos combinados en UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Notación UML para Diagramas de Secuencia
+
+La notación UML para diagramas de secuencia proporciona un conjunto estándar de símbolos y convenciones que permiten representar visualmente la interacción entre objetos a lo largo del tiempo. Esta notación estandarizada facilita la comunicación entre los miembros del equipo y los stakeholders.
+
+## 4.1. Representación gráfica de objetos
+
+Los objetos en un diagrama de secuencia representan las instancias de clases que participan en la interacción.
+
+<PlantUml code={`@startuml
+actor Actor
+boundary Boundary
+control Control
+entity Entity
+database Database
+collections Collections
+participant Participant
+@enduml`} />
+
+<div>
+  <ul>
+    <li>Se representan en la parte superior del diagrama.</li>
+    <li>Pueden mostrar el nombre del objeto, la clase o ambos.</li>
+    <li>Existen símbolos especiales para diferentes tipos de objetos (actores, entidades, etc.).</li>
+  </ul>
+</div>
+
+<Tabs>
+  <TabItem label="Notación básica">
+    <div>
+      <PlantUml code={`@startuml
+participant "objeto1" as o1
+participant ":Clase" as o2
+participant "objeto:Clase" as o3
+@enduml`} />
+      <p>Diferentes formas de nombrar objetos: solo nombre, solo clase, o ambos.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Estereotipos">
+    <div>
+      <PlantUml code={`@startuml
+participant "objeto1" as o1 <<stereotype>>
+participant "objeto2" as o2 <<external>>
+@enduml`} />
+      <p>Los objetos pueden tener estereotipos que indican su rol o naturaleza.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Colores y estilos">
+    <div>
+      <PlantUml code={`@startuml
+participant "Cliente" as C #LightBlue
+participant "Servidor" as S #LightGreen
+@enduml`} />
+      <p>Se pueden usar colores y estilos para diferenciar visualmente los objetos.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Usar los símbolos específicos para cada tipo de objeto (actor, boundary, control, entity, etc.) mejora la legibilidad del diagrama y comunica mejor la arquitectura del sistema.
+</Aside>
+
+## 4.2. Representación de líneas de vida
+
+Las líneas de vida representan la existencia de un objeto a lo largo del tiempo y se extienden verticalmente desde el símbolo del objeto.
+
+<PlantUml code={`@startuml
+participant "Objeto" as Obj
+
+hnote over Obj : Creación
+
+Obj -> Obj : operación()
+
+hnote over Obj : Destrucción
+@enduml`} />
+
+<div>
+  <ul>
+    <li>Se representan como líneas verticales discontinuas.</li>
+    <li>El tiempo fluye de arriba hacia abajo.</li>
+    <li>Pueden terminar con un símbolo de destrucción (X).</li>
+  </ul>
+</div>
+
+<Tabs>
+  <TabItem label="Línea de vida básica">
+    <div>
+      <PlantUml code={`@startuml
+participant "Objeto" as Obj
+Obj -> Obj : operación()
+@enduml`} />
+      <p>Línea de vida básica que muestra la existencia de un objeto durante la interacción.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Creación y destrucción">
+    <div>
+      <PlantUml code={`@startuml
+participant "Creador" as C
+participant "Objeto" as O #LightBlue
+
+C -> O **: crear()
+O -> O : operación()
+O -> O !!: destruir()
+@enduml`} />
+      <p>La línea de vida comienza con la creación del objeto y termina con su destrucción.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+## 4.3. Representación de mensajes
+
+Los mensajes representan la comunicación entre objetos y se dibujan como flechas que conectan las líneas de vida.
+
+<PlantUml code={`@startuml
+participant "Objeto A" as A
+participant "Objeto B" as B
+
+A -> B : mensaje síncrono
+A ->> B : mensaje asíncrono
+A --> B : mensaje de retorno
+@enduml`} />
+
+<div>
+  <ul>
+    <li><strong>Mensaje síncrono</strong>: Flecha con punta sólida (→).</li>
+    <li><strong>Mensaje asíncrono</strong>: Flecha con punta abierta (→>).</li>
+    <li><strong>Mensaje de retorno</strong>: Flecha discontinua (-->).</li>
+    <li><strong>Mensaje de creación</strong>: Flecha discontinua con símbolo de creación (**).</li>
+    <li><strong>Mensaje de destrucción</strong>: Flecha con símbolo de destrucción (!!).</li>
+  </ul>
+</div>
+
+<Tabs>
+  <TabItem label="Mensajes con parámetros">
+    <div>
+      <PlantUml code={`@startuml
+participant "Cliente" as C
+participant "Servidor" as S
+
+C -> S : solicitar(id=123, datos="test")
+S --> C : responder(resultado=true)
+@enduml`} />
+      <p>Los mensajes pueden incluir parámetros para especificar la información que se transmite.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Mensajes con notas">
+    <div>
+      <PlantUml code={`@startuml
+participant "A" as A
+participant "B" as B
+
+A -> B : mensaje()
+note right: Este mensaje es importante
+
+A -> B : otroMensaje()
+note left of A: Nota sobre A
+note right of B: Nota sobre B
+note over A, B: Nota sobre ambos
+@enduml`} />
+      <p>Se pueden añadir notas a los mensajes para proporcionar información adicional.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+## 4.4. Condiciones y fragmentos combinados
+
+Los fragmentos combinados permiten representar estructuras de control como condicionales, bucles y paralelismo en los diagramas de secuencia.
+
+### Fragmentos condicionales (alt)
+
+<Tabs>
+  <TabItem label="Procesamiento de pago">
+    <div>
+      <PlantUml code={`@startuml
+actor "Cliente" as Cliente
+participant "Tienda Online" as Tienda
+participant "Procesador de Pagos" as Procesador
+participant "Servicio de Fraude" as AntiFraude
+database "Base de Datos" as DB
+
+Cliente -> Tienda : realizarPago(tarjeta, monto)
+activate Tienda
+Tienda -> Procesador : procesarPago(tarjeta, monto)
+activate Procesador
+Processador -> AntiFraude : verificarRiesgo(tarjeta, monto, ip)
+activate AntiFraude
+AntiFraude -> AntiFraude : calcularPuntuaciónRiesgo()
+activate AntiFraude #DarkSalmon
+deactivate AntiFraude
+AntiFraude --> Procesador : nivelRiesgo
+deactivate AntiFraude
+
+alt nivelRiesgo < 50
+  Procesador -> Procesador : autorizarTransacción()
+  Procesador -> DB : registrarTransacción(datos)
+  activate DB
+  DB --> Procesador : idTransacción
+  deactivate DB
+  Procesador --> Tienda : pagoAprobado(idTransacción)
+  Tienda -> DB : actualizarPedido(idPedido, "PAGADO")
+  activate DB
+  DB --> Tienda : pedidoActualizado
+  deactivate DB
+  Tienda --> Cliente : mostrarConfirmación()
+  
+else nivelRiesgo >= 50 && nivelRiesgo < 80
+  Procesador -> Procesador : solicitarVerificaciónAdicional()
+  Procesador --> Tienda : verificaciónRequerida(tipo)
+  Tienda --> Cliente : solicitarVerificaciónAdicional()
+  Cliente -> Tienda : proporcionarVerificación(datos)
+  Tienda -> Procesador : verificarDatosAdicionales(datos)
+  Procesador -> DB : registrarTransacción(datos)
+  activate DB
+  DB --> Procesador : idTransacción
+  deactivate DB
+  Procesador --> Tienda : pagoAprobado(idTransacción)
+  Tienda -> DB : actualizarPedido(idPedido, "PAGADO")
+  activate DB
+  DB --> Tienda : pedidoActualizado
+  deactivate DB
+  Tienda --> Cliente : mostrarConfirmación()
+  
+else nivelRiesgo >= 80
+  Procesador -> Procesador : rechazarTransacción()
+  Procesador -> DB : registrarIntentoFallido(datos)
+  activate DB
+  DB --> Procesador : registrado
+  deactivate DB
+  Procesador --> Tienda : pagoRechazado("ALTO_RIESGO")
+  Tienda --> Cliente : mostrarError("No se pudo procesar el pago")
+end
+
+deactivate Procesador
+deactivate Tienda
+@enduml`} />
+      <p>Este ejemplo detallado muestra un proceso de pago con tres caminos condicionales basados en el nivel de riesgo: bajo riesgo (aprobación directa), riesgo medio (verificación adicional) y alto riesgo (rechazo).</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Validación de formulario">
+    <div>
+      <PlantUml code={`@startuml
+actor "Usuario" as User
+participant "Interfaz" as UI
+participant "Validador" as Validator
+participant "Servicio" as Service
+
+User -> UI : enviarFormulario(datos)
+activate UI
+UI -> Validator : validarDatos(datos)
+activate Validator
+
+alt todos los campos válidos
+  Validator --> UI : datosVálidos(true)
+  UI -> Service : procesarFormulario(datos)
+  activate Service
+  Service --> UI : operaciónExitosa
+  deactivate Service
+  UI --> User : mostrarConfirmación()
+  
+else campos requeridos faltantes
+  Validator --> UI : datosVálidos(false, "CAMPOS_REQUERIDOS")
+  UI --> User : mostrarError("Complete todos los campos requeridos")
+  
+else formato inválido
+  Validator --> UI : datosVálidos(false, "FORMATO_INVÁLIDO")
+  UI --> User : mostrarError("El formato de algunos campos es incorrecto")
+  
+else datos duplicados
+  Validator --> UI : datosVálidos(false, "DATOS_DUPLICADOS")
+  UI --> User : mostrarError("Ya existe un registro con estos datos")
+end
+
+deactivate Validator
+deactivate UI
+@enduml`} />
+      <p>Este ejemplo muestra la validación de un formulario con múltiples condiciones de error: campos requeridos faltantes, formato inválido y datos duplicados.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+<div>
+  <ul>
+    <li>Representan estructuras condicionales (if-else).</li>
+    <li>Cada sección corresponde a una condición diferente.</li>
+    <li>Las condiciones se muestran en la esquina superior izquierda de cada sección.</li>
+  </ul>
+</div>
+
+### Bucles (loop)
+
+<Tabs>
+  <TabItem label="Procesamiento por lotes">
+    <div>
+      <PlantUml code={`@startuml
+participant "Servicio de Procesamiento" as Service
+participant "Procesador" as Processor
+database "Base de Datos" as DB
+
+activate Service
+Service -> DB : obtenerElementosPendientes()
+activate DB
+DB --> Service : listaPendientes[]
+deactivate DB
+
+loop para cada elemento en listaPendientes
+  Service -> Processor : procesarElemento(elemento)
+  activate Processor
+  
+  alt procesamiento exitoso
+    Processor -> Processor : transformarDatos(elemento)
+    activate Processor #DarkSalmon
+    deactivate Processor
+    Processor --> Service : resultadoProcesamiento
+    Service -> DB : actualizarEstado(elemento.id, "PROCESADO", resultadoProcesamiento)
+    activate DB
+    DB --> Service : actualizado
+    deactivate DB
+  else error en procesamiento
+    Processor -> Processor : registrarError(elemento)
+    Processor --> Service : error
+    Service -> DB : actualizarEstado(elemento.id, "ERROR", error.mensaje)
+    activate DB
+    DB --> Service : actualizado
+    deactivate DB
+    
+    opt reintentos < 3
+      Service -> DB : incrementarReintentos(elemento.id)
+      activate DB
+      DB --> Service : actualizado
+      deactivate DB
+    end
+  end
+  
+  deactivate Processor
+  
+  Service -> Service : actualizarProgreso()
+  activate Service #DarkSalmon
+  deactivate Service
+end
+
+Service -> DB : marcarLoteCompletado(idLote)
+activate DB
+DB --> Service : completado
+deactivate DB
+deactivate Service
+@enduml`} />
+      <p>Este ejemplo detallado muestra un proceso por lotes que recorre una lista de elementos pendientes, procesa cada uno y actualiza su estado en la base de datos. Incluye manejo de errores y reintentos.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sincronización de datos">
+    <div>
+      <PlantUml code={`@startuml
+participant "Servicio de Sincronización" as Sync
+participant "API Externa" as API
+database "Base de Datos Local" as LocalDB
+
+activate Sync
+Sync -> LocalDB : obtenerUltimaSincronización()
+activate LocalDB
+LocalDB --> Sync : timestampUltimaSinc
+deactivate LocalDB
+
+Sync -> API : obtenerCambios(timestampUltimaSinc)
+activate API
+API --> Sync : listaCambios[]
+deactivate API
+
+loop para cada cambio en listaCambios
+  Sync -> Sync : validarDatos(cambio)
+  activate Sync #DarkSalmon
+  deactivate Sync
+  
+  alt cambio válido
+    Sync -> LocalDB : buscarRegistroLocal(cambio.id)
+    activate LocalDB
+    LocalDB --> Sync : registroLocal
+    deactivate LocalDB
+    
+    opt registroLocal existe
+      Sync -> Sync : resolverConflictos(registroLocal, cambio)
+      activate Sync #DarkGoldenRod
+      deactivate Sync
+    end
+    
+    Sync -> LocalDB : guardarCambio(cambio)
+    activate LocalDB
+    LocalDB --> Sync : guardado
+    deactivate LocalDB
+  else cambio inválido
+    Sync -> Sync : registrarErrorSincronización(cambio)
+  end
+  
+  Sync -> Sync : actualizarProgreso(i, listaCambios.length)
+end
+
+Sync -> LocalDB : actualizarUltimaSincronización(now())
+activate LocalDB
+LocalDB --> Sync : actualizado
+deactivate LocalDB
+deactivate Sync
+@enduml`} />
+      <p>Este ejemplo muestra un proceso de sincronización de datos con una API externa, procesando cada cambio en un bucle, con validación de datos y resolución de conflictos.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+<div>
+  <ul>
+    <li>Representan estructuras iterativas (for, while, etc.).</li>
+    <li>La condición o descripción del bucle se muestra en la esquina superior izquierda.</li>
+    <li>El contenido del bucle puede incluir otros fragmentos combinados (condicionales, opcionales, etc.).</li>
+  </ul>
+</div>
+
+### Opcionales (opt)
+
+<PlantUml code={`@startuml
+actor "Usuario" as User
+participant "Sistema" as System
+database "Base de Datos" as DB
+
+User -> System : guardarPreferencias(preferencias)
+activate System
+
+System -> DB : guardarPreferencias(userId, preferencias)
+activate DB
+DB --> System : guardado
+deactivate DB
+
+opt preferencias.notificaciones == true
+  System -> System : configurarNotificaciones(userId, preferencias.canales)
+  activate System #DarkSalmon
+  System -> DB : guardarConfigNotificaciones(userId, preferencias.canales)
+  activate DB
+  DB --> System : guardado
+  deactivate DB
+  deactivate System
+end
+
+System --> User : preferenciasGuardadas()
+deactivate System
+@enduml`} />
+
+<div>
+  <ul>
+    <li>Representan secciones de código que se ejecutan solo si se cumple una condición.</li>
+    <li>Similar a un fragmento alt con una sola sección.</li>
+    <li>Útil para mostrar comportamientos opcionales sin complicar el diagrama con múltiples alternativas.</li>
+  </ul>
+</div>
+
+### Paralelismo (par)
+
+<PlantUml code={`@startuml
+participant "Aplicación" as App
+participant "Servicio de Imágenes" as ImageService
+participant "Servicio de Datos" as DataService
+database "Almacenamiento" as Storage
+
+activate App
+
+par Procesamiento de imágenes
+  App -> ImageService : procesarImagen(imagen)
+  activate ImageService
+  ImageService -> ImageService : redimensionar()
+  ImageService -> ImageService : optimizar()
+  ImageService -> Storage : guardarImagen(imagenProcesada)
+  activate Storage
+  Storage --> ImageService : urlImagen
+  deactivate Storage
+  ImageService --> App : urlImagen
+  deactivate ImageService
+else Procesamiento de metadatos
+  App -> DataService : procesarMetadatos(datos)
+  activate DataService
+  DataService -> DataService : validar()
+  DataService -> DataService : formatear()
+  DataService -> Storage : guardarMetadatos(metadatosProcesados)
+  activate Storage
+  Storage --> DataService : idMetadatos
+  deactivate Storage
+  DataService --> App : idMetadatos
+  deactivate DataService
+end
+
+App -> App : combinarResultados(urlImagen, idMetadatos)
+deactivate App
+@enduml`} />
+
+<div>
+  <ul>
+    <li>Representa ejecución concurrente o paralela.</li>
+    <li>Cada sección se ejecuta en paralelo con las demás.</li>
+    <li>Ideal para modelar operaciones que pueden realizarse simultáneamente.</li>
+  </ul>
+</div>
+
+<Tabs>
+  <TabItem label="Fragmentos anidados">
+    <div>
+      <PlantUml code={`@startuml
+participant "A" as A
+participant "B" as B
+participant "C" as C
+
+opt condición principal
+  A -> B : mensaje1()
+  
+  alt condición anidada 1
+    B -> C : mensaje2()
+  else condición anidada 2
+    B -> C : mensaje3()
+  end
+end
+@enduml`} />
+      <p>Los fragmentos combinados pueden anidarse para representar estructuras de control complejas.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Fragmentos múltiples">
+    <div>
+      <PlantUml code={`@startuml
+participant "Cliente" as C
+participant "Servidor" as S
+
+opt autenticación necesaria
+  C -> S : autenticar()
+  S --> C : token
+end
+
+loop para cada item
+  C -> S : procesar(item)
+  
+  alt éxito
+    S --> C : resultado
+  else error
+    S --> C : error
+  end
+end
+@enduml`} />
+      <p>Se pueden combinar múltiples fragmentos para modelar flujos complejos.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+### Otros tipos de fragmentos
+
+<div>
+  <ul>
+    <li><strong>break</strong>: Representa una ruptura en el flujo normal (similar a un break en un bucle).</li>
+    <li><strong>critical</strong>: Representa una sección crítica que debe ejecutarse atómicamente.</li>
+    <li><strong>ref</strong>: Referencia a otro diagrama de secuencia.</li>
+    <li><strong>sd</strong>: Define un diagrama de secuencia anidado.</li>
+    <li><strong>region</strong>: Define una región en el diagrama.</li>
+  </ul>
+</div>
+
+<PlantUml code={`@startuml
+participant "A" as A
+participant "B" as B
+
+group región etiquetada
+  A -> B : mensaje dentro de la región
+end
+
+ref over A, B : referencia a otro diagrama
+
+critical sección crítica
+  A -> B : operación atómica
+end
+@enduml`} />
+
+<Aside type="note">
+  Los fragmentos combinados son una herramienta poderosa para representar flujos de control complejos en los diagramas de secuencia, permitiendo modelar condicionales, bucles, paralelismo y otras estructuras de control de manera visual y comprensible.
+</Aside>
+
+En la siguiente sección, exploraremos las aplicaciones prácticas de los diagramas de secuencia en diferentes contextos de desarrollo de software.

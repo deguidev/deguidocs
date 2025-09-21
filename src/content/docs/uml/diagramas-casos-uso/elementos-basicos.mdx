@@ -8,6 +8,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
 
 # Elementos Básicos de un Diagrama de Casos de Uso
 
@@ -21,20 +22,38 @@ Los actores representan entidades externas que interactúan con el sistema. Pued
 
 Un actor es cualquier entidad externa que intercambia información con el sistema. Los actores no forman parte del sistema en sí, sino que representan roles que interactúan con él.
 
-<Code code={`    👤
-    │
-    │
- ───┴───
-    │
-    │
-   ┌┴┐
-  ┌┘ └┐
-  │   │
- ┌┴┐ ┌┴┐
- │ │ │ │
- └─┘ └─┘`} lang="text" title="Representación de un actor" />
 
 ### Tipos de actores
+
+<PlantUml code={`@startuml
+' Definición de actores principales
+actor "Actor" as ActorGenerico
+actor "Usuario Registrado" as UsuarioRegistrado
+actor "Administrador" as Administrador
+actor "Cliente" as Cliente
+
+' Definición de actores secundarios
+actor "Actor Secundario" as ActorSecundario
+actor "Sistema de Pago" as SistemaPago
+actor "Servicio de Correo Electrónico" as ServicioCorreo
+actor "Base de Datos Externa" as BaseDatos
+
+' Relaciones de herencia
+ActorGenerico <|-- UsuarioRegistrado
+ActorGenerico <|-- Administrador
+ActorGenerico <|-- Cliente
+
+ActorSecundario <|-- SistemaPago
+ActorSecundario <|-- ServicioCorreo
+ActorSecundario <|-- BaseDatos
+@enduml`} />
+
+
+
+<Aside type="note">
+  Este diagrama muestra la jerarquía de los diferentes tipos de actores en UML. Se presentan los actores primarios (Usuario Registrado, Administrador, Cliente) que heredan de un Actor genérico, y los actores secundarios (Sistema de Pago, Servicio de Correo Electrónico, Base de Datos Externa) que heredan de un Actor Secundario. Los actores se representan con figuras hexagonales siguiendo la notación estándar de UML.
+</Aside>
+
 
 <Tabs>
   <TabItem label="Actores primarios">
@@ -92,12 +111,27 @@ Los casos de uso representan funcionalidades o servicios que el sistema proporci
 
 Un caso de uso es una descripción de una secuencia de interacciones entre el sistema y uno o más actores, que produce un resultado valioso y observable para los actores involucrados.
 
-<Code code={`┌───────────────────┐
-│                   │
-│   Nombre del      │
-│   Caso de Uso     │
-│                   │
-└───────────────────┘`} lang="text" title="Representación de un caso de uso" />
+
+<PlantUml code={`@startuml
+' Definición de casos de uso
+usecase "Consultar Saldo" as ConsultarSaldo
+usecase "Transferir Fondos" as TransferirFondos
+usecase "Retirar Dinero" as RetirarDinero
+
+' Relaciones entre casos de uso
+RetirarDinero ..> ConsultarSaldo : <<include>>
+RetirarDinero ..> TransferirFondos : <<extend>>
+
+' Actor que interactúa con los casos de uso
+actor Cliente
+Cliente --> ConsultarSaldo
+Cliente --> TransferirFondos
+Cliente --> RetirarDinero
+@enduml`} />
+
+<Aside type="note">
+  Este diagrama muestra cómo se representan los casos de uso en UML. Se muestran tres casos de uso (Consultar Saldo, Transferir Fondos y Retirar Dinero) con sus relaciones de inclusión y extensión, y un actor (Cliente) que interactúa con ellos.
+</Aside>
 
 ### Características de los casos de uso
 
@@ -162,28 +196,24 @@ Flujos Alternativos:
 
 El límite del sistema es un rectángulo que engloba todos los casos de uso, representando la frontera entre el sistema y los actores externos.
 
-<Code code={`┌─────────────────────────────────┐
-│           Sistema                │
-│                                  │
-│    ┌──────────────────┐          │
-│    │                  │          │
-│    │   Caso de Uso 1  │◄────────┐
-│    │                  │         │
-│    └──────────────────┘         │
-│                                  │
-│    ┌──────────────────┐         │
-│    │                  │         │
-│    │   Caso de Uso 2  │◄────────┼──── Actor
-│    │                  │         │
-│    └──────────────────┘         │
-│                                  │
-│    ┌──────────────────┐         │
-│    │                  │         │
-│    │   Caso de Uso 3  │◄────────┘
-│    │                  │
-│    └──────────────────┘
-│                                  │
-└─────────────────────────────────┘`} lang="text" title="Límite del sistema en un diagrama de casos de uso" />
+
+<PlantUml code={`@startuml
+rectangle "Sistema" {
+  usecase "Caso de Uso 1" as CU1
+  usecase "Caso de Uso 2" as CU2
+  usecase "Caso de Uso 3" as CU3
+}
+
+actor Actor
+
+Actor --> CU1
+Actor --> CU2
+Actor --> CU3
+@enduml`} />
+
+<Aside type="note">
+  Este diagrama muestra el límite del sistema en UML. El rectángulo representa el sistema que contiene los casos de uso, mientras que los actores se encuentran fuera del sistema.
+</Aside>
 
 <div>
   <ul>
@@ -202,15 +232,17 @@ Las relaciones en los diagramas de casos de uso conectan actores con casos de us
 
 La asociación es la relación más básica y común, que conecta un actor con un caso de uso indicando que el actor participa en ese caso de uso.
 
-<Code code={`    👤
-    │
-    │
-    │
-    ▼
-┌─────────┐
-│ Caso de │
-│   Uso   │
-└─────────┘`} lang="text" title="Asociación entre actor y caso de uso" />
+
+<PlantUml code={`@startuml
+actor Usuario
+usecase "Iniciar Sesión" as IniciarSesion
+
+Usuario --> IniciarSesion
+@enduml`} />
+
+<Aside type="note">
+  Este diagrama muestra la asociación entre un actor (Usuario) y un caso de uso (Iniciar Sesión). La flecha indica que el actor inicia la interacción con el caso de uso.
+</Aside>
 
 <div>
   <ul>
@@ -228,38 +260,26 @@ La asociación es la relación más básica y común, que conecta un actor con u
 
 ### Ejemplo completo de elementos básicos
 
-<Code code={`┌───────────────────────────────────────────────┐
-│                   Sistema Bancario              │
-│                                                 │
-│    ┌───────────────────┐     ┌───────────────┐  │
-│    │                   │     │               │  │
-│    │  Consultar Saldo  │     │ Transferir    │  │
-│    │                   │     │ Fondos        │  │
-│    └───────────────────┘     └───────────────┘  │
-│            ▲                        ▲           │
-│            │                        │           │
-│            │                        │           │
-│    ┌───────┴───────┐                │           │
-│    │               │                │           │
-│    │ Retirar Dinero│◄───────────────┘           │
-│    │               │                            │
-│    └───────────────┘                            │
-│            ▲                                    │
-└────────────┼────────────────────────────────────┘
-             │
-             │
-          ┌──┴──┐
-          │     │
-       ───┴───  │
-          │     │
-          │     │
-         ┌┴┐   ┌┴┐
-         │ │   │ │
-         └─┘   └─┘
-        Cliente`} lang="text" title="Ejemplo completo de un diagrama de casos de uso básico" />
+
+<PlantUml code={`@startuml
+rectangle "Sistema Bancario" {
+  usecase "Consultar Saldo" as ConsultarSaldo
+  usecase "Transferir Fondos" as TransferirFondos
+  usecase "Retirar Dinero" as RetirarDinero
+  
+  RetirarDinero ..> ConsultarSaldo : <<include>>
+  RetirarDinero ..> TransferirFondos : <<extend>>
+}
+
+actor Cliente
+
+Cliente --> ConsultarSaldo
+Cliente --> TransferirFondos
+Cliente --> RetirarDinero
+@enduml`} />
 
 <Aside type="note">
-  Este diagrama muestra un sistema bancario con tres casos de uso (Consultar Saldo, Transferir Fondos y Retirar Dinero) y un actor (Cliente) que interactúa con ellos. El rectángulo representa el límite del sistema.
+  Este diagrama completo muestra un sistema bancario con tres casos de uso (Consultar Saldo, Transferir Fondos y Retirar Dinero) y un actor (Cliente). También muestra relaciones entre casos de uso: "Retirar Dinero" incluye "Consultar Saldo" y puede extenderse a "Transferir Fondos". El rectángulo representa el límite del sistema.
 </Aside>
 
 ## Buenas prácticas al definir elementos básicos

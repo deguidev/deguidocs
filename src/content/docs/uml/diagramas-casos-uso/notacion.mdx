@@ -8,6 +8,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
 
 # Notación UML para Casos de Uso
 
@@ -19,70 +20,64 @@ Los actores representan roles que interactúan con el sistema y se dibujan fuera
 
 ### Símbolo estándar para actores
 
-<Code code={`    👤
-    │
-    │
- ───┴───
-    │
-    │
-   ┌┴┐
-  ┌┘ └┐
-  │   │
- ┌┴┐ ┌┴┐
- │ │ │ │
- └─┘ └─┘
-   Actor`} lang="text" title="Representación estándar de un actor" />
+<PlantUml code={`@startuml
+actor "Actor" as Actor
+@enduml`} />
 
 <div>
   <ul>
     <li>Se representa con una figura de "stick person" (figura de palitos)</li>
-    <li>El nombre del actor se coloca debajo de la figura</li>
+    <li>El nombre del actor se coloca debajo o al lado de la figura</li>
     <li>El nombre debe ser un sustantivo que describa el rol (no el nombre de una persona específica)</li>
   </ul>
 </div>
+
+<Aside type="tip">
+  En PlantUML, los actores se definen con la palabra clave <code>actor</code> seguida del nombre del actor. Opcionalmente, se puede asignar un alias para referenciar al actor en otras partes del diagrama.
+</Aside>
 
 ### Variaciones en la representación de actores
 
 <Tabs>
   <TabItem label="Actor humano">
     <div>
-      <Code code={`    👤
-    │
-    │
- ───┴───
-    │
-    │
-   ┌┴┐
-  ┌┘ └┐
-  │   │
- ┌┴┐ ┌┴┐
- │ │ │ │
- └─┘ └─┘
- Usuario`} lang="text" title="Actor humano" />
+      <PlantUml code={`@startuml
+actor Usuario
+@enduml`} />
+      <p>Los actores humanos se representan con una figura de "stick person" (figura de palitos).</p>
     </div>
   </TabItem>
   
   <TabItem label="Actor no humano">
     <div>
-      <Code code={`┌─────────┐
-│         │
-│ Sistema │
-│ Externo │
-│         │
-└─────────┘`} lang="text" title="Actor no humano (sistema externo)" />
+      <PlantUml code={`@startuml
+rectangle "Sistema\nExterno" as SistemaExterno <<actor>>
+@enduml`} />
       <p>Los actores no humanos (como sistemas externos) a veces se representan como rectángulos con el estereotipo «actor».</p>
     </div>
   </TabItem>
   
   <TabItem label="Notación alternativa">
     <div>
-      <Code code={`┌─────────┐
-│ «actor» │
-│         │
-│ Cliente │
-│         │
-└─────────┘`} lang="text" title="Notación alternativa para actor" />
-      <p>Algunos modeladores prefieren usar esta notación para todos los actores, especialmente en herramientas donde dibujar figuras humanas es difícil.</p>
+      <PlantUml code={`@startuml
+rectangle "Cliente" as Cliente <<actor>>
+@enduml`} />
+      <p>Algunos modeladores prefieren usar esta notación rectangular para todos los actores, especialmente en herramientas donde dibujar figuras humanas es difícil.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Ejemplo completo">
+    <div>
+      <PlantUml code={`@startuml
+actor "Usuario" as Usuario
+rectangle "Sistema de Pago" as SistemaPago <<actor>>
+
+usecase "Realizar Compra" as RealizarCompra
+
+Usuario --> RealizarCompra
+RealizarCompra --> SistemaPago
+@enduml`} />
+      <p>Este ejemplo muestra cómo se pueden combinar diferentes tipos de actores en un diagrama de casos de uso, donde un actor humano (Usuario) interactúa con un caso de uso que a su vez interactúa con un actor no humano (Sistema de Pago).</p>
     </div>
   </TabItem>
 </Tabs>
@@ -100,13 +95,16 @@ Los estereotipos pueden utilizarse para clasificar diferentes tipos de actores:
   </ul>
 </div>
 
-<Code code={`    👤               👤               ┌─────────┐          ┌─────────┐
-    │                │               │         │          │         │
-    │                │               │«external»│          │«timer»  │
-    │                │               │         │          │         │
- «primary»        «secondary»        │ Sistema │          │ Reloj   │
- Cliente          Administrador      │ Pago    │          │ Sistema │
-                                     └─────────┘          └─────────┘`} lang="text" title="Estereotipos de actores" />
+<PlantUml code={`@startuml
+actor "Cliente" as Cliente <<primary>>
+actor "Administrador" as Admin <<secondary>>
+rectangle "Sistema de Pago" as SistemaPago <<external>>
+rectangle "Reloj del Sistema" as Reloj <<timer>>
+@enduml`} />
+
+<Aside type="tip">
+  En PlantUML, puedes agregar estereotipos a los actores usando la notación `<<estereotipo>>` después del nombre o alias del actor.
+</Aside>
 
 <Aside type="note">
   Los estereotipos son opcionales y no siempre se utilizan en los diagramas de casos de uso. Su uso depende del nivel de detalle requerido y las convenciones del equipo.
@@ -118,60 +116,81 @@ Los casos de uso representan funcionalidades que el sistema proporciona a los ac
 
 ### Símbolo estándar para casos de uso
 
-<Code code={`┌───────────────────┐
-│                   │
-│   Nombre del      │
-│   Caso de Uso     │
-│                   │
-└───────────────────┘`} lang="text" title="Representación estándar de un caso de uso" />
+<PlantUml code={`@startuml
+usecase "Realizar Compra" as RealizarCompra
+@enduml`} />
 
 <div>
   <ul>
-    <li>Se representa con una elipse (aunque en ASCII art usamos un rectángulo con esquinas redondeadas)</li>
+    <li>Se representa con una elipse</li>
     <li>El nombre del caso de uso se coloca dentro de la elipse</li>
     <li>El nombre debe ser un verbo en infinitivo seguido de un objeto (ej. "Realizar Compra")</li>
   </ul>
 </div>
+
+<Aside type="tip">
+  En PlantUML, los casos de uso se definen con la palabra clave `usecase` seguida del nombre del caso de uso. Opcionalmente, se puede asignar un alias para referenciar al caso de uso en otras partes del diagrama.
+</Aside>
 
 ### Variaciones en la representación de casos de uso
 
 <Tabs>
   <TabItem label="Caso de uso básico">
     <div>
-      <Code code={`┌───────────────────┐
-│                   │
-│   Realizar        │
-│   Compra          │
-│                   │
-└───────────────────┘`} lang="text" title="Caso de uso básico" />
+      <PlantUml code={`@startuml
+usecase "Realizar Compra" as RealizarCompra
+@enduml`} />
+      <p>Representación básica de un caso de uso con su nombre dentro de una elipse.</p>
     </div>
   </TabItem>
   
   <TabItem label="Caso de uso con estereotipo">
     <div>
-      <Code code={`┌───────────────────┐
-│   «CRUD»          │
-│                   │
-│   Gestionar       │
-│   Productos       │
-│                   │
-└───────────────────┘`} lang="text" title="Caso de uso con estereotipo" />
-      <p>Los estereotipos pueden utilizarse para clasificar diferentes tipos de casos de uso.</p>
+      <PlantUml code={`@startuml
+usecase "Gestionar Productos" as GestionarProductos <<CRUD>>
+@enduml`} />
+      <p>Los estereotipos pueden utilizarse para clasificar diferentes tipos de casos de uso. En este ejemplo, se usa el estereotipo «CRUD» para indicar que el caso de uso implica operaciones de Crear, Leer, Actualizar y Eliminar.</p>
     </div>
   </TabItem>
   
   <TabItem label="Caso de uso con puntos de extensión">
     <div>
-      <Code code={`┌───────────────────┐
-│                   │
-│   Realizar        │
-│   Compra          │
-│                   │
-│   Extension points│
-│   - seleccionPago │
-│   - confirmación  │
-└───────────────────┘`} lang="text" title="Caso de uso con puntos de extensión" />
-      <p>Los puntos de extensión indican dónde pueden insertarse comportamientos opcionales.</p>
+      <PlantUml code={`@startuml
+usecase "Realizar Compra" as RealizarCompra
+note right of RealizarCompra
+  <b>Extension points:</b>
+  - seleccionPago
+  - confirmación
+end note
+@enduml`} />
+      <p>Los puntos de extensión indican dónde pueden insertarse comportamientos opcionales. En PlantUML, se pueden representar usando notas asociadas al caso de uso.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Ejemplo completo">
+    <div>
+      <PlantUml code={`@startuml
+actor Cliente
+actor "Sistema de Pago" as SistemaPago
+
+rectangle "Sistema de Compras" {
+  usecase "Realizar Compra" as RealizarCompra
+  usecase "Aplicar Descuento" as AplicarDescuento <<opcional>>
+  usecase "Procesar Pago" as ProcesarPago
+  
+  note right of RealizarCompra
+    <b>Extension points:</b>
+    - seleccionPago
+    - confirmación
+  end note
+}
+
+Cliente --> RealizarCompra
+AplicarDescuento ..> RealizarCompra : <<extend>>
+RealizarCompra ..> ProcesarPago : <<include>>
+ProcesarPago --> SistemaPago
+@enduml`} />
+      <p>Este ejemplo muestra diferentes tipos de casos de uso en un contexto más completo, incluyendo actores, límite del sistema, relaciones y puntos de extensión.</p>
     </div>
   </TabItem>
 </Tabs>
@@ -189,6 +208,17 @@ Los estereotipos pueden utilizarse para clasificar diferentes tipos de casos de 
   </ul>
 </div>
 
+<PlantUml code={`@startuml
+usecase "Gestionar Productos" as GestionarProductos <<CRUD>>
+usecase "Procesar Pedido" as ProcesarPedido <<business>>
+usecase "Validar Datos" as ValidarDatos <<abstract>>
+usecase "Generar Reporte Diario" as GenerarReporte <<system>>
+@enduml`} />
+
+<Aside type="note">
+  En PlantUML, los estereotipos se agregan después del nombre o alias del caso de uso usando la notación `<<estereotipo>>`.
+</Aside>
+
 <Aside type="tip">
   Al nombrar casos de uso, use verbos activos que describan claramente la acción desde la perspectiva del actor. Por ejemplo, "Registrar Usuario" es mejor que "Registro de Usuario" o "El usuario se registra".
 </Aside>
@@ -199,15 +229,12 @@ Las relaciones en los diagramas de casos de uso conectan actores con casos de us
 
 ### Asociación (actor-caso de uso)
 
-<Code code={`    👤
-    │
-    │
-    │
-    ▼
-┌─────────┐
-│ Caso de │
-│   Uso   │
-└─────────┘`} lang="text" title="Asociación entre actor y caso de uso" />
+<PlantUml code={`@startuml
+actor Usuario
+usecase "Caso de Uso" as CasoDeUso
+
+Usuario --> CasoDeUso
+@enduml`} />
 
 <div>
   <ul>
@@ -218,11 +245,52 @@ Las relaciones en los diagramas de casos de uso conectan actores con casos de us
   </ul>
 </div>
 
+<Tabs>
+  <TabItem label="Asociación básica">
+    <div>
+      <PlantUml code={`@startuml
+actor Usuario
+usecase "Realizar Compra" as RealizarCompra
+
+Usuario --> RealizarCompra
+@enduml`} />
+      <p>Asociación básica entre un actor y un caso de uso.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Asociación con etiqueta">
+    <div>
+      <PlantUml code={`@startuml
+actor Cliente
+usecase "Realizar Pago" as RealizarPago
+
+Cliente --> RealizarPago : inicia
+@enduml`} />
+      <p>Asociación con una etiqueta que describe la naturaleza de la interacción.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Asociación con multiplicidad">
+    <div>
+      <PlantUml code={`@startuml
+actor "Profesor" as Profesor
+usecase "Calificar Examen" as CalificarExamen
+
+Profesor "1" --> "*" CalificarExamen
+@enduml`} />
+      <p>Asociación con multiplicidad, indicando que un profesor puede calificar múltiples exámenes.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
 ### Inclusión («include»)
 
-<Code code={`┌───────────────┐     «include»     ┌───────────────┐
-│ Caso de Uso A │- - - - - - - ->│ Caso de Uso B │
-└───────────────┘                └───────────────┘`} lang="text" title="Relación de inclusión" />
+<PlantUml code={`@startuml
+usecase "Caso de Uso A" as CasoDeUsoA
+usecase "Caso de Uso B" as CasoDeUsoB
+
+CasoDeUsoA ..> CasoDeUsoB : <<include>>
+@enduml`} />
 
 <div>
   <ul>
@@ -233,13 +301,48 @@ Las relaciones en los diagramas de casos de uso conectan actores con casos de us
   </ul>
 </div>
 
+<Tabs>
+  <TabItem label="Inclusión básica">
+    <div>
+      <PlantUml code={`@startuml
+usecase "Realizar Compra" as RealizarCompra
+usecase "Procesar Pago" as ProcesarPago
+
+RealizarCompra ..> ProcesarPago : <<include>>
+@enduml`} />
+      <p>Inclusión básica donde "Realizar Compra" siempre incluye "Procesar Pago".</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Inclusión múltiple">
+    <div>
+      <PlantUml code={`@startuml
+usecase "Realizar Compra" as RealizarCompra
+usecase "Verificar Inventario" as VerificarInventario
+usecase "Procesar Pago" as ProcesarPago
+usecase "Generar Factura" as GenerarFactura
+
+RealizarCompra ..> VerificarInventario : <<include>>
+RealizarCompra ..> ProcesarPago : <<include>>
+ProcesarPago ..> GenerarFactura : <<include>>
+@enduml`} />
+      <p>Un caso de uso puede incluir múltiples casos de uso, y estos a su vez pueden incluir otros casos de uso.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
 ### Extensión («extend»)
 
-<Code code={`┌───────────────┐     «extend»     ┌───────────────┐
-│ Caso de Uso A │- - - - - - - ->│ Caso de Uso B │
-└───────────────┘                └───────────────┘
-                                 {Punto de extensión:
-                                  Condición}`} lang="text" title="Relación de extensión" />
+<PlantUml code={`@startuml
+usecase "Caso de Uso A" as CasoDeUsoA
+usecase "Caso de Uso B" as CasoDeUsoB
+
+CasoDeUsoA ..> CasoDeUsoB : <<extend>>
+note right of CasoDeUsoB
+  Punto de extensión:
+  Condición
+end note
+@enduml`} />
 
 <div>
   <ul>
@@ -251,17 +354,55 @@ Las relaciones en los diagramas de casos de uso conectan actores con casos de us
   </ul>
 </div>
 
+<Tabs>
+  <TabItem label="Extensión básica">
+    <div>
+      <PlantUml code={`@startuml
+usecase "Aplicar Descuento" as AplicarDescuento
+usecase "Realizar Compra" as RealizarCompra
+
+AplicarDescuento ..> RealizarCompra : <<extend>>
+note right of RealizarCompra
+  Punto de extensión:
+  Cuando el cliente tiene cupón
+end note
+@enduml`} />
+      <p>Extensión básica donde "Aplicar Descuento" extiende "Realizar Compra" cuando se cumple una condición específica.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Múltiples extensiones">
+    <div>
+      <PlantUml code={`@startuml
+usecase "Realizar Compra" as RealizarCompra
+usecase "Aplicar Descuento" as AplicarDescuento
+usecase "Ofrecer Envío Gratuito" as EnvioGratuito
+usecase "Sugerir Productos" as SugerirProductos
+
+AplicarDescuento ..> RealizarCompra : <<extend>>
+EnvioGratuito ..> RealizarCompra : <<extend>>
+SugerirProductos ..> RealizarCompra : <<extend>>
+
+note right of RealizarCompra
+  Puntos de extensión:
+  - seleccionProductos: Cuando hay cupón
+  - calculoTotal: Cuando la compra > $1000
+  - finalizarCompra: Siempre
+end note
+@enduml`} />
+      <p>Un caso de uso base puede tener múltiples extensiones en diferentes puntos de extensión.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
 ### Generalización
 
-<Code code={`┌───────────────┐
-│ Caso de Uso A │
-└───────────────┘
-       ▲
-       │
-       │
-┌──────┴──────┐
-│ Caso de Uso B│
-└─────────────┘`} lang="text" title="Generalización entre casos de uso" />
+<PlantUml code={`@startuml
+usecase "Caso de Uso A" as CasoDeUsoA
+usecase "Caso de Uso B" as CasoDeUsoB
+
+CasoDeUsoB --|> CasoDeUsoA
+@enduml`} />
 
 <div>
   <ul>
@@ -272,17 +413,52 @@ Las relaciones en los diagramas de casos de uso conectan actores con casos de us
   </ul>
 </div>
 
-<Code code={`    👤
-    ▲
-    │
-    │
-┌───┴───┐
-│       │
-│       │
-┌─┐     ┌─┐
-│ │     │ │
-└─┘     └─┘
-Actor B`} lang="text" title="Generalización entre actores" />
+<Tabs>
+  <TabItem label="Generalización básica">
+    <div>
+      <PlantUml code={`@startuml
+usecase "Realizar Pago" as RealizarPago
+usecase "Pagar con Tarjeta" as PagarConTarjeta
+usecase "Pagar con Efectivo" as PagarConEfectivo
+
+PagarConTarjeta --|> RealizarPago
+PagarConEfectivo --|> RealizarPago
+@enduml`} />
+      <p>Generalización básica donde "Pagar con Tarjeta" y "Pagar con Efectivo" son tipos específicos de "Realizar Pago".</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Generalización jerárquica">
+    <div>
+      <PlantUml code={`@startuml
+usecase "Autenticar Usuario" as AutenticarUsuario
+usecase "Autenticar con Credenciales" as AutenticarCredenciales
+usecase "Autenticar con Biometría" as AutenticarBiometria
+usecase "Autenticar con Contraseña" as AutenticarContrasena
+usecase "Autenticar con Certificado" as AutenticarCertificado
+usecase "Autenticar con Huella" as AutenticarHuella
+usecase "Autenticar con Facial" as AutenticarFacial
+
+AutenticarCredenciales --|> AutenticarUsuario
+AutenticarBiometria --|> AutenticarUsuario
+
+AutenticarContrasena --|> AutenticarCredenciales
+AutenticarCertificado --|> AutenticarCredenciales
+
+AutenticarHuella --|> AutenticarBiometria
+AutenticarFacial --|> AutenticarBiometria
+@enduml`} />
+      <p>Generalización jerárquica con múltiples niveles de especialización para diferentes métodos de autenticación.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
+<PlantUml code={`@startuml
+actor "Actor A" as ActorA
+actor "Actor B" as ActorB
+
+ActorB --|> ActorA
+@enduml`} />
 
 <div>
   <ul>
@@ -292,32 +468,61 @@ Actor B`} lang="text" title="Generalización entre actores" />
   </ul>
 </div>
 
+<Tabs>
+  <TabItem label="Generalización básica">
+    <div>
+      <PlantUml code={`@startuml
+actor "Usuario" as Usuario
+actor "Usuario Registrado" as UsuarioRegistrado
+actor "Administrador" as Administrador
+
+UsuarioRegistrado --|> Usuario
+Administrador --|> UsuarioRegistrado
+@enduml`} />
+      <p>Generalización básica donde "Usuario Registrado" es un tipo de "Usuario" y "Administrador" es un tipo de "Usuario Registrado".</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Generalización múltiple">
+    <div>
+      <PlantUml code={`@startuml
+actor "Persona" as Persona
+actor "Empleado" as Empleado
+actor "Cliente" as Cliente
+actor "Vendedor" as Vendedor
+actor "Técnico" as Tecnico
+actor "Cliente VIP" as ClienteVIP
+
+Empleado --|> Persona
+Cliente --|> Persona
+
+Vendedor --|> Empleado
+Tecnico --|> Empleado
+
+ClienteVIP --|> Cliente
+@enduml`} />
+      <p>Generalización múltiple donde diferentes tipos de actores heredan de actores más generales, formando una jerarquía.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
 ## Límite del sistema
 
 El límite del sistema es un rectángulo que engloba todos los casos de uso, representando la frontera entre el sistema y los actores externos.
 
-<Code code={`┌─────────────────────────────────┐
-│           Sistema                │
-│                                  │
-│    ┌──────────────────┐          │
-│    │                  │          │
-│    │   Caso de Uso 1  │◄────────┐
-│    │                  │         │
-│    └──────────────────┘         │
-│                                  │
-│    ┌──────────────────┐         │
-│    │                  │         │
-│    │   Caso de Uso 2  │◄────────┼──── Actor
-│    │                  │         │
-│    └──────────────────┘         │
-│                                  │
-│    ┌──────────────────┐         │
-│    │                  │         │
-│    │   Caso de Uso 3  │◄────────┘
-│    │                  │
-│    └──────────────────┘
-│                                  │
-└─────────────────────────────────┘`} lang="text" title="Límite del sistema en un diagrama de casos de uso" />
+<PlantUml code={`@startuml
+actor Actor
+
+rectangle "Sistema" {
+  usecase "Caso de Uso 1" as CU1
+  usecase "Caso de Uso 2" as CU2
+  usecase "Caso de Uso 3" as CU3
+}
+
+Actor --> CU1
+Actor --> CU2
+Actor --> CU3
+@enduml`} />
 
 <div>
   <ul>
@@ -329,6 +534,50 @@ El límite del sistema es un rectángulo que engloba todos los casos de uso, rep
   </ul>
 </div>
 
+<Tabs>
+  <TabItem label="Límite básico">
+    <div>
+      <PlantUml code={`@startuml
+actor Cliente
+
+rectangle "Sistema de Ventas" {
+  usecase "Realizar Compra" as RealizarCompra
+  usecase "Consultar Productos" as ConsultarProductos
+  usecase "Gestionar Carrito" as GestionarCarrito
+}
+
+Cliente --> RealizarCompra
+Cliente --> ConsultarProductos
+Cliente --> GestionarCarrito
+@enduml`} />
+      <p>Límite básico de un sistema con tres casos de uso y un actor externo.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema con múltiples actores">
+    <div>
+      <PlantUml code={`@startuml
+actor Cliente
+actor Vendedor
+actor "Sistema de Pago" as SistemaPago <<external>>
+
+rectangle "Sistema de Comercio" {
+  usecase "Realizar Compra" as RealizarCompra
+  usecase "Gestionar Inventario" as GestionarInventario
+  usecase "Procesar Pago" as ProcesarPago
+  
+  RealizarCompra ..> ProcesarPago : <<include>>
+}
+
+Cliente --> RealizarCompra
+Vendedor --> GestionarInventario
+ProcesarPago --> SistemaPago
+@enduml`} />
+      <p>Sistema con múltiples actores (humanos y no humanos) y relaciones entre casos de uso dentro del límite.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
 <Aside type="note">
   El límite del sistema es opcional en diagramas pequeños o simples, pero es muy útil en diagramas complejos para clarificar qué está dentro y fuera del alcance del sistema.
 </Aside>
@@ -337,55 +586,115 @@ El límite del sistema es un rectángulo que engloba todos los casos de uso, rep
 
 Los paquetes pueden utilizarse para organizar casos de uso relacionados en grupos lógicos, especialmente en sistemas grandes.
 
-<Code code={`┌─────────────────────────────────┐
-│           Sistema                │
-│                                  │
-│  ┌───────────────────────────┐   │
-│  │     Gestión de Usuarios   │   │
-│  │  ┌─────────────────────┐  │   │
-│  │  │                     │  │   │
-│  │  │  Registrar Usuario  │  │   │
-│  │  │                     │  │   │
-│  │  └─────────────────────┘  │   │
-│  │                           │   │
-│  │  ┌─────────────────────┐  │   │
-│  │  │                     │  │   │
-│  │  │  Modificar Usuario  │  │   │
-│  │  │                     │  │   │
-│  │  └─────────────────────┘  │   │
-│  └───────────────────────────┘   │
-│                                  │
-│  ┌───────────────────────────┐   │
-│  │     Gestión de Pedidos    │   │
-│  │                           │   │
-│  │  ...                      │   │
-│  └───────────────────────────┘   │
-│                                  │
-└─────────────────────────────────┘`} lang="text" title="Uso de paquetes en diagramas de casos de uso" />
+<PlantUml code={`@startuml
+rectangle "Sistema" {
+  package "Gestión de Usuarios" {
+    usecase "Registrar Usuario" as RegistrarUsuario
+    usecase "Modificar Usuario" as ModificarUsuario
+  }
+  
+  package "Gestión de Pedidos" {
+    usecase "Crear Pedido" as CrearPedido
+    usecase "Consultar Estado" as ConsultarEstado
+  }
+}
+@enduml`} />
 
 <div>
   <ul>
-    <li>Se representan como carpetas con el nombre en la pestaña superior</li>
+    <li>Se representan como paquetes con el nombre en la parte superior</li>
     <li>Contienen casos de uso relacionados funcionalmente</li>
     <li>Ayudan a organizar diagramas complejos</li>
     <li>Pueden tener relaciones entre ellos (dependencias, importaciones)</li>
   </ul>
 </div>
 
+<Tabs>
+  <TabItem label="Paquetes básicos">
+    <div>
+      <PlantUml code={`@startuml
+rectangle "Sistema de Comercio Electrónico" {
+  package "Gestión de Usuarios" {
+    usecase "Registrar Usuario" as RegistrarUsuario
+    usecase "Iniciar Sesión" as IniciarSesion
+    usecase "Recuperar Contraseña" as RecuperarContrasena
+  }
+  
+  package "Gestión de Productos" {
+    usecase "Buscar Productos" as BuscarProductos
+    usecase "Ver Detalles" as VerDetalles
+  }
+  
+  package "Gestión de Compras" {
+    usecase "Añadir al Carrito" as AnadirCarrito
+    usecase "Realizar Pago" as RealizarPago
+  }
+}
+
+actor Cliente
+
+Cliente --> RegistrarUsuario
+Cliente --> IniciarSesion
+Cliente --> BuscarProductos
+Cliente --> AnadirCarrito
+@enduml`} />
+      <p>Organización básica de casos de uso en paquetes por funcionalidad.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Paquetes con relaciones">
+    <div>
+      <PlantUml code={`@startuml
+rectangle "Sistema Hospitalario" {
+  package "Gestión de Pacientes" as GestionPacientes {
+    usecase "Registrar Paciente" as RegistrarPaciente
+    usecase "Actualizar Historia" as ActualizarHistoria
+  }
+  
+  package "Gestión de Citas" as GestionCitas {
+    usecase "Agendar Cita" as AgendarCita
+    usecase "Cancelar Cita" as CancelarCita
+  }
+  
+  package "Gestión de Facturación" as GestionFacturacion {
+    usecase "Generar Factura" as GenerarFactura
+    usecase "Procesar Pago" as ProcesarPago
+  }
+}
+
+actor Médico
+actor Paciente
+actor "Personal Administrativo" as Admin
+
+GestionCitas ..> GestionPacientes : <<use>>
+GestionFacturacion ..> GestionCitas : <<use>>
+
+Paciente --> RegistrarPaciente
+Paciente --> AgendarCita
+Médico --> ActualizarHistoria
+Admin --> GenerarFactura
+@enduml`} />
+      <p>Paquetes con relaciones entre ellos, mostrando dependencias funcionales.</p>
+    </div>
+  </TabItem>
+</Tabs>
+
 ## Notas y restricciones
 
 Las notas pueden añadirse a los diagramas de casos de uso para proporcionar información adicional.
 
-<Code code={`┌───────────────┐     «extend»     ┌───────────────┐
-│ Aplicar       │- - - - - - - ->│ Realizar      │
-│ Descuento     │                │ Compra        │
-└───────────────┘                └───────────────┘
-       │
-       │                ┌─────────────────────────┐
-       └───────────────►│ {Punto de extensión:    │
-                        │  Cuando el cliente      │
-                        │  tiene cupón válido}    │
-                        └─────────────────────────┘`} lang="text" title="Uso de notas en diagramas de casos de uso" />
+<PlantUml code={`@startuml
+usecase "Aplicar Descuento" as AplicarDescuento
+usecase "Realizar Compra" as RealizarCompra
+
+AplicarDescuento ..> RealizarCompra : <<extend>>
+
+note right of AplicarDescuento
+  {Punto de extensión:
+   Cuando el cliente
+   tiene cupón válido}
+end note
+@enduml`} />
 
 <div>
   <ul>
@@ -398,54 +707,31 @@ Las notas pueden añadirse a los diagramas de casos de uso para proporcionar inf
 
 ## Ejemplo completo con notación UML
 
-<Code code={`┌─────────────────────────────────────────────────────────────────────┐
-│                        Sistema de Comercio Electrónico                  │
-│                                                                         │
-│  ┌────────────────────────────────┐    ┌────────────────────────────┐   │
-│  │      Gestión de Usuarios       │    │    Gestión de Compras      │   │
-│  │                                │    │                            │   │
-│  │  ┌────────────────┐            │    │   ┌────────────────┐       │   │
-│  │  │                │            │    │   │                │       │   │
-│  │  │    Registrar   │◄───────────┼────┼───┤    Realizar    │       │   │
-│  │  │    Usuario     │            │    │   │    Compra      │       │   │
-│  │  │                │            │    │   │                │       │   │
-│  │  └────────────────┘            │    │   └────────────────┘       │   │
-│  │                                │    │          ▲                 │   │
-│  │  ┌────────────────┐   «extend» │    │          │                 │   │
-│  │  │                │            │    │          │ «include»       │   │
-│  │  │    Recuperar   │- - - - - - ┼- - ┼- - - - - ┘                 │   │
-│  │  │    Contraseña  │            │    │                            │   │
-│  │  │                │            │    │   ┌────────────────┐       │   │
-│  │  └────────────────┘            │    │   │                │       │   │
-│  │                                │    │   │    Procesar    │◄ ─ ─ ─┼───┼─┐
-│  └────────────────────────────────┘    │   │    Pago        │       │   │ │
-│                                        │   │                │       │   │ │
-│                                        │   └────────────────┘       │   │ │
-│                                        │          ▲                 │   │ │
-│                                        │          │                 │   │ │
-│                                        │          │ «extend»        │   │ │
-│                                        │   ┌────────────────┐       │   │ │
-│                                        │   │                │       │   │ │
-│                                        │   │    Aplicar     │       │   │ │
-│                                        │   │    Descuento   │       │   │ │
-│                                        │   │                │       │   │ │
-│                                        │   └────────────────┘       │   │ │
-│                                        └────────────────────────────┘   │ │
-│                                                                         │ │
-└─────────────────────────────────────────────────────────────────────────┘ │
-                                                                            │
-                   ┌─┐                                         ┌─────────┐  │
-                   │ │                                         │         │  │
-                ───┴─┴──                                       │«external»│  │
-                   │                                           │         │  │
-                   │                                           │ Sistema │  │
-                  ┌┴┐                                          │ Pago    │──┘
-                 ┌┘ └┐                                         │         │
-                 │   │                                         └─────────┘
-                ┌┴┐ ┌┴┐
-                │ │ │ │
-                └─┘ └─┘
-                Cliente`} lang="text" title="Ejemplo completo de diagrama de casos de uso con notación UML" />
+<PlantUml code={`@startuml
+actor Cliente
+actor "Sistema de Pago" as SistemaPago <<external>>
+
+rectangle "Sistema de Comercio Electrónico" {
+  package "Gestión de Usuarios" {
+    usecase "Registrar Usuario" as RegistrarUsuario
+    usecase "Recuperar Contraseña" as RecuperarContrasena
+  }
+  
+  package "Gestión de Compras" {
+    usecase "Realizar Compra" as RealizarCompra
+    usecase "Procesar Pago" as ProcesarPago
+    usecase "Aplicar Descuento" as AplicarDescuento
+  }
+}
+
+Cliente --> RegistrarUsuario
+Cliente --> RealizarCompra
+
+RecuperarContrasena ..> RealizarCompra : <<extend>>
+RealizarCompra ..> ProcesarPago : <<include>>
+AplicarDescuento ..> RealizarCompra : <<extend>>
+ProcesarPago --> SistemaPago
+@enduml`} />
 
 <Aside type="tip">
   Al crear diagramas de casos de uso, recuerde que el objetivo principal es comunicar claramente las funcionalidades del sistema y cómo los usuarios interactúan con ellas. Use la notación UML de manera consistente y evite sobrecargar el diagrama con demasiados detalles.

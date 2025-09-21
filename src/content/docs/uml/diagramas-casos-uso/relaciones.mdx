@@ -8,6 +8,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
 
 # Tipos de Relaciones en Casos de Uso
 
@@ -28,32 +29,138 @@ La asociación es el tipo de relación más básico en los diagramas de casos de
   </ul>
 </div>
 
-<Code code={`    👤
-    │
-    │
-    │
-    ▼
-┌─────────┐
-│ Realizar│
-│  Compra │
-└─────────┘`} lang="text" title="Asociación entre actor y caso de uso" />
+<Tabs>
+  <TabItem label="Ejemplo básico">
+    <div>
+      <PlantUml code={`@startuml
+actor Usuario
+usecase "Realizar Compra" as RealizarCompra
+
+Usuario --> RealizarCompra
+@enduml`} />
+      <p>En este ejemplo básico, un Usuario se asocia con el caso de uso Realizar Compra, indicando que el usuario puede iniciar o participar en esta funcionalidad.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema educativo">
+    <div>
+      <PlantUml code={`@startuml
+actor Estudiante
+actor Profesor
+actor "Administrador" as Admin
+
+usecase "Consultar Calificaciones" as ConsultarCalificaciones
+usecase "Registrar Asistencia" as RegistrarAsistencia
+usecase "Subir Material" as SubirMaterial
+usecase "Gestionar Usuarios" as GestionarUsuarios
+
+Estudiante --> ConsultarCalificaciones
+Profesor --> ConsultarCalificaciones
+Profesor --> RegistrarAsistencia
+Profesor --> SubirMaterial
+Admin --> GestionarUsuarios
+@enduml`} />
+      <p>Este ejemplo muestra un sistema educativo con múltiples actores (Estudiante, Profesor, Administrador) y sus asociaciones con diferentes casos de uso. Tanto estudiantes como profesores pueden consultar calificaciones, mientras que solo los profesores pueden registrar asistencia y subir material, y solo los administradores pueden gestionar usuarios.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema hospitalario">
+    <div>
+      <PlantUml code={`@startuml
+actor Paciente
+actor Médico
+actor Enfermera
+actor "Personal Administrativo" as Admin
+
+usecase "Solicitar Cita" as SolicitarCita
+usecase "Consultar Historial" as ConsultarHistorial
+usecase "Registrar Signos Vitales" as RegistrarSignos
+usecase "Prescribir Medicamentos" as PrescribirMedicamentos
+usecase "Facturar Servicios" as FacturarServicios
+
+Paciente --> SolicitarCita
+Médico --> ConsultarHistorial
+Enfermera --> ConsultarHistorial
+Enfermera --> RegistrarSignos
+Médico --> PrescribirMedicamentos
+Admin --> FacturarServicios
+Admin --> SolicitarCita
+@enduml`} />
+      <p>Este ejemplo ilustra un sistema hospitalario donde diferentes actores tienen distintas asociaciones con los casos de uso. Los pacientes pueden solicitar citas, los médicos pueden consultar historiales y prescribir medicamentos, las enfermeras pueden registrar signos vitales y consultar historiales, y el personal administrativo puede facturar servicios y también ayudar a solicitar citas.</p>
+    </div>
+  </TabItem>
+</Tabs>
 
 ### Multiplicidad en asociaciones
 
 Aunque no es común mostrarla en diagramas de casos de uso, la multiplicidad puede indicarse para representar cuántas instancias de un actor pueden participar en un caso de uso y viceversa.
 
-<Code code={`    👤 1..*
-    │
-    │
-    │
-    ▼ 1
-┌─────────┐
-│ Realizar│
-│  Compra │
-└─────────┘`} lang="text" title="Asociación con multiplicidad" />
+<Tabs>
+  <TabItem label="Ejemplo básico">
+    <div>
+      <PlantUml code={`@startuml
+actor "Usuario" as Usuario
+usecase "Realizar Compra" as RealizarCompra
+
+Usuario "1..*" --> "1" RealizarCompra
+@enduml`} />
+      <p>En este ejemplo, la notación "1..*" indica que uno o más usuarios pueden participar en una instancia del caso de uso "Realizar Compra".</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema de reservas">
+    <div>
+      <PlantUml code={`@startuml
+actor "Cliente" as Cliente
+actor "Agente" as Agente
+usecase "Reservar Habitación" as ReservarHabitacion
+usecase "Gestionar Reserva" as GestionarReserva
+
+Cliente "1" --> "*" ReservarHabitacion : realiza
+Agente "1" --> "*" ReservarHabitacion : asiste en
+Agente "1" --> "*" GestionarReserva : administra
+@enduml`} />
+      <p>En este sistema de reservas de hotel, un cliente puede realizar múltiples reservas de habitaciones ("1" a "*"), y un agente puede asistir en múltiples reservas y gestionar múltiples reservas existentes.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema bancario">
+    <div>
+      <PlantUml code={`@startuml
+actor "Cliente" as Cliente
+actor "Cajero" as Cajero
+usecase "Abrir Cuenta" as AbrirCuenta
+usecase "Realizar Transacción" as RealizarTransaccion
+
+Cliente "1" --> "1..5" AbrirCuenta : solicita
+Cliente "1" --> "*" RealizarTransaccion : ejecuta
+Cajero "1..*" --> "*" RealizarTransaccion : procesa
+@enduml`} />
+      <p>En este sistema bancario, un cliente puede abrir entre 1 y 5 cuentas ("1..5"), y puede realizar múltiples transacciones ("*"). Uno o más cajeros ("1..*") pueden procesar múltiples transacciones.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema de biblioteca">
+    <div>
+      <PlantUml code={`@startuml
+actor "Lector" as Lector
+actor "Bibliotecario" as Bibliotecario
+usecase "Prestar Libro" as PrestarLibro
+usecase "Devolver Libro" as DevolverLibro
+usecase "Catalogar Material" as CatalogarMaterial
+
+Lector "1" --> "0..5" PrestarLibro : solicita
+Lector "1" --> "0..5" DevolverLibro : realiza
+Bibliotecario "1..3" --> "*" PrestarLibro : gestiona
+Bibliotecario "1" --> "*" CatalogarMaterial : ejecuta
+@enduml`} />
+      <p>En este sistema de biblioteca, un lector puede tener entre 0 y 5 préstamos activos y devoluciones pendientes. Entre 1 y 3 bibliotecarios pueden gestionar cada préstamo, y un bibliotecario puede catalogar múltiples materiales.</p>
+    </div>
+  </TabItem>
+</Tabs>
 
 <Aside type="note">
-  En el ejemplo anterior, la notación "1..*" indica que uno o más actores pueden participar en una instancia del caso de uso "Realizar Compra".
+  La multiplicidad en las asociaciones permite especificar cuántas instancias de un actor pueden participar en un caso de uso y viceversa. Las notaciones comunes incluyen "1" (exactamente uno), "*" (cero o más), "1..*" (uno o más), "0..1" (cero o uno) y rangos específicos como "2..5" (entre dos y cinco).
 </Aside>
 
 ## 3.2. Inclusión («include»)
@@ -72,10 +179,12 @@ La relación de inclusión se utiliza cuando un caso de uso incorpora el comport
   </ul>
 </div>
 
-<Code code={`┌───────────────┐     «include»     ┌───────────────┐
-│ Realizar Pago │- - - - - - - ->│ Autenticar   │
-│               │                │ Usuario      │
-└───────────────┘                └───────────────┘`} lang="text" title="Relación de inclusión" />
+<PlantUml code={`@startuml
+usecase "Realizar Pago" as RealizarPago
+usecase "Autenticar Usuario" as AutenticarUsuario
+
+RealizarPago ..> AutenticarUsuario : <<include>>
+@enduml`} />
 
 ### Cuándo usar la relación de inclusión
 
@@ -88,29 +197,112 @@ La relación de inclusión se utiliza cuando un caso de uso incorpora el comport
 </div>
 
 <Tabs>
-  <TabItem label="Ejemplo correcto">
+  <TabItem label="Ejemplo comercial">
     <div>
-      <Code code={`┌────────────────┐     «include»     ┌────────────────┐
-│ Realizar Compra│- - - - - - - ->│ Procesar Pago │
-└────────────────┘                └────────────────┘
-       │                                  │
-       │ «include»                        │ «include»
-       ▼                                  ▼
-┌────────────────┐              ┌────────────────┐
-│ Verificar      │              │ Generar        │
-│ Inventario     │              │ Factura        │
-└────────────────┘              └────────────────┘`} lang="text" title="Uso correcto de la relación de inclusión" />
+      <PlantUml code={`@startuml
+usecase "Realizar Compra" as RealizarCompra
+usecase "Procesar Pago" as ProcesarPago
+usecase "Verificar Inventario" as VerificarInventario
+usecase "Generar Factura" as GenerarFactura
+
+RealizarCompra ..> ProcesarPago : <<include>>
+RealizarCompra ..> VerificarInventario : <<include>>
+ProcesarPago ..> GenerarFactura : <<include>>
+@enduml`} />
       <p>En este ejemplo, "Realizar Compra" siempre incluye verificar el inventario, procesar el pago y generar una factura.</p>
     </div>
   </TabItem>
   
-  <TabItem label="Ejemplo incorrecto">
+  <TabItem label="Sistema bancario">
     <div>
-      <Code code={`┌────────────────┐     «include»     ┌────────────────┐
-│ Realizar Compra│- - - - - - - ->│ Seleccionar   │
-└────────────────┘                │ Productos     │
-                                  └────────────────┘`} lang="text" title="Uso incorrecto de la relación de inclusión" />
-      <p>Este es un uso incorrecto porque "Seleccionar Productos" no es una funcionalidad separada, sino un paso dentro del caso de uso "Realizar Compra".</p>
+      <PlantUml code={`@startuml
+actor Cliente
+actor Cajero
+actor "Sistema Externo" as SistemaExterno
+
+usecase "Realizar Transacción" as RealizarTransaccion
+usecase "Autenticar Usuario" as AutenticarUsuario
+usecase "Verificar Fondos" as VerificarFondos
+usecase "Registrar Operación" as RegistrarOperacion
+usecase "Notificar Cliente" as NotificarCliente
+
+Cliente --> RealizarTransaccion
+Cajero --> RealizarTransaccion
+SistemaExterno --> NotificarCliente
+
+RealizarTransaccion ..> AutenticarUsuario : <<include>>
+RealizarTransaccion ..> VerificarFondos : <<include>>
+RealizarTransaccion ..> RegistrarOperacion : <<include>>
+RegistrarOperacion ..> NotificarCliente : <<include>>
+@enduml`} />
+      <p>Este ejemplo muestra un sistema bancario donde "Realizar Transacción" siempre incluye autenticar al usuario, verificar fondos y registrar la operación. Además, el registro de operación siempre incluye notificar al cliente. Participan varios actores: Cliente, Cajero y un Sistema Externo para notificaciones.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema de reservas">
+    <div>
+      <PlantUml code={`@startuml
+actor Cliente
+actor "Agente de Reservas" as Agente
+
+usecase "Reservar Vuelo" as ReservarVuelo
+usecase "Buscar Disponibilidad" as BuscarDisponibilidad
+usecase "Seleccionar Asiento" as SeleccionarAsiento
+usecase "Procesar Pago" as ProcesarPago
+usecase "Emitir Boleto" as EmitirBoleto
+
+Cliente --> ReservarVuelo
+Agente --> ReservarVuelo
+
+ReservarVuelo ..> BuscarDisponibilidad : <<include>>
+ReservarVuelo ..> SeleccionarAsiento : <<include>>
+ReservarVuelo ..> ProcesarPago : <<include>>
+ReservarVuelo ..> EmitirBoleto : <<include>>
+@enduml`} />
+      <p>En este sistema de reservas de vuelos, el caso de uso "Reservar Vuelo" siempre incluye buscar disponibilidad, seleccionar asiento, procesar el pago y emitir el boleto. Tanto el Cliente como el Agente de Reservas pueden iniciar este caso de uso.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema de ventas complejo">
+    <div>
+      <PlantUml code={`@startuml
+actor Cliente
+actor Vendedor
+actor Almacenista
+actor "Sistema Contable" as SistemaContable
+actor "Sistema de Envíos" as SistemaEnvios
+
+usecase "Procesar Venta" as ProcesarVenta
+usecase "Autenticar Usuario" as AutenticarUsuario
+usecase "Consultar Catálogo" as ConsultarCatalogo
+usecase "Verificar Disponibilidad" as VerificarDisponibilidad
+usecase "Calcular Impuestos" as CalcularImpuestos
+usecase "Procesar Pago" as ProcesarPago
+usecase "Generar Factura" as GenerarFactura
+usecase "Actualizar Inventario" as ActualizarInventario
+usecase "Programar Envío" as ProgramarEnvio
+usecase "Registrar Comisión" as RegistrarComision
+
+Cliente --> ProcesarVenta
+Vendedor --> ProcesarVenta
+Almacenista --> ActualizarInventario
+SistemaContable --> GenerarFactura
+SistemaEnvios --> ProgramarEnvio
+
+ProcesarVenta ..> AutenticarUsuario : <<include>>
+ProcesarVenta ..> ConsultarCatalogo : <<include>>
+ProcesarVenta ..> VerificarDisponibilidad : <<include>>
+ProcesarVenta ..> CalcularImpuestos : <<include>>
+ProcesarVenta ..> ProcesarPago : <<include>>
+ProcesarVenta ..> GenerarFactura : <<include>>
+ProcesarVenta ..> ActualizarInventario : <<include>>
+ProcesarVenta ..> ProgramarEnvio : <<include>>
+ProcesarVenta ..> RegistrarComision : <<include>>
+
+VerificarDisponibilidad ..> ActualizarInventario : <<include>>
+GenerarFactura ..> CalcularImpuestos : <<include>>
+@enduml`} />
+      <p>Este ejemplo muestra un sistema de ventas complejo con múltiples actores (Cliente, Vendedor, Almacenista, Sistema Contable, Sistema de Envíos) y numerosos casos de uso incluidos. El caso de uso principal "Procesar Venta" incluye obligatoriamente varios pasos como autenticar usuario, consultar catálogo, verificar disponibilidad, calcular impuestos, procesar pago, generar factura, actualizar inventario, programar envío y registrar comisión del vendedor. Además, hay relaciones de inclusión anidadas: "Verificar Disponibilidad" incluye "Actualizar Inventario" y "Generar Factura" incluye "Calcular Impuestos".</p>
     </div>
   </TabItem>
 </Tabs>
@@ -135,13 +327,17 @@ La relación de extensión se utiliza cuando un caso de uso añade comportamient
   </ul>
 </div>
 
-<Code code={`┌───────────────┐     «extend»     ┌───────────────┐
-│ Aplicar       │- - - - - - - ->│ Realizar      │
-│ Descuento     │                │ Compra        │
-└───────────────┘                └───────────────┘
-                                 {Punto de extensión:
-                                  Cuando el cliente
-                                  tiene cupón}`} lang="text" title="Relación de extensión" />
+<PlantUml code={`@startuml
+usecase "Realizar Compra" as RealizarCompra
+usecase "Aplicar Descuento" as AplicarDescuento
+
+AplicarDescuento ..> RealizarCompra : <<extend>>
+note right of RealizarCompra
+  Punto de extensión:
+  Cuando el cliente
+  tiene cupón
+end note
+@enduml`} />
 
 ### Cuándo usar la relación de extensión
 
@@ -155,26 +351,157 @@ La relación de extensión se utiliza cuando un caso de uso añade comportamient
 </div>
 
 <Tabs>
-  <TabItem label="Ejemplo correcto">
+  <TabItem label="Ejemplo financiero">
     <div>
-      <Code code={`┌────────────────┐     «extend»     ┌────────────────┐
-│ Solicitar      │- - - - - - - ->│ Crear         │
-│ Aprobación     │                │ Cuenta        │
-└────────────────┘                └────────────────┘
-                                  {Punto de extensión:
-                                   Cuando el monto
-                                   supera el límite}`} lang="text" title="Uso correcto de la relación de extensión" />
+      <PlantUml code={`@startuml
+usecase "Crear Cuenta" as CrearCuenta
+usecase "Solicitar Aprobación" as SolicitarAprobacion
+
+SolicitarAprobacion ..> CrearCuenta : <<extend>>
+note right of CrearCuenta
+  Punto de extensión:
+  Cuando el monto
+  supera el límite
+end note
+@enduml`} />
       <p>En este ejemplo, "Solicitar Aprobación" extiende "Crear Cuenta" solo cuando se cumple una condición específica.</p>
     </div>
   </TabItem>
   
-  <TabItem label="Ejemplo incorrecto">
+  <TabItem label="Sistema de compras">
     <div>
-      <Code code={`┌────────────────┐     «extend»     ┌────────────────┐
-│ Pagar con      │- - - - - - - ->│ Realizar      │
-│ Tarjeta        │                │ Pago          │
-└────────────────┘                └────────────────┘`} lang="text" title="Uso incorrecto de la relación de extensión" />
-      <p>Este es un uso incorrecto porque "Pagar con Tarjeta" es una especialización de "Realizar Pago", no una extensión opcional. Debería modelarse como una generalización.</p>
+      <PlantUml code={`@startuml
+actor Cliente
+actor "Servicio de Cupones" as ServicioCupones
+
+usecase "Realizar Compra" as RealizarCompra
+usecase "Aplicar Descuento" as AplicarDescuento
+usecase "Aplicar Cupón" as AplicarCupon
+usecase "Ofrecer Envío Gratuito" as EnvioGratuito
+
+Cliente --> RealizarCompra
+ServicioCupones --> AplicarCupon
+
+AplicarDescuento ..> RealizarCompra : <<extend>>
+note right of RealizarCompra
+  Punto de extensión:
+  Cuando el total supera $1000
+end note
+
+AplicarCupon ..> RealizarCompra : <<extend>>
+note left of RealizarCompra
+  Punto de extensión:
+  Cuando el cliente tiene cupón
+end note
+
+EnvioGratuito ..> RealizarCompra : <<extend>>
+note bottom of RealizarCompra
+  Punto de extensión:
+  Cuando la compra supera $2000
+end note
+@enduml`} />
+      <p>Este ejemplo muestra un sistema de compras donde el caso de uso "Realizar Compra" puede ser extendido por tres casos de uso diferentes bajo condiciones específicas: "Aplicar Descuento" cuando el total supera $1000, "Aplicar Cupón" cuando el cliente tiene un cupón disponible, y "Ofrecer Envío Gratuito" cuando la compra supera $2000.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema bancario">
+    <div>
+      <PlantUml code={`@startuml
+actor Cliente
+actor "Oficial de Crédito" as OficialCredito
+actor "Sistema de Fraude" as SistemaFraude
+
+usecase "Realizar Retiro" as RealizarRetiro
+usecase "Verificar Identidad Adicional" as VerificarIdentidad
+usecase "Notificar Departamento Seguridad" as NotificarSeguridad
+usecase "Ofrecer Préstamo" as OfrecerPrestamo
+
+Cliente --> RealizarRetiro
+OficialCredito --> OfrecerPrestamo
+SistemaFraude --> NotificarSeguridad
+
+VerificarIdentidad ..> RealizarRetiro : <<extend>>
+note right of RealizarRetiro
+  Punto de extensión:
+  Cuando el monto > $10,000
+end note
+
+NotificarSeguridad ..> RealizarRetiro : <<extend>>
+note left of RealizarRetiro
+  Punto de extensión:
+  Cuando se detecta
+  actividad sospechosa
+end note
+
+OfrecerPrestamo ..> RealizarRetiro : <<extend>>
+note bottom of RealizarRetiro
+  Punto de extensión:
+  Cuando el saldo queda bajo
+end note
+@enduml`} />
+      <p>En este sistema bancario, el caso de uso "Realizar Retiro" puede ser extendido por "Verificar Identidad Adicional" cuando el monto es mayor a $10,000, por "Notificar Departamento Seguridad" cuando se detecta actividad sospechosa, y por "Ofrecer Préstamo" cuando el saldo queda bajo después del retiro. Cada extensión involucra diferentes actores.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema de ventas complejo">
+    <div>
+      <PlantUml code={`@startuml
+actor Cliente
+actor Vendedor
+actor "Gerente de Ventas" as Gerente
+actor "Sistema de Marketing" as SistemaMarketing
+actor "Sistema de Fidelización" as SistemaFidelizacion
+actor "Sistema de Crédito" as SistemaCredito
+
+usecase "Procesar Venta" as ProcesarVenta
+usecase "Verificar Historial Crediticio" as VerificarHistorial
+usecase "Ofrecer Garantía Extendida" as OfrecerGarantia
+usecase "Aplicar Descuento VIP" as DescuentoVIP
+usecase "Inscribir en Programa de Puntos" as InscribirPuntos
+usecase "Ofrecer Productos Relacionados" as ProductosRelacionados
+usecase "Solicitar Aprobación de Crédito" as SolicitarCredito
+usecase "Programar Demostración" as ProgramarDemo
+usecase "Activar Promoción Especial" as PromocionEspecial
+usecase "Generar Encuesta de Satisfacción" as GenerarEncuesta
+
+Cliente --> ProcesarVenta
+Vendedor --> ProcesarVenta
+Vendedor --> OfrecerGarantia
+Vendedor --> ProductosRelacionados
+Gerente --> SolicitarCredito
+SistemaMarketing --> PromocionEspecial
+SistemaFidelizacion --> InscribirPuntos
+SistemaCredito --> VerificarHistorial
+
+VerificarHistorial ..> ProcesarVenta : <<extend>>
+note right of ProcesarVenta : Cuando la compra es a crédito
+
+OfrecerGarantia ..> ProcesarVenta : <<extend>>
+note left of ProcesarVenta : Cuando el producto es electrónico o de alto valor
+
+DescuentoVIP ..> ProcesarVenta : <<extend>>
+note top of DescuentoVIP : Cuando el cliente es VIP
+
+InscribirPuntos ..> ProcesarVenta : <<extend>>
+note top of InscribirPuntos : Cuando el cliente acepta el programa de fidelización
+
+ProductosRelacionados ..> ProcesarVenta : <<extend>>
+note top of ProductosRelacionados : Después de agregar productos al carrito
+
+SolicitarCredito ..> VerificarHistorial : <<extend>>
+note right of VerificarHistorial : Cuando el historial muestra riesgo medio
+
+ProgramarDemo ..> OfrecerGarantia : <<extend>>
+note right of OfrecerGarantia : Cuando el producto es complejo
+
+PromocionEspecial ..> ProductosRelacionados : <<extend>>
+note right of ProductosRelacionados : Cuando hay campaña activa
+
+GenerarEncuesta ..> ProcesarVenta : <<extend>>
+note bottom of ProcesarVenta : Al finalizar la compra
+@enduml`} />
+      <p>Este ejemplo muestra un sistema de ventas complejo con múltiples actores (Cliente, Vendedor, Gerente de Ventas, Sistema de Marketing, Sistema de Fidelización, Sistema de Crédito) y numerosas extensiones opcionales para el caso de uso principal "Procesar Venta". Las extensiones incluyen verificar historial crediticio cuando la compra es a crédito, ofrecer garantía extendida para productos electrónicos, aplicar descuento VIP para clientes especiales, inscribir en programa de puntos si el cliente acepta, ofrecer productos relacionados después de agregar productos al carrito, y generar una encuesta de satisfacción al finalizar la compra.</p>
+      <p>Además, el diagrama muestra extensiones anidadas: "Solicitar Aprobación de Crédito" extiende "Verificar Historial Crediticio" (que a su vez extiende "Procesar Venta"), "Programar Demostración" extiende "Ofrecer Garantía Extendida", y "Activar Promoción Especial" extiende "Ofrecer Productos Relacionados". Esto demuestra cómo las extensiones pueden formar cadenas complejas de comportamiento opcional.</p>
     </div>
   </TabItem>
 </Tabs>
@@ -198,27 +525,57 @@ La generalización representa una relación de herencia entre actores o entre ca
   </ul>
 </div>
 
-<Code code={`    👤
-    ▲
-    │
-    │
-┌───┴───┐
-│       │
-│       │
-┌─┐     ┌─┐
-│ │     │ │
-└─┘     └─┘
-Usuario Registrado
-    ▲
-    │
-    │
-┌───┴───┐
-│       │
-│       │
-┌─┐     ┌─┐
-│ │     │ │
-└─┘     └─┘
-Administrador`} lang="text" title="Generalización entre actores" />
+<Tabs>
+  <TabItem label="Sistema web">
+    <div>
+      <PlantUml code={`@startuml
+actor "Usuario" as Usuario
+actor "Usuario Registrado" as UsuarioRegistrado
+actor "Administrador" as Administrador
+
+Usuario <|-- UsuarioRegistrado
+UsuarioRegistrado <|-- Administrador
+@enduml`} />
+      <p>En este ejemplo, "Usuario Registrado" es un tipo de "Usuario" y hereda todas sus asociaciones. A su vez, "Administrador" es un tipo de "Usuario Registrado" y hereda todas las asociaciones de ambos actores padre.</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema educativo">
+    <div>
+      <PlantUml code={`@startuml
+actor "Miembro Universitario" as Miembro
+actor "Estudiante" as Estudiante
+actor "Profesor" as Profesor
+actor "Estudiante Graduado" as EstudianteGraduado
+actor "Profesor Titular" as ProfesorTitular
+
+Miembro <|-- Estudiante
+Miembro <|-- Profesor
+Estudiante <|-- EstudianteGraduado
+Profesor <|-- ProfesorTitular
+@enduml`} />
+      <p>Este ejemplo muestra un sistema educativo donde "Estudiante" y "Profesor" son tipos de "Miembro Universitario". A su vez, "Estudiante Graduado" es un tipo específico de "Estudiante" y "Profesor Titular" es un tipo específico de "Profesor".</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema hospitalario">
+    <div>
+      <PlantUml code={`@startuml
+actor "Personal Sanitario" as Personal
+actor "Médico" as Medico
+actor "Enfermero" as Enfermero
+actor "Especialista" as Especialista
+actor "Cirujano" as Cirujano
+
+Personal <|-- Medico
+Personal <|-- Enfermero
+Medico <|-- Especialista
+Especialista <|-- Cirujano
+@enduml`} />
+      <p>Este ejemplo muestra un sistema hospitalario donde "Médico" y "Enfermero" son tipos de "Personal Sanitario". Además, "Especialista" es un tipo de "Médico" y "Cirujano" es un tipo específico de "Especialista".</p>
+    </div>
+  </TabItem>
+</Tabs>
 
 ### Generalización entre casos de uso
 
@@ -231,23 +588,64 @@ Administrador`} lang="text" title="Generalización entre actores" />
   </ul>
 </div>
 
-<Code code={`┌───────────────┐
-│ Realizar Pago │
-└───────────────┘
-       ▲
-       │
-       │
-┌──────┴──────┐     ┌──────────────┐
-│ Pagar con   │     │ Pagar con    │
-│ Tarjeta     │     │ Efectivo     │
-└─────────────┘     └──────────────┘
-       ▲
-       │
-       │
-┌──────┴──────┐     ┌──────────────┐
-│ Pagar con   │     │ Pagar con    │
-│ Crédito     │     │ Débito       │
-└─────────────┘     └──────────────┘`} lang="text" title="Generalización entre casos de uso" />
+<Tabs>
+  <TabItem label="Sistema de pagos">
+    <div>
+      <PlantUml code={`@startuml
+usecase "Realizar Pago" as RealizarPago
+usecase "Pagar con Tarjeta" as PagarConTarjeta
+usecase "Pagar con Efectivo" as PagarConEfectivo
+usecase "Pagar con Crédito" as PagarConCredito
+usecase "Pagar con Débito" as PagarConDebito
+
+PagarConTarjeta --|> RealizarPago
+PagarConEfectivo --|> RealizarPago
+
+PagarConCredito --|> PagarConTarjeta
+PagarConDebito --|> PagarConTarjeta
+@enduml`} />
+      <p>En este ejemplo, "Pagar con Tarjeta" y "Pagar con Efectivo" son tipos de "Realizar Pago". A su vez, "Pagar con Crédito" y "Pagar con Débito" son tipos específicos de "Pagar con Tarjeta".</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema de autenticación">
+    <div>
+      <PlantUml code={`@startuml
+usecase "Autenticar Usuario" as AutenticarUsuario
+usecase "Autenticar con Contraseña" as AutenticarContrasena
+usecase "Autenticar con Biometría" as AutenticarBiometria
+usecase "Autenticar con Huella" as AutenticarHuella
+usecase "Autenticar con Facial" as AutenticarFacial
+
+AutenticarContrasena --|> AutenticarUsuario
+AutenticarBiometria --|> AutenticarUsuario
+
+AutenticarHuella --|> AutenticarBiometria
+AutenticarFacial --|> AutenticarBiometria
+@enduml`} />
+      <p>Este ejemplo muestra un sistema de autenticación donde "Autenticar con Contraseña" y "Autenticar con Biometría" son tipos de "Autenticar Usuario". A su vez, "Autenticar con Huella" y "Autenticar con Facial" son tipos específicos de "Autenticar con Biometría".</p>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Sistema de comunicación">
+    <div>
+      <PlantUml code={`@startuml
+usecase "Enviar Mensaje" as EnviarMensaje
+usecase "Enviar Correo" as EnviarCorreo
+usecase "Enviar Mensaje Instantáneo" as EnviarMI
+usecase "Enviar Correo Personal" as EnviarCorreoPersonal
+usecase "Enviar Correo Masivo" as EnviarCorreoMasivo
+
+EnviarCorreo --|> EnviarMensaje
+EnviarMI --|> EnviarMensaje
+
+EnviarCorreoPersonal --|> EnviarCorreo
+EnviarCorreoMasivo --|> EnviarCorreo
+@enduml`} />
+      <p>Este ejemplo muestra un sistema de comunicación donde "Enviar Correo" y "Enviar Mensaje Instantáneo" son tipos de "Enviar Mensaje". A su vez, "Enviar Correo Personal" y "Enviar Correo Masivo" son tipos específicos de "Enviar Correo".</p>
+    </div>
+  </TabItem>
+</Tabs>
 
 ### Cuándo usar la generalización
 
@@ -318,38 +716,28 @@ Administrador`} lang="text" title="Generalización entre actores" />
 
 ## Ejemplo completo con diferentes tipos de relaciones
 
-<Code code={`                                                 👤
-                                                 │
-                                                 │ Usuario
-                                                 │
-┌─────────────────────────────────────────────┐  │
-│                 Sistema de Comercio          │  │
-│                                             │  │
-│  ┌───────────────┐      «extend»            │  │
-│  │ Aplicar       │- - - - - - - - - - - -┐  │  │
-│  │ Descuento     │                       │  │  │
-│  └───────────────┘                       │  │  │
-│                                          ▼  │  │
-│  ┌───────────────┐                ┌───────────┐
-│  │ Generar       │◄ - - - - - - - │ Realizar  │◄───
-│  │ Factura       │    «include»   │ Compra    │
-│  └───────────────┘                └───────────┘
-│         ▲                              ▲
-│         │ «include»                    │
-│  ┌──────┴────────┐                     │
-│  │ Calcular      │                     │
-│  │ Impuestos     │                     │
-│  └───────────────┘                     │
-│                                        │
-└────────────────────────────────────────┼─────┐
-                                         │     │
-                                  ┌──────┴───┐ │
-                                  │          │ │
-                                  │          │ │
-                                 ┌┴┐        ┌┴┐│
-                                 │ │        │ ││
-                                 └─┘        └─┘│
-                               Cliente    Vendedor`} lang="text" title="Ejemplo completo con diferentes tipos de relaciones" />
+<PlantUml code={`@startuml
+actor Usuario
+actor Cliente
+actor Vendedor
+
+rectangle "Sistema de Comercio" {
+  usecase "Realizar Compra" as RealizarCompra
+  usecase "Aplicar Descuento" as AplicarDescuento
+  usecase "Generar Factura" as GenerarFactura
+  usecase "Calcular Impuestos" as CalcularImpuestos
+  
+  AplicarDescuento ..> RealizarCompra : <<extend>>
+  RealizarCompra ..> GenerarFactura : <<include>>
+  GenerarFactura ..> CalcularImpuestos : <<include>>
+}
+
+Usuario <|-- Cliente
+Usuario <|-- Vendedor
+
+Cliente --> RealizarCompra
+Vendedor --> RealizarCompra
+@enduml`} />
 
 <Aside type="note">
   En este ejemplo:

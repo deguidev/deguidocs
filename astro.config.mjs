@@ -18,6 +18,7 @@ export default defineConfig({
 		starlight({
 			customCss: ['./src/style/starlight.css'],
 			title: 'deguidocs',
+
 			logo: {
                 src: '@assets/deguidocs.png',
                 alt: 'Logo de la documentación'
@@ -221,23 +222,23 @@ export default defineConfig({
 							label: 'Vue 3',
 							collapsed: true,
 							items: [
-								{ label: '01. Introducción a Vue 3', link: '/guides/vue/introduction/' },
-								{ label: '02. Estructura del Componente', link: '/guides/vue/component-structure/' },
-								{ label: '03. Reactividad', link: '/guides/vue/reactivity/' },
-								{ label: '04. Props y Eventos', link: '/guides/vue/props-events/' },
-								{ label: '05. Computadas y Observadores', link: '/guides/vue/computed-watchers/' },
-								{ label: '06. Ciclo de Vida', link: '/guides/vue/lifecycle/' },
-								{ label: '07. Métodos y Funciones', link: '/guides/vue/methods-functions/' },
-								{ label: '08. Formularios y Modelos', link: '/guides/vue/forms-models/' },
-								{ label: '09. Directivas y Bindings', link: '/guides/vue/directives-bindings/' },
-								{ label: '10. Slots', link: '/guides/vue/slots/' },
-								{ label: '11. Comunicación entre Componentes', link: '/guides/vue/component-communication/' },
-								{ label: '12. Estilos y CSS', link: '/guides/vue/styles-css/' },
-								{ label: '13. Composables', link: '/guides/vue/composables/' },
-								{ label: '14. Transiciones y Animaciones', link: '/guides/vue/transitions-animations/' },
-								{ label: '15. Vue Router con Composition API', link: '/guides/vue/vue-router/' },
-								{ label: '16. Pinia (Reemplazo de Vuex)', link: '/guides/vue/pinia/' },
-								{ label: '17. Manejo de APIs y Fetch', link: '/guides/vue/api-fetch/' },
+								{ label: '01. Introducción a Vue 3', link: '/frameworks/vue/introduction/' },
+								{ label: '02. Estructura del Componente', link: '/frameworks/vue/component-structure/' },
+								{ label: '03. Reactividad', link: '/frameworks/vue/reactivity/' },
+								{ label: '04. Props y Eventos', link: '/frameworks/vue/props-events/' },
+								{ label: '05. Computadas y Observadores', link: '/frameworks/vue/computed-watchers/' },
+								{ label: '06. Ciclo de Vida', link: '/frameworks/vue/lifecycle/' },
+								{ label: '07. Métodos y Funciones', link: '/frameworks/vue/methods-functions/' },
+								{ label: '08. Formularios y Modelos', link: '/frameworks/vue/forms-models/' },
+								{ label: '09. Directivas y Bindings', link: '/frameworks/vue/directives-bindings/' },
+								{ label: '10. Slots', link: '/frameworks/vue/slots/' },
+								{ label: '11. Comunicación entre Componentes', link: '/frameworks/vue/component-communication/' },
+								{ label: '12. Estilos y CSS', link: '/frameworks/vue/styles-css/' },
+								{ label: '13. Composables', link: '/frameworks/vue/composables/' },
+								{ label: '14. Transiciones y Animaciones', link: '/frameworks/vue/transitions-animations/' },
+								{ label: '15. Vue Router con Composition API', link: '/frameworks/vue/vue-router/' },
+								{ label: '16. Pinia (Reemplazo de Vuex)', link: '/frameworks/vue/pinia/' },
+								{ label: '17. Manejo de APIs y Fetch', link: '/frameworks/vue/api-fetch/' },
 							],
 						},
 						{
@@ -335,6 +336,16 @@ export default defineConfig({
 								{ label: '3. Tipos de Relaciones en Casos de Uso', link: '/uml/diagramas-casos-uso/relaciones/' },
 								{ label: '4. Notación UML para Casos de Uso', link: '/uml/diagramas-casos-uso/notacion/' },
 								{ label: '5. Aplicaciones del Diagrama de Casos de Uso', link: '/uml/diagramas-casos-uso/aplicaciones/' }
+							]
+						},
+						{ 
+							label: 'Diagramas de Secuencia',
+							collapsed: true,
+							items: [
+								{ label: '1. Introducción al Diagrama de Secuencia', link: '/uml/diagramas-secuencia/introduccion/' },
+								{ label: '2. Elementos Básicos de un Diagrama de Secuencia', link: '/uml/diagramas-secuencia/elementos-basicos/' },
+								{ label: '3. Tipos de Mensajes en un Diagrama de Secuencia', link: '/uml/diagramas-secuencia/tipos-mensajes/' },
+								{ label: '4. Notación UML para Diagramas de Secuencia', link: '/uml/diagramas-secuencia/notacion/' },
 							]
 						}
 					]
