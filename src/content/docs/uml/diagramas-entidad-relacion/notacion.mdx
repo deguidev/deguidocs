@@ -1,0 +1,255 @@
+---
+title: 4. Notación PlantUML para Diagramas Entidad-Relación
+description: Sintaxis específica de PlantUML para crear diagramas entidad-relación efectivos
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Notación PlantUML para Diagramas Entidad-Relación
+
+PlantUML ofrece una sintaxis específica y poderosa para crear diagramas entidad-relación que permite modelar bases de datos de manera clara y profesional.
+
+## 4.1. Sintaxis básica de entidades
+
+<PlantUml code={`@startuml
+entity "Usuario" {
+  * id : BIGINT <<PK>>
+  --
+  * username : VARCHAR(50) <<UNIQUE>>
+  * email : VARCHAR(255) <<UNIQUE>>
+  nombre : VARCHAR(100)
+  fecha_registro : TIMESTAMP <<DEFAULT NOW()>>
+  activo : BOOLEAN <<DEFAULT TRUE>>
+}
+
+entity "Perfil" {
+  * usuario_id : BIGINT <<PK, FK>>
+  --
+  biografia : TEXT
+  avatar : VARCHAR(255)
+  fecha_nacimiento : DATE
+  telefono : VARCHAR(20)
+}
+
+Usuario ||--|| Perfil : "tiene"
+@enduml`} />
+
+### Elementos de la sintaxis
+
+- `entity "Nombre"`: Define una entidad
+- `*` : Indica campo obligatorio (NOT NULL)
+- `<<PK>>` : Clave primaria
+- `<<FK>>` : Clave foránea
+- `<<UNIQUE>>` : Restricción de unicidad
+- `--` : Separador visual entre grupos de campos
+
+## 4.2. Tipos de datos y restricciones
+
+<PlantUml code={`@startuml
+entity "Producto" {
+  * id : BIGINT <<PK, AUTO_INCREMENT>>
+  --
+  * codigo : VARCHAR(50) <<UNIQUE, NOT NULL>>
+  * nombre : VARCHAR(200) <<NOT NULL>>
+  descripcion : TEXT
+  * precio : DECIMAL(10,2) <<NOT NULL, CHECK > 0>>
+  stock : INTEGER <<DEFAULT 0, CHECK >= 0>>
+  * categoria_id : BIGINT <<FK, NOT NULL>>
+  --
+  fecha_creacion : TIMESTAMP <<DEFAULT CURRENT_TIMESTAMP>>
+  fecha_actualizacion : TIMESTAMP <<ON UPDATE CURRENT_TIMESTAMP>>
+  activo : BOOLEAN <<DEFAULT TRUE>>
+  --
+  <<INDEX>> idx_codigo (codigo)
+  <<INDEX>> idx_categoria (categoria_id)
+  <<INDEX>> idx_nombre (nombre)
+  <<FULLTEXT>> ft_descripcion (descripcion)
+}
+@enduml`} />
+
+### Restricciones comunes
+
+<Tabs>
+  <TabItem label="Restricciones de campo">
+    <PlantUml code={`@startuml
+entity "Empleado" {
+  * id : BIGINT <<PK>>
+  --
+  * email : VARCHAR(255) <<UNIQUE, NOT NULL>>
+  * salario : DECIMAL(10,2) <<CHECK > 0>>
+  * edad : INTEGER <<CHECK BETWEEN 18 AND 65>>
+  * departamento : ENUM('IT', 'VENTAS', 'RRHH')
+  * estado : SET('ACTIVO', 'VACACIONES', 'LICENCIA')
+}
+@enduml`} />
+  </TabItem>
+  <TabItem label="Índices y claves">
+    <PlantUml code={`@startuml
+entity "Cliente" {
+  * id : BIGINT <<PK>>
+  --
+  * documento : VARCHAR(20) <<UNIQUE>>
+  * email : VARCHAR(255) <<UNIQUE>>
+  nombre : VARCHAR(100)
+  apellido : VARCHAR(100)
+  --
+  <<INDEX>> idx_documento (documento)
+  <<INDEX>> idx_email (email)
+  <<INDEX>> idx_nombre_apellido (nombre, apellido)
+  <<UNIQUE>> uk_documento_tipo (documento, tipo_documento)
+}
+@enduml`} />
+  </TabItem>
+</Tabs>
+
+## 4.3. Relaciones y cardinalidad
+
+<PlantUml code={`@startuml
+entity "Cliente" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * email : VARCHAR(255)
+}
+
+entity "Pedido" {
+  * id : BIGINT <<PK>>
+  --
+  * cliente_id : BIGINT <<FK>>
+  * fecha : DATE
+  * total : DECIMAL(10,2)
+}
+
+entity "Producto" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(200)
+  * precio : DECIMAL(8,2)
+}
+
+entity "DetallePedido" {
+  * pedido_id : BIGINT <<PK, FK>>
+  * producto_id : BIGINT <<PK, FK>>
+  --
+  * cantidad : INTEGER
+  * precio_unitario : DECIMAL(8,2)
+}
+
+Cliente ||--o{ Pedido : "realiza"
+Pedido ||--o{ DetallePedido : "contiene"
+Producto ||--o{ DetallePedido : "incluye"
+@enduml`} />
+
+### Símbolos de cardinalidad
+
+- `||--||` : Uno a uno (1:1)
+- `||--o{` : Uno a muchos (1:N)
+- `}o--o{` : Muchos a muchos (N:M)
+- `||--o|` : Uno a uno opcional
+- `}o--||` : Muchos a uno
+
+## 4.4. Temas y estilos
+
+<PlantUml code={`@startuml
+!theme blueprint
+
+entity "Usuario" {
+  * id : BIGINT <<PK>>
+  --
+  * username : VARCHAR(50)
+  * email : VARCHAR(255)
+  * password_hash : VARCHAR(255)
+}
+
+entity "Sesion" {
+  * id : BIGINT <<PK>>
+  --
+  * usuario_id : BIGINT <<FK>>
+  * token : VARCHAR(255)
+  * fecha_inicio : TIMESTAMP
+  * fecha_expiracion : TIMESTAMP
+  * ip_address : VARCHAR(45)
+  * user_agent : TEXT
+}
+
+Usuario ||--o{ Sesion : "inicia"
+@enduml`} />
+
+## 4.5. Ejemplo completo: E-commerce
+
+<PlantUml code={`@startuml
+!theme aws-orange
+
+entity "usuarios" {
+  * id : BIGINT <<PK>>
+  --
+  * email : VARCHAR(255) <<UNIQUE>>
+  * password_hash : VARCHAR(255)
+  * nombre : VARCHAR(100)
+  * apellido : VARCHAR(100)
+  fecha_registro : TIMESTAMP <<DEFAULT NOW()>>
+  activo : BOOLEAN <<DEFAULT TRUE>>
+}
+
+entity "productos" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(50) <<UNIQUE>>
+  * nombre : VARCHAR(200)
+  * precio : DECIMAL(10,2)
+  * stock : INTEGER <<DEFAULT 0>>
+  * categoria_id : BIGINT <<FK>>
+}
+
+entity "categorias" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100) <<UNIQUE>>
+  * descripcion : TEXT
+  activa : BOOLEAN <<DEFAULT TRUE>>
+}
+
+entity "pedidos" {
+  * id : BIGINT <<PK>>
+  --
+  * usuario_id : BIGINT <<FK>>
+  * fecha : TIMESTAMP <<DEFAULT NOW()>>
+  * total : DECIMAL(12,2)
+  * estado : VARCHAR(20) <<DEFAULT 'PENDIENTE'>>
+}
+
+entity "detalles_pedido" {
+  * pedido_id : BIGINT <<PK, FK>>
+  * producto_id : BIGINT <<PK, FK>>
+  --
+  * cantidad : INTEGER
+  * precio_unitario : DECIMAL(10,2)
+  * subtotal : DECIMAL(12,2)
+}
+
+categorias ||--o{ productos : "clasifica"
+usuarios ||--o{ pedidos : "realiza"
+pedidos ||--o{ detalles_pedido : "contiene"
+productos ||--o{ detalles_pedido : "incluye"
+@enduml`} />
+
+## 4.6. Mejores prácticas
+
+<Steps>
+1. **Usar nombres descriptivos** para entidades y atributos
+2. **Especificar tipos de datos** apropiados para cada campo
+3. **Definir restricciones** de integridad y validación
+4. **Crear índices** para campos de búsqueda frecuente
+5. **Documentar relaciones** con nombres claros
+</Steps>
+
+<Aside type="tip">
+  La notación PlantUML para diagramas ER permite crear documentación técnica precisa que puede servir como base para la implementación de la base de datos.
+</Aside>
+
+La sintaxis de PlantUML para diagramas entidad-relación proporciona todas las herramientas necesarias para crear modelos de datos profesionales y completos que faciliten tanto el diseño como la implementación de sistemas de bases de datos robustos.

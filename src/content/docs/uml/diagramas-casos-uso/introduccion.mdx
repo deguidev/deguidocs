@@ -8,8 +8,50 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
 
 # Introducción al Diagrama de Casos de Uso
+
+## Un ejemplo muy sencillo
+
+Imaginemos que estamos diseñando una aplicación para un cajero automático. ¿Qué puede hacer un cliente con este cajero? Un diagrama de casos de uso nos ayuda a visualizarlo de manera simple:
+
+<PlantUml code={`@startuml
+
+actor "Cliente" as Cliente
+
+rectangle "Cajero Automático" {
+  usecase "Consultar Saldo" as ConsultarSaldo
+  usecase "Retirar Dinero" as RetirarDinero
+  usecase "Depositar Dinero" as DepositarDinero
+  usecase "Cambiar PIN" as CambiarPIN
+}
+
+Cliente --> ConsultarSaldo
+Cliente --> RetirarDinero
+Cliente --> DepositarDinero
+Cliente --> CambiarPIN
+
+@enduml`} />
+
+En este sencillo ejemplo:
+
+- Tenemos un **actor**: el `Cliente` que usa el cajero
+- Tenemos cuatro **casos de uso** (funcionalidades que ofrece el sistema):
+  - Consultar saldo
+  - Retirar dinero
+  - Depositar dinero
+  - Cambiar PIN
+- Las **líneas** conectan al actor con los casos de uso que puede realizar
+
+Este diagrama nos permite entender rápidamente:
+- Qué puede hacer un usuario con el sistema
+- Cuáles son las funcionalidades principales que debemos implementar
+- Los límites del sistema (lo que está dentro del rectángulo)
+
+Sin necesidad de código o detalles técnicos, cualquier persona puede comprender qué hará nuestro sistema.
+
+## Definición y propósito
 
 Los diagramas de casos de uso son una herramienta fundamental en el modelado de sistemas y la ingeniería de requisitos. Representan gráficamente la interacción entre los usuarios (actores) y el sistema, mostrando las funcionalidades que el sistema debe proporcionar y cómo los diferentes tipos de usuarios interactúan con estas funcionalidades.
 
@@ -37,6 +79,27 @@ Un diagrama de casos de uso es una representación gráfica de las interacciones
 |                     |
 +---------------------+`} lang="text" title="Estructura básica de un diagrama de casos de uso" />
 
+<PlantUml code={`@startuml
+
+rectangle "Sistema de Biblioteca" {
+  usecase "Prestar Libro" as UC1
+  usecase "Devolver Libro" as UC2
+  usecase "Buscar Libro" as UC3
+  usecase "Gestionar Multas" as UC4
+}
+
+actor Bibliotecario
+actor "Usuario" as User
+actor "Administrador" as Admin
+
+Bibliotecario --> UC1
+Bibliotecario --> UC2
+User --> UC3
+Bibliotecario --> UC4
+Admin --> UC4
+
+@enduml`} />
+
 ### Propósito principal
 
 <div>
@@ -55,6 +118,48 @@ Un diagrama de casos de uso es una representación gráfica de las interacciones
 ## 1.2. Importancia en el análisis de requisitos
 
 Los diagramas de casos de uso juegan un papel crucial en el proceso de análisis de requisitos, ofreciendo múltiples beneficios:
+
+<PlantUml code={`@startuml
+
+rectangle "Sistema de Comercio Electrónico" {
+  usecase "Buscar Productos" as UC1
+  usecase "Ver Detalles de Producto" as UC2
+  usecase "Añadir al Carrito" as UC3
+  usecase "Realizar Compra" as UC4
+  usecase "Gestionar Inventario" as UC5
+  usecase "Procesar Pagos" as UC6
+  usecase "Gestionar Devoluciones" as UC7
+  
+  UC3 .> UC2 : <<include>>
+  UC4 .> UC3 : <<include>>
+  UC4 .> UC6 : <<include>>
+  UC7 .> UC6 : <<extends>>
+}
+
+actor "Cliente" as Customer
+actor "Administrador" as Admin
+actor "Sistema de Pagos" as PaymentSystem
+
+Customer --> UC1
+Customer --> UC2
+Customer --> UC3
+Customer --> UC4
+Admin --> UC5
+PaymentSystem --> UC6
+Customer --> UC7
+Admin --> UC7
+
+note right of UC4
+  Requisito prioritario:
+  Proceso de compra simplificado
+end note
+
+note right of UC7
+  Requisito identificado
+  durante el análisis
+end note
+
+@enduml`} />
 
 ### Enfoque centrado en el usuario
 
@@ -109,6 +214,33 @@ Los diagramas de casos de uso juegan un papel crucial en el proceso de análisis
 ## 1.3. Relación con otros diagramas UML
 
 Los diagramas de casos de uso no existen de forma aislada, sino que se complementan con otros diagramas UML para proporcionar una visión completa del sistema.
+
+<PlantUml code={`@startuml
+
+package "Diagramas UML" {
+  package "Diagramas de Comportamiento" {
+    rectangle "Diagrama de Casos de Uso" as DCU #LightBlue
+    rectangle "Diagrama de Actividades" as DA
+    rectangle "Diagrama de Secuencia" as DS
+    rectangle "Diagrama de Estados" as DE
+  }
+  
+  package "Diagramas Estructurales" {
+    rectangle "Diagrama de Clases" as DC
+    rectangle "Diagrama de Componentes" as DCO
+    rectangle "Diagrama de Despliegue" as DD
+  }
+}
+
+DCU -down-> DA : "detalla flujo de\ntrabajos de casos de uso"
+DCU -down-> DS : "muestra interacción\nentre objetos"
+DCU -down-> DE : "representa estados\nde objetos"
+
+DCU -down-> DC : "define clases para\nimplementar casos de uso"
+DCU -down-> DCO : "organiza componentes\nque implementan casos de uso"
+DCU -down-> DD : "especifica infraestructura\nfísica"
+
+@enduml`} />
 
 ### Relación con diagramas de comportamiento
 
@@ -183,6 +315,52 @@ Los diagramas de casos de uso no existen de forma aislada, sino que se complemen
     <li><strong>Gestión del alcance</strong>: Facilitan la definición clara de lo que está dentro y fuera del alcance del proyecto.</li>
   </ul>
 </div>
+
+<PlantUml code={`@startuml
+
+rectangle "Sistema de Gestión Hospitalaria" {
+  usecase "Registrar Paciente" as UC1
+  usecase "Agendar Cita" as UC2
+  usecase "Consultar Historial Médico" as UC3
+  usecase "Prescribir Medicamentos" as UC4
+  usecase "Gestionar Hospitalización" as UC5
+  usecase "Facturar Servicios" as UC6
+  
+  ' Relaciones entre casos de uso
+  UC2 ..> UC1 : <<include>>
+  UC4 ..> UC3 : <<include>>
+  UC5 ..> UC3 : <<include>>
+  UC6 ..> UC5 : <<extends>>
+}
+
+' Actores
+actor "Paciente" as Patient
+actor "Médico" as Doctor
+actor "Enfermera" as Nurse
+actor "Administrativo" as Admin
+actor "Sistema de Facturación" as BillingSys
+
+' Relaciones actor-caso de uso
+Patient --> UC1
+Patient --> UC2
+Doctor --> UC3
+Doctor --> UC4
+Doctor --> UC5
+Nurse --> UC3
+Nurse --> UC5
+Admin --> UC1
+Admin --> UC2
+Admin --> UC6
+BillingSys --> UC6
+
+' Notas explicativas
+note right of UC1 : Simplicidad: Claro y comprensible
+note right of UC3 : Visión global: Muestra todas las funcionalidades
+note right of UC4 : Priorización: Identifica funciones clave
+note right of UC5 : Trazabilidad: Conecta con otros diagramas
+note bottom of UC6 : Gestión del alcance: Define límites del sistema
+
+@enduml`} />
 
 <Aside type="caution">
   Los diagramas de casos de uso no son suficientes por sí solos para especificar completamente un sistema. Deben complementarse con descripciones detalladas de cada caso de uso, otros diagramas UML y especificaciones adicionales.

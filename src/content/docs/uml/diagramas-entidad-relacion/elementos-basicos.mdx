@@ -1,0 +1,626 @@
+---
+title: 2. Elementos Básicos de Diagramas Entidad-Relación
+description: Entidades, atributos, claves y tipos de datos en diagramas entidad-relación
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Elementos Básicos de Diagramas Entidad-Relación
+
+Los diagramas entidad-relación están compuestos por elementos fundamentales que permiten modelar la estructura de datos de manera precisa y completa. En esta sección exploraremos cada uno de estos elementos en detalle.
+
+## 2.1. Entidades
+
+Una entidad representa un objeto, concepto o cosa del mundo real que tiene existencia independiente y puede ser identificada de manera única dentro del sistema.
+
+### Características de las entidades
+
+- **Identificabilidad**: Cada instancia debe ser única
+- **Independencia**: Puede existir por sí misma
+- **Relevancia**: Debe ser importante para el sistema
+- **Instanciabilidad**: Debe tener múltiples ocurrencias
+
+<PlantUml code={`@startuml
+!theme aws-orange
+
+entity "Cliente" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100) <<NOT NULL>>
+  * email : VARCHAR(255) <<UNIQUE>>
+  telefono : VARCHAR(20)
+  direccion : TEXT
+  fecha_registro : TIMESTAMP <<DEFAULT NOW()>>
+  activo : BOOLEAN <<DEFAULT TRUE>>
+}
+
+entity "Producto" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(50) <<UNIQUE>>
+  * nombre : VARCHAR(200) <<NOT NULL>>
+  * descripcion : TEXT
+  * precio : DECIMAL(10,2) <<NOT NULL>>
+  stock : INTEGER <<DEFAULT 0>>
+  categoria_id : BIGINT <<FK>>
+}
+
+entity "Categoria" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100) <<NOT NULL>>
+  * descripcion : TEXT
+  activa : BOOLEAN <<DEFAULT TRUE>>
+}
+
+Categoria ||--o{ Producto : "clasifica"
+
+note right of Cliente : Entidad fuerte con clave primaria propia
+note bottom of Producto : Entidad con referencia a categoría
+note left of Categoria : Entidad de clasificación
+@enduml`} />
+
+### Tipos de entidades
+
+<Tabs>
+  <TabItem label="Entidades Fuertes">
+    <PlantUml code={`@startuml
+entity "Empleado" {
+  * id : BIGINT <<PK>>
+  --
+  * numero_empleado : VARCHAR(20) <<UNIQUE>>
+  * nombre : VARCHAR(100) <<NOT NULL>>
+  * apellido : VARCHAR(100) <<NOT NULL>>
+  * email : VARCHAR(255) <<UNIQUE>>
+  * fecha_contratacion : DATE <<NOT NULL>>
+  * salario : DECIMAL(10,2)
+  * departamento_id : BIGINT <<FK>>
+}
+
+entity "Departamento" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(10) <<UNIQUE>>
+  * nombre : VARCHAR(100) <<NOT NULL>>
+  * presupuesto : DECIMAL(12,2)
+  * ubicacion : VARCHAR(100)
+}
+
+Departamento ||--o{ Empleado : "contiene"
+@enduml`} />
+    <p>Entidades que existen independientemente con clave primaria propia.</p>
+  </TabItem>
+  <TabItem label="Entidades Débiles">
+    <PlantUml code={`@startuml
+entity "Pedido" {
+  * id : BIGINT <<PK>>
+  --
+  * numero : VARCHAR(20) <<UNIQUE>>
+  * fecha : DATE <<NOT NULL>>
+  * total : DECIMAL(10,2)
+  * cliente_id : BIGINT <<FK>>
+}
+
+entity "DetallePedido" {
+  * pedido_id : BIGINT <<PK, FK>>
+  * producto_id : BIGINT <<PK, FK>>
+  --
+  * cantidad : INTEGER <<NOT NULL>>
+  * precio_unitario : DECIMAL(8,2) <<NOT NULL>>
+  * subtotal : DECIMAL(10,2) <<NOT NULL>>
+}
+
+entity "Producto" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(200) <<NOT NULL>>
+  * precio : DECIMAL(8,2) <<NOT NULL>>
+}
+
+Pedido ||--o{ DetallePedido : "contiene"
+Producto ||--o{ DetallePedido : "se detalla en"
+@enduml`} />
+    <p>Entidades que dependen de otra entidad para su identificación.</p>
+  </TabItem>
+  <TabItem label="Entidades Asociativas">
+    <PlantUml code={`@startuml
+entity "Estudiante" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(20) <<UNIQUE>>
+  * nombre : VARCHAR(100) <<NOT NULL>>
+  * carrera : VARCHAR(100)
+}
+
+entity "Curso" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(10) <<UNIQUE>>
+  * nombre : VARCHAR(200) <<NOT NULL>>
+  * creditos : INTEGER
+}
+
+entity "Inscripcion" {
+  * estudiante_id : BIGINT <<PK, FK>>
+  * curso_id : BIGINT <<PK, FK>>
+  --
+  * fecha_inscripcion : DATE <<NOT NULL>>
+  * calificacion : DECIMAL(3,1)
+  * estado : VARCHAR(20) <<DEFAULT 'ACTIVO'>>
+}
+
+Estudiante ||--o{ Inscripcion
+Curso ||--o{ Inscripcion
+@enduml`} />
+    <p>Entidades que representan relaciones muchos-a-muchos con atributos.</p>
+  </TabItem>
+</Tabs>
+
+## 2.2. Atributos
+
+Los atributos son las propiedades o características que describen las entidades. Cada atributo tiene un nombre, un tipo de dato y puede tener restricciones adicionales.
+
+### Tipos de atributos
+
+<PlantUml code={`@startuml
+entity "Persona" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(50) <<NOT NULL>>
+  * apellido : VARCHAR(50) <<NOT NULL>>
+  nombre_completo : VARCHAR(101) <<COMPUTED>>
+  --
+  * fecha_nacimiento : DATE <<NOT NULL>>
+  edad : INTEGER <<DERIVED>>
+  --
+  telefono_principal : VARCHAR(20)
+  telefono_secundario : VARCHAR(20)
+  --
+  direccion_calle : VARCHAR(100)
+  direccion_ciudad : VARCHAR(50)
+  direccion_codigo_postal : VARCHAR(10)
+  --
+  email_personal : VARCHAR(255)
+  email_trabajo : VARCHAR(255)
+}
+
+note right of Persona : Ejemplo completo de tipos de atributos
+note bottom : - Simples: nombre, apellido
+note bottom : - Compuestos: dirección (calle + ciudad + CP)
+note bottom : - Derivados: edad (calculada desde fecha_nacimiento)
+note bottom : - Multivaluados: múltiples teléfonos y emails
+@enduml`} />
+
+### Clasificación de atributos
+
+<Steps>
+1. **Atributos Simples**: No se pueden dividir en componentes más pequeños
+2. **Atributos Compuestos**: Se pueden dividir en sub-atributos
+3. **Atributos Derivados**: Su valor se calcula a partir de otros atributos
+4. **Atributos Multivaluados**: Pueden tener múltiples valores para una entidad
+5. **Atributos Opcionales**: Pueden tener valores nulos
+6. **Atributos Obligatorios**: Deben tener siempre un valor
+</Steps>
+
+## 2.3. Claves
+
+Las claves son atributos o conjuntos de atributos que permiten identificar de manera única las instancias de una entidad.
+
+### Tipos de claves
+
+<PlantUml code={`@startuml
+entity "Usuario" {
+  * id : BIGINT <<PK, AUTO_INCREMENT>>
+  --
+  * username : VARCHAR(50) <<UNIQUE, NOT NULL>>
+  * email : VARCHAR(255) <<UNIQUE, NOT NULL>>
+  * documento_identidad : VARCHAR(20) <<UNIQUE>>
+  * nombre : VARCHAR(100) <<NOT NULL>>
+  * apellido : VARCHAR(100) <<NOT NULL>>
+  fecha_registro : TIMESTAMP <<DEFAULT NOW()>>
+  ultimo_acceso : TIMESTAMP
+  activo : BOOLEAN <<DEFAULT TRUE>>
+  --
+  <<INDEX>> idx_username (username)
+  <<INDEX>> idx_email (email)
+  <<INDEX>> idx_documento (documento_identidad)
+  <<INDEX>> idx_nombre_apellido (nombre, apellido)
+}
+
+note right of Usuario : Claves candidatas: id, username, email, documento
+note bottom : Clave primaria: id (elegida por simplicidad)
+note left : Claves alternativas: username, email, documento
+@enduml`} />
+
+<Tabs>
+  <TabItem label="Clave Primaria">
+    <PlantUml code={`@startuml
+entity "Producto" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(50) <<UNIQUE>>
+  * nombre : VARCHAR(200) <<NOT NULL>>
+  precio : DECIMAL(8,2)
+}
+
+entity "DetalleVenta" {
+  * venta_id : BIGINT <<PK, FK>>
+  * producto_id : BIGINT <<PK, FK>>
+  --
+  cantidad : INTEGER <<NOT NULL>>
+  precio_unitario : DECIMAL(8,2)
+}
+
+note right of Producto : Clave primaria simple
+note bottom of DetalleVenta : Clave primaria compuesta
+@enduml`} />
+    <p>Identifica únicamente cada fila de la tabla.</p>
+  </TabItem>
+  <TabItem label="Clave Foránea">
+    <PlantUml code={`@startuml
+entity "Cliente" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * email : VARCHAR(255)
+}
+
+entity "Pedido" {
+  * id : BIGINT <<PK>>
+  --
+  * cliente_id : BIGINT <<FK>>
+  * fecha : DATE
+  * total : DECIMAL(10,2)
+}
+
+entity "Direccion" {
+  * id : BIGINT <<PK>>
+  --
+  * cliente_id : BIGINT <<FK>>
+  * tipo : VARCHAR(20)
+  * calle : VARCHAR(100)
+  * ciudad : VARCHAR(50)
+}
+
+Cliente ||--o{ Pedido
+Cliente ||--o{ Direccion
+@enduml`} />
+    <p>Referencia a la clave primaria de otra tabla.</p>
+  </TabItem>
+  <TabItem label="Clave Única">
+    <PlantUml code={`@startuml
+entity "Empleado" {
+  * id : BIGINT <<PK>>
+  --
+  * numero_empleado : VARCHAR(20) <<UNIQUE>>
+  * email_corporativo : VARCHAR(255) <<UNIQUE>>
+  * documento_identidad : VARCHAR(20) <<UNIQUE>>
+  * nombre : VARCHAR(100)
+  * apellido : VARCHAR(100)
+}
+
+note right : Múltiples restricciones UNIQUE
+note bottom : Garantizan unicidad sin ser clave primaria
+@enduml`} />
+    <p>Garantiza unicidad sin ser clave primaria.</p>
+  </TabItem>
+</Tabs>
+
+## 2.4. Tipos de datos
+
+Los tipos de datos definen qué clase de información puede almacenar cada atributo y cómo se almacena físicamente.
+
+### Tipos de datos numéricos
+
+<PlantUml code={`@startuml
+entity "ProductoFinanciero" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(20) <<UNIQUE>>
+  cantidad_pequeña : TINYINT
+  cantidad_mediana : SMALLINT
+  cantidad_normal : INTEGER
+  cantidad_grande : BIGINT
+  --
+  precio_exacto : DECIMAL(10,2)
+  precio_aproximado : FLOAT
+  precio_precision_doble : DOUBLE
+  --
+  porcentaje : DECIMAL(5,2)
+  tasa_interes : DECIMAL(8,4)
+}
+
+note right : Tipos numéricos según precisión requerida
+note bottom : DECIMAL para valores monetarios exactos
+@enduml`} />
+
+### Tipos de datos de texto
+
+<PlantUml code={`@startuml
+entity "Documento" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : CHAR(10)
+  * titulo : VARCHAR(255) <<NOT NULL>>
+  * resumen : TEXT
+  * contenido_completo : LONGTEXT
+  --
+  * tipo_documento : ENUM('PDF', 'WORD', 'EXCEL', 'POWERPOINT')
+  * estado : SET('BORRADOR', 'REVISION', 'APROBADO', 'PUBLICADO')
+  --
+  metadatos : JSON
+}
+
+note right : Diferentes tipos según longitud y uso
+note bottom : ENUM y SET para valores predefinidos
+@enduml`} />
+
+### Tipos de datos temporales
+
+<PlantUml code={`@startuml
+entity "Evento" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(200) <<NOT NULL>>
+  fecha_solo : DATE
+  hora_solo : TIME
+  fecha_hora : DATETIME
+  marca_tiempo : TIMESTAMP <<DEFAULT CURRENT_TIMESTAMP>>
+  año : YEAR
+  --
+  duracion : TIME
+  fecha_creacion : TIMESTAMP <<DEFAULT NOW()>>
+  fecha_actualizacion : TIMESTAMP <<ON UPDATE NOW()>>
+}
+
+note right : Tipos temporales según precisión necesaria
+note bottom : TIMESTAMP para auditoría automática
+@enduml`} />
+
+## 2.5. Restricciones y validaciones
+
+Las restricciones garantizan la integridad y consistencia de los datos almacenados.
+
+<PlantUml code={`@startuml
+entity "CuentaBancaria" {
+  * id : BIGINT <<PK>>
+  --
+  * numero_cuenta : VARCHAR(20) <<UNIQUE, NOT NULL>>
+  * tipo_cuenta : ENUM('AHORROS', 'CORRIENTE', 'NOMINA') <<NOT NULL>>
+  * saldo : DECIMAL(15,2) <<DEFAULT 0.00, CHECK >= 0>>
+  * limite_credito : DECIMAL(10,2) <<CHECK >= 0>>
+  --
+  * cliente_id : BIGINT <<FK, NOT NULL>>
+  * sucursal_id : BIGINT <<FK, NOT NULL>>
+  --
+  fecha_apertura : DATE <<NOT NULL, DEFAULT CURRENT_DATE>>
+  fecha_cierre : DATE <<CHECK > fecha_apertura>>
+  activa : BOOLEAN <<DEFAULT TRUE>>
+  --
+  <<CHECK>> saldo_limite : saldo >= -limite_credito
+  <<INDEX>> idx_numero_cuenta (numero_cuenta)
+  <<INDEX>> idx_cliente_tipo (cliente_id, tipo_cuenta)
+}
+
+note right : Restricciones de integridad completas
+note bottom : CHECK constraints para reglas de negocio
+@enduml`} />
+
+### Tipos de restricciones
+
+<Tabs>
+  <TabItem label="Restricciones de dominio">
+    <PlantUml code={`@startuml
+entity "Empleado" {
+  * id : BIGINT <<PK>>
+  --
+  * edad : INTEGER <<CHECK BETWEEN 18 AND 65>>
+  * salario : DECIMAL(10,2) <<CHECK > 0>>
+  * email : VARCHAR(255) <<CHECK LIKE '%@%.%'>>
+  * telefono : VARCHAR(15) <<CHECK REGEXP '^[0-9+()-]+$'>>
+  * genero : ENUM('M', 'F', 'OTRO')
+  * estado_civil : SET('SOLTERO', 'CASADO', 'DIVORCIADO', 'VIUDO')
+}
+@enduml`} />
+    <p>Validan que los valores estén dentro de rangos permitidos.</p>
+  </TabItem>
+  <TabItem label="Restricciones de entidad">
+    <PlantUml code={`@startuml
+entity "Producto" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(50) <<UNIQUE, NOT NULL>>
+  * nombre : VARCHAR(200) <<NOT NULL>>
+  * precio : DECIMAL(8,2) <<NOT NULL, CHECK > 0>>
+  * stock : INTEGER <<DEFAULT 0, CHECK >= 0>>
+  --
+  <<UNIQUE>> uk_codigo_nombre (codigo, nombre)
+}
+@enduml`} />
+    <p>Garantizan la unicidad e integridad de cada entidad.</p>
+  </TabItem>
+  <TabItem label="Restricciones referenciales">
+    <PlantUml code={`@startuml
+entity "Departamento" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100) <<NOT NULL>>
+}
+
+entity "Empleado" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100) <<NOT NULL>>
+  * departamento_id : BIGINT <<FK, NOT NULL>>
+  --
+  <<FK>> fk_empleado_departamento : 
+    departamento_id REFERENCES Departamento(id)
+    ON DELETE RESTRICT ON UPDATE CASCADE
+}
+
+Departamento ||--o{ Empleado
+@enduml`} />
+    <p>Mantienen la consistencia entre entidades relacionadas.</p>
+  </TabItem>
+</Tabs>
+
+## 2.6. Índices y optimización
+
+Los índices mejoran el rendimiento de las consultas y garantizan restricciones de unicidad.
+
+<PlantUml code={`@startuml
+entity "Transaccion" {
+  * id : BIGINT <<PK>>
+  --
+  * numero_transaccion : VARCHAR(50) <<UNIQUE>>
+  * cuenta_origen_id : BIGINT <<FK>>
+  * cuenta_destino_id : BIGINT <<FK>>
+  * monto : DECIMAL(15,2) <<NOT NULL>>
+  * tipo_transaccion : VARCHAR(50) <<NOT NULL>>
+  * fecha_transaccion : TIMESTAMP <<DEFAULT NOW()>>
+  * estado : VARCHAR(20) <<DEFAULT 'PENDIENTE'>>
+  * descripcion : TEXT
+  --
+  <<INDEX>> idx_numero_transaccion (numero_transaccion)
+  <<INDEX>> idx_cuenta_origen (cuenta_origen_id)
+  <<INDEX>> idx_cuenta_destino (cuenta_destino_id)
+  <<INDEX>> idx_fecha_estado (fecha_transaccion, estado)
+  <<INDEX>> idx_tipo_fecha (tipo_transaccion, fecha_transaccion)
+  <<FULLTEXT>> ft_descripcion (descripcion)
+}
+
+note right : Índices estratégicos para consultas frecuentes
+note bottom : Índice compuesto para consultas por rango de fechas
+@enduml`} />
+
+### Tipos de índices
+
+- **Índice único**: Garantiza unicidad y mejora búsquedas
+- **Índice compuesto**: Optimiza consultas con múltiples columnas
+- **Índice parcial**: Solo indexa filas que cumplen una condición
+- **Índice de texto completo**: Para búsquedas en campos de texto
+
+## 2.7. Ejemplo integrado: Sistema de gestión hospitalaria
+
+<PlantUml code={`@startuml
+!theme blueprint
+
+entity "pacientes" {
+  * id : BIGINT <<PK>>
+  --
+  * numero_historia : VARCHAR(20) <<UNIQUE, NOT NULL>>
+  * documento_identidad : VARCHAR(20) <<UNIQUE, NOT NULL>>
+  * tipo_documento : ENUM('CEDULA', 'PASAPORTE', 'TARJETA_IDENTIDAD')
+  --
+  * nombre : VARCHAR(100) <<NOT NULL>>
+  * apellido : VARCHAR(100) <<NOT NULL>>
+  * fecha_nacimiento : DATE <<NOT NULL>>
+  edad : INTEGER <<GENERATED AS (YEAR(CURDATE()) - YEAR(fecha_nacimiento))>>
+  --
+  * genero : ENUM('M', 'F', 'OTRO') <<NOT NULL>>
+  * tipo_sangre : ENUM('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-')
+  --
+  telefono_principal : VARCHAR(20)
+  telefono_emergencia : VARCHAR(20)
+  email : VARCHAR(255)
+  --
+  direccion_calle : VARCHAR(200)
+  direccion_ciudad : VARCHAR(100)
+  direccion_codigo_postal : VARCHAR(10)
+  --
+  fecha_registro : TIMESTAMP <<DEFAULT NOW()>>
+  activo : BOOLEAN <<DEFAULT TRUE>>
+  --
+  <<INDEX>> idx_numero_historia (numero_historia)
+  <<INDEX>> idx_documento (documento_identidad)
+  <<INDEX>> idx_nombre_apellido (nombre, apellido)
+  <<INDEX>> idx_fecha_nacimiento (fecha_nacimiento)
+}
+
+entity "medicos" {
+  * id : BIGINT <<PK>>
+  --
+  * numero_colegiado : VARCHAR(20) <<UNIQUE, NOT NULL>>
+  * documento_identidad : VARCHAR(20) <<UNIQUE, NOT NULL>>
+  --
+  * nombre : VARCHAR(100) <<NOT NULL>>
+  * apellido : VARCHAR(100) <<NOT NULL>>
+  * especialidad : VARCHAR(100) <<NOT NULL>>
+  * telefono : VARCHAR(20)
+  * email : VARCHAR(255) <<UNIQUE>>
+  --
+  fecha_contratacion : DATE <<NOT NULL>>
+  activo : BOOLEAN <<DEFAULT TRUE>>
+  --
+  <<INDEX>> idx_numero_colegiado (numero_colegiado)
+  <<INDEX>> idx_especialidad (especialidad)
+}
+
+entity "citas" {
+  * id : BIGINT <<PK>>
+  --
+  * paciente_id : BIGINT <<FK, NOT NULL>>
+  * medico_id : BIGINT <<FK, NOT NULL>>
+  --
+  * fecha_cita : DATETIME <<NOT NULL>>
+  * duracion_minutos : INTEGER <<DEFAULT 30, CHECK > 0>>
+  * motivo : VARCHAR(500)
+  * estado : ENUM('PROGRAMADA', 'CONFIRMADA', 'EN_CURSO', 'COMPLETADA', 'CANCELADA') <<DEFAULT 'PROGRAMADA'>>
+  --
+  observaciones : TEXT
+  fecha_creacion : TIMESTAMP <<DEFAULT NOW()>>
+  --
+  <<INDEX>> idx_paciente_fecha (paciente_id, fecha_cita)
+  <<INDEX>> idx_medico_fecha (medico_id, fecha_cita)
+  <<INDEX>> idx_fecha_estado (fecha_cita, estado)
+  <<UNIQUE>> uk_medico_fecha (medico_id, fecha_cita)
+}
+
+entity "historias_clinicas" {
+  * id : BIGINT <<PK>>
+  --
+  * cita_id : BIGINT <<FK, UNIQUE>>
+  * paciente_id : BIGINT <<FK, NOT NULL>>
+  * medico_id : BIGINT <<FK, NOT NULL>>
+  --
+  * fecha_consulta : DATETIME <<NOT NULL>>
+  * sintomas : TEXT
+  * diagnostico : TEXT <<NOT NULL>>
+  * tratamiento : TEXT
+  * medicamentos : TEXT
+  --
+  peso : DECIMAL(5,2) <<CHECK > 0>>
+  altura : DECIMAL(3,2) <<CHECK > 0>>
+  presion_sistolica : INTEGER <<CHECK BETWEEN 70 AND 250>>
+  presion_diastolica : INTEGER <<CHECK BETWEEN 40 AND 150>>
+  temperatura : DECIMAL(3,1) <<CHECK BETWEEN 35.0 AND 42.0>>
+  --
+  proxima_cita : DATE
+  observaciones : TEXT
+  --
+  <<INDEX>> idx_paciente_fecha (paciente_id, fecha_consulta)
+  <<INDEX>> idx_medico_fecha (medico_id, fecha_consulta)
+  <<FULLTEXT>> ft_diagnostico (diagnostico)
+}
+
+pacientes ||--o{ citas : "programa"
+medicos ||--o{ citas : "atiende"
+citas ||--|| historias_clinicas : "genera"
+pacientes ||--o{ historias_clinicas : "pertenece a"
+medicos ||--o{ historias_clinicas : "elabora"
+
+note right of pacientes : Entidad principal con datos demográficos completos
+note bottom of citas : Control de disponibilidad médica con restricción única
+note left of historias_clinicas : Registro médico con validaciones de signos vitales
+@enduml`} />
+
+<Aside type="tip">
+  Este ejemplo muestra un modelo físico completo con tipos de datos específicos, restricciones de integridad, índices optimizados y reglas de negocio implementadas a nivel de base de datos.
+</Aside>
+
+Los elementos básicos de los diagramas entidad-relación proporcionan la base fundamental para crear modelos de datos robustos y eficientes. La correcta definición de entidades, atributos, claves y restricciones es esencial para garantizar la integridad y el rendimiento del sistema de base de datos.

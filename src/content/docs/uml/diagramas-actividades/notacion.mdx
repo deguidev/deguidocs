@@ -1,0 +1,791 @@
+---
+title: 4. Notación UML para Diagramas de Actividades
+description: Guía completa de la notación estándar UML para diagramas de actividades
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Notación UML para Diagramas de Actividades
+
+La notación UML para diagramas de actividades proporciona un conjunto estandarizado de símbolos y convenciones para representar flujos de trabajo y procesos. Esta guía se basa en la sintaxis beta de PlantUML que ofrece mayor flexibilidad y características avanzadas.
+
+## 4.1. Elementos fundamentales
+
+Los diagramas de actividades utilizan elementos específicos para representar diferentes aspectos del flujo de trabajo.
+
+<PlantUml code={`@startuml
+start
+:Acción simple;
+note right: Actividad básica
+
+:Objeto de datos; <<object>>
+note right: Nodo de objeto
+
+:Enviar señal; <<sendSignal>>
+note right: Acción de envío
+
+:Esperar evento; <<acceptEvent>>
+note right: Acción de recepción
+
+:Timeout 30s; <<timeEvent>>
+note right: Evento temporal
+
+if (¿Condición?) then (verdadero)
+  :Acción A;
+else (falso)
+  :Acción B;
+endif
+
+fork
+  :Proceso paralelo 1;
+fork again
+  :Proceso paralelo 2;
+end fork
+
+stop
+@enduml`} />
+
+### Tabla de elementos y estereotipos
+
+<div>
+  <table>
+    <thead>
+      <tr>
+        <th>Elemento</th>
+        <th>Estereotipo</th>
+        <th>Sintaxis</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Nodo inicial</td>
+        <td>-</td>
+        <td><code>start</code></td>
+        <td>Indica el punto de inicio del flujo</td>
+      </tr>
+      <tr>
+        <td>Nodo final</td>
+        <td>-</td>
+        <td><code>stop</code></td>
+        <td>Indica la terminación del flujo</td>
+      </tr>
+      <tr>
+        <td>Actividad</td>
+        <td>-</td>
+        <td><code>:Nombre;</code></td>
+        <td>Representa una acción o paso en el proceso</td>
+      </tr>
+      <tr>
+        <td>Objeto</td>
+        <td>object</td>
+        <td><code>:Nombre; &lt;&lt;object&gt;&gt;</code></td>
+        <td>Representa datos o objetos utilizados en el proceso</td>
+      </tr>
+      <tr>
+        <td>Envío de señal</td>
+        <td>sendSignal</td>
+        <td><code>:Nombre; &lt;&lt;sendSignal&gt;&gt;</code></td>
+        <td>Representa el envío de una señal</td>
+      </tr>
+      <tr>
+        <td>Aceptación de evento</td>
+        <td>acceptEvent</td>
+        <td><code>:Nombre; &lt;&lt;acceptEvent&gt;&gt;</code></td>
+        <td>Representa la recepción de un evento</td>
+      </tr>
+      <tr>
+        <td>Evento temporal</td>
+        <td>timeEvent</td>
+        <td><code>:Nombre; &lt;&lt;timeEvent&gt;&gt;</code></td>
+        <td>Representa un evento basado en tiempo</td>
+      </tr>
+      <tr>
+        <td>Objeto con señal</td>
+        <td>objectSignal</td>
+        <td><code>:Nombre; &lt;&lt;objectSignal&gt;&gt;</code></td>
+        <td>Representa un objeto tipado por señal</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+## 4.2. Sintaxis de actividades básicas
+
+Las actividades son los elementos fundamentales y se definen con una sintaxis específica en PlantUML.
+
+<PlantUml code={`@startuml
+start
+:Actividad simple;
+note right: Sintaxis básica
+
+:Actividad\ncon múltiples\nlíneas;
+note right: Usar \\n para saltos de línea
+
+:Actividad con **formato**;
+note right: Formato de texto disponible
+
+#lightblue:Actividad con color;
+note right: Color de fondo personalizado
+
+|Departamento A|
+:Actividad en swimlane;
+note right: Organización por responsables
+
+stop
+@enduml`} />
+
+### Sintaxis y características
+
+<Tabs>
+  <TabItem label="Actividades básicas">
+    <Code code={`start
+:Nombre de la actividad;
+:Otra actividad;
+stop`} lang="text" title="Sintaxis básica de actividades" />
+  </TabItem>
+  <TabItem label="Actividades con formato">
+    <Code code={`:Actividad con **negrita**;
+:Actividad con //cursiva//;
+:Actividad con __subrayado__;
+:Actividad\ncon múltiples\nlíneas;`} lang="text" title="Formato de texto en actividades" />
+  </TabItem>
+  <TabItem label="Actividades con colores">
+    <Code code={`#lightblue:Actividad azul;
+#palegreen:Actividad verde;
+#pink:Actividad rosa;
+#yellow:Actividad amarilla;`} lang="text" title="Colores en actividades" />
+  </TabItem>
+  <TabItem label="Swimlanes">
+    <Code code={`|Usuario|
+:Iniciar sesión;
+|Sistema|
+:Validar credenciales;
+|Base de datos|
+:Consultar usuario;`} lang="text" title="Organización con swimlanes" />
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Las actividades deben tener nombres descriptivos que indiquen claramente la acción que se realiza. Usa verbos en infinitivo para mayor claridad.
+</Aside>
+
+## 4.3. Estructuras de control
+
+Las estructuras de control permiten representar decisiones, bucles y flujos condicionales en los diagramas de actividades.
+
+### 4.3.1. Decisiones condicionales
+
+<PlantUml code={`@startuml
+start
+:Recibir solicitud;
+
+if (¿Usuario autenticado?) then (sí)
+  :Procesar solicitud;
+  
+  if (¿Datos válidos?) then (sí)
+    :Guardar en base de datos;
+    :Enviar confirmación;
+  else (no)
+    :Mostrar errores de validación;
+  endif
+  
+else (no)
+  :Solicitar autenticación;
+  :Redirigir a login;
+endif
+
+stop
+@enduml`} />
+
+### 4.3.2. Bucles y repeticiones
+
+<PlantUml code={`@startuml
+start
+:Inicializar contador = 0;
+
+while (¿contador < 10?) is (sí)
+  :Procesar elemento;
+  :Incrementar contador;
+endwhile (no)
+
+:Finalizar proceso;
+
+repeat
+  :Solicitar entrada del usuario;
+  :Validar entrada;
+repeat while (¿Entrada inválida?) is (sí)
+
+stop
+@enduml`} />
+
+### Sintaxis de estructuras de control
+
+<Tabs>
+  <TabItem label="Decisiones">
+    <Code code={`if (condición) then (verdadero)
+  :acción si verdadero;
+else (falso)
+  :acción si falso;
+endif
+
+' Decisión múltiple
+if (condición) then (opción1)
+  :acción para opción1;
+else if (opción2)
+  :acción para opción2;
+else (otra)
+  :acción por defecto;
+endif`} lang="text" title="Sintaxis de decisiones" />
+  </TabItem>
+  <TabItem label="Bucle while">
+    <Code code={`while (condición) is (verdadero)
+  :actividad repetitiva;
+endwhile (falso)`} lang="text" title="Sintaxis de bucle while" />
+  </TabItem>
+  <TabItem label="Bucle repeat">
+    <Code code={`repeat
+  :actividad repetitiva;
+repeat while (condición) is (verdadero)`} lang="text" title="Sintaxis de bucle repeat" />
+  </TabItem>
+  <TabItem label="Bucle foreach">
+    <Code code={`foreach item in collection
+  :procesar item;
+end`} lang="text" title="Sintaxis de bucle foreach" />
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Las etiquetas en los flujos de decisión deben ser claras y corresponder a los posibles resultados de la condición evaluada.
+</Aside>
+
+## 4.4. Flujos paralelos y sincronización
+
+Los flujos paralelos permiten representar actividades que se ejecutan concurrentemente usando fork/join.
+
+<PlantUml code={`@startuml
+start
+:Iniciar proceso;
+
+fork
+  :Validar datos;
+  :Procesar información A;
+fork again
+  :Verificar permisos;
+  :Procesar información B;
+fork again
+  :Registrar auditoría;
+  :Generar log;
+end fork
+
+:Consolidar resultados;
+:Finalizar proceso;
+stop
+@enduml`} />
+
+### 4.4.1. Terminación condicional de flujos
+
+<PlantUml code={`@startuml
+start
+:Iniciar descarga;
+note right: Proceso principal de descarga
+
+fork
+  :Descargar archivo;
+  note right: Hilo principal de descarga
+  :Verificar integridad;
+  note right: Validación del archivo
+fork again
+  :Mostrar progreso;
+  note right: Hilo de interfaz de usuario
+  while (¿Descarga completa?) is (no)
+    :Actualizar barra de progreso;
+  endwhile (sí)
+fork again
+  :Esperar cancelación del usuario;
+  note right: Hilo de monitoreo de cancelación
+  if (¿Usuario canceló?) then (sí)
+    :Limpiar recursos;
+    note right: Limpieza antes de terminar
+    kill
+  else (no)
+    :Continuar;
+  endif
+end fork
+
+:Notificar descarga completa;
+note right: Consolidación de resultados
+stop
+@enduml`} />
+
+### Sintaxis y variantes
+
+<Tabs>
+  <TabItem label="Fork/Join simple">
+    <Code code={`fork
+  :actividad rama 1;
+fork again
+  :actividad rama 2;
+end fork`} lang="text" title="Sintaxis básica de fork/join" />
+  </TabItem>
+  <TabItem label="Fork sin Join">
+    <Code code={`fork
+  :actividad rama 1;
+  :continuar independientemente;
+fork again
+  :actividad rama 2;
+  :otra actividad independiente;
+end`} lang="text" title="Fork sin sincronización" />
+  </TabItem>
+  <TabItem label="Fork con decisiones">
+    <Code code={`fork
+  :actividad A;
+  if (condición) then (sí)
+    :actividad A1;
+  else (no)
+    :actividad A2;
+  endif
+fork again
+  :actividad B;
+end fork`} lang="text" title="Fork con decisiones en las ramas" />
+  </TabItem>
+</Tabs>
+
+## 4.5. Notación de objetos
+
+Los nodos de objeto representan datos o información que fluye entre actividades usando estereotipos específicos.
+
+<PlantUml code={`@startuml
+start
+:Crear documento;
+note right: Acción inicial
+
+:Documento borrador; <<object>>
+note right: Objeto con estereotipo
+
+:Revisar documento;
+note right: Proceso de revisión
+
+:Documento revisado; <<object>>
+note right: Estado actualizado del objeto
+
+:Aprobar documento;
+note right: Proceso de aprobación
+
+:Documento final; <<object>>
+note right: Estado final del objeto
+
+stop
+@enduml`} />
+
+### Sintaxis y variantes
+
+<Tabs>
+  <TabItem label="Objeto con estereotipo">
+    <Code code={`:Nombre del objeto; <<object>>`} lang="text" title="Sintaxis correcta con estereotipo" />
+  </TabItem>
+  <TabItem label="Objeto con señal">
+    <Code code={`:Objeto de señal; <<objectSignal>>`} lang="text" title="Objeto tipado por señal" />
+  </TabItem>
+  <TabItem label="Flujo de objetos">
+    <Code code={`:Datos de entrada; <<object>>
+:Procesar datos;
+:Resultado del procesamiento; <<object>>`} lang="text" title="Flujo de objetos entre actividades" />
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Los colores ayudan a distinguir visualmente los objetos de las actividades. Comúnmente se usa verde claro (#palegreen) para objetos, pero puedes usar cualquier color que mejore la legibilidad.
+</Aside>
+
+## 4.6. Notación de señales y eventos
+
+Las señales y eventos representan comunicación asíncrona usando estereotipos específicos según la especificación UML.
+
+<PlantUml code={`@startuml
+start
+:Detectar evento;
+note right: Acción que detecta un evento
+
+:Enviar notificación; <<sendSignal>>
+note right: Estereotipo para envío de señal
+
+:Continuar proceso;
+note right: Proceso continúa
+
+:Esperar evento; <<acceptEvent>>
+note right: Estereotipo para aceptar evento
+
+:Procesar evento;
+note right: Procesamiento del evento recibido
+
+:Timeout 30s; <<timeEvent>>
+note right: Evento temporal con timeout
+
+stop
+@enduml`} />
+
+### Sintaxis y variantes
+
+<Tabs>
+  <TabItem label="Envío de señal">
+    <Code code={`:Enviar señal; <<sendSignal>>`} lang="text" title="Sintaxis correcta con estereotipo" />
+  </TabItem>
+  <TabItem label="Aceptación de evento">
+    <Code code={`:Recibir evento; <<acceptEvent>>`} lang="text" title="Sintaxis correcta para recepción" />
+  </TabItem>
+  <TabItem label="Evento temporal">
+    <Code code={`:Esperar 30 segundos; <<timeEvent>>`} lang="text" title="Evento basado en tiempo" />
+  </TabItem>
+  <TabItem label="Flujo con eventos">
+    <Code code={`:Enviar solicitud; <<sendSignal>>
+:Esperar respuesta; <<acceptEvent>>
+if (¿Respuesta recibida?) then (sí)
+  :Procesar respuesta;
+else (no)
+  :Timeout 5min; <<timeEvent>>
+  :Escalar incidente;
+endif`} lang="text" title="Flujo completo con eventos" />
+  </TabItem>
+</Tabs>
+
+## 4.7. Notación de particiones (Swimlanes)
+
+Las particiones o swimlanes dividen el diagrama en secciones que representan diferentes responsabilidades o actores.
+
+<PlantUml code={`@startuml
+|Cliente|
+start
+:Realizar solicitud;
+|Sistema|
+:Procesar solicitud;
+|Administrador|
+:Aprobar solicitud;
+|Sistema|
+:Completar proceso;
+|Cliente|
+:Recibir confirmación;
+stop
+@enduml`} />
+
+### Sintaxis y variantes
+
+<Tabs>
+  <TabItem label="Swimlanes verticales">
+    <Code code={`|Nombre del actor|
+:Actividad del actor;
+|Otro actor|
+:Actividad del otro actor;`} lang="text" title="Sintaxis de swimlanes verticales" />
+  </TabItem>
+  <TabItem label="Swimlanes horizontales">
+    <Code code={`partition "Nombre del actor" {
+  :Actividad del actor;
+}
+partition "Otro actor" {
+  :Actividad del otro actor;
+}`} lang="text" title="Sintaxis de swimlanes horizontales" />
+  </TabItem>
+  <TabItem label="Swimlanes con colores">
+    <Code code={`|#lightblue|Cliente|
+:Actividad del cliente;
+|#lightgreen|Sistema|
+:Actividad del sistema;`} lang="text" title="Swimlanes con colores" />
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Las swimlanes son especialmente útiles para visualizar la responsabilidad de cada actor en un proceso y las transferencias de control entre ellos.
+</Aside>
+
+## 4.8. Notación de bucles
+
+Los bucles representan actividades que se repiten hasta que se cumple una condición específica.
+
+<PlantUml code={`@startuml
+start
+:Inicializar contador = 0;
+note right: Preparación del bucle
+
+while (¿contador < 10?) is (verdadero)
+  :Procesar elemento;
+  note right: Actividad repetitiva
+  :Incrementar contador;
+  note right: Actualización del contador
+endwhile (falso)
+
+:Finalizar proceso;
+note right: Después del bucle while
+
+repeat
+  :Solicitar entrada del usuario;
+  note right: Actividad que se repite
+  :Validar entrada;
+  note right: Validación de datos
+repeat while (¿Entrada inválida?) is (verdadero)
+
+:Procesar entrada válida;
+note right: Procesamiento final
+stop
+@enduml`} />
+
+### Sintaxis y variantes
+
+<Tabs>
+  <TabItem label="While">
+    <Code code={`while (condición) is (resultado para continuar)
+  :actividad repetitiva;
+endwhile (resultado para salir)`} lang="text" title="Sintaxis de bucle while" />
+  </TabItem>
+  <TabItem label="Repeat">
+    <Code code={`repeat
+  :actividad repetitiva;
+repeat while (condición) is (resultado para repetir)`} lang="text" title="Sintaxis de bucle repeat" />
+  </TabItem>
+  <TabItem label="Loop con contador">
+    <Code code={`:inicializar i = 0;
+while (i < 10) is (verdadero)
+  :hacer algo;
+  :incrementar i;
+endwhile (falso)`} lang="text" title="Bucle con contador" />
+  </TabItem>
+</Tabs>
+
+## 4.9. Notación de excepciones
+
+La notación de excepciones representa el manejo de situaciones excepcionales o errores durante la ejecución del proceso.
+
+<PlantUml code={`@startuml
+start
+:Iniciar operación;
+note right: Preparación para operación riesgosa
+
+if (¿Operación segura?) then (sí)
+  :Ejecutar operación normal;
+  note right: Flujo normal sin errores
+else (no)
+  :Detectar error;
+  note right: Identificación del problema
+  
+  if (¿Error crítico?) then (sí)
+    :Registrar error crítico;
+    note right: Log de error crítico
+    :Notificar administrador;
+    note right: Escalamiento del problema
+    stop
+  else (no)
+    :Registrar advertencia;
+    note right: Log de advertencia
+    :Continuar con precaución;
+    note right: Flujo alternativo
+  endif
+endif
+
+:Finalizar operación;
+note right: Conclusión exitosa
+stop
+@enduml`} />
+
+### Sintaxis y variantes
+
+<Tabs>
+  <TabItem label="Manejo con decisiones">
+    <Code code={`if (¿Operación segura?) then (sí)
+  :operación normal;
+else (no)
+  :manejar error;
+endif`} lang="text" title="Manejo de errores con decisiones" />
+  </TabItem>
+  <TabItem label="Múltiples tipos de error">
+    <Code code={`if (¿Error detectado?) then (sí)
+  if (¿Error crítico?) then (sí)
+    :manejar error crítico;
+    stop
+  else (no)
+    :manejar advertencia;
+  endif
+else (no)
+  :continuar normal;
+endif`} lang="text" title="Manejo de múltiples tipos de errores" />
+  </TabItem>
+  <TabItem label="Flujo con recuperación">
+    <Code code={`if (¿Operación exitosa?) then (sí)
+  :continuar proceso;
+else (no)
+  :registrar error;
+  :intentar recuperación;
+  if (¿Recuperación exitosa?) then (sí)
+    :continuar proceso;
+  else (no)
+    :terminar con error;
+    stop
+  endif
+endif`} lang="text" title="Flujo con recuperación de errores" />
+  </TabItem>
+</Tabs>
+
+## 4.10. Notación de notas y comentarios
+
+Las notas y comentarios proporcionan información adicional o aclaraciones sobre elementos del diagrama.
+
+<PlantUml code={`@startuml
+start
+:Actividad importante;
+note left: Esta actividad es crítica
+note right
+  Esta nota tiene
+  múltiples líneas
+end note
+stop
+@enduml`} />
+
+### Sintaxis y variantes
+
+<Tabs>
+  <TabItem label="Nota simple">
+    <Code code={`note left: Texto de la nota`} lang="text" title="Nota simple a la izquierda" />
+  </TabItem>
+  <TabItem label="Nota multilínea">
+    <Code code={`note right
+  Línea 1 de la nota
+  Línea 2 de la nota
+end note`} lang="text" title="Nota multilínea a la derecha" />
+  </TabItem>
+  <TabItem label="Nota flotante">
+    <Code code={`note "Texto de la nota" as N1
+:Actividad;
+N1 .. Actividad`} lang="text" title="Nota flotante conectada a una actividad" />
+  </TabItem>
+  <TabItem label="Nota con color">
+    <Code code={`note left #yellow: Nota importante`} lang="text" title="Nota con color de fondo" />
+  </TabItem>
+</Tabs>
+
+## 4.11. Estilos y personalización
+
+Los diagramas de actividades pueden personalizarse para mejorar su legibilidad y apariencia visual.
+
+<PlantUml code={`@startuml
+skinparam backgroundColor #EEEBDC
+skinparam handwritten true
+
+skinparam activity {
+  BackgroundColor #lightBlue
+  BorderColor #blue
+  FontColor #000
+}
+
+start
+:Actividad con estilo;
+if (¿Condición?) then (sí)
+  #palegreen:Actividad verde;
+else (no)
+  #pink:Actividad rosa;
+endif
+stop
+@enduml`} />
+
+### Opciones de personalización
+
+<Tabs>
+  <TabItem label="Colores">
+    <Code code={`skinparam backgroundColor #EEEBDC
+skinparam activity {
+  BackgroundColor #lightBlue
+  BorderColor #blue
+  FontColor #000
+}`} lang="text" title="Personalización de colores" />
+  </TabItem>
+  <TabItem label="Estilos de línea">
+    <Code code={`skinparam ArrowColor #red
+skinparam ArrowThickness 2`} lang="text" title="Personalización de flechas" />
+  </TabItem>
+  <TabItem label="Fuentes">
+    <Code code={`skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam activity {
+  FontStyle bold
+}`} lang="text" title="Personalización de fuentes" />
+  </TabItem>
+  <TabItem label="Estilos predefinidos">
+    <Code code={`skinparam handwritten true
+skinparam monochrome true
+skinparam shadowing false`} lang="text" title="Estilos predefinidos" />
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  La personalización debe usarse con moderación y consistencia. El objetivo principal es mejorar la legibilidad y comprensión del diagrama, no hacerlo visualmente complejo.
+</Aside>
+
+## 4.12. Buenas prácticas de notación
+
+Seguir buenas prácticas de notación es esencial para crear diagramas de actividades claros y efectivos.
+
+### Recomendaciones generales
+
+<div>
+  <ul>
+    <li><strong>Nombres descriptivos</strong>: Usa nombres concisos pero descriptivos para actividades y objetos.</li>
+    <li><strong>Nivel de detalle adecuado</strong>: Incluye suficiente detalle para comprender el proceso, pero evita el exceso que puede complicar el diagrama.</li>
+    <li><strong>Consistencia</strong>: Mantén un estilo consistente en todo el diagrama (nomenclatura, colores, etc.).</li>
+    <li><strong>Dirección del flujo</strong>: Mantén un flujo general de arriba hacia abajo o de izquierda a derecha para facilitar la lectura.</li>
+    <li><strong>Alineación</strong>: Alinea los elementos para mejorar la legibilidad y la estética del diagrama.</li>
+    <li><strong>Uso de colores</strong>: Usa colores para destacar elementos importantes o diferenciar tipos de actividades, pero sin exceso.</li>
+  </ul>
+</div>
+
+### Errores comunes a evitar
+
+<div>
+  <ul>
+    <li><strong>Diagramas sobrecargados</strong>: Evita incluir demasiados elementos en un solo diagrama.</li>
+    <li><strong>Flujos cruzados</strong>: Minimiza el cruce de líneas que dificultan la lectura del diagrama.</li>
+    <li><strong>Inconsistencia en la terminología</strong>: Usa los mismos términos para referirte a los mismos conceptos.</li>
+    <li><strong>Falta de contexto</strong>: Proporciona suficiente información para entender el propósito del diagrama.</li>
+    <li><strong>Ambigüedad en las decisiones</strong>: Asegúrate de que las condiciones y resultados en los puntos de decisión sean claros.</li>
+  </ul>
+</div>
+
+<PlantUml code={`@startuml
+' Ejemplo de buenas prácticas
+skinparam backgroundColor white
+skinparam activity {
+  BackgroundColor #lightBlue
+  BorderColor #blue
+}
+
+|#lightgreen|Cliente|
+start
+:Realizar pedido;
+|#lightblue|Sistema|
+:Validar pedido;
+if (¿Pedido válido?) then (sí)
+  :Procesar pago;
+  note right: Verificar fondos disponibles
+  if (¿Pago exitoso?) then (sí)
+    |#lightyellow|Almacén|
+    :Preparar pedido;
+    :Enviar pedido;
+    |#lightgreen|Cliente|
+    :Recibir pedido;
+  else (no)
+    |#lightgreen|Cliente|
+    :Notificar problema de pago;
+  endif
+else (no)
+  |#lightgreen|Cliente|
+  :Notificar error en pedido;
+endif
+stop
+@enduml`} />
+
+<Aside type="note">
+  Un buen diagrama de actividades debe ser comprensible por sí mismo, sin necesidad de explicaciones adicionales extensas. Debe comunicar claramente el flujo del proceso y las decisiones involucradas.
+</Aside>
+
+La notación UML para diagramas de actividades proporciona un lenguaje visual estandarizado que facilita la comunicación y documentación de procesos. Dominar esta notación te permitirá crear diagramas efectivos que sean fáciles de entender para todos los interesados en el proyecto.

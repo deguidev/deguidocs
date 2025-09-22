@@ -1,0 +1,758 @@
+---
+title: 3. Relaciones en Diagramas Entidad-Relación
+description: Tipos de relaciones, cardinalidad e integridad referencial en diagramas entidad-relación
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Relaciones en Diagramas Entidad-Relación
+
+Las relaciones representan las asociaciones entre entidades y son fundamentales para modelar cómo interactúan los datos en un sistema. Una correcta definición de relaciones garantiza la integridad y consistencia de la información.
+
+## 3.1. Conceptos fundamentales de relaciones
+
+Una relación es una asociación entre dos o más entidades que representa una interacción significativa del mundo real. Las relaciones se caracterizan por:
+
+- **Nombre**: Describe la naturaleza de la asociación
+- **Cardinalidad**: Especifica cuántas instancias pueden participar
+- **Participación**: Indica si la participación es obligatoria u opcional
+- **Atributos**: Propiedades específicas de la relación
+
+<PlantUml code={`@startuml
+!theme aws-orange
+
+entity "Cliente" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * email : VARCHAR(255)
+  * telefono : VARCHAR(20)
+}
+
+entity "Pedido" {
+  * id : BIGINT <<PK>>
+  --
+  * cliente_id : BIGINT <<FK>>
+  * fecha : DATE
+  * total : DECIMAL(10,2)
+  * estado : VARCHAR(20)
+}
+
+entity "Producto" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(200)
+  * precio : DECIMAL(8,2)
+  * stock : INTEGER
+}
+
+entity "DetallePedido" {
+  * pedido_id : BIGINT <<PK, FK>>
+  * producto_id : BIGINT <<PK, FK>>
+  --
+  * cantidad : INTEGER
+  * precio_unitario : DECIMAL(8,2)
+  * subtotal : DECIMAL(10,2)
+}
+
+Cliente ||--o{ Pedido : "realiza"
+Pedido ||--o{ DetallePedido : "contiene"
+Producto ||--o{ DetallePedido : "se incluye en"
+
+note right of Cliente : Un cliente puede realizar muchos pedidos
+note bottom of DetallePedido : Entidad asociativa con atributos propios
+note left of Producto : Un producto puede estar en muchos pedidos
+@enduml`} />
+
+## 3.2. Tipos de cardinalidad
+
+La cardinalidad define cuántas instancias de una entidad pueden asociarse con instancias de otra entidad.
+
+### Relación Uno a Uno (1:1)
+
+<PlantUml code={`@startuml
+entity "Empleado" {
+  * id : BIGINT <<PK>>
+  --
+  * numero_empleado : VARCHAR(20)
+  * nombre : VARCHAR(100)
+  * apellido : VARCHAR(100)
+  * email : VARCHAR(255)
+}
+
+entity "DetalleEmpleado" {
+  * empleado_id : BIGINT <<PK, FK>>
+  --
+  * fecha_nacimiento : DATE
+  * direccion : TEXT
+  * telefono_emergencia : VARCHAR(20)
+  * numero_seguro_social : VARCHAR(20)
+  * estado_civil : VARCHAR(20)
+  * numero_hijos : INTEGER
+}
+
+Empleado ||--|| DetalleEmpleado : "tiene"
+
+note right of Empleado : Cada empleado tiene exactamente un detalle
+note bottom of DetalleEmpleado : Cada detalle pertenece a un solo empleado
+@enduml`} />
+
+### Relación Uno a Muchos (1:N)
+
+<PlantUml code={`@startuml
+entity "Departamento" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(10)
+  * nombre : VARCHAR(100)
+  * presupuesto : DECIMAL(12,2)
+  * ubicacion : VARCHAR(100)
+}
+
+entity "Empleado" {
+  * id : BIGINT <<PK>>
+  --
+  * departamento_id : BIGINT <<FK>>
+  * nombre : VARCHAR(100)
+  * apellido : VARCHAR(100)
+  * cargo : VARCHAR(100)
+  * salario : DECIMAL(10,2)
+}
+
+entity "Proyecto" {
+  * id : BIGINT <<PK>>
+  --
+  * departamento_id : BIGINT <<FK>>
+  * nombre : VARCHAR(200)
+  * fecha_inicio : DATE
+  * fecha_fin : DATE
+  * presupuesto : DECIMAL(12,2)
+}
+
+Departamento ||--o{ Empleado : "contiene"
+Departamento ||--o{ Proyecto : "gestiona"
+
+note right of Departamento : Un departamento tiene muchos empleados y proyectos
+note bottom of Empleado : Cada empleado pertenece a un departamento
+@enduml`} />
+
+### Relación Muchos a Muchos (N:M)
+
+<PlantUml code={`@startuml
+entity "Estudiante" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(20)
+  * nombre : VARCHAR(100)
+  * apellido : VARCHAR(100)
+  * carrera : VARCHAR(100)
+  * semestre : INTEGER
+}
+
+entity "Curso" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(10)
+  * nombre : VARCHAR(200)
+  * creditos : INTEGER
+  * prerequisitos : TEXT
+}
+
+entity "Inscripcion" {
+  * estudiante_id : BIGINT <<PK, FK>>
+  * curso_id : BIGINT <<PK, FK>>
+  --
+  * fecha_inscripcion : DATE
+  * calificacion : DECIMAL(3,1)
+  * estado : VARCHAR(20)
+  * intentos : INTEGER
+}
+
+entity "Profesor" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(20)
+  * nombre : VARCHAR(100)
+  * especialidad : VARCHAR(100)
+}
+
+entity "Asignacion" {
+  * profesor_id : BIGINT <<PK, FK>>
+  * curso_id : BIGINT <<PK, FK>>
+  * periodo : VARCHAR(10) <<PK>>
+  --
+  * fecha_asignacion : DATE
+  * aula : VARCHAR(20)
+  * horario : VARCHAR(100)
+}
+
+Estudiante ||--o{ Inscripcion
+Curso ||--o{ Inscripcion
+Profesor ||--o{ Asignacion
+Curso ||--o{ Asignacion
+
+note right of Inscripcion : Muchos estudiantes se inscriben en muchos cursos
+note bottom of Asignacion : Muchos profesores pueden impartir muchos cursos
+@enduml`} />
+
+## 3.3. Participación en relaciones
+
+La participación define si una entidad debe participar obligatoriamente en una relación.
+
+<Tabs>
+  <TabItem label="Participación Total">
+    <PlantUml code={`@startuml
+entity "Pedido" {
+  * id : BIGINT <<PK>>
+  --
+  * cliente_id : BIGINT <<FK, NOT NULL>>
+  * fecha : DATE
+  * total : DECIMAL(10,2)
+}
+
+entity "Cliente" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * email : VARCHAR(255)
+}
+
+entity "DetallePedido" {
+  * pedido_id : BIGINT <<PK, FK>>
+  * producto_id : BIGINT <<PK, FK>>
+  --
+  * cantidad : INTEGER
+  * precio : DECIMAL(8,2)
+}
+
+Cliente ||--o{ Pedido : "realiza"
+Pedido ||--o{ DetallePedido : "contiene"
+
+note right of Pedido : Todo pedido DEBE tener un cliente
+note bottom of DetallePedido : Todo detalle DEBE pertenecer a un pedido
+@enduml`} />
+    <p>Participación obligatoria - la entidad debe participar en la relación.</p>
+  </TabItem>
+  <TabItem label="Participación Parcial">
+    <PlantUml code={`@startuml
+entity "Empleado" {
+  * id : BIGINT <<PK>>
+  --
+  * supervisor_id : BIGINT <<FK>>
+  * nombre : VARCHAR(100)
+  * cargo : VARCHAR(100)
+}
+
+entity "Proyecto" {
+  * id : BIGINT <<PK>>
+  --
+  * lider_id : BIGINT <<FK>>
+  * nombre : VARCHAR(200)
+  * estado : VARCHAR(50)
+}
+
+entity "AsignacionProyecto" {
+  * empleado_id : BIGINT <<PK, FK>>
+  * proyecto_id : BIGINT <<PK, FK>>
+  --
+  * fecha_asignacion : DATE
+  * rol : VARCHAR(50)
+  * horas_asignadas : INTEGER
+}
+
+Empleado ||--o{ Empleado : "supervisa"
+Empleado ||--o{ Proyecto : "lidera"
+Empleado ||--o{ AsignacionProyecto
+Proyecto ||--o{ AsignacionProyecto
+
+note right of Empleado : No todos los empleados supervisan a otros
+note bottom of Proyecto : No todos los proyectos tienen líder asignado
+@enduml`} />
+    <p>Participación opcional - la entidad puede o no participar en la relación.</p>
+  </TabItem>
+</Tabs>
+
+## 3.4. Integridad referencial
+
+La integridad referencial garantiza que las relaciones entre entidades se mantengan consistentes.
+
+<PlantUml code={`@startuml
+entity "Categoria" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * descripcion : TEXT
+  activa : BOOLEAN
+}
+
+entity "Producto" {
+  * id : BIGINT <<PK>>
+  --
+  * categoria_id : BIGINT <<FK>>
+  * nombre : VARCHAR(200)
+  * precio : DECIMAL(8,2)
+  --
+  <<FK>> fk_producto_categoria :
+    categoria_id REFERENCES Categoria(id)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+}
+
+entity "Venta" {
+  * id : BIGINT <<PK>>
+  --
+  * cliente_id : BIGINT <<FK>>
+  * fecha : DATE
+  * total : DECIMAL(10,2)
+  --
+  <<FK>> fk_venta_cliente :
+    cliente_id REFERENCES Cliente(id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+}
+
+entity "DetalleVenta" {
+  * venta_id : BIGINT <<PK, FK>>
+  * producto_id : BIGINT <<PK, FK>>
+  --
+  cantidad : INTEGER
+  precio_unitario : DECIMAL(8,2)
+  --
+  <<FK>> fk_detalle_venta :
+    venta_id REFERENCES Venta(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+  <<FK>> fk_detalle_producto :
+    producto_id REFERENCES Producto(id)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+}
+
+Categoria ||--o{ Producto : "clasifica"
+Venta ||--o{ DetalleVenta : "contiene"
+Producto ||--o{ DetalleVenta : "se vende en"
+
+note right of Producto : RESTRICT: No se puede eliminar categoría con productos
+note bottom of DetalleVenta : CASCADE: Al eliminar venta se eliminan detalles
+note left of Venta : SET NULL: Al eliminar cliente, venta queda sin cliente
+@enduml`} />
+
+### Acciones de integridad referencial
+
+<Steps>
+1. **RESTRICT/NO ACTION**: Impide la operación si existen registros dependientes
+2. **CASCADE**: Propaga la operación a los registros dependientes
+3. **SET NULL**: Establece NULL en la clave foránea
+4. **SET DEFAULT**: Establece el valor por defecto en la clave foránea
+</Steps>
+
+## 3.5. Relaciones especiales
+
+### Relaciones recursivas
+
+<PlantUml code={`@startuml
+entity "Empleado" {
+  * id : BIGINT <<PK>>
+  --
+  * supervisor_id : BIGINT <<FK>>
+  * nombre : VARCHAR(100)
+  * apellido : VARCHAR(100)
+  * cargo : VARCHAR(100)
+  * nivel_jerarquico : INTEGER
+  --
+  <<FK>> fk_empleado_supervisor :
+    supervisor_id REFERENCES Empleado(id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+}
+
+entity "Categoria" {
+  * id : BIGINT <<PK>>
+  --
+  * categoria_padre_id : BIGINT <<FK>>
+  * nombre : VARCHAR(100)
+  * nivel : INTEGER
+  * ruta : VARCHAR(500)
+  --
+  <<FK>> fk_categoria_padre :
+    categoria_padre_id REFERENCES Categoria(id)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE
+}
+
+Empleado ||--o{ Empleado : "supervisa"
+Categoria ||--o{ Categoria : "contiene"
+
+note right of Empleado : Jerarquía organizacional
+note bottom of Categoria : Árbol de categorías anidadas
+@enduml`} />
+
+### Relaciones ternarias
+
+<PlantUml code={`@startuml
+entity "Proveedor" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * contacto : VARCHAR(100)
+  * telefono : VARCHAR(20)
+}
+
+entity "Producto" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(200)
+  * descripcion : TEXT
+}
+
+entity "Almacen" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(20)
+  * nombre : VARCHAR(100)
+  * ubicacion : VARCHAR(200)
+}
+
+entity "Suministro" {
+  * proveedor_id : BIGINT <<PK, FK>>
+  * producto_id : BIGINT <<PK, FK>>
+  * almacen_id : BIGINT <<PK, FK>>
+  --
+  * precio_unitario : DECIMAL(8,2)
+  * cantidad_minima : INTEGER
+  * tiempo_entrega_dias : INTEGER
+  * fecha_ultimo_suministro : DATE
+  * activo : BOOLEAN
+}
+
+Proveedor ||--o{ Suministro
+Producto ||--o{ Suministro
+Almacen ||--o{ Suministro
+
+note bottom : Relación ternaria: Proveedor suministra Producto a Almacén
+note right of Suministro : Entidad asociativa con atributos específicos
+@enduml`} />
+
+## 3.6. Patrones de relaciones comunes
+
+### Patrón de auditoría
+
+<PlantUml code={`@startuml
+entity "Usuario" {
+  * id : BIGINT <<PK>>
+  --
+  * username : VARCHAR(50)
+  * email : VARCHAR(255)
+  * activo : BOOLEAN
+}
+
+entity "Documento" {
+  * id : BIGINT <<PK>>
+  --
+  * titulo : VARCHAR(200)
+  * contenido : TEXT
+  * version : INTEGER
+  * creado_por : BIGINT <<FK>>
+  * modificado_por : BIGINT <<FK>>
+  * fecha_creacion : TIMESTAMP
+  * fecha_modificacion : TIMESTAMP
+}
+
+entity "HistorialDocumento" {
+  * id : BIGINT <<PK>>
+  --
+  * documento_id : BIGINT <<FK>>
+  * usuario_id : BIGINT <<FK>>
+  * accion : VARCHAR(50)
+  * version_anterior : INTEGER
+  * version_nueva : INTEGER
+  * fecha_accion : TIMESTAMP
+  * comentarios : TEXT
+}
+
+Usuario ||--o{ Documento : "crea"
+Usuario ||--o{ Documento : "modifica"
+Usuario ||--o{ HistorialDocumento : "registra"
+Documento ||--o{ HistorialDocumento : "tiene historial"
+
+note right of Usuario : Usuario como creador y modificador
+note bottom of HistorialDocumento : Registro completo de cambios
+@enduml`} />
+
+### Patrón de jerarquía con roles
+
+<PlantUml code={`@startuml
+entity "Persona" {
+  * id : BIGINT <<PK>>
+  --
+  * documento : VARCHAR(20)
+  * nombre : VARCHAR(100)
+  * apellido : VARCHAR(100)
+  * email : VARCHAR(255)
+  * telefono : VARCHAR(20)
+}
+
+entity "Rol" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(50)
+  * descripcion : TEXT
+  * activo : BOOLEAN
+}
+
+entity "PersonaRol" {
+  * persona_id : BIGINT <<PK, FK>>
+  * rol_id : BIGINT <<PK, FK>>
+  * contexto_id : BIGINT <<PK, FK>>
+  --
+  * fecha_asignacion : DATE
+  * fecha_vencimiento : DATE
+  * activo : BOOLEAN
+  * asignado_por : BIGINT <<FK>>
+}
+
+entity "Contexto" {
+  * id : BIGINT <<PK>>
+  --
+  * tipo : VARCHAR(50)
+  * nombre : VARCHAR(100)
+  * descripcion : TEXT
+}
+
+Persona ||--o{ PersonaRol
+Rol ||--o{ PersonaRol
+Contexto ||--o{ PersonaRol
+Persona ||--o{ PersonaRol : "asigna roles"
+
+note right of PersonaRol : Una persona puede tener múltiples roles en diferentes contextos
+note bottom of Contexto : Contexto define el ámbito del rol (proyecto, departamento, etc.)
+@enduml`} />
+
+## 3.7. Normalización y relaciones
+
+La normalización organiza las relaciones para eliminar redundancia y anomalías.
+
+<Tabs>
+  <TabItem label="Sin normalizar">
+    <PlantUml code={`@startuml
+entity "Pedido_Desnormalizado" {
+  * id : BIGINT <<PK>>
+  --
+  * cliente_nombre : VARCHAR(100)
+  * cliente_email : VARCHAR(255)
+  * cliente_telefono : VARCHAR(20)
+  * cliente_direccion : TEXT
+  --
+  * producto1_nombre : VARCHAR(200)
+  * producto1_precio : DECIMAL(8,2)
+  * producto1_cantidad : INTEGER
+  --
+  * producto2_nombre : VARCHAR(200)
+  * producto2_precio : DECIMAL(8,2)
+  * producto2_cantidad : INTEGER
+  --
+  * fecha_pedido : DATE
+  * total : DECIMAL(10,2)
+}
+
+note right : Problemas: Redundancia, anomalías de actualización
+note bottom : Limitación: Solo 2 productos por pedido
+@enduml`} />
+    <p>Estructura desnormalizada con problemas de redundancia.</p>
+  </TabItem>
+  <TabItem label="Normalizado">
+    <PlantUml code={`@startuml
+entity "Cliente" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * email : VARCHAR(255)
+  * telefono : VARCHAR(20)
+  * direccion : TEXT
+}
+
+entity "Producto" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(200)
+  * precio : DECIMAL(8,2)
+  * descripcion : TEXT
+}
+
+entity "Pedido" {
+  * id : BIGINT <<PK>>
+  --
+  * cliente_id : BIGINT <<FK>>
+  * fecha : DATE
+  * total : DECIMAL(10,2)
+  * estado : VARCHAR(20)
+}
+
+entity "DetallePedido" {
+  * pedido_id : BIGINT <<PK, FK>>
+  * producto_id : BIGINT <<PK, FK>>
+  --
+  * cantidad : INTEGER
+  * precio_unitario : DECIMAL(8,2)
+  * subtotal : DECIMAL(10,2)
+}
+
+Cliente ||--o{ Pedido
+Pedido ||--o{ DetallePedido
+Producto ||--o{ DetallePedido
+
+note right : Ventajas: Sin redundancia, flexible, mantenible
+@enduml`} />
+    <p>Estructura normalizada que elimina redundancia y anomalías.</p>
+  </TabItem>
+</Tabs>
+
+## 3.8. Ejemplo completo: Sistema de gestión académica
+
+<PlantUml code={`@startuml
+!theme blueprint
+
+entity "Estudiante" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(20) <<UNIQUE>>
+  * documento : VARCHAR(20) <<UNIQUE>>
+  * nombre : VARCHAR(100)
+  * apellido : VARCHAR(100)
+  * email : VARCHAR(255) <<UNIQUE>>
+  * telefono : VARCHAR(20)
+  * fecha_nacimiento : DATE
+  * fecha_ingreso : DATE
+  * carrera_id : BIGINT <<FK>>
+  * estado : VARCHAR(20)
+}
+
+entity "Carrera" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(10) <<UNIQUE>>
+  * nombre : VARCHAR(200)
+  * duracion_semestres : INTEGER
+  * creditos_totales : INTEGER
+  * facultad_id : BIGINT <<FK>>
+}
+
+entity "Facultad" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(10) <<UNIQUE>>
+  * nombre : VARCHAR(100)
+  * decano_id : BIGINT <<FK>>
+  * presupuesto : DECIMAL(12,2)
+}
+
+entity "Profesor" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(20) <<UNIQUE>>
+  * documento : VARCHAR(20) <<UNIQUE>>
+  * nombre : VARCHAR(100)
+  * apellido : VARCHAR(100)
+  * email : VARCHAR(255) <<UNIQUE>>
+  * especialidad : VARCHAR(100)
+  * tipo_contrato : VARCHAR(50)
+  * fecha_contratacion : DATE
+  * facultad_id : BIGINT <<FK>>
+}
+
+entity "Materia" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(10) <<UNIQUE>>
+  * nombre : VARCHAR(200)
+  * creditos : INTEGER
+  * horas_teoricas : INTEGER
+  * horas_practicas : INTEGER
+  * carrera_id : BIGINT <<FK>>
+  * semestre_recomendado : INTEGER
+}
+
+entity "Prerequisito" {
+  * materia_id : BIGINT <<PK, FK>>
+  * materia_prerequisito_id : BIGINT <<PK, FK>>
+  --
+  * tipo_prerequisito : VARCHAR(20)
+  * obligatorio : BOOLEAN
+}
+
+entity "Grupo" {
+  * id : BIGINT <<PK>>
+  --
+  * codigo : VARCHAR(20) <<UNIQUE>>
+  * materia_id : BIGINT <<FK>>
+  * profesor_id : BIGINT <<FK>>
+  * periodo : VARCHAR(10)
+  * cupo_maximo : INTEGER
+  * cupo_actual : INTEGER
+  * aula : VARCHAR(20)
+  * horario : VARCHAR(200)
+}
+
+entity "Inscripcion" {
+  * estudiante_id : BIGINT <<PK, FK>>
+  * grupo_id : BIGINT <<PK, FK>>
+  --
+  * fecha_inscripcion : DATE
+  * estado : VARCHAR(20)
+  * nota_final : DECIMAL(3,1)
+  * creditos_obtenidos : INTEGER
+  * intentos : INTEGER
+}
+
+entity "Evaluacion" {
+  * id : BIGINT <<PK>>
+  --
+  * grupo_id : BIGINT <<FK>>
+  * nombre : VARCHAR(100)
+  * tipo : VARCHAR(50)
+  * fecha : DATE
+  * porcentaje : DECIMAL(5,2)
+  * descripcion : TEXT
+}
+
+entity "Calificacion" {
+  * evaluacion_id : BIGINT <<PK, FK>>
+  * estudiante_id : BIGINT <<PK, FK>>
+  --
+  * nota : DECIMAL(3,1)
+  * fecha_calificacion : DATE
+  * observaciones : TEXT
+}
+
+' Relaciones principales
+Facultad ||--o{ Carrera : "ofrece"
+Facultad ||--o{ Profesor : "emplea"
+Profesor ||--|| Facultad : "dirige"
+Carrera ||--o{ Estudiante : "forma"
+Carrera ||--o{ Materia : "incluye"
+Materia ||--o{ Prerequisito : "requiere"
+Materia ||--o{ Prerequisito : "es prerequisito de"
+Materia ||--o{ Grupo : "se dicta en"
+Profesor ||--o{ Grupo : "imparte"
+Estudiante ||--o{ Inscripcion
+Grupo ||--o{ Inscripcion
+Grupo ||--o{ Evaluacion : "tiene"
+Evaluacion ||--o{ Calificacion : "genera"
+Estudiante ||--o{ Calificacion : "recibe"
+
+note right of Estudiante : Entidad principal del sistema académico
+note bottom of Prerequisito : Relación recursiva para dependencias entre materias
+note left of Inscripcion : Entidad asociativa con información académica
+note top of Calificacion : Registro detallado de evaluaciones
+@enduml`} />
+
+<Aside type="tip">
+  Este ejemplo muestra un sistema académico completo con múltiples tipos de relaciones: uno-a-muchos, muchos-a-muchos, recursivas y con diferentes niveles de participación.
+</Aside>
+
+Las relaciones en los diagramas entidad-relación son fundamentales para crear modelos de datos que reflejen fielmente las reglas de negocio y garanticen la integridad de la información. Una correcta definición de cardinalidad, participación e integridad referencial es esencial para el éxito del sistema de base de datos.

@@ -1,0 +1,622 @@
+---
+title: 4. Notación UML para Diagramas de Despliegue
+description: Sintaxis y convenciones específicas de PlantUML para diagramas de despliegue
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Notación UML para Diagramas de Despliegue
+
+La notación UML para diagramas de despliegue en PlantUML proporciona una sintaxis específica para representar nodos, artefactos, componentes y sus relaciones de manera clara y estandarizada en el contexto de la arquitectura física del sistema.
+
+## 4.1. Sintaxis básica de nodos
+
+Los nodos se definen usando la palabra clave `node` seguida del nombre entre comillas.
+
+<PlantUml code={`@startuml
+node "Web Server"
+node "Application Server" as app
+node "Database Server" as db
+node "Mobile Device" <<device>> as mobile
+@enduml`} />
+
+### Variaciones de sintaxis
+
+<Tabs>
+  <TabItem label="Nodos básicos">
+    <PlantUml code={`@startuml
+node "Production Server"
+node "Development Server"
+node "Testing Server"
+@enduml`} />
+    <p>Definición básica de nodos de servidor.</p>
+  </TabItem>
+  <TabItem label="Nodos con alias">
+    <PlantUml code={`@startuml
+node "Web Server" as web
+node "App Server" as app
+node "DB Server" as db
+
+web --> app
+app --> db
+@enduml`} />
+    <p>Usando alias para referencias más fáciles.</p>
+  </TabItem>
+  <TabItem label="Nodos con estereotipos">
+    <PlantUml code={`@startuml
+node "Physical Server" <<server>>
+node "Laptop" <<client>>
+cloud "AWS Cloud" <<cloud>>
+database "PostgreSQL" <<database>>
+@enduml`} />
+    <p>Nodos con estereotipos que indican su tipo.</p>
+  </TabItem>
+</Tabs>
+
+## 4.2. Definición de artefactos
+
+Los artefactos se definen con la palabra clave `artifact` y representan elementos físicos del sistema.
+
+<PlantUml code={`@startuml
+artifact "application.jar" as jar
+artifact "config.properties" as config
+artifact "database.sql" as sql
+artifact "docker-compose.yml" as compose
+
+component [Application] as app
+component [Database] as db
+
+app --> jar : packaged as
+app --> config : configured by
+db --> sql : initialized with
+app --> compose : deployed with
+@enduml`} />
+
+### Tipos de artefactos
+
+<Tabs>
+  <TabItem label="Archivos ejecutables">
+    <PlantUml code={`@startuml
+artifact "app.jar" <<executable>>
+artifact "service.exe" <<executable>>
+artifact "script.sh" <<script>>
+artifact "app.war" <<web-archive>>
+@enduml`} />
+    <p>Artefactos que pueden ejecutarse directamente.</p>
+  </TabItem>
+  <TabItem label="Archivos de configuración">
+    <PlantUml code={`@startuml
+artifact "application.yml" <<config>>
+artifact "nginx.conf" <<config>>
+artifact "Dockerfile" <<config>>
+artifact "k8s-manifest.yaml" <<config>>
+@enduml`} />
+    <p>Archivos de configuración del sistema.</p>
+  </TabItem>
+  <TabItem label="Archivos de datos">
+    <PlantUml code={`@startuml
+artifact "schema.sql" <<data>>
+artifact "backup.dump" <<backup>>
+artifact "static-files.zip" <<resources>>
+artifact "ssl-cert.pem" <<certificate>>
+@enduml`} />
+    <p>Archivos de datos y recursos del sistema.</p>
+  </TabItem>
+</Tabs>
+
+## 4.3. Componentes en nodos
+
+Los componentes se pueden desplegar dentro de nodos usando la sintaxis de contenimiento.
+
+<PlantUml code={`@startuml
+node "Application Server" {
+  component [Web Service] as web
+  component [Business Logic] as logic
+  component [Data Access] as data
+  artifact "app.jar"
+  artifact "config.yml"
+}
+
+node "Database Server" {
+  database "PostgreSQL" as db
+  component [Backup Service] as backup
+  artifact "schema.sql"
+}
+
+web --> logic : calls
+logic --> data : uses
+data --> db : queries
+backup --> db : backs up
+@enduml`} />
+
+### Organización de componentes
+
+<Tabs>
+  <TabItem label="Servidor de aplicación">
+    <PlantUml code={`@startuml
+node "App Server" {
+  component [Spring Boot]
+  component [Tomcat]
+  component [JVM]
+  artifact "application.jar"
+  artifact "server.xml"
+}
+@enduml`} />
+    <p>Componentes típicos en un servidor de aplicación Java.</p>
+  </TabItem>
+  <TabItem label="Servidor web">
+    <PlantUml code={`@startuml
+node "Web Server" {
+  component [Nginx]
+  component [SSL Module]
+  artifact "nginx.conf"
+  artifact "ssl.cert"
+  artifact "static-files"
+}
+@enduml`} />
+    <p>Componentes de un servidor web con SSL.</p>
+  </TabItem>
+  <TabItem label="Contenedor Docker">
+    <PlantUml code={`@startuml
+node "Docker Container" <<container>> {
+  component [Node.js App]
+  component [PM2]
+  artifact "package.json"
+  artifact "Dockerfile"
+}
+@enduml`} />
+    <p>Aplicación Node.js en contenedor Docker.</p>
+  </TabItem>
+</Tabs>
+
+## 4.4. Especificaciones de despliegue
+
+Las especificaciones de despliegue definen parámetros y configuraciones para el despliegue.
+
+<PlantUml code={`@startuml
+node "Production Server" {
+  component [Application]
+  artifact "app.jar"
+  
+  note as JVMSettings
+    JVM Settings:
+    - Xmx: 4096m
+    - Xms: 2048m
+    - profile: production
+    - port: 8080
+  end note
+}
+
+node "Database Server" {
+  database "PostgreSQL"
+  
+  note as DBConfig
+    DB Configuration:
+    - max_connections: 200
+    - shared_buffers: 512MB
+    - port: 5432
+    - ssl: on
+  end note
+}
+@enduml`} />
+
+## 4.5. Conexiones y protocolos
+
+Las conexiones entre nodos se especifican con diferentes protocolos y puertos.
+
+<PlantUml code={`@startuml
+node "Client" as client
+node "Load Balancer" as lb
+node "Web Server 1" as web1
+node "Web Server 2" as web2
+node "Database" as db
+node "Cache" as cache
+
+client --> lb : HTTPS/443
+lb --> web1 : HTTP/80
+lb --> web2 : HTTP/80
+web1 --> db : JDBC/5432
+web2 --> db : JDBC/5432
+web1 --> cache : Redis/6379
+web2 --> cache : Redis/6379
+
+note right of client : Cliente con navegador web
+note right of lb : Balanceador con SSL termination
+note bottom of db : Base de datos con pool de conexiones
+@enduml`} />
+
+### Tipos de conexiones
+
+<Tabs>
+  <TabItem label="Protocolos web">
+    <PlantUml code={`@startuml
+node "Browser" as browser
+node "Web Server" as web
+node "API Server" as api
+
+browser --> web : HTTPS/443
+web --> api : HTTP/8080
+browser --> api : WebSocket/8081
+@enduml`} />
+    <p>Conexiones HTTP, HTTPS y WebSocket.</p>
+  </TabItem>
+  <TabItem label="Protocolos de base de datos">
+    <PlantUml code={`@startuml
+node "App Server" as app
+node "PostgreSQL" as pg
+node "MongoDB" as mongo
+node "Redis" as redis
+
+app --> pg : JDBC/5432
+app --> mongo : MongoDB/27017
+app --> redis : Redis/6379
+@enduml`} />
+    <p>Conexiones a diferentes tipos de bases de datos.</p>
+  </TabItem>
+  <TabItem label="Protocolos de microservicios">
+    <PlantUml code={`@startuml
+node "Service A" as svcA
+node "Service B" as svcB
+node "Message Queue" as mq
+
+svcA --> svcB : gRPC/50051
+svcA --> mq : AMQP/5672
+svcB --> mq : STOMP/61613
+@enduml`} />
+    <p>Comunicación entre microservicios.</p>
+  </TabItem>
+</Tabs>
+
+## 4.6. Dispositivos y procesadores
+
+Los dispositivos representan hardware físico con capacidades específicas.
+
+<PlantUml code={`@startuml
+node "Web Server" <<server>> {
+  component "Intel Xeon E5" <<processor>>
+  component "32GB DDR4" <<memory>>
+  component "1TB NVMe SSD" <<storage>>
+  component "10Gbps Ethernet" <<network>>
+}
+
+node "Database Server" <<server>> {
+  component "AMD EPYC 7742" <<processor>>
+  component "128GB DDR4" <<memory>>
+  component "4TB NVMe RAID" <<storage>>
+  component "25Gbps Ethernet" <<network>>
+}
+
+node "Load Balancer" <<appliance>> {
+  component "ARM Cortex-A78" <<processor>>
+  component "16GB DDR4" <<memory>>
+  component "Dual 10Gbps" <<network>>
+}
+
+"Web Server" --> "Database Server" : Gigabit Ethernet
+"Load Balancer" --> "Web Server" : Gigabit Ethernet
+@enduml`} />
+
+## 4.7. Agrupación con paquetes
+
+Los paquetes organizan nodos relacionados por ubicación, función o seguridad.
+
+<PlantUml code={`@startuml
+package "DMZ Network" {
+  node "Load Balancer" {
+    component [HAProxy]
+  }
+  node "Web Server 1" {
+    component [Nginx]
+  }
+  node "Web Server 2" {
+    component [Nginx]
+  }
+}
+
+package "Internal Network" {
+  node "App Server 1" {
+    component [Spring Boot]
+  }
+  node "App Server 2" {
+    component [Spring Boot]
+  }
+}
+
+package "Database Network" {
+  node "Primary DB" {
+    database "PostgreSQL Master"
+  }
+  node "Replica DB" {
+    database "PostgreSQL Slave"
+  }
+}
+
+"Load Balancer" --> "Web Server 1"
+"Load Balancer" --> "Web Server 2"
+"Web Server 1" --> "App Server 1"
+"Web Server 2" --> "App Server 2"
+"App Server 1" --> "Primary DB"
+"App Server 2" --> "Primary DB"
+"Primary DB" --> "Replica DB" : Replication
+@enduml`} />
+
+### Tipos de agrupación
+
+<Tabs>
+  <TabItem label="Por ubicación física">
+    <PlantUml code={`@startuml
+package "Data Center 1" {
+  node "Server Rack A"
+  node "Server Rack B"
+}
+
+package "Data Center 2" {
+  node "Server Rack C"
+  node "Server Rack D"
+}
+@enduml`} />
+    <p>Agrupación por ubicación geográfica.</p>
+  </TabItem>
+  <TabItem label="Por función">
+    <PlantUml code={`@startuml
+package "Web Tier" {
+  node "Web Server 1"
+  node "Web Server 2"
+}
+
+package "Application Tier" {
+  node "App Server 1"
+  node "App Server 2"
+}
+
+package "Data Tier" {
+  node "Database Server"
+  node "Cache Server"
+}
+@enduml`} />
+    <p>Agrupación por capas arquitecturales.</p>
+  </TabItem>
+  <TabItem label="Por seguridad">
+    <PlantUml code={`@startuml
+package "Public Zone" {
+  node "Load Balancer"
+}
+
+package "DMZ" {
+  node "Web Servers"
+}
+
+package "Private Zone" {
+  node "App Servers"
+  node "Databases"
+}
+@enduml`} />
+    <p>Agrupación por zonas de seguridad.</p>
+  </TabItem>
+</Tabs>
+
+## 4.8. Notas y documentación
+
+Las notas proporcionan información adicional sobre configuraciones y decisiones de despliegue.
+
+<PlantUml code={`@startuml
+node "Production Server" {
+  component [Application]
+  artifact "app.jar"
+}
+
+node "Database Server" {
+  database "PostgreSQL"
+}
+
+node "Monitoring Server" {
+  component [Prometheus]
+  component [Grafana]
+}
+
+[Application] --> [PostgreSQL] : JDBC
+[Prometheus] --> [Application] : Metrics
+[Grafana] --> [Prometheus] : Queries
+
+note right of "Production Server" : Servidor con Java 11 y 8GB RAM
+note bottom of "Database Server" : PostgreSQL 13 con replicación automática
+note left of "Monitoring Server" : Stack de monitoreo con alertas 24/7
+
+note top : Arquitectura de producción con monitoreo integrado
+
+note as CONFIG
+  Configuración de despliegue:
+  - SSL habilitado en todos los endpoints
+  - Backup automático cada 6 horas
+  - Logs centralizados en ELK Stack
+  - Auto-scaling basado en CPU y memoria
+end note
+
+"Production Server" .. CONFIG
+@enduml`} />
+
+## 4.9. Ejemplo completo con notación avanzada
+
+<PlantUml code={`@startuml
+!theme aws-orange
+
+title Sistema de E-commerce - Arquitectura de Despliegue
+
+package "AWS Cloud Infrastructure" {
+  
+  package "Public Subnet" #lightblue {
+    node "Application Load Balancer" <<aws-alb>> {
+      component [ALB Controller]
+      artifact "ssl-certificate.pem" <<certificate>>
+    }
+    
+    node "NAT Gateway" <<aws-nat>> {
+      component [NAT Service]
+    }
+  }
+  
+  package "Private Subnet - Web Tier" #lightgreen {
+    node "Web Server 1" <<ec2-instance>> {
+      component [Nginx] <<web-server>>
+      component [CloudWatch Agent] <<monitoring>>
+      artifact "nginx.conf" <<config>>
+    }
+    
+    node "Web Server 2" <<ec2-instance>> {
+      component [Nginx] <<web-server>>
+      component [CloudWatch Agent] <<monitoring>>
+      artifact "nginx.conf" <<config>>
+    }
+  }
+  
+  package "Private Subnet - App Tier" #lightyellow {
+    node "App Server 1" <<ecs-container>> {
+      component [Spring Boot API] <<microservice>>
+      component [User Service] <<microservice>>
+      artifact "application.jar" <<executable>>
+      artifact "application.yml" <<config>>
+    }
+    
+    node "App Server 2" <<ecs-container>> {
+      component [Spring Boot API] <<microservice>>
+      component [Order Service] <<microservice>>
+      artifact "application.jar" <<executable>>
+      artifact "application.yml" <<config>>
+    }
+  }
+  
+  package "Private Subnet - Data Tier" #lightcoral {
+    node "RDS Primary" <<aws-rds>> {
+      database "PostgreSQL 13" <<primary-db>>
+      component [Automated Backup] <<backup-service>>
+    }
+    
+    node "RDS Read Replica" <<aws-rds>> {
+      database "PostgreSQL 13" <<replica-db>>
+    }
+    
+    node "ElastiCache" <<aws-elasticache>> {
+      component [Redis Cluster] <<cache>>
+      artifact "redis.conf" <<config>>
+    }
+  }
+}
+
+package "External Services" #lightsalmon {
+  cloud "Stripe API" <<external-service>> {
+    component [Payment Gateway] <<api>>
+  }
+  
+  cloud "SendGrid" <<external-service>> {
+    component [Email Service] <<api>>
+  }
+}
+
+' Conexiones principales
+[ALB Controller] --> [Nginx] : HTTPS/443
+[Nginx] --> [Spring Boot API] : HTTP/8080
+[Spring Boot API] --> [PostgreSQL 13] : JDBC/5432
+[PostgreSQL 13] --> [PostgreSQL 13] : Async Replication
+[Spring Boot API] --> [Redis Cluster] : Redis/6379
+[Order Service] --> [Payment Gateway] : HTTPS/443
+[User Service] --> [Email Service] : HTTPS/443
+
+' Especificaciones de despliegue
+note as WebServerConfig
+  Web Server Config:
+  - instance_type: t3.medium
+  - cpu_cores: 2
+  - memory: 4GB
+  - storage: 20GB SSD
+end note
+
+note as AppServerConfig
+  App Server Config:
+  - container_cpu: 1024
+  - container_memory: 2048MB
+  - desired_count: 2
+  - max_capacity: 10
+end note
+
+note as DatabaseConfig
+  Database Config:
+  - instance_class: db.r5.large
+  - allocated_storage: 100GB
+  - backup_retention: 7 days
+  - multi_az: true
+end note
+
+note right of [ALB Controller] : Load balancer con SSL termination y WAF
+note bottom of [Redis Cluster] : Cache distribuido para sesiones y datos frecuentes
+note right of [PostgreSQL 13] : Base de datos principal con backup automático
+
+note as ARCHITECTURE
+  Arquitectura de microservicios en AWS:
+  - Auto Scaling Groups para alta disponibilidad
+  - Multi-AZ deployment para redundancia
+  - CloudWatch para monitoreo y alertas
+  - VPC con subnets públicas y privadas
+  - Security Groups para control de acceso
+end note
+
+ARCHITECTURE .. [ALB Controller]
+@enduml`} />
+
+<Aside type="tip">
+  La notación UML en PlantUML para diagramas de despliegue es muy flexible y permite representar desde arquitecturas simples hasta infraestructuras complejas en la nube.
+</Aside>
+
+## 4.10. Mejores prácticas de notación
+
+### Recomendaciones generales
+
+<Steps>
+1. **Consistencia**: Usa la misma notación para elementos similares
+2. **Claridad**: Especifica protocolos y puertos en las conexiones
+3. **Documentación**: Usa notas para explicar decisiones de arquitectura
+4. **Agrupación**: Organiza nodos por función, ubicación o seguridad
+5. **Estereotipos**: Usa estereotipos para indicar tipos de nodos y servicios
+</Steps>
+
+<Tabs>
+  <TabItem label="✅ Buenas prácticas">
+    <PlantUml code={`@startuml
+' Usar estereotipos consistentes
+node "Web Server" <<server>> {
+  component [Nginx] <<web-server>>
+  artifact "nginx.conf" <<config>>
+}
+
+node "Database" <<database>> {
+  database "PostgreSQL" <<primary-db>>
+}
+
+' Especificar protocolos y puertos
+[Nginx] --> [PostgreSQL] : JDBC/5432
+
+' Documentar configuraciones importantes
+note right of "Web Server" : Servidor con SSL habilitado y compresión gzip
+@enduml`} />
+    <p>Uso consistente de estereotipos, especificación de protocolos y documentación.</p>
+  </TabItem>
+  <TabItem label="❌ Malas prácticas">
+    <PlantUml code={`@startuml
+' Nombres inconsistentes y sin estereotipos
+node "srv1"
+node "database_server_production"
+node "app"
+
+' Sin especificación de protocolos
+srv1 --> database_server_production
+app --> srv1
+@enduml`} />
+    <p>Nombres inconsistentes, falta de estereotipos y documentación.</p>
+  </TabItem>
+</Tabs>
+
+La notación UML para diagramas de despliegue en PlantUML ofrece gran flexibilidad para representar infraestructuras desde simples hasta complejas. La clave está en mantener consistencia y proporcionar suficiente detalle para que el diagrama sea útil para la planificación y documentación del despliegue.

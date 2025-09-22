@@ -12,7 +12,43 @@ import PlantUml from "@components/PlantUml.astro";
 
 # Introducción al Diagrama de Secuencia
 
-Los diagramas de secuencia son uno de los diagramas más importantes en UML para modelar el comportamiento dinámico de un sistema. Estos diagramas se centran en la interacción entre objetos a lo largo del tiempo, mostrando el intercambio de mensajes en orden cronológico.
+## Un ejemplo muy sencillo
+
+Imaginemos que queremos representar cómo funciona el proceso de pedir un café en una cafetería. Un diagrama de secuencia nos ayuda a visualizar el orden exacto de los pasos y la interacción entre las personas involucradas:
+
+<PlantUml code={`@startuml
+actor Cliente
+participant "Cajero" as Cajero
+participant "Barista" as Barista
+
+Cliente -> Cajero: Pedir café
+activate Cajero
+Cajero --> Cliente: Solicitar pago
+Cliente -> Cajero: Entregar dinero
+Cajero -> Barista: Ordenar café
+activate Barista
+Barista -> Barista: Preparar café
+activate Barista #DarkSalmon
+deactivate Barista
+Barista --> Cajero: Entregar café
+deactivate Barista
+Cajero --> Cliente: Entregar café
+deactivate Cajero
+@enduml`} />
+
+En este sencillo ejemplo:
+
+- Tenemos tres **participantes**: `Cliente`, `Cajero` y `Barista`
+- Las **flechas** representan **mensajes** (acciones o comunicación) entre los participantes
+- El **tiempo fluye de arriba hacia abajo**, mostrando el orden exacto de los eventos
+- Las **barras verticales** (activaciones) muestran cuándo cada participante está activamente trabajando
+
+Este diagrama nos permite entender rápidamente:
+- El orden preciso de los pasos en el proceso
+- Quién interactúa con quién y en qué momento
+- Cuándo cada participante está ocupado realizando una tarea
+
+A diferencia de otros diagramas, el diagrama de secuencia se enfoca en mostrar cómo ocurren las interacciones a través del tiempo, lo que es crucial para entender procesos y flujos de trabajo.
 
 ## 1.1. Definición y propósito
 

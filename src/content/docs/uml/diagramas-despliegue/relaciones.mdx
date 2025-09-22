@@ -1,0 +1,503 @@
+---
+title: 3. Relaciones en los Diagramas de Despliegue
+description: Tipos de conexiones y comunicaciones entre nodos en UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Relaciones en los Diagramas de Despliegue
+
+Las relaciones en los diagramas de despliegue definen cómo los diferentes nodos, componentes y artefactos se comunican e interactúan entre sí. Estas conexiones son fundamentales para entender el flujo de datos y la arquitectura de comunicación del sistema.
+
+## 3.1. Conexiones de comunicación
+
+Las conexiones de comunicación representan los enlaces físicos o lógicos entre nodos que permiten el intercambio de información.
+
+<PlantUml code={`@startuml
+node "Cliente Web" as client
+node "Servidor Web" as web
+node "Servidor de Aplicación" as app
+node "Base de Datos" as db
+
+client --> web : HTTPS/443
+web --> app : HTTP/8080
+app --> db : JDBC/5432
+
+note right of client : Navegador del usuario
+note right of web : Servidor Nginx con SSL
+note right of app : Aplicación Java Spring Boot
+note right of db : PostgreSQL con conexión persistente
+@enduml`} />
+
+### Tipos de conexiones
+
+<Tabs>
+  <TabItem label="Conexiones HTTP/HTTPS">
+    <PlantUml code={`@startuml
+node "Browser" as browser
+node "Web Server" as web
+node "API Server" as api
+
+browser --> web : HTTPS/443
+web --> api : HTTP/8080
+note right of browser : SSL/TLS seguro
+note bottom of web : Proxy reverso
+@enduml`} />
+    <p>Comunicación web estándar con encriptación.</p>
+  </TabItem>
+  <TabItem label="Conexiones de base de datos">
+    <PlantUml code={`@startuml
+node "App Server" as app
+node "Database" as db
+node "Cache" as cache
+
+app --> db : JDBC/5432
+app --> cache : Redis/6379
+note right of app : Pool de conexiones
+note bottom of cache : Cache distribuido
+@enduml`} />
+    <p>Conexiones a sistemas de almacenamiento de datos.</p>
+  </TabItem>
+  <TabItem label="Conexiones de microservicios">
+    <PlantUml code={`@startuml
+node "Service A" as svcA
+node "Service B" as svcB
+node "Message Queue" as mq
+
+svcA --> svcB : gRPC/50051
+svcA --> mq : AMQP/5672
+svcB --> mq : AMQP/5672
+note right of svcA : Comunicación síncrona
+note bottom of mq : Mensajería asíncrona
+@enduml`} />
+    <p>Comunicación entre servicios distribuidos.</p>
+  </TabItem>
+</Tabs>
+
+## 3.2. Dependencias de despliegue
+
+Las dependencias de despliegue muestran qué artefactos o componentes requieren otros elementos para funcionar correctamente.
+
+<PlantUml code={`@startuml
+node "Application Server" {
+  artifact "app.jar" as jar
+  artifact "config.properties" as config
+  component [Spring Boot] as app
+  component [JVM] as jvm
+}
+
+jar --> jvm : requires
+config --> app : configures
+app --> jvm : runs on
+
+note right of jar : Aplicación empaquetada
+note right of config : Configuración externa
+note right of jvm : Runtime de Java 11
+@enduml`} />
+
+### Tipos de dependencias
+
+- **Dependencias de runtime**: Elementos necesarios para la ejecución
+- **Dependencias de configuración**: Archivos de configuración requeridos
+- **Dependencias de datos**: Bases de datos o archivos de datos necesarios
+- **Dependencias de red**: Servicios externos requeridos
+
+## 3.3. Relaciones de contenimiento
+
+Las relaciones de contenimiento muestran qué elementos están desplegados dentro de otros elementos.
+
+<PlantUml code={`@startuml
+node "Physical Server" {
+  node "Docker Container 1" {
+    component [Web Service]
+    artifact "nginx.conf"
+  }
+  
+  node "Docker Container 2" {
+    component [API Service]
+    artifact "app.jar"
+  }
+  
+  node "Docker Container 3" {
+    database "PostgreSQL"
+    artifact "schema.sql"
+  }
+}
+
+note bottom of "Physical Server" : Servidor físico con múltiples contenedores
+@enduml`} />
+
+### Niveles de contenimiento
+
+<Tabs>
+  <TabItem label="Contenedores en servidores">
+    <PlantUml code={`@startuml
+node "Kubernetes Node" {
+  node "Pod 1" {
+    component [Frontend]
+  }
+  node "Pod 2" {
+    component [Backend]
+  }
+  node "Pod 3" {
+    component [Database]
+  }
+}
+@enduml`} />
+    <p>Pods de Kubernetes en un nodo del cluster.</p>
+  </TabItem>
+  <TabItem label="Componentes en contenedores">
+    <PlantUml code={`@startuml
+node "Docker Container" {
+  component [Application]
+  component [Monitoring Agent]
+  artifact "app.jar"
+  artifact "config.yml"
+}
+@enduml`} />
+    <p>Múltiples componentes dentro de un contenedor.</p>
+  </TabItem>
+  <TabItem label="Artefactos en nodos">
+    <PlantUml code={`@startuml
+node "File Server" {
+  artifact "static-files.zip"
+  artifact "images.tar"
+  artifact "documents.pdf"
+  artifact "backup.sql"
+}
+@enduml`} />
+    <p>Archivos almacenados en un servidor de archivos.</p>
+  </TabItem>
+</Tabs>
+
+## 3.4. Asociaciones de red
+
+Las asociaciones de red representan las conexiones físicas o lógicas entre diferentes segmentos de red.
+
+<PlantUml code={`@startuml
+package "DMZ Network" {
+  node "Load Balancer" as lb
+  node "Web Server 1" as web1
+  node "Web Server 2" as web2
+}
+
+package "Internal Network" {
+  node "App Server 1" as app1
+  node "App Server 2" as app2
+}
+
+package "Database Network" {
+  node "DB Primary" as db1
+  node "DB Replica" as db2
+}
+
+lb --> web1 : Ethernet
+lb --> web2 : Ethernet
+web1 --> app1 : VLAN
+web2 --> app2 : VLAN
+app1 --> db1 : Private Network
+app2 --> db1 : Private Network
+db1 --> db2 : Replication Link
+
+note top of "DMZ Network" : Red pública con firewall
+note top of "Internal Network" : Red privada de aplicaciones
+note top of "Database Network" : Red aislada para datos
+@enduml`} />
+
+### Características de las redes
+
+- **Segmentación**: Separación lógica de diferentes tipos de tráfico
+- **Seguridad**: Control de acceso entre segmentos
+- **Rendimiento**: Optimización del ancho de banda
+- **Redundancia**: Múltiples rutas para alta disponibilidad
+
+## 3.5. Relaciones de replicación
+
+Las relaciones de replicación muestran cómo los datos o servicios se duplican entre diferentes nodos para garantizar disponibilidad y rendimiento.
+
+<PlantUml code={`@startuml
+node "Primary Database" as primary {
+  database "Master DB"
+  component [Replication Service]
+}
+
+node "Replica Database 1" as replica1 {
+  database "Slave DB 1"
+  component [Sync Service]
+}
+
+node "Replica Database 2" as replica2 {
+  database "Slave DB 2"
+  component [Sync Service]
+}
+
+node "Application Server" as app {
+  component [Data Access Layer]
+}
+
+primary --> replica1 : Async Replication
+primary --> replica2 : Async Replication
+app --> primary : Write Operations
+app --> replica1 : Read Operations
+app --> replica2 : Read Operations
+
+note right of primary : Base de datos principal para escrituras
+note right of replica1 : Réplica para lecturas y backup
+note right of replica2 : Réplica adicional para balanceo
+@enduml`} />
+
+## 3.6. Conexiones de balanceador de carga
+
+Los balanceadores de carga distribuyen el tráfico entre múltiples nodos para optimizar el rendimiento y la disponibilidad.
+
+<PlantUml code={`@startuml
+cloud "Internet" {
+  node "Client" as client
+}
+
+node "Load Balancer" as lb {
+  component [HAProxy]
+  artifact "haproxy.cfg"
+}
+
+node "Web Server 1" as web1 {
+  component [Nginx]
+  component [App Instance 1]
+}
+
+node "Web Server 2" as web2 {
+  component [Nginx]
+  component [App Instance 2]
+}
+
+node "Web Server 3" as web3 {
+  component [Nginx]
+  component [App Instance 3]
+}
+
+client --> lb : HTTPS/443
+lb --> web1 : HTTP/80
+lb --> web2 : HTTP/80
+lb --> web3 : HTTP/80
+
+note right of lb : Balanceador con algoritmo round-robin
+note bottom of web1 : Servidor activo
+note bottom of web2 : Servidor activo
+note bottom of web3 : Servidor de respaldo
+@enduml`} />
+
+### Algoritmos de balanceo
+
+- **Round Robin**: Distribución secuencial entre servidores
+- **Least Connections**: Envío al servidor con menos conexiones
+- **IP Hash**: Asignación basada en hash de IP del cliente
+- **Weighted**: Distribución basada en pesos asignados
+
+## 3.7. Relaciones de monitoreo
+
+Las relaciones de monitoreo muestran cómo los sistemas de supervisión se conectan con los componentes monitoreados.
+
+<PlantUml code={`@startuml
+package "Production Environment" {
+  node "Web Server" as web {
+    component [Nginx]
+    component [Monitoring Agent]
+  }
+  
+  node "App Server" as app {
+    component [Spring Boot]
+    component [Metrics Collector]
+  }
+  
+  node "Database" as db {
+    database "PostgreSQL"
+    component [DB Monitor]
+  }
+}
+
+package "Monitoring Infrastructure" {
+  node "Metrics Server" as metrics {
+    component [Prometheus]
+  }
+  
+  node "Log Server" as logs {
+    component [ELK Stack]
+  }
+  
+  node "Dashboard" as dash {
+    component [Grafana]
+  }
+}
+
+[Monitoring Agent] --> [Prometheus] : Metrics/9090
+[Metrics Collector] --> [Prometheus] : Metrics/9090
+[DB Monitor] --> [Prometheus] : Metrics/9090
+[Nginx] --> [ELK Stack] : Logs/5044
+[Spring Boot] --> [ELK Stack] : Logs/5044
+[Grafana] --> [Prometheus] : Query/9090
+[Grafana] --> [ELK Stack] : Query/9200
+
+note right of metrics : Servidor de métricas centralizadas
+note right of logs : Agregación y análisis de logs
+note right of dash : Dashboards y alertas
+@enduml`} />
+
+## 3.8. Ejemplo completo de relaciones
+
+<PlantUml code={`@startuml
+package "E-commerce System Deployment" {
+  
+  cloud "CDN" {
+    node "Edge Server 1" as edge1
+    node "Edge Server 2" as edge2
+  }
+  
+  package "Load Balancer Tier" {
+    node "Primary LB" as lb1 {
+      component [HAProxy Primary]
+    }
+    node "Backup LB" as lb2 {
+      component [HAProxy Backup]
+    }
+  }
+  
+  package "Web Tier" {
+    node "Web Server 1" as web1 {
+      component [Nginx]
+      artifact "ssl.cert"
+    }
+    node "Web Server 2" as web2 {
+      component [Nginx]
+      artifact "ssl.cert"
+    }
+  }
+  
+  package "Application Tier" {
+    node "App Server 1" as app1 {
+      component [User Service]
+      component [Order Service]
+    }
+    node "App Server 2" as app2 {
+      component [Payment Service]
+      component [Inventory Service]
+    }
+  }
+  
+  package "Data Tier" {
+    node "Primary DB" as db1 {
+      database "PostgreSQL Master"
+    }
+    node "Replica DB" as db2 {
+      database "PostgreSQL Slave"
+    }
+    node "Cache Cluster" as cache {
+      component [Redis Cluster]
+    }
+  }
+  
+  package "External Services" {
+    node "Payment Gateway" as payment {
+      component [Stripe API]
+    }
+    node "Email Service" as email {
+      component [SendGrid API]
+    }
+  }
+}
+
+' Conexiones principales
+edge1 --> lb1 : HTTPS/443
+edge2 --> lb1 : HTTPS/443
+lb1 --> lb2 : VRRP Heartbeat
+lb1 --> web1 : HTTP/80
+lb1 --> web2 : HTTP/80
+web1 --> app1 : HTTP/8080
+web2 --> app2 : HTTP/8080
+app1 --> db1 : JDBC/5432
+app2 --> db1 : JDBC/5432
+db1 --> db2 : Streaming Replication
+app1 --> cache : Redis/6379
+app2 --> cache : Redis/6379
+app2 --> payment : HTTPS/443
+app1 --> email : HTTPS/443
+
+' Relaciones de dependencia
+lb1 --> web1 : health check
+lb1 --> web2 : health check
+web1 --> app1 : proxy pass
+web2 --> app2 : proxy pass
+
+note top of edge1 : CDN para contenido estático
+note right of lb1 : Balanceador activo con failover
+note bottom of db1 : Base de datos principal con replicación
+note right of cache : Cache distribuido para sesiones
+note bottom of payment : Gateway de pagos externo
+@enduml`} />
+
+<Aside type="tip">
+  Este ejemplo muestra una arquitectura completa con múltiples tipos de relaciones: balanceo de carga, replicación de datos, conexiones externas y monitoreo.
+</Aside>
+
+## 3.9. Mejores prácticas para relaciones
+
+### Principios de diseño
+
+<Steps>
+1. **Minimizar latencia**: Colocar componentes relacionados cerca físicamente
+2. **Maximizar disponibilidad**: Implementar redundancia en conexiones críticas
+3. **Optimizar seguridad**: Segmentar redes y usar conexiones encriptadas
+4. **Documentar protocolos**: Especificar claramente los protocolos de comunicación
+5. **Planificar escalabilidad**: Diseñar conexiones que soporten crecimiento
+</Steps>
+
+<Tabs>
+  <TabItem label="❌ Mal diseño">
+    <PlantUml code={`@startuml
+node "Monolithic Server" {
+  component [Web App]
+  component [Database]
+  component [File Storage]
+  component [Email Service]
+}
+
+node "Client" <<device>> as client
+client --> [Web App] : All traffic through single point
+
+note bottom : Punto único de falla sin redundancia
+@enduml`} />
+    <p>Arquitectura monolítica sin redundancia ni escalabilidad.</p>
+  </TabItem>
+  <TabItem label="✅ Buen diseño">
+    <PlantUml code={`@startuml
+node "Load Balancer" as lb
+node "Web Server 1" as web1
+node "Web Server 2" as web2
+node "Database Primary" as db1
+node "Database Replica" as db2
+node "Cache Server" as cache
+
+node "Client" <<device>> as client
+
+client --> lb : Distributed load
+lb --> web1 : Balanced traffic
+lb --> web2 : Balanced traffic
+web1 --> db1 : Primary writes
+web1 --> db2 : Read queries
+web2 --> db1 : Primary writes
+web2 --> db2 : Read queries
+web1 --> cache : Session data
+web2 --> cache : Session data
+db1 --> db2 : Replication
+
+note bottom : Arquitectura distribuida con alta disponibilidad
+@enduml`} />
+    <p>Diseño distribuido con balanceo, replicación y cache.</p>
+  </TabItem>
+</Tabs>
+
+Las relaciones en los diagramas de despliegue son fundamentales para entender cómo los diferentes elementos del sistema se comunican y dependen entre sí. Un buen diseño de relaciones resulta en sistemas más robustos, escalables y mantenibles.

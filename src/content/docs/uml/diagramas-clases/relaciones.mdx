@@ -8,6 +8,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
 
 # Relaciones Entre Clases
 
@@ -31,6 +32,34 @@ La asociación es la relación más básica y común entre clases. Representa un
 
 <Code code={`[Profesor] <────────> [Curso]
            imparte    contiene`} lang="text" title="Asociación bidireccional con roles" />
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Estudiante {
+  -id: String
+  -nombre: String
+  +inscribirse(curso: Curso): void
+}
+
+class Curso {
+  -codigo: String
+  -nombre: String
+  +agregarEstudiante(estudiante: Estudiante): void
+}
+
+' Asociación unidireccional
+Estudiante --> Curso : se inscribe >
+
+class Profesor {
+  -id: String
+  -nombre: String
+  -especialidad: String
+}
+
+' Asociación bidireccional con roles
+Profesor "1..*" <--> "*" Curso : imparte > < contiene
+@enduml`} />
 
 ### Ejemplo en contexto
 
@@ -124,6 +153,53 @@ La multiplicidad define cuántos objetos de una clase pueden relacionarse con un
 
 <Code code={`[Estudiante] 0..* ----------> 0..* [Curso]
                   se inscribe`} lang="text" title="Relación muchos a muchos" />
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Pedido {
+  -id: Integer
+  -fecha: Date
+  -total: Double
+  +calcularTotal(): Double
+}
+
+class LineaPedido {
+  -cantidad: Integer
+  -precioUnitario: Double
+  +getSubtotal(): Double
+}
+
+' Multiplicidad: un pedido tiene una o más líneas de pedido
+Pedido "1" --> "1..*" LineaPedido : tiene >
+
+class Estudiante {
+  -id: String
+  -nombre: String
+}
+
+class Curso {
+  -codigo: String
+  -nombre: String
+}
+
+' Multiplicidad: relación muchos a muchos
+Estudiante "*" --> "*" Curso : se inscribe >
+
+class Biblioteca {
+  -nombre: String
+  -direccion: String
+}
+
+class Libro {
+  -isbn: String
+  -titulo: String
+  -autor: String
+}
+
+' Multiplicidad: una biblioteca tiene muchos libros, un libro pertenece a una biblioteca
+Biblioteca "1" --> "*" Libro : contiene >
+@enduml`} />
 
 ### Ejemplo en contexto
 
@@ -229,6 +305,49 @@ La agregación es un tipo especial de asociación que representa una relación "
 
 <Code code={`[Departamento] <>----------> [Empleado]
                tiene`} lang="text" title="Agregación: Un departamento tiene empleados" />
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Departamento {
+  -nombre: String
+  -ubicacion: String
+  +agregarEmpleado(empleado: Empleado): void
+  +eliminarEmpleado(empleado: Empleado): void
+  +getEmpleados(): List<Empleado>
+}
+
+class Empleado {
+  -id: Integer
+  -nombre: String
+  -puesto: String
+  +setDepartamento(departamento: Departamento): void
+}
+
+' Agregación: un departamento tiene empleados, pero los empleados
+' pueden existir independientemente del departamento
+Departamento o-- "*" Empleado : tiene >
+
+class Equipo {
+  -nombre: String
+  -categoria: String
+  +agregarJugador(jugador: Jugador): void
+}
+
+class Jugador {
+  -nombre: String
+  -posicion: String
+  -numero: Integer
+}
+
+' Otra agregación: un equipo tiene jugadores
+Equipo o-- "1..*" Jugador : tiene >
+
+note "Los jugadores pueden
+existir sin un equipo o
+cambiar de equipo" as N1
+Jugador .. N1
+@enduml`} />
 
 ### Ejemplo en contexto
 
@@ -340,6 +459,49 @@ La composición es una forma más fuerte de agregación que representa una relac
 
 <Code code={`[Casa] <*>----------> [Habitacion]
          contiene`} lang="text" title="Composición: Una casa contiene habitaciones" />
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Casa {
+  -direccion: String
+  -metrosCuadrados: Double
+  +agregarHabitacion(tipo: String, area: Double): Habitacion
+  +getHabitaciones(): List<Habitacion>
+}
+
+class Habitacion {
+  -tipo: String
+  -area: Double
+  -casa: Casa
+}
+
+' Composición: una casa contiene habitaciones, si la casa
+' se destruye, las habitaciones también se destruyen
+Casa *-- "1..*" Habitacion : contiene >
+
+class Pedido {
+  -id: Integer
+  -fecha: Date
+  -total: Double
+  +calcularTotal(): Double
+  +agregarLinea(producto: Producto, cantidad: Integer): LineaPedido
+}
+
+class LineaPedido {
+  -cantidad: Integer
+  -precioUnitario: Double
+  -pedido: Pedido
+  +getSubtotal(): Double
+}
+
+' Otra composición: un pedido contiene líneas de pedido
+Pedido *-- "1..*" LineaPedido : contiene >
+
+note "Las líneas de pedido no pueden
+existir sin su pedido asociado" as N1
+LineaPedido .. N1
+@enduml`} />
 
 ### Ejemplo en contexto
 
@@ -467,6 +629,61 @@ La herencia o generalización representa una relación "es un" entre clases, don
     +--------+---------+
     |                  |
 [Automovil]        [Motocicleta]`} lang="text" title="Herencia: Automóvil y Motocicleta heredan de Vehículo" />
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Vehiculo {
+  -marca: String
+  -modelo: String
+  -año: Integer
+  +arrancar(): void
+  +detener(): void
+  +getMarca(): String
+  +getModelo(): String
+}
+
+class Automovil {
+  -numeroPuertas: Integer
+  -tipoTransmision: String
+  +abrirMaletero(): void
+}
+
+class Motocicleta {
+  -cilindrada: Integer
+  -tipoManillar: String
+  +hacerCaballito(): void
+}
+
+' Herencia: Automovil y Motocicleta heredan de Vehiculo
+Vehiculo <|-- Automovil
+Vehiculo <|-- Motocicleta
+
+class Persona {
+  -nombre: String
+  -edad: Integer
+  +getNombre(): String
+  +getEdad(): Integer
+  +saludar(): String
+}
+
+class Empleado {
+  -salario: Double
+  -puesto: String
+  +getSalario(): Double
+  +trabajar(): void
+}
+
+class Estudiante {
+  -matricula: String
+  -carrera: String
+  +estudiar(): void
+}
+
+' Otra jerarquía de herencia
+Persona <|-- Empleado
+Persona <|-- Estudiante
+@enduml`} />
 
 ### Ejemplo en contexto
 
@@ -604,6 +821,54 @@ La dependencia es una relación más débil que indica que una clase usa o depen
 
 <Code code={`[Controlador] - - - - -> [Servicio]
                usa`} lang="text" title="Dependencia: Controlador usa Servicio" />
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Impresora {
+  -modelo: String
+  -encendida: Boolean
+  +encender(): void
+  +apagar(): void
+  +imprimir(documento: Documento): void
+}
+
+class Documento {
+  -titulo: String
+  -contenido: String
+  +getTitulo(): String
+  +getContenido(): String
+}
+
+' Dependencia: Impresora usa Documento temporalmente
+Impresora ..> Documento : usa >
+
+class ConfiguracionImpresion {
+  -calidad: String
+  -dobleCara: Boolean
+  +getCalidad(): String
+  +isDobleCara(): Boolean
+}
+
+' Otra dependencia
+Impresora ..> ConfiguracionImpresion : configura con >
+
+class ControladorUsuarios {
+  +registrarUsuario(datos: Object): Usuario
+  +autenticarUsuario(email: String, clave: String): Boolean
+}
+
+class ServicioCorreo {
+  +enviarCorreo(destinatario: String, asunto: String, cuerpo: String): void
+}
+
+' Dependencia: el controlador usa el servicio de correo
+ControladorUsuarios ..> ServicioCorreo : usa >
+
+note "El controlador usa el servicio
+pero no lo almacena como atributo" as N1
+ControladorUsuarios .. N1
+@enduml`} />
 
 ### Ejemplo en contexto
 

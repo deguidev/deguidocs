@@ -8,6 +8,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
 
 # Elementos Básicos de un Diagrama de Clases
 
@@ -33,7 +34,28 @@ Una clase se representa como un rectángulo dividido en tres secciones:
 | + metodo3(param): tipoRet  |
 +----------------------------+`} lang="text" title="Representación de una Clase UML" />
 
-<Badge text="+ Público" variant="success" /> <Badge text="- Privado" variant="danger" /> <Badge text="# Protegido" variant="default" /> <Badge text="~ Paquete" variant="note" />
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Persona {
+  -nombre: String
+  -edad: Integer
+  #direccion: String
+  +email: String
+  -fechaNacimiento: Date
+  +getNombre(): String
+  +setNombre(nombre: String): void
+  +calcularEdad(): Integer
+  #validarEmail(email: String): Boolean
+}
+@enduml`} />
+
+<div>
+<Badge text="+ Público" variant="success" /> 
+<Badge text="- Privado" variant="danger" /> 
+<Badge text="# Protegido" variant="caution" /> 
+<Badge text="~ Paquete" variant="note" />
+</div>
 
 <Aside type="tip">
   Las secciones de atributos y métodos pueden omitirse si no son relevantes para el diagrama. En diagramas simplificados, a veces se muestra solo el nombre de la clase.
@@ -42,6 +64,20 @@ Una clase se representa como un rectángulo dividido en tres secciones:
 ### Atributos
 
 Los atributos son las propiedades o características que definen a una clase. Representan los datos que almacenan los objetos de esa clase.
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Producto {
+  -id: Integer
+  -nombre: String
+  -precio: Double = 0.0
+  #stock: Integer = 10
+  +categoria: String
+  -fechaCreacion: Date
+  ~proveedor: String
+}
+@enduml`} />
 
 <Tabs>
   <TabItem label="Sintaxis">
@@ -70,6 +106,21 @@ Los atributos son las propiedades o características que definen a una clase. Re
 ### Métodos
 
 Los métodos representan el comportamiento de una clase, es decir, las operaciones que pueden realizar los objetos de esa clase.
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class CuentaBancaria {
+  -numeroCuenta: String
+  -saldo: Double
+  -titular: String
+  +depositar(monto: Double): void
+  +retirar(monto: Double): Boolean
+  +consultarSaldo(): Double
+  -validarFondos(monto: Double): Boolean
+  #actualizarHistorial(operacion: String): void
+}
+@enduml`} />
 
 <Tabs>
   <TabItem label="Sintaxis">
@@ -104,6 +155,21 @@ Los constructores y destructores son métodos especiales:
 - **Destructor**: Se representa con el mismo nombre de la clase precedido por un tilde (~)
   <Code code={`+ ~NombreClase(): void`} lang="text" title="Destructor en UML" />
 
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Ventana {
+  -ancho: Integer
+  -alto: Integer
+  -titulo: String
+  +Ventana(titulo: String)
+  +Ventana(titulo: String, ancho: Integer, alto: Integer)
+  +~Ventana()
+  +redimensionar(ancho: Integer, alto: Integer): void
+  +cerrar(): void
+}
+@enduml`} />
+
 ## 2.2. Objetos vs. Clases
 
 Entender la diferencia entre clases y objetos es fundamental en el modelado orientado a objetos.
@@ -135,6 +201,27 @@ Aunque los objetos se representan principalmente en los diagramas de objetos, a 
 | nombre = "Juan Pérez" |
 | edad = 30              |
 +------------------------+`} lang="text" title="Representación de un objeto (instancia de la clase Persona)" />
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+' Definición de la clase
+class Persona {
+  -nombre: String
+  -edad: Integer
+  +getNombre(): String
+  +getEdad(): Integer
+}
+
+' Instancia de la clase (objeto)
+object "juan:Persona" as juan {
+  nombre = "Juan Pérez"
+  edad = 30
+}
+
+' Relación entre clase y objeto
+Persona <|.. juan
+@enduml`} />
 
 <Aside type="note">
   La diferencia clave entre clases y objetos es que las clases son abstracciones que definen estructura y comportamiento, mientras que los objetos son instancias concretas con valores específicos para sus atributos.
@@ -168,6 +255,34 @@ La visibilidad define el nivel de acceso a los atributos y métodos de una clase
     }`} lang="text" title="Ejemplo de Visibilidad en UML" />
   </TabItem>
 </Tabs>
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Empleado {
+  +nombre: String
+  -numeroSeguroSocial: String
+  #salarioBase: Double
+  ~departamento: String
+  +calcularSalario(): Double
+  -validarDatos(): Boolean
+  #calcularBonificacion(): Double
+  ~actualizarRegistroInterno(): void
+}
+
+class Cliente {
+}
+
+class Gerente {
+}
+
+class Proveedor {
+}
+
+Empleado <-- Cliente : puede ver métodos públicos
+Empleado <|-- Gerente : puede ver métodos públicos y protegidos
+Empleado <.. Proveedor : está en otro paquete,\nsólo ve métodos públicos
+@enduml`} />
 
 ### Implicaciones de la visibilidad
 
@@ -213,3 +328,26 @@ La elección adecuada de la visibilidad es crucial para el principio de encapsul
 - Usar visibilidad protegida para métodos que deben ser sobrescritos por subclases
 - Limitar la interfaz pública a lo estrictamente necesario
 - Documentar claramente el propósito de los miembros públicos y protegidos
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Usuario {
+  -nombre: String
+  -email: String
+  -contraseña: String
+  +getNombre(): String
+  +getEmail(): String
+  +setNombre(nombre: String): void
+  +setEmail(email: String): void
+  -encriptarContraseña(contraseña: String): String
+  -validarEmail(email: String): Boolean
+}
+
+note right of Usuario
+  Buenas prácticas:
+  - Atributos privados
+  - Métodos de acceso públicos
+  - Métodos auxiliares privados
+end note
+@enduml`} />

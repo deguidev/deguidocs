@@ -1,0 +1,266 @@
+---
+title: 1. Introducción a los Diagramas de Despliegue
+description: Conceptos fundamentales y propósito de los diagramas de despliegue UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Introducción a los Diagramas de Despliegue
+
+Los diagramas de despliegue son un tipo de diagrama estructural en UML que muestra la configuración física de los componentes de software en el hardware del sistema. Estos diagramas son esenciales para visualizar cómo se distribuyen los artefactos de software en los nodos de hardware.
+
+## 1.1. ¿Qué son los diagramas de despliegue?
+
+Un diagrama de despliegue representa la arquitectura física de un sistema mostrando los nodos de hardware, los artefactos de software desplegados en ellos, y las conexiones de comunicación entre estos nodos.
+
+<PlantUml code={`@startuml
+node "Servidor Web" as web {
+  artifact "app.war" as war
+  component [Tomcat] as tomcat
+}
+
+node "Servidor de Base de Datos" as db {
+  database "MySQL" as mysql
+  component [MySQL Server] as server
+}
+
+node "Cliente" as client {
+  component [Navegador Web] as browser
+}
+
+client --> web : HTTP/HTTPS
+web --> db : JDBC
+@enduml`} />
+
+### Características principales
+
+- **Arquitectura física**: Muestran la infraestructura de hardware del sistema
+- **Distribución de software**: Visualizan dónde se ejecutan los componentes
+- **Conectividad**: Definen las comunicaciones entre nodos
+- **Escalabilidad**: Ayudan a planificar el crecimiento del sistema
+
+## 1.2. Propósito y beneficios
+
+Los diagramas de despliegue sirven múltiples propósitos en el desarrollo y mantenimiento de sistemas:
+
+### Beneficios principales
+
+<div>
+  <ul>
+    <li><strong>Planificación de infraestructura</strong>: Ayudan a diseñar la arquitectura física</li>
+    <li><strong>Gestión de recursos</strong>: Optimizan el uso de hardware y red</li>
+    <li><strong>Identificación de cuellos de botella</strong>: Detectan posibles problemas de rendimiento</li>
+    <li><strong>Documentación de despliegue</strong>: Proporcionan guías para la instalación</li>
+    <li><strong>Análisis de seguridad</strong>: Identifican puntos vulnerables en la red</li>
+  </ul>
+</div>
+
+<Tabs>
+  <TabItem label="Arquitectura simple">
+    <PlantUml code={`@startuml
+node "Servidor de Aplicación" {
+  component [API REST]
+  component [Business Logic]
+}
+
+node "Base de Datos" {
+  database "PostgreSQL"
+}
+
+node "Cliente Web" {
+  component [React App]
+}
+
+[React App] --> [API REST] : HTTPS
+[API REST] --> [PostgreSQL] : SQL
+@enduml`} />
+    <p>Arquitectura básica de tres capas.</p>
+  </TabItem>
+  <TabItem label="Arquitectura distribuida">
+    <PlantUml code={`@startuml
+cloud "Internet" {
+  node "Load Balancer" as lb
+}
+
+node "Servidor Web 1" as web1 {
+  component [Nginx]
+  component [App Instance 1]
+}
+
+node "Servidor Web 2" as web2 {
+  component [Nginx]
+  component [App Instance 2]
+}
+
+node "Servidor de Cache" as cache {
+  component [Redis]
+}
+
+node "Servidor de Base de Datos" as db {
+  database "MongoDB Cluster"
+}
+
+lb --> web1
+lb --> web2
+web1 --> cache
+web2 --> cache
+web1 --> db
+web2 --> db
+@enduml`} />
+    <p>Sistema distribuido con balanceador de carga y cache.</p>
+  </TabItem>
+</Tabs>
+
+## 1.3. Cuándo usar diagramas de despliegue
+
+Los diagramas de despliegue son especialmente útiles en las siguientes situaciones:
+
+### Casos de uso principales
+
+<Steps>
+1. **Planificación de infraestructura**: Durante el diseño de la arquitectura física
+2. **Migración de sistemas**: Al mover aplicaciones entre entornos
+3. **Optimización de rendimiento**: Para identificar y resolver cuellos de botella
+4. **Documentación de producción**: Como parte de la documentación del sistema
+5. **Análisis de costos**: Para evaluar los recursos necesarios
+</Steps>
+
+<Aside type="tip">
+  Los diagramas de despliegue son especialmente valiosos en sistemas distribuidos donde múltiples componentes se ejecutan en diferentes máquinas y requieren comunicación de red.
+</Aside>
+
+## 1.4. Relación con otros diagramas UML
+
+Los diagramas de despliegue se relacionan estrechamente con otros diagramas UML:
+
+### Diagramas relacionados
+
+- **Diagramas de componentes**: Muestran qué componentes se despliegan
+- **Diagramas de paquetes**: Organizan los artefactos en grupos lógicos
+- **Diagramas de actividades**: Describen procesos de despliegue
+- **Diagramas de casos de uso**: Definen requisitos funcionales del sistema
+
+<PlantUml code={`@startuml
+package "Entorno de Producción" {
+  node "Frontend Server" as frontend {
+    artifact "build.zip"
+    component [Nginx]
+    component [React App]
+  }
+
+  node "Backend Server" as backend {
+    artifact "api.jar"
+    component [Spring Boot]
+    component [Tomcat]
+  }
+
+  node "Database Server" as database {
+    artifact "schema.sql"
+    database "PostgreSQL"
+  }
+}
+
+package "Entorno de Desarrollo" {
+  node "Dev Machine" as dev {
+    component [IDE]
+    component [Local Server]
+    component [Test DB]
+  }
+}
+
+frontend --> backend : REST API
+backend --> database : JDBC
+dev --> backend : Deploy
+@enduml`} />
+
+<Aside type="note">
+  Los diagramas de despliegue proporcionan la vista física que complementa las vistas lógicas de otros diagramas UML.
+</Aside>
+
+## 1.5. Niveles de abstracción
+
+Los diagramas de despliegue pueden representarse en diferentes niveles de detalle:
+
+### Niveles comunes
+
+1. **Nivel de sistema**: Vista general de toda la infraestructura
+2. **Nivel de subsistema**: Detalles de un entorno específico
+3. **Nivel de nodo**: Configuración interna de un servidor particular
+
+<Tabs>
+  <TabItem label="Vista de sistema">
+    <PlantUml code={`@startuml
+cloud "Internet"
+node "DMZ"
+node "Internal Network"
+database "Database Cluster"
+
+Internet --> DMZ
+DMZ --> "Internal Network"
+"Internal Network" --> "Database Cluster"
+@enduml`} />
+    <p>Vista de alto nivel mostrando las zonas principales del sistema.</p>
+  </TabItem>
+  <TabItem label="Vista de subsistema">
+    <PlantUml code={`@startuml
+package "DMZ" {
+  node "Web Server 1" {
+    component [Apache]
+  }
+  node "Web Server 2" {
+    component [Apache]
+  }
+  node "Load Balancer" {
+    component [HAProxy]
+  }
+}
+
+[Load Balancer] --> [Web Server 1]
+[Load Balancer] --> [Web Server 2]
+@enduml`} />
+    <p>Vista detallada de los componentes en la zona DMZ.</p>
+  </TabItem>
+</Tabs>
+
+## 1.6. Elementos clave
+
+Los diagramas de despliegue utilizan varios elementos específicos:
+
+### Elementos principales
+
+- **Nodos**: Representan recursos de hardware o entornos de ejecución
+- **Artefactos**: Archivos físicos como ejecutables, bibliotecas, documentos
+- **Componentes**: Unidades de software desplegables
+- **Conexiones**: Enlaces de comunicación entre nodos
+- **Especificaciones de despliegue**: Configuraciones y parámetros
+
+<PlantUml code={`@startuml
+node "Production Server" <<server>> {
+  artifact "application.jar" <<executable>>
+  artifact "config.properties" <<configuration>>
+  component [JVM] <<runtime>>
+  component [Application] <<service>>
+}
+
+node "Database Server" <<database>> {
+  artifact "backup.sql" <<data>>
+  database "Production DB" <<persistent>>
+}
+
+node "Mobile Device" <<client>> {
+  component [Mobile App] <<application>>
+}
+
+"Mobile Device" --> "Production Server" : HTTPS
+"Production Server" --> "Database Server" : JDBC
+
+note right of "Production Server" : Servidor principal con Java 11
+note bottom of "Database Server" : Base de datos con replicación
+@enduml`} />
+
+Los diagramas de despliegue son una herramienta fundamental para arquitectos de sistemas y administradores que necesitan planificar, documentar y gestionar la infraestructura física de aplicaciones complejas. En las siguientes secciones, exploraremos los elementos específicos y las mejores prácticas para crear estos diagramas efectivamente.

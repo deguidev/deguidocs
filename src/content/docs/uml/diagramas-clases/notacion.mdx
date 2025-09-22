@@ -8,6 +8,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
 
 # Notación UML para Clases
 
@@ -25,6 +26,17 @@ En UML, una clase se representa mediante un rectángulo dividido en tres compart
 -----------------
 | operaciones   |
 -----------------`} lang="text" title="Estructura básica de una clase en UML" />
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Persona {
+  -nombre: String
+  -edad: Integer
+  +getNombre(): String
+  +setNombre(nombre: String): void
+}
+@enduml`} />
 
 ### Compartimentos de una clase
 
@@ -74,6 +86,41 @@ En UML, una clase se representa mediante un rectángulo dividido en tres compart
 -----------------
 | operaciones   |
 -----------------`} lang="text" title="Interfaz en UML" />
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+' Clase simplificada (solo nombre)
+class Usuario
+
+' Clase con nombre y atributos
+class Producto {
+  -id: Integer
+  -nombre: String
+  -precio: Double
+}
+
+' Interfaz en UML
+interface Pagable {
+  +pagar(): Boolean
+  +calcularTotal(): Double
+}
+
+' Clase abstracta
+abstract class Figura {
+  #x: Integer
+  #y: Integer
+  +mover(dx: Integer, dy: Integer): void
+  +{abstract} calcularArea(): Double
+}
+
+' Clase con estereotipo
+class "<<entity>>\nCliente" as Cliente {
+  -id: String
+  -nombre: String
+  -email: String
+}
+@enduml`} />
 
 <Aside type="tip">
   En diagramas complejos, es común simplificar la representación de clases mostrando solo la información relevante para el contexto específico. Por ejemplo, en un diagrama que muestra principalmente relaciones, podría omitirse el compartimento de atributos y operaciones.
@@ -136,6 +183,42 @@ Los atributos en UML siguen una sintaxis específica que permite expresar divers
 # saldo: Double {readOnly}
 - cuentas: Cuenta[0..*] {ordered}
 ~ activo: Boolean = true`} lang="text" title="Ejemplos de atributos en UML" />
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Cliente {
+  -nombre: String
+  +edad: Integer = 0
+  #saldo: Double {readOnly}
+  -cuentas: Cuenta[0..*] {ordered}
+  ~activo: Boolean = true
+}
+
+class Cuenta {
+  -numero: String
+  -tipo: String
+  -fechaApertura: Date
+}
+
+Cliente "1" -- "0..*" Cuenta : tiene >
+
+note right of Cliente::nombre
+  Atributo privado
+end note
+
+note right of Cliente::edad
+  Atributo público con valor inicial
+end note
+
+note right of Cliente::saldo
+  Atributo protegido de solo lectura
+end note
+
+note right of Cliente::cuentas
+  Colección ordenada de cuentas
+end note
+@enduml`} />
 
 <Aside type="note">
   No es necesario incluir todos los elementos en cada atributo. La notación puede simplificarse según las necesidades del diagrama, mostrando solo la información relevante.
@@ -205,6 +288,49 @@ Las operaciones (métodos) en UML siguen una sintaxis específica que permite ex
 + obtenerHistorial(): Transaccion[*] {query}
 + crearInstancia(): Producto {static}`} lang="text" title="Ejemplos de operaciones en UML" />
 
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class CarritoCompra {
+  -items: List<Item>
+  -cliente: Cliente
+  +calcularTotal(): Double
+  -validarDatos(usuario: String, clave: String): Boolean
+  #actualizarSaldo(monto: Double): void
+  +obtenerHistorial(): Transaccion[*] {query}
+}
+
+class Producto {
+  -codigo: String
+  -nombre: String
+  -precio: Double
+  +{static} crearInstancia(): Producto
+  +{abstract} calcularImpuestos(): Double
+}
+
+class Item {
+  -cantidad: Integer
+  -producto: Producto
+  +getSubtotal(): Double
+}
+
+note right of CarritoCompra::calcularTotal
+  Método público que devuelve un Double
+end note
+
+note right of CarritoCompra::validarDatos
+  Método privado con parámetros
+end note
+
+note right of Producto::crearInstancia
+  Método estático (de clase)
+end note
+
+note right of Producto::calcularImpuestos
+  Método abstracto
+end note
+@enduml`} />
+
 ### Representación de constructores y destructores
 
 <Code code={`+ NombreClase(parametros): void  // Constructor
@@ -229,6 +355,54 @@ Los estereotipos extienden el vocabulario de UML y se representan entre comillas
 + cerrarSesion(): void
 -----------------`} lang="text" title="Clase con estereotipo de interfaz" />
 
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+' Interfaz
+interface "<<interface>>\nAutenticable" as Autenticable {
+  +autenticar(usuario: String, clave: String): Boolean
+  +cerrarSesion(): void
+}
+
+' Clase abstracta
+abstract "<<abstract>>\nUsuario" as Usuario {
+  #id: String
+  #nombre: String
+  +getNombre(): String
+  +{abstract} obtenerPermisos(): List<String>
+}
+
+' Entidad
+class "<<entity>>\nCliente" as Cliente {
+  -email: String
+  -telefono: String
+}
+
+' Controlador
+class "<<control>>\nAutenticacionController" as AutenticacionController {
+  +login(usuario: String, clave: String): Boolean
+  +logout(): void
+}
+
+' Boundary
+class "<<boundary>>\nLoginForm" as LoginForm {
+  +mostrarFormulario(): void
+  +procesarLogin(): void
+}
+
+' Utility
+class "<<utility>>\nStringUtils" as StringUtils {
+  +{static} formatear(texto: String): String
+  +{static} validarEmail(email: String): Boolean
+}
+
+Usuario <|-- Cliente
+Autenticable <|.. Cliente
+LoginForm ..> AutenticacionController
+AutenticacionController ..> Cliente
+AutenticacionController ..> StringUtils
+@enduml`} />
+
 ### Estereotipos comunes
 
 | Estereotipo | Descripción | Aplicación |
@@ -252,6 +426,30 @@ Las etiquetas permiten añadir propiedades personalizadas a los elementos UML.
 {version = 1.0}
 {author = "Juan Pérez"}`} lang="text" title="Clase con etiquetas" />
 
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Producto {
+  -id: String {id}
+  -precio: Double
+}
+note bottom of Producto
+  {version = 1.0}
+  {author = "Juan Pérez"}
+end note
+
+class Documento {
+  -titulo: String
+  -contenido: String
+  -fechaCreacion: Date
+}
+note bottom of Documento
+  {persistence = true}
+  {table = "documentos"}
+  {generated = true}
+end note
+@enduml`} />
+
 ### Restricciones
 
 Las restricciones especifican condiciones que deben cumplirse y se representan entre llaves.
@@ -262,6 +460,35 @@ Las restricciones especifican condiciones que deben cumplirse y se representan e
 -----------------
 | + retirar(monto: Double): Boolean
 -----------------`} lang="text" title="Clase con restricciones" />
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Cuenta {
+  -saldo: Double {saldo >= 0}
+  +retirar(monto: Double): Boolean {monto > 0}
+  +depositar(monto: Double): void {monto > 0}
+}
+
+class Usuario {
+  -nombre: String {minLength=3, maxLength=50}
+  -email: String {unique}
+  -edad: Integer {edad >= 18}
+}
+
+class Contraseña {
+  -valor: String {minLength=8}
+  +validar(): Boolean {!valor.contains(nombreUsuario)}
+}
+
+note right of Cuenta::saldo
+  El saldo nunca puede ser negativo
+end note
+
+note right of Usuario::edad
+  Solo se permiten usuarios mayores de edad
+end note
+@enduml`} />
 
 <Aside type="tip">
   Los estereotipos, etiquetas y restricciones son mecanismos de extensión que permiten adaptar UML a dominios específicos o metodologías particulares. Son especialmente útiles cuando se trabaja con herramientas de generación de código o en contextos donde se requiere información adicional no cubierta por la notación estándar.
@@ -286,6 +513,66 @@ Las restricciones especifican condiciones que deben cumplirse y se representan e
 -----------------
 {version = "2.0"}
 {author = "Equipo de Desarrollo"}`} lang="text" title="Ejemplo completo de notación UML" />
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+package "com.empresa.clientes" {
+  class "<<entity>>\nCliente" as Cliente {
+    +id: String {id, unique}
+    -nombre: String [1]
+    -apellido: String [1]
+    -email: String [0..1]
+    #fechaRegistro: Date = "hoy" {readOnly}
+    ~activo: Boolean = true
+    +getNombreCompleto(): String {query}
+    +actualizarDatos(datos: DatosCliente): Boolean
+    +desactivar(): void
+    -validarEmail(email: String): Boolean
+  }
+  
+  class DatosCliente {
+    -nombre: String
+    -apellido: String
+    -email: String
+    -telefono: String
+  }
+  
+  interface "<<interface>>\nEntidadPersistente" as EntidadPersistente {
+    +getId(): String
+    +esValido(): Boolean
+  }
+  
+  abstract class "<<abstract>>\nPersona" as Persona {
+    #nombre: String
+    #apellido: String
+    +getNombreCompleto(): String {query}
+  }
+  
+  class Direccion {
+    -calle: String
+    -ciudad: String
+    -codigoPostal: String
+    -pais: String
+  }
+  
+  ' Relaciones
+  Cliente "1" o-- "0..*" Direccion : tiene >
+  Cliente ..> DatosCliente : usa >
+  EntidadPersistente <|.. Cliente
+  Persona <|-- Cliente
+}
+
+note bottom of Cliente
+  {version = "2.0"}
+  {author = "Equipo de Desarrollo"}
+end note
+
+note right of Cliente::fechaRegistro
+  Fecha en que se registró el cliente,
+  no se puede modificar
+end note
+@enduml`} />
 
 <Aside type="note">
   La notación UML es flexible y permite diferentes niveles de detalle según las necesidades del diagrama. En la práctica, es común omitir detalles que no son relevantes para el propósito específico del diagrama.

@@ -1,0 +1,622 @@
+---
+title: 4. Notación UML para Diagramas de Componentes
+description: Sintaxis y convenciones específicas de PlantUML para diagramas de componentes
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Notación UML para Diagramas de Componentes
+
+La notación UML para diagramas de componentes en PlantUML proporciona una sintaxis específica para representar componentes, interfaces, relaciones y otros elementos arquitecturales de manera clara y estandarizada.
+
+## 4.1. Sintaxis básica de componentes
+
+Los componentes se definen usando la palabra clave `component` seguida del nombre entre corchetes.
+
+<PlantUml code={`@startuml
+component [UserService]
+component [ProductService] as product
+component "Order Management" as order
+@enduml`} />
+
+### Variaciones de sintaxis
+
+<Tabs>
+  <TabItem label="Sintaxis estándar">
+    <PlantUml code={`@startuml
+component [Authentication Service]
+component [Payment Gateway]
+component [Notification System]
+@enduml`} />
+    <p>Forma básica de definir componentes.</p>
+  </TabItem>
+  <TabItem label="Con alias">
+    <PlantUml code={`@startuml
+component [Authentication Service] as auth
+component [Payment Gateway] as payment
+component [Notification System] as notify
+
+auth --> payment
+payment --> notify
+@enduml`} />
+    <p>Usando alias para referencias más fáciles.</p>
+  </TabItem>
+  <TabItem label="Con estereotipos">
+    <PlantUml code={`@startuml
+component [Database Service] <<database>>
+component [Web Service] <<webservice>>
+component [Library Component] <<library>>
+component [External API] <<external>>
+@enduml`} />
+    <p>Componentes con estereotipos que indican su tipo.</p>
+  </TabItem>
+</Tabs>
+
+## 4.2. Definición de interfaces
+
+Las interfaces se definen con la palabra clave `interface` y se conectan a componentes usando diferentes tipos de líneas.
+
+<PlantUml code={`@startuml
+interface "IUserService" as IUser
+interface "IPaymentProcessor" as IPayment
+interface "INotificationService" as INotify
+
+component [UserManager] as user
+component [PaymentGateway] as payment
+component [EmailService] as email
+
+user .up.|> IUser : implements
+payment .up.|> IPayment : implements
+email .up.|> INotify : implements
+
+component [OrderService] as order
+order --> IUser : uses
+order --> IPayment : uses
+order --> INotify : uses
+@enduml`} />
+
+### Tipos de conexiones de interfaces
+
+<Tabs>
+  <TabItem label="Interface proporcionada">
+    <PlantUml code={`@startuml
+component [DatabaseService] as db
+interface "IDataAccess" as IData
+
+db .up.|> IData : provides
+db --|> IData
+@enduml`} />
+    <p>Diferentes formas de mostrar interfaces proporcionadas.</p>
+  </TabItem>
+  <TabItem label="Interface requerida">
+    <PlantUml code={`@startuml
+component [ReportService] as report
+interface "IDataSource" as IData
+
+report --> IData : requires
+report --( IData
+@enduml`} />
+    <p>Diferentes formas de mostrar interfaces requeridas.</p>
+  </TabItem>
+  <TabItem label="Conexión completa">
+    <PlantUml code={`@startuml
+component [DataProvider] as provider
+component [DataConsumer] as consumer
+interface "IDataService" as IData
+
+provider --|> IData
+consumer --( IData
+IData )-- consumer
+@enduml`} />
+    <p>Conexión completa entre proveedor y consumidor.</p>
+  </TabItem>
+</Tabs>
+
+## 4.3. Paquetes y agrupación
+
+Los paquetes organizan componentes relacionados y se definen con la palabra clave `package`.
+
+<PlantUml code={`@startuml
+package "Frontend Layer" {
+  component [React App] as react
+  component [Redux Store] as redux
+  component [Router] as router
+}
+
+package "API Layer" {
+  component [Express Server] as express
+  component [GraphQL] as graphql
+  component [REST API] as rest
+}
+
+package "Business Layer" {
+  component [User Service] as user
+  component [Product Service] as product
+  component [Order Service] as order
+}
+
+package "Data Layer" {
+  component [MongoDB] as mongo
+  component [Redis Cache] as redis
+  database "PostgreSQL" as postgres
+}
+
+react --> express
+express --> user
+express --> product
+user --> mongo
+product --> postgres
+order --> redis
+@enduml`} />
+
+### Estilos de paquetes
+
+<Tabs>
+  <TabItem label="Paquete simple">
+    <PlantUml code={`@startuml
+package "Services" {
+  component [UserService]
+  component [ProductService]
+}
+@enduml`} />
+    <p>Paquete básico con componentes.</p>
+  </TabItem>
+  <TabItem label="Paquete con estereotipo">
+    <PlantUml code={`@startuml
+package "External APIs" <<cloud>> {
+  component [Payment Gateway]
+  component [Email Service]
+}
+@enduml`} />
+    <p>Paquete con estereotipo visual.</p>
+  </TabItem>
+  <TabItem label="Paquetes anidados">
+    <PlantUml code={`@startuml
+package "Backend" {
+  package "Core Services" {
+    component [UserService]
+    component [AuthService]
+  }
+  package "External Services" {
+    component [PaymentAPI]
+    component [EmailAPI]
+  }
+}
+@enduml`} />
+    <p>Paquetes anidados para mejor organización.</p>
+  </TabItem>
+</Tabs>
+
+## 4.4. Tipos de relaciones y conectores
+
+PlantUML ofrece diferentes tipos de líneas para representar distintos tipos de relaciones.
+
+<PlantUml code={`@startuml
+component [OrderService] as order
+component [PaymentService] as payment
+component [UserService] as user
+component [EmailService] as email
+component [DatabaseService] as db
+
+' Dependencia simple
+order --> payment : uses
+
+' Dependencia con estereotipo
+order --> user : <<call>>
+
+' Composición
+order *-- email : owns
+
+' Agregación
+order o-- db : shares
+
+' Asociación bidireccional
+order <--> user : communicates
+
+' Dependencia débil
+order ..> email : notifies
+@enduml`} />
+
+### Símbolos de relaciones
+
+<Tabs>
+  <TabItem label="Dependencias">
+    <PlantUml code={`@startuml
+component A
+component B
+component C
+component D
+
+A --> B : uses
+A ..> C : depends
+A -.-> D : weak dependency
+@enduml`} />
+    <p>Diferentes tipos de dependencias.</p>
+  </TabItem>
+  <TabItem label="Composición y agregación">
+    <PlantUml code={`@startuml
+component System
+component ModuleA
+component ModuleB
+component SharedService
+
+System *-- ModuleA : composition
+System *-- ModuleB : composition
+ModuleA o-- SharedService : aggregation
+ModuleB o-- SharedService : aggregation
+@enduml`} />
+    <p>Relaciones parte-todo.</p>
+  </TabItem>
+  <TabItem label="Asociaciones">
+    <PlantUml code={`@startuml
+component Frontend
+component Backend
+component Database
+
+Frontend -- Backend : HTTP
+Backend -- Database : SQL
+Frontend <--> Backend : bidirectional
+@enduml`} />
+    <p>Asociaciones y comunicación bidireccional.</p>
+  </TabItem>
+</Tabs>
+
+## 4.5. Puertos y conectores
+
+Los puertos representan puntos de conexión específicos en los componentes.
+
+<PlantUml code={`@startuml
+component [WebServer] as web {
+  port "HTTP" as http
+  port "HTTPS" as https
+  port "Admin" as admin
+}
+
+interface "IWebService" as IWeb
+interface "IAdminService" as IAdmin
+
+http -- IWeb
+https -- IWeb
+admin -- IAdmin
+
+component [LoadBalancer] as lb
+component [AdminPanel] as ap
+
+lb --> IWeb
+ap --> IAdmin
+
+note right of web : Servidor con múltiples puntos de acceso
+@enduml`} />
+
+## 4.6. Nodos y artefactos
+
+Los nodos representan recursos de hardware o contenedores de despliegue.
+
+<PlantUml code={`@startuml
+node "Web Server" as webNode {
+  component [Nginx] as nginx
+  component [Static Files] as static
+  artifact "app.js" as appjs
+}
+
+node "Application Server" as appNode {
+  component [Node.js Runtime] as nodejs
+  component [Express App] as express
+  artifact "package.json" as pkg
+}
+
+node "Database Server" as dbNode {
+  database "MongoDB" as mongo
+  component [Backup Service] as backup
+  artifact "mongod.conf" as config
+}
+
+nginx --> express : proxy
+express --> mongo : queries
+backup --> mongo : backs up
+
+note bottom of webNode : Servidor web con archivos estáticos
+note bottom of appNode : Servidor de aplicación con runtime Node.js
+note bottom of dbNode : Servidor de base de datos con servicio de backup
+@enduml`} />
+
+### Tipos de nodos y artefactos
+
+<Tabs>
+  <TabItem label="Nodos físicos">
+    <PlantUml code={`@startuml
+node "Physical Server 1" {
+  component [Web Service]
+}
+
+node "Physical Server 2" {
+  component [Database]
+}
+
+cloud "CDN" {
+  component [Static Assets]
+}
+@enduml`} />
+    <p>Nodos que representan hardware físico.</p>
+  </TabItem>
+  <TabItem label="Contenedores">
+    <PlantUml code={`@startuml
+node "Docker Container" <<container>> {
+  component [Microservice A]
+  artifact "Dockerfile"
+}
+
+node "Kubernetes Pod" <<pod>> {
+  component [Microservice B]
+  artifact "deployment.yaml"
+}
+@enduml`} />
+    <p>Nodos que representan contenedores virtuales.</p>
+  </TabItem>
+  <TabItem label="Artefactos">
+    <PlantUml code={`@startuml
+artifact "application.jar" as jar
+artifact "config.properties" as config
+artifact "database.sql" as sql
+artifact "docker-compose.yml" as compose
+
+component [Application] as app
+app --> jar : packaged as
+app --> config : configured by
+@enduml`} />
+    <p>Diferentes tipos de artefactos del sistema.</p>
+  </TabItem>
+</Tabs>
+
+## 4.7. Notas y documentación
+
+Las notas proporcionan información adicional y documentación en el diagrama.
+
+<PlantUml code={`@startuml
+component [APIGateway] as gateway
+component [AuthService] as auth
+component [UserService] as user
+
+gateway --> auth : validates token
+gateway --> user : forwards request
+
+note right of gateway : Punto de entrada único para todas las peticiones
+note bottom of auth : Servicio de autenticación basado en JWT
+note left of user : Gestiona información de usuarios registrados
+
+note top : Este diagrama muestra la arquitectura básica del sistema de autenticación
+
+note as N1
+  Flujo de autenticación:
+  1. Cliente envía petición con token
+  2. Gateway valida token con AuthService
+  3. Si es válido, reenvía a UserService
+  4. UserService procesa y responde
+end note
+
+gateway .. N1
+@enduml`} />
+
+### Tipos de notas
+
+<Tabs>
+  <TabItem label="Notas posicionales">
+    <PlantUml code={`@startuml
+component [Service] as svc
+
+note right of svc : Nota a la derecha
+note left of svc : Nota a la izquierda
+note top of svc : Nota arriba
+note bottom of svc : Nota abajo
+@enduml`} />
+    <p>Notas posicionadas relativamente a componentes.</p>
+  </TabItem>
+  <TabItem label="Notas flotantes">
+    <PlantUml code={`@startuml
+component [ServiceA] as a
+component [ServiceB] as b
+
+note as N1
+  Esta es una nota flotante
+  que puede contener múltiples líneas
+  y explicaciones detalladas
+end note
+
+a .. N1
+b .. N1
+@enduml`} />
+    <p>Notas independientes conectadas a múltiples elementos.</p>
+  </TabItem>
+  <TabItem label="Notas de título">
+    <PlantUml code={`@startuml
+title Diagrama de Componentes del Sistema
+
+component [Frontend]
+component [Backend]
+component [Database]
+
+Frontend --> Backend
+Backend --> Database
+
+note bottom : Arquitectura simplificada del sistema
+@enduml`} />
+    <p>Títulos y notas generales del diagrama.</p>
+  </TabItem>
+</Tabs>
+
+## 4.8. Colores y estilos
+
+PlantUML permite personalizar la apariencia de los componentes y relaciones.
+
+<PlantUml code={`@startuml
+!define BUSINESS_COLOR #lightblue
+!define DATA_COLOR #lightgreen
+!define EXTERNAL_COLOR #orange
+
+package "Business Layer" BUSINESS_COLOR {
+  component [UserService] #yellow
+  component [OrderService] #yellow
+}
+
+package "Data Layer" DATA_COLOR {
+  component [Database] #lightgray
+  component [Cache] #lightgray
+}
+
+package "External Services" EXTERNAL_COLOR {
+  component [PaymentAPI] #red
+  component [EmailAPI] #red
+}
+
+[UserService] --> [Database] : #blue;line.bold
+[OrderService] --> [PaymentAPI] : #red;line.dashed
+@enduml`} />
+
+## 4.9. Ejemplo completo con notación avanzada
+
+<PlantUml code={`@startuml
+!theme aws-orange
+
+title Sistema de E-commerce - Arquitectura de Componentes
+
+package "Frontend Tier" #lightblue {
+  component [Web UI] as web <<presentation>>
+  component [Mobile App] as mobile <<presentation>>
+  
+  note right of web : Interfaz web responsiva desarrollada en React
+}
+
+package "API Gateway" #lightyellow {
+  component [Kong Gateway] as gateway <<proxy>>
+  
+  port "HTTP" as http
+  port "HTTPS" as https
+  
+  gateway --> http
+  gateway --> https
+}
+
+package "Microservices" #lightgreen {
+  component [User Service] as user <<microservice>>
+  component [Product Service] as product <<microservice>>
+  component [Order Service] as order <<microservice>>
+  component [Payment Service] as payment <<microservice>>
+  
+  interface "IUserAPI" as IUser
+  interface "IProductAPI" as IProduct
+  interface "IOrderAPI" as IOrder
+  interface "IPaymentAPI" as IPayment
+  
+  user .up.|> IUser : implements
+  product .up.|> IProduct : implements
+  order .up.|> IOrder : implements
+  payment .up.|> IPayment : implements
+}
+
+package "Data Layer" #lightcoral {
+  database "User DB" as userdb
+  database "Product DB" as productdb
+  database "Order DB" as orderdb
+  component [Redis Cache] as cache <<cache>>
+}
+
+package "External Services" #lightsalmon {
+  component [Stripe API] as stripe <<external>>
+  component [SendGrid] as email <<external>>
+  component [AWS S3] as storage <<external>>
+}
+
+' Connections
+web --> gateway : HTTPS
+mobile --> gateway : HTTPS
+
+gateway --> IUser : routes
+gateway --> IProduct : routes
+gateway --> IOrder : routes
+gateway --> IPayment : routes
+
+user --> userdb : persists
+product --> productdb : persists
+order --> orderdb : persists
+
+user --> cache : caches
+product --> cache : caches
+
+order --> IPayment : processes payment
+payment --> stripe : integrates
+user --> email : sends notifications
+product --> storage : stores images
+
+' Notes
+note right of gateway : Maneja autenticación, rate limiting y routing
+note bottom of cache : Cache distribuido para mejorar rendimiento
+note right of stripe : Procesamiento seguro de pagos con tarjeta
+
+note as ARCH
+  Arquitectura de microservicios con:
+  - Separación clara de responsabilidades
+  - APIs bien definidas
+  - Servicios independientes y escalables
+  - Cache distribuido para rendimiento
+end note
+
+ARCH .. gateway
+@enduml`} />
+
+<Aside type="tip">
+  La notación UML en PlantUML es muy flexible y permite crear diagramas tanto simples como complejos. La clave está en usar la sintaxis apropiada para el nivel de detalle requerido.
+</Aside>
+
+## 4.10. Mejores prácticas de notación
+
+### Recomendaciones generales
+
+<Steps>
+1. **Consistencia**: Usa la misma notación para elementos similares
+2. **Claridad**: Prefiere la simplicidad sobre la complejidad visual
+3. **Documentación**: Usa notas para explicar decisiones arquitecturales
+4. **Colores**: Usa colores de manera consistente para agrupar elementos relacionados
+5. **Alias**: Usa alias cortos para componentes referenciados frecuentemente
+</Steps>
+
+<Tabs>
+  <TabItem label="✅ Buenas prácticas">
+    <PlantUml code={`@startuml
+' Usar alias consistentes
+component [UserService] as user
+component [OrderService] as order
+component [PaymentService] as payment
+
+' Agrupar elementos relacionados
+package "Core Services" {
+  user
+  order
+}
+
+' Documentar decisiones importantes
+user --> payment : uses
+note on link : Integración asíncrona para mejor rendimiento
+@enduml`} />
+    <p>Uso consistente de alias, agrupación lógica y documentación.</p>
+  </TabItem>
+  <TabItem label="❌ Malas prácticas">
+    <PlantUml code={`@startuml
+' Nombres inconsistentes y sin alias
+component [UserService]
+component [ord_svc]
+component [PaymentGatewayServiceImplementation]
+
+' Sin agrupación lógica
+[UserService] --> [PaymentGatewayServiceImplementation]
+[ord_svc] --> [UserService]
+@enduml`} />
+    <p>Nombres inconsistentes, falta de agrupación y documentación.</p>
+  </TabItem>
+</Tabs>
+
+La notación UML para diagramas de componentes en PlantUML ofrece gran flexibilidad para representar arquitecturas de software de manera clara y profesional. La clave está en elegir el nivel de detalle apropiado y mantener consistencia en todo el diagrama.

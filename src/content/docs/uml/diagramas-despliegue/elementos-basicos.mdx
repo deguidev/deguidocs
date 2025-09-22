@@ -1,0 +1,393 @@
+---
+title: 2. Elementos Básicos de los Diagramas de Despliegue
+description: Nodos, artefactos, componentes y otros elementos fundamentales en UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Elementos Básicos de los Diagramas de Despliegue
+
+Los diagramas de despliegue utilizan varios elementos específicos para representar la arquitectura física de un sistema. Cada elemento tiene un propósito particular y una notación específica en UML.
+
+## 2.1. Nodos
+
+Un nodo representa un recurso computacional físico o virtual donde se pueden desplegar y ejecutar artefactos de software. Los nodos son los elementos fundamentales de los diagramas de despliegue.
+
+<PlantUml code={`@startuml
+node "Servidor Web" as web
+node "Servidor de Aplicación" as app
+node "Servidor de Base de Datos" as db
+node "Cliente Desktop" as client
+
+note right of web : Servidor físico con Apache
+note right of app : Máquina virtual con Tomcat
+note right of db : Servidor dedicado con MySQL
+note right of client : Computadora del usuario
+@enduml`} />
+
+### Tipos de nodos
+
+- **Nodos de dispositivo**: Hardware físico como servidores, computadoras, móviles
+- **Nodos de entorno de ejecución**: Software que proporciona servicios como JVM, contenedores
+- **Nodos de red**: Elementos de infraestructura como routers, switches
+
+<Tabs>
+  <TabItem label="Nodos físicos">
+    <PlantUml code={`@startuml
+node "Servidor Rack" <<device>>
+node "Laptop" <<device>>
+node "Smartphone" <<device>>
+node "Router" <<device>>
+@enduml`} />
+    <p>Dispositivos físicos de hardware.</p>
+  </TabItem>
+  <TabItem label="Nodos virtuales">
+    <PlantUml code={`@startuml
+node "Docker Container" <<container>>
+node "Virtual Machine" <<vm>>
+node "Kubernetes Pod" <<pod>>
+node "AWS Lambda" <<serverless>>
+@enduml`} />
+    <p>Entornos virtualizados y en la nube.</p>
+  </TabItem>
+  <TabItem label="Entornos de ejecución">
+    <PlantUml code={`@startuml
+node "JVM" <<runtime>>
+node "Node.js Runtime" <<runtime>>
+node ".NET Framework" <<runtime>>
+node "Python Interpreter" <<runtime>>
+@enduml`} />
+    <p>Plataformas de ejecución de software.</p>
+  </TabItem>
+</Tabs>
+
+## 2.2. Artefactos
+
+Los artefactos representan elementos físicos de información que son utilizados o producidos por el proceso de desarrollo de software. Son los elementos que se despliegan en los nodos.
+
+<PlantUml code={`@startuml
+artifact "application.jar" as jar
+artifact "config.properties" as config
+artifact "database.sql" as sql
+artifact "deployment.yaml" as yaml
+artifact "nginx.conf" as nginx
+
+note right of jar : Aplicación Java empaquetada
+note right of config : Archivo de configuración
+note right of sql : Script de base de datos
+note right of yaml : Configuración de Kubernetes
+note right of nginx : Configuración del servidor web
+@enduml`} />
+
+### Tipos de artefactos
+
+<Tabs>
+  <TabItem label="Ejecutables">
+    <PlantUml code={`@startuml
+artifact "app.jar" <<executable>>
+artifact "service.exe" <<executable>>
+artifact "script.sh" <<script>>
+artifact "app.war" <<web-archive>>
+@enduml`} />
+    <p>Archivos que pueden ejecutarse directamente.</p>
+  </TabItem>
+  <TabItem label="Configuración">
+    <PlantUml code={`@startuml
+artifact "application.yml" <<config>>
+artifact "database.properties" <<config>>
+artifact "Dockerfile" <<config>>
+artifact "docker-compose.yml" <<config>>
+@enduml`} />
+    <p>Archivos de configuración del sistema.</p>
+  </TabItem>
+  <TabItem label="Datos">
+    <PlantUml code={`@startuml
+artifact "schema.sql" <<data>>
+artifact "backup.dump" <<data>>
+artifact "static-files.zip" <<data>>
+artifact "certificates.pem" <<security>>
+@enduml`} />
+    <p>Archivos de datos y recursos.</p>
+  </TabItem>
+</Tabs>
+
+## 2.3. Componentes desplegables
+
+Los componentes en diagramas de despliegue representan unidades de software que pueden ser desplegadas independientemente en nodos específicos.
+
+<PlantUml code={`@startuml
+node "Servidor de Aplicación" {
+  component [API Gateway] as gateway
+  component [User Service] as user
+  component [Order Service] as order
+  component [Payment Service] as payment
+}
+
+node "Servidor Web" {
+  component [Frontend App] as frontend
+  component [Static Files] as static
+}
+
+frontend --> gateway : HTTP
+gateway --> user : Internal API
+gateway --> order : Internal API
+gateway --> payment : Internal API
+@enduml`} />
+
+### Características de los componentes
+
+- **Independencia**: Pueden desplegarse por separado
+- **Encapsulación**: Ocultan su implementación interna
+- **Interfaces**: Proporcionan puntos de comunicación claros
+- **Reutilización**: Pueden ejecutarse en diferentes nodos
+
+## 2.4. Especificaciones de despliegue
+
+Las especificaciones de despliegue definen la configuración y parámetros necesarios para desplegar artefactos en nodos específicos.
+
+<PlantUml code={`@startuml
+node "Production Server" {
+  artifact "app.jar"
+  component [Spring Boot App]
+  
+  note as JVMConfig
+    JVM Configuration:
+    - Xmx: 2048m
+    - Xms: 1024m
+    - profile: production
+  end note
+}
+
+node "Database Server" {
+  database "PostgreSQL"
+  
+  note as DBConfig
+    Database Configuration:
+    - max_connections: 200
+    - shared_buffers: 256MB
+    - port: 5432
+  end note
+}
+@enduml`} />
+
+## 2.5. Dispositivos y procesadores
+
+Los dispositivos representan nodos físicos con capacidades de procesamiento, mientras que los procesadores son elementos que pueden ejecutar componentes.
+
+<PlantUml code={`@startuml
+node "Web Server" <<device>> as webdev {
+  component "Intel Xeon" <<processor>>
+  component "16GB RAM" <<memory>>
+}
+
+node "Database Server" <<device>> as dbdev {
+  component "AMD EPYC" <<processor>>
+  component "64GB RAM" <<memory>>
+  component "SSD Storage" <<storage>>
+}
+
+node "Load Balancer" <<device>> as lbdev {
+  component "ARM Cortex" <<processor>>
+  component "8GB RAM" <<memory>>
+}
+
+webdev --> dbdev : Ethernet
+lbdev --> webdev : Ethernet
+@enduml`} />
+
+### Especificaciones de hardware
+
+- **CPU**: Tipo y velocidad del procesador
+- **Memoria**: Cantidad de RAM disponible
+- **Almacenamiento**: Tipo y capacidad de disco
+- **Red**: Interfaces y ancho de banda
+
+## 2.6. Conexiones de comunicación
+
+Las conexiones representan los enlaces de comunicación entre nodos, mostrando cómo se comunican los diferentes elementos del sistema.
+
+<PlantUml code={`@startuml
+node "Cliente" as client
+node "Proxy Server" as proxy
+node "App Server 1" as app1
+node "App Server 2" as app2
+node "Database" as db
+node "Cache Server" as cache
+
+client --> proxy : HTTPS/443
+proxy --> app1 : HTTP/8080
+proxy --> app2 : HTTP/8080
+app1 --> db : TCP/5432
+app2 --> db : TCP/5432
+app1 --> cache : TCP/6379
+app2 --> cache : TCP/6379
+
+note right of client : SSL/TLS encriptado
+note bottom of app1 : Conexión persistente
+@enduml`} />
+
+### Tipos de conexiones
+
+<Tabs>
+  <TabItem label="Protocolos de red">
+    <PlantUml code={`@startuml
+node "Client" as c
+node "Server" as s
+
+c --> s : HTTP/HTTPS
+c --> s : TCP/UDP
+c --> s : WebSocket
+c --> s : gRPC
+@enduml`} />
+    <p>Diferentes protocolos de comunicación.</p>
+  </TabItem>
+  <TabItem label="Conexiones internas">
+    <PlantUml code={`@startuml
+node "Server" {
+  component A
+  component B
+  A --> B : IPC
+  A --> B : Shared Memory
+  A --> B : Message Queue
+}
+@enduml`} />
+    <p>Comunicación dentro del mismo nodo.</p>
+  </TabItem>
+  <TabItem label="Conexiones de red">
+    <PlantUml code={`@startuml
+cloud "Internet"
+node "DMZ" 
+node "Internal Network"
+
+Internet --> DMZ : Firewall
+DMZ --> "Internal Network" : VPN
+@enduml`} />
+    <p>Conexiones a través de diferentes redes.</p>
+  </TabItem>
+</Tabs>
+
+## 2.7. Estereotipos y etiquetas
+
+Los estereotipos proporcionan información adicional sobre el tipo y propósito de los elementos en el diagrama.
+
+<PlantUml code={`@startuml
+node "Web Tier" <<web-server>> {
+  component [Nginx] <<reverse-proxy>>
+  artifact "ssl.cert" <<certificate>>
+}
+
+node "App Tier" <<application-server>> {
+  component [Spring Boot] <<microservice>>
+  artifact "app.jar" <<executable>>
+}
+
+node "Data Tier" <<database-server>> {
+  database "PostgreSQL" <<relational-db>>
+  artifact "backup.sql" <<data-backup>>
+}
+
+node "Mobile" <<client-device>> {
+  component [Mobile App] <<native-app>>
+}
+
+cloud "CDN" <<content-delivery>> {
+  artifact "static-assets" <<web-content>>
+}
+@enduml`} />
+
+## 2.8. Ejemplo integrado
+
+Veamos un ejemplo completo que combina todos los elementos básicos:
+
+<PlantUml code={`@startuml
+package "E-commerce Deployment Architecture" {
+  
+  cloud "Internet" {
+    node "User Device" <<client>> {
+      component [Web Browser] <<client-app>>
+      component [Mobile App] <<native-app>>
+    }
+  }
+  
+  package "DMZ" {
+    node "Load Balancer" <<hardware>> {
+      component [HAProxy] <<load-balancer>>
+      artifact "haproxy.cfg" <<config>>
+    }
+    
+    node "Web Server 1" <<vm>> {
+      component [Nginx] <<web-server>>
+      artifact "nginx.conf" <<config>>
+      artifact "ssl.cert" <<certificate>>
+    }
+    
+    node "Web Server 2" <<vm>> {
+      component [Nginx] <<web-server>>
+      artifact "nginx.conf" <<config>>
+      artifact "ssl.cert" <<certificate>>
+    }
+  }
+  
+  package "Application Tier" {
+    node "App Server 1" <<container>> {
+      component [API Gateway] <<microservice>>
+      component [User Service] <<microservice>>
+      artifact "app1.jar" <<executable>>
+      artifact "config.yml" <<config>>
+    }
+    
+    node "App Server 2" <<container>> {
+      component [Order Service] <<microservice>>
+      component [Payment Service] <<microservice>>
+      artifact "app2.jar" <<executable>>
+      artifact "config.yml" <<config>>
+    }
+  }
+  
+  package "Data Tier" {
+    node "Database Primary" <<server>> {
+      database "PostgreSQL Master" <<primary-db>>
+      artifact "schema.sql" <<data>>
+    }
+    
+    node "Database Replica" <<server>> {
+      database "PostgreSQL Slave" <<replica-db>>
+      artifact "backup.sql" <<backup>>
+    }
+    
+    node "Cache Server" <<server>> {
+      component [Redis] <<cache>>
+      artifact "redis.conf" <<config>>
+    }
+  }
+}
+
+' Conexiones
+[Web Browser] --> [HAProxy] : HTTPS/443
+[Mobile App] --> [HAProxy] : HTTPS/443
+[HAProxy] --> [Nginx] : HTTP/80
+[Nginx] --> [API Gateway] : HTTP/8080
+[API Gateway] --> [User Service] : gRPC
+[API Gateway] --> [Order Service] : gRPC
+[Order Service] --> [Payment Service] : HTTP
+[User Service] --> [PostgreSQL Master] : JDBC/5432
+[Order Service] --> [PostgreSQL Master] : JDBC/5432
+[PostgreSQL Master] --> [PostgreSQL Slave] : Replication
+[User Service] --> [Redis] : TCP/6379
+[Order Service] --> [Redis] : TCP/6379
+
+note right of [HAProxy] : Balanceador con SSL termination
+note bottom of [PostgreSQL Master] : Base de datos principal con replicación
+note right of [Redis] : Cache distribuido para sesiones
+@enduml`} />
+
+<Aside type="tip">
+  Este ejemplo muestra una arquitectura típica de microservicios con separación clara entre las capas de presentación, aplicación y datos.
+</Aside>
+
+Los elementos básicos de los diagramas de despliegue proporcionan un vocabulario completo para modelar infraestructuras complejas. En la siguiente sección, exploraremos las relaciones entre estos elementos y cómo representarlas efectivamente.

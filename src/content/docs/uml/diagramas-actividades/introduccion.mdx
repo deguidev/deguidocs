@@ -1,0 +1,231 @@
+---
+title: 1. Introducción al Diagrama de Actividades
+description: Definición, propósito e importancia de los diagramas de actividades en UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Introducción al Diagrama de Actividades
+
+## Un ejemplo muy sencillo
+
+Imaginemos que queremos representar el proceso de preparar un sándwich. Un diagrama de actividades nos ayuda a visualizar todos los pasos necesarios y las decisiones que tomamos durante el proceso:
+
+<PlantUml code={`@startuml
+start
+:Sacar pan y ingredientes;
+:Cortar el pan;
+if (¿Hay jamón?) then (sí)
+  :Añadir jamón;
+else (no)
+  :Añadir queso extra;
+endif
+:Añadir lechuga y tomate;
+if (¿Quieres mayonesa?) then (sí)
+  :Añadir mayonesa;
+else (no)
+  if (¿Quieres mostaza?) then (sí)
+    :Añadir mostaza;
+  endif
+endif
+:Cerrar el sándwich;
+:Cortar por la mitad;
+stop
+@enduml`} />
+
+En este sencillo ejemplo:
+
+- El diagrama comienza con un **punto de inicio** (círculo negro) y termina con un **punto final** (círculo con borde)
+- Cada **rectángulo redondeado** representa una **acción** o actividad
+- Los **rombos** representan **decisiones** con diferentes caminos a seguir
+- Las **flechas** muestran el **flujo** de una actividad a otra
+- El flujo puede **bifurcarse** según las condiciones (si hay jamón o no, si queremos mayonesa o no)
+
+Este diagrama nos permite entender rápidamente:
+- La secuencia de pasos para completar una tarea
+- Las decisiones que pueden alterar el flujo del proceso
+- Los caminos alternativos según diferentes condiciones
+
+A diferencia de un diagrama de secuencia (que muestra interacciones entre objetos), el diagrama de actividades se centra en mostrar el flujo de trabajo y la lógica del proceso mismo.
+
+## 1.1. Definición y propósito
+
+Un diagrama de actividades es una representación gráfica del flujo de trabajo o de procesos paso a paso. Es uno de los diagramas de comportamiento en UML (Unified Modeling Language) que muestra el flujo de control de una actividad a otra.
+
+### Propósito principal
+
+Los diagramas de actividades sirven para:
+
+- **Modelar procesos de negocio**: Representar flujos de trabajo organizacionales.
+- **Visualizar algoritmos**: Mostrar la lógica de un método o función.
+- **Documentar flujos de usuario**: Ilustrar cómo los usuarios interactúan con un sistema.
+- **Planificar proyectos**: Representar secuencias de actividades y sus dependencias.
+
+<PlantUml code={`@startuml
+start
+:Recibir pedido;
+fork
+  :Verificar inventario;
+  if (¿Productos disponibles?) then (sí)
+    :Reservar productos;
+  else (no)
+    :Notificar falta de stock;
+    stop
+  endif
+fork again
+  :Verificar pago;
+  if (¿Pago aprobado?) then (sí)
+    :Confirmar pago;
+  else (no)
+    :Solicitar método alternativo;
+    if (¿Cliente proporciona otro método?) then (sí)
+      :Procesar nuevo pago;
+    else (no)
+      :Cancelar pedido;
+      stop
+    endif
+  endif
+end fork
+:Preparar envío;
+:Despachar pedido;
+:Notificar al cliente;
+stop
+@enduml`} />
+
+### Ventajas de los diagramas de actividades
+
+<div>
+  <ul>
+    <li><strong>Claridad visual</strong>: Representan procesos complejos de manera clara y comprensible.</li>
+    <li><strong>Flexibilidad</strong>: Pueden modelar desde procesos de negocio hasta algoritmos técnicos.</li>
+    <li><strong>Comunicación efectiva</strong>: Facilitan la comunicación entre stakeholders técnicos y no técnicos.</li>
+    <li><strong>Identificación de problemas</strong>: Ayudan a detectar cuellos de botella, redundancias o ineficiencias.</li>
+  </ul>
+</div>
+
+<Aside type="tip">
+  Los diagramas de actividades son especialmente útiles cuando necesitas modelar procesos que involucran decisiones, actividades paralelas o flujos alternativos.
+</Aside>
+
+## 1.2. Importancia en el modelado de procesos
+
+Los diagramas de actividades juegan un papel crucial en el modelado de procesos por varias razones:
+
+### Visualización de flujos complejos
+
+<div>
+  <ul>
+    <li>Permiten representar visualmente procesos con múltiples caminos y condiciones.</li>
+    <li>Facilitan la comprensión de flujos paralelos y sincronización de actividades.</li>
+    <li>Ayudan a identificar puntos de decisión críticos en un proceso.</li>
+  </ul>
+</div>
+
+### Análisis y optimización
+
+<div>
+  <ul>
+    <li>Permiten analizar la eficiencia de los procesos existentes.</li>
+    <li>Facilitan la identificación de pasos redundantes o innecesarios.</li>
+    <li>Ayudan a detectar oportunidades de paralelización para mejorar el rendimiento.</li>
+  </ul>
+</div>
+
+### Documentación y comunicación
+
+<Tabs>
+  <TabItem label="Equipos técnicos">
+    <div>
+      <p>Para desarrolladores y arquitectos:</p>
+      <ul>
+        <li>Proporcionan una guía clara para la implementación de algoritmos.</li>
+        <li>Documentan la lógica de negocio que debe ser codificada.</li>
+        <li>Ayudan a entender el flujo de control en sistemas complejos.</li>
+      </ul>
+    </div>
+  </TabItem>
+  
+  <TabItem label="Stakeholders no técnicos">
+    <div>
+      <p>Para gerentes, clientes y usuarios finales:</p>
+      <ul>
+        <li>Presentan los procesos de manera visual y accesible.</li>
+        <li>Facilitan la validación de que los requisitos de negocio se cumplen.</li>
+        <li>Ayudan a comunicar cómo funcionará el sistema sin usar jerga técnica.</li>
+      </ul>
+    </div>
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  A diferencia de otros diagramas UML que se centran en la estructura (como los diagramas de clases) o en las interacciones entre objetos (como los diagramas de secuencia), los diagramas de actividades se enfocan en el flujo de trabajo y la lógica del proceso.
+</Aside>
+
+## 1.3. Relación con otros diagramas UML
+
+Los diagramas de actividades se complementan con otros diagramas UML para proporcionar una visión completa del sistema:
+
+<div>
+  <table>
+    <thead>
+      <tr>
+        <th>Diagrama UML</th>
+        <th>Relación con diagramas de actividades</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Diagrama de casos de uso</td>
+        <td>Un diagrama de actividades puede detallar el flujo de un caso de uso específico</td>
+      </tr>
+      <tr>
+        <td>Diagrama de clases</td>
+        <td>Las actividades suelen implementarse como métodos en las clases</td>
+      </tr>
+      <tr>
+        <td>Diagrama de secuencia</td>
+        <td>Mientras el diagrama de actividades muestra el flujo lógico, el de secuencia muestra las interacciones entre objetos</td>
+      </tr>
+      <tr>
+        <td>Diagrama de estados</td>
+        <td>El diagrama de estados se centra en los cambios de estado de un objeto, mientras que el de actividades se centra en el flujo de trabajo</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<PlantUml code={`@startuml
+rectangle "Diagramas UML" {
+  rectangle "Diagramas de Comportamiento" {
+    rectangle "Diagrama de Casos de Uso" as DCU
+    rectangle "Diagrama de Actividades" as DA #LightBlue
+    rectangle "Diagrama de Secuencia" as DS
+    rectangle "Diagrama de Estados" as DE
+  }
+  
+  rectangle "Diagramas Estructurales" {
+    rectangle "Diagrama de Clases" as DC
+    rectangle "Diagrama de Componentes" as DCO
+  }
+}
+
+DCU --> DA : "se detalla con"
+DA --> DC : "se implementa en"
+DA --> DS : "se complementa con"
+DA <--> DE : "se complementan"
+@enduml`} />
+
+### Flujo de trabajo típico en UML
+
+<Code code={`Requisitos → Casos de Uso → Diagramas de Actividades → Diagramas de Clases → Implementación`} lang="text" title="Flujo de trabajo típico en el modelado UML" />
+
+<Aside type="tip">
+  Aunque este flujo representa una progresión lógica, en la práctica el desarrollo suele ser iterativo, con refinamientos continuos en todos los diagramas a medida que evoluciona el entendimiento del sistema.
+</Aside>
+
+En las siguientes secciones, exploraremos en detalle los elementos básicos que componen un diagrama de actividades, las diferentes relaciones entre actividades, y la notación UML específica para estos diagramas.

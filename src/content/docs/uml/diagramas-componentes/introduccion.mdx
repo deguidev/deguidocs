@@ -1,0 +1,222 @@
+---
+title: 1. Introducción a los Diagramas de Componentes
+description: Conceptos fundamentales y propósito de los diagramas de componentes UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Introducción a los Diagramas de Componentes
+
+Los diagramas de componentes son un tipo de diagrama estructural en UML que muestra la organización y las dependencias entre un conjunto de componentes de software. Estos diagramas son fundamentales para visualizar la arquitectura de un sistema desde una perspectiva de alto nivel.
+
+## 1.1. ¿Qué son los diagramas de componentes?
+
+Un diagrama de componentes representa la estructura estática de un sistema mostrando sus componentes de software y las relaciones entre ellos. Los componentes son unidades modulares de software que encapsulan funcionalidad específica y pueden ser desplegados independientemente.
+
+<PlantUml code={`@startuml
+package "Sistema de E-commerce" {
+  component [Interfaz Web] as UI
+  component [Gestión de Productos] as Products
+  component [Procesador de Pagos] as Payments
+  component [Base de Datos] as DB
+  
+  UI --> Products
+  UI --> Payments
+  Products --> DB
+  Payments --> DB
+}
+@enduml`} />
+
+### Características principales
+
+- **Modularidad**: Muestran cómo el sistema se divide en módulos reutilizables
+- **Dependencias**: Visualizan las relaciones y dependencias entre componentes
+- **Interfaces**: Definen puntos de comunicación entre componentes
+- **Despliegue**: Ayudan a planificar la distribución de componentes
+
+## 1.2. Propósito y beneficios
+
+Los diagramas de componentes sirven múltiples propósitos en el desarrollo de software:
+
+### Beneficios principales
+
+<div>
+  <ul>
+    <li><strong>Visualización de arquitectura</strong>: Proporcionan una vista clara de la estructura del sistema</li>
+    <li><strong>Gestión de dependencias</strong>: Ayudan a identificar y gestionar las dependencias entre módulos</li>
+    <li><strong>Reutilización</strong>: Facilitan la identificación de componentes reutilizables</li>
+    <li><strong>Mantenimiento</strong>: Simplifican el mantenimiento al mostrar el impacto de los cambios</li>
+    <li><strong>Comunicación</strong>: Mejoran la comunicación entre equipos de desarrollo</li>
+  </ul>
+</div>
+
+<Tabs>
+  <TabItem label="Arquitectura de capas">
+    <PlantUml code={`@startuml
+package "Capa de Presentación" {
+  component [Controladores Web]
+  component [API REST]
+}
+
+package "Capa de Negocio" {
+  component [Servicios de Usuario]
+  component [Servicios de Producto]
+  component [Validadores]
+}
+
+package "Capa de Datos" {
+  component [Repositorios]
+  component [ORM]
+  database "Base de Datos"
+}
+
+[Controladores Web] --> [Servicios de Usuario]
+[API REST] --> [Servicios de Producto]
+[Servicios de Usuario] --> [Repositorios]
+[Servicios de Producto] --> [Repositorios]
+[Repositorios] --> [ORM]
+[ORM] --> [Base de Datos]
+@enduml`} />
+    <p>Ejemplo de arquitectura en capas mostrando la separación de responsabilidades.</p>
+  </TabItem>
+  <TabItem label="Microservicios">
+    <PlantUml code={`@startuml
+cloud "Internet" {
+  component [Gateway API]
+}
+
+package "Microservicios" {
+  component [Servicio de Usuarios]
+  component [Servicio de Productos]
+  component [Servicio de Pedidos]
+  component [Servicio de Notificaciones]
+}
+
+package "Bases de Datos" {
+  database "DB Usuarios"
+  database "DB Productos"
+  database "DB Pedidos"
+}
+
+[Gateway API] --> [Servicio de Usuarios]
+[Gateway API] --> [Servicio de Productos]
+[Gateway API] --> [Servicio de Pedidos]
+
+[Servicio de Usuarios] --> [DB Usuarios]
+[Servicio de Productos] --> [DB Productos]
+[Servicio de Pedidos] --> [DB Pedidos]
+
+[Servicio de Pedidos] --> [Servicio de Notificaciones]
+@enduml`} />
+    <p>Arquitectura de microservicios con servicios independientes y especializados.</p>
+  </TabItem>
+</Tabs>
+
+## 1.3. Cuándo usar diagramas de componentes
+
+Los diagramas de componentes son especialmente útiles en las siguientes situaciones:
+
+### Casos de uso principales
+
+<Steps>
+1. **Diseño de arquitectura**: Durante la fase de diseño para definir la estructura del sistema
+2. **Refactorización**: Al reestructurar código existente para mejorar la modularidad
+3. **Integración de sistemas**: Para mostrar cómo diferentes sistemas se conectan
+4. **Documentación**: Como parte de la documentación técnica del proyecto
+5. **Análisis de impacto**: Para evaluar el impacto de cambios en el sistema
+</Steps>
+
+<Aside type="tip">
+  Los diagramas de componentes son especialmente valiosos en proyectos grandes donde la complejidad arquitectural requiere una visualización clara de las dependencias y relaciones entre módulos.
+</Aside>
+
+## 1.4. Relación con otros diagramas UML
+
+Los diagramas de componentes se relacionan estrechamente con otros diagramas UML:
+
+### Diagramas relacionados
+
+- **Diagramas de clases**: Los componentes pueden contener múltiples clases
+- **Diagramas de despliegue**: Muestran dónde se ejecutan los componentes
+- **Diagramas de paquetes**: Organizan componentes en grupos lógicos
+- **Diagramas de secuencia**: Muestran interacciones entre componentes
+
+<PlantUml code={`@startuml
+package "Frontend" {
+  component [React App] as frontend
+  component [Redux Store] as store
+}
+
+package "Backend" {
+  component [Express Server] as server
+  component [Authentication] as auth
+  component [Business Logic] as logic
+}
+
+package "Database" {
+  component [MongoDB] as mongo
+  component [Redis Cache] as redis
+}
+
+frontend --> server : HTTP/REST
+store --> frontend : State Management
+server --> auth : Validate Token
+server --> logic : Process Request
+logic --> mongo : Data Persistence
+logic --> redis : Caching
+
+note right of server : API Gateway que maneja todas las peticiones HTTP
+note bottom of mongo : Base de datos principal para persistencia
+@enduml`} />
+
+<Aside type="note">
+  Los diagramas de componentes proporcionan una vista de alto nivel que complementa los diagramas más detallados como los de clases o secuencia.
+</Aside>
+
+## 1.5. Niveles de abstracción
+
+Los diagramas de componentes pueden representarse en diferentes niveles de abstracción:
+
+### Niveles comunes
+
+1. **Nivel de sistema**: Vista general de todo el sistema
+2. **Nivel de subsistema**: Componentes dentro de un subsistema específico
+3. **Nivel de módulo**: Detalles internos de un componente particular
+
+<Tabs>
+  <TabItem label="Vista de sistema">
+    <PlantUml code={`@startuml
+component [Sistema Web]
+component [Sistema Móvil]
+component [API Gateway]
+component [Base de Datos]
+
+[Sistema Web] --> [API Gateway]
+[Sistema Móvil] --> [API Gateway]
+[API Gateway] --> [Base de Datos]
+@enduml`} />
+    <p>Vista de alto nivel mostrando los componentes principales del sistema.</p>
+  </TabItem>
+  <TabItem label="Vista de subsistema">
+    <PlantUml code={`@startuml
+package "API Gateway" {
+  component [Router]
+  component [Authentication]
+  component [Rate Limiter]
+  component [Logger]
+}
+
+[Router] --> [Authentication]
+[Router] --> [Rate Limiter]
+[Router] --> [Logger]
+@enduml`} />
+    <p>Vista detallada de los componentes internos del API Gateway.</p>
+  </TabItem>
+</Tabs>
+
+Los diagramas de componentes son una herramienta esencial para arquitectos de software y desarrolladores que necesitan visualizar, comunicar y gestionar la estructura de sistemas complejos. En las siguientes secciones, exploraremos los elementos básicos y la notación específica para crear estos diagramas efectivamente.

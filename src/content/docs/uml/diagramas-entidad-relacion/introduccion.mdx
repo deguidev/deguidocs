@@ -1,0 +1,326 @@
+---
+title: 1. Introducción a los Diagramas Entidad-Relación
+description: Conceptos fundamentales y propósito de los diagramas entidad-relación en el diseño de bases de datos
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Introducción a los Diagramas Entidad-Relación
+
+Los diagramas entidad-relación (ER) son una herramienta fundamental en el diseño de bases de datos que permite modelar de manera visual la estructura de los datos y las relaciones entre las diferentes entidades de un sistema de información.
+
+## 1.1. ¿Qué son los diagramas entidad-relación?
+
+Un diagrama entidad-relación es una representación gráfica que muestra las entidades de un sistema de información, sus atributos y las relaciones que existen entre ellas. Estos diagramas son esenciales para:
+
+- **Diseñar** la estructura de una base de datos
+- **Comunicar** el modelo de datos a diferentes stakeholders
+- **Documentar** la arquitectura de información
+- **Validar** los requisitos de datos con usuarios finales
+
+<PlantUml code={`@startuml
+!theme aws-orange
+
+entity "Cliente" {
+  * id : INTEGER
+  --
+  * nombre : VARCHAR(100)
+  * email : VARCHAR(255)
+  telefono : VARCHAR(20)
+  fecha_registro : DATE
+}
+
+entity "Pedido" {
+  * id : INTEGER
+  --
+  * cliente_id : INTEGER
+  * fecha_pedido : DATE
+  * total : DECIMAL(10,2)
+  estado : VARCHAR(50)
+}
+
+entity "Producto" {
+  * id : INTEGER
+  --
+  * nombre : VARCHAR(200)
+  * precio : DECIMAL(8,2)
+  stock : INTEGER
+  categoria : VARCHAR(100)
+}
+
+Cliente ||--o{ Pedido : "realiza"
+Pedido }o--o{ Producto : "contiene"
+
+note right of Cliente : Entidad principal del sistema
+note bottom of Pedido : Representa las transacciones
+note left of Producto : Catálogo de productos disponibles
+@enduml`} />
+
+## 1.2. Niveles de modelado de datos
+
+Los diagramas entidad-relación se pueden crear en diferentes niveles de abstracción:
+
+### Modelo Conceptual
+- **Propósito**: Capturar los requisitos de alto nivel
+- **Audiencia**: Analistas de negocio y usuarios finales
+- **Características**: Entidades principales y relaciones básicas
+
+### Modelo Lógico
+- **Propósito**: Definir la estructura detallada independiente de la tecnología
+- **Audiencia**: Diseñadores de bases de datos
+- **Características**: Atributos detallados, tipos de datos, normalización
+
+### Modelo Físico
+- **Propósito**: Implementación específica en un SGBD
+- **Audiencia**: Desarrolladores y administradores de BD
+- **Características**: Tablas, índices, restricciones, optimizaciones
+
+<Tabs>
+  <TabItem label="Modelo Conceptual">
+    <PlantUml code={`@startuml
+entity "Usuario"
+entity "Pedido"
+entity "Producto"
+
+Usuario ||--o{ Pedido
+Pedido }o--o{ Producto
+@enduml`} />
+    <p>Vista de alto nivel con entidades principales.</p>
+  </TabItem>
+  <TabItem label="Modelo Lógico">
+    <PlantUml code={`@startuml
+entity "Usuario" {
+  id
+  nombre
+  email
+  fecha_registro
+}
+
+entity "Pedido" {
+  id
+  usuario_id
+  fecha
+  total
+}
+
+entity "Producto" {
+  id
+  nombre
+  precio
+  stock
+}
+
+Usuario ||--o{ Pedido
+Pedido }o--o{ Producto
+@enduml`} />
+    <p>Incluye atributos principales sin tipos específicos.</p>
+  </TabItem>
+  <TabItem label="Modelo Físico">
+    <PlantUml code={`@startuml
+entity "usuarios" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100) <<NOT NULL>>
+  * email : VARCHAR(255) <<UNIQUE>>
+  fecha_registro : TIMESTAMP <<DEFAULT NOW()>>
+}
+
+entity "pedidos" {
+  * id : BIGINT <<PK>>
+  --
+  * usuario_id : BIGINT <<FK>>
+  * fecha : TIMESTAMP <<NOT NULL>>
+  * total : DECIMAL(10,2) <<NOT NULL>>
+}
+
+usuarios ||--o{ pedidos
+@enduml`} />
+    <p>Implementación completa con tipos de datos y restricciones.</p>
+  </TabItem>
+</Tabs>
+
+## 1.3. Beneficios de usar diagramas ER
+
+### Para el diseño de bases de datos
+
+<Steps>
+1. **Claridad visual**: Facilita la comprensión de estructuras complejas
+2. **Detección temprana de errores**: Identifica problemas antes de la implementación
+3. **Comunicación efectiva**: Lenguaje común entre técnicos y no técnicos
+4. **Documentación**: Registro permanente del diseño de datos
+5. **Mantenimiento**: Facilita modificaciones y evolución del esquema
+</Steps>
+
+### Para el desarrollo de software
+
+- **Generación de código**: Base para crear clases y objetos
+- **Validación de requisitos**: Confirma que el modelo cumple las necesidades
+- **Optimización**: Identifica oportunidades de mejora en rendimiento
+- **Integración**: Facilita la conexión entre diferentes sistemas
+
+## 1.4. Elementos fundamentales
+
+Los diagramas entidad-relación están compuestos por tres elementos principales:
+
+### Entidades
+Representan objetos o conceptos del mundo real que tienen existencia independiente.
+
+<PlantUml code={`@startuml
+entity "Empleado" {
+  * id : INTEGER
+  --
+  nombre : VARCHAR(100)
+  cargo : VARCHAR(50)
+  salario : DECIMAL(8,2)
+}
+
+entity "Departamento" {
+  * id : INTEGER
+  --
+  nombre : VARCHAR(100)
+  presupuesto : DECIMAL(12,2)
+}
+
+entity "Proyecto" {
+  * id : INTEGER
+  --
+  nombre : VARCHAR(200)
+  fecha_inicio : DATE
+  fecha_fin : DATE
+}
+
+note top of Empleado : Entidad fuerte con clave primaria propia
+note top of Departamento : Entidad independiente
+note top of Proyecto : Entidad con ciclo de vida definido
+@enduml`} />
+
+### Atributos
+Propiedades o características que describen las entidades.
+
+- **Simples**: No se pueden dividir (nombre, edad)
+- **Compuestos**: Se pueden dividir en partes (dirección = calle + ciudad + código postal)
+- **Derivados**: Se calculan a partir de otros atributos (edad a partir de fecha de nacimiento)
+- **Multivaluados**: Pueden tener múltiples valores (teléfonos, emails)
+
+### Relaciones
+Asociaciones entre dos o más entidades que representan interacciones del mundo real.
+
+<PlantUml code={`@startuml
+entity "Estudiante" {
+  * id : INTEGER
+  --
+  nombre : VARCHAR(100)
+  carrera : VARCHAR(100)
+}
+
+entity "Curso" {
+  * id : INTEGER
+  --
+  nombre : VARCHAR(200)
+  creditos : INTEGER
+}
+
+entity "Profesor" {
+  * id : INTEGER
+  --
+  nombre : VARCHAR(100)
+  especialidad : VARCHAR(100)
+}
+
+Estudiante }o--o{ Curso : "se inscribe"
+Profesor ||--o{ Curso : "imparte"
+
+note bottom of Estudiante : Muchos estudiantes pueden tomar muchos cursos
+note right of Profesor : Un profesor puede impartir varios cursos
+@enduml`} />
+
+## 1.5. Ejemplo práctico: Sistema de biblioteca
+
+Veamos un ejemplo completo que ilustra los conceptos fundamentales:
+
+<PlantUml code={`@startuml
+!theme blueprint
+
+entity "usuarios" {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100) <<NOT NULL>>
+  * email : VARCHAR(255) <<UNIQUE>>
+  * telefono : VARCHAR(20)
+  * direccion : TEXT
+  fecha_registro : TIMESTAMP <<DEFAULT NOW()>>
+  activo : BOOLEAN <<DEFAULT TRUE>>
+}
+
+entity "libros" {
+  * id : BIGINT <<PK>>
+  --
+  * isbn : VARCHAR(13) <<UNIQUE>>
+  * titulo : VARCHAR(300) <<NOT NULL>>
+  * autor : VARCHAR(200) <<NOT NULL>>
+  * editorial : VARCHAR(100)
+  * año_publicacion : INTEGER
+  * categoria : VARCHAR(50)
+  * ubicacion : VARCHAR(20)
+  disponible : BOOLEAN <<DEFAULT TRUE>>
+}
+
+entity "prestamos" {
+  * id : BIGINT <<PK>>
+  --
+  * usuario_id : BIGINT <<FK>>
+  * libro_id : BIGINT <<FK>>
+  * fecha_prestamo : DATE <<NOT NULL>>
+  * fecha_devolucion_esperada : DATE <<NOT NULL>>
+  fecha_devolucion_real : DATE
+  * estado : VARCHAR(20) <<DEFAULT 'ACTIVO'>>
+}
+
+entity "multas" {
+  * id : BIGINT <<PK>>
+  --
+  * prestamo_id : BIGINT <<FK>>
+  * monto : DECIMAL(6,2) <<NOT NULL>>
+  * motivo : VARCHAR(200)
+  fecha_generacion : TIMESTAMP <<DEFAULT NOW()>>
+  pagada : BOOLEAN <<DEFAULT FALSE>>
+}
+
+usuarios ||--o{ prestamos : "solicita"
+libros ||--o{ prestamos : "se presta en"
+prestamos ||--o{ multas : "puede generar"
+
+note right of usuarios : Miembros registrados de la biblioteca
+note bottom of libros : Catálogo completo de recursos
+note left of prestamos : Registro de todas las transacciones
+note top of multas : Penalizaciones por retrasos o daños
+@enduml`} />
+
+<Aside type="tip">
+  Este ejemplo muestra un modelo físico completo con tipos de datos específicos, restricciones y relaciones que reflejan las reglas de negocio de una biblioteca.
+</Aside>
+
+## 1.6. Herramientas y notaciones
+
+### PlantUML para diagramas ER
+
+PlantUML ofrece una sintaxis específica y poderosa para crear diagramas entidad-relación:
+
+- **Sintaxis declarativa**: Fácil de escribir y mantener
+- **Temas personalizables**: Diferentes estilos visuales
+- **Integración**: Compatible con múltiples editores y plataformas
+- **Exportación**: Múltiples formatos de salida
+
+### Ventajas de usar PlantUML
+
+1. **Versionado**: Los diagramas se pueden versionar como código
+2. **Colaboración**: Fácil de compartir y revisar
+3. **Automatización**: Generación automática de documentación
+4. **Consistencia**: Estilo uniforme en todos los diagramas
+
+Los diagramas entidad-relación son fundamentales para el éxito de cualquier proyecto que involucre bases de datos. En las siguientes secciones, exploraremos en detalle cada elemento y aprenderemos las mejores prácticas para crear modelos efectivos y mantenibles.

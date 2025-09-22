@@ -8,8 +8,48 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
 
 # Introducción al Diagrama de Clases
+
+## Un ejemplo muy sencillo
+
+Imaginemos que queremos crear un sistema para una biblioteca. En esta biblioteca tenemos libros y personas que los toman prestados. Un diagrama de clases nos ayuda a visualizar esto de forma simple:
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Libro {
+  -titulo: String
+  -autor: String
+  -disponible: Boolean
+  +prestar(): Boolean
+  +devolver(): void
+}
+
+class Persona {
+  -nombre: String
+  -id: Integer
+  -librosEnPrestamo: List<Libro>
+  +tomarPrestado(libro: Libro): Boolean
+  +devolverLibro(libro: Libro): void
+}
+
+Persona "1" -- "0..*" Libro: toma prestado >
+@enduml`} />
+
+En este sencillo ejemplo:
+
+- Tenemos dos **clases**: `Libro` y `Persona`
+- Cada clase tiene sus **atributos** (datos que almacena):
+  - Un libro tiene título, autor y si está disponible
+  - Una persona tiene nombre, identificación y una lista de libros prestados
+- Cada clase tiene **métodos** (acciones que puede realizar):
+  - Un libro puede ser prestado o devuelto
+  - Una persona puede tomar prestado o devolver un libro
+- Existe una **relación** entre ambas clases: una persona puede tomar prestados varios libros (0 o más)
+
+Este diagrama nos permite entender rápidamente la estructura del sistema y cómo se relacionan sus componentes, antes de escribir una sola línea de código.
 
 ## 1.1. Definición y propósito
 
@@ -18,6 +58,42 @@ El diagrama de clases es uno de los tipos más importantes de diagramas en UML (
 - Las clases que componen el sistema
 - Los atributos y operaciones de cada clase
 - Las relaciones estructurales entre las clases
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Usuario {
+  -id: Integer
+  -nombre: String
+  -email: String
+  -fechaRegistro: Date
+  +registrar(): void
+  +iniciarSesion(): boolean
+  +actualizarPerfil(datos: Object): void
+}
+
+class Producto {
+  -id: Integer
+  -nombre: String
+  -precio: Double
+  -stock: Integer
+  +agregarStock(cantidad: Integer): void
+  +reducirStock(cantidad: Integer): boolean
+  +actualizarPrecio(nuevoPrecio: Double): void
+}
+
+class Pedido {
+  -id: Integer
+  -fecha: Date
+  -estado: String
+  +calcularTotal(): Double
+  +confirmar(): void
+  +cancelar(): void
+}
+
+Usuario "1" -- "*" Pedido: realiza >
+Pedido "*" -- "*" Producto: contiene >
+@enduml`} />
 
 <Aside type="tip">
   Un diagrama de clases sirve como un plano para la implementación de código, facilitando la transición del diseño a la programación.
@@ -55,7 +131,149 @@ Los diagramas de clases son fundamentales en el proceso de desarrollo de softwar
   </TabItem>
 </Tabs>
 
-## 1.3. Relación con otros diagramas UML
+## 1.3. Tipos de relaciones entre clases
+
+Los diagramas de clases permiten representar diferentes tipos de relaciones entre clases. A continuación se muestran los principales tipos de relaciones con ejemplos en PlantUML:
+
+<Tabs>
+  <TabItem label="Asociación">
+      <PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Profesor {
+  -nombre: String
+  +enseñar(): void
+}
+
+class Estudiante {
+  -nombre: String
+  +aprender(): void
+}
+
+Profesor "1" -- "*" Estudiante: enseña >
+@enduml`} />
+      <p>La asociación representa una relación estructural entre clases. En este ejemplo, un profesor puede enseñar a muchos estudiantes.</p>
+  </TabItem>
+  
+  <TabItem label="Agregación">
+      <PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Departamento {
+  -nombre: String
+  +obtenerEmpleados(): List
+}
+
+class Empleado {
+  -nombre: String
+  -puesto: String
+  +trabajar(): void
+}
+
+Departamento o-- "1..*" Empleado: contiene >
+@enduml`} />
+      <p>La agregación es una forma especial de asociación que representa una relación "todo-parte" donde las partes pueden existir independientemente del todo. Un empleado puede existir sin un departamento.</p>
+  </TabItem>
+  
+  <TabItem label="Composición">
+      <PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Coche {
+  -modelo: String
+  -año: Integer
+  +arrancar(): void
+}
+
+class Motor {
+  -potencia: Integer
+  -tipo: String
+  +encender(): void
+}
+
+Coche *-- "1" Motor: tiene >
+@enduml`} />
+      <p>La composición es una forma más fuerte de agregación donde las partes no pueden existir sin el todo. Si se destruye el coche, también se destruye el motor.</p>
+  </TabItem>
+  
+  <TabItem label="Herencia">
+      <PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class Vehiculo {
+  -marca: String
+  -modelo: String
+  +mover(): void
+}
+
+class Coche {
+  -numPuertas: Integer
+  +conducir(): void
+}
+
+class Motocicleta {
+  -cilindrada: Integer
+  +acelerar(): void
+}
+
+Vehiculo <|-- Coche
+Vehiculo <|-- Motocicleta
+@enduml`} />
+      <p>La herencia representa una relación "es un" donde una clase (subclase) hereda atributos y métodos de otra clase (superclase). Tanto Coche como Motocicleta son tipos de Vehículo.</p>
+  </TabItem>
+  
+  <TabItem label="Implementación">
+      <PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+interface Pagable {
+  +pagar(): void
+  +calcularTotal(): Double
+}
+
+class Factura {
+  -numero: String
+  -fecha: Date
+  +pagar(): void
+  +calcularTotal(): Double
+}
+
+class Suscripción {
+  -periodo: String
+  -renovaciónAutomática: Boolean
+  +pagar(): void
+  +calcularTotal(): Double
+}
+
+Pagable <|.. Factura
+Pagable <|.. Suscripción
+@enduml`} />
+      <p>La implementación representa una relación donde una clase implementa los métodos definidos en una interfaz. Tanto Factura como Suscripción implementan la interfaz Pagable.</p>
+  </TabItem>
+  
+  <TabItem label="Dependencia">
+      <PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+class OrdenCompra {
+  -id: Integer
+  -fecha: Date
+  +generarFactura(): Factura
+}
+
+class Factura {
+  -numero: String
+  -monto: Double
+  +imprimir(): void
+}
+
+OrdenCompra ..> Factura: crea >
+@enduml`} />
+      <p>La dependencia indica que una clase usa o depende de otra clase. En este caso, OrdenCompra depende de Factura porque crea instancias de esta clase.</p>
+  </TabItem>
+</Tabs>
+
+## 1.4. Relación con otros diagramas UML
 
 El diagrama de clases se relaciona con otros diagramas UML, complementándose para ofrecer diferentes perspectivas del sistema:
 
@@ -75,3 +293,142 @@ El diagrama de clases se relaciona con otros diagramas UML, complementándose pa
 <Badge text="Estático vs. Dinámico" variant="note" />
 
 La combinación del diagrama de clases (estructura estática) con diagramas dinámicos (como secuencia o actividad) proporciona una visión completa del sistema, abarcando tanto su estructura como su comportamiento.
+
+## 1.5. Ejemplo completo de diagrama de clases
+
+A continuación se muestra un ejemplo más completo de un diagrama de clases para un sistema de comercio electrónico, que integra varios tipos de relaciones:
+
+<PlantUml code={`@startuml
+skinparam classAttributeIconSize 0
+
+' Interfaces
+interface Autenticable {
+  +autenticar(usuario: String, contraseña: String): boolean
+}
+
+interface Pagable {
+  +procesar(): boolean
+  +cancelar(): boolean
+}
+
+' Clases abstractas
+abstract class Usuario {
+  #id: Integer
+  #nombre: String
+  #email: String
+  #contraseña: String
+  +registrar(): void
+  +actualizarPerfil(datos: Object): void
+}
+
+' Clases concretas - Usuarios
+class Cliente {
+  -direcciones: List<Direccion>
+  -metodoPago: MetodoPago
+  +agregarDireccion(direccion: Direccion): void
+  +realizarPedido(): Pedido
+}
+
+class Administrador {
+  -nivel: String
+  -departamento: String
+  +gestionarProductos(): void
+  +gestionarUsuarios(): void
+}
+
+' Clases de productos
+class Producto {
+  -id: Integer
+  -nombre: String
+  -descripcion: String
+  -precio: Double
+  -stock: Integer
+  -categoria: Categoria
+  +actualizarStock(cantidad: Integer): void
+  +aplicarDescuento(porcentaje: Double): void
+}
+
+class Categoria {
+  -id: Integer
+  -nombre: String
+  -descripcion: String
+  +agregarProducto(producto: Producto): void
+}
+
+' Clases de pedidos
+class Pedido {
+  -id: Integer
+  -fecha: Date
+  -estado: String
+  -items: List<ItemPedido>
+  -cliente: Cliente
+  -direccionEnvio: Direccion
+  -metodoPago: MetodoPago
+  +calcularTotal(): Double
+  +confirmar(): void
+  +cancelar(): void
+}
+
+class ItemPedido {
+  -producto: Producto
+  -cantidad: Integer
+  -precioUnitario: Double
+  +calcularSubtotal(): Double
+}
+
+' Clases auxiliares
+class Direccion {
+  -calle: String
+  -ciudad: String
+  -codigoPostal: String
+  -pais: String
+  +validar(): boolean
+}
+
+abstract class MetodoPago {
+  #id: Integer
+  #titular: String
+  +validar(): boolean
+}
+
+class TarjetaCredito {
+  -numero: String
+  -fechaExpiracion: String
+  -cvv: String
+}
+
+class PayPal {
+  -correoElectronico: String
+}
+
+' Relaciones
+Usuario <|-- Cliente
+Usuario <|-- Administrador
+Usuario ..|> Autenticable
+
+Cliente "1" *-- "*" Direccion
+Cliente "1" -- "*" Pedido: realiza >
+Cliente "1" -- "1..* " MetodoPago: utiliza >
+
+Pedido "1" *-- "1..* " ItemPedido
+Pedido "1" -- "1" Direccion: se envía a >
+Pedido "1" -- "1" MetodoPago: se paga con >
+
+ItemPedido "*" -- "1" Producto: contiene >
+
+Producto "*" -- "1" Categoria: pertenece a >
+
+MetodoPago <|-- TarjetaCredito
+MetodoPago <|-- PayPal
+MetodoPago ..|> Pagable
+@enduml`} />
+
+Este diagrama de clases muestra un sistema de comercio electrónico con:
+
+- **Herencia**: Las clases Cliente y Administrador heredan de Usuario; TarjetaCredito y PayPal heredan de MetodoPago.
+- **Implementación**: Usuario implementa la interfaz Autenticable; MetodoPago implementa la interfaz Pagable.
+- **Composición**: Cliente contiene Direcciones; Pedido contiene ItemPedido.
+- **Asociación**: Cliente realiza Pedidos; Pedido se envía a una Dirección.
+- **Agregación**: Producto pertenece a una Categoría.
+
+Este ejemplo ilustra cómo los diferentes tipos de relaciones se combinan en un diagrama de clases completo para modelar un sistema real.

@@ -1,0 +1,394 @@
+---
+title: 2. Elementos Básicos de los Diagramas de Componentes
+description: Componentes, interfaces, puertos y otros elementos fundamentales en UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Elementos Básicos de los Diagramas de Componentes
+
+Los diagramas de componentes utilizan varios elementos básicos para representar la estructura y organización de un sistema de software. Cada elemento tiene un propósito específico y una notación particular en UML.
+
+## 2.1. Componentes
+
+Un componente es una unidad modular de software que encapsula funcionalidad y puede ser desplegado independientemente. Los componentes representan partes físicas y reemplazables de un sistema.
+
+<PlantUml code={`@startuml
+component [Servicio de Autenticación] as auth
+component [Gestor de Base de Datos] as db
+component [API REST] as api
+component [Interfaz de Usuario] as ui
+
+note right of auth : Maneja login y autorización de usuarios
+
+note right of db : Abstrae el acceso a la base de datos
+
+note right of api : Expone servicios vía HTTP/REST
+
+note right of ui : Interfaz web responsive
+
+@enduml`} />
+
+### Características de los componentes
+
+- **Encapsulación**: Ocultan su implementación interna
+- **Interfaces bien definidas**: Proporcionan puntos de acceso claros
+- **Reutilización**: Pueden ser utilizados en diferentes contextos
+- **Independencia**: Pueden ser desarrollados y desplegados por separado
+
+<Tabs>
+  <TabItem label="Componente simple">
+    <PlantUml code={`@startuml
+component [Logger]
+@enduml`} />
+    <p>Representación básica de un componente.</p>
+  </TabItem>
+  <TabItem label="Componente con descripción">
+    <PlantUml code={`@startuml
+component [Sistema de Notificaciones] as notifications
+note bottom of notifications : Envía emails, SMS y notificaciones push
+@enduml`} />
+    <p>Componente con información adicional.</p>
+  </TabItem>
+  <TabItem label="Componente con estereotipo">
+    <PlantUml code={`@startuml
+component [Base de Datos] <<database>>
+component [Servicio Web] <<webservice>>
+component [Librería] <<library>>
+@enduml`} />
+    <p>Componentes con estereotipos que indican su tipo.</p>
+  </TabItem>
+</Tabs>
+
+## 2.2. Interfaces
+
+Las interfaces definen contratos que especifican qué servicios proporciona un componente sin revelar cómo los implementa. Son puntos de conexión entre componentes.
+
+<PlantUml code={`@startuml
+interface "IUserService" as IUser
+interface "IPaymentProcessor" as IPayment
+interface "INotificationService" as INotify
+
+component [UserManager] as user
+component [PaymentGateway] as payment
+component [EmailService] as email
+
+user .up.|> IUser : implements
+payment .up.|> IPayment : implements
+email .up.|> INotify : implements
+
+component [OrderService] as order
+order --> IUser : uses
+order --> IPayment : uses
+order --> INotify : uses
+@enduml`} />
+
+### Tipos de interfaces
+
+<Tabs>
+  <TabItem label="Interface proporcionada">
+    <PlantUml code={`@startuml
+component [DatabaseService] as db
+interface "IDataAccess" as IData
+
+db .up.|> IData : provides
+note right of IData : Interface que expone el componente
+@enduml`} />
+    <p>Interface que un componente proporciona a otros.</p>
+  </TabItem>
+  <TabItem label="Interface requerida">
+    <PlantUml code={`@startuml
+component [ReportGenerator] as report
+interface "IDataSource" as IData
+
+report --> IData : requires
+note right of IData : Interface que necesita el componente
+@enduml`} />
+    <p>Interface que un componente necesita de otros.</p>
+  </TabItem>
+  <TabItem label="Conexión completa">
+    <PlantUml code={`@startuml
+component [DataProvider] as provider
+component [DataConsumer] as consumer
+interface "IDataService" as IData
+
+provider .up.|> IData : provides
+consumer --> IData : requires
+
+note bottom of IData : Contrato entre proveedor y consumidor
+@enduml`} />
+    <p>Conexión completa entre componentes a través de una interface.</p>
+  </TabItem>
+</Tabs>
+
+## 2.3. Puertos
+
+Los puertos representan puntos de interacción específicos de un componente con su entorno. Son puntos de conexión donde las interfaces se conectan al componente.
+
+<PlantUml code={`@startuml
+component [WebServer] as web {
+  port "HTTP" as http
+  port "HTTPS" as https
+  port "Admin" as admin
+}
+
+interface "IWebService" as IWeb
+interface "IAdminService" as IAdmin
+
+http -- IWeb
+https -- IWeb
+admin -- IAdmin
+
+component [LoadBalancer] as lb
+component [AdminPanel] as ap
+
+lb --> IWeb
+ap --> IAdmin
+
+note right of web : Servidor web con múltiples puertos
+@enduml`} />
+
+### Características de los puertos
+
+- **Puntos de conexión**: Definen dónde se conectan las interfaces
+- **Separación de responsabilidades**: Diferentes puertos para diferentes propósitos
+- **Flexibilidad**: Permiten múltiples formas de interactuar con un componente
+
+## 2.4. Paquetes
+
+Los paquetes agrupan componentes relacionados y proporcionan un mecanismo de organización y namespace.
+
+<PlantUml code={`@startuml
+package "Frontend" {
+  component [React App]
+  component [Redux Store]
+  component [Router]
+}
+
+package "Backend" {
+  component [Express Server]
+  component [Authentication]
+  component [Business Logic]
+}
+
+package "Database" {
+  component [MongoDB Driver]
+  component [Connection Pool]
+  database "MongoDB"
+}
+
+package "External Services" {
+  component [Payment Gateway]
+  component [Email Service]
+  component [SMS Service]
+}
+
+[React App] --> [Express Server]
+[Express Server] --> [MongoDB Driver]
+[Business Logic] --> [Payment Gateway]
+[Authentication] --> [Email Service]
+@enduml`} />
+
+### Beneficios de los paquetes
+
+- **Organización**: Agrupan componentes relacionados
+- **Namespace**: Evitan conflictos de nombres
+- **Modularidad**: Facilitan la gestión de dependencias
+- **Despliegue**: Pueden representar unidades de despliegue
+
+## 2.5. Conectores
+
+Los conectores representan enlaces de comunicación entre componentes, mostrando cómo fluye la información.
+
+<PlantUml code={`@startuml
+component [Cliente Web] as client
+component [API Gateway] as gateway
+component [Microservicio A] as serviceA
+component [Microservicio B] as serviceB
+component [Base de Datos] as db
+
+client --> gateway : HTTP/REST
+gateway --> serviceA : gRPC
+gateway --> serviceB : HTTP
+serviceA --> db : SQL
+serviceB --> db : SQL
+
+note right of gateway : Enruta peticiones a microservicios
+note bottom of db : Base de datos compartida
+@enduml`} />
+
+### Tipos de conectores
+
+<Tabs>
+  <TabItem label="Dependencia simple">
+    <PlantUml code={`@startuml
+component [OrderService] as order
+component [InventoryService] as inventory
+
+order --> inventory : checks stock
+@enduml`} />
+    <p>Dependencia directa entre componentes.</p>
+  </TabItem>
+  <TabItem label="Comunicación bidireccional">
+    <PlantUml code={`@startuml
+component [Frontend] as fe
+component [Backend] as be
+
+fe <--> be : HTTP/WebSocket
+@enduml`} />
+    <p>Comunicación en ambas direcciones.</p>
+  </TabItem>
+  <TabItem label="Múltiples conexiones">
+    <PlantUml code={`@startuml
+component [API Gateway] as gateway
+component [Auth Service] as auth
+component [User Service] as user
+component [Order Service] as order
+
+gateway --> auth : validate
+gateway --> user : user data
+gateway --> order : order data
+
+auth --> user : user lookup
+order --> user : customer info
+@enduml`} />
+    <p>Un componente conectado a múltiples servicios.</p>
+  </TabItem>
+</Tabs>
+
+## 2.6. Artefactos
+
+Los artefactos representan elementos físicos del sistema como archivos, ejecutables, bibliotecas o bases de datos.
+
+<PlantUml code={`@startuml
+artifact "app.jar" as jar
+artifact "config.properties" as config
+artifact "database.sql" as sql
+database "ProductionDB" as db
+
+component [Application] as app
+component [Configuration Manager] as configMgr
+component [Database Service] as dbService
+
+app --> jar : deployed as
+configMgr --> config : reads
+dbService --> sql : executes
+dbService --> db : connects to
+
+note right of jar : Archivo ejecutable de la aplicación
+note right of config : Archivo de configuración
+@enduml`} />
+
+### Tipos de artefactos
+
+- **Ejecutables**: .jar, .exe, .dll
+- **Archivos de configuración**: .properties, .xml, .json
+- **Scripts**: .sql, .sh, .bat
+- **Recursos**: imágenes, documentos, plantillas
+
+## 2.7. Nodos
+
+Los nodos representan recursos físicos o virtuales donde se ejecutan los componentes.
+
+<PlantUml code={`@startuml
+node "Web Server" as webNode {
+  component [Frontend App]
+  component [Static Files]
+}
+
+node "Application Server" as appNode {
+  component [API Service]
+  component [Business Logic]
+}
+
+node "Database Server" as dbNode {
+  database "MySQL"
+  component [Backup Service]
+}
+
+[Frontend App] --> [API Service] : HTTP
+[API Service] --> [MySQL] : SQL
+
+note bottom of webNode : Servidor web Nginx/Apache
+note bottom of appNode : Servidor de aplicaciones Tomcat/Node.js
+note bottom of dbNode : Servidor de base de datos MySQL/PostgreSQL
+@enduml`} />
+
+## 2.8. Ejemplo integrado
+
+Veamos un ejemplo que combina todos los elementos básicos en un sistema completo:
+
+<PlantUml code={`@startuml
+package "E-commerce System" {
+  
+  package "Frontend Tier" {
+    component [Web UI] as webui
+    component [Mobile App] as mobile
+  }
+  
+  package "API Layer" {
+    component [API Gateway] as gateway
+    interface "REST API" as restapi
+    
+    gateway .up.|> restapi : provides
+  }
+  
+  package "Business Services" {
+    component [User Service] as userSvc
+    component [Product Service] as productSvc
+    component [Order Service] as orderSvc
+    
+    interface "IUserService" as IUser
+    interface "IProductService" as IProduct
+    interface "IOrderService" as IOrder
+    
+    userSvc .up.|> IUser : implements
+    productSvc .up.|> IProduct : implements
+    orderSvc .up.|> IOrder : implements
+  }
+  
+  package "Data Layer" {
+    component [User Repository] as userRepo
+    component [Product Repository] as productRepo
+    component [Order Repository] as orderRepo
+    database "Main Database" as mainDB
+  }
+  
+  package "External Services" {
+    component [Payment Gateway] as payment
+    component [Email Service] as email
+  }
+}
+
+' Conexiones
+webui --> restapi : uses
+mobile --> restapi : uses
+gateway --> IUser : delegates to
+gateway --> IProduct : delegates to
+gateway --> IOrder : delegates to
+
+userSvc --> userRepo : uses
+productSvc --> productRepo : uses
+orderSvc --> orderRepo : uses
+
+userRepo --> mainDB : queries
+productRepo --> mainDB : queries
+orderRepo --> mainDB : queries
+
+orderSvc --> payment : processes payments
+userSvc --> email : sends notifications
+
+note right of gateway : Punto de entrada único para todas las peticiones
+note bottom of mainDB : Base de datos principal con todas las entidades
+@enduml`} />
+
+<Aside type="tip">
+  Este ejemplo muestra cómo los diferentes elementos trabajan juntos para formar una arquitectura coherente y bien estructurada.
+</Aside>
+
+Los elementos básicos de los diagramas de componentes proporcionan un vocabulario rico para modelar sistemas complejos. En la siguiente sección, exploraremos las relaciones entre estos elementos y cómo representarlas efectivamente.

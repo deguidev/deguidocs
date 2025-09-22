@@ -1,0 +1,556 @@
+---
+title: 2. Elementos Básicos del Diagrama de Actividades
+description: Componentes fundamentales que conforman un diagrama de actividades en UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Elementos Básicos del Diagrama de Actividades
+
+Los diagramas de actividades se componen de varios elementos básicos que permiten representar flujos de trabajo, procesos y algoritmos. Conocer estos elementos es fundamental para crear diagramas claros y efectivos.
+
+## 2.1. Nodos de acción
+
+Los nodos de acción representan pasos individuales en un flujo de actividades. Son las unidades básicas de comportamiento en un diagrama de actividades.
+
+<PlantUml code={`@startuml
+start
+:Verificar credenciales;
+:Procesar solicitud;
+:Generar respuesta;
+stop
+@enduml`} />
+
+### Características principales
+
+- Se representan como **rectángulos con esquinas redondeadas**
+- Describen una acción atómica que no puede descomponerse más
+- Tienen un nombre que describe brevemente la acción
+- Pueden tener flujos entrantes y salientes
+
+<Tabs>
+  <TabItem label="Sintaxis">
+    <Code code={`:nombre de la acción;`} lang="text" title="Sintaxis básica de un nodo de acción en PlantUML" />
+  </TabItem>
+  <TabItem label="Ejemplos">
+    <Code code={`:Validar formulario;
+:Calcular total;
+:Enviar correo electrónico;
+:Actualizar base de datos;`} lang="text" title="Ejemplos de nodos de acción" />
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Los nombres de las acciones deben ser concisos pero descriptivos, generalmente usando verbos en infinitivo que indiquen claramente la acción que se realiza.
+</Aside>
+
+## 2.2. Nodos inicial y final
+
+Los nodos inicial y final marcan el comienzo y la terminación de un flujo de actividades.
+
+<PlantUml code={`@startuml
+start
+:Realizar actividad;
+stop
+@enduml`} />
+
+### Nodo inicial
+
+- Representado por un **círculo negro sólido**
+- Indica el punto de entrada o inicio del flujo
+- Un diagrama puede tener múltiples nodos iniciales para diferentes flujos
+
+### Nodo final
+
+- Representado por un **círculo con un círculo concéntrico** (diana)
+- Indica la terminación del flujo de actividades
+- Un diagrama puede tener múltiples nodos finales
+
+<Tabs>
+  <TabItem label="Sintaxis">
+    <Code code={`start
+' Actividades aquí
+stop`} lang="text" title="Sintaxis de nodos inicial y final en PlantUML" />
+  </TabItem>
+  <TabItem label="Variantes">
+    <Code code={`' Nodo final de actividad
+stop
+
+' Nodo final de flujo (termina un flujo específico, no toda la actividad)
+end
+
+' Múltiples inicios y finales
+start
+:Actividad 1;
+stop
+
+start
+:Actividad 2;
+stop`} lang="text" title="Variantes de nodos finales" />
+  </TabItem>
+</Tabs>
+
+## 2.3. Decisiones y fusiones
+
+Las decisiones y fusiones permiten representar flujos condicionales y la convergencia de flujos alternativos.
+
+### Nodo de decisión
+
+<PlantUml code={`@startuml
+start
+:Verificar saldo;
+if (¿Saldo suficiente?) then (sí)
+  :Realizar transacción;
+else (no)
+  :Mostrar error;
+endif
+stop
+@enduml`} />
+
+- Representado por un **rombo**
+- Tiene un flujo entrante y múltiples flujos salientes
+- Cada flujo saliente está etiquetado con una condición
+- Las condiciones deben ser mutuamente excluyentes
+
+### Nodo de fusión
+
+<PlantUml code={`@startuml
+start
+if (¿Método de pago?) then (tarjeta)
+  :Procesar pago con tarjeta;
+else (efectivo)
+  :Registrar pago en efectivo;
+endif
+:Emitir recibo;
+stop
+@enduml`} />
+
+- También representado por un **rombo**
+- Tiene múltiples flujos entrantes y un único flujo saliente
+- Combina caminos alternativos en un único flujo
+
+<Tabs>
+  <TabItem label="Sintaxis">
+    <Code code={`if (condición) then (opción1)
+  :acción para opción1;
+else (opción2)
+  :acción para opción2;
+endif`} lang="text" title="Sintaxis de decisión en PlantUML" />
+  </TabItem>
+  <TabItem label="Decisiones anidadas">
+    <Code code={`if (¿Tipo de usuario?) then (nuevo)
+  :Mostrar tutorial;
+  if (¿Completó registro?) then (sí)
+    :Activar cuenta;
+  else (no)
+    :Solicitar datos faltantes;
+  endif
+else (existente)
+  :Mostrar panel principal;
+endif`} lang="text" title="Ejemplo de decisiones anidadas" />
+  </TabItem>
+</Tabs>
+
+## 2.4. Bifurcaciones y uniones
+
+Las bifurcaciones y uniones permiten representar actividades que se ejecutan en paralelo.
+
+### Nodo de bifurcación (fork)
+
+<PlantUml code={`@startuml
+start
+:Recibir pedido;
+fork
+  :Preparar producto;
+fork again
+  :Procesar pago;
+end fork
+:Enviar pedido;
+stop
+@enduml`} />
+
+- Representado por una **barra negra horizontal**
+- Tiene un flujo entrante y múltiples flujos salientes
+- Indica que las actividades en los flujos salientes se ejecutan en paralelo
+
+### Nodo de unión (join)
+
+- También representado por una **barra negra horizontal**
+- Tiene múltiples flujos entrantes y un único flujo saliente
+- Sincroniza flujos paralelos; el flujo saliente se activa solo cuando todos los flujos entrantes han completado
+
+<Tabs>
+  <TabItem label="Sintaxis">
+    <Code code={`fork
+  :actividad paralela 1;
+fork again
+  :actividad paralela 2;
+end fork`} lang="text" title="Sintaxis de bifurcación y unión en PlantUML" />
+  </TabItem>
+  <TabItem label="Ejemplo complejo">
+    <Code code={`fork
+  :Verificar inventario;
+  if (¿Disponible?) then (sí)
+    :Reservar productos;
+  else (no)
+    :Notificar falta de stock;
+  endif
+fork again
+  :Validar dirección;
+  :Calcular costos de envío;
+end fork
+:Confirmar pedido;`} lang="text" title="Ejemplo con bifurcación y decisiones" />
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  La diferencia clave entre decisiones y bifurcaciones es que en las decisiones solo se sigue un camino (basado en una condición), mientras que en las bifurcaciones todos los caminos se ejecutan en paralelo.
+</Aside>
+
+## 2.5. Particiones (Swimlanes)
+
+Las particiones o swimlanes dividen el diagrama en secciones que representan diferentes responsabilidades o actores.
+
+<PlantUml code={`@startuml
+|Cliente|
+start
+:Realizar pedido;
+|Sistema|
+:Validar pedido;
+if (¿Pedido válido?) then (sí)
+  :Procesar pedido;
+  |Almacén|
+  :Preparar productos;
+  :Empaquetar pedido;
+  |Logística|
+  :Enviar pedido;
+  |Cliente|
+  :Recibir pedido;
+else (no)
+  |Sistema|
+  :Notificar error;
+  |Cliente|
+  :Corregir pedido;
+endif
+stop
+@enduml`} />
+
+### Características principales
+
+- Dividen el diagrama en carriles verticales u horizontales
+- Cada carril representa un actor, departamento o sistema responsable
+- Ayudan a visualizar quién es responsable de cada actividad
+- Facilitan la identificación de transferencias de responsabilidad
+
+<Tabs>
+  <TabItem label="Sintaxis vertical">
+    <Code code={`|Actor1|
+:Actividad de Actor1;
+|Actor2|
+:Actividad de Actor2;`} lang="text" title="Sintaxis de swimlanes verticales en PlantUML" />
+  </TabItem>
+  <TabItem label="Sintaxis horizontal">
+    <Code code={`partition "Actor1" {
+  :Actividad de Actor1;
+}
+partition "Actor2" {
+  :Actividad de Actor2;
+}`} lang="text" title="Sintaxis de swimlanes horizontales en PlantUML" />
+  </TabItem>
+</Tabs>
+
+## 2.6. Nodos de objeto
+
+Los nodos de objeto representan objetos o datos que son utilizados o producidos por las actividades.
+
+<PlantUml code={`@startuml
+start
+:Crear pedido;
+#palegreen:Pedido;
+:Validar información;
+if (¿Información válida?) then (sí)
+  :Procesar pago;
+  #palegreen:Recibo;
+  :Enviar confirmación;
+else (no)
+  :Solicitar corrección;
+endif
+stop
+@enduml`} />
+
+### Características principales
+
+- Se representan como **rectángulos** (a diferencia de las acciones que tienen esquinas redondeadas)
+- Contienen el nombre del objeto, a veces con su estado entre corchetes
+- Pueden estar conectados a acciones para mostrar entradas y salidas
+
+<Tabs>
+  <TabItem label="Sintaxis">
+    <Code code={`#color:Nombre del objeto;
+#color:Objeto [Estado];`} lang="text" title="Sintaxis de nodos de objeto en PlantUML" />
+  </TabItem>
+  <TabItem label="Ejemplos">
+    <Code code={`#palegreen:Formulario [Completado];
+#pink:Factura [Pendiente];
+#lightblue:Informe [Generado];`} lang="text" title="Ejemplos de nodos de objeto con estados" />
+  </TabItem>
+</Tabs>
+
+## 2.7. Señales y eventos
+
+Las señales y eventos representan la recepción o envío de señales entre actividades o sistemas.
+
+
+<PlantUml code={`
+@startuml
+start
+:Iniciar proceso;
+note right
+Inicio del flujo principal.
+Representa el punto de partida.
+end note
+
+:Solicitar autorización; <<sendSignal>> 
+note right
+Aquí el sistema o usuario envía
+una señal para pedir autorización.
+end note
+
+:Autorización; <<objectSignal>>
+note left
+Este nodo representa el objeto "Autorización"
+que viaja por el proceso como información.
+end note
+
+:Esperar respuesta; <<acceptEvent>>
+note right
+El sistema queda a la espera de una señal
+que confirme si la autorización llega.
+end note
+
+:Recibir autorización; <<acceptEvent>>
+note right
+Se recibe el evento de autorización.
+Este es un punto clave de validación.
+end note
+
+if ("¿Autorización válida?") then (Sí)
+  :Continuar proceso;
+  note right
+  Con la autorización válida
+  el proceso sigue adelante.
+  end note
+else (No)
+  :Rechazar proceso;
+  note right
+  Si la autorización es inválida,
+  el flujo termina con rechazo.
+  end note
+endif
+
+:TimeEvent 30s; <<timeEvent>>
+note left
+Evento temporal opcional.
+Si en 30 segundos no llega respuesta,
+se dispara este evento.
+end note
+
+stop
+note right
+Fin del flujo de actividades.
+end note
+@enduml
+
+
+
+`} />
+### Tipos de señales
+
+- **Señal de envío**: Representada con un símbolo de flecha hacia la derecha (mayor que) antes del nombre. Indica que el proceso envía una notificación o mensaje a otro proceso o sistema.
+- **Señal de recepción**: Representada con un símbolo de flecha hacia la izquierda (menor que) antes del nombre. Indica que el proceso está esperando y recibiendo una notificación o mensaje de otro proceso o sistema.
+- **Evento temporal**: Representado con un reloj de arena o una notación de tiempo para indicar espera o restricciones temporales en el flujo de actividades.
+
+<Tabs>
+  <TabItem label="Sintaxis">
+    <Code code={`' Señal de envío
+#color:>Nombre de la señal;
+
+' Señal de recepción
+#color:<Nombre de la señal;
+
+' Evento temporal
+#color:Esperar 24 horas;`} lang="text" title="Sintaxis de señales y eventos en PlantUML" />
+  </TabItem>
+  <TabItem label="Ejemplo completo">
+    <Code code={`start
+:Procesar pedido;
+#orange:>Enviar solicitud de pago;
+:Esperar confirmación;
+if (¿Tiempo de espera excedido?) then (sí)
+  #orange:>Enviar recordatorio;
+endif
+#orange:<Recibir confirmación de pago;
+:Completar pedido;
+stop`} lang="text" title="Ejemplo de señales en un proceso de pago" />
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Las señales son especialmente útiles para modelar interacciones asíncronas entre diferentes sistemas o actores en un proceso.
+</Aside>
+
+## 2.8. Notas y comentarios
+
+Las notas y comentarios permiten añadir explicaciones o aclaraciones al diagrama.
+
+<PlantUml code={`@startuml
+start
+:Verificar usuario;
+note right: Comprobar credenciales en la base de datos
+if (¿Usuario válido?) then (sí)
+  :Conceder acceso;
+  note left
+    Solo usuarios con
+    permisos activos
+  end note
+else (no)
+  :Bloquear acceso;
+  note right: Registrar intento fallido
+endif
+stop
+@enduml`} />
+
+### Características principales
+
+- Pueden colocarse a la izquierda, derecha, arriba o abajo de cualquier elemento
+- No afectan al flujo del diagrama, solo proporcionan información adicional
+- Pueden ser de una sola línea o multilínea
+
+<Tabs>
+  <TabItem label="Sintaxis">
+    <Code code={`' Nota de una línea
+note right: Texto de la nota
+
+' Nota multilínea
+note left
+  Línea 1
+  Línea 2
+end note`} lang="text" title="Sintaxis de notas en PlantUML" />
+  </TabItem>
+  <TabItem label="Posicionamiento">
+    <Code code={`note left of [elemento]: Nota a la izquierda
+note right of [elemento]: Nota a la derecha
+note top of [elemento]: Nota arriba
+note bottom of [elemento]: Nota abajo`} lang="text" title="Posicionamiento de notas" />
+  </TabItem>
+</Tabs>
+
+## 2.9. Regiones de expansión
+
+Las regiones de expansión representan actividades que se ejecutan múltiples veces para un conjunto de elementos.
+
+<PlantUml code={`@startuml
+start
+:Obtener lista de productos;
+#lightblue:Lista de productos;
+partition "Región de expansión" {
+  :Verificar disponibilidad;
+  if (¿Disponible?) then (sí)
+    :Añadir a carrito;
+  else (no)
+    :Marcar como agotado;
+  endif
+}
+note right of "Región de expansión"
+  Se ejecuta para cada
+  producto de la lista
+end note
+:Mostrar resumen;
+stop
+@enduml`} />
+
+### Características principales
+
+- Representan operaciones iterativas o bucles
+- Se aplican a colecciones de elementos
+- Pueden contener flujos complejos dentro de ellas
+
+<Tabs>
+  <TabItem label="Sintaxis">
+    <Code code={`partition "Región de expansión" {
+  ' Actividades que se repiten
+}`} lang="text" title="Sintaxis de regiones de expansión en PlantUML" />
+  </TabItem>
+  <TabItem label="Ejemplo con bucle">
+    <Code code={`start
+:Obtener pedidos pendientes;
+while (¿Hay más pedidos?) is (sí)
+  :Procesar siguiente pedido;
+  :Actualizar estado;
+endwhile (no)
+:Generar informe;
+stop`} lang="text" title="Ejemplo con bucle while" />
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  En PlantUML, las regiones de expansión pueden representarse usando particiones con nombres descriptivos o mediante estructuras de control como while, repeat o foreach.
+</Aside>
+
+## 2.10. Excepciones y gestión de errores
+
+Los diagramas de actividades también pueden representar el manejo de excepciones y errores.
+
+<PlantUml code={`@startuml
+start
+:Iniciar transacción;
+try
+  :Ejecutar operación;
+  :Confirmar transacción;
+catch
+  :Registrar error;
+  :Revertir transacción;
+endtry
+stop
+@enduml`} />
+
+### Características principales
+
+- Permiten modelar flujos alternativos cuando ocurren errores
+- Ayudan a visualizar mecanismos de recuperación
+- Pueden representar diferentes tipos de excepciones
+
+<Tabs>
+  <TabItem label="Sintaxis">
+    <Code code={`try
+  ' Actividades normales
+catch
+  ' Actividades de manejo de errores
+endtry`} lang="text" title="Sintaxis de manejo de excepciones en PlantUML" />
+  </TabItem>
+  <TabItem label="Ejemplo detallado">
+    <Code code={`start
+:Conectar a base de datos;
+try
+  :Ejecutar consulta;
+  :Procesar resultados;
+catch
+  if (¿Error de conexión?) then (sí)
+    :Reintentar conexión;
+    backward:Conectar a base de datos;
+  else (otro error)
+    :Registrar error en log;
+    :Notificar al administrador;
+  endif
+endtry
+:Cerrar conexión;
+stop`} lang="text" title="Ejemplo de manejo de diferentes tipos de errores" />
+  </TabItem>
+</Tabs>
+
+Estos elementos básicos constituyen el vocabulario fundamental para crear diagramas de actividades efectivos. En las siguientes secciones, exploraremos cómo estos elementos se relacionan entre sí y las diferentes notaciones UML para representarlos.

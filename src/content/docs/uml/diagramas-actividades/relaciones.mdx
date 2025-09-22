@@ -1,0 +1,651 @@
+---
+title: 3. Relaciones en el Diagrama de Actividades
+description: Tipos de conexiones y flujos entre elementos en los diagramas de actividades UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Relaciones en el Diagrama de Actividades
+
+Las relaciones en los diagramas de actividades representan el flujo de control y datos entre los diferentes elementos del diagrama. Estas conexiones son fundamentales para entender cómo se relacionan las actividades y cómo fluye la ejecución del proceso.
+
+## 3.1. Flujos de control
+
+Los flujos de control representan la secuencia en la que se ejecutan las actividades. Son las conexiones más básicas y comunes en un diagrama de actividades.
+
+<PlantUml code={`@startuml
+start
+:Actividad 1;
+:Actividad 2;
+:Actividad 3;
+stop
+@enduml`} />
+
+### Características principales
+
+- Se representan mediante **flechas** que conectan nodos
+- Indican la dirección del flujo de ejecución
+- Pueden ser simples o condicionales
+
+<Tabs>
+  <TabItem label="Flujo simple">
+    <PlantUml code={`@startuml
+start
+:Recibir solicitud;
+:Procesar solicitud;
+:Enviar respuesta;
+stop
+@enduml`} />
+    <p>En este ejemplo, el flujo es lineal y secuencial, pasando de una actividad a la siguiente sin condiciones.</p>
+  </TabItem>
+  <TabItem label="Flujo condicional">
+    <PlantUml code={`@startuml
+start
+:Verificar edad;
+if (¿Mayor de 18?) then (sí)
+  :Permitir acceso;
+else (no)
+  :Denegar acceso;
+endif
+stop
+@enduml`} />
+    <p>En este caso, el flujo se divide según una condición, tomando caminos diferentes dependiendo del resultado de la evaluación.</p>
+  </TabItem>
+</Tabs>
+
+### Etiquetas en flujos
+
+Los flujos pueden incluir etiquetas para proporcionar información adicional:
+
+<PlantUml code={`@startuml
+start
+:Verificar stock;
+if (¿Disponible?) then (sí)
+  :Procesar pedido;
+else (no)
+  :Notificar falta de stock;
+  note right: Se envía correo automático
+endif
+stop
+@enduml`} />
+
+<Aside type="tip">
+  Las etiquetas en los flujos condicionales deben ser claras y concisas, generalmente respondiendo a la pregunta planteada en el nodo de decisión.
+</Aside>
+
+## 3.2. Flujos de objeto
+
+Los flujos de objeto representan el movimiento de datos u objetos entre actividades usando estereotipos específicos según la especificación UML.
+
+<PlantUml code={`@startuml
+start
+:Crear formulario;
+note right: Acción inicial
+
+:Formulario vacío; <<object>>
+note right: Objeto en estado inicial
+
+:Completar datos;
+note right: Proceso de llenado
+
+:Formulario completo; <<object>>
+note right: Objeto con datos
+
+:Validar formulario;
+note right: Proceso de validación
+
+if (¿Válido?) then (sí)
+  :Procesar datos;
+  :Datos procesados; <<object>>
+  note right: Resultado del procesamiento
+else (no)
+  :Mostrar errores;
+  :Lista de errores; <<object>>
+  note right: Información de errores
+endif
+stop
+@enduml`} />
+
+### Características principales
+
+- Conectan nodos de acción con nodos de objeto
+- Muestran cómo los datos son producidos y consumidos
+- Pueden indicar transformaciones de datos
+
+<Tabs>
+  <TabItem label="Producción de datos">
+    <PlantUml code={`@startuml
+start
+:Generar informe;
+:Informe mensual; <<object>>
+stop
+@enduml`} />
+    <p>Una actividad produce un objeto como resultado.</p>
+  </TabItem>
+  <TabItem label="Consumo de datos">
+    <PlantUml code={`@startuml
+start
+:Solicitud de cliente; <<object>>
+:Procesar solicitud;
+stop
+@enduml`} />
+    <p>Una actividad consume un objeto como entrada.</p>
+  </TabItem>
+  <TabItem label="Transformación de datos">
+    <PlantUml code={`@startuml
+start
+:Datos crudos; <<object>>
+:Limpiar datos;
+:Datos limpios; <<object>>
+:Analizar datos;
+:Resultados del análisis; <<object>>
+stop
+@enduml`} />
+    <p>Una secuencia de actividades que transforman progresivamente los datos.</p>
+  </TabItem>
+</Tabs>
+
+## 3.3. Flujos concurrentes
+
+Los flujos concurrentes representan actividades que pueden ejecutarse en paralelo. Se crean mediante nodos de bifurcación (fork) y unión (join).
+
+<PlantUml code={`@startuml
+start
+:Iniciar proceso;
+fork
+  :Actividad A;
+fork again
+  :Actividad B;
+fork again
+  :Actividad C;
+end fork
+:Finalizar proceso;
+stop
+@enduml`} />
+
+### Características principales
+
+- Permiten modelar procesos que ocurren simultáneamente
+- Comienzan con un nodo de bifurcación (fork)
+- Terminan con un nodo de unión (join) que sincroniza los flujos
+- Cada rama puede contener múltiples actividades y decisiones
+
+<Tabs>
+  <TabItem label="Bifurcación simple">
+    <PlantUml code={`@startuml
+start
+:Recibir pedido;
+fork
+  :Preparar factura;
+fork again
+  :Empaquetar productos;
+end fork
+:Enviar pedido;
+stop
+@enduml`} />
+    <p>Dos actividades que pueden realizarse en paralelo.</p>
+  </TabItem>
+  <TabItem label="Bifurcación compleja">
+    <PlantUml code={`@startuml
+start
+:Iniciar proyecto;
+fork
+  :Diseñar interfaz;
+  :Validar diseño;
+fork again
+  :Configurar base de datos;
+  if (¿Migración necesaria?) then (sí)
+    :Migrar datos;
+  endif
+  :Probar conexión;
+end fork
+:Integrar componentes;
+stop
+@enduml`} />
+    <p>Flujos paralelos con diferentes niveles de complejidad en cada rama.</p>
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Los flujos concurrentes no necesariamente implican ejecución simultánea en términos de tiempo real; representan independencia lógica entre actividades.
+</Aside>
+
+## 3.4. Flujos de excepción
+
+Los flujos de excepción representan caminos alternativos que se toman cuando ocurren errores o excepciones durante la ejecución normal.
+
+<PlantUml code={`@startuml
+start
+:Iniciar operación;
+note right: Preparación del proceso
+
+if (¿Operación segura?) then (sí)
+  :Ejecutar tarea crítica;
+  note right: Ejecución normal
+  :Completar operación;
+  note right: Finalización exitosa
+else (no)
+  :Detectar error;
+  note right: Identificación del problema
+  :Manejar error;
+  note right: Gestión del error
+  :Registrar incidente;
+  note right: Log para auditoría
+endif
+stop
+@enduml`} />
+
+### Características principales
+
+- Representan el manejo de situaciones excepcionales
+- Permiten modelar mecanismos de recuperación
+- Pueden dirigir el flujo a diferentes partes del diagrama
+
+<Tabs>
+  <TabItem label="Excepción simple">
+    <PlantUml code={`@startuml
+start
+:Conectar a servicio;
+if (¿Conexión exitosa?) then (sí)
+  :Realizar operación;
+else (no)
+  :Error de conexión; <<object>>
+  :Notificar error;
+endif
+stop
+@enduml`} />
+    <p>Manejo básico de un error de conexión.</p>
+  </TabItem>
+  <TabItem label="Múltiples excepciones">
+    <PlantUml code={`@startuml
+start
+:Procesar transacción;
+if (¿Resultado?) then (éxito)
+  :Confirmar transacción;
+else (error)
+  if (¿Tipo de error?) then (datos)
+    :Solicitar corrección;
+    :Reintentar proceso;
+  elseif (conexión) then
+    :Reintentar conexión;
+    :Reintentar proceso;
+  else (crítico)
+    :Cancelar operación;
+    :Notificar administrador;
+  endif
+endif
+stop
+@enduml`} />
+    <p>Manejo de diferentes tipos de excepciones con estrategias específicas para cada una.</p>
+  </TabItem>
+</Tabs>
+
+## 3.5. Flujos iterativos
+
+Los flujos iterativos representan actividades que se repiten hasta que se cumple una condición específica.
+
+<PlantUml code={`@startuml
+start
+:Inicializar contador;
+while (¿Contador < 10?) is (sí)
+  :Incrementar contador;
+  :Realizar operación;
+endwhile (no)
+:Finalizar proceso;
+stop
+@enduml`} />
+
+### Características principales
+
+- Modelan bucles y repeticiones
+- Incluyen una condición de continuación o terminación
+- Pueden representarse con diferentes estructuras (while, repeat, foreach)
+
+<Tabs>
+  <TabItem label="Bucle while">
+    <PlantUml code={`@startuml
+start
+:Obtener lista de tareas;
+while (¿Hay más tareas?) is (sí)
+  :Procesar siguiente tarea;
+endwhile (no)
+:Generar informe;
+stop
+@enduml`} />
+    <p>Bucle que continúa mientras queden tareas por procesar.</p>
+  </TabItem>
+  <TabItem label="Bucle repeat">
+    <PlantUml code={`@startuml
+start
+repeat
+  :Solicitar datos;
+  :Validar entrada;
+repeat while (¿Datos inválidos?) is (sí)
+:Procesar datos;
+stop
+@enduml`} />
+    <p>Bucle que se ejecuta al menos una vez y repite si los datos son inválidos.</p>
+  </TabItem>
+  <TabItem label="Bucle foreach">
+    <PlantUml code={`@startuml
+start
+:Obtener lista de productos;
+:Lista de productos; <<object>>
+:Inicializar total = 0;
+partition "Para cada producto" {
+  :Calcular precio con impuestos;
+  :Añadir al total;
+}
+:Mostrar total;
+stop
+@enduml`} />
+    <p>Representación de un bucle que procesa cada elemento de una colección.</p>
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Los flujos iterativos deben incluir siempre una condición clara de terminación para evitar bucles infinitos en el proceso modelado.
+</Aside>
+
+## 3.6. Flujos de interrupción
+
+Los flujos de interrupción representan eventos que pueden interrumpir una actividad en curso y redirigir el flujo a otra parte del diagrama.
+
+<PlantUml code={`@startuml
+start
+:Iniciar proceso largo;
+:Ejecutar tarea;
+note right: Puede ser interrumpido
+if (¿Solicitud de cancelación?) then (sí)
+  :Detener proceso;
+  :Limpiar recursos;
+  stop
+else (no)
+  :Continuar ejecución;
+endif
+:Completar proceso;
+stop
+@enduml`} />
+
+### Características principales
+
+- Representan eventos que pueden ocurrir durante la ejecución de una actividad
+- Permiten modelar cancelaciones, timeouts o intervenciones externas
+- Redirigen el flujo a actividades de manejo específicas
+
+<Tabs>
+  <TabItem label="Timeout">
+    <PlantUml code={`@startuml
+start
+:Enviar solicitud;
+:Esperar respuesta;
+if (¿Respuesta recibida?) then (sí)
+  :Procesar respuesta;
+else (timeout)
+  :Registrar timeout;
+  :Reintentar o cancelar;
+endif
+stop
+@enduml`} />
+    <p>Manejo de un timeout durante la espera de una respuesta.</p>
+  </TabItem>
+  <TabItem label="Cancelación por usuario">
+    <PlantUml code={`@startuml
+start
+:Iniciar descarga;
+while (¿Descarga en progreso?) is (sí)
+  :Transferir datos;
+  if (¿Usuario canceló?) then (sí)
+    :Detener transferencia;
+    :Eliminar archivos parciales;
+    stop
+  endif
+endwhile (completada)
+:Verificar integridad;
+stop
+@enduml`} />
+    <p>Proceso que puede ser cancelado por el usuario en cualquier momento.</p>
+  </TabItem>
+</Tabs>
+
+## 3.7. Flujos entre particiones (Swimlanes)
+
+Los flujos entre particiones representan transferencias de control o responsabilidad entre diferentes actores o sistemas.
+
+<PlantUml code={`@startuml
+|Cliente|
+start
+:Realizar pedido;
+|Sistema|
+:Validar pedido;
+:Procesar pago;
+|Almacén|
+:Preparar productos;
+|Logística|
+:Enviar pedido;
+|Cliente|
+:Recibir pedido;
+stop
+@enduml`} />
+
+### Características principales
+
+- Cruzan los límites entre diferentes particiones (swimlanes)
+- Representan transferencias de responsabilidad
+- Ayudan a identificar interfaces entre actores o sistemas
+
+<Tabs>
+  <TabItem label="Proceso de compra">
+    <PlantUml code={`@startuml
+|Cliente|
+start
+:Seleccionar productos;
+:Iniciar checkout;
+|Sistema de pago|
+:Solicitar datos de pago;
+|Cliente|
+:Proporcionar datos;
+|Sistema de pago|
+:Validar datos;
+if (¿Datos válidos?) then (sí)
+  :Procesar transacción;
+  |Sistema|
+  :Confirmar pedido;
+  |Almacén|
+  :Preparar envío;
+else (no)
+  |Cliente|
+  :Corregir datos;
+  backward:Proporcionar datos;
+endif
+stop
+@enduml`} />
+    <p>Proceso de compra que involucra múltiples actores con transferencias de responsabilidad.</p>
+  </TabItem>
+  <TabItem label="Proceso de soporte">
+    <PlantUml code={`@startuml
+|Cliente|
+start
+:Reportar problema;
+|Soporte nivel 1|
+:Analizar problema;
+if (¿Puede resolver?) then (sí)
+  :Solucionar problema;
+  |Cliente|
+  :Verificar solución;
+else (no)
+  |Soporte nivel 2|
+  :Investigar a fondo;
+  :Desarrollar solución;
+  |Soporte nivel 1|
+  :Comunicar solución;
+  |Cliente|
+  :Aplicar solución;
+endif
+:Confirmar resolución;
+stop
+@enduml`} />
+    <p>Proceso de soporte técnico con escalamiento entre diferentes niveles.</p>
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Los flujos entre particiones son especialmente útiles para identificar puntos de comunicación y posibles cuellos de botella en procesos que involucran múltiples actores.
+</Aside>
+
+## 3.8. Flujos de señal
+
+Los flujos de señal representan la comunicación asíncrona entre diferentes partes del diagrama usando estereotipos específicos.
+
+<PlantUml code={`@startuml
+start
+:Iniciar proceso;
+note right: Proceso principal
+
+:Ejecutar tarea larga;
+note right: Operación que toma tiempo
+
+:Enviar notificación de inicio; <<sendSignal>>
+note right: Señal asíncrona de inicio
+
+:Continuar procesamiento;
+note right: Proceso continúa
+
+:Recibir confirmación; <<acceptEvent>>
+note right: Espera evento de confirmación
+
+:Finalizar proceso;
+note right: Conclusión del proceso
+stop
+@enduml`} />
+
+### Características principales
+
+- Representan comunicación asíncrona
+- Pueden enviar o recibir señales
+- No requieren que el emisor espere por una respuesta
+
+<Tabs>
+  <TabItem label="Envío de señal">
+    <PlantUml code={`@startuml
+start
+:Detectar error crítico;
+:Enviar alerta; <<sendSignal>>
+:Intentar recuperación;
+stop
+@enduml`} />
+    <p>Envío de una señal de alerta cuando se detecta un error.</p>
+  </TabItem>
+  <TabItem label="Recepción de señal">
+    <PlantUml code={`@startuml
+start
+:Iniciar monitoreo;
+:Recibir señal de evento; <<acceptEvent>>
+:Procesar evento;
+stop
+@enduml`} />
+    <p>Recepción de una señal que desencadena el procesamiento.</p>
+  </TabItem>
+  <TabItem label="Comunicación bidireccional">
+    <PlantUml code={`@startuml
+|Sistema A|
+start
+:Iniciar operación;
+:Solicitar datos; <<sendSignal>>
+:Esperar respuesta; <<acceptEvent>>
+:Recibir datos; <<acceptEvent>>
+:Procesar datos;
+stop
+
+|Sistema B|
+start
+:Recibir solicitud; <<acceptEvent>>
+:Buscar datos;
+:Enviar datos; <<sendSignal>>
+stop
+@enduml`} />
+    <p>Comunicación asíncrona bidireccional entre dos sistemas.</p>
+  </TabItem>
+</Tabs>
+
+## 3.9. Flujos de tiempo
+
+Los flujos de tiempo representan restricciones temporales o eventos basados en tiempo usando estereotipos específicos.
+
+<PlantUml code={`@startuml
+start
+:Iniciar proceso;
+note right: Proceso principal
+
+:Esperar 30 minutos; <<timeEvent>>
+note right: Evento temporal con duración específica
+
+if (¿Respuesta recibida?) then (sí)
+  :Continuar proceso;
+  note right: Flujo normal
+else (no)
+  :Escalar incidencia;
+  note right: Flujo de escalamiento
+endif
+stop
+@enduml`} />
+
+### Características principales
+
+- Representan esperas, timeouts o eventos temporales
+- Pueden incluir duraciones específicas
+- Modelan restricciones de tiempo en el proceso
+
+<Tabs>
+  <TabItem label="Timeout">
+    <PlantUml code={`@startuml
+start
+:Enviar solicitud de aprobación; <<sendSignal>>
+:Esperar respuesta máx. 24h; <<timeEvent>>
+if (¿Respuesta recibida a tiempo?) then (sí)
+  :Recibir respuesta; <<acceptEvent>>
+  if (¿Aprobada?) then (sí)
+    :Continuar proceso;
+  else (no)
+    :Notificar rechazo;
+    stop
+  endif
+else (timeout)
+  :Aplicar aprobación automática;
+  note right: Regla de negocio: Aprobar por defecto si no hay respuesta
+endif
+:Finalizar proceso;
+stop
+@enduml`} />
+    <p>Proceso con un timeout que resulta en una aprobación automática.</p>
+  </TabItem>
+  <TabItem label="Eventos programados">
+    <PlantUml code={`@startuml
+start
+:Iniciar campaña;
+fork
+  :Ejecutar campaña;
+fork again
+  :Esperar 7 días; <<timeEvent>>
+  :Enviar recordatorio; <<sendSignal>>
+  :Esperar 3 días; <<timeEvent>>
+  :Enviar último recordatorio; <<sendSignal>>
+end fork
+:Finalizar campaña;
+:Generar informe de resultados;
+stop
+@enduml`} />
+    <p>Proceso con eventos programados que ocurren en momentos específicos.</p>
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Los flujos de tiempo son especialmente útiles para modelar procesos de negocio con plazos específicos, recordatorios programados o acciones que deben ocurrir después de ciertos intervalos.
+</Aside>
+
+Estas relaciones entre elementos son fundamentales para crear diagramas de actividades efectivos que representen con precisión los flujos de trabajo y procesos. En la siguiente sección, exploraremos la notación UML específica para representar estos elementos y relaciones.

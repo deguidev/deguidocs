@@ -1,0 +1,395 @@
+---
+title: 3. Relaciones en los Diagramas de Componentes
+description: Tipos de conexiones y dependencias entre componentes en UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Relaciones en los Diagramas de Componentes
+
+Las relaciones en los diagramas de componentes definen cómo los diferentes elementos del sistema interactúan entre sí. Estas conexiones son fundamentales para entender la arquitectura y las dependencias del sistema.
+
+## 3.1. Dependencias
+
+Las dependencias representan relaciones donde un componente necesita de otro para funcionar correctamente. Son las relaciones más comunes en los diagramas de componentes.
+
+<PlantUml code={`@startuml
+component [OrderService] as order
+component [PaymentService] as payment
+component [InventoryService] as inventory
+component [NotificationService] as notify
+
+order --> payment : processes payment
+order --> inventory : checks stock
+order --> notify : sends confirmation
+
+note right of order : OrderService depende de varios servicios para funcionar
+@enduml`} />
+
+### Tipos de dependencias
+
+<Tabs>
+  <TabItem label="Dependencia de uso">
+    <PlantUml code={`@startuml
+component [ReportGenerator] as report
+component [DatabaseService] as db
+
+report --> db : <<use>>
+note bottom : ReportGenerator usa DatabaseService para obtener datos
+@enduml`} />
+    <p>Un componente utiliza los servicios de otro.</p>
+  </TabItem>
+  <TabItem label="Dependencia de compilación">
+    <PlantUml code={`@startuml
+component [BusinessLogic] as logic
+component [UtilityLibrary] as utils
+
+logic --> utils : <<import>>
+note bottom : BusinessLogic importa funciones de UtilityLibrary
+@enduml`} />
+    <p>Dependencia necesaria en tiempo de compilación.</p>
+  </TabItem>
+  <TabItem label="Dependencia de despliegue">
+    <PlantUml code={`@startuml
+component [WebApplication] as webapp
+component [DatabaseDriver] as driver
+
+webapp --> driver : <<deploy>>
+note bottom : WebApplication necesita DatabaseDriver para ejecutarse
+@enduml`} />
+    <p>Dependencia necesaria en tiempo de ejecución.</p>
+  </TabItem>
+</Tabs>
+
+## 3.2. Realización de interfaces
+
+La realización muestra cómo un componente implementa una interface específica, definiendo el contrato que cumple.
+
+<PlantUml code={`@startuml
+interface "IPaymentProcessor" as IPayment
+interface "IUserService" as IUser
+interface "IOrderService" as IOrder
+
+component [PayPalGateway] as paypal
+component [StripeGateway] as stripe
+component [UserManager] as userMgr
+component [OrderProcessor] as orderProc
+
+paypal .up.|> IPayment : implements
+stripe .up.|> IPayment : implements
+userMgr .up.|> IUser : implements
+orderProc .up.|> IOrder : implements
+
+component [ECommerceApp] as app
+app --> IPayment : uses
+app --> IUser : uses
+app --> IOrder : uses
+
+note right of IPayment : Múltiples implementaciones de la misma interface
+@enduml`} />
+
+### Beneficios de la realización
+
+- **Polimorfismo**: Permite intercambiar implementaciones
+- **Desacoplamiento**: Reduce dependencias directas
+- **Flexibilidad**: Facilita cambios y extensiones
+- **Testabilidad**: Permite crear mocks fácilmente
+
+## 3.3. Composición y agregación
+
+Estas relaciones muestran relaciones parte-todo entre componentes.
+
+<PlantUml code={`@startuml
+component [ECommerceSystem] as system
+component [UserModule] as user
+component [ProductModule] as product
+component [OrderModule] as order
+component [PaymentModule] as payment
+
+system *-- user : contains
+system *-- product : contains
+system *-- order : contains
+system *-- payment : contains
+
+component [DatabaseConnection] as dbConn
+component [Logger] as logger
+component [ConfigManager] as config
+
+user o-- dbConn : uses
+product o-- dbConn : uses
+order o-- dbConn : uses
+user o-- logger : uses
+product o-- logger : uses
+order o-- logger : uses
+
+note right of system : Composición: los módulos son parte integral del sistema
+note right of dbConn : Agregación: servicios compartidos entre módulos
+@enduml`} />
+
+### Diferencias clave
+
+<Tabs>
+  <TabItem label="Composición">
+    <PlantUml code={`@startuml
+component [WebServer] as server
+component [RequestHandler] as handler
+component [ResponseBuilder] as response
+component [SessionManager] as session
+
+server *-- handler : owns
+server *-- response : owns
+server *-- session : owns
+
+note bottom of server : Los componentes internos no pueden existir sin el servidor
+@enduml`} />
+    <p>Relación fuerte donde las partes no pueden existir sin el todo.</p>
+  </TabItem>
+  <TabItem label="Agregación">
+    <PlantUml code={`@startuml
+component [ProjectManager] as pm
+component [Developer] as dev1
+component [Developer] as dev2
+component [Designer] as designer
+
+pm o-- dev1 : manages
+pm o-- dev2 : manages
+pm o-- designer : manages
+
+note bottom of pm : Los desarrolladores pueden existir independientemente del proyecto
+@enduml`} />
+    <p>Relación débil donde las partes pueden existir independientemente.</p>
+  </TabItem>
+</Tabs>
+
+## 3.4. Asociaciones
+
+Las asociaciones representan conexiones estructurales entre componentes que colaboran pero mantienen su independencia.
+
+<PlantUml code={`@startuml
+component [Frontend] as fe
+component [Backend] as be
+component [Database] as db
+component [CacheService] as cache
+component [LoggingService] as log
+
+fe -- be : communicates
+be -- db : queries
+be -- cache : caches data
+be -- log : writes logs
+fe -- log : writes logs
+
+note top of fe : Frontend y Backend comunican bidireccionalmente
+note bottom of cache : Cache mejora rendimiento pero no es crítico
+@enduml`} />
+
+### Características de las asociaciones
+
+- **Bidireccionales**: Ambos componentes se conocen
+- **Independientes**: Cada componente puede existir sin el otro
+- **Colaborativas**: Trabajan juntos para lograr objetivos
+
+## 3.5. Conectores de ensamblaje
+
+Los conectores de ensamblaje muestran cómo las interfaces proporcionadas se conectan con las interfaces requeridas.
+
+<PlantUml code={`@startuml
+component [OrderService] as order
+component [PaymentGateway] as payment
+component [EmailService] as email
+
+interface "IPaymentProcessor" as IPayment
+interface "INotificationService" as INotify
+
+payment .up.|> IPayment : provides
+email .up.|> INotify : provides
+
+order --> IPayment : requires
+order --> INotify : requires
+
+note right of order : OrderService requiere interfaces que otros proveen
+@enduml`} />
+
+### Ventajas de los conectores
+
+- **Claridad**: Muestran exactamente qué interfaces se conectan
+- **Verificación**: Permiten validar que todas las dependencias están satisfechas
+- **Documentación**: Documentan los contratos entre componentes
+
+## 3.6. Delegación
+
+La delegación muestra cómo un componente reenvía peticiones a otros componentes.
+
+<PlantUml code={`@startuml
+component [APIGateway] as gateway
+component [AuthService] as auth
+component [UserService] as user
+component [OrderService] as order
+
+interface "IAuthService" as IAuth
+interface "IUserService" as IUser
+interface "IOrderService" as IOrder
+
+auth .up.|> IAuth : implements
+user .up.|> IUser : implements
+order .up.|> IOrder : implements
+
+gateway --> IAuth : delegates auth
+gateway --> IUser : delegates user ops
+gateway --> IOrder : delegates orders
+
+note right of gateway : Gateway delega operaciones a servicios especializados
+@enduml`} />
+
+## 3.7. Relaciones de herencia
+
+Aunque menos comunes, los componentes pueden tener relaciones de herencia para reutilizar funcionalidad.
+
+<PlantUml code={`@startuml
+component [BaseService] as base
+component [UserService] as user
+component [ProductService] as product
+component [OrderService] as order
+
+user --|> base : extends
+product --|> base : extends
+order --|> base : extends
+
+note right of base : BaseService proporciona funcionalidad común
+note bottom of user : Servicios específicos extienden funcionalidad base
+@enduml`} />
+
+## 3.8. Ejemplo completo de relaciones
+
+<PlantUml code={`@startuml
+package "E-commerce Architecture" {
+  
+  ' Interfaces
+  interface "IUserService" as IUser
+  interface "IProductService" as IProduct
+  interface "IOrderService" as IOrder
+  interface "IPaymentService" as IPayment
+  interface "INotificationService" as INotify
+  
+  ' Core Services
+  component [UserService] as userSvc
+  component [ProductService] as productSvc
+  component [OrderService] as orderSvc
+  
+  ' External Services
+  component [PayPalGateway] as paypal
+  component [StripeGateway] as stripe
+  component [EmailService] as email
+  component [SMSService] as sms
+  
+  ' Infrastructure
+  component [APIGateway] as gateway
+  component [Database] as db
+  component [CacheService] as cache
+  component [LoggingService] as logger
+  
+  ' Interface implementations
+  userSvc .up.|> IUser : implements
+  productSvc .up.|> IProduct : implements
+  orderSvc .up.|> IOrder : implements
+  paypal .up.|> IPayment : implements
+  stripe .up.|> IPayment : implements
+  email .up.|> INotify : implements
+  sms .up.|> INotify : implements
+  
+  ' Gateway delegations
+  gateway --> IUser : delegates
+  gateway --> IProduct : delegates
+  gateway --> IOrder : delegates
+  
+  ' Service dependencies
+  orderSvc --> IPayment : uses
+  orderSvc --> INotify : uses
+  orderSvc --> IProduct : checks inventory
+  
+  ' Infrastructure dependencies
+  userSvc --> db : persists data
+  productSvc --> db : persists data
+  orderSvc --> db : persists data
+  
+  userSvc --> cache : caches data
+  productSvc --> cache : caches data
+  
+  userSvc --> logger : logs events
+  productSvc --> logger : logs events
+  orderSvc --> logger : logs events
+  gateway --> logger : logs requests
+  
+  ' Aggregation relationships
+  gateway o-- userSvc : manages
+  gateway o-- productSvc : manages
+  gateway o-- orderSvc : manages
+}
+
+note top of gateway : API Gateway actúa como punto de entrada único del sistema
+note bottom of db : Base de datos compartida por todos los servicios
+note right of cache : Cache mejora rendimiento de consultas frecuentes
+@enduml`} />
+
+<Aside type="tip">
+  Este ejemplo muestra cómo diferentes tipos de relaciones trabajan juntas para crear una arquitectura cohesiva y bien estructurada.
+</Aside>
+
+## 3.9. Mejores prácticas para relaciones
+
+### Principios de diseño
+
+<Steps>
+1. **Minimizar dependencias**: Reduce el acoplamiento entre componentes
+2. **Usar interfaces**: Prefiere dependencias de interfaces sobre implementaciones concretas
+3. **Aplicar inversión de dependencias**: Los módulos de alto nivel no deben depender de módulos de bajo nivel
+4. **Documentar relaciones**: Usa notas para explicar el propósito de las relaciones complejas
+5. **Validar consistencia**: Asegúrate de que todas las dependencias están satisfechas
+</Steps>
+
+<Tabs>
+  <TabItem label="❌ Mal diseño">
+    <PlantUml code={`@startuml
+component [OrderService] as order
+component [MySQLDatabase] as mysql
+component [SendGridEmail] as sendgrid
+component [PayPalGateway] as paypal
+
+order --> mysql : direct dependency
+order --> sendgrid : direct dependency
+order --> paypal : direct dependency
+
+note bottom : Dependencias directas crean alto acoplamiento
+@enduml`} />
+    <p>Alto acoplamiento con dependencias directas.</p>
+  </TabItem>
+  <TabItem label="✅ Buen diseño">
+    <PlantUml code={`@startuml
+component [OrderService] as order
+interface "IDataRepository" as IData
+interface "IEmailService" as IEmail
+interface "IPaymentGateway" as IPayment
+
+component [MySQLRepository] as mysql
+component [EmailProvider] as email
+component [PaymentProvider] as payment
+
+order --> IData : uses
+order --> IEmail : uses
+order --> IPayment : uses
+
+mysql .up.|> IData : implements
+email .up.|> IEmail : implements
+payment .up.|> IPayment : implements
+
+note bottom : Bajo acoplamiento usando interfaces y abstracciones
+@enduml`} />
+    <p>Bajo acoplamiento usando interfaces y abstracciones.</p>
+  </TabItem>
+</Tabs>
+
+Las relaciones en los diagramas de componentes son la clave para entender cómo los diferentes elementos del sistema trabajan juntos. Un buen diseño de relaciones resulta en sistemas más mantenibles, flexibles y testeable.

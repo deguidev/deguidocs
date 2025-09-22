@@ -324,7 +324,6 @@ export default defineConfig({
 								{ label: '2. Elementos Básicos de un Diagrama de Clases', link: '/uml/diagramas-clases/elementos-basicos/' },
 								{ label: '3. Relaciones Entre Clases', link: '/uml/diagramas-clases/relaciones/' },
 								{ label: '4. Notación UML para Clases', link: '/uml/diagramas-clases/notacion/' },
-								{ label: '5. Aplicaciones del Diagrama de Clases', link: '/uml/diagramas-clases/aplicaciones/' }
 							]
 						},
 						{ 
@@ -335,7 +334,6 @@ export default defineConfig({
 								{ label: '2. Elementos Básicos de un Diagrama de Casos de Uso', link: '/uml/diagramas-casos-uso/elementos-basicos/' },
 								{ label: '3. Tipos de Relaciones en Casos de Uso', link: '/uml/diagramas-casos-uso/relaciones/' },
 								{ label: '4. Notación UML para Casos de Uso', link: '/uml/diagramas-casos-uso/notacion/' },
-								{ label: '5. Aplicaciones del Diagrama de Casos de Uso', link: '/uml/diagramas-casos-uso/aplicaciones/' }
 							]
 						},
 						{ 
@@ -347,7 +345,47 @@ export default defineConfig({
 								{ label: '3. Tipos de Mensajes en un Diagrama de Secuencia', link: '/uml/diagramas-secuencia/tipos-mensajes/' },
 								{ label: '4. Notación UML para Diagramas de Secuencia', link: '/uml/diagramas-secuencia/notacion/' },
 							]
-						}
+						},
+						{
+							label: 'Diagramas de Actividades',
+							collapsed: true,
+							items: [
+								{ label: '1. Introducción al Diagrama de Actividades', link: '/uml/diagramas-actividades/introduccion/' },
+								{ label: '2. Elementos Básicos de un Diagrama de Actividades', link: '/uml/diagramas-actividades/elementos-basicos/' },
+								{ label: '3. Tipos de Relaciones en un Diagrama de Actividades', link: '/uml/diagramas-actividades/relaciones/' },
+								{ label: '4. Notación UML para Diagramas de Actividades', link: '/uml/diagramas-actividades/notacion/' },
+							]
+						},
+						{ 
+							label: 'Diagramas de Componentes',
+							collapsed: true,
+							items: [
+								{ label: '1. Introducción al Diagrama de Componentes', link: '/uml/diagramas-componentes/introduccion/' },
+								{ label: '2. Elementos Básicos de un Diagrama de Componentes', link: '/uml/diagramas-componentes/elementos-basicos/' },
+								{ label: '3. Tipos de Relaciones en un Diagrama de Componentes', link: '/uml/diagramas-componentes/relaciones/' },
+								{ label: '4. Notación UML para Diagramas de Componentes', link: '/uml/diagramas-componentes/notacion/' },
+							]
+						},
+						{ 
+							label: 'Diagramas de Despliegue',
+							collapsed: true,
+							items: [
+								{ label: '1. Introducción al Diagrama de Despliegue', link: '/uml/diagramas-despliegue/introduccion/' },
+								{ label: '2. Elementos Básicos de un Diagrama de Despliegue', link: '/uml/diagramas-despliegue/elementos-basicos/' },
+								{ label: '3. Tipos de Relaciones en un Diagrama de Despliegue', link: '/uml/diagramas-despliegue/relaciones/' },
+								{ label: '4. Notación UML para Diagramas de Despliegue', link: '/uml/diagramas-despliegue/notacion/' },
+							]
+						},
+						{
+							label: 'Diagramas de Entidad-Relación',
+							collapsed: true,
+							items: [
+								{ label: '1. Introducción al Diagrama de Entidad-Relación', link: '/uml/diagramas-entidad-relacion/introduccion/' },
+								{ label: '2. Elementos Básicos de un Diagrama de Entidad-Relación', link: '/uml/diagramas-entidad-relacion/elementos-basicos/' },
+								{ label: '3. Tipos de Relaciones en un Diagrama de Entidad-Relación', link: '/uml/diagramas-entidad-relacion/relaciones/' },
+								{ label: '4. Notación UML para Diagramas de Entidad-Relación', link: '/uml/diagramas-entidad-relacion/notacion/' },
+							]
+						},
 					]
 				},
 				{
