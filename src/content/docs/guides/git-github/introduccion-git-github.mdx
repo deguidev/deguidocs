@@ -1,0 +1,434 @@
+---
+title: Introducción a Git y GitHub
+description: Conceptos fundamentales de Git y GitHub, ventajas del control de versiones y flujo de trabajo básico
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Módulo 1: Introducción a Git y GitHub
+
+En este módulo aprenderás los conceptos fundamentales que necesitas conocer antes de comenzar a trabajar con Git y GitHub. Entenderás qué son, por qué son importantes y cómo pueden mejorar tu flujo de trabajo como desarrollador.
+
+## ¿Qué es Git?
+
+Git es un **sistema de control de versiones distribuido** creado por Linus Torvalds en 2005. Es una herramienta que te permite rastrear cambios en archivos y coordinar el trabajo entre múltiples personas.
+
+### Características principales de Git
+
+<Badge text="Sistema distribuido" variant="tip" />
+
+- **Distribuido**: Cada desarrollador tiene una copia completa del historial del proyecto
+- **Rápido**: Operaciones locales extremadamente rápidas
+- **Integridad**: Usa checksums SHA-1 para garantizar la integridad de los datos
+- **Branching**: Sistema de ramas ligero y eficiente
+- **Staging Area**: Área intermedia para preparar commits
+- **Open Source**: Software libre y gratuito
+
+<Aside type="note">
+Git no es lo mismo que GitHub. Git es la herramienta de control de versiones, mientras que GitHub es una plataforma que aloja repositorios Git en la nube.
+</Aside>
+
+### ¿Por qué usar Git?
+
+<Tabs>
+  <TabItem label="Sin control de versiones">
+    ```
+    mi-proyecto/
+    ├── index.html
+    ├── index-backup.html
+    ├── index-final.html
+    ├── index-final-final.html
+    ├── index-ESTE-SI-ES-EL-FINAL.html
+    └── index-version-que-funciona.html
+    ```
+    
+    **Problemas:**
+    - Archivos duplicados innecesarios
+    - Confusión sobre cuál es la versión actual
+    - Pérdida de historial de cambios
+    - Dificultad para colaborar
+  </TabItem>
+  
+  <TabItem label="Con Git">
+    ```
+    mi-proyecto/
+    ├── .git/           # Historial completo
+    ├── index.html      # Versión actual
+    ├── styles.css
+    └── script.js
+    
+    # Historial de commits
+    commit abc123: "Agregar funcionalidad de login"
+    commit def456: "Corregir bug en navegación"
+    commit ghi789: "Diseño inicial"
+    ```
+    
+    **Ventajas:**
+    - Un solo archivo por cada componente
+    - Historial completo de cambios
+    - Posibilidad de volver a versiones anteriores
+    - Colaboración eficiente
+  </TabItem>
+</Tabs>
+
+## ¿Qué es GitHub?
+
+GitHub es una **plataforma de desarrollo colaborativo** que utiliza Git para el control de versiones. Es como una red social para desarrolladores donde puedes:
+
+### Funcionalidades principales
+
+<Badge text="Plataforma colaborativa" variant="note" />
+
+- **Alojar repositorios**: Almacenar código en la nube
+- **Colaborar**: Trabajar en equipo en proyectos
+- **Issues**: Sistema de seguimiento de problemas y tareas
+- **Pull Requests**: Proponer y revisar cambios
+- **Actions**: Automatización y CI/CD
+- **Pages**: Alojar sitios web estáticos
+- **Packages**: Registro de paquetes
+- **Security**: Análisis de seguridad y dependencias
+
+### GitHub vs otras plataformas
+
+| Característica | GitHub | GitLab | Bitbucket |
+|----------------|--------|--------|-----------|
+| **Popularidad** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+| **Repositorios privados gratuitos** | ✅ | ✅ | ✅ |
+| **CI/CD integrado** | GitHub Actions | GitLab CI | Pipelines |
+| **Comunidad** | Muy grande | Grande | Mediana |
+| **Integración con Atlassian** | ❌ | ❌ | ✅ |
+
+<Aside type="tip">
+GitHub es la plataforma más popular con más de 100 millones de repositorios y es donde se alojan la mayoría de proyectos open source.
+</Aside>
+
+## Ventajas del control de versiones
+
+El control de versiones no es solo para programadores. Cualquier proyecto que involucre archivos que cambian con el tiempo puede beneficiarse.
+
+### 1. Historial completo de cambios
+
+<Code code={`# Ver historial de cambios
+git log --oneline
+
+# Salida ejemplo:
+abc1234 Agregar función de búsqueda
+def5678 Corregir bug en login
+ghi9012 Actualizar documentación
+jkl3456 Versión inicial`} lang="bash" title="Historial de commits" />
+
+### 2. Capacidad de revertir cambios
+
+<Code code={`# Volver a una versión anterior
+git checkout abc1234
+
+# Revertir un commit específico
+git revert def5678
+
+# Deshacer cambios no confirmados
+git checkout -- archivo.txt`} lang="bash" title="Revertir cambios" />
+
+### 3. Trabajo en paralelo con ramas
+
+<Code code={`# Crear nueva rama para una funcionalidad
+git branch nueva-funcionalidad
+git checkout nueva-funcionalidad
+
+# O en un solo comando
+git checkout -b nueva-funcionalidad
+
+# Trabajar en la rama sin afectar main
+git add .
+git commit -m "Desarrollar nueva funcionalidad"
+
+# Fusionar cuando esté lista
+git checkout main
+git merge nueva-funcionalidad`} lang="bash" title="Trabajo con ramas" />
+
+### 4. Colaboración eficiente
+
+<Steps>
+<ol>
+  <li>**Clonar**: Cada desarrollador obtiene una copia completa</li>
+  <li>**Trabajar**: Hacer cambios en ramas separadas</li>
+  <li>**Sincronizar**: Compartir cambios con el equipo</li>
+  <li>**Integrar**: Fusionar cambios de manera controlada</li>
+</ol>
+</Steps>
+
+### 5. Backup automático
+
+- **Distribuido**: Cada clon es un backup completo
+- **Remoto**: Repositorios en la nube (GitHub, GitLab, etc.)
+- **Historial**: Nunca pierdes versiones anteriores
+
+## Flujo de trabajo general en Git
+
+Entender el flujo básico de Git es fundamental para trabajar eficientemente.
+
+### Estados de los archivos en Git
+
+<Tabs>
+  <TabItem label="Diagrama de estados">
+    ```
+    Working Directory    Staging Area    Repository
+    (Directorio de       (Área de        (Repositorio)
+     trabajo)            preparación)
+    
+    archivo.txt    →    git add    →    git commit
+    (modificado)         (staged)        (committed)
+         ↑                                    ↓
+         └────────── git checkout ←───────────┘
+    ```
+  </TabItem>
+  
+  <TabItem label="Explicación detallada">
+    **1. Working Directory (Directorio de trabajo)**
+    - Archivos en tu sistema de archivos
+    - Pueden estar modificados, nuevos o eliminados
+    - Estado: "modified" o "untracked"
+    
+    **2. Staging Area (Área de preparación)**
+    - Archivos preparados para el próximo commit
+    - Snapshot de cómo se verán en el commit
+    - Estado: "staged"
+    
+    **3. Repository (Repositorio)**
+    - Archivos confirmados en el historial
+    - Versión permanente en la base de datos de Git
+    - Estado: "committed"
+  </TabItem>
+</Tabs>
+
+### Flujo de trabajo típico
+
+<Steps>
+<ol>
+  <li>
+    **Modificar archivos** en tu directorio de trabajo
+    <Code code={`# Editar archivos con tu editor favorito
+    echo "Nuevo contenido" >> archivo.txt`} lang="bash" />
+  </li>
+  
+  <li>
+    **Revisar cambios** antes de confirmarlos
+    <Code code={`# Ver qué archivos han cambiado
+    git status
+    
+    # Ver diferencias específicas
+    git diff archivo.txt`} lang="bash" />
+  </li>
+  
+  <li>
+    **Agregar al staging area** los cambios que quieres confirmar
+    <Code code={`# Agregar archivo específico
+    git add archivo.txt
+    
+    # Agregar todos los archivos modificados
+    git add .
+    
+    # Agregar interactivamente
+    git add -p`} lang="bash" />
+  </li>
+  
+  <li>
+    **Confirmar cambios** con un mensaje descriptivo
+    <Code code={`# Commit con mensaje
+    git commit -m "Agregar nueva funcionalidad de búsqueda"
+    
+    # Commit con editor para mensaje largo
+    git commit`} lang="bash" />
+  </li>
+  
+  <li>
+    **Sincronizar con repositorio remoto** (si trabajas en equipo)
+    <Code code={`# Descargar cambios del remoto
+    git pull origin main
+    
+    # Subir tus cambios
+    git push origin main`} lang="bash" />
+  </li>
+</ol>
+</Steps>
+
+### Comandos esenciales para empezar
+
+<Badge text="Comandos básicos" variant="tip" />
+
+<Code code={`# Configuración inicial (solo una vez)
+git config --global user.name "Tu Nombre"
+git config --global user.email "tu@email.com"
+
+# Inicializar repositorio
+git init
+
+# Clonar repositorio existente
+git clone https://github.com/usuario/repo.git
+
+# Ver estado actual
+git status
+
+# Agregar cambios
+git add archivo.txt
+git add .
+
+# Confirmar cambios
+git commit -m "Mensaje descriptivo"
+
+# Ver historial
+git log
+git log --oneline
+
+# Conectar con repositorio remoto
+git remote add origin https://github.com/usuario/repo.git
+
+# Subir cambios
+git push origin main
+
+# Descargar cambios
+git pull origin main`} lang="bash" title="Comandos esenciales" />
+
+## Conceptos clave que debes recordar
+
+### Repository (Repositorio)
+Un directorio que contiene tu proyecto y todo su historial de versiones.
+
+### Commit
+Una "fotografía" de tu proyecto en un momento específico. Cada commit tiene:
+- **SHA**: Identificador único (ej: `abc1234`)
+- **Mensaje**: Descripción de los cambios
+- **Autor**: Quién hizo los cambios
+- **Fecha**: Cuándo se hicieron los cambios
+
+### Branch (Rama)
+Una línea independiente de desarrollo. Te permite trabajar en funcionalidades sin afectar el código principal.
+
+### Remote (Remoto)
+Una versión de tu repositorio alojada en internet (como GitHub).
+
+### Clone vs Fork
+- **Clone**: Copia local de un repositorio
+- **Fork**: Copia de un repositorio en tu cuenta de GitHub
+
+## Flujos de trabajo comunes
+
+### Flujo personal (un desarrollador)
+
+<Code code={`# 1. Crear o clonar repositorio
+git init mi-proyecto
+cd mi-proyecto
+
+# 2. Trabajar en el proyecto
+echo "# Mi Proyecto" > README.md
+git add README.md
+git commit -m "Agregar README"
+
+# 3. Conectar con GitHub
+git remote add origin https://github.com/usuario/mi-proyecto.git
+git push -u origin main
+
+# 4. Continuar desarrollo
+# ... hacer cambios ...
+git add .
+git commit -m "Agregar nueva funcionalidad"
+git push`} lang="bash" title="Flujo personal" />
+
+### Flujo colaborativo (equipo)
+
+<Code code={`# 1. Clonar repositorio del equipo
+git clone https://github.com/equipo/proyecto.git
+cd proyecto
+
+# 2. Crear rama para nueva funcionalidad
+git checkout -b mi-funcionalidad
+
+# 3. Desarrollar y confirmar cambios
+# ... hacer cambios ...
+git add .
+git commit -m "Implementar mi funcionalidad"
+
+# 4. Sincronizar con main
+git checkout main
+git pull origin main
+git checkout mi-funcionalidad
+git merge main
+
+# 5. Subir rama y crear Pull Request
+git push origin mi-funcionalidad
+# Crear PR en GitHub`} lang="bash" title="Flujo colaborativo" />
+
+## Mejores prácticas desde el inicio
+
+<Badge text="Buenas prácticas" variant="caution" />
+
+### Mensajes de commit
+- **Usa presente**: "Agregar función" no "Agregué función"
+- **Sé descriptivo**: Explica qué y por qué, no cómo
+- **Máximo 50 caracteres** en la primera línea
+- **Usa convenciones**: feat:, fix:, docs:, etc.
+
+<Code code={`# Buenos mensajes
+git commit -m "feat: agregar sistema de autenticación"
+git commit -m "fix: corregir error en cálculo de totales"
+git commit -m "docs: actualizar guía de instalación"
+
+# Mensajes a evitar
+git commit -m "cambios"
+git commit -m "fix"
+git commit -m "trabajo del día"`} lang="bash" />
+
+### Estructura de repositorio
+```
+mi-proyecto/
+├── .gitignore          # Archivos a ignorar
+├── README.md           # Documentación principal
+├── LICENSE             # Licencia del proyecto
+├── src/                # Código fuente
+├── docs/               # Documentación
+├── tests/              # Pruebas
+└── .github/            # Configuración de GitHub
+    └── workflows/      # GitHub Actions
+```
+
+### Archivos .gitignore
+<Code code={`# Dependencias
+node_modules/
+vendor/
+
+# Archivos de configuración local
+.env
+config.local.js
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# Archivos compilados
+*.class
+*.o
+dist/
+build/`} lang="txt" title=".gitignore" />
+
+## Resumen
+
+En este módulo has aprendido:
+
+<Badge text="Conceptos fundamentales" variant="tip" />
+
+- ✅ **Git**: Sistema de control de versiones distribuido
+- ✅ **GitHub**: Plataforma para alojar repositorios Git
+- ✅ **Ventajas**: Historial, colaboración, backup, reversión
+- ✅ **Flujo básico**: Working → Staging → Repository
+- ✅ **Comandos esenciales**: init, add, commit, push, pull
+- ✅ **Buenas prácticas**: Mensajes claros, estructura organizada
+
+En el próximo módulo profundizaremos en los fundamentos de Git, aprendiendo a crear repositorios, manejar el staging area y trabajar con el historial de commits.

@@ -1,0 +1,595 @@
+---
+title: Componentes Básicos de Swing
+description: Aprende a usar los componentes fundamentales de Java Swing
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Módulo 2: Componentes Básicos de Swing
+
+Los componentes son los elementos fundamentales que forman la interfaz de usuario en Java Swing. En este módulo aprenderemos a usar los componentes más comunes y cómo manejar los eventos que generan.
+
+## JLabel, JTextField, JButton
+
+### JLabel - Etiquetas de texto
+
+JLabel es uno de los componentes más simples de Swing. Se utiliza para mostrar texto o imágenes que no pueden ser editadas por el usuario.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class EjemploJLabel extends JFrame {
+    public EjemploJLabel() {
+        setTitle("Ejemplo JLabel");
+        setSize(400, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+        
+        // Etiqueta simple
+        JLabel etiquetaSimple = new JLabel("Texto simple");
+        
+        // Etiqueta con formato
+        JLabel etiquetaFormato = new JLabel("<html><b>Texto en negrita</b></html>");
+        etiquetaFormato.setForeground(Color.BLUE);
+        etiquetaFormato.setFont(new Font("Arial", Font.BOLD, 16));
+        
+        // Etiqueta con imagen
+        ImageIcon icono = new ImageIcon("ruta/imagen.png");
+        JLabel etiquetaImagen = new JLabel("Con imagen", icono, JLabel.CENTER);
+        
+        add(etiquetaSimple);
+        add(etiquetaFormato);
+        add(etiquetaImagen);
+        
+        setVisible(true);
+    }
+}`} lang="java" title="EjemploJLabel.java" />
+
+<Aside type="tip">
+JLabel soporta HTML básico, lo que permite formatear texto con negrita, cursiva, colores y más usando etiquetas HTML.
+</Aside>
+
+### JTextField - Campos de texto
+
+JTextField permite al usuario ingresar y editar texto en una sola línea.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class EjemploJTextField extends JFrame {
+    private JTextField campoTexto;
+    private JLabel etiquetaResultado;
+    
+    public EjemploJTextField() {
+        setTitle("Ejemplo JTextField");
+        setSize(400, 150);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+        
+        // Campo de texto
+        campoTexto = new JTextField(20); // 20 columnas de ancho
+        campoTexto.setText("Texto inicial");
+        campoTexto.setToolTipText("Ingresa tu texto aquí");
+        
+        // Campo de contraseña
+        JPasswordField campoPassword = new JPasswordField(15);
+        
+        // Botón para obtener texto
+        JButton botonObtener = new JButton("Obtener Texto");
+        
+        // Etiqueta para mostrar resultado
+        etiquetaResultado = new JLabel("Resultado aparecerá aquí");
+        
+        // Agregar listener al botón
+        botonObtener.addActionListener(e -> {
+            String texto = campoTexto.getText();
+            etiquetaResultado.setText("Texto ingresado: " + texto);
+        });
+        
+        add(new JLabel("Texto:"));
+        add(campoTexto);
+        add(new JLabel("Contraseña:"));
+        add(campoPassword);
+        add(botonObtener);
+        add(etiquetaResultado);
+        
+        setVisible(true);
+    }
+}`} lang="java" title="EjemploJTextField.java" />
+
+### JButton - Botones
+
+JButton es el componente para crear botones que responden a clics del usuario.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class EjemploJButton extends JFrame {
+    private int contador = 0;
+    private JLabel etiquetaContador;
+    
+    public EjemploJButton() {
+        setTitle("Ejemplo JButton");
+        setSize(300, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+        
+        // Botón simple
+        JButton botonSimple = new JButton("Clic simple");
+        
+        // Botón con imagen
+        ImageIcon icono = new ImageIcon("icono.png");
+        JButton botonImagen = new JButton("Con imagen", icono);
+        
+        // Contador
+        etiquetaContador = new JLabel("Contador: 0");
+        JButton botonContador = new JButton("Incrementar");
+        
+        // Listeners
+        botonSimple.addActionListener(e -> 
+            JOptionPane.showMessageDialog(this, "¡Botón presionado!"));
+        
+        botonContador.addActionListener(e -> {
+            contador++;
+            etiquetaContador.setText("Contador: " + contador);
+        });
+        
+        add(botonSimple);
+        add(botonImagen);
+        add(etiquetaContador);
+        add(botonContador);
+        
+        setVisible(true);
+    }
+}`} lang="java" title="EjemploJButton.java" />
+
+## JCheckBox, JRadioButton, ButtonGroup
+
+### JCheckBox - Casillas de verificación
+
+JCheckBox permite seleccionar múltiples opciones independientes.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class EjemploJCheckBox extends JFrame {
+    public EjemploJCheckBox() {
+        setTitle("Ejemplo JCheckBox");
+        setSize(300, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+        
+        JCheckBox checkJava = new JCheckBox("Java", true);
+        JCheckBox checkPython = new JCheckBox("Python");
+        JCheckBox checkJavaScript = new JCheckBox("JavaScript");
+        
+        JButton botonVerificar = new JButton("Ver selecciones");
+        
+        botonVerificar.addActionListener(e -> {
+            StringBuilder selecciones = new StringBuilder("Seleccionado: ");
+            if (checkJava.isSelected()) selecciones.append("Java ");
+            if (checkPython.isSelected()) selecciones.append("Python ");
+            if (checkJavaScript.isSelected()) selecciones.append("JavaScript ");
+            
+            JOptionPane.showMessageDialog(this, selecciones.toString());
+        });
+        
+        add(new JLabel("Lenguajes que conoces:"));
+        add(checkJava);
+        add(checkPython);
+        add(checkJavaScript);
+        add(botonVerificar);
+        
+        setVisible(true);
+    }
+}`} lang="java" title="EjemploJCheckBox.java" />
+
+### JRadioButton y ButtonGroup
+
+JRadioButton permite seleccionar una sola opción de un grupo. ButtonGroup asegura que solo uno esté seleccionado.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class EjemploJRadioButton extends JFrame {
+    public EjemploJRadioButton() {
+        setTitle("Ejemplo JRadioButton");
+        setSize(300, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+        
+        // Crear radio buttons
+        JRadioButton radioJunior = new JRadioButton("Junior", true);
+        JRadioButton radioSenior = new JRadioButton("Senior");
+        JRadioButton radioExpert = new JRadioButton("Expert");
+        
+        // Agrupar radio buttons
+        ButtonGroup grupo = new ButtonGroup();
+        grupo.add(radioJunior);
+        grupo.add(radioSenior);
+        grupo.add(radioExpert);
+        
+        JButton botonSeleccion = new JButton("Ver nivel");
+        
+        botonSeleccion.addActionListener(e -> {
+            String nivel = "";
+            if (radioJunior.isSelected()) nivel = "Junior";
+            else if (radioSenior.isSelected()) nivel = "Senior";
+            else if (radioExpert.isSelected()) nivel = "Expert";
+            
+            JOptionPane.showMessageDialog(this, "Nivel seleccionado: " + nivel);
+        });
+        
+        add(new JLabel("Nivel de experiencia:"));
+        add(radioJunior);
+        add(radioSenior);
+        add(radioExpert);
+        add(botonSeleccion);
+        
+        setVisible(true);
+    }
+}`} lang="java" title="EjemploJRadioButton.java" />
+
+## JComboBox, JList
+
+### JComboBox - Lista desplegable
+
+JComboBox presenta una lista de opciones en un menú desplegable.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class EjemploJComboBox extends JFrame {
+    public EjemploJComboBox() {
+        setTitle("Ejemplo JComboBox");
+        setSize(300, 150);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+        
+        // Crear ComboBox con datos
+        String[] paises = {"México", "España", "Argentina", "Colombia", "Chile"};
+        JComboBox<String> comboPaises = new JComboBox<>(paises);
+        
+        // ComboBox editable
+        JComboBox<String> comboEditable = new JComboBox<>();
+        comboEditable.setEditable(true);
+        comboEditable.addItem("Opción 1");
+        comboEditable.addItem("Opción 2");
+        
+        JLabel etiquetaSeleccion = new JLabel("Selección: ");
+        
+        // Listener para cambios
+        comboPaises.addActionListener(e -> {
+            String seleccion = (String) comboPaises.getSelectedItem();
+            etiquetaSeleccion.setText("País seleccionado: " + seleccion);
+        });
+        
+        add(new JLabel("País:"));
+        add(comboPaises);
+        add(new JLabel("Editable:"));
+        add(comboEditable);
+        add(etiquetaSeleccion);
+        
+        setVisible(true);
+    }
+}`} lang="java" title="EjemploJComboBox.java" />
+
+### JList - Lista de elementos
+
+JList muestra una lista de elementos donde se pueden seleccionar uno o varios.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class EjemploJList extends JFrame {
+    public EjemploJList() {
+        setTitle("Ejemplo JList");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        
+        // Datos para la lista
+        String[] tecnologias = {
+            "Java", "Python", "JavaScript", "C++", "C#", 
+            "PHP", "Ruby", "Go", "Kotlin", "Swift"
+        };
+        
+        JList<String> lista = new JList<>(tecnologias);
+        lista.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        
+        // Scroll pane para la lista
+        JScrollPane scrollPane = new JScrollPane(lista);
+        
+        JButton botonSeleccion = new JButton("Ver selecciones");
+        JTextArea areaResultado = new JTextArea(5, 30);
+        areaResultado.setEditable(false);
+        
+        botonSeleccion.addActionListener(e -> {
+            java.util.List<String> seleccionadas = lista.getSelectedValuesList();
+            areaResultado.setText("Tecnologías seleccionadas:\n" + 
+                String.join(", ", seleccionadas));
+        });
+        
+        add(scrollPane, BorderLayout.CENTER);
+        add(botonSeleccion, BorderLayout.SOUTH);
+        add(new JScrollPane(areaResultado), BorderLayout.EAST);
+        
+        setVisible(true);
+    }
+}`} lang="java" title="EjemploJList.java" />
+
+## JTextArea, JScrollPane
+
+### JTextArea - Área de texto multilínea
+
+JTextArea permite ingresar y mostrar texto en múltiples líneas.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class EjemploJTextArea extends JFrame {
+    public EjemploJTextArea() {
+        setTitle("Ejemplo JTextArea");
+        setSize(500, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        
+        // Área de texto
+        JTextArea areaTexto = new JTextArea(15, 40);
+        areaTexto.setText("Escribe aquí tu texto...\nPuedes usar múltiples líneas.");
+        areaTexto.setWrapStyleWord(true);
+        areaTexto.setLineWrap(true);
+        
+        // ScrollPane para el área de texto
+        JScrollPane scrollPane = new JScrollPane(areaTexto);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        
+        // Panel de botones
+        JPanel panelBotones = new JPanel();
+        JButton botonLimpiar = new JButton("Limpiar");
+        JButton botonContar = new JButton("Contar palabras");
+        JLabel etiquetaConteo = new JLabel("Palabras: 0");
+        
+        botonLimpiar.addActionListener(e -> areaTexto.setText(""));
+        
+        botonContar.addActionListener(e -> {
+            String texto = areaTexto.getText().trim();
+            int palabras = texto.isEmpty() ? 0 : texto.split("\\s+").length;
+            etiquetaConteo.setText("Palabras: " + palabras);
+        });
+        
+        panelBotones.add(botonLimpiar);
+        panelBotones.add(botonContar);
+        panelBotones.add(etiquetaConteo);
+        
+        add(scrollPane, BorderLayout.CENTER);
+        add(panelBotones, BorderLayout.SOUTH);
+        
+        setVisible(true);
+    }
+}`} lang="java" title="EjemploJTextArea.java" />
+
+## Manejadores de eventos con ActionListener
+
+Los eventos son fundamentales en las aplicaciones GUI. ActionListener es la interfaz más común para manejar eventos de botones y otros componentes.
+
+<Tabs>
+  <TabItem label="Implementación básica">
+    <Code code={`import javax.swing.*;
+import java.awt.event.*;
+
+public class EventosBasicos extends JFrame implements ActionListener {
+    private JButton boton1, boton2;
+    private JLabel etiqueta;
+    
+    public EventosBasicos() {
+        setTitle("Eventos Básicos");
+        setSize(300, 150);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new java.awt.FlowLayout());
+        
+        boton1 = new JButton("Botón 1");
+        boton2 = new JButton("Botón 2");
+        etiqueta = new JLabel("Presiona un botón");
+        
+        // Registrar listeners
+        boton1.addActionListener(this);
+        boton2.addActionListener(this);
+        
+        add(boton1);
+        add(boton2);
+        add(etiqueta);
+        
+        setVisible(true);
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == boton1) {
+            etiqueta.setText("Presionaste Botón 1");
+        } else if (e.getSource() == boton2) {
+            etiqueta.setText("Presionaste Botón 2");
+        }
+    }
+}`} lang="java" />
+  </TabItem>
+  
+  <TabItem label="Con expresiones lambda">
+    <Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class EventosLambda extends JFrame {
+    public EventosLambda() {
+        setTitle("Eventos con Lambda");
+        setSize(300, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+        
+        JButton botonSaludo = new JButton("Saludar");
+        JButton botonDespedida = new JButton("Despedirse");
+        JLabel etiqueta = new JLabel("Hola!");
+        
+        // Usar expresiones lambda
+        botonSaludo.addActionListener(e -> 
+            etiqueta.setText("¡Hola, mundo!"));
+        
+        botonDespedida.addActionListener(e -> 
+            etiqueta.setText("¡Hasta luego!"));
+        
+        add(botonSaludo);
+        add(botonDespedida);
+        add(etiqueta);
+        
+        setVisible(true);
+    }
+}`} lang="java" />
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+Las expresiones lambda (disponibles desde Java 8) proporcionan una sintaxis más concisa para manejar eventos, especialmente útil para acciones simples.
+</Aside>
+
+## Ejemplo completo: Formulario de registro
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class FormularioRegistro extends JFrame {
+    private JTextField campoNombre, campoEmail;
+    private JPasswordField campoPassword;
+    private JComboBox<String> comboPais;
+    private JCheckBox checkTerminos;
+    private JRadioButton radioMasculino, radioFemenino;
+    private JTextArea areaComentarios;
+    
+    public FormularioRegistro() {
+        setTitle("Formulario de Registro");
+        setSize(400, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        
+        initComponents();
+        layoutComponents(gbc);
+        addEventListeners();
+        
+        setVisible(true);
+    }
+    
+    private void initComponents() {
+        campoNombre = new JTextField(20);
+        campoEmail = new JTextField(20);
+        campoPassword = new JPasswordField(20);
+        
+        String[] paises = {"México", "España", "Argentina", "Colombia"};
+        comboPais = new JComboBox<>(paises);
+        
+        checkTerminos = new JCheckBox("Acepto términos y condiciones");
+        
+        radioMasculino = new JRadioButton("Masculino", true);
+        radioFemenino = new JRadioButton("Femenino");
+        ButtonGroup grupoGenero = new ButtonGroup();
+        grupoGenero.add(radioMasculino);
+        grupoGenero.add(radioFemenino);
+        
+        areaComentarios = new JTextArea(5, 20);
+        areaComentarios.setLineWrap(true);
+    }
+    
+    private void layoutComponents(GridBagConstraints gbc) {
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        
+        // Nombre
+        gbc.gridx = 0; gbc.gridy = 0;
+        add(new JLabel("Nombre:"), gbc);
+        gbc.gridx = 1;
+        add(campoNombre, gbc);
+        
+        // Email
+        gbc.gridx = 0; gbc.gridy = 1;
+        add(new JLabel("Email:"), gbc);
+        gbc.gridx = 1;
+        add(campoEmail, gbc);
+        
+        // Password
+        gbc.gridx = 0; gbc.gridy = 2;
+        add(new JLabel("Contraseña:"), gbc);
+        gbc.gridx = 1;
+        add(campoPassword, gbc);
+        
+        // País
+        gbc.gridx = 0; gbc.gridy = 3;
+        add(new JLabel("País:"), gbc);
+        gbc.gridx = 1;
+        add(comboPais, gbc);
+        
+        // Género
+        gbc.gridx = 0; gbc.gridy = 4;
+        add(new JLabel("Género:"), gbc);
+        gbc.gridx = 1;
+        JPanel panelGenero = new JPanel();
+        panelGenero.add(radioMasculino);
+        panelGenero.add(radioFemenino);
+        add(panelGenero, gbc);
+        
+        // Comentarios
+        gbc.gridx = 0; gbc.gridy = 5;
+        add(new JLabel("Comentarios:"), gbc);
+        gbc.gridx = 1;
+        add(new JScrollPane(areaComentarios), gbc);
+        
+        // Términos
+        gbc.gridx = 1; gbc.gridy = 6;
+        add(checkTerminos, gbc);
+        
+        // Botones
+        gbc.gridx = 1; gbc.gridy = 7;
+        JPanel panelBotones = new JPanel();
+        JButton botonRegistrar = new JButton("Registrar");
+        JButton botonLimpiar = new JButton("Limpiar");
+        panelBotones.add(botonRegistrar);
+        panelBotones.add(botonLimpiar);
+        add(panelBotones, gbc);
+    }
+    
+    private void addEventListeners() {
+        // Implementar listeners aquí
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new FormularioRegistro());
+    }
+}`} lang="java" title="FormularioRegistro.java" />
+
+## Resumen
+
+En este módulo hemos aprendido:
+
+<Badge text="Componentes básicos" variant="tip" />
+
+- **JLabel**: Para mostrar texto e imágenes
+- **JTextField**: Para entrada de texto en una línea
+- **JButton**: Para crear botones interactivos
+- **JCheckBox**: Para opciones múltiples
+- **JRadioButton**: Para opciones excluyentes
+- **JComboBox**: Para listas desplegables
+- **JList**: Para listas de selección múltiple
+- **JTextArea**: Para texto multilínea
+- **JScrollPane**: Para agregar barras de desplazamiento
+
+<Badge text="Manejo de eventos" variant="note" />
+
+- **ActionListener**: Interfaz principal para eventos
+- **Expresiones lambda**: Sintaxis moderna para eventos
+- **Event Dispatch Thread**: Hilo de eventos de Swing
+
+En el próximo módulo aprenderemos sobre la organización de interfaces usando layouts y paneles.

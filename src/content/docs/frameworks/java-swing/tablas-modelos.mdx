@@ -1,0 +1,213 @@
+---
+title: Tablas y Modelos Personalizados
+description: Aprende a trabajar con JTable y DefaultTableModel en Java Swing
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Módulo 4: Tablas y Modelos Personalizados
+
+Las tablas son componentes esenciales para mostrar datos estructurados. JTable, junto con sus modelos, proporciona una forma potente y flexible de presentar información tabular.
+
+## Uso de JTable
+
+JTable es el componente principal para mostrar datos en formato tabular. Funciona con un modelo de datos que separa la presentación de los datos.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class TablaBasica extends JFrame {
+    public TablaBasica() {
+        setTitle("Tabla Básica");
+        setSize(500, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // Datos de ejemplo
+        String[][] datos = {
+            {"Juan", "Pérez", "25", "Desarrollador"},
+            {"María", "García", "30", "Diseñadora"},
+            {"Carlos", "López", "28", "Analista"},
+            {"Ana", "Martín", "26", "Tester"}
+        };
+        
+        // Nombres de columnas
+        String[] columnas = {"Nombre", "Apellido", "Edad", "Puesto"};
+        
+        // Crear tabla
+        JTable tabla = new JTable(datos, columnas);
+        
+        // Agregar a un ScrollPane
+        JScrollPane scrollPane = new JScrollPane(tabla);
+        
+        add(scrollPane, BorderLayout.CENTER);
+        setVisible(true);
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new TablaBasica());
+    }
+}`} lang="java" title="TablaBasica.java" />
+
+<Aside type="note">
+Siempre coloca JTable dentro de un JScrollPane para permitir el desplazamiento cuando hay muchos datos.
+</Aside>
+
+## DefaultTableModel y cómo cargar datos
+
+DefaultTableModel es la implementación más común del modelo de tabla, permitiendo modificar datos dinámicamente.
+
+<Code code={`import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+
+public class TablaConModelo extends JFrame {
+    private DefaultTableModel modelo;
+    private JTable tabla;
+    
+    public TablaConModelo() {
+        setTitle("Tabla con DefaultTableModel");
+        setSize(600, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        
+        initTabla();
+        initBotones();
+        cargarDatosIniciales();
+        
+        setVisible(true);
+    }
+    
+    private void initTabla() {
+        // Crear modelo con columnas
+        String[] columnas = {"ID", "Nombre", "Email", "Teléfono", "Activo"};
+        modelo = new DefaultTableModel(columnas, 0) {
+            @Override
+            public Class<?> getColumnClass(int column) {
+                switch (column) {
+                    case 0: return Integer.class;
+                    case 4: return Boolean.class;
+                    default: return String.class;
+                }
+            }
+            
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column != 0; // ID no editable
+            }
+        };
+        
+        tabla = new JTable(modelo);
+        tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        add(new JScrollPane(tabla), BorderLayout.CENTER);
+    }
+    
+    private void cargarDatosIniciales() {
+        Object[][] datos = {
+            {1, "Juan Pérez", "juan@email.com", "555-0001", true},
+            {2, "María García", "maria@email.com", "555-0002", true},
+            {3, "Carlos López", "carlos@email.com", "555-0003", false}
+        };
+        
+        for (Object[] fila : datos) {
+            modelo.addRow(fila);
+        }
+    }
+}`} lang="java" title="TablaConModelo.java" />
+
+## Selección de filas y celdas
+
+<Tabs>
+  <TabItem label="Modos de selección">
+    <Code code={`// Selección de una sola fila
+tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+// Selección de múltiples filas continuas
+tabla.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+
+// Selección de múltiples filas (intervalos múltiples)
+tabla.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+// Permitir selección de celdas individuales
+tabla.setCellSelectionEnabled(true);`} lang="java" />
+  </TabItem>
+  
+  <TabItem label="Obtener selecciones">
+    <Code code={`// Obtener fila seleccionada
+int filaSeleccionada = tabla.getSelectedRow();
+
+// Obtener todas las filas seleccionadas
+int[] filasSeleccionadas = tabla.getSelectedRows();
+
+// Obtener valor de celda seleccionada
+if (filaSeleccionada != -1) {
+    Object valor = tabla.getValueAt(filaSeleccionada, 0);
+}`} lang="java" />
+  </TabItem>
+</Tabs>
+
+## Eventos con tablas (ListSelectionListener)
+
+<Code code={`import javax.swing.*;
+import javax.swing.event.*;
+import java.awt.*;
+
+public class EventosTabla extends JFrame {
+    private JTable tabla;
+    private JLabel lblSeleccion;
+    
+    public EventosTabla() {
+        setTitle("Eventos de Tabla");
+        setSize(500, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // Crear tabla
+        String[] columnas = {"Producto", "Precio", "Stock"};
+        Object[][] datos = {
+            {"Laptop", 999.99, 10},
+            {"Mouse", 25.50, 50},
+            {"Teclado", 75.00, 30}
+        };
+        
+        tabla = new JTable(datos, columnas);
+        
+        // Agregar listener
+        tabla.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int fila = tabla.getSelectedRow();
+                if (fila != -1) {
+                    String producto = (String) tabla.getValueAt(fila, 0);
+                    lblSeleccion.setText("Seleccionado: " + producto);
+                }
+            }
+        });
+        
+        lblSeleccion = new JLabel("Selecciona un producto");
+        
+        add(new JScrollPane(tabla), BorderLayout.CENTER);
+        add(lblSeleccion, BorderLayout.SOUTH);
+        
+        setVisible(true);
+    }
+}`} lang="java" title="EventosTabla.java" />
+
+## Resumen
+
+En este módulo hemos aprendido:
+
+<Badge text="JTable" variant="tip" />
+- Creación básica con arrays de datos
+- DefaultTableModel para datos dinámicos
+- Configuración de selección y columnas
+- Operaciones CRUD básicas
+
+<Badge text="Eventos" variant="note" />
+- ListSelectionListener para cambios de selección
+- Validación de datos
+- Sincronización tabla-formulario
+
+En el próximo módulo aprenderemos sobre CRUD con base de datos.

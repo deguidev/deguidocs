@@ -1,0 +1,632 @@
+---
+title: Trabajo colaborativo
+description: Aprende a trabajar en equipo con forks, pull requests y mejores prácticas de colaboración en GitHub
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Módulo 5: Trabajo colaborativo
+
+GitHub facilita la colaboración en proyectos de código abierto y privados. En este módulo aprenderás a contribuir a proyectos existentes, crear pull requests y seguir las mejores prácticas de colaboración.
+
+## ¿Qué es un fork?
+
+Un **fork** es una copia completa de un repositorio en tu cuenta de GitHub. Te permite experimentar y hacer cambios sin afectar el proyecto original.
+
+### Diferencias entre Clone, Fork y Branch
+
+<Tabs>
+  <TabItem label="Clone">
+    **Clone**: Copia local de un repositorio
+    
+    ```
+    GitHub Repo → Local Machine
+    ```
+    
+    - Copia completa en tu computadora
+    - Puedes hacer cambios localmente
+    - Necesitas permisos para push al original
+    - Ideal para repositorios propios o con acceso
+  </TabItem>
+  
+  <TabItem label="Fork">
+    **Fork**: Copia del repositorio en tu cuenta GitHub
+    
+    ```
+    Original Repo → Your GitHub Account
+    ```
+    
+    - Copia independiente en GitHub
+    - Puedes hacer cambios libremente
+    - Contribuir mediante Pull Requests
+    - Ideal para proyectos open source
+  </TabItem>
+  
+  <TabItem label="Branch">
+    **Branch**: Línea de desarrollo dentro del mismo repositorio
+    
+    ```
+    Same Repo: main ← → feature-branch
+    ```
+    
+    - Desarrollo paralelo en mismo repo
+    - Fusión directa con merge
+    - Ideal para equipos con acceso directo
+  </TabItem>
+</Tabs>
+
+### Cuándo usar Fork vs Branch
+
+<Badge text="Fork" variant="tip" />
+- Contribuir a proyectos open source
+- No tienes permisos de escritura
+- Experimentar con cambios grandes
+- Mantener tu propia versión del proyecto
+
+<Badge text="Branch" variant="note" />
+- Trabajar en equipo con acceso directo
+- Desarrollo de funcionalidades planificadas
+- Proyectos privados de la empresa
+- Control directo sobre el repositorio
+
+## Crear un fork y trabajar en él
+
+### Proceso completo de fork
+
+<Steps>
+<ol>
+  <li>
+    **Crear fork en GitHub**
+    - Ve al repositorio original
+    - Haz clic en "Fork" (esquina superior derecha)
+    - Selecciona tu cuenta como destino
+    - Opcionalmente cambia el nombre
+  </li>
+  
+  <li>
+    **Clonar tu fork localmente**
+    <Code code={`# Clonar tu fork (no el original)
+git clone https://github.com/tu-usuario/proyecto-fork.git
+cd proyecto-fork
+
+# Verificar remoto
+git remote -v
+# origin  https://github.com/tu-usuario/proyecto-fork.git (fetch)
+# origin  https://github.com/tu-usuario/proyecto-fork.git (push)`} lang="bash" />
+  </li>
+  
+  <li>
+    **Configurar upstream (repositorio original)**
+    <Code code={`# Agregar repositorio original como upstream
+git remote add upstream https://github.com/usuario-original/proyecto-original.git
+
+# Verificar configuración
+git remote -v
+# origin    https://github.com/tu-usuario/proyecto-fork.git (fetch)
+# origin    https://github.com/tu-usuario/proyecto-fork.git (push)
+# upstream  https://github.com/usuario-original/proyecto-original.git (fetch)
+# upstream  https://github.com/usuario-original/proyecto-original.git (push)`} lang="bash" />
+  </li>
+  
+  <li>
+    **Mantener fork actualizado**
+    <Code code={`# Sincronizar con upstream regularmente
+git fetch upstream
+git checkout main
+git merge upstream/main
+git push origin main`} lang="bash" />
+  </li>
+</ol>
+</Steps>
+
+### Flujo de trabajo con fork
+
+<Code code={`# 1. Sincronizar con upstream
+git fetch upstream
+git checkout main
+git merge upstream/main
+
+# 2. Crear rama para nueva funcionalidad
+git checkout -b feature/mi-contribucion
+
+# 3. Hacer cambios y commits
+echo "Mi contribución" > nuevo-archivo.txt
+git add nuevo-archivo.txt
+git commit -m "feat: agregar nueva funcionalidad"
+
+# 4. Push a tu fork
+git push origin feature/mi-contribucion
+
+# 5. Crear Pull Request desde GitHub
+# 6. Después del merge, limpiar
+git checkout main
+git branch -d feature/mi-contribucion
+git push origin --delete feature/mi-contribucion`} lang="bash" title="Flujo completo con fork" />
+
+## Pull requests y revisión de código
+
+Los **Pull Requests (PR)** son solicitudes para fusionar cambios de una rama a otra, con revisión de código incluida.
+
+### Crear un Pull Request efectivo
+
+<Steps>
+<ol>
+  <li>
+    **Preparar la rama**
+    <Code code={`# Asegurar que la rama está actualizada
+git checkout main
+git pull upstream main
+git checkout feature/mi-funcionalidad
+git rebase main
+
+# Push final
+git push origin feature/mi-funcionalidad`} lang="bash" />
+  </li>
+  
+  <li>
+    **Crear PR en GitHub**
+    - Ve a tu fork en GitHub
+    - Haz clic en "Compare & pull request"
+    - Selecciona las ramas correctas:
+      - Base: `usuario-original/proyecto-original` → `main`
+      - Compare: `tu-usuario/proyecto-fork` → `feature/mi-funcionalidad`
+  </li>
+  
+  <li>
+    **Escribir descripción completa**
+    ```markdown
+    ## Descripción
+    Breve descripción de los cambios realizados.
+    
+    ## Tipo de cambio
+    - [ ] Bug fix (corrección que soluciona un problema)
+    - [x] Nueva funcionalidad (cambio que agrega funcionalidad)
+    - [ ] Breaking change (cambio que rompe compatibilidad)
+    - [ ] Documentación
+    
+    ## ¿Cómo se ha probado?
+    Describe las pruebas realizadas para verificar los cambios.
+    
+    ## Checklist
+    - [x] Mi código sigue las convenciones del proyecto
+    - [x] He realizado una auto-revisión de mi código
+    - [x] He comentado mi código en áreas difíciles de entender
+    - [x] He actualizado la documentación correspondiente
+    - [x] Mis cambios no generan nuevas advertencias
+    - [x] He agregado pruebas que demuestran que mi corrección es efectiva
+    ```
+  </li>
+</ol>
+</Steps>
+
+### Elementos de un buen Pull Request
+
+<Badge text="Título descriptivo" variant="tip" />
+
+<Code code={`# Buenos títulos
+feat: agregar sistema de autenticación con JWT
+fix: corregir error de validación en formulario de registro
+docs: actualizar guía de contribución
+refactor: simplificar lógica de cálculo de precios
+
+# Títulos a evitar
+Cambios
+Fix
+Update
+Trabajo del día`} lang="text" title="Títulos de PR" />
+
+<Badge text="Descripción completa" variant="note" />
+
+- **¿Qué?** - Qué cambios se realizaron
+- **¿Por qué?** - Razón de los cambios
+- **¿Cómo?** - Cómo se implementó la solución
+- **Pruebas** - Cómo se verificó que funciona
+- **Screenshots** - Capturas si hay cambios visuales
+
+### Proceso de revisión de código
+
+<Tabs>
+  <TabItem label="Como autor del PR">
+    <Code code={`# Responder a comentarios de revisión
+# 1. Hacer cambios solicitados
+git checkout feature/mi-funcionalidad
+# ... hacer cambios ...
+git add .
+git commit -m "fix: aplicar sugerencias de revisión"
+git push origin feature/mi-funcionalidad
+
+# 2. Responder a comentarios en GitHub
+# 3. Solicitar nueva revisión si es necesario
+# 4. Agradecer a los revisores`} lang="bash" />
+  </TabItem>
+  
+  <TabItem label="Como revisor">
+    **Qué revisar:**
+    - Funcionalidad correcta
+    - Calidad del código
+    - Convenciones del proyecto
+    - Documentación actualizada
+    - Pruebas incluidas
+    - Rendimiento
+    - Seguridad
+    
+    **Cómo dar feedback:**
+    - Ser constructivo y específico
+    - Explicar el "por qué"
+    - Sugerir alternativas
+    - Reconocer buen código
+    - Usar tono profesional
+  </TabItem>
+</Tabs>
+
+### Tipos de revisión en GitHub
+
+<Code code={`# Tipos de review en GitHub:
+
+# 1. Comment (Comentario)
+# - Feedback general
+# - Preguntas
+# - Sugerencias opcionales
+
+# 2. Approve (Aprobar)
+# - Cambios se ven bien
+# - Listo para merge
+# - Puede incluir comentarios menores
+
+# 3. Request changes (Solicitar cambios)
+# - Problemas que deben corregirse
+# - Bloquea el merge
+# - Requiere nueva revisión`} lang="text" title="Tipos de revisión" />
+
+## Buenas prácticas de colaboración
+
+### Comunicación efectiva
+
+<Badge text="Issues y Discussions" variant="tip" />
+
+<Code code={`# Crear issue antes de grandes cambios
+# 1. Describir el problema o funcionalidad
+# 2. Discutir posibles soluciones
+# 3. Obtener aprobación del mantenedor
+# 4. Referenciar issue en PR: "Closes #123"
+
+# Usar discussions para:
+# - Preguntas generales
+# - Propuestas de funcionalidades
+# - Ayuda con implementación`} lang="text" title="Comunicación" />
+
+### Convenciones de commit
+
+<Code code={`# Conventional Commits
+# Formato: tipo(alcance): descripción
+
+# Tipos principales:
+feat: nueva funcionalidad
+fix: corrección de bug
+docs: cambios en documentación
+style: formato, espacios, etc.
+refactor: refactorización sin cambio funcional
+test: agregar o corregir pruebas
+chore: tareas de mantenimiento
+
+# Ejemplos:
+feat(auth): agregar login con Google OAuth
+fix(api): corregir error 500 en endpoint usuarios
+docs(readme): actualizar instrucciones de instalación
+style(css): corregir indentación en estilos
+refactor(utils): simplificar función de validación
+test(auth): agregar pruebas para login
+chore(deps): actualizar dependencias`} lang="bash" title="Convenciones de commit" />
+
+### Etiqueta en la comunidad
+
+<Tabs>
+  <TabItem label="Como contribuidor">
+    **Antes de contribuir:**
+    - Lee CONTRIBUTING.md
+    - Revisa issues existentes
+    - Sigue las convenciones del proyecto
+    - Prueba tus cambios localmente
+    
+    **Al crear PR:**
+    - Describe claramente los cambios
+    - Incluye pruebas si es necesario
+    - Actualiza documentación
+    - Sé paciente con las revisiones
+    
+    **Durante revisión:**
+    - Responde constructivamente
+    - Haz cambios solicitados
+    - Agradece el feedback
+    - Aprende de las sugerencias
+  </TabItem>
+  
+  <TabItem label="Como mantenedor">
+    **Al revisar PRs:**
+    - Sé constructivo y específico
+    - Explica el razonamiento
+    - Reconoce el esfuerzo
+    - Proporciona ejemplos
+    
+    **Al gestionar issues:**
+    - Responde oportunamente
+    - Etiqueta apropiadamente
+    - Proporciona contexto
+    - Guía a nuevos contribuidores
+    
+    **Documentación:**
+    - Mantén README actualizado
+    - Crea guías de contribución
+    - Documenta convenciones
+    - Proporciona ejemplos
+  </TabItem>
+</Tabs>
+
+## Flujos de trabajo colaborativos
+
+### Flujo Fork + PR (Open Source)
+
+<Steps>
+<ol>
+  <li>
+    **Contribuidor hace fork**
+    <Code code={`# 1. Fork en GitHub
+# 2. Clone local
+git clone https://github.com/contribuidor/proyecto.git
+cd proyecto
+
+# 3. Configurar upstream
+git remote add upstream https://github.com/original/proyecto.git`} lang="bash" />
+  </li>
+  
+  <li>
+    **Desarrollar funcionalidad**
+    <Code code={`# Sincronizar con upstream
+git fetch upstream
+git checkout main
+git merge upstream/main
+
+# Crear rama feature
+git checkout -b feature/nueva-funcionalidad
+
+# Desarrollar y commit
+git add .
+git commit -m "feat: implementar nueva funcionalidad"`} lang="bash" />
+  </li>
+  
+  <li>
+    **Crear Pull Request**
+    <Code code={`# Push a fork
+git push origin feature/nueva-funcionalidad
+
+# Crear PR en GitHub desde fork a upstream
+# Base: original/proyecto:main
+# Compare: contribuidor/proyecto:feature/nueva-funcionalidad`} lang="bash" />
+  </li>
+  
+  <li>
+    **Revisión y merge**
+    - Mantenedor revisa el PR
+    - Contribuidor hace cambios si es necesario
+    - Mantenedor hace merge
+    - Contribuidor sincroniza y limpia
+  </li>
+</ol>
+</Steps>
+
+### Flujo Branch + PR (Equipos)
+
+<Code code={`# Para equipos con acceso directo al repositorio
+
+# 1. Crear rama desde main
+git checkout main
+git pull origin main
+git checkout -b feature/nueva-funcionalidad
+
+# 2. Desarrollar funcionalidad
+git add .
+git commit -m "feat: implementar funcionalidad"
+git push -u origin feature/nueva-funcionalidad
+
+# 3. Crear PR en mismo repositorio
+# Base: main
+# Compare: feature/nueva-funcionalidad
+
+# 4. Revisión por equipo y merge
+# 5. Limpiar rama después del merge`} lang="bash" title="Flujo de equipo" />
+
+## Herramientas y automatización
+
+### GitHub Actions para colaboración
+
+<Code code={`# .github/workflows/pr-checks.yml
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    - name: Install dependencies
+      run: npm ci
+    - name: Run tests
+      run: npm test
+    - name: Run linter
+      run: npm run lint
+    - name: Check formatting
+      run: npm run format:check`} lang="yaml" title="Automatización de PR" />
+
+### Plantillas para Issues y PRs
+
+<Tabs>
+  <TabItem label="Issue Template">
+    <Code code={`<!-- .github/ISSUE_TEMPLATE/bug_report.md -->
+---
+name: Bug Report
+about: Reportar un error
+title: '[BUG] '
+labels: bug
+assignees: ''
+---
+
+## Descripción del bug
+Descripción clara y concisa del error.
+
+## Pasos para reproducir
+1. Ve a '...'
+2. Haz clic en '....'
+3. Desplázate hacia abajo hasta '....'
+4. Ver error
+
+## Comportamiento esperado
+Descripción clara de lo que esperabas que pasara.
+
+## Capturas de pantalla
+Si aplica, agrega capturas para explicar el problema.
+
+## Información adicional
+- OS: [ej. iOS]
+- Navegador: [ej. chrome, safari]
+- Versión: [ej. 22]`} lang="markdown" />
+  </TabItem>
+  
+  <TabItem label="PR Template">
+    <Code code={`<!-- .github/pull_request_template.md -->
+## Descripción
+Breve descripción de los cambios.
+
+## Tipo de cambio
+- [ ] Bug fix
+- [ ] Nueva funcionalidad
+- [ ] Breaking change
+- [ ] Documentación
+
+## ¿Cómo se ha probado?
+Describe las pruebas realizadas.
+
+## Checklist
+- [ ] Mi código sigue las convenciones del proyecto
+- [ ] He realizado auto-revisión
+- [ ] He comentado código complejo
+- [ ] He actualizado la documentación
+- [ ] Mis cambios no generan advertencias
+- [ ] He agregado pruebas`} lang="markdown" />
+  </TabItem>
+</Tabs>
+
+### Protección de ramas
+
+<Code code={`# Configurar branch protection en GitHub:
+# Settings → Branches → Add rule
+
+# Reglas recomendadas:
+# ✅ Require pull request reviews before merging
+# ✅ Require status checks to pass before merging
+# ✅ Require branches to be up to date before merging
+# ✅ Require conversation resolution before merging
+# ✅ Restrict pushes that create files larger than 100MB
+# ✅ Require signed commits`} lang="text" title="Protección de ramas" />
+
+## Ejemplo práctico: Contribuir a proyecto open source
+
+<Steps>
+<ol>
+  <li>
+    **Encontrar proyecto y issue**
+    <Code code={`# 1. Buscar proyectos con label "good first issue"
+# 2. Leer CONTRIBUTING.md
+# 3. Comentar en issue para indicar interés
+# 4. Esperar confirmación del mantenedor`} lang="bash" />
+  </li>
+  
+  <li>
+    **Fork y configuración**
+    <Code code={`# Fork en GitHub
+# Clone local
+git clone https://github.com/tu-usuario/proyecto-opensource.git
+cd proyecto-opensource
+
+# Configurar upstream
+git remote add upstream https://github.com/original/proyecto-opensource.git
+
+# Instalar dependencias
+npm install  # o el comando apropiado`} lang="bash" />
+  </li>
+  
+  <li>
+    **Desarrollar solución**
+    <Code code={`# Sincronizar con upstream
+git fetch upstream
+git checkout main
+git merge upstream/main
+
+# Crear rama
+git checkout -b fix/issue-123-corregir-validacion
+
+# Hacer cambios
+# ... editar archivos ...
+
+# Probar cambios
+npm test
+npm run lint
+
+# Commit
+git add .
+git commit -m "fix: corregir validación de email en formulario
+
+Closes #123
+
+- Agregar regex para validación de email
+- Actualizar mensajes de error
+- Agregar pruebas unitarias"`} lang="bash" />
+  </li>
+  
+  <li>
+    **Crear Pull Request**
+    <Code code={`# Push a fork
+git push origin fix/issue-123-corregir-validacion
+
+# Crear PR en GitHub con:
+# - Título descriptivo
+# - Descripción completa
+# - Referencia al issue
+# - Screenshots si aplica`} lang="bash" />
+  </li>
+  
+  <li>
+    **Seguimiento y merge**
+    - Responder a comentarios de revisión
+    - Hacer cambios solicitados
+    - Agradecer a revisores
+    - Celebrar cuando se haga merge 🎉
+  </li>
+</ol>
+</Steps>
+
+## Resumen
+
+En este módulo has aprendido:
+
+<Badge text="Trabajo colaborativo" variant="tip" />
+
+- ✅ **Forks**: Crear copias independientes para contribuir
+- ✅ **Pull Requests**: Solicitar fusión de cambios con revisión
+- ✅ **Revisión de código**: Dar y recibir feedback constructivo
+- ✅ **Buenas prácticas**: Comunicación, convenciones y etiqueta
+- ✅ **Flujos colaborativos**: Fork+PR y Branch+PR
+- ✅ **Herramientas**: GitHub Actions, plantillas, protección
+- ✅ **Contribución open source**: Proceso completo de contribución
+
+¡Felicidades! Has completado el curso de Git y GitHub. Ahora tienes todas las herramientas necesarias para trabajar eficientemente con control de versiones y colaborar en proyectos de cualquier tamaño.

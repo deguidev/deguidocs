@@ -76,11 +76,12 @@ export default defineConfig({
 							label: 'GitHub 🐈‍⬛',
 							collapsed: true,
 							items: [
-								{ label: '1. Introducción a Git', link: '/versiones/git/introduccion/' },
-								{ label: '2. Comandos básicos', link: '/versiones/git/comandos-basicos/' },
-								{ label: '3. Ramas y fusiones', link: '/versiones/git/ramas-fusiones/' },
-								{ label: '4. Repositorios remotos', link: '/versiones/git/repositorios-remotos/' },
-								{ label: '5. Flujos de trabajo', link: '/versiones/git/flujos-trabajo/' }
+								{ label: '1. Introducción a Git y GitHub', link: '/guides/git-github/introduccion-git-github/' },
+								{ label: '2. Configuración inicial', link: '/guides/git-github/configuracion-inicial/' },
+								{ label: '3. Fundamentos de Git', link: '/guides/git-github/fundamentos-git/' },
+								{ label: '4. Repositorios remotos', link: '/guides/git-github/repositorios-remotos/' },
+								{ label: '5. Ramas en Git', link: '/guides/git-github/ramas-git/' },
+								{ label: '6. Trabajo colaborativo', link: '/guides/git-github/trabajo-colaborativo/' }
 							]
 						},
 					]

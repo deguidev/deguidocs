@@ -1,0 +1,575 @@
+---
+title: Repositorios remotos con GitHub
+description: Aprende a trabajar con repositorios remotos, clonar, conectar repositorios locales y sincronizar cambios
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Módulo 3: Repositorios remotos con GitHub
+
+Los repositorios remotos son versiones de tu proyecto alojadas en internet. GitHub es la plataforma más popular para alojar repositorios Git. En este módulo aprenderás a trabajar con repositorios remotos de manera eficiente.
+
+## Crear repositorio en GitHub
+
+Antes de conectar tu repositorio local con GitHub, necesitas crear un repositorio remoto en la plataforma.
+
+### Crear repositorio desde GitHub
+
+<Steps>
+<ol>
+  <li>
+    **Iniciar sesión** en [github.com](https://github.com)
+  </li>
+  <li>
+    **Crear nuevo repositorio**: Haz clic en el botón "+" → "New repository"
+  </li>
+  <li>
+    **Configurar repositorio**:
+    - **Repository name**: Nombre único y descriptivo
+    - **Description**: Descripción breve del proyecto (opcional)
+    - **Visibility**: Public (visible para todos) o Private (solo para ti)
+    - **Initialize**: Opciones de inicialización
+  </li>
+  <li>
+    **Opciones de inicialización**:
+    - ✅ **Add a README file**: Recomendado para nuevos proyectos
+    - ✅ **Add .gitignore**: Selecciona plantilla según tu tecnología
+    - ✅ **Choose a license**: Importante para proyectos open source
+  </li>
+</ol>
+</Steps>
+
+<Aside type="tip">
+Si ya tienes un repositorio local, NO inicialices el repositorio remoto con README, .gitignore o licencia para evitar conflictos.
+</Aside>
+
+### Configuraciones importantes
+
+<Tabs>
+  <TabItem label="Repositorio público">
+    **Ventajas:**
+    - Visible en tu perfil
+    - Otros pueden contribuir
+    - Ideal para portafolio
+    - GitHub Pages gratuito
+    
+    **Consideraciones:**
+    - Código visible para todos
+    - No incluir información sensible
+    - Seguir buenas prácticas
+  </TabItem>
+  
+  <TabItem label="Repositorio privado">
+    **Ventajas:**
+    - Código privado
+    - Control total de acceso
+    - Ideal para proyectos comerciales
+    - Colaboradores invitados
+    
+    **Limitaciones:**
+    - No visible en perfil público
+    - Limitaciones en GitHub Pages
+    - Menos exposición
+  </TabItem>
+</Tabs>
+
+## Clonar repositorio (git clone)
+
+Clonar es crear una copia local completa de un repositorio remoto, incluyendo todo su historial.
+
+### Comandos básicos de clonación
+
+<Code code={`# Clonar con HTTPS (requiere token para push)
+git clone https://github.com/usuario/repositorio.git
+
+# Clonar con SSH (requiere configuración de llaves)
+git clone git@github.com:usuario/repositorio.git
+
+# Clonar en directorio específico
+git clone https://github.com/usuario/repositorio.git mi-proyecto
+
+# Clonar solo la rama principal (más rápido)
+git clone --single-branch https://github.com/usuario/repositorio.git
+
+# Clonar con historial limitado
+git clone --depth 1 https://github.com/usuario/repositorio.git`} lang="bash" title="Opciones de clonación" />
+
+### Diferencias entre HTTPS y SSH
+
+<Tabs>
+  <TabItem label="HTTPS">
+    <Code code={`# URL HTTPS
+https://github.com/usuario/repositorio.git
+
+# Ventajas:
+# - Funciona en cualquier red
+# - No requiere configuración especial
+# - Fácil de usar para principiantes
+
+# Desventajas:
+# - Requiere token para push
+# - Puede ser más lento
+# - Necesita autenticación frecuente`} lang="bash" />
+  </TabItem>
+  
+  <TabItem label="SSH">
+    <Code code={`# URL SSH
+git@github.com:usuario/repositorio.git
+
+# Ventajas:
+# - Autenticación automática con llaves
+# - Más seguro
+# - Más rápido para operaciones frecuentes
+
+# Desventajas:
+# - Requiere configuración inicial
+# - Puede estar bloqueado en algunas redes
+# - Más complejo para principiantes`} lang="bash" />
+  </TabItem>
+</Tabs>
+
+### Después de clonar
+
+<Code code={`# Navegar al directorio clonado
+cd repositorio
+
+# Verificar configuración
+git remote -v
+git branch -a
+git log --oneline
+
+# Ver información del repositorio
+git config --list --local`} lang="bash" title="Verificar clonación" />
+
+## Conectar repositorio local con remoto (git remote add)
+
+Si ya tienes un repositorio local y quieres conectarlo con GitHub, usa `git remote add`.
+
+### Agregar repositorio remoto
+
+<Code code={`# Agregar remoto llamado 'origin' (convención estándar)
+git remote add origin https://github.com/usuario/repositorio.git
+
+# Verificar que se agregó correctamente
+git remote -v
+
+# Ver información detallada del remoto
+git remote show origin`} lang="bash" title="Agregar remoto" />
+
+### Gestionar múltiples remotos
+
+<Code code={`# Agregar múltiples remotos
+git remote add origin https://github.com/usuario/repositorio.git
+git remote add upstream https://github.com/original/repositorio.git
+git remote add backup https://gitlab.com/usuario/repositorio.git
+
+# Ver todos los remotos
+git remote -v
+
+# Cambiar URL de remoto existente
+git remote set-url origin git@github.com:usuario/repositorio.git
+
+# Eliminar remoto
+git remote remove backup
+
+# Renombrar remoto
+git remote rename origin github`} lang="bash" title="Gestionar remotos" />
+
+<Aside type="note">
+**origin** es el nombre convencional para el repositorio remoto principal. **upstream** se usa comúnmente para el repositorio original cuando trabajas con forks.
+</Aside>
+
+## Subir cambios (git push)
+
+`git push` envía tus commits locales al repositorio remoto.
+
+### Comandos básicos de push
+
+<Code code={`# Push básico (primera vez)
+git push -u origin main
+
+# Push después de configurar upstream
+git push
+
+# Push de rama específica
+git push origin nombre-rama
+
+# Push de todas las ramas
+git push --all origin
+
+# Push incluyendo tags
+git push --tags origin`} lang="bash" title="Comandos push" />
+
+### Configurar upstream
+
+<Tabs>
+  <TabItem label="¿Qué es upstream?">
+    **Upstream** es la rama remota que Git usa por defecto para `git push` y `git pull`.
+    
+    <Code code={`# Configurar upstream en el primer push
+git push -u origin main
+# Equivale a:
+git push --set-upstream origin main
+
+# Después puedes usar simplemente:
+git push
+git pull`} lang="bash" />
+  </TabItem>
+  
+  <TabItem label="Verificar upstream">
+    <Code code={`# Ver configuración de upstream
+git branch -vv
+
+# Ver configuración de rama actual
+git status
+
+# Configurar upstream para rama existente
+git branch --set-upstream-to=origin/main main`} lang="bash" />
+  </TabItem>
+</Tabs>
+
+### Solucionar problemas comunes de push
+
+<Code code={`# Error: Updates were rejected
+# Solución: Pull primero, luego push
+git pull origin main
+git push origin main
+
+# Error: Non-fast-forward
+# Solución: Merge o rebase
+git pull --rebase origin main
+git push origin main
+
+# Forzar push (¡CUIDADO!)
+git push --force origin main
+# Mejor usar:
+git push --force-with-lease origin main`} lang="bash" title="Solucionar errores de push" />
+
+<Aside type="caution">
+**¡Nunca uses `--force` en ramas compartidas!** Puede sobrescribir el trabajo de otros desarrolladores. Usa `--force-with-lease` si es absolutamente necesario.
+</Aside>
+
+## Descargar cambios (git pull, git fetch)
+
+Mantener tu repositorio local sincronizado con el remoto es esencial en el trabajo colaborativo.
+
+### git fetch vs git pull
+
+<Tabs>
+  <TabItem label="git fetch">
+    <Code code={`# Descargar cambios sin fusionar
+git fetch origin
+
+# Fetch de rama específica
+git fetch origin main
+
+# Fetch de todos los remotos
+git fetch --all
+
+# Ver qué cambios hay disponibles
+git log HEAD..origin/main --oneline
+
+# Ver diferencias
+git diff HEAD origin/main`} lang="bash" />
+    
+    **git fetch:**
+    - Descarga cambios del remoto
+    - NO modifica tu working directory
+    - Actualiza referencias remotas
+    - Seguro de usar siempre
+  </TabItem>
+  
+  <TabItem label="git pull">
+    <Code code={`# Pull básico (fetch + merge)
+git pull origin main
+
+# Pull con rebase
+git pull --rebase origin main
+
+# Pull de rama actual
+git pull
+
+# Pull con estrategia específica
+git pull --no-ff origin main`} lang="bash" />
+    
+    **git pull:**
+    - Equivale a `git fetch` + `git merge`
+    - Modifica tu working directory
+    - Puede crear commits de merge
+    - Requiere working directory limpio
+  </TabItem>
+</Tabs>
+
+### Flujo recomendado para sincronización
+
+<Steps>
+<ol>
+  <li>
+    **Verificar estado local**
+    <Code code={`git status
+# Asegúrate de que no hay cambios sin confirmar`} lang="bash" />
+  </li>
+  
+  <li>
+    **Fetch para ver cambios disponibles**
+    <Code code={`git fetch origin
+git log HEAD..origin/main --oneline`} lang="bash" />
+  </li>
+  
+  <li>
+    **Pull con la estrategia apropiada**
+    <Code code={`# Para historial lineal (recomendado)
+git pull --rebase origin main
+
+# Para preservar contexto de merge
+git pull origin main`} lang="bash" />
+  </li>
+  
+  <li>
+    **Resolver conflictos si existen**
+    <Code code={`# Si hay conflictos, Git te lo indicará
+git status
+# Editar archivos conflictivos
+git add archivo-resuelto.txt
+git rebase --continue  # Si usaste --rebase
+git commit             # Si usaste merge normal`} lang="bash" />
+  </li>
+</ol>
+</Steps>
+
+## Ejemplo práctico completo
+
+Vamos a crear un flujo completo desde cero:
+
+### Escenario 1: Repositorio nuevo en GitHub
+
+<Steps>
+<ol>
+  <li>
+    **Crear repositorio en GitHub**
+    - Ir a github.com → New repository
+    - Nombre: "mi-proyecto-web"
+    - Descripción: "Mi primer proyecto con Git y GitHub"
+    - Público, sin inicializar
+  </li>
+  
+  <li>
+    **Crear proyecto local**
+    <Code code={`mkdir mi-proyecto-web
+cd mi-proyecto-web
+git init
+
+# Crear archivos iniciales
+echo "# Mi Proyecto Web" > README.md
+echo "console.log('Hola mundo');" > app.js
+
+# Primer commit
+git add .
+git commit -m "feat: estructura inicial del proyecto"`} lang="bash" />
+  </li>
+  
+  <li>
+    **Conectar con GitHub**
+    <Code code={`git remote add origin https://github.com/tu-usuario/mi-proyecto-web.git
+git branch -M main
+git push -u origin main`} lang="bash" />
+  </li>
+  
+  <li>
+    **Continuar desarrollo**
+    <Code code={`# Hacer cambios
+echo "body { font-family: Arial; }" > styles.css
+git add styles.css
+git commit -m "feat: agregar estilos básicos"
+
+# Subir cambios
+git push`} lang="bash" />
+  </li>
+</ol>
+</Steps>
+
+### Escenario 2: Clonar proyecto existente
+
+<Steps>
+<ol>
+  <li>
+    **Clonar repositorio**
+    <Code code={`git clone https://github.com/usuario/proyecto-existente.git
+cd proyecto-existente`} lang="bash" />
+  </li>
+  
+  <li>
+    **Explorar el proyecto**
+    <Code code={`# Ver estructura
+ls -la
+
+# Ver historial
+git log --oneline
+
+# Ver remotos configurados
+git remote -v
+
+# Ver ramas disponibles
+git branch -a`} lang="bash" />
+  </li>
+  
+  <li>
+    **Hacer contribuciones**
+    <Code code={`# Crear nueva funcionalidad
+echo "Nueva funcionalidad" > nueva-feature.js
+git add nueva-feature.js
+git commit -m "feat: agregar nueva funcionalidad"
+
+# Sincronizar antes de push
+git pull --rebase
+git push`} lang="bash" />
+  </li>
+</ol>
+</Steps>
+
+## Trabajar con múltiples colaboradores
+
+### Flujo de trabajo recomendado
+
+<Code code={`# 1. Siempre pull antes de empezar a trabajar
+git pull origin main
+
+# 2. Crear rama para nueva funcionalidad
+git checkout -b mi-funcionalidad
+
+# 3. Desarrollar y hacer commits
+git add .
+git commit -m "feat: implementar mi funcionalidad"
+
+# 4. Sincronizar con main antes de push
+git checkout main
+git pull origin main
+git checkout mi-funcionalidad
+git rebase main
+
+# 5. Push de la rama
+git push origin mi-funcionalidad
+
+# 6. Crear Pull Request en GitHub
+# 7. Después del merge, limpiar
+git checkout main
+git pull origin main
+git branch -d mi-funcionalidad`} lang="bash" title="Flujo colaborativo" />
+
+### Comandos útiles para colaboración
+
+<Code code={`# Ver quién modificó cada línea
+git blame archivo.txt
+
+# Ver cambios de otros colaboradores
+git log --author="Nombre Colaborador"
+
+# Ver estadísticas de contribuciones
+git shortlog -sn
+
+# Ver archivos modificados por otros
+git diff --name-only HEAD~1 HEAD
+
+# Crear patch para compartir cambios
+git format-patch HEAD~1
+
+# Aplicar patch recibido
+git apply cambios.patch`} lang="bash" title="Comandos de colaboración" />
+
+## Configuración avanzada de remotos
+
+### Configurar diferentes URLs para fetch y push
+
+<Code code={`# Configurar URL diferente para push (útil para forks)
+git remote set-url --push origin git@github.com:mi-usuario/mi-fork.git
+
+# Ver configuración
+git remote -v
+# origin  https://github.com/original/repo.git (fetch)
+# origin  git@github.com:mi-usuario/mi-fork.git (push)
+
+# Agregar múltiples URLs de push
+git remote set-url --add --push origin git@gitlab.com:mi-usuario/repo.git`} lang="bash" title="URLs múltiples" />
+
+### Configurar pull automático
+
+<Code code={`# Configurar pull para hacer rebase por defecto
+git config pull.rebase true
+
+# Solo para este repositorio
+git config --local pull.rebase true
+
+# Configurar fast-forward only
+git config pull.ff only
+
+# Ver configuración actual
+git config --get pull.rebase`} lang="bash" title="Configurar pull" />
+
+## Solución de problemas comunes
+
+<Badge text="Problemas frecuentes" variant="caution" />
+
+<Tabs>
+  <TabItem label="Error de autenticación">
+    <Code code={`# Error: Authentication failed
+# Solución 1: Verificar token
+git config --global credential.helper store
+# Hacer push y usar token como contraseña
+
+# Solución 2: Cambiar a SSH
+git remote set-url origin git@github.com:usuario/repo.git
+
+# Solución 3: Verificar configuración
+git config --list | grep credential`} lang="bash" />
+  </TabItem>
+  
+  <TabItem label="Conflictos de merge">
+    <Code code={`# Cuando hay conflictos en pull
+git status
+# Editar archivos con conflictos
+# Buscar marcadores: <<<<<<< ======= >>>>>>>
+
+# Después de resolver
+git add archivo-resuelto.txt
+git commit -m "resolve: conflictos en archivo-resuelto"
+
+# O abortar merge
+git merge --abort`} lang="bash" />
+  </TabItem>
+  
+  <TabItem label="Repositorio desincronizado">
+    <Code code={`# Cuando local y remoto han divergido
+git fetch origin
+git log --oneline --graph --all
+
+# Opción 1: Merge
+git pull origin main
+
+# Opción 2: Rebase (historial más limpio)
+git pull --rebase origin main
+
+# Opción 3: Reset (¡CUIDADO! Pierdes commits locales)
+git reset --hard origin/main`} lang="bash" />
+  </TabItem>
+</Tabs>
+
+## Resumen
+
+En este módulo has aprendido:
+
+<Badge text="Repositorios remotos" variant="tip" />
+
+- ✅ **Crear repositorios** en GitHub
+- ✅ **git clone**: Clonar repositorios existentes
+- ✅ **git remote**: Conectar repositorios locales con remotos
+- ✅ **git push**: Subir cambios al repositorio remoto
+- ✅ **git pull/fetch**: Descargar cambios del repositorio remoto
+- ✅ **Sincronización**: Mantener repositorios actualizados
+- ✅ **Colaboración**: Trabajar en equipo eficientemente
+- ✅ **Solución de problemas**: Resolver conflictos comunes
+
+En el próximo módulo aprenderemos sobre ramas (branches), una de las características más poderosas de Git para el desarrollo paralelo y la organización del trabajo.

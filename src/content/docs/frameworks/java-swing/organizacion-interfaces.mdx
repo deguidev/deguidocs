@@ -1,0 +1,576 @@
+---
+title: Organización de Interfaces
+description: Aprende a organizar componentes usando layouts y paneles en Java Swing
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Módulo 3: Organización de Interfaces
+
+La organización adecuada de los componentes es fundamental para crear interfaces de usuario profesionales y funcionales. En este módulo aprenderemos sobre los diferentes layouts y cómo usar paneles para estructurar nuestras aplicaciones.
+
+## Layouts: FlowLayout, BorderLayout, GridLayout
+
+Los Layout Managers son responsables de organizar automáticamente los componentes dentro de un contenedor, adaptándose a diferentes tamaños de ventana.
+
+### FlowLayout
+
+FlowLayout organiza los componentes en una fila, de izquierda a derecha, y cuando no hay más espacio, continúa en la siguiente fila.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class EjemploFlowLayout extends JFrame {
+    public EjemploFlowLayout() {
+        setTitle("FlowLayout Example");
+        setSize(400, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // Configurar FlowLayout
+        setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        
+        // Agregar componentes
+        for (int i = 1; i <= 8; i++) {
+            add(new JButton("Botón " + i));
+        }
+        
+        setVisible(true);
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new EjemploFlowLayout());
+    }
+}`} lang="java" title="EjemploFlowLayout.java" />
+
+<Aside type="tip">
+FlowLayout es ideal para barras de herramientas o paneles con botones que no requieren posicionamiento específico.
+</Aside>
+
+### BorderLayout
+
+BorderLayout divide el contenedor en cinco regiones: NORTH, SOUTH, EAST, WEST y CENTER.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class EjemploBorderLayout extends JFrame {
+    public EjemploBorderLayout() {
+        setTitle("BorderLayout Example");
+        setSize(500, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // BorderLayout es el layout por defecto de JFrame
+        setLayout(new BorderLayout());
+        
+        // Agregar componentes a cada región
+        add(new JButton("NORTH"), BorderLayout.NORTH);
+        add(new JButton("SOUTH"), BorderLayout.SOUTH);
+        add(new JButton("EAST"), BorderLayout.EAST);
+        add(new JButton("WEST"), BorderLayout.WEST);
+        add(new JButton("CENTER"), BorderLayout.CENTER);
+        
+        setVisible(true);
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new EjemploBorderLayout());
+    }
+}`} lang="java" title="EjemploBorderLayout.java" />
+
+### GridLayout
+
+GridLayout organiza los componentes en una cuadrícula de filas y columnas de igual tamaño.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class EjemploGridLayout extends JFrame {
+    public EjemploGridLayout() {
+        setTitle("GridLayout Example - Calculadora");
+        setSize(300, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // GridLayout de 4 filas y 4 columnas
+        setLayout(new GridLayout(4, 4, 5, 5));
+        
+        // Botones de calculadora
+        String[] botones = {
+            "7", "8", "9", "/",
+            "4", "5", "6", "*",
+            "1", "2", "3", "-",
+            "0", ".", "=", "+"
+        };
+        
+        for (String texto : botones) {
+            JButton boton = new JButton(texto);
+            boton.setFont(new Font("Arial", Font.BOLD, 18));
+            add(boton);
+        }
+        
+        setVisible(true);
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new EjemploGridLayout());
+    }
+}`} lang="java" title="EjemploGridLayout.java" />
+
+## Paneles (JPanel) y organización visual
+
+JPanel es un contenedor que permite agrupar componentes y aplicar diferentes layouts a cada grupo.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class EjemploJPanel extends JFrame {
+    public EjemploJPanel() {
+        setTitle("Ejemplo con JPanel");
+        setSize(500, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        
+        // Panel superior con botones
+        JPanel panelSuperior = new JPanel(new FlowLayout());
+        panelSuperior.setBackground(Color.LIGHT_GRAY);
+        panelSuperior.add(new JButton("Nuevo"));
+        panelSuperior.add(new JButton("Abrir"));
+        panelSuperior.add(new JButton("Guardar"));
+        
+        // Panel central con área de texto
+        JPanel panelCentral = new JPanel(new BorderLayout());
+        JTextArea areaTexto = new JTextArea();
+        panelCentral.add(new JScrollPane(areaTexto), BorderLayout.CENTER);
+        
+        // Panel inferior con información
+        JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelInferior.setBackground(Color.GRAY);
+        panelInferior.add(new JLabel("Listo"));
+        panelInferior.add(new JLabel(" | "));
+        panelInferior.add(new JLabel("Línea: 1"));
+        
+        // Panel lateral con opciones
+        JPanel panelLateral = new JPanel();
+        panelLateral.setLayout(new BoxLayout(panelLateral, BoxLayout.Y_AXIS));
+        panelLateral.setBorder(BorderFactory.createTitledBorder("Opciones"));
+        panelLateral.add(new JCheckBox("Opción 1"));
+        panelLateral.add(new JCheckBox("Opción 2"));
+        panelLateral.add(new JCheckBox("Opción 3"));
+        
+        // Agregar paneles al frame
+        add(panelSuperior, BorderLayout.NORTH);
+        add(panelCentral, BorderLayout.CENTER);
+        add(panelInferior, BorderLayout.SOUTH);
+        add(panelLateral, BorderLayout.EAST);
+        
+        setVisible(true);
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new EjemploJPanel());
+    }
+}`} lang="java" title="EjemploJPanel.java" />
+
+## Ventanas secundarias (JDialog, JOptionPane)
+
+### JOptionPane - Diálogos simples
+
+JOptionPane proporciona métodos estáticos para crear diálogos comunes rápidamente.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class EjemploJOptionPane extends JFrame {
+    public EjemploJOptionPane() {
+        setTitle("Ejemplo JOptionPane");
+        setSize(400, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+        
+        JButton botonInfo = new JButton("Información");
+        JButton botonAdvertencia = new JButton("Advertencia");
+        JButton botonError = new JButton("Error");
+        JButton botonConfirmar = new JButton("Confirmar");
+        JButton botonInput = new JButton("Entrada");
+        
+        botonInfo.addActionListener(e -> 
+            JOptionPane.showMessageDialog(this, "Esto es información", "Info", 
+                JOptionPane.INFORMATION_MESSAGE));
+        
+        botonAdvertencia.addActionListener(e -> 
+            JOptionPane.showMessageDialog(this, "Esto es una advertencia", "Advertencia", 
+                JOptionPane.WARNING_MESSAGE));
+        
+        botonError.addActionListener(e -> 
+            JOptionPane.showMessageDialog(this, "Esto es un error", "Error", 
+                JOptionPane.ERROR_MESSAGE));
+        
+        botonConfirmar.addActionListener(e -> {
+            int resultado = JOptionPane.showConfirmDialog(this, 
+                "¿Estás seguro?", "Confirmar", JOptionPane.YES_NO_OPTION);
+            if (resultado == JOptionPane.YES_OPTION) {
+                JOptionPane.showMessageDialog(this, "Confirmado");
+            }
+        });
+        
+        botonInput.addActionListener(e -> {
+            String nombre = JOptionPane.showInputDialog(this, "Ingresa tu nombre:");
+            if (nombre != null && !nombre.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Hola, " + nombre);
+            }
+        });
+        
+        add(botonInfo);
+        add(botonAdvertencia);
+        add(botonError);
+        add(botonConfirmar);
+        add(botonInput);
+        
+        setVisible(true);
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new EjemploJOptionPane());
+    }
+}`} lang="java" title="EjemploJOptionPane.java" />
+
+### JDialog - Ventanas personalizadas
+
+JDialog permite crear ventanas secundarias completamente personalizadas.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class EjemploJDialog extends JFrame {
+    public EjemploJDialog() {
+        setTitle("Ventana Principal");
+        setSize(300, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+        
+        JButton botonAbrir = new JButton("Abrir Diálogo");
+        botonAbrir.addActionListener(e -> abrirDialogo());
+        
+        add(botonAbrir);
+        setVisible(true);
+    }
+    
+    private void abrirDialogo() {
+        JDialog dialogo = new JDialog(this, "Diálogo Personalizado", true);
+        dialogo.setSize(300, 200);
+        dialogo.setLocationRelativeTo(this);
+        dialogo.setLayout(new BorderLayout());
+        
+        // Contenido del diálogo
+        JPanel panelCentral = new JPanel(new GridLayout(3, 2, 5, 5));
+        panelCentral.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        panelCentral.add(new JLabel("Nombre:"));
+        JTextField campoNombre = new JTextField();
+        panelCentral.add(campoNombre);
+        
+        panelCentral.add(new JLabel("Email:"));
+        JTextField campoEmail = new JTextField();
+        panelCentral.add(campoEmail);
+        
+        panelCentral.add(new JLabel("Teléfono:"));
+        JTextField campoTelefono = new JTextField();
+        panelCentral.add(campoTelefono);
+        
+        // Panel de botones
+        JPanel panelBotones = new JPanel(new FlowLayout());
+        JButton botonAceptar = new JButton("Aceptar");
+        JButton botonCancelar = new JButton("Cancelar");
+        
+        botonAceptar.addActionListener(e -> {
+            String mensaje = String.format("Datos ingresados:\nNombre: %s\nEmail: %s\nTeléfono: %s",
+                campoNombre.getText(), campoEmail.getText(), campoTelefono.getText());
+            JOptionPane.showMessageDialog(dialogo, mensaje);
+            dialogo.dispose();
+        });
+        
+        botonCancelar.addActionListener(e -> dialogo.dispose());
+        
+        panelBotones.add(botonAceptar);
+        panelBotones.add(botonCancelar);
+        
+        dialogo.add(panelCentral, BorderLayout.CENTER);
+        dialogo.add(panelBotones, BorderLayout.SOUTH);
+        
+        dialogo.setVisible(true);
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new EjemploJDialog());
+    }
+}`} lang="java" title="EjemploJDialog.java" />
+
+## Diseño con GroupLayout y BoxLayout
+
+### BoxLayout
+
+BoxLayout organiza componentes en una sola fila o columna.
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+
+public class EjemploBoxLayout extends JFrame {
+    public EjemploBoxLayout() {
+        setTitle("BoxLayout Example");
+        setSize(300, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // Panel principal con BoxLayout vertical
+        JPanel panelPrincipal = new JPanel();
+        panelPrincipal.setLayout(new BoxLayout(panelPrincipal, BoxLayout.Y_AXIS));
+        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // Agregar componentes con espaciado
+        panelPrincipal.add(new JLabel("Formulario de Login"));
+        panelPrincipal.add(Box.createVerticalStrut(10));
+        
+        panelPrincipal.add(new JLabel("Usuario:"));
+        panelPrincipal.add(new JTextField());
+        panelPrincipal.add(Box.createVerticalStrut(10));
+        
+        panelPrincipal.add(new JLabel("Contraseña:"));
+        panelPrincipal.add(new JPasswordField());
+        panelPrincipal.add(Box.createVerticalStrut(20));
+        
+        // Panel horizontal para botones
+        JPanel panelBotones = new JPanel();
+        panelBotones.setLayout(new BoxLayout(panelBotones, BoxLayout.X_AXIS));
+        panelBotones.add(Box.createHorizontalGlue());
+        panelBotones.add(new JButton("Cancelar"));
+        panelBotones.add(Box.createHorizontalStrut(10));
+        panelBotones.add(new JButton("Aceptar"));
+        
+        panelPrincipal.add(panelBotones);
+        
+        add(panelPrincipal);
+        setVisible(true);
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new EjemploBoxLayout());
+    }
+}`} lang="java" title="EjemploBoxLayout.java" />
+
+### GroupLayout
+
+GroupLayout es más complejo pero ofrece mayor control sobre el posicionamiento.
+
+<Code code={`import javax.swing.*;
+
+public class EjemploGroupLayout extends JFrame {
+    public EjemploGroupLayout() {
+        setTitle("GroupLayout Example");
+        setSize(400, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // Crear componentes
+        JLabel labelNombre = new JLabel("Nombre:");
+        JTextField campoNombre = new JTextField();
+        JLabel labelEmail = new JLabel("Email:");
+        JTextField campoEmail = new JTextField();
+        JButton botonEnviar = new JButton("Enviar");
+        JButton botonCancelar = new JButton("Cancelar");
+        
+        // Crear GroupLayout
+        GroupLayout layout = new GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        
+        // Configurar gaps automáticos
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        
+        // Grupo horizontal
+        layout.setHorizontalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(labelNombre)
+                    .addComponent(labelEmail))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(campoNombre)
+                    .addComponent(campoEmail)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(botonCancelar)
+                        .addComponent(botonEnviar)))
+        );
+        
+        // Grupo vertical
+        layout.setVerticalGroup(
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelNombre)
+                    .addComponent(campoNombre))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelEmail)
+                    .addComponent(campoEmail))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(botonCancelar)
+                    .addComponent(botonEnviar))
+        );
+        
+        setVisible(true);
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new EjemploGroupLayout());
+    }
+}`} lang="java" title="EjemploGroupLayout.java" />
+
+## Ejemplo completo: Aplicación con múltiples layouts
+
+<Code code={`import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class AplicacionCompleta extends JFrame {
+    private JTextArea areaTexto;
+    private JLabel statusLabel;
+    
+    public AplicacionCompleta() {
+        setTitle("Editor de Texto - Layouts Combinados");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        initComponents();
+        setVisible(true);
+    }
+    
+    private void initComponents() {
+        // Barra de menú
+        setJMenuBar(crearMenuBar());
+        
+        // Barra de herramientas (NORTH)
+        add(crearToolBar(), BorderLayout.NORTH);
+        
+        // Área central con texto
+        add(crearAreaCentral(), BorderLayout.CENTER);
+        
+        // Panel lateral (EAST)
+        add(crearPanelLateral(), BorderLayout.EAST);
+        
+        // Barra de estado (SOUTH)
+        add(crearBarraEstado(), BorderLayout.SOUTH);
+    }
+    
+    private JMenuBar crearMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+        
+        JMenu menuArchivo = new JMenu("Archivo");
+        menuArchivo.add(new JMenuItem("Nuevo"));
+        menuArchivo.add(new JMenuItem("Abrir"));
+        menuArchivo.add(new JMenuItem("Guardar"));
+        menuArchivo.addSeparator();
+        menuArchivo.add(new JMenuItem("Salir"));
+        
+        JMenu menuEditar = new JMenu("Editar");
+        menuEditar.add(new JMenuItem("Copiar"));
+        menuEditar.add(new JMenuItem("Pegar"));
+        menuEditar.add(new JMenuItem("Cortar"));
+        
+        menuBar.add(menuArchivo);
+        menuBar.add(menuEditar);
+        
+        return menuBar;
+    }
+    
+    private JToolBar crearToolBar() {
+        JToolBar toolBar = new JToolBar();
+        toolBar.setFloatable(false);
+        
+        toolBar.add(new JButton("Nuevo"));
+        toolBar.add(new JButton("Abrir"));
+        toolBar.add(new JButton("Guardar"));
+        toolBar.addSeparator();
+        toolBar.add(new JButton("Copiar"));
+        toolBar.add(new JButton("Pegar"));
+        
+        return toolBar;
+    }
+    
+    private JScrollPane crearAreaCentral() {
+        areaTexto = new JTextArea();
+        areaTexto.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        areaTexto.setLineWrap(true);
+        areaTexto.setWrapStyleWord(true);
+        
+        return new JScrollPane(areaTexto);
+    }
+    
+    private JPanel crearPanelLateral() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createTitledBorder("Propiedades"));
+        panel.setPreferredSize(new Dimension(200, 0));
+        
+        // Sección de formato
+        panel.add(new JLabel("Formato:"));
+        panel.add(new JCheckBox("Negrita"));
+        panel.add(new JCheckBox("Cursiva"));
+        panel.add(new JCheckBox("Subrayado"));
+        panel.add(Box.createVerticalStrut(10));
+        
+        // Sección de tamaño
+        panel.add(new JLabel("Tamaño:"));
+        String[] tamaños = {"10", "12", "14", "16", "18", "20"};
+        panel.add(new JComboBox<>(tamaños));
+        panel.add(Box.createVerticalStrut(10));
+        
+        // Botones de acción
+        panel.add(new JButton("Aplicar formato"));
+        panel.add(Box.createVerticalGlue());
+        
+        return panel;
+    }
+    
+    private JPanel crearBarraEstado() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel.setBorder(BorderFactory.createLoweredBevelBorder());
+        
+        statusLabel = new JLabel("Listo");
+        panel.add(statusLabel);
+        panel.add(new JLabel(" | "));
+        panel.add(new JLabel("Línea: 1, Columna: 1"));
+        
+        return panel;
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new AplicacionCompleta());
+    }
+}`} lang="java" title="AplicacionCompleta.java" />
+
+## Resumen
+
+En este módulo hemos aprendido:
+
+<Badge text="Layout Managers" variant="tip" />
+
+- **FlowLayout**: Organización secuencial con salto de línea
+- **BorderLayout**: División en 5 regiones (North, South, East, West, Center)
+- **GridLayout**: Cuadrícula de filas y columnas uniformes
+- **BoxLayout**: Organización en una sola dimensión
+- **GroupLayout**: Control preciso del posicionamiento
+
+<Badge text="Contenedores" variant="note" />
+
+- **JPanel**: Agrupación de componentes con layouts específicos
+- **JDialog**: Ventanas secundarias personalizadas
+- **JOptionPane**: Diálogos estándar rápidos
+
+<Badge text="Mejores prácticas" variant="caution" />
+
+- Combinar diferentes layouts para interfaces complejas
+- Usar paneles para agrupar componentes relacionados
+- Aplicar bordes y espaciado para mejorar la apariencia
+- Considerar la redimensionabilidad de la ventana
+
+En el próximo módulo aprenderemos sobre tablas y modelos personalizados para manejar datos tabulares.

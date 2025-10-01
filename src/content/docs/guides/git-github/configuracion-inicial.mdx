@@ -1,0 +1,424 @@
+---
+title: Configuración inicial y cuenta GitHub
+description: Aprende a configurar Git y GitHub desde cero para comenzar a trabajar con control de versiones
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Configuración inicial y cuenta GitHub
+
+Antes de comenzar a trabajar con Git y GitHub, necesitamos configurar nuestro entorno de desarrollo. En esta guía aprenderás a crear tu cuenta de GitHub, instalar Git y configurar la autenticación.
+
+## Crear una cuenta en GitHub
+
+GitHub es la plataforma más popular para alojar repositorios Git y colaborar en proyectos de código.
+
+<Steps>
+  1. **Visita GitHub**: Ve a [github.com](https://github.com) y haz clic en "Sign up"
+  2. **Completa el registro**:
+     - Elige un nombre de usuario único y memorable
+     - Usa un email válido (preferiblemente profesional)
+     - Crea una contraseña segura
+  3. **Verifica tu cuenta**: Revisa tu email y confirma tu cuenta
+  4. **Completa tu perfil**: Agrega una foto, biografía y información relevante
+</Steps>
+
+<Aside type="tip">
+Tu nombre de usuario de GitHub será visible en todos tus repositorios y contribuciones. Elige algo profesional que te represente bien.
+</Aside>
+
+## Verificar correo y perfil
+
+Un perfil completo y verificado genera más confianza en la comunidad de desarrolladores.
+
+### Verificación de email
+
+<Code code={`# En GitHub, ve a Settings > Emails
+# Asegúrate de que tu email principal esté verificado
+# Puedes agregar múltiples emails si trabajas desde diferentes dispositivos`} lang="bash" title="Verificación de email" />
+
+### Configuración de perfil recomendada
+
+- **Foto de perfil**: Una imagen profesional o avatar representativo
+- **Nombre completo**: Tu nombre real para proyectos profesionales
+- **Biografía**: Breve descripción de tu experiencia o intereses
+- **Ubicación**: Ciudad o país (opcional)
+- **Sitio web**: Tu portafolio o LinkedIn (opcional)
+- **Empresa**: Donde trabajas actualmente (opcional)
+
+## Instalar Git en Windows, Linux y Mac
+
+Git es el sistema de control de versiones que utilizaremos. Necesitas instalarlo en tu sistema operativo.
+
+<Tabs>
+  <TabItem label="Windows">
+    <Steps>
+      1. **Descarga Git**: Ve a [git-scm.com](https://git-scm.com/download/win)
+      2. **Ejecuta el instalador**: Descarga el archivo .exe y ejecútalo
+      3. **Configuración recomendada**:
+         - Editor: Visual Studio Code (si lo tienes instalado)
+         - Ajustar PATH: "Git from the command line and also from 3rd-party software"
+         - HTTPS transport backend: "Use the OpenSSL library"
+         - Line ending conversions: "Checkout Windows-style, commit Unix-style"
+         - Terminal emulator: "Use Windows' default console window"
+      4. **Verificar instalación**: Abre Command Prompt o PowerShell y ejecuta:
+    </Steps>
+    
+    <Code code={`git --version
+# Debería mostrar algo como: git version 2.41.0.windows.1`} lang="bash" />
+  </TabItem>
+  
+  <TabItem label="macOS">
+    <Steps>
+      1. **Opción 1 - Homebrew** (recomendado):
+         ```bash
+         # Instalar Homebrew si no lo tienes
+         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+         
+         # Instalar Git
+         brew install git
+         ```
+      2. **Opción 2 - Descarga directa**: Ve a [git-scm.com](https://git-scm.com/download/mac)
+      3. **Opción 3 - Xcode Command Line Tools**:
+         ```bash
+         xcode-select --install
+         ```
+      4. **Verificar instalación**:
+         ```bash
+         git --version
+         ```
+    </Steps>
+  </TabItem>
+  
+  <TabItem label="Linux (Ubuntu/Debian)">
+    <Code code={`# Actualizar repositorios
+sudo apt update
+
+# Instalar Git
+sudo apt install git
+
+# Verificar instalación
+git --version`} lang="bash" />
+    
+    **Para otras distribuciones:**
+    
+    <Code code={`# CentOS/RHEL/Fedora
+sudo yum install git
+# o para versiones más nuevas
+sudo dnf install git
+
+# Arch Linux
+sudo pacman -S git
+
+# openSUSE
+sudo zypper install git`} lang="bash" />
+  </TabItem>
+</Tabs>
+
+## Configurar Git por primera vez
+
+Después de instalar Git, necesitas configurar tu identidad. Esta información se incluirá en todos tus commits.
+
+<Code code={`# Configurar tu nombre (usa tu nombre real)
+git config --global user.name "Tu Nombre Completo"
+
+# Configurar tu email (usa el mismo email de GitHub)
+git config --global user.email "tu.email@ejemplo.com"
+
+# Configurar el editor por defecto (opcional)
+git config --global core.editor "code --wait"  # Para VS Code
+git config --global core.editor "nano"         # Para nano
+git config --global core.editor "vim"          # Para vim
+
+# Configurar el comportamiento de salto de línea
+git config --global core.autocrlf true    # Windows
+git config --global core.autocrlf input   # macOS/Linux
+
+# Verificar tu configuración
+git config --list`} lang="bash" title="Configuración inicial de Git" />
+
+<Aside type="note">
+La configuración `--global` aplica a todos los repositorios en tu sistema. Puedes usar `--local` para configurar un repositorio específico.
+</Aside>
+
+## Limpiar credenciales anteriores (opcional)
+
+Si ya has usado Git con GitHub anteriormente y quieres empezar con credenciales limpias, es recomendable eliminar las credenciales guardadas.
+
+<Tabs>
+  <TabItem label="Windows">
+    <Steps>
+      1. **Abrir Administrador de Credenciales**: Busca "Credential Manager" o "Administrador de Credenciales" en el menú inicio
+      2. **Ir a Credenciales de Windows**: Haz clic en "Windows Credentials" o "Credenciales de Windows"
+      3. **Buscar entradas de GitHub**: Busca las entradas relacionadas con `github.com`
+      4. **Eliminar credenciales**: Haz clic en cada entrada de GitHub y selecciona "Remove" o "Eliminar"
+    </Steps>
+    
+    <Aside type="tip">
+    También puedes usar el comando: `git config --global --unset credential.helper` para limpiar la configuración de credenciales.
+    </Aside>
+  </TabItem>
+  
+  <TabItem label="macOS">
+    <Code code={`# Eliminar credenciales de GitHub del Keychain
+git credential-osxkeychain erase
+# Luego escribe:
+host=github.com
+protocol=https
+# Presiona Enter dos veces
+
+# O usar el Keychain Access
+# Aplicaciones > Utilidades > Acceso a Llaveros
+# Buscar "github.com" y eliminar las entradas`} lang="bash" />
+  </TabItem>
+  
+  <TabItem label="Linux">
+    <Code code={`# Si usas credential helper store
+rm ~/.git-credentials
+
+# Si usas credential helper cache
+git credential-cache exit
+
+# Limpiar configuración global de credenciales
+git config --global --unset credential.helper`} lang="bash" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+Después de limpiar las credenciales, Git te pedirá autenticarte nuevamente la próxima vez que hagas push o pull a un repositorio privado.
+</Aside>
+
+## Autenticación con GitHub: Token Personal de Acceso (PAT)
+
+GitHub ya no permite autenticación con contraseña para operaciones Git. Necesitas crear un Token Personal de Acceso.
+
+<Steps>
+  1. **Ve a GitHub Settings**: Haz clic en tu avatar → Settings
+  2. **Developer settings**: En el menú izquierdo, ve a "Developer settings"
+  3. **Personal access tokens**: Selecciona "Tokens (classic)"
+  4. **Generate new token**: Haz clic en "Generate new token (classic)"
+  5. **Configurar el token**:
+     - **Note**: Descripción del token (ej: "Mi laptop personal")
+     - **Expiration**: Selecciona un tiempo apropiado
+     - **Scopes**: Selecciona los permisos necesarios
+</Steps>
+
+### Permisos recomendados para el token
+
+<Badge text="Permisos básicos" variant="tip" />
+
+- `repo` - Acceso completo a repositorios privados
+- `workflow` - Actualizar archivos de GitHub Actions
+- `write:packages` - Subir paquetes
+- `delete:packages` - Eliminar paquetes
+- `admin:org` - Acceso completo a organizaciones (si aplica)
+- `admin:public_key` - Administrar llaves SSH públicas
+- `admin:repo_hook` - Administrar hooks de repositorio
+- `user` - Actualizar datos de usuario
+- `delete_repo` - Eliminar repositorios
+
+<Code code={`# Una vez creado el token, cópialo y guárdalo en un lugar seguro
+# Lo usarás como contraseña cuando Git te pida autenticación
+
+# Ejemplo de uso:
+git clone https://github.com/usuario/repositorio.git
+# Username: tu-usuario-github
+# Password: ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (tu token)`} lang="bash" title="Uso del token" />
+
+<Aside type="caution">
+**¡Importante!** Guarda tu token en un lugar seguro. GitHub no te lo mostrará nuevamente. Si lo pierdes, tendrás que generar uno nuevo.
+</Aside>
+
+## Conexión por HTTPS y SSH
+
+Puedes conectarte a GitHub usando HTTPS (con token) o SSH (con llaves). SSH es más conveniente para uso frecuente.
+
+### Configuración SSH
+
+<Steps>
+  1. **Generar llave SSH**
+  2. **Agregar llave al ssh-agent**
+  3. **Copiar llave pública**
+  4. **Agregar llave a GitHub**
+</Steps>
+
+**Paso 1: Generar llave SSH**
+
+<Code code={`# Generar nueva llave SSH (usa tu email de GitHub)
+ssh-keygen -t ed25519 -C "tu.email@ejemplo.com"
+
+# Si tu sistema no soporta ed25519, usa RSA:
+ssh-keygen -t rsa -b 4096 -C "tu.email@ejemplo.com"
+
+# Cuando te pregunte dónde guardar la llave, presiona Enter (ubicación por defecto)
+# Cuando te pida una passphrase, puedes dejarla vacía o agregar una para mayor seguridad`} lang="bash" title="Generar llave SSH" />
+
+**Paso 2: Agregar llave al ssh-agent**
+
+<Tabs>
+  <TabItem label="Windows">
+    <Code code={`# Iniciar ssh-agent
+eval "$(ssh-agent -s)"
+
+# Agregar llave privada
+ssh-add ~/.ssh/id_ed25519`} lang="bash" />
+  </TabItem>
+  
+  <TabItem label="macOS">
+    <Code code={`# Iniciar ssh-agent
+eval "$(ssh-agent -s)"
+
+# Agregar llave al keychain de macOS
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519`} lang="bash" />
+  </TabItem>
+  
+  <TabItem label="Linux">
+    <Code code={`# Iniciar ssh-agent
+eval "$(ssh-agent -s)"
+
+# Agregar llave privada
+ssh-add ~/.ssh/id_ed25519`} lang="bash" />
+  </TabItem>
+</Tabs>
+
+**Paso 3: Copiar llave pública**
+
+<Code code={`# Mostrar y copiar la llave pública
+cat ~/.ssh/id_ed25519.pub
+
+# En Windows también puedes usar:
+clip < ~/.ssh/id_ed25519.pub
+
+# En macOS:
+pbcopy < ~/.ssh/id_ed25519.pub
+
+# En Linux:
+xclip -selection clipboard < ~/.ssh/id_ed25519.pub`} lang="bash" title="Copiar llave pública" />
+
+**Paso 4: Agregar llave a GitHub**
+
+- Ve a GitHub Settings → SSH and GPG keys
+- Haz clic en "New SSH key"
+- Título: Descripción de tu dispositivo (ej: "Mi laptop Dell")
+- Key: Pega tu llave pública
+- Haz clic en "Add SSH key"
+
+## Probar conexión con GitHub
+
+Una vez configurada la autenticación, prueba tu conexión:
+
+<Tabs>
+  <TabItem label="Probar SSH">
+    <Code code={`# Probar conexión SSH
+ssh -T git@github.com
+
+# Respuesta esperada:
+# Hi usuario! You've successfully authenticated, but GitHub does not provide shell access.`} lang="bash" />
+  </TabItem>
+  
+  <TabItem label="Probar HTTPS">
+    <Code code={`# Crear un repositorio de prueba o clonar uno existente
+git clone https://github.com/usuario/repositorio.git
+
+# Te pedirá:
+# Username: tu-usuario-github
+# Password: tu-token-personal`} lang="bash" />
+  </TabItem>
+</Tabs>
+
+### Solución de problemas comunes
+
+<Tabs>
+  <TabItem label="Error de permisos SSH">
+    <Code code={`# Si tienes problemas de permisos:
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/id_ed25519
+chmod 644 ~/.ssh/id_ed25519.pub
+
+# Verificar que ssh-agent esté ejecutándose:
+ps aux | grep ssh-agent`} lang="bash" />
+  </TabItem>
+  
+  <TabItem label="Error de autenticación HTTPS">
+    <Code code={`# Si Git sigue pidiendo contraseña en lugar de token:
+git config --global credential.helper store
+
+# O para Windows:
+git config --global credential.helper manager-core
+
+# Luego realiza una operación Git y usa tu token como contraseña`} lang="bash" />
+  </TabItem>
+</Tabs>
+
+## Configuración adicional recomendada
+
+<Code code={`# Configurar Git para que use colores en la salida
+git config --global color.ui auto
+
+# Configurar alias útiles
+git config --global alias.st status
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.unstage 'reset HEAD --'
+git config --global alias.last 'log -1 HEAD'
+git config --global alias.visual '!gitk'
+
+# Configurar comportamiento de push
+git config --global push.default simple
+
+# Configurar pull para hacer rebase por defecto
+git config --global pull.rebase true
+
+# Ver toda tu configuración
+git config --list --show-origin`} lang="bash" title="Configuración avanzada" />
+
+## Verificación final
+
+Para asegurarte de que todo está configurado correctamente:
+
+<Code code={`# Verificar versión de Git
+git --version
+
+# Verificar configuración de usuario
+git config user.name
+git config user.email
+
+# Probar conexión con GitHub
+ssh -T git@github.com
+
+# Crear un repositorio de prueba
+mkdir test-repo
+cd test-repo
+git init
+echo "# Mi primer repositorio" > README.md
+git add README.md
+git commit -m "Primer commit"
+
+# Si todo funciona correctamente, puedes eliminar el directorio de prueba
+cd ..
+rm -rf test-repo`} lang="bash" title="Verificación completa" />
+
+<Aside type="tip">
+¡Felicidades! Ya tienes Git y GitHub configurados correctamente. Ahora estás listo para comenzar a trabajar con control de versiones y colaborar en proyectos.
+</Aside>
+
+## Resumen
+
+En esta guía has aprendido:
+
+<Badge text="Configuración completa" variant="tip" />
+
+- ✅ Crear y configurar una cuenta de GitHub
+- ✅ Instalar Git en tu sistema operativo
+- ✅ Configurar tu identidad en Git
+- ✅ Crear y configurar tokens de acceso personal
+- ✅ Generar y registrar llaves SSH
+- ✅ Probar la conexión con GitHub
+- ✅ Configuraciones adicionales para mejorar tu flujo de trabajo
+
+En el siguiente módulo aprenderemos los conceptos fundamentales de Git y GitHub, y cómo comenzar a trabajar con repositorios.

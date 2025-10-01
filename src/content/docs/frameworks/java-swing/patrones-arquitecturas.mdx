@@ -1,0 +1,805 @@
+---
+title: Patrones de Diseño y Arquitecturas
+description: Aprende a implementar MVC, arquitectura por capas y patrones como Singleton y DAO
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Módulo 6: Patrones de Diseño y Arquitecturas
+
+Los patrones de diseño y arquitecturas bien definidas son fundamentales para crear aplicaciones mantenibles, escalables y robustas. En este módulo aprenderemos los patrones más importantes para aplicaciones Java Swing.
+
+## Arquitectura MVC (Modelo - Vista - Controlador)
+
+MVC es un patrón arquitectónico que separa la aplicación en tres componentes principales, facilitando el mantenimiento y la escalabilidad.
+
+### ¿Qué es MVC y por qué es importante?
+
+<Steps>
+<ol>
+  <li>**Modelo**: Representa los datos y la lógica de negocio</li>
+  <li>**Vista**: Maneja la presentación y la interfaz de usuario</li>
+  <li>**Controlador**: Gestiona la interacción entre Modelo y Vista</li>
+</ol>
+</Steps>
+
+<Aside type="tip">
+MVC permite que los cambios en una capa no afecten directamente a las otras, facilitando el mantenimiento y las pruebas.
+</Aside>
+
+### Implementación práctica con formulario CRUD
+
+<Tabs>
+  <TabItem label="Modelo - Usuario">
+    <Code code={`public class UsuarioModel {
+    private int id;
+    private String nombre;
+    private String email;
+    private String telefono;
+    private boolean activo;
+    
+    // Constructores
+    public UsuarioModel() {}
+    
+    public UsuarioModel(String nombre, String email, String telefono, boolean activo) {
+        this.nombre = nombre;
+        this.email = email;
+        this.telefono = telefono;
+        this.activo = activo;
+    }
+    
+    // Getters y Setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
+    
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
+    
+    // Validaciones del modelo
+    public boolean esValido() {
+        return nombre != null && !nombre.trim().isEmpty() &&
+               email != null && !email.trim().isEmpty() && 
+               email.contains("@");
+    }
+    
+    @Override
+    public String toString() {
+        return "UsuarioModel{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", email='" + email + '\'' +
+                ", activo=" + activo +
+                '}';
+    }
+}`} lang="java" />
+  </TabItem>
+  
+  <TabItem label="Vista - UsuarioView">
+    <Code code={`import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+public class UsuarioView extends JFrame {
+    private JTextField txtNombre, txtEmail, txtTelefono;
+    private JCheckBox chkActivo;
+    private JButton btnAgregar, btnActualizar, btnEliminar, btnLimpiar;
+    private JTable tabla;
+    private DefaultTableModel modeloTabla;
+    
+    public UsuarioView() {
+        initComponents();
+    }
+    
+    private void initComponents() {
+        setTitle("Gestión de Usuarios - MVC");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        
+        // Panel formulario
+        JPanel panelFormulario = crearPanelFormulario();
+        add(panelFormulario, BorderLayout.NORTH);
+        
+        // Panel tabla
+        JPanel panelTabla = crearPanelTabla();
+        add(panelTabla, BorderLayout.CENTER);
+        
+        setLocationRelativeTo(null);
+    }
+    
+    private JPanel crearPanelFormulario() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Datos del Usuario"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        
+        // Campos
+        txtNombre = new JTextField(20);
+        txtEmail = new JTextField(20);
+        txtTelefono = new JTextField(20);
+        chkActivo = new JCheckBox("Activo", true);
+        
+        // Layout
+        gbc.gridx = 0; gbc.gridy = 0;
+        panel.add(new JLabel("Nombre:"), gbc);
+        gbc.gridx = 1;
+        panel.add(txtNombre, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 1;
+        panel.add(new JLabel("Email:"), gbc);
+        gbc.gridx = 1;
+        panel.add(txtEmail, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 2;
+        panel.add(new JLabel("Teléfono:"), gbc);
+        gbc.gridx = 1;
+        panel.add(txtTelefono, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
+        panel.add(chkActivo, gbc);
+        
+        // Botones
+        JPanel panelBotones = new JPanel(new FlowLayout());
+        btnAgregar = new JButton("Agregar");
+        btnActualizar = new JButton("Actualizar");
+        btnEliminar = new JButton("Eliminar");
+        btnLimpiar = new JButton("Limpiar");
+        
+        panelBotones.add(btnAgregar);
+        panelBotones.add(btnActualizar);
+        panelBotones.add(btnEliminar);
+        panelBotones.add(btnLimpiar);
+        
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
+        panel.add(panelBotones, gbc);
+        
+        return panel;
+    }
+    
+    private JPanel crearPanelTabla() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Lista de Usuarios"));
+        
+        String[] columnas = {"ID", "Nombre", "Email", "Teléfono", "Activo"};
+        modeloTabla = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        tabla = new JTable(modeloTabla);
+        tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        panel.add(new JScrollPane(tabla), BorderLayout.CENTER);
+        return panel;
+    }
+    
+    // Métodos para obtener datos del formulario
+    public UsuarioModel obtenerDatosFormulario() {
+        return new UsuarioModel(
+            txtNombre.getText().trim(),
+            txtEmail.getText().trim(),
+            txtTelefono.getText().trim(),
+            chkActivo.isSelected()
+        );
+    }
+    
+    // Métodos para mostrar datos en el formulario
+    public void mostrarDatosEnFormulario(UsuarioModel usuario) {
+        txtNombre.setText(usuario.getNombre());
+        txtEmail.setText(usuario.getEmail());
+        txtTelefono.setText(usuario.getTelefono());
+        chkActivo.setSelected(usuario.isActivo());
+    }
+    
+    // Métodos para manejar la tabla
+    public void actualizarTabla(List<UsuarioModel> usuarios) {
+        modeloTabla.setRowCount(0);
+        for (UsuarioModel usuario : usuarios) {
+            Object[] fila = {
+                usuario.getId(),
+                usuario.getNombre(),
+                usuario.getEmail(),
+                usuario.getTelefono(),
+                usuario.isActivo()
+            };
+            modeloTabla.addRow(fila);
+        }
+    }
+    
+    public int getFilaSeleccionada() {
+        return tabla.getSelectedRow();
+    }
+    
+    public void limpiarFormulario() {
+        txtNombre.setText("");
+        txtEmail.setText("");
+        txtTelefono.setText("");
+        chkActivo.setSelected(true);
+        tabla.clearSelection();
+    }
+    
+    // Métodos para agregar listeners (el controlador los implementará)
+    public void addAgregarListener(ActionListener listener) {
+        btnAgregar.addActionListener(listener);
+    }
+    
+    public void addActualizarListener(ActionListener listener) {
+        btnActualizar.addActionListener(listener);
+    }
+    
+    public void addEliminarListener(ActionListener listener) {
+        btnEliminar.addActionListener(listener);
+    }
+    
+    public void addLimpiarListener(ActionListener listener) {
+        btnLimpiar.addActionListener(listener);
+    }
+    
+    public void addTablaSelectionListener(javax.swing.event.ListSelectionListener listener) {
+        tabla.getSelectionModel().addListSelectionListener(listener);
+    }
+    
+    // Métodos para mostrar mensajes
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje);
+    }
+    
+    public void mostrarError(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    
+    public boolean confirmarEliminacion(String nombre) {
+        int resultado = JOptionPane.showConfirmDialog(this,
+            "¿Estás seguro de eliminar el usuario: " + nombre + "?",
+            "Confirmar eliminación",
+            JOptionPane.YES_NO_OPTION);
+        return resultado == JOptionPane.YES_OPTION;
+    }
+}`} lang="java" />
+  </TabItem>
+  
+  <TabItem label="Controlador - UsuarioController">
+    <Code code={`import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+public class UsuarioController {
+    private UsuarioModel modelo;
+    private UsuarioView vista;
+    private UsuarioDAO dao;
+    private List<UsuarioModel> usuarios;
+    
+    public UsuarioController(UsuarioView vista, UsuarioDAO dao) {
+        this.vista = vista;
+        this.dao = dao;
+        
+        initController();
+        cargarUsuarios();
+    }
+    
+    private void initController() {
+        // Agregar listeners a los botones
+        vista.addAgregarListener(new AgregarListener());
+        vista.addActualizarListener(new ActualizarListener());
+        vista.addEliminarListener(new EliminarListener());
+        vista.addLimpiarListener(new LimpiarListener());
+        vista.addTablaSelectionListener(new TablaSelectionListener());
+    }
+    
+    private void cargarUsuarios() {
+        usuarios = dao.obtenerTodos();
+        vista.actualizarTabla(usuarios);
+    }
+    
+    // Listener para agregar usuario
+    class AgregarListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            UsuarioModel usuario = vista.obtenerDatosFormulario();
+            
+            if (!usuario.esValido()) {
+                vista.mostrarError("Por favor, completa todos los campos obligatorios");
+                return;
+            }
+            
+            if (dao.insertar(usuario)) {
+                vista.mostrarMensaje("Usuario agregado exitosamente");
+                cargarUsuarios();
+                vista.limpiarFormulario();
+            } else {
+                vista.mostrarError("Error al agregar el usuario");
+            }
+        }
+    }
+    
+    // Listener para actualizar usuario
+    class ActualizarListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (modelo == null) {
+                vista.mostrarError("Selecciona un usuario para actualizar");
+                return;
+            }
+            
+            UsuarioModel datosActualizados = vista.obtenerDatosFormulario();
+            
+            if (!datosActualizados.esValido()) {
+                vista.mostrarError("Por favor, completa todos los campos obligatorios");
+                return;
+            }
+            
+            // Mantener el ID del usuario original
+            datosActualizados.setId(modelo.getId());
+            
+            if (dao.actualizar(datosActualizados)) {
+                vista.mostrarMensaje("Usuario actualizado exitosamente");
+                cargarUsuarios();
+                vista.limpiarFormulario();
+                modelo = null;
+            } else {
+                vista.mostrarError("Error al actualizar el usuario");
+            }
+        }
+    }
+    
+    // Listener para eliminar usuario
+    class EliminarListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (modelo == null) {
+                vista.mostrarError("Selecciona un usuario para eliminar");
+                return;
+            }
+            
+            if (vista.confirmarEliminacion(modelo.getNombre())) {
+                if (dao.eliminar(modelo.getId())) {
+                    vista.mostrarMensaje("Usuario eliminado exitosamente");
+                    cargarUsuarios();
+                    vista.limpiarFormulario();
+                    modelo = null;
+                } else {
+                    vista.mostrarError("Error al eliminar el usuario");
+                }
+            }
+        }
+    }
+    
+    // Listener para limpiar formulario
+    class LimpiarListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            vista.limpiarFormulario();
+            modelo = null;
+        }
+    }
+    
+    // Listener para selección en tabla
+    class TablaSelectionListener implements ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if (!e.getValueIsAdjusting()) {
+                int filaSeleccionada = vista.getFilaSeleccionada();
+                if (filaSeleccionada != -1 && filaSeleccionada < usuarios.size()) {
+                    modelo = usuarios.get(filaSeleccionada);
+                    vista.mostrarDatosEnFormulario(modelo);
+                }
+            }
+        }
+    }
+}`} lang="java" />
+  </TabItem>
+</Tabs>
+
+## Arquitectura por Capas (3 capas)
+
+La arquitectura por capas organiza la aplicación en niveles con responsabilidades específicas.
+
+### Capa de Presentación
+
+<Code code={`// Capa de Presentación - Solo maneja la interfaz
+public class PresentacionLayer {
+    private UsuarioView vista;
+    private UsuarioController controlador;
+    
+    public PresentacionLayer() {
+        // Inicializar solo componentes de UI
+        vista = new UsuarioView();
+        
+        // El controlador conecta con la capa de negocio
+        UsuarioService service = new UsuarioService();
+        controlador = new UsuarioController(vista, service);
+        
+        vista.setVisible(true);
+    }
+}`} lang="java" title="PresentacionLayer.java" />
+
+### Capa de Negocio
+
+<Code code={`// Capa de Negocio - Lógica de validación y reglas de negocio
+public class UsuarioService {
+    private UsuarioDAO dao;
+    
+    public UsuarioService() {
+        this.dao = new UsuarioDAO();
+    }
+    
+    public boolean crearUsuario(UsuarioModel usuario) {
+        // Validaciones de negocio
+        if (!validarReglas(usuario)) {
+            return false;
+        }
+        
+        // Verificar duplicados
+        if (existeEmail(usuario.getEmail())) {
+            throw new RuntimeException("Ya existe un usuario con ese email");
+        }
+        
+        // Aplicar reglas de negocio
+        usuario.setEmail(usuario.getEmail().toLowerCase());
+        
+        return dao.insertar(usuario);
+    }
+    
+    public boolean actualizarUsuario(UsuarioModel usuario) {
+        if (!validarReglas(usuario)) {
+            return false;
+        }
+        
+        // Verificar que el usuario existe
+        UsuarioModel existente = dao.obtenerPorId(usuario.getId());
+        if (existente == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+        
+        return dao.actualizar(usuario);
+    }
+    
+    public boolean eliminarUsuario(int id) {
+        // Verificar reglas de negocio antes de eliminar
+        if (tieneRegistrosRelacionados(id)) {
+            throw new RuntimeException("No se puede eliminar: tiene registros relacionados");
+        }
+        
+        return dao.eliminar(id);
+    }
+    
+    public List<UsuarioModel> obtenerTodosLosUsuarios() {
+        return dao.obtenerTodos();
+    }
+    
+    private boolean validarReglas(UsuarioModel usuario) {
+        // Reglas de negocio específicas
+        if (usuario.getNombre().length() < 2) {
+            throw new RuntimeException("El nombre debe tener al menos 2 caracteres");
+        }
+        
+        if (!usuario.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            throw new RuntimeException("Formato de email inválido");
+        }
+        
+        return true;
+    }
+    
+    private boolean existeEmail(String email) {
+        return dao.buscarPorEmail(email) != null;
+    }
+    
+    private boolean tieneRegistrosRelacionados(int id) {
+        // Verificar en otras tablas si tiene registros relacionados
+        return false; // Implementar según necesidades
+    }
+}`} lang="java" title="UsuarioService.java" />
+
+### Capa de Datos
+
+<Code code={`// Capa de Datos - Solo acceso a datos, sin lógica de negocio
+public class UsuarioDAO {
+    private Connection conexion;
+    
+    public UsuarioDAO() {
+        this.conexion = ConexionDB.getInstance().getConexion();
+    }
+    
+    public boolean insertar(UsuarioModel usuario) {
+        String sql = "INSERT INTO usuarios (nombre, email, telefono, activo) VALUES (?, ?, ?, ?)";
+        
+        try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+            stmt.setString(1, usuario.getNombre());
+            stmt.setString(2, usuario.getEmail());
+            stmt.setString(3, usuario.getTelefono());
+            stmt.setBoolean(4, usuario.isActivo());
+            
+            return stmt.executeUpdate() > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error insertando usuario: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    public List<UsuarioModel> obtenerTodos() {
+        List<UsuarioModel> usuarios = new ArrayList<>();
+        String sql = "SELECT * FROM usuarios ORDER BY nombre";
+        
+        try (Statement stmt = conexion.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                UsuarioModel usuario = mapearResultSet(rs);
+                usuarios.add(usuario);
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error obteniendo usuarios: " + e.getMessage());
+        }
+        
+        return usuarios;
+    }
+    
+    public UsuarioModel obtenerPorId(int id) {
+        String sql = "SELECT * FROM usuarios WHERE id = ?";
+        
+        try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapearResultSet(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error obteniendo usuario por ID: " + e.getMessage());
+        }
+        
+        return null;
+    }
+    
+    private UsuarioModel mapearResultSet(ResultSet rs) throws SQLException {
+        UsuarioModel usuario = new UsuarioModel();
+        usuario.setId(rs.getInt("id"));
+        usuario.setNombre(rs.getString("nombre"));
+        usuario.setEmail(rs.getString("email"));
+        usuario.setTelefono(rs.getString("telefono"));
+        usuario.setActivo(rs.getBoolean("activo"));
+        return usuario;
+    }
+}`} lang="java" title="UsuarioDAO.java" />
+
+## Patrón Singleton
+
+El patrón Singleton asegura que una clase tenga una sola instancia y proporciona acceso global a ella.
+
+<Code code={`public class ConexionSingleton {
+    private static ConexionSingleton instancia;
+    private Connection conexion;
+    private static final String URL = "jdbc:mysql://localhost:3306/swing_app";
+    private static final String USUARIO = "root";
+    private static final String PASSWORD = "password";
+    
+    // Constructor privado para evitar instanciación externa
+    private ConexionSingleton() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            this.conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
+            System.out.println("Conexión establecida exitosamente");
+        } catch (ClassNotFoundException | SQLException e) {
+            System.err.println("Error estableciendo conexión: " + e.getMessage());
+        }
+    }
+    
+    // Método sincronizado para obtener la instancia (thread-safe)
+    public static synchronized ConexionSingleton getInstance() {
+        if (instancia == null) {
+            instancia = new ConexionSingleton();
+        }
+        return instancia;
+    }
+    
+    public Connection getConexion() {
+        try {
+            // Verificar si la conexión sigue activa
+            if (conexion == null || conexion.isClosed()) {
+                instancia = new ConexionSingleton();
+            }
+        } catch (SQLException e) {
+            System.err.println("Error verificando conexión: " + e.getMessage());
+        }
+        return conexion;
+    }
+    
+    public void cerrarConexion() {
+        try {
+            if (conexion != null && !conexion.isClosed()) {
+                conexion.close();
+                System.out.println("Conexión cerrada");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error cerrando conexión: " + e.getMessage());
+        }
+    }
+}`} lang="java" title="ConexionSingleton.java" />
+
+<Aside type="note">
+El patrón Singleton es útil para recursos compartidos como conexiones de base de datos, pero debe usarse con cuidado ya que puede dificultar las pruebas unitarias.
+</Aside>
+
+## Patrón DAO (Data Access Object)
+
+El patrón DAO encapsula el acceso a datos y proporciona una interfaz uniforme.
+
+<Code code={`// Interfaz genérica para operaciones CRUD
+public interface GenericDAO<T, ID> {
+    boolean insertar(T entidad);
+    T obtenerPorId(ID id);
+    List<T> obtenerTodos();
+    boolean actualizar(T entidad);
+    boolean eliminar(ID id);
+}
+
+// Implementación específica para Usuario
+public class UsuarioDAOImpl implements GenericDAO<UsuarioModel, Integer> {
+    private Connection conexion;
+    
+    public UsuarioDAOImpl() {
+        this.conexion = ConexionSingleton.getInstance().getConexion();
+    }
+    
+    @Override
+    public boolean insertar(UsuarioModel usuario) {
+        String sql = "INSERT INTO usuarios (nombre, email, telefono, activo) VALUES (?, ?, ?, ?)";
+        
+        try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+            stmt.setString(1, usuario.getNombre());
+            stmt.setString(2, usuario.getEmail());
+            stmt.setString(3, usuario.getTelefono());
+            stmt.setBoolean(4, usuario.isActivo());
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error insertando usuario", e);
+        }
+    }
+    
+    @Override
+    public UsuarioModel obtenerPorId(Integer id) {
+        String sql = "SELECT * FROM usuarios WHERE id = ?";
+        
+        try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapearUsuario(rs);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error obteniendo usuario por ID", e);
+        }
+        
+        return null;
+    }
+    
+    @Override
+    public List<UsuarioModel> obtenerTodos() {
+        List<UsuarioModel> usuarios = new ArrayList<>();
+        String sql = "SELECT * FROM usuarios ORDER BY nombre";
+        
+        try (Statement stmt = conexion.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                usuarios.add(mapearUsuario(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error obteniendo todos los usuarios", e);
+        }
+        
+        return usuarios;
+    }
+    
+    @Override
+    public boolean actualizar(UsuarioModel usuario) {
+        String sql = "UPDATE usuarios SET nombre = ?, email = ?, telefono = ?, activo = ? WHERE id = ?";
+        
+        try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+            stmt.setString(1, usuario.getNombre());
+            stmt.setString(2, usuario.getEmail());
+            stmt.setString(3, usuario.getTelefono());
+            stmt.setBoolean(4, usuario.isActivo());
+            stmt.setInt(5, usuario.getId());
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error actualizando usuario", e);
+        }
+    }
+    
+    @Override
+    public boolean eliminar(Integer id) {
+        String sql = "DELETE FROM usuarios WHERE id = ?";
+        
+        try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error eliminando usuario", e);
+        }
+    }
+    
+    private UsuarioModel mapearUsuario(ResultSet rs) throws SQLException {
+        UsuarioModel usuario = new UsuarioModel();
+        usuario.setId(rs.getInt("id"));
+        usuario.setNombre(rs.getString("nombre"));
+        usuario.setEmail(rs.getString("email"));
+        usuario.setTelefono(rs.getString("telefono"));
+        usuario.setActivo(rs.getBoolean("activo"));
+        return usuario;
+    }
+}`} lang="java" title="UsuarioDAOImpl.java" />
+
+## Aplicación principal integrando todos los patrones
+
+<Code code={`public class AplicacionPrincipal {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // Configurar Look and Feel
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeel());
+                
+                // Inicializar la aplicación con arquitectura por capas
+                new PresentacionLayer();
+                
+            } catch (Exception e) {
+                System.err.println("Error iniciando aplicación: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+        
+        // Agregar shutdown hook para cerrar conexiones
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            ConexionSingleton.getInstance().cerrarConexion();
+            System.out.println("Aplicación cerrada correctamente");
+        }));
+    }
+}`} lang="java" title="AplicacionPrincipal.java" />
+
+## Resumen
+
+En este módulo hemos aprendido:
+
+<Badge text="Arquitectura MVC" variant="tip" />
+- Separación clara de responsabilidades
+- Modelo para datos y lógica de negocio
+- Vista para interfaz de usuario
+- Controlador para coordinar interacciones
+
+<Badge text="Arquitectura por Capas" variant="note" />
+- Capa de Presentación (UI)
+- Capa de Negocio (lógica y validaciones)
+- Capa de Datos (acceso a base de datos)
+
+<Badge text="Patrones de Diseño" variant="caution" />
+- **Singleton**: Una sola instancia para recursos compartidos
+- **DAO**: Encapsulación del acceso a datos
+- **Separación de responsabilidades**: Código más mantenible
+
+Estos patrones y arquitecturas proporcionan una base sólida para desarrollar aplicaciones Java Swing robustas, escalables y fáciles de mantener.
