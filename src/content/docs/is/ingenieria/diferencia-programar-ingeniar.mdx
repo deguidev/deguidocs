@@ -1,0 +1,177 @@
+---
+title: 2. Diferencia entre Programar e Ingeniar Software
+description: Contrastes entre la programación y la aplicación de la ingeniería al desarrollo de software
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+
+Imagina que programar es como cocinar un plato para ti, pero ingeniar software es como ser el chef de un restaurante completo. Ambos cocinan, pero uno piensa en todo el negocio.
+
+## ¿Qué es programar?
+
+<Aside type="tip">
+**Programar** es como escribir una receta y cocinarla. Te enfocas en hacer que funcione, punto.
+</Aside>
+
+Cuando solo programamos:
+- Escribimos código para resolver un problema específico
+- Trabajamos solos o en grupos pequeños
+- Nos enfocamos en que el programa funcione
+- No pensamos mucho en el futuro
+
+## ¿Qué es ingeniar software?
+
+<Aside type="note">
+**Ingeniar software** es como planear, construir y administrar un restaurante completo. Piensas en todo: los clientes, los empleados, el dinero, el futuro.
+</Aside>
+
+Cuando ingeniamos software:
+- Planeamos todo el proyecto desde el inicio
+- Trabajamos en equipos grandes
+- Pensamos en la calidad, costos y tiempo
+- Preparamos el software para crecer y cambiar
+
+## Comparación Visual
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Solo Programar" as prog {
+  card "Escribir código" as codigo
+  card "Resolver el problema" as problema
+  card "Que funcione ya" as funcione
+  card "Trabajo individual" as individual
+}
+
+rectangle "Ingeniar Software" as ing {
+  card "Planear todo" as planear
+  card "Trabajar en equipo" as equipo
+  card "Pensar en el futuro" as futuro
+  card "Controlar calidad" as calidad
+  card "Gestionar tiempo y dinero" as gestion
+}
+
+prog -[hidden]right-> ing
+
+note bottom of prog : Como hacer una comida rápida
+note bottom of ing : Como manejar un restaurante
+@enduml`} />
+
+## Analogía del Constructor
+
+<Steps>
+1. **Programar** es como ser un albañil que construye una pared
+2. **Ingeniar Software** es como ser el arquitecto que diseña toda la casa
+3. El albañil se enfoca en su pared
+4. El arquitecto piensa en toda la casa: planos, materiales, presupuesto, permisos
+</Steps>
+
+## Diferencias Principales
+
+<Tabs>
+<TabItem label="Programar">
+**Es como ser un cocinero:**
+- Haces un plato
+- Usas una receta
+- Te enfocas en que sepa bien
+- Trabajas en tu cocina
+- Si sale mal, lo tiras y haces otro
+</TabItem>
+<TabItem label="Ingeniar Software">
+**Es como ser el dueño del restaurante:**
+- Planeas todo el menú
+- Entrenas a los cocineros
+- Piensas en los clientes
+- Manejas el dinero
+- Si algo sale mal, afecta todo el negocio
+</TabItem>
+</Tabs>
+
+## ¿Cuándo usar cada uno?
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "¿Qué necesitas hacer?" {
+  card "Proyecto pequeño" as pequeno #lightgreen
+  card "Proyecto grande" as grande #lightblue
+  card "Solo para ti" as personal #lightyellow
+  card "Para muchas personas" as publico #lightpink
+}
+
+rectangle "Soluciones" {
+  card "Solo Programar" as prog #lightgreen
+  card "Ingeniar Software" as ing #lightcoral
+}
+
+pequeno --> prog : Rápido y sencillo
+personal --> prog : No necesitas tanto control
+grande --> ing : Necesitas planear bien
+publico --> ing : Muchas personas dependen de ti
+
+note bottom of prog : Como hacer una app personal
+note bottom of ing : Como hacer WhatsApp
+@enduml`} />
+
+## Ejemplos del mundo real
+
+### Solo Programar:
+- Hacer una calculadora para tu tarea
+- Crear un programa para organizar tus fotos
+- Automatizar algo repetitivo en tu trabajo
+
+### Ingeniar Software:
+- Crear Netflix (millones de usuarios)
+- Desarrollar el sistema de un banco
+- Hacer una app como Uber (conductores + pasajeros)
+
+## ¿Por qué es importante la diferencia?
+
+<Aside type="caution">
+**¡Cuidado!** Si intentas hacer un proyecto grande solo programando (sin planear), es como intentar construir un edificio sin arquitecto. Puede colapsar.
+</Aside>
+
+Las consecuencias de no ingeniar cuando es necesario:
+
+1. **El proyecto se vuelve un desastre** - Como una cocina sucia
+2. **Cuesta mucho dinero arreglarlo** - Como reconstruir una casa mal hecha
+3. **Los usuarios se frustran** - Como clientes que se van del restaurante
+4. **El equipo se estresa** - Como cocineros trabajando sin organización
+
+## Evolución Natural
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+card "Aprendes a programar" as aprender #lightblue
+card "Haces proyectos pequeños" as pequenos #lightgreen
+card "Te unes a equipos" as equipos #lightyellow
+card "Aprendes a ingeniar" as ingeniar #lightpink
+card "Lideras proyectos grandes" as liderar #lightcoral
+
+aprender --> pequenos : Practicas solo
+pequenos --> equipos : Te invitan a trabajar
+equipos --> ingeniar : Aprendes de otros
+ingeniar --> liderar : Ya sabes planear
+
+note bottom of aprender : Como aprender a cocinar
+note bottom of liderar : Como ser chef ejecutivo
+@enduml`} />
+
+## Resumen Simple
+
+<Badge text="Programar" variant="tip" /> = Hacer que funcione
+
+<Badge text="Ingeniar" variant="success" /> = Hacer que funcione bien, a tiempo, sin gastar mucho, y que dure
+
+**La clave:** Ambos son importantes. Necesitas saber programar para poder ingeniar software, pero si quieres hacer cosas grandes, necesitas aprender a ingeniar.
+

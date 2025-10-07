@@ -1,0 +1,412 @@
+---
+title: 5. Documentación de Requerimientos
+description: Técnicas para documentar, especificar y versionar requerimientos de software
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+
+Cuando ya tenemos los requerimientos capturados y priorizados, necesitamos escribirlos bien para que todos entiendan lo mismo. Es como hacer un mapa del tesoro: si está mal dibujado, nadie encontrará el tesoro.
+
+## ¿Por qué documentar los requerimientos?
+
+<Aside type="tip">
+**Recuerda**: La memoria humana es frágil. Lo que no se escribe, se olvida o se malinterpreta. Un buen documento de requerimientos es como un contrato que protege a todos.
+</Aside>
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Beneficios de la Documentación" {
+  card "Entendimiento común" as entendimiento #lightblue
+  card "Referencia permanente" as referencia #lightgreen
+  card "Evita malentendidos" as malentendidos #lightyellow
+  card "Base para pruebas" as pruebas #lightpink
+  card "Guía para nuevos miembros" as guia #lightcyan
+}
+
+actor "Cliente" as cliente
+actor "Equipo" as equipo
+
+cliente --> entendimiento : Confirma
+equipo --> entendimiento : Consulta
+
+entendimiento --> referencia : Sirve como
+referencia --> malentendidos : Previene
+malentendidos --> pruebas : Facilita
+pruebas --> guia : Ayuda como
+
+note bottom of entendimiento : "Todos en la misma página"
+note bottom of referencia : "Lo que acordamos hacer"
+note bottom of malentendidos : "No lo que yo creía"
+note bottom of pruebas : "Cómo verificar que funciona"
+@enduml`} />
+
+## Documento de Especificación de Requerimientos de Software (SRS)
+
+El SRS es como el plano detallado de una casa. Muestra exactamente qué se va a construir, para que todos (arquitectos, albañiles, dueños) entiendan lo mismo.
+
+### ¿Qué es un SRS?
+
+<Badge text="Definición" variant="note" /> **Documento formal que describe detalladamente todos los requerimientos del software**
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Documento SRS" as srs #lightblue {
+  card "1. Introducción" as intro
+  card "2. Descripción General" as general
+  card "3. Requerimientos Funcionales" as funcionales
+  card "4. Requerimientos No Funcionales" as nofuncionales
+  card "5. Interfaces Externas" as interfaces
+  card "6. Restricciones" as restricciones
+  card "7. Apéndices" as apendices
+}
+
+note bottom of intro : Propósito, alcance, definiciones
+note bottom of general : Contexto, usuarios, limitaciones
+note bottom of funcionales : Lo que el sistema DEBE hacer
+note bottom of nofuncionales : Cómo debe hacerlo
+note bottom of interfaces : Conexiones con otros sistemas
+note bottom of restricciones : Limitaciones técnicas o legales
+note bottom of apendices : Diagramas, glosario, etc.
+@enduml`} />
+
+### Estructura de un buen SRS
+
+<Steps>
+1. **Introducción**
+   - Propósito del documento
+   - Alcance del proyecto
+   - Definiciones y acrónimos
+   - Referencias a otros documentos
+
+2. **Descripción General**
+   - Contexto del producto
+   - Funciones principales
+   - Características de los usuarios
+   - Restricciones generales
+
+3. **Requerimientos Funcionales**
+   - Organizados por módulos o casos de uso
+   - Detallados con la estructura vista anteriormente
+   - Priorizados según lo acordado
+
+4. **Requerimientos No Funcionales**
+   - Rendimiento
+   - Seguridad
+   - Usabilidad
+   - Confiabilidad
+   - Otros atributos de calidad
+
+5. **Interfaces Externas**
+   - Interfaces de usuario
+   - Interfaces con otros sistemas
+   - Interfaces de hardware
+
+6. **Restricciones de Diseño**
+   - Limitaciones técnicas
+   - Estándares a cumplir
+   - Requisitos legales
+
+7. **Apéndices**
+   - Diagramas complementarios
+   - Glosario de términos
+   - Prototipos o mockups
+</Steps>
+
+### Ejemplo simplificado de un SRS
+
+<Tabs>
+<TabItem label="Introducción">
+**1. Introducción**
+
+**1.1 Propósito**
+Este documento describe los requerimientos para la aplicación "SuperTienda", una plataforma de comercio electrónico para venta de productos.
+
+**1.2 Alcance**
+El sistema permitirá a los usuarios buscar productos, agregarlos al carrito, realizar pagos y seguir sus pedidos. No incluye el sistema de inventario ni contabilidad.
+
+**1.3 Definiciones**
+- **Usuario**: Cualquier persona que utiliza la aplicación
+- **Cliente**: Usuario registrado que puede comprar
+- **Administrador**: Usuario con privilegios especiales
+</TabItem>
+<TabItem label="Requerimientos Funcionales">
+**3. Requerimientos Funcionales**
+
+**RF-01: Registro de usuarios**
+- **Descripción**: El sistema debe permitir a los usuarios crear una cuenta con email y contraseña.
+- **Entradas**: Nombre, email, contraseña, teléfono (opcional)
+- **Proceso**: Validar formato de email, verificar que no exista, encriptar contraseña
+- **Salida**: Confirmación de registro y email de verificación
+- **Prioridad**: Alta
+
+**RF-02: Búsqueda de productos**
+- **Descripción**: El sistema debe permitir buscar productos por nombre, categoría o precio.
+- **Entradas**: Término de búsqueda, filtros opcionales
+- **Proceso**: Consultar base de datos y ordenar resultados por relevancia
+- **Salida**: Lista paginada de productos coincidentes
+- **Prioridad**: Alta
+</TabItem>
+<TabItem label="Requerimientos No Funcionales">
+**4. Requerimientos No Funcionales**
+
+**RNF-01: Tiempo de respuesta**
+- **Descripción**: Las búsquedas deben completarse en menos de 2 segundos
+- **Criterio**: 95% de las búsquedas cumplen este tiempo con hasta 500 usuarios simultáneos
+- **Tipo**: Rendimiento
+
+**RNF-02: Disponibilidad**
+- **Descripción**: El sistema debe estar disponible 99.9% del tiempo
+- **Criterio**: Máximo 8.76 horas de caída al año
+- **Tipo**: Confiabilidad
+</TabItem>
+</Tabs>
+
+### Consejos para escribir un buen SRS
+
+<Aside type="caution">
+**Evita estas trampas**: Un SRS malo puede ser peor que no tener ninguno. Asegúrate de que sea claro, completo y actualizado.
+</Aside>
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Características de un Buen SRS" {
+  card "Completo" as completo #lightgreen
+  card "Consistente" as consistente #lightblue
+  card "No ambiguo" as noambiguo #lightyellow
+  card "Verificable" as verificable #lightpink
+  card "Modificable" as modificable #lightcyan
+  card "Trazable" as trazable #lightgray
+}
+
+note bottom of completo : Todo lo necesario está incluido
+note bottom of consistente : No hay contradicciones
+note bottom of noambiguo : Solo una interpretación posible
+note bottom of verificable : Se puede comprobar si se cumple
+note bottom of modificable : Fácil de actualizar
+note bottom of trazable : Se puede seguir el origen de cada requisito
+@enduml`} />
+
+#### Consejos prácticos:
+
+<Steps>
+1. **Usa lenguaje claro**: Evita jerga técnica cuando sea posible
+2. **Sé específico**: "El sistema debe ser rápido" es malo; "Debe responder en menos de 3 segundos" es bueno
+3. **Usa plantillas**: No reinventes la rueda, usa formatos estándar
+4. **Incluye ejemplos**: Un ejemplo vale más que mil palabras
+5. **Revisa con todos**: Cliente, desarrolladores, testers, todos deben entenderlo
+</Steps>
+
+## Versionado de cambios
+
+Los requerimientos cambian con el tiempo. Es normal y hay que manejarlo bien.
+
+<Badge text="Definición" variant="caution" /> **El versionado de cambios es el proceso de registrar, aprobar y rastrear modificaciones en los requerimientos**
+
+### ¿Por qué versionar los cambios?
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Sin Control de Versiones" {
+  card "Versión 1" as v1a #lightblue
+  card "Versión 2?" as v2a #lightgreen
+  card "Versión 3??" as v3a #lightyellow
+  card "Versión ???" as v4a #lightpink
+}
+
+rectangle "Con Control de Versiones" {
+  card "Versión 1.0" as v1b #lightblue
+  card "Versión 1.1" as v2b #lightgreen
+  card "Versión 2.0" as v3b #lightyellow
+  card "Versión 2.1" as v4b #lightpink
+}
+
+v1a --> v2a : Cambio sin registro
+v2a --> v3a : ¿Quién cambió esto?
+v3a --> v4a : ¿Qué cambió?
+
+v1b --> v2b : Cambio menor (documentado)
+v2b --> v3b : Cambio mayor (aprobado)
+v3b --> v4b : Cambio menor (rastreable)
+
+note bottom of v4a : Caos y confusión
+note bottom of v4b : Orden y claridad
+@enduml`} />
+
+### Elementos de un buen sistema de versionado
+
+<Steps>
+1. **Número de versión**: Identificador único (ej. 1.0, 1.1, 2.0)
+2. **Fecha del cambio**: Cuándo se realizó
+3. **Autor**: Quién lo solicitó y quién lo aprobó
+4. **Descripción del cambio**: Qué se modificó exactamente
+5. **Justificación**: Por qué fue necesario el cambio
+6. **Impacto**: Qué otras partes se ven afectadas
+</Steps>
+
+### Ejemplo de registro de cambios
+
+<Tabs>
+<TabItem label="Tabla de Cambios">
+| Versión | Fecha | Autor | Descripción | Justificación | Impacto |
+|---------|-------|-------|------------|---------------|----------|
+| 1.0 | 10/01/2023 | Juan Pérez | Versión inicial | N/A | N/A |
+| 1.1 | 15/02/2023 | María Gómez | Agregado filtro por precio | Solicitud de usuarios | Bajo - Solo UI |
+| 2.0 | 03/04/2023 | Carlos López | Nuevo sistema de pagos | Cambio de proveedor | Alto - Afecta procesamiento |
+| 2.1 | 22/05/2023 | Laura Martínez | Corrección en RF-05 | Error detectado | Medio - Afecta reportes |
+</TabItem>
+<TabItem label="Detalle de un Cambio">
+**Cambio en Versión 2.0**
+
+**Requerimiento modificado**: RF-08 Procesamiento de pagos
+
+**Cambio realizado**: Se reemplazó el proveedor de pagos de PayPal a Stripe
+
+**Versión anterior**:
+```
+RF-08: El sistema debe procesar pagos a través de PayPal, aceptando tarjetas de crédito y débito.
+```
+
+**Nueva versión**:
+```
+RF-08: El sistema debe procesar pagos a través de Stripe, aceptando tarjetas de crédito, débito y métodos alternativos como Apple Pay y Google Pay.
+```
+
+**Justificación**: Stripe ofrece comisiones más bajas y más métodos de pago.
+
+**Impacto**: Requiere cambios en el módulo de pagos y en la interfaz de usuario.
+
+**Aprobado por**: Comité de Cambios (Acta #45)
+</TabItem>
+</Tabs>
+
+### Estrategias de numeración de versiones
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Semántica de Versiones" {
+  card "X.Y.Z" as version
+  card "MAYOR" as mayor #lightcoral
+  card "MENOR" as menor #lightgreen
+  card "PARCHE" as parche #lightblue
+}
+
+version --> mayor
+version --> menor
+version --> parche
+
+note bottom of mayor : Cambios incompatibles (2.0.0)
+note bottom of menor : Nuevas funcionalidades (1.1.0)
+note bottom of parche : Correcciones de errores (1.0.1)
+@enduml`} />
+
+#### Ejemplos de cambios de versión:
+
+<Tabs>
+<TabItem label="Cambio MAYOR (X.0.0)">
+**De 1.9.5 a 2.0.0**
+
+**Tipos de cambios**:
+- Cambios que rompen la compatibilidad
+- Rediseño completo de una funcionalidad
+- Eliminación de características importantes
+
+**Ejemplo**:
+- Cambiar de un sistema de autenticación propio a OAuth
+- Rediseñar completamente la interfaz de usuario
+- Cambiar la arquitectura del sistema
+</TabItem>
+<TabItem label="Cambio MENOR (0.Y.0)">
+**De 1.9.5 a 1.10.0**
+
+**Tipos de cambios**:
+- Nuevas funcionalidades que no rompen compatibilidad
+- Mejoras significativas en funcionalidades existentes
+- Deprecación de funciones (pero sin eliminarlas)
+
+**Ejemplo**:
+- Agregar un nuevo método de pago
+- Implementar un nuevo tipo de búsqueda
+- Añadir exportación a PDF de reportes
+</TabItem>
+<TabItem label="PARCHE (0.0.Z)">
+**De 1.9.5 a 1.9.6**
+
+**Tipos de cambios**:
+- Correcciones de errores
+- Cambios menores que no afectan funcionalidad
+- Mejoras de rendimiento pequeñas
+
+**Ejemplo**:
+- Corregir un error de cálculo
+- Arreglar un problema de visualización
+- Optimizar una consulta a la base de datos
+</TabItem>
+</Tabs>
+
+## Herramientas para documentación y versionado
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Herramientas" {
+  card "Documentación" as docs #lightblue {
+    card "Confluence" as confluence
+    card "Microsoft Word" as word
+    card "Google Docs" as gdocs
+    card "Markdown" as markdown
+  }
+  
+  card "Control de Versiones" as cv #lightgreen {
+    card "Git" as git
+    card "SVN" as svn
+    card "Jira" as jira
+  }
+  
+  card "Especializadas" as esp #lightyellow {
+    card "ReqIF" as reqif
+    card "DOORS" as doors
+    card "Jama" as jama
+  }
+}
+
+note bottom of confluence : Wiki colaborativa
+note bottom of markdown : Simple y versátil
+note bottom of git : Control de cambios
+note bottom of jira : Seguimiento de cambios
+note bottom of doors : Estándar en industrias
+@enduml`} />
+
+## Consejos finales para documentación efectiva
+
+<Aside type="tip">
+**La clave**: Un buen documento de requerimientos debe ser fácil de leer, fácil de mantener y fácil de rastrear. No importa qué herramienta uses, estos principios son universales.
+</Aside>
+
+<Steps>
+1. **Mantén la documentación actualizada**: Un documento desactualizado es peor que no tener documento
+2. **Usa formatos estándar**: No reinventes la rueda, usa plantillas probadas
+3. **Automatiza lo que puedas**: Usa herramientas que faciliten el versionado
+4. **Comunica los cambios**: Asegúrate de que todos sepan cuando algo cambia
+5. **Mantén un historial accesible**: Cualquiera debe poder ver qué cambió y por qué
+</Steps>
+
+### Recuerda:
+
+<Badge text="Consejo final" variant="note" /> **La documentación no es un fin en sí mismo, sino un medio para lograr un mejor software. Si no ayuda a ese objetivo, algo está mal.**

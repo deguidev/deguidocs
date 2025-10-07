@@ -1,0 +1,182 @@
+---
+title: 1. Concepto y Propósito de la Ingeniería de Software
+description: Fundamentos y objetivos de la Ingeniería de Software
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+
+La Ingeniería de Software es como ser un arquitecto, pero para crear programas de computadora. En lugar de diseñar edificios, diseñamos aplicaciones y sistemas que usamos todos los días.
+
+## ¿Qué es la Ingeniería de Software?
+
+<Aside type="tip">
+**En palabras simples**: Es la forma ordenada y profesional de crear programas de computadora, siguiendo reglas y métodos para que funcionen bien y no fallen.
+</Aside>
+
+La Ingeniería de Software nos ayuda a crear programas de manera:
+- **Ordenada**: Siguiendo pasos claros, como una receta de cocina
+- **Profesional**: Con cuidado y responsabilidad, como un doctor
+- **Medible**: Sabiendo cuánto tiempo y dinero necesitamos
+
+## ¿Cómo nació la Ingeniería de Software?
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam componentStyle rectangle
+
+rectangle "Época Antigua" as era1 {
+  card "1940s-1960s" as periodo1
+  card "Cada quien programaba como quería" as prog1
+  card "Programas pequeños" as proy1
+}
+
+rectangle "Los Problemas Llegaron" as era2 {
+  card "1960s-1970s" as periodo2
+  card "Programas más difíciles" as prog2
+  card "Muchos errores y gastos" as proy2
+}
+
+rectangle "La Solución" as era3 {
+  card "1970s-presente" as periodo3
+  card "Reglas y métodos claros" as prog3
+  card "Trabajo en equipo organizado" as proy3
+}
+
+era1 --> era2 : Los programas se volvieron más complicados
+era2 --> era3 : Necesitábamos orden y reglas
+
+note bottom of era2 : En 1968 se inventó el nombre en una conferencia
+@enduml`} />
+
+## ¿Para qué sirve la Ingeniería de Software?
+
+La Ingeniería de Software nos ayuda a resolver los problemas más comunes cuando creamos programas:
+
+<Steps>
+1. **Manejar cosas complicadas**: Los programas de hoy son muy difíciles de hacer
+2. **Que funcione bien**: El programa debe hacer lo que promete sin errores
+3. **No gastar mucho dinero ni tiempo**: Terminar el proyecto sin pasarse del presupuesto
+4. **Poder arreglarlo después**: Si algo se rompe, poder repararlo fácilmente
+5. **Usar partes que ya funcionan**: No inventar todo desde cero
+</Steps>
+
+## ¿Qué queremos lograr?
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Lo que buscamos cuando hacemos programas" {
+  card "Que funcione bien" as calidad #lightblue
+  card "Hacerlo rápido" as productividad #lightgreen
+  card "Poder cambiarlo" as mantenibilidad #lightyellow
+  card "Que crezca" as escalabilidad #lightpink
+  card "Que sea seguro" as confiabilidad #lightgray
+  card "Fácil de usar" as usabilidad #lightcyan
+}
+
+calidad --> productividad : Menos errores = más velocidad
+productividad --> mantenibilidad : Código ordenado
+mantenibilidad --> escalabilidad : Fácil de hacer más grande
+escalabilidad --> confiabilidad : Sistemas fuertes
+confiabilidad --> usabilidad : La gente confía
+usabilidad --> calidad : Los usuarios están contentos
+
+note top of calidad : Sin errores
+note top of productividad : Trabajo eficiente
+note top of mantenibilidad : Fácil de arreglar
+note top of escalabilidad : Puede crecer
+note top of confiabilidad : Siempre funciona
+note top of usabilidad : Fácil de entender
+@enduml`} />
+
+## ¿Cuál es la diferencia con solo programar?
+
+<Tabs>
+<TabItem label="Solo Programar">
+- Solo escribir código
+- Trabajar solo
+- Hacer una parte pequeña
+- Usar herramientas básicas
+- Escribir pocas notas
+</TabItem>
+<TabItem label="Ingeniería de Software">
+- Planear todo el proceso
+- Trabajar en equipo
+- Ver todo el proyecto completo
+- Usar herramientas profesionales
+- Escribir muchas explicaciones
+</TabItem>
+</Tabs>
+
+## ¿Por qué es importante hoy en día?
+
+Los programas están en todas partes y necesitamos que funcionen bien:
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Nuestro mundo digital" {
+  card "Hospitales y bancos" as criticos
+  card "Tiendas online" as economia
+  card "Apps del celular" as vida
+  card "Nuevas tecnologías" as innovacion
+}
+
+rectangle "Lo que necesitamos" {
+  card "Que sea seguro" as seguridad
+  card "Que sea rápido" as eficiencia
+  card "Que crezca" as escala
+  card "Que se adapte" as adapta
+}
+
+rectangle "Ingeniería de Software" as is
+
+criticos --> seguridad
+economia --> eficiencia
+vida --> escala
+innovacion --> adapta
+
+seguridad --> is
+eficiencia --> is
+escala --> is
+adapta --> is
+
+note bottom of criticos : No puede fallar
+note bottom of economia : Muchas personas comprando
+note bottom of vida : WhatsApp, Instagram, TikTok
+note bottom of innovacion : Robots, carros inteligentes
+@enduml`} />
+
+## Reglas básicas que seguimos
+
+<Badge text="Regla 1" variant="tip" /> **Hacer las cosas simples**: No complicar lo que puede ser fácil
+
+<Badge text="Regla 2" variant="note" /> **Dividir en partes**: Como armar un rompecabezas, cada pieza tiene su lugar
+
+<Badge text="Regla 3" variant="caution" /> **Esconder lo complicado**: El usuario no necesita ver cómo funciona por dentro
+
+<Badge text="Regla 4" variant="success" /> **Organizar por niveles**: Como una empresa, cada nivel tiene su función
+
+## Retos de hoy en día
+
+<Aside type="caution">
+**Los nuevos desafíos**: Hoy tenemos que hacer programas que funcionen en muchas computadoras al mismo tiempo, manejar muchísima información, protegernos de los hackers y hacer que todo sea fácil de usar.
+</Aside>
+
+Los retos más grandes son:
+
+1. **Programas en muchas computadoras**: Como Netflix que funciona en millones de dispositivos
+2. **Manejar mucha información**: Como Google que busca en toda la internet
+3. **Protegerse de los malos**: Evitar que roben nuestra información personal
+4. **Que sea fácil de usar**: Como TikTok que hasta los niños pueden usar
+5. **No contaminar**: Hacer programas que no gasten mucha electricidad
+

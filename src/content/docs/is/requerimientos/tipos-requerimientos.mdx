@@ -1,0 +1,410 @@
+---
+title: 2. Tipos de Requerimientos
+description: Clasificación de requerimientos funcionales y no funcionales en el desarrollo de software
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+
+Los requerimientos son como las instrucciones para hacer una casa. Hay dos tipos: las que dicen QUÉ debe tener la casa (cuartos, baños, cocina) y las que dicen CÓMO debe ser (bonita, segura, cómoda).
+
+## Los 2 tipos principales
+
+<Aside type="tip">
+**La diferencia clave**: Los funcionales dicen "qué hace", los no funcionales dicen "cómo lo hace".
+</Aside>
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Tipos de Requerimientos" {
+  card "FUNCIONALES" as funcionales #lightblue
+  card "NO FUNCIONALES" as nofuncionales #lightgreen
+}
+
+rectangle "¿Qué describen?" {
+  card "QUÉ hace el programa" as que #lightblue
+  card "CÓMO lo hace" as como #lightgreen
+}
+
+rectangle "Ejemplos" {
+  card "Login, buscar, comprar" as ejemplos1 #lightblue
+  card "Rápido, seguro, bonito" as ejemplos2 #lightgreen
+}
+
+funcionales --> que : Las acciones
+nofuncionales --> como : Las cualidades
+
+que --> ejemplos1 : Funciones específicas
+como --> ejemplos2 : Características de calidad
+
+note bottom of funcionales : Como los ingredientes de una receta
+note bottom of nofuncionales : Como el sabor y la presentación
+@enduml`} />
+
+## 1. Requerimientos Funcionales
+
+<Badge text="Tipo #1" variant="success" /> **Lo que el programa DEBE HACER**
+
+Son como la lista de tareas de un empleado. Cada función es algo específico que el programa tiene que saber hacer.
+
+### ¿Qué son exactamente?
+
+Los requerimientos funcionales describen:
+- **Acciones** que puede realizar el usuario
+- **Procesos** que debe ejecutar el sistema
+- **Información** que debe manejar
+- **Resultados** que debe producir
+
+### Estructura de un Requerimiento Funcional
+
+Los requerimientos funcionales describen **qué debe hacer el sistema**. Su estructura profesional incluye:
+
+<Steps>
+1. **Identificador**: Código único (RF-01, RF-02, etc.)
+2. **Nombre**: Breve descripción de la funcionalidad
+3. **Descripción**: Explicación clara de lo que debe realizar
+4. **Entradas**: Datos que proporciona el usuario
+5. **Procesamiento**: Acciones que aplica el sistema
+6. **Salidas**: Resultados o respuestas del sistema
+7. **Precondiciones**: Situaciones previas necesarias
+8. **Postcondiciones**: Estado final del sistema
+9. **Prioridad**: Alta, media o baja
+10. **Actores**: Usuarios o sistemas que intervienen
+</Steps>
+
+### Ejemplos profesionales de Requerimientos Funcionales:
+
+<Tabs>
+<TabItem label="RF-01: Login de Usuario">
+**ID**: RF-01  
+**Nombre**: Iniciar sesión de usuario  
+**Descripción**: El sistema debe permitir a los usuarios registrados acceder a la plataforma mediante credenciales válidas.  
+**Entradas**: Email y contraseña  
+**Procesamiento**: Validar formato de email, verificar credenciales en base de datos, generar token de sesión  
+**Salidas**: Acceso al dashboard principal o mensaje de error  
+**Precondiciones**: Usuario debe estar registrado previamente  
+**Postcondiciones**: Usuario autenticado con sesión activa  
+**Prioridad**: Alta  
+**Actores**: Usuario registrado
+</TabItem>
+<TabItem label="RF-02: Búsqueda de Productos">
+**ID**: RF-02  
+**Nombre**: Buscar productos en catálogo  
+**Descripción**: El sistema debe permitir buscar productos por nombre, categoría o código usando filtros.  
+**Entradas**: Término de búsqueda, filtros opcionales (precio, categoría)  
+**Procesamiento**: Consultar base de datos, aplicar filtros, ordenar resultados por relevancia  
+**Salidas**: Lista de productos que coinciden con los criterios  
+**Precondiciones**: Catálogo debe tener productos disponibles  
+**Postcondiciones**: Resultados mostrados al usuario  
+**Prioridad**: Alta  
+**Actores**: Usuario (registrado o invitado)
+</TabItem>
+<TabItem label="RF-03: Procesar Pago">
+**ID**: RF-03  
+**Nombre**: Procesar pago de compra  
+**Descripción**: El sistema debe procesar pagos con tarjeta de crédito de forma segura y generar comprobante.  
+**Entradas**: Datos de tarjeta, monto, productos seleccionados  
+**Procesamiento**: Validar tarjeta, conectar con pasarela de pago, descontar inventario  
+**Salidas**: Confirmación de pago exitoso o mensaje de error  
+**Precondiciones**: Usuario con carrito de compras, productos disponibles  
+**Postcondiciones**: Pago registrado, inventario actualizado, orden creada  
+**Prioridad**: Alta  
+**Actores**: Usuario, sistema de pagos externo
+</TabItem>
+<TabItem label="RF-04: Generar Reporte">
+**ID**: RF-04  
+**Nombre**: Generar reporte de ventas  
+**Descripción**: El sistema debe generar reportes de ventas por período con gráficos y estadísticas.  
+**Entradas**: Rango de fechas, tipo de reporte  
+**Procesamiento**: Consultar transacciones, calcular totales, generar gráficos  
+**Salidas**: Reporte en PDF con estadísticas y gráficos  
+**Precondiciones**: Usuario con permisos de administrador  
+**Postcondiciones**: Reporte generado y disponible para descarga  
+**Prioridad**: Media  
+**Actores**: Administrador
+</TabItem>
+<TabItem label="RF-05: Notificaciones Push">
+**ID**: RF-05  
+**Nombre**: Enviar notificaciones automáticas  
+**Descripción**: El sistema debe enviar notificaciones push cuando ocurran eventos importantes.  
+**Entradas**: Tipo de evento, usuario destinatario, mensaje  
+**Procesamiento**: Verificar preferencias de usuario, formatear mensaje, enviar notificación  
+**Salidas**: Notificación entregada al dispositivo del usuario  
+**Precondiciones**: Usuario con notificaciones habilitadas  
+**Postcondiciones**: Notificación enviada y registrada  
+**Prioridad**: Media  
+**Actores**: Sistema automático, usuario receptor
+</TabItem>
+</Tabs>
+
+### Características de los funcionales:
+
+<Steps>
+1. **Tienen ID y nombre claros**: Como "RF-01: Iniciar sesión de usuario"
+2. **Describen una acción concreta**: "Permitir a usuarios registrados acceder mediante credenciales"
+3. **Especifican entradas precisas**: "Email y contraseña"
+4. **Detallan el procesamiento**: "Validar formato, verificar credenciales, generar token"
+5. **Definen salidas esperadas**: "Acceso al dashboard o mensaje de error"
+6. **Establecen condiciones**: "Usuario debe estar registrado previamente"
+7. **Indican el resultado final**: "Usuario autenticado con sesión activa"
+</Steps>
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Anatomía de un Requerimiento Funcional" {
+  card "ACTOR" as actor #lightblue
+  card "ACCIÓN" as accion #lightgreen
+  card "OBJETO" as objeto #lightyellow
+  card "RESULTADO" as resultado #lightpink
+}
+
+actor --> accion : "El usuario"
+accion --> objeto : "debe poder buscar"
+objeto --> resultado : "productos"
+resultado --> actor : "y ver una lista"
+
+rectangle "Ejemplo completo" as ejemplo #lightgray
+
+actor --> ejemplo : "El usuario debe poder buscar productos y ver una lista de resultados"
+
+note bottom of actor : ¿Quién?
+note bottom of accion : ¿Qué hace?
+note bottom of objeto : ¿Con qué?
+note bottom of resultado : ¿Qué obtiene?
+@enduml`} />
+
+## 2. Requerimientos No Funcionales
+
+<Badge text="Tipo #2" variant="note" /> **CÓMO debe funcionar el programa**
+
+Son como las cualidades de una persona. No son cosas que hace, sino cómo es: amable, rápida, confiable, bonita.
+
+### ¿Qué son exactamente?
+
+Los requerimientos no funcionales describen:
+- **Calidad** del funcionamiento
+- **Restricciones** del sistema
+- **Condiciones** del ambiente
+- **Estándares** que debe cumplir
+
+### Las 6 categorías principales:
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Tipos de No Funcionales" {
+  card "RENDIMIENTO" as rendimiento #lightblue
+  card "SEGURIDAD" as seguridad #lightgreen
+  card "USABILIDAD" as usabilidad #lightyellow
+  card "CONFIABILIDAD" as confiabilidad #lightpink
+  card "ESCALABILIDAD" as escalabilidad #lightgray
+  card "COMPATIBILIDAD" as compatibilidad #lightcyan
+}
+
+rectangle "¿Qué significan?" {
+  card "Qué tan rápido" as rapido
+  card "Qué tan protegido" as protegido
+  card "Qué tan fácil de usar" as facil
+  card "Qué tan estable" as estable
+  card "Cuántos usuarios soporta" as usuarios
+  card "Con qué funciona" as funciona
+}
+
+rendimiento --> rapido : Velocidad de respuesta
+seguridad --> protegido : Protección de datos
+usabilidad --> facil : Experiencia del usuario
+confiabilidad --> estable : Disponibilidad del sistema
+escalabilidad --> usuarios : Capacidad de crecimiento
+compatibilidad --> funciona : Integración con otros sistemas
+
+note bottom of rendimiento : Como la velocidad de un carro
+note bottom of seguridad : Como las cerraduras de tu casa
+note bottom of usabilidad : Como un control remoto simple
+@enduml`} />
+
+### Estructura de un Requerimiento No Funcional
+
+Los no funcionales definen **cómo debe comportarse el sistema**. Su estructura profesional incluye:
+
+<Steps>
+1. **Identificador**: Código único (RNF-01, RNF-02, etc.)
+2. **Nombre**: Resumen del aspecto a controlar
+3. **Descripción**: Detalle de la característica o restricción
+4. **Criterios de aceptación**: Cómo se evaluará el cumplimiento
+5. **Prioridad**: Nivel de importancia o impacto
+6. **Tipo de atributo**: Clasificación (seguridad, rendimiento, etc.)
+</Steps>
+
+### Ejemplos profesionales de Requerimientos No Funcionales:
+
+<Tabs>
+<TabItem label="RNF-01: Tiempo de Respuesta">
+**ID**: RNF-01  
+**Nombre**: Tiempo de respuesta del sistema  
+**Descripción**: El sistema debe responder a cualquier solicitud del usuario en menos de 3 segundos bajo condiciones normales de carga.  
+**Criterios de aceptación**: Pruebas de carga deben demostrar que el 95% de las respuestas cumplen el tiempo límite con hasta 500 usuarios concurrentes.  
+**Tipo**: Rendimiento  
+**Prioridad**: Alta
+</TabItem>
+<TabItem label="RNF-02: Seguridad de Datos">
+**ID**: RNF-02  
+**Nombre**: Encriptación de información sensible  
+**Descripción**: Toda información personal y financiera debe estar encriptada usando algoritmos AES-256 tanto en tránsito como en reposo.  
+**Criterios de aceptación**: Auditoría de seguridad debe confirmar que no hay datos sensibles sin encriptar y cumple estándares PCI DSS.  
+**Tipo**: Seguridad  
+**Prioridad**: Alta
+</TabItem>
+<TabItem label="RNF-03: Disponibilidad">
+**ID**: RNF-03  
+**Nombre**: Disponibilidad del sistema  
+**Descripción**: El sistema debe estar disponible 99.9% del tiempo, permitiendo máximo 8.76 horas de inactividad al año.  
+**Criterios de aceptación**: Monitoreo debe registrar uptime mínimo del 99.9% mensual, con alertas automáticas ante caídas.  
+**Tipo**: Confiabilidad  
+**Prioridad**: Alta
+</TabItem>
+<TabItem label="RNF-04: Usabilidad Móvil">
+**ID**: RNF-04  
+**Nombre**: Compatibilidad con dispositivos móviles  
+**Descripción**: La interfaz debe ser completamente funcional y responsive en dispositivos móviles con pantallas desde 4 pulgadas.  
+**Criterios de aceptación**: Pruebas de usabilidad deben confirmar que todas las funciones son accesibles en iOS y Android con satisfacción del usuario >85%.  
+**Tipo**: Usabilidad  
+**Prioridad**: Media
+</TabItem>
+<TabItem label="RNF-05: Escalabilidad">
+**ID**: RNF-05  
+**Nombre**: Capacidad de escalamiento  
+**Descripción**: El sistema debe soportar un crecimiento del 200% en usuarios sin degradación significativa del rendimiento.  
+**Criterios de aceptación**: Arquitectura debe permitir escalamiento horizontal y pruebas deben confirmar soporte para 1500 usuarios concurrentes manteniendo tiempos de respuesta.  
+**Tipo**: Escalabilidad  
+**Prioridad**: Media
+</TabItem>
+</Tabs>
+
+## Comparación práctica
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Ejemplo: Sistema de Biblioteca" {
+  rectangle "FUNCIONALES" as func #lightblue {
+    card "Buscar libros"
+    card "Prestar libros"
+    card "Devolver libros"
+    card "Renovar préstamos"
+    card "Ver historial"
+  }
+  
+  rectangle "NO FUNCIONALES" as nofunc #lightgreen {
+    card "Búsqueda en 2 segundos"
+    card "Disponible 24/7"
+    card "Interfaz intuitiva"
+    card "Datos seguros"
+    card "Soporte 500 usuarios"
+  }
+}
+
+rectangle "La diferencia" {
+  card "QUÉ hace" as que #lightblue
+  card "CÓMO lo hace" as como #lightgreen
+}
+
+func --> que : Acciones específicas
+nofunc --> como : Cualidades del sistema
+
+note bottom of func : Las funciones son como verbos
+note bottom of nofunc : Las cualidades son como adjetivos
+@enduml`} />
+
+
+
+## Errores comunes al escribir requerimientos
+
+<Aside type="caution">
+**¡Cuidado!** Muchos requerimientos fallan porque no siguen la estructura profesional. Aquí tienes ejemplos de errores típicos vs. la forma correcta.
+</Aside>
+
+<Tabs>
+<TabItem label="❌ Requerimientos mal escritos">
+**Funcionales vagos:**
+- "El sistema debe tener login" → Falta estructura completa
+- "Debe buscar productos" → No especifica entradas, salidas, ni procesamiento
+- "Permitir pagos" → No define precondiciones ni actores
+
+**No funcionales imprecisos:**
+- "El sistema debe ser rápido" → No define criterios medibles
+- "Debe ser seguro" → No especifica tipo de seguridad ni estándares
+- "Fácil de usar" → No tiene criterios de aceptación objetivos
+</TabItem>
+<TabItem label="✅ Requerimientos bien estructurados">
+**Funcional completo:**
+- **ID**: RF-06, **Nombre**: Login con email, **Descripción**: Sistema debe autenticar usuarios con email/contraseña, **Entradas**: Email y contraseña, **Procesamiento**: Validar formato y credenciales, **Salidas**: Acceso o error, **Prioridad**: Alta
+
+**No funcional medible:**
+- **ID**: RNF-06, **Nombre**: Tiempo de autenticación, **Descripción**: Login debe completarse en menos de 2 segundos, **Criterios**: 95% de logins bajo 2s en pruebas, **Tipo**: Rendimiento, **Prioridad**: Alta
+</TabItem>
+</Tabs>
+
+## ¿Por qué necesitamos ambos tipos?
+
+<Steps>
+1. **Los funcionales** definen QUÉ construir
+2. **Los no funcionales** definen CÓMO construirlo bien
+3. **Sin funcionales** → No sabes qué hacer
+4. **Sin no funcionales** → Funciona, pero mal
+5. **Con ambos** → Sistema completo y de calidad
+</Steps>
+
+## Analogía final: Construir un carro
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Hacer un Carro" {
+  rectangle "FUNCIONALES" as funcarro #lightblue {
+    card "Acelerar"
+    card "Frenar"
+    card "Girar"
+    card "Encender luces"
+    card "Tocar claxon"
+  }
+  
+  rectangle "NO FUNCIONALES" as nofuncarro #lightgreen {
+    card "Velocidad máxima 180 km/h"
+    card "Frena en 10 metros"
+    card "Consume 15 km/litro"
+    card "Cómodo para 5 personas"
+    card "Bonito diseño"
+  }
+}
+
+rectangle "Resultado" as resultado #lightyellow
+
+funcarro --> resultado : Define las funciones
+nofuncarro --> resultado : Define la calidad
+
+note bottom of resultado : Un carro completo y bien hecho
+@enduml`} />
+
+## Resumen: Los dos son importantes
+
+<Aside type="tip">
+**Recuerda**: Los funcionales son el esqueleto del programa (estructura), los no funcionales son los músculos y la piel (calidad). Necesitas ambos para que funcione bien.
+</Aside>
+
+**En pocas palabras**:
+- **Funcionales** = Las cosas que hace (verbos) → "Registrar usuario", "Procesar pago", "Enviar email", "Generar reporte", "Buscar producto"
+- **No funcionales** = Cómo las hace (adjetivos) → "Rápido (3 segundos)", "Seguro (encriptado)", "Disponible (99.9%)", "Fácil de usar (intuitivo)", "Escalable (1500 usuarios)"
+
+**La clave**: Un buen sistema necesita ambos tipos. Sin funcionales no sirve para nada, sin no funcionales nadie lo quiere usar.

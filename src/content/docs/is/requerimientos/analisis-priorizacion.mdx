@@ -1,0 +1,352 @@
+---
+title: 4. Análisis y Priorización
+description: Métodos para analizar, clasificar y priorizar requerimientos de software
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+
+Cuando ya tenemos muchos requerimientos, necesitamos organizarlos y decidir cuáles son más importantes. Es como cuando tienes una lista larga de compras pero poco dinero: ¿qué compras primero?
+
+## ¿Por qué necesitamos analizar y priorizar?
+
+<Aside type="caution">
+**Realidad del desarrollo**: Casi nunca hay suficiente tiempo y dinero para hacer todo lo que el cliente quiere. Debemos elegir sabiamente qué hacer primero.
+</Aside>
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Restricciones del Proyecto" {
+  card "Tiempo limitado" as tiempo #lightcoral
+  card "Presupuesto fijo" as dinero #lightyellow
+  card "Equipo finito" as equipo #lightpink
+}
+
+rectangle "100 Requerimientos" as reqs #lightblue
+rectangle "Necesitamos elegir los más importantes" as elegir #lightgreen
+
+tiempo -[hidden]right-> dinero
+dinero -[hidden]right-> equipo
+
+reqs --> elegir
+tiempo --> elegir : Restringe
+dinero --> elegir : Limita
+equipo --> elegir : Condiciona
+
+note bottom of reqs : Como una lista enorme de compras
+note bottom of elegir : Como decidir qué comprar primero
+@enduml`} />
+
+## Pasos para analizar requerimientos
+
+Antes de priorizar, necesitamos entender bien cada requerimiento:
+
+<Steps>
+1. **Revisar claridad**: ¿Se entiende qué pide exactamente?
+2. **Verificar completitud**: ¿Tiene toda la información necesaria?
+3. **Comprobar factibilidad**: ¿Es posible hacerlo con la tecnología actual?
+4. **Identificar dependencias**: ¿Depende de otros requerimientos?
+5. **Estimar esfuerzo**: ¿Cuánto tiempo y recursos necesita?
+</Steps>
+
+### Ejemplo de análisis de un requerimiento:
+
+<Tabs>
+<TabItem label="Requerimiento Original">
+"El sistema debe ser rápido"
+</TabItem>
+<TabItem label="Análisis">
+- **Claridad**: ❗ Muy vago. ¿Qué significa "rápido"?
+- **Completitud**: ❗ Falta información. ¿Qué partes deben ser rápidas?
+- **Factibilidad**: ❓ No podemos evaluar sin más detalles
+- **Dependencias**: ❓ Posiblemente del hardware disponible
+- **Esfuerzo**: ❓ Imposible estimar sin aclaraciones
+</TabItem>
+<TabItem label="Requerimiento Mejorado">
+"Las búsquedas de productos deben mostrar resultados en menos de 2 segundos, incluso con 1000 usuarios simultáneos"
+
+- **Claridad**: ✅ Específico y medible
+- **Completitud**: ✅ Indica función y criterio de éxito
+- **Factibilidad**: ✅ Posible con optimización de base de datos
+- **Dependencias**: ✅ Depende del diseño de la base de datos
+- **Esfuerzo**: ✅ Estimado: 3 días de trabajo
+</TabItem>
+</Tabs>
+
+## Clasificación por importancia
+
+Existen varias formas de clasificar requerimientos por su importancia:
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Métodos de Clasificación" {
+  card "Escala MoSCoW" as moscow #lightblue
+  card "Matriz de Valor/Esfuerzo" as matriz #lightgreen
+  card "Votación de Stakeholders" as votacion #lightyellow
+  card "Impacto en el Negocio" as impacto #lightpink
+}
+
+note bottom of moscow : Must, Should, Could, Won't
+note bottom of matriz : Valor vs. Dificultad
+note bottom of votacion : Democracia con los interesados
+note bottom of impacto : Basado en objetivos de negocio
+@enduml`} />
+
+### 1. Método MoSCoW
+
+Es como clasificar tu lista de compras en: imprescindibles, importantes, deseables y descartados.
+
+<Tabs>
+<TabItem label="M - Must Have (Obligatorio)">
+**Significado**: Requisitos fundamentales sin los cuales el sistema no funcionaría.
+
+**Ejemplos**:
+- Login de usuarios
+- Proceso de pago
+- Búsqueda de productos
+- Carrito de compras
+
+**Características**:
+- Sin estos, el proyecto fracasa
+- No son negociables
+- Se implementan primero
+</TabItem>
+<TabItem label="S - Should Have (Debería)">
+**Significado**: Importantes pero no vitales. El sistema puede funcionar sin ellos temporalmente.
+
+**Ejemplos**:
+- Filtros avanzados de búsqueda
+- Historial de pedidos
+- Recomendaciones personalizadas
+- Notificaciones por email
+
+**Características**:
+- Agregan valor significativo
+- Pueden esperar a una segunda fase
+- Dolorosos de omitir, pero no fatales
+</TabItem>
+<TabItem label="C - Could Have (Podría)">
+**Significado**: Deseables pero no necesarios. Son "extras" que mejoran la experiencia.
+
+**Ejemplos**:
+- Modo oscuro
+- Compartir en redes sociales
+- Animaciones en la interfaz
+- Múltiples opciones de pago
+
+**Características**:
+- Menor impacto si se omiten
+- Se implementan si sobra tiempo
+- Mejoran la satisfacción pero no son esenciales
+</TabItem>
+<TabItem label="W - Won't Have (No tendrá)">
+**Significado**: Descartados para esta versión, pero pueden considerarse en el futuro.
+
+**Ejemplos**:
+- Integración con asistentes de voz
+- Realidad aumentada
+- Programa de lealtad con puntos
+- App para smartwatch
+
+**Características**:
+- Acordados como fuera de alcance
+- Documentados para futuras versiones
+- No se gastan recursos en ellos ahora
+</TabItem>
+</Tabs>
+
+### 2. Matriz de Valor vs. Esfuerzo
+
+Es como decidir qué tareas hacer primero según cuánto beneficio dan y cuánto cuestan.
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Matriz Valor/Esfuerzo" {
+  rectangle "ALTO VALOR - BAJO ESFUERZO" as cuadrante1 #lightgreen
+  note right of cuadrante1 : Login, Búsqueda simple, Ver productos
+  
+  rectangle "ALTO VALOR - ALTO ESFUERZO" as cuadrante2 #lightyellow
+  note right of cuadrante2 : Pago con tarjeta, Recomendaciones, Chat
+  
+  rectangle "BAJO VALOR - BAJO ESFUERZO" as cuadrante3 #lightblue
+  note right of cuadrante3 : Cambiar colores, Logos personalizados
+  
+  rectangle "BAJO VALOR - ALTO ESFUERZO" as cuadrante4 #lightpink
+  note right of cuadrante4 : Redes sociales, Animaciones complejas
+}
+
+note bottom of cuadrante1 : Ganancias rápidas
+note bottom of cuadrante2 : Proyectos grandes importantes
+note bottom of cuadrante3 : Tareas fáciles de baja prioridad
+note bottom of cuadrante4 : Evitar o posponer
+@enduml`} />
+
+#### ¿Cómo usar la matriz?
+
+<Steps>
+1. **Estima el valor** de cada requerimiento (1-10)
+2. **Estima el esfuerzo** necesario (1-10)
+3. **Coloca cada requerimiento** en su cuadrante
+4. **Prioriza** según la posición:
+   - Cuadrante 1 (verde): Hazlo primero - son las "victorias rápidas"
+   - Cuadrante 2 (amarillo): Planifica bien - valen la pena pero requieren esfuerzo
+   - Cuadrante 3 (azul): Hazlo si hay tiempo - fáciles pero poco importantes
+   - Cuadrante 4 (rosa): Evita o pospone - mucho trabajo para poco beneficio
+</Steps>
+
+## Validación con el cliente
+
+Una vez que has analizado y priorizado, necesitas confirmar con el cliente que estás en el camino correcto.
+
+<Aside type="tip">
+**Consejo clave**: La validación no es solo preguntar "está bien", sino mostrar consecuencias reales de las decisiones de priorización.
+</Aside>
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+actor "Cliente" as cliente
+actor "Equipo de Desarrollo" as equipo
+
+rectangle "Proceso de Validación" {
+  card "1. Presentar priorización" as presentar #lightblue
+  card "2. Explicar consecuencias" as explicar #lightgreen
+  card "3. Mostrar calendario" as mostrar #lightyellow
+  card "4. Obtener aprobación" as aprobar #lightpink
+  card "5. Documentar acuerdos" as documentar #lightcyan
+}
+
+equipo --> presentar : Prepara
+cliente --> presentar : Escucha
+
+presentar --> explicar : "Esto estará en la primera versión"
+explicar --> mostrar : "Esto significa que..."
+mostrar --> aprobar : "Este es el plan de entregas"
+aprobar --> documentar : "Estamos de acuerdo"
+
+note bottom of presentar : Mostrar la clasificación
+note bottom of explicar : "Estas funciones quedarán fuera"
+note bottom of mostrar : "Entregaremos en estas fechas"
+note bottom of aprobar : Firma o acuerdo formal
+@enduml`} />
+
+### Técnicas efectivas para validar con el cliente
+
+<Tabs>
+<TabItem label="1. Demostración Visual">
+- Usa prototipos para mostrar qué estará y qué no estará
+- Presenta mockups de las funciones priorizadas
+- Compara versiones "con" y "sin" ciertas funciones
+- Muestra ejemplos de otros productos similares
+</TabItem>
+<TabItem label="2. Escenarios de Usuario">
+- Cuenta historias de cómo usarán el producto
+- "Con esta priorización, un usuario podrá hacer X pero no Y"
+- Presenta un "día en la vida" usando el producto
+- Muestra cómo se resolverán problemas reales
+</TabItem>
+<TabItem label="3. Datos y Evidencias">
+- Presenta investigaciones de mercado
+- Muestra estadísticas de uso de funciones similares
+- Comparte feedback de pruebas con usuarios
+- Calcula el retorno de inversión de cada función
+</TabItem>
+</Tabs>
+
+### Manejo de desacuerdos en la priorización
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Cliente quiere todo para ayer" as problema #lightcoral
+
+rectangle "Soluciones" {
+  card "Educación" as educar #lightblue
+  card "Negociación" as negociar #lightgreen
+  card "Compromiso" as compromiso #lightyellow
+  card "Datos objetivos" as datos #lightpink
+}
+
+problema --> educar : Explicar restricciones
+problema --> negociar : Buscar alternativas
+problema --> compromiso : Encontrar punto medio
+problema --> datos : Mostrar evidencias
+
+note bottom of educar : "Hacer todo a la vez tomaría 2 años"
+note bottom of negociar : "¿Qué podemos quitar para añadir esto?"
+note bottom of compromiso : "Haremos una versión básica primero"
+note bottom of datos : "Según estudios, los usuarios prefieren X"
+@enduml`} />
+
+#### Consejos para manejar desacuerdos:
+
+<Steps>
+1. **Escucha activamente**: Entiende por qué el cliente valora ciertos requerimientos
+2. **Explica con ejemplos**: Usa casos reales de proyectos anteriores
+3. **Ofrece alternativas**: "Si añadimos esto, podemos quitar aquello"
+4. **Muestra el impacto**: "Añadir esta función retrasaría la entrega 2 semanas"
+5. **Documenta las decisiones**: Anota los acuerdos y razones
+</Steps>
+
+## Herramientas prácticas para priorización
+
+### 1. Tabla de priorización
+
+Una simple tabla puede ayudar mucho:
+
+| ID | Requerimiento | Valor (1-10) | Esfuerzo (1-10) | Riesgo (1-10) | Prioridad | Categoría |
+|----|--------------|-------------|---------------|-------------|-----------|------------|
+| RF-01 | Login de usuarios | 10 | 3 | 2 | Alta | Must Have |
+| RF-02 | Búsqueda avanzada | 7 | 6 | 4 | Media | Should Have |
+| RF-03 | Modo oscuro | 3 | 2 | 1 | Baja | Could Have |
+| RF-04 | Integración con IA | 6 | 9 | 8 | Baja | Won't Have |
+
+### 2. Votación de stakeholders
+
+Cada interesado recibe 100 puntos para distribuir entre los requerimientos:
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Votación (100 puntos por persona)" {
+  card "Login: 85 puntos" as login #lightgreen
+  card "Carrito: 70 puntos" as carrito #lightgreen
+  card "Búsqueda: 65 puntos" as busqueda #lightyellow
+  card "Perfil: 40 puntos" as perfil #lightyellow
+  card "Comentarios: 25 puntos" as comentarios #lightpink
+  card "Modo oscuro: 15 puntos" as oscuro #lightpink
+}
+
+note bottom of login : Prioridad máxima
+note bottom of oscuro : Prioridad mínima
+@enduml`} />
+
+## Resumen: El arte de priorizar
+
+<Aside type="tip">
+**Recuerda**: Priorizar no es decir "no" permanentemente, sino "ahora no". Es decidir el orden correcto para crear valor lo antes posible.
+</Aside>
+
+**Las claves para una buena priorización**:
+
+1. **Analiza cada requerimiento** para entenderlo completamente
+2. **Clasifica por importancia** usando métodos como MoSCoW
+3. **Evalúa valor vs. esfuerzo** para maximizar el retorno
+4. **Valida con el cliente** para asegurar alineación
+5. **Documenta las decisiones** para referencia futura
+
+Con estas herramientas, podrás tomar decisiones inteligentes sobre qué construir primero y entregar el máximo valor con los recursos disponibles.

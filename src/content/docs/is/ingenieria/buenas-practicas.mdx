@@ -1,0 +1,321 @@
+---
+title: 5. Buenas Prácticas de Ingeniería
+description: Principios y técnicas recomendadas para el desarrollo efectivo de software
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+
+Las buenas prácticas son como las reglas de oro para hacer software. Son trucos que han funcionado durante años y que nos ayudan a evitar problemas. Es como seguir las recetas de la abuela: si funcionaron antes, funcionarán ahora.
+
+## Las 3 prácticas más importantes
+
+<Aside type="tip">
+**La clave del éxito**: Hacer software es como tocar en una banda. Necesitas trabajar en equipo, guardar tus canciones y practicar mucho para que todo suene bien.
+</Aside>
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Las 3 Prácticas de Oro" {
+  card "Trabajo en equipo" as equipo #lightblue
+  card "Control de versiones" as versiones #lightgreen
+  card "Pruebas continuas" as pruebas #lightyellow
+}
+
+rectangle "¿Qué logran?" {
+  card "Proyectos exitosos" as exito #lightpink
+  card "Menos errores" as errores #lightcyan
+  card "Clientes felices" as felices #lightgray
+}
+
+equipo --> exito : Todos trabajan hacia la misma meta
+versiones --> errores : Podemos deshacer errores
+pruebas --> felices : El programa funciona bien
+
+note bottom of equipo : Como una orquesta afinada
+note bottom of versiones : Como guardar partituras
+note bottom of pruebas : Como ensayar antes del concierto
+@enduml`} />
+
+## 1. Trabajo en equipo
+
+<Badge text="Práctica #1" variant="success" /> **Trabajar juntos como un equipo de fútbol**
+
+Hacer software solo es como intentar jugar fútbol sin compañeros. Puedes ser muy bueno, pero necesitas un equipo para ganar.
+
+### ¿Por qué es importante?
+
+<Steps>
+1. **Nadie sabe todo**: Como en un hospital, cada doctor tiene su especialidad
+2. **Más ojos ven más**: Cuatro personas encuentran errores que una no ve
+3. **Se aprende más rápido**: Como estudiar en grupo vs. solo
+4. **El trabajo se divide**: Como limpiar la casa entre toda la familia
+</Steps>
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Un Equipo Exitoso" {
+  actor "Programador Frontend" as frontend
+  actor "Programador Backend" as backend
+  actor "Diseñador" as diseñador
+  actor "Tester" as tester
+  actor "Líder de Proyecto" as lider
+}
+
+rectangle "Proyecto" as proyecto #lightgreen
+
+frontend --> proyecto : Hace la interfaz bonita
+backend --> proyecto : Hace que funcione por dentro
+diseñador --> proyecto : Decide cómo se ve
+tester --> proyecto : Encuentra errores
+lider --> proyecto : Coordina a todos
+
+note bottom of frontend : Como el decorador de pasteles
+note bottom of backend : Como el motor del carro
+note bottom of diseñador : Como el arquitecto
+note bottom of tester : Como el inspector de calidad
+note bottom of lider : Como el director de orquesta
+@enduml`} />
+
+### ¿Cómo trabajar bien en equipo?
+
+<Tabs>
+<TabItem label="Comunicación">
+**Hablar claro y seguido:**
+- Reuniones cortas diarias (como el parte meteorológico)
+- Usar herramientas como Slack o Teams
+- Preguntar cuando no entiendes
+- Compartir lo que sabes
+</TabItem>
+<TabItem label="Colaboración">
+**Ayudarse mutuamente:**
+- Revisar el código de otros (como revisar la tarea del compañero)
+- Compartir conocimiento en documentos
+- Hacer pair programming (programar de a dos)
+- Celebrar los éxitos juntos
+</TabItem>
+
+</Tabs>
+
+## 2. Control de versiones
+
+<Badge text="Práctica #2" variant="note" /> **Guardar todas las versiones como un videojuego**
+
+Es como tener puntos de guardado en un videojuego. Si algo sale mal, puedes volver atrás.
+
+### ¿Qué es el control de versiones?
+
+Imagina que estás escribiendo un libro:
+- **Versión 1**: El primer borrador
+- **Versión 2**: Corriges errores de ortografía
+- **Versión 3**: Cambias el final
+- **Versión 4**: Tu amigo sugiere cambios
+
+Con control de versiones, puedes:
+- Ver todas las versiones
+- Volver a cualquier versión anterior
+- Combinar cambios de diferentes personas
+- Saber quién cambió qué y cuándo
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Historia del Proyecto" {
+  card "Versión 1.0 Primera versión" as v1 #lightblue
+  card "Versión 1.1 Arreglé un bug" as v11 #lightgreen
+  card "Versión 1.2 Nueva función" as v12 #lightyellow
+  card "Versión 2.0 Gran actualización" as v2 #lightpink
+}
+
+v1 --> v11 : Juan arregló login
+v11 --> v12 : María agregó chat
+v12 --> v2 : Todo el equipo trabajó
+
+rectangle "¿Qué puedo hacer?" {
+  card "Ver cambios" as cambios
+  card "Volver atrás" as volver
+  card "Combinar trabajo" as combinar
+}
+
+v2 --> cambios : ¿Qué cambió?
+v2 --> volver : ¿Algo salió mal?
+v2 --> combinar : ¿Trabajamos en paralelo?
+
+note bottom of v1 : Como guardar partida
+note bottom of cambios : Como ver replay
+note bottom of volver : Como cargar partida anterior
+note bottom of combinar : Como jugar cooperativo
+@enduml`} />
+
+### Herramientas populares:
+
+- **Git**: La más usada (como WhatsApp de los programadores)
+- **GitHub**: Para guardar código en la nube
+- **GitLab**: Alternativa a GitHub
+- **Bitbucket**: Otra opción popular
+
+### ¿Cómo funciona en la práctica?
+
+<Steps>
+1. **Clonar**: Descargar el proyecto a tu computadora (como descargar una app)
+2. **Trabajar**: Hacer cambios en tu copia local
+3. **Commit**: Guardar tus cambios con un mensaje (como "Arreglé el botón de login")
+4. **Push**: Subir tus cambios al servidor (como subir foto a Instagram)
+5. **Pull**: Descargar cambios de otros (como actualizar tu feed)
+</Steps>
+
+## 3. Pruebas continuas
+
+<Badge text="Práctica #3" variant="caution" /> **Probar todo como un chef que prueba la comida**
+
+Un chef prueba la comida antes de servirla. Nosotros probamos el código antes de entregarlo.
+
+### ¿Por qué probar?
+
+<Aside type="caution">
+**La realidad**: Un error en producción es como servir comida cruda en un restaurante. Los clientes se van y no regresan.
+</Aside>
+
+Las pruebas nos ayudan a:
+- Encontrar errores antes que los usuarios
+- Asegurar que todo funciona como debe
+- Poder cambiar código sin miedo
+- Dormir tranquilos por las noches
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Tipos de Pruebas" {
+  card "Pruebas Unitarias" as unitarias #lightblue
+  card "Pruebas de Integración" as integracion #lightgreen
+  card "Pruebas de Sistema" as sistema #lightyellow
+  card "Pruebas de Usuario" as usuario #lightpink
+}
+
+rectangle "¿Qué prueban?" {
+  card "Una función" as funcion
+  card "Varias partes juntas" as partes
+  card "Todo el programa" as programa
+  card "La experiencia completa" as experiencia
+}
+
+unitarias --> funcion : Como probar un ingrediente
+integracion --> partes : Como probar una receta
+sistema --> programa : Como probar todo el menú
+usuario --> experiencia : Como la experiencia del cliente
+
+note bottom of unitarias : ¿La sal está buena?
+note bottom of integracion : ¿La pasta con salsa sabe bien?
+note bottom of sistema : ¿Todo el plato está perfecto?
+note bottom of usuario : ¿El cliente está feliz?
+@enduml`} />
+
+### Estrategias de pruebas:
+
+<Tabs>
+<TabItem label="Pruebas Automáticas">
+**Como robots que prueban por ti:**
+- Se ejecutan solas cada vez que cambias código
+- Son rápidas y consistentes
+- Como tener un asistente que prueba todo
+- Ejemplos: Jest, Selenium, Cypress
+</TabItem>
+<TabItem label="Pruebas Manuales">
+**Como probar a mano:**
+- Una persona real usa el programa
+- Encuentra problemas que los robots no ven
+- Como que un amigo pruebe tu app
+- Importante para la experiencia de usuario
+</TabItem>
+<TabItem label="Pruebas Continuas">
+**Probar todo el tiempo:**
+- Cada vez que alguien hace cambios
+- Como probar la comida mientras cocinas
+- Encuentra problemas rápido
+- Parte de CI/CD (Integración Continua)
+</TabItem>
+</Tabs>
+
+## ¿Cómo aplicar las 3 prácticas juntas?
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "El Círculo Virtuoso" {
+  card "Trabajo en Equipo" as equipo #lightblue
+  card "Control de Versiones" as versiones #lightgreen
+  card "Pruebas Continuas" as pruebas #lightyellow
+}
+
+rectangle "Resultado" as resultado #lightpink
+
+equipo --> versiones : El equipo colabora usando Git
+versiones --> pruebas : Cada cambio se prueba automáticamente
+pruebas --> equipo : Los resultados se comparten con el equipo
+equipo --> resultado : Proyectos exitosos
+versiones --> resultado : Código organizado
+pruebas --> resultado : Software de calidad
+
+note bottom of equipo : Comunicación constante
+note bottom of versiones : Historial completo
+note bottom of pruebas : Confianza en los cambios
+note bottom of resultado : Clientes felices y equipo tranquilo
+@enduml`} />
+
+## Un día típico con buenas prácticas:
+
+<Steps>
+1. **Mañana**: Reunión de equipo (15 minutos) - ¿Qué hicimos ayer? ¿Qué haremos hoy?
+2. **Desarrollo**: Escribir código y pruebas en paralelo
+3. **Commit**: Guardar cambios con mensajes claros
+4. **Push**: Subir cambios al repositorio compartido
+5. **Revisión**: Compañeros revisan tu código
+6. **Merge**: Integrar cambios al proyecto principal
+7. **Pruebas automáticas**: Se ejecutan solas
+8. **Despliegue**: Si todo está bien, se publica automáticamente
+</Steps>
+
+## Beneficios de seguir estas prácticas:
+
+### Para el equipo:
+- Menos estrés y peleas
+- Trabajo más organizado
+- Aprendizaje constante
+- Mejor ambiente laboral
+
+### Para el proyecto:
+- Menos errores en producción
+- Entregas más rápidas
+- Código más limpio
+- Fácil mantenimiento
+
+### Para los clientes:
+- Software que funciona bien
+- Actualizaciones frecuentes
+- Menos interrupciones
+- Mejor experiencia
+
+## Resumen: Las reglas de oro
+
+<Aside type="tip">
+**Recuerda**: Estas prácticas son como lavarse los dientes. Al principio puede parecer tedioso, pero después se vuelve automático y te salva de muchos problemas.
+</Aside>
+
+1. **Trabajo en equipo**: Como una banda de música, todos tocan en armonía
+2. **Control de versiones**: Como tener una máquina del tiempo para tu código
+3. **Pruebas continuas**: Como tener un guardaespaldas que protege tu software
+
+**La magia**: Cuando combinas estas tres prácticas, hacer software se vuelve más fácil, divertido y exitoso.
+

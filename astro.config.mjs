@@ -29,18 +29,18 @@ export default defineConfig({
 			],
 			sidebar: [
 				{
-					label: 'Inicio',
+					label: '🏠 Inicio',
 					items: [
 						{ label: 'Bienvenida', link: '/' },
 					],
 				},
 				{
-					label: 'Guías',
+					label: '📖 Guías',
 					link: '/guides/'
 				},
 
 				{
-					label: 'Base de datos',
+					label: '💾 Base de datos',
 					collapsed: true,
 					items: [
 						{
@@ -69,11 +69,11 @@ export default defineConfig({
 					]
 				},
 				{
-					label: 'Control de Versiones',
+					label: '🔄 Control de Versiones',
 					collapsed: true,
 					items: [
 						{
-							label: 'GitHub 🐈‍⬛',
+							label: '🐈 GitHub ',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Git y GitHub', link: '/guides/git-github/introduccion-git-github/' },
@@ -88,11 +88,11 @@ export default defineConfig({
 				},
 			
 				{
-					label: 'Lenguajes de Programación',
+					label: '💻 Lenguajes de Programación',
 					collapsed: false,
 					items: [
 						{
-							label: 'SQL',
+							label: '📂 SQL',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a SQL', link: '/lenguajes/sql/introduccion/' },
@@ -106,7 +106,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: 'PHP',
+							label: '🐘 PHP',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a PHP', link: '/lenguajes/php/introduccion/' },
@@ -123,7 +123,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: 'Java',
+							label: '🦊 Java',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Java', link: '/lenguajes/java/introduccion/' },
@@ -140,7 +140,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: 'Python',
+							label: '🐍 Python',
 							collapsed: true,
 							items: [
 								{ label: 'Introducción a Python', link: '/lenguajes/python/introduction/' },
@@ -157,7 +157,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: 'HTML',
+							label: '🐛 HTML',
 							collapsed: true,
 							items: [
 								{ label: 'Introducción a HTML', link: '/guides/html/introduction/' },
@@ -174,7 +174,7 @@ export default defineConfig({
 							],
 						},
 						{
-							label: 'CSS',
+							label: '🐌 CSS',
 							collapsed: true,
 							items: [
 								{ label: 'Introducción a CSS', link: '/guides/css/introduction/' },
@@ -188,7 +188,7 @@ export default defineConfig({
 							],
 						},
 						{
-							label: 'JavaScript',
+							label: '🌟 JavaScript',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a JavaScript', link: '/lenguajes/javascript/introduction/' },
@@ -216,11 +216,11 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'Frameworks',
-					collapsed: true,
+					label: '🛠️ Frameworks',
+					collapsed: false,
 					items: [
 						{
-							label: 'Vue 3',
+							label: '🐊 Vue 3',
 							collapsed: true,
 							items: [
 								{ label: '01. Introducción a Vue 3', link: '/frameworks/vue/introduction/' },
@@ -243,7 +243,7 @@ export default defineConfig({
 							],
 						},
 						{
-							label: 'Laravel',
+							label: '🦋 Laravel',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Laravel', link: '/guides/laravel/introduction/' },
@@ -266,7 +266,7 @@ export default defineConfig({
 							]	
 						},
 						{
-							label: 'Inertia',
+							label: '🐳 Inertia',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Inertia.js', link: '/guides/inertia/introduction/' },
@@ -284,7 +284,7 @@ export default defineConfig({
 							]	
 						},
 						{
-							label:'Java Swing',
+							label:'🪸 Java Swing',
 							collapsed:true,
 							items:[
 								{ label: '1. Introducción a Java y Java Swing', link: '/frameworks/java-swing/introduccion/' },
@@ -296,7 +296,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: 'Alpine.js',
+							label: '🦉 Alpine.js',
 							collapsed: true,
 							items: [
 								{ label: '01. Introducción a Alpine.js', link: '/guides/alpine/introduction/' },
@@ -314,11 +314,11 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'UML',
+					label: '🐞 UML',
 					collapsed: true,
 					items: [
 						{ 
-							label: 'Diagramas de Clases',
+							label: '🦉 Diag. Clases',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Clases', link: '/uml/diagramas-clases/introduccion/' },
@@ -328,7 +328,7 @@ export default defineConfig({
 							]
 						},
 						{ 
-							label: 'Diagramas de Casos de Uso',
+							label: '🦌 Diag. Casos de Uso',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Casos de Uso', link: '/uml/diagramas-casos-uso/introduccion/' },
@@ -338,7 +338,7 @@ export default defineConfig({
 							]
 						},
 						{ 
-							label: 'Diagramas de Secuencia',
+							label: '🐢 Diag. Secuencia',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Secuencia', link: '/uml/diagramas-secuencia/introduccion/' },
@@ -348,7 +348,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: 'Diagramas de Actividades',
+							label: '🐝 Diag. Actividades',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Actividades', link: '/uml/diagramas-actividades/introduccion/' },
@@ -358,7 +358,7 @@ export default defineConfig({
 							]
 						},
 						{ 
-							label: 'Diagramas de Componentes',
+							label: '🦋 Diag. Componentes',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Componentes', link: '/uml/diagramas-componentes/introduccion/' },
@@ -368,7 +368,7 @@ export default defineConfig({
 							]
 						},
 						{ 
-							label: 'Diagramas de Despliegue',
+							label: '🐏 Diag. Despliegue',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Despliegue', link: '/uml/diagramas-despliegue/introduccion/' },
@@ -378,7 +378,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: 'Diagramas de Entidad-Relación',
+							label: '🐟 Diag. Entidad-Relación',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Entidad-Relación', link: '/uml/diagramas-entidad-relacion/introduccion/' },
@@ -390,7 +390,42 @@ export default defineConfig({
 					]
 				},
 				{
-					label: 'Utilidades',
+					label: '📚 Ingeniería de Software',
+					collapsed: true,
+					items: [
+						{
+							label: '💻 Ingeniería de Software',
+							collapsed: true,
+							items: [
+								{ label: '1. Concepto y Propósito', link: '/is/ingenieria/concepto-y-proposito/' },
+								{ label: '2. Diferencia entre Programar e Ingeniar Software', link: '/is/ingenieria/diferencia-programar-ingeniar/' },
+								{ label: '3. Objetivos Clave del Ingeniero de Software', link: '/is/ingenieria/objetivos-clave/' },
+								{ label: '4. Problemas Comunes en el Desarrollo', link: '/is/ingenieria/problemas-comunes/' },
+								{ label: '5. Buenas Prácticas de Ingeniería', link: '/is/ingenieria/buenas-practicas/' },
+							]
+						},
+						{
+							label: '🐘 Ingeniería de Requerimientos',
+							collapsed: true,
+							items: [
+								{ label: '1. Qué son los Requerimientos', link: '/is/requerimientos/que-son-requerimientos/' },
+								{ label: '2. Tipos de Requerimientos', link: '/is/requerimientos/tipos-requerimientos/' },
+								{ label: '3. Cómo Capturar los Requerimientos', link: '/is/requerimientos/capturar-requerimientos/' },
+								{ label: '4. Análisis y Priorización', link: '/is/requerimientos/analisis-priorizacion/' },
+								{ label: '5. Documentación de Requerimientos', link: '/is/requerimientos/documentacion/' },
+							]
+						}
+					]
+				},
+				{
+					label: '💚 Metodologías',
+					collapsed: true,
+					items: [
+						
+					]
+				},
+				{
+					label: '🍿 Utilidades',
 					collapsed: true,
 					items: [
 						{
@@ -423,7 +458,7 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'Referencia',
+					label: '📑 Referencia',
 					collapsed: true,
 					autogenerate: { directory: 'reference' },
 				},

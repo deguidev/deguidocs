@@ -1,0 +1,261 @@
+---
+title: 1. Qué son los Requerimientos
+description: Introducción a los requerimientos de software y su importancia en el desarrollo
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+
+Los requerimientos son como la lista de compras cuando vas al supermercado, pero para hacer programas. Es todo lo que el programa debe hacer para que la gente esté contenta.
+
+## ¿Qué son exactamente?
+
+<Aside type="tip">
+**En palabras simples**: Los requerimientos son las instrucciones que le damos al programador sobre qué debe hacer el programa. Es como darle la receta completa al cocinero.
+</Aside>
+
+Un requerimiento es una descripción de:
+- **Qué** debe hacer el programa
+- **Cómo** debe comportarse
+- **Cuándo** debe hacer las cosas
+- **Para quién** está hecho
+
+### Ejemplo de la vida real:
+
+Imagina que quieres una app para pedir pizza:
+
+<Steps>
+1. **"Quiero ver el menú de pizzas"** ← Esto es un requerimiento
+2. **"Quiero elegir el tamaño"** ← Esto también
+3. **"Quiero pagar con tarjeta"** ← Y esto también
+4. **"Quiero saber cuándo llega"** ← Y esto también
+</Steps>
+
+## ¿De dónde vienen los requerimientos?
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "¿Quién pide cosas?" {
+  actor "Cliente" as cliente #lightblue
+  actor "Usuarios finales" as usuarios #lightgreen
+  actor "Jefe de la empresa" as jefe #lightyellow
+  actor "Gobierno/Leyes" as gobierno #lightpink
+}
+
+rectangle "Tipos de peticiones" {
+  card "Necesidades del negocio" as negocio
+  card "Problemas a resolver" as problemas
+  card "Mejoras deseadas" as mejoras
+  card "Reglas obligatorias" as reglas
+}
+
+cliente --> negocio : "Necesito vender más"
+usuarios --> problemas : "Esto no funciona bien"
+jefe --> mejoras : "Quiero que sea más rápido"
+gobierno --> reglas : "Debe cumplir la ley"
+
+note bottom of cliente : Quien paga el proyecto
+note bottom of usuarios : Quien usará el programa
+note bottom of jefe : Quien toma decisiones
+note bottom of gobierno : Reglas que hay que seguir
+@enduml`} />
+
+## ¿Por qué son importantes?
+
+<Badge text="¡Súper importante!" variant="caution" /> **Sin requerimientos claros, es como construir una casa sin planos**
+
+### ¿Qué pasa si no tenemos requerimientos claros?
+
+<Tabs>
+<TabItem label="❌ Sin requerimientos">
+- El programador adivina qué hacer
+- El cliente recibe algo que no quería
+- Se pierde tiempo y dinero
+- Todos se enojan
+- El proyecto fracasa
+</TabItem>
+<TabItem label="✅ Con requerimientos claros">
+- Todos saben qué esperar
+- El programador sabe qué hacer
+- El cliente recibe lo que pidió
+- Se ahorra tiempo y dinero
+- Todos están contentos
+</TabItem>
+</Tabs>
+
+## Analogías para entender mejor
+
+### 1. Como una receta de cocina
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "Hacer una torta" {
+  card "Ingredientes" as ingredientes #lightblue
+  card "Pasos a seguir" as pasos #lightgreen
+  card "Tiempo de cocción" as tiempo #lightyellow
+  card "Cómo debe quedar" as resultado #lightpink
+}
+
+rectangle "Hacer un programa" {
+  card "Funciones necesarias" as funciones #lightblue
+  card "Cómo debe funcionar" as funcionamiento #lightgreen
+  card "Cuándo debe responder" as respuesta #lightyellow
+  card "Cómo debe verse" as apariencia #lightpink
+}
+
+ingredientes --> funciones : "Login, registro, búsqueda"
+pasos --> funcionamiento : "Primero login, luego buscar"
+tiempo --> respuesta : "Debe cargar en 2 segundos"
+resultado --> apariencia : "Debe verse bonito y fácil"
+
+note bottom of ingredientes : Lo que necesitas
+note bottom of funciones : Lo que debe hacer
+@enduml`} />
+
+### 2. Como construir una casa
+
+- **Arquitecto** = Analista de requerimientos
+- **Planos** = Documento de requerimientos
+- **Cliente** = Usuario final
+- **Constructor** = Programador
+
+## Características de un buen requerimiento
+
+Un requerimiento debe ser como una buena dirección de casa:
+
+<Steps>
+1. **Claro**: Que cualquiera lo entienda
+2. **Específico**: Sin dudas sobre qué hacer
+3. **Medible**: Poder saber si se cumplió
+4. **Realizable**: Que se pueda hacer
+5. **Necesario**: Que realmente se necesite
+</Steps>
+
+### Ejemplos:
+
+<Tabs>
+<TabItem label="❌ Requerimiento malo">
+**"El sistema debe ser rápido"**
+
+¿Por qué está mal?
+- ¿Qué es "rápido"? ¿1 segundo? ¿10 segundos?
+- ¿Rápido en qué? ¿Cargar? ¿Buscar?
+- No se puede medir
+</TabItem>
+<TabItem label="✅ Requerimiento bueno">
+**"El sistema debe mostrar los resultados de búsqueda en menos de 3 segundos"**
+
+¿Por qué está bien?
+- Es específico: "resultados de búsqueda"
+- Es medible: "menos de 3 segundos"
+- Es claro: todos entienden qué significa
+</TabItem>
+</Tabs>
+
+## El proceso de los requerimientos
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "El Viaje de los Requerimientos" {
+  card "1. Descubrir" as descubrir #lightblue
+  card "2. Analizar" as analizar #lightgreen
+  card "3. Documentar" as documentar #lightyellow
+  card "4. Validar" as validar #lightpink
+  card "5. Gestionar" as gestionar #lightgray
+}
+
+descubrir --> analizar : Preguntamos qué necesitan
+analizar --> documentar : Entendemos y organizamos
+documentar --> validar : Escribimos claramente
+validar --> gestionar : Confirmamos con el cliente
+gestionar --> descubrir : Manejamos cambios
+
+note bottom of descubrir : "¿Qué necesitas?"
+note bottom of analizar : "¿Cómo funciona esto?"
+note bottom of documentar : "Escribamos todo"
+note bottom of validar : "¿Es esto correcto?"
+note bottom of gestionar : "¿Hay cambios?"
+@enduml`} />
+
+## Tipos básicos de requerimientos
+
+<Badge text="Hay 2 tipos principales" variant="note" />
+
+### 1. Lo que hace (Funcional)
+- "Debe permitir login"
+- "Debe enviar emails"
+- "Debe calcular precios"
+
+### 2. Cómo lo hace (No funcional)
+- "Debe ser rápido"
+- "Debe ser seguro"
+- "Debe verse bonito"
+
+## ¿Quién trabaja con requerimientos?
+
+<PlantUml code={`@startuml
+!theme plain
+skinparam backgroundColor white
+
+rectangle "El Equipo de Requerimientos" {
+  actor "Analista de Negocio" as analista #lightblue
+  actor "Product Owner" as po #lightgreen
+  actor "Usuarios" as usuarios #lightyellow
+  actor "Desarrolladores" as devs #lightpink
+  actor "Testers" as testers #lightgray
+}
+
+rectangle "Sus roles" {
+  card "Descubre necesidades" as descubre
+  card "Prioriza funciones" as prioriza
+  card "Da feedback" as feedback
+  card "Implementa soluciones" as implementa
+  card "Verifica cumplimiento" as verifica
+}
+
+analista --> descubre : Habla con clientes
+po --> prioriza : Decide qué es más importante
+usuarios --> feedback : Dice si le gusta
+devs --> implementa : Hace el programa
+testers --> verifica : Prueba que funcione
+
+note bottom of analista : El detective
+note bottom of po : El organizador
+note bottom of usuarios : Los jueces
+note bottom of devs : Los constructores
+note bottom of testers : Los inspectores
+@enduml`} />
+
+## Errores comunes
+
+<Aside type="caution">
+**¡Cuidado con estos errores!** Son como hoyos en el camino que pueden arruinar todo el proyecto.
+</Aside>
+
+### Los 5 errores más comunes:
+
+1. **Asumir cosas**: "Seguro que quiere esto"
+2. **No preguntar**: "Ya sé qué necesita"
+3. **No documentar**: "Me acuerdo de todo"
+4. **No validar**: "Está perfecto así"
+
+## Resumen: Los requerimientos son la base
+
+<Aside type="tip">
+**Recuerda**: Los requerimientos son como los cimientos de una casa. Si están mal, todo lo demás se tambalea. Si están bien, el proyecto será un éxito.
+</Aside>
+
+**En pocas palabras**: Los requerimientos son la lista de todo lo que el programa debe hacer para que los usuarios estén felices. Son la comunicación entre lo que la gente necesita y lo que los programadores van a construir.
+
+**La regla de oro**: Mejor gastar tiempo entendiendo bien los requerimientos al principio, que gastar tiempo y dinero arreglando errores después.
