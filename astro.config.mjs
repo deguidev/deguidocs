@@ -41,8 +41,8 @@ export default defineConfig({
 
 				{
 					label: '💾 Base de datos',
-					collapsed: true,
-					items: [
+					collapsed: false,
+					items: [ 
 						{
 							label: 'Oracle ❤️',
 							collapsed: true,
@@ -413,6 +413,17 @@ export default defineConfig({
 								{ label: '3. Cómo Capturar los Requerimientos', link: '/is/requerimientos/capturar-requerimientos/' },
 								{ label: '4. Análisis y Priorización', link: '/is/requerimientos/analisis-priorizacion/' },
 								{ label: '5. Documentación de Requerimientos', link: '/is/requerimientos/documentacion/' },
+							]
+						},
+						{
+							label: '🦒 Ciclo de Vida del Software',
+							collapsed: true,
+							items: [
+								{ label: '1. Concepto General del Ciclo de Vida', link: '/is/ciclo/concepto-general/' },
+								{ label: '2. Fases Principales', link: '/is/ciclo/fases-principales/' },
+								{ label: '3. Metodologías Tradicionales', link: '/is/ciclo/metodologias-tradicionales/' },
+								{ label: '4. Metodologías Ágiles', link: '/is/ciclo/metodologias-agiles/' },
+								{ label: '5. Diferencias entre Tradicionales y Ágiles', link: '/is/ciclo/diferencias/' },
 							]
 						}
 					]

@@ -1,0 +1,207 @@
+---
+title: 1. Concepto General del Ciclo de Vida
+description: Entendiendo el ciclo de vida del desarrollo de software
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+
+<Aside type="tip">
+**En palabras simples**: El ciclo de vida del software es como el viaje que hace un programa desde que es una idea hasta que se usa y mantiene. Es la historia completa de cómo nace, crece y evoluciona un software.
+</Aside>
+
+## ¿Qué es el Ciclo de Vida del Software?
+
+El ciclo de vida del software (SDLC - Software Development Life Cycle) es el proceso completo que sigue un producto de software desde su planificación inicial hasta su eventual retirada. Imagina que es como la vida de una persona: nace (se planifica), crece (se desarrolla), madura (se implementa) y eventualmente se retira o se renueva.
+
+### Características principales
+
+- **Estructurado**: Proporciona un marco ordenado para desarrollar software
+- **Predecible**: Permite estimar tiempos y recursos necesarios
+- **Controlado**: Facilita el seguimiento del progreso y la calidad
+- **Adaptable**: Puede ajustarse según las necesidades del proyecto
+
+## Importancia del Ciclo de Vida
+
+<Tabs>
+  <TabItem label="Para desarrolladores">
+    - Proporciona una hoja de ruta clara
+    - Ayuda a organizar el trabajo en etapas manejables
+    - Facilita la colaboración entre equipos
+    - Permite identificar problemas tempranamente
+  </TabItem>
+  <TabItem label="Para clientes">
+    - Ofrece visibilidad sobre el progreso del proyecto
+    - Permite intervenir en momentos clave
+    - Asegura que el producto final cumpla con las expectativas
+    - Facilita la estimación de costos y tiempos
+  </TabItem>
+  <TabItem label="Para la empresa">
+    - Mejora la gestión de recursos
+    - Reduce riesgos y costos inesperados
+    - Aumenta la calidad del producto final
+    - Facilita el mantenimiento a largo plazo
+  </TabItem>
+</Tabs>
+
+## Visión General del Ciclo de Vida
+
+<PlantUml code={`
+@startuml
+skinparam roundcorner 20
+skinparam componentStyle uml2
+skinparam ArrowColor #5D8AA8
+skinparam ComponentBorderColor #5D8AA8
+
+title Ciclo de Vida del Software - Visión General
+
+component "Planificacion Inicial" as plan #DEEAEE
+component "Analisis de Requerimientos" as req #B1CCBA
+component "Diseño" as design #F0B5B3
+component "Desarrollo" as dev #D3E397
+component "Pruebas" as test #F2E1AC
+component "Implementacion" as impl #C9C9FF
+component "Mantenimiento y Evolucion" as mant #FFD9DA
+
+plan -right-> req
+req -right-> design
+design -right-> dev
+dev -right-> test
+test -right-> impl
+impl -right-> mant
+mant -[#FF6347,dashed]-> plan : Nuevas versiones
+@enduml
+`} />
+
+## Modelos de Ciclo de Vida
+
+Existen diferentes formas de organizar el ciclo de vida del software. Cada modelo tiene sus propias características y es adecuado para diferentes tipos de proyectos.
+
+<Steps>
+1. **Modelo en Cascada**: Secuencial y ordenado, cada fase comienza cuando termina la anterior.
+
+2. **Modelo Iterativo**: Repite ciclos de desarrollo para mejorar el producto gradualmente.
+
+3. **Modelo Incremental**: Construye el software por partes funcionales que se van entregando.
+
+4. **Modelo en Espiral**: Combina elementos de diseño y prototipado en iteraciones.
+
+5. **Modelos Ágiles**: Adaptables y centrados en la colaboración y respuesta al cambio.
+</Steps>
+
+## Comparación Visual de Modelos
+
+<PlantUml code={`
+@startuml
+skinparam ArrowColor #5D8AA8
+skinparam ActivityBorderColor #5D8AA8
+skinparam ActivityBackgroundColor #ECECFF
+
+title Comparación de Modelos de Ciclo de Vida
+
+|Cascada|
+:Requisitos;
+:Diseño;
+:Implementación;
+:Verificacion;
+:Mantenimiento;
+
+|Iterativo|
+:Planificacion;
+repeat
+  :Requisitos;
+  :Diseño;
+  :Implementacion;
+  :Pruebas;
+repeat while (Producto completo?) is (No)
+:Entrega final;
+
+|Agil|
+:Planificacion inicial;
+repeat
+  :Planificacion de sprint;
+  :Desarrollo;
+  :Revision;
+  :Entrega incremental;
+repeat while (Proyecto terminado?) is (No)
+:Producto final;
+@enduml
+`} />
+
+## Beneficios de Seguir un Ciclo de Vida
+
+<Aside type="note">
+Seguir un ciclo de vida estructurado es como usar un mapa para un viaje: te ayuda a llegar a tu destino de manera más eficiente y con menos sorpresas en el camino.
+</Aside>
+
+- **Mejor calidad del software**: Procesos sistemáticos que aseguran revisiones en cada etapa
+- **Detección temprana de problemas**: Identificar y corregir errores cuando son más fáciles y baratos de solucionar
+- **Mayor satisfacción del cliente**: Entregas que cumplen con las expectativas y requisitos
+- **Mejor gestión de recursos**: Planificación adecuada de tiempo, personal y presupuesto
+- **Documentación consistente**: Registro del proceso para referencia futura y mantenimiento
+
+## Factores que Influyen en la Elección del Ciclo de Vida
+
+<PlantUml code={`
+@startuml
+skinparam ArrowColor #5D8AA8
+skinparam rectangleBorderColor #5D8AA8
+skinparam rectangleBackgroundColor #ECECFF
+
+title Factores para Elegir un Modelo de Ciclo de Vida
+
+rectangle "Tamaño del Proyecto" as size
+rectangle "Claridad de Requisitos" as req
+rectangle "Complejidad" as complex
+rectangle "Riesgo" as risk
+rectangle "Tiempo Disponible" as time
+rectangle "Experiencia del Equipo" as exp
+rectangle "Participacion del Cliente" as client
+
+rectangle "Eleccion del Modelo de Ciclo de Vida" as choice
+
+size --> choice
+req --> choice
+complex --> choice
+risk --> choice
+time --> choice
+exp --> choice
+client --> choice
+@enduml
+`} />
+
+## Evolución del Concepto
+
+El concepto de ciclo de vida del software ha evolucionado significativamente desde sus inicios:
+
+<Tabs>
+  <TabItem label="1960s-1970s">
+    - Enfoque lineal y secuencial (Cascada)
+    - Procesos rígidos y documentación extensa
+    - Poca interacción con el cliente durante el desarrollo
+  </TabItem>
+  <TabItem label="1980s-1990s">
+    - Surgimiento de modelos iterativos e incrementales
+    - Mayor énfasis en la gestión de riesgos
+    - Introducción del modelo en espiral
+  </TabItem>
+  <TabItem label="2000s-Presente">
+    - Adopción generalizada de metodologías ágiles
+    - Ciclos de desarrollo más cortos y frecuentes
+    - Mayor colaboración con el cliente
+    - DevOps y entrega continua
+  </TabItem>
+</Tabs>
+
+## Resumen
+
+El ciclo de vida del software es un marco conceptual que define las etapas necesarias para desarrollar y mantener un producto de software. Proporciona estructura, previsibilidad y control al proceso de desarrollo, adaptándose a diferentes necesidades y contextos.
+
+<Aside type="tip">
+Recuerda que no existe un modelo de ciclo de vida "perfecto" para todos los proyectos. La clave está en seleccionar el enfoque que mejor se adapte a las necesidades específicas de tu proyecto y equipo.
+</Aside>

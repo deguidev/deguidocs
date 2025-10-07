@@ -1,0 +1,431 @@
+---
+title: 2. Fases Principales
+description: Las etapas fundamentales en el ciclo de vida del desarrollo de software
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+<Aside type="tip">
+**En palabras simples**: Las fases principales son como los pasos que sigues para construir una casa: primero planificas, luego diseñas, construyes, verificas que todo funcione, te mudas y finalmente la mantienes.
+</Aside>
+
+El desarrollo de software sigue una serie de etapas bien definidas que nos ayudan a crear aplicaciones de manera ordenada y eficiente. Cada fase tiene objetivos específicos y produce resultados que alimentan la siguiente etapa.
+
+## Visión General de las Fases
+
+<PlantUml code={`
+@startuml
+skinparam componentStyle uml2
+
+title Fases Principales del Ciclo de Vida
+
+component "1. Analisis" as analisis
+component "2. Diseño" as diseño
+component "3. Desarrollo" as desarrollo
+component "4. Pruebas" as pruebas
+component "5. Implementacion" as implementacion
+component "6. Mantenimiento" as mantenimiento
+
+analisis --> diseño : Requisitos
+diseño --> desarrollo : Arquitectura
+desarrollo --> pruebas : Codigo
+pruebas --> implementacion : Software validado
+implementacion --> mantenimiento : Sistema en produccion
+mantenimiento ..> analisis : Nuevos requisitos
+@enduml
+`} />
+
+## 1. Análisis <Badge text="¿Qué necesitamos?" variant="tip" />
+
+El análisis es como ser un detective que investiga exactamente qué necesita el cliente. Es la fase donde descubrimos y documentamos todos los requisitos del software.
+
+### ¿Qué hacemos en esta fase?
+
+<Tabs>
+  <TabItem label="Actividades principales">
+    - **Recopilación de requisitos**: Entrevistas con usuarios y stakeholders
+    - **Análisis de necesidades**: Identificar problemas a resolver
+    - **Documentación**: Crear especificaciones claras y detalladas
+    - **Validación**: Confirmar que entendimos correctamente las necesidades
+  </TabItem>
+  <TabItem label="Técnicas utilizadas">
+    - Entrevistas estructuradas
+    - Encuestas y cuestionarios
+    - Observación directa
+    - Análisis de documentos existentes
+    - Talleres colaborativos
+  </TabItem>
+  <TabItem label="Entregables">
+    - Documento de requisitos funcionales
+    - Especificaciones no funcionales
+    - Casos de uso
+    - Historias de usuario
+    - Criterios de aceptación
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+**Ejemplo práctico**: Si estamos creando una app de delivery, en esta fase preguntaríamos: ¿Qué tipos de usuarios tendremos? ¿Cómo harán los pedidos? ¿Qué información necesita el repartidor?
+</Aside>
+
+## 2. Diseño <Badge text="¿Cómo lo haremos?" variant="note" />
+
+El diseño es como crear los planos de una casa antes de construirla. Aquí definimos la arquitectura y estructura de nuestro software.
+
+### ¿Qué hacemos en esta fase?
+
+<Tabs>
+  <TabItem label="Actividades principales">
+    - **Diseño arquitectónico**: Definir la estructura general del sistema
+    - **Diseño de interfaces**: Crear mockups y prototipos de UI/UX
+    - **Diseño de base de datos**: Modelar entidades, relaciones y esquemas
+    - **Diseño de algoritmos**: Especificar soluciones a problemas complejos
+    - **Diseño de componentes**: Definir módulos y sus interacciones
+    - **Validación del diseño**: Revisar y aprobar las especificaciones técnicas
+  </TabItem>
+  <TabItem label="Técnicas utilizadas">
+    - Modelado de arquitectura (capas, microservicios)
+    - Wireframing y prototipado
+    - Modelado entidad-relación (ER)
+    - Diagramas de flujo de datos
+    - Patrones de diseño (MVC, Observer, Factory)
+    - Revisiones técnicas y peer reviews
+  </TabItem>
+  <TabItem label="Entregables">
+    - **Diagramas UML**: Clases, Componentes, Despliegue
+    - **Diagramas ER**: Modelo conceptual y físico de BD
+    - Especificaciones técnicas detalladas
+    - Mockups y prototipos de interfaz
+    - Documentación de arquitectura
+    - Estándares de codificación y convenciones
+  </TabItem>
+</Tabs>
+
+### Tipos de diseño
+
+<PlantUml code={`
+@startuml
+title Tipos de Diseño en el Desarrollo de Software
+
+rectangle "Diseño de Alto Nivel" as alto {
+  rectangle "Arquitectura del Sistema" as arq
+  rectangle "Modulos Principales" as mod
+  rectangle "Interfaces entre Componentes" as int
+}
+
+rectangle "Diseño Detallado" as detalle {
+  rectangle "Algoritmos Especificos" as alg
+  rectangle "Estructuras de Datos" as datos
+  rectangle "Interfaces de Usuario" as ui
+}
+
+rectangle "Diseño de Base de Datos" as bd {
+  rectangle "Modelo Entidad-Relacion" as er
+  rectangle "Esquemas de Tablas" as tablas
+  rectangle "Indices y Restricciones" as indices
+}
+
+alto --> detalle
+detalle --> bd
+@enduml
+`} />
+
+## 3. Desarrollo <Badge text="¡Construyamos!" variant="success" />
+
+El desarrollo es donde finalmente escribimos el código. Es como la construcción de la casa siguiendo los planos que diseñamos.
+
+### ¿Qué hacemos en esta fase?
+
+<Tabs>
+  <TabItem label="Actividades principales">
+    - **Codificación**: Escribir el código fuente siguiendo las especificaciones
+    - **Implementación de algoritmos**: Convertir diseños en código funcional
+    - **Integración de componentes**: Conectar diferentes módulos del sistema
+    - **Documentación de código**: Comentar y documentar el código fuente
+    - **Control de versiones**: Gestionar cambios y colaboración en el código
+    - **Refactoring**: Mejorar la estructura del código sin cambiar funcionalidad
+  </TabItem>
+  <TabItem label="Técnicas utilizadas">
+    - Programación orientada a objetos
+    - Patrones de diseño (Singleton, Factory, Observer)
+    - Test-Driven Development (TDD)
+    - Pair Programming y Code Reviews
+    - Integración continua (CI/CD)
+    - Metodologías ágiles (Scrum, Kanban)
+  </TabItem>
+  <TabItem label="Entregables">
+    - **Código fuente**: Implementación completa de funcionalidades
+    - **Diagramas UML**: Secuencia (para flujos complejos)
+    - Documentación técnica del código
+    - Scripts de base de datos y migraciones
+    - Configuraciones de ambiente de desarrollo
+    - Reportes de progreso y métricas de código
+  </TabItem>
+</Tabs>
+
+## 4. Pruebas <Badge text="¿Funciona bien?" variant="caution" />
+
+Las pruebas son como inspeccionar la casa antes de habitarla. Verificamos que todo funcione correctamente y cumpla con los requisitos.
+
+### ¿Qué hacemos en esta fase?
+
+<Tabs>
+  <TabItem label="Actividades principales">
+    - **Planificación de pruebas**: Definir estrategias y casos de prueba
+    - **Ejecución de pruebas**: Realizar pruebas unitarias, integración y sistema
+    - **Detección de defectos**: Identificar y documentar errores encontrados
+    - **Verificación de requisitos**: Confirmar que se cumplen las especificaciones
+    - **Pruebas de regresión**: Asegurar que nuevos cambios no rompan funcionalidad existente
+    - **Validación de rendimiento**: Evaluar velocidad, carga y eficiencia del sistema
+  </TabItem>
+  <TabItem label="Técnicas utilizadas">
+    - Testing automatizado (unit tests, integration tests)
+    - Pruebas manuales exploratorias
+    - Test-Driven Development (TDD)
+    - Behavior-Driven Development (BDD)
+    - Pruebas de carga y estrés
+    - Análisis estático de código
+  </TabItem>
+  <TabItem label="Entregables">
+    - **Plan de pruebas**: Estrategia y casos de prueba documentados
+    - **Diagramas UML**: Actividades (para flujos de prueba)
+    - Reportes de defectos y bugs encontrados
+    - Scripts de pruebas automatizadas
+    - Métricas de cobertura de código
+    - Certificación de calidad del software
+  </TabItem>
+</Tabs>
+
+### Pirámide de pruebas
+
+<PlantUml code={`
+@startuml
+title Piramide de Pruebas
+
+rectangle "Pruebas End-to-End" as ete
+rectangle "Pruebas de Integracion" as integracion
+rectangle "Pruebas Unitarias" as unitarias
+
+note right of ete : Pocas, lentas, costosas
+note right of integracion : Moderadas, verifican conexiones
+note right of unitarias : Muchas, rapidas, baratas
+
+ete --> integracion
+integracion --> unitarias
+@enduml
+`} />
+
+<Aside type="caution">
+**Importante**: Las pruebas no solo buscan errores, también confirman que el software hace lo que debe hacer. Es mejor encontrar problemas antes de que los usuarios los descubran.
+</Aside>
+
+## 5. Implementación <Badge text="¡A producción!" variant="success" />
+
+La implementación es el momento de "mudarse a la casa". Ponemos el software en funcionamiento para que los usuarios reales puedan usarlo.
+
+### ¿Qué hacemos en esta fase?
+
+<Tabs>
+  <TabItem label="Actividades principales">
+    - **Preparación del ambiente**: Configurar servidores y infraestructura de producción
+    - **Despliegue del software**: Instalar y configurar la aplicación en producción
+    - **Migración de datos**: Transferir información del sistema anterior al nuevo
+    - **Capacitación de usuarios**: Entrenar a los usuarios finales en el nuevo sistema
+    - **Monitoreo inicial**: Vigilar rendimiento y detectar problemas tempranamente
+    - **Soporte post-implementación**: Resolver dudas y problemas inmediatos
+  </TabItem>
+  <TabItem label="Técnicas utilizadas">
+    - Automatización de despliegues (CI/CD)
+    - Estrategias de implementación (Blue-Green, Canary)
+    - Monitoreo y logging en tiempo real
+    - Rollback automatizado en caso de fallos
+    - Capacitación estructurada y documentación de usuario
+    - Pruebas de aceptación del usuario (UAT)
+  </TabItem>
+  <TabItem label="Entregables">
+    - **Sistema en producción**: Software funcionando para usuarios reales
+    - **Diagramas UML**: Despliegue (arquitectura de infraestructura)
+    - Documentación de usuario final
+    - Manuales de operación y mantenimiento
+    - Plan de contingencia y rollback
+    - Reportes de implementación y métricas de adopción
+  </TabItem>
+</Tabs>
+
+### Estrategias de implementación
+
+<PlantUml code={`
+@startuml
+title Estrategias de Implementacion
+
+rectangle "Big Bang" as bigbang
+rectangle "Implementacion Gradual" as gradual
+rectangle "Por Fases" as fases
+rectangle "Piloto" as piloto  
+rectangle "Paralela" as paralela
+rectangle "Blue-Green" as bluegreen
+rectangle "Canary" as canary
+
+note bottom of bigbang : Todo de una vez
+note bottom of bluegreen : Dos ambientes identicos
+note bottom of canary : Pequeno grupo primero
+
+gradual --> fases
+gradual --> piloto
+gradual --> paralela
+@enduml
+`} />
+
+## 6. Mantenimiento <Badge text="Cuidemos el sistema" variant="note" />
+
+El mantenimiento es como cuidar la casa después de mudarse: reparaciones, mejoras y adaptaciones a nuevas necesidades.
+
+### ¿Qué hacemos en esta fase?
+
+<Tabs>
+  <TabItem label="Actividades principales">
+    - **Monitoreo continuo**: Supervisar el rendimiento y funcionamiento del sistema
+    - **Corrección de errores**: Solucionar bugs y problemas reportados por usuarios
+    - **Actualizaciones de seguridad**: Aplicar parches y cerrar vulnerabilidades
+    - **Mejoras de funcionalidad**: Implementar nuevas características solicitadas
+    - **Optimización de rendimiento**: Mejorar velocidad y eficiencia del sistema
+    - **Gestión de cambios**: Controlar y documentar todas las modificaciones
+  </TabItem>
+  <TabItem label="Técnicas utilizadas">
+    - Monitoreo automatizado y alertas
+    - Análisis de logs y métricas de rendimiento
+    - Gestión de incidentes y tickets de soporte
+    - Versionado y control de releases
+    - Análisis de impacto de cambios
+    - Backup y recuperación de datos
+  </TabItem>
+  <TabItem label="Entregables">
+    - **Actualizaciones y parches**: Nuevas versiones del software
+    - **Diagramas UML actualizados**: Clases, Componentes (cuando hay cambios)
+    - Reportes de rendimiento y disponibilidad
+    - Documentación de cambios y versiones
+    - Planes de backup y recuperación
+    - Métricas de satisfacción del usuario
+  </TabItem>
+</Tabs>
+
+### Tipos de mantenimiento
+
+<Tabs>
+  <TabItem label="Correctivo">
+    - **Corrección de errores**: Solucionar bugs reportados por usuarios
+    - **Parches de seguridad**: Cerrar vulnerabilidades descubiertas
+    - **Fixes urgentes**: Resolver problemas críticos rápidamente
+  </TabItem>
+  <TabItem label="Adaptativo">
+    - **Nuevos requisitos**: Agregar funcionalidades solicitadas
+    - **Cambios de tecnología**: Actualizar frameworks y librerías
+    - **Compliance**: Adaptarse a nuevas regulaciones
+  </TabItem>
+  <TabItem label="Perfectivo">
+    - **Optimización**: Mejorar rendimiento y eficiencia
+    - **Refactoring**: Limpiar y organizar mejor el código
+    - **Usabilidad**: Mejorar la experiencia del usuario
+  </TabItem>
+  <TabItem label="Preventivo">
+    - **Monitoreo proactivo**: Detectar problemas antes de que ocurran
+    - **Actualizaciones regulares**: Mantener el sistema actualizado
+    - **Documentación**: Mantener la documentación al día
+  </TabItem>
+</Tabs>
+
+## Interrelación entre Fases
+
+<PlantUml code={`
+@startuml
+title Flujo de Informacion entre Fases
+
+actor "Usuario" as user
+rectangle "Analisis" as analisis
+rectangle "Diseño" as diseño
+rectangle "Desarrollo" as desarrollo
+rectangle "Pruebas" as pruebas
+rectangle "Implementacion" as implementacion
+rectangle "Mantenimiento" as mantenimiento
+
+user --> analisis : Requisitos
+analisis --> diseño : Especificaciones
+diseño --> desarrollo : Planos tecnicos
+desarrollo --> pruebas : Codigo fuente
+pruebas --> implementacion : Software validado
+implementacion --> mantenimiento : Sistema en produccion
+mantenimiento --> user : Valor entregado
+
+mantenimiento ..> analisis : Feedback y nuevos requisitos
+pruebas ..> desarrollo : Errores encontrados
+desarrollo ..> diseño : Problemas de implementacion
+@enduml
+`} />
+
+## Diagramas UML por Fase
+
+Una guía rápida de qué diagramas UML son más útiles en cada fase del desarrollo:
+
+<PlantUml code={`
+@startuml
+title Diagramas UML en las Fases del Ciclo de Vida
+
+rectangle "1. Analisis" as analisis {
+  rectangle "Casos de Uso" as uc
+  rectangle "Actividades" as act1
+}
+
+rectangle "2. Diseño" as diseño {
+  rectangle "Clases" as class
+  rectangle "Componentes" as comp
+  rectangle "Entidad-Relacion" as er
+}
+
+rectangle "3. Desarrollo" as desarrollo {
+  rectangle "Secuencia" as seq
+  rectangle "Colaboracion" as col
+}
+
+rectangle "4. Pruebas" as pruebas {
+  rectangle "Actividades" as act2
+  rectangle "Estados" as state
+}
+
+rectangle "5. Implementacion" as implementacion {
+  rectangle "Despliegue" as deploy
+  rectangle "Componentes" as comp2
+}
+
+rectangle "6. Mantenimiento" as mantenimiento {
+  rectangle "Clases actualizadas" as class2
+  rectangle "Componentes actualizados" as comp3
+}
+
+analisis --> diseño
+diseño --> desarrollo
+desarrollo --> pruebas
+pruebas --> implementacion
+implementacion --> mantenimiento
+@enduml
+`} />
+
+## Resumen
+
+Las seis fases principales del ciclo de vida del software trabajan en conjunto para transformar una idea en un sistema funcional y mantenible:
+
+1. **Análisis**: Entendemos qué necesitamos construir → **UML**: Casos de Uso, Actividades
+2. **Diseño**: Planificamos cómo lo construiremos → **UML**: Clases, Componentes, ER
+3. **Desarrollo**: Construimos el software → **UML**: Secuencia, Colaboración
+4. **Pruebas**: Verificamos que funcione correctamente → **UML**: Actividades, Estados
+5. **Implementación**: Lo ponemos en funcionamiento → **UML**: Despliegue, Componentes
+6. **Mantenimiento**: Lo cuidamos y mejoramos continuamente → **UML**: Actualizaciones de diagramas existentes
+
+<Aside type="tip">
+Recuerda que aunque estas fases se presentan de forma secuencial, en la práctica pueden solaparse, repetirse o ejecutarse de manera iterativa según la metodología de desarrollo que uses. Los diagramas UML son herramientas de comunicación que nos ayudan a visualizar y documentar diferentes aspectos del sistema en cada fase.
+</Aside>
+
