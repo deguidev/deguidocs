@@ -1,0 +1,1264 @@
+---
+title: 4. Contenido del Cuerpo
+description: Etiquetas de texto, formato, listas, citas y abreviaciones
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
+
+El **cuerpo del documento** (`<body>`) contiene todo el contenido visible de la página web. Aquí es donde colocas texto, imágenes, enlaces, listas y todos los elementos que los usuarios verán e interactuarán.
+
+<Aside type="tip">
+👁️ **Concepto clave:** Todo lo que está dentro del `<body>` es visible en el navegador. Es el contenido real de tu página web.
+</Aside>
+
+---
+
+## 📝 Etiquetas de Texto
+
+Las etiquetas de texto son fundamentales para estructurar y organizar el contenido escrito de tu página.
+
+### Párrafos: `<p>`
+
+El párrafo es el elemento más básico para texto.
+
+<Tabs>
+<TabItem label="Uso básico">
+
+```html
+<!-- Párrafo simple -->
+<p>Este es un párrafo de texto.</p>
+
+<!-- Múltiples párrafos -->
+<p>Primer párrafo con contenido.</p>
+<p>Segundo párrafo con más información.</p>
+<p>Tercer párrafo que continúa la explicación.</p>
+
+<!-- Párrafo con contenido largo -->
+<p>
+  Este es un párrafo más extenso que puede contener múltiples líneas
+  de texto. Los navegadores automáticamente ajustan el texto al ancho
+  disponible y crean saltos de línea cuando es necesario.
+</p>
+```
+
+**Características:**
+- ✅ Elemento de **bloque** (ocupa todo el ancho)
+- ✅ Agrega espacio automático arriba y abajo
+- ✅ Puede contener texto y elementos **inline**
+- ❌ No puede contener otros elementos de bloque
+
+</TabItem>
+
+<TabItem label="Buenas prácticas">
+
+### ✅ Uso correcto
+
+```html
+<!-- ✅ BUENO: Un párrafo por idea -->
+<p>HTML es el lenguaje de marcado estándar para crear páginas web.</p>
+<p>CSS se usa para dar estilo y diseño a las páginas HTML.</p>
+<p>JavaScript añade interactividad y comportamiento dinámico.</p>
+
+<!-- ✅ BUENO: Párrafo con formato inline -->
+<p>
+  Este es un texto con <strong>palabras importantes</strong> y 
+  <em>énfasis</em> en ciertas partes.
+</p>
+
+<!-- ✅ BUENO: Párrafo con enlace -->
+<p>
+  Para más información, visita 
+  <a href="https://ejemplo.com">nuestro sitio web</a>.
+</p>
+```
+
+### ❌ Errores comunes
+
+```html
+<!-- ❌ MALO: Usar <br> en lugar de párrafos -->
+Primer texto<br>
+Segundo texto<br>
+Tercer texto
+
+<!-- ✅ CORRECTO: Usar párrafos -->
+<p>Primer texto</p>
+<p>Segundo texto</p>
+<p>Tercer texto</p>
+
+<!-- ❌ MALO: Párrafos vacíos para espaciado -->
+<p>Texto</p>
+<p></p>
+<p></p>
+<p>Más texto</p>
+
+<!-- ✅ CORRECTO: Usar CSS para espaciado -->
+<p>Texto</p>
+<p style="margin-top: 40px;">Más texto</p>
+
+<!-- ❌ MALO: Anidar párrafos -->
+<p>
+  Texto exterior
+  <p>Texto interior</p>
+</p>
+
+<!-- ✅ CORRECTO: Párrafos separados -->
+<p>Texto exterior</p>
+<p>Texto interior</p>
+```
+
+</TabItem>
+
+<TabItem label="Ejemplo visual">
+
+<LivePreview 
+  title="🎨 Párrafos en acción"
+  html={`<div style="font-family: Georgia, serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.8; color: #2c3e50;">
+  
+  <h2 style="color: #34495e; margin-bottom: 20px;">Artículo de Ejemplo</h2>
+  
+  <p style="margin-bottom: 20px; text-align: justify;">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod 
+    tempor incididunt ut labore et dolore magna aliqua. Este es un ejemplo de 
+    párrafo con texto justificado que se ajusta automáticamente al ancho del 
+    contenedor.
+  </p>
+  
+  <p style="margin-bottom: 20px; text-align: justify;">
+    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. Los 
+    párrafos crean <strong>separación visual</strong> entre ideas y facilitan 
+    la <em>lectura del contenido</em>. Cada párrafo debe contener una idea 
+    principal.
+  </p>
+  
+  <p style="margin-bottom: 20px; background: #ecf0f1; padding: 15px; border-left: 4px solid #3498db; border-radius: 4px;">
+    💡 Este párrafo tiene estilos especiales aplicados con CSS para destacarlo 
+    del resto del contenido. Los párrafos son muy versátiles.
+  </p>
+  
+  <p style="margin-bottom: 0; text-align: justify;">
+    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum 
+    dolore eu fugiat nulla pariatur. Para más información, visita 
+    <a href="#" style="color: #3498db; text-decoration: none;">este enlace</a>.
+  </p>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+### Encabezados: `<h1>` hasta `<h6>`
+
+Los encabezados crean una jerarquía de títulos en tu página.
+
+<Tabs>
+<TabItem label="Jerarquía">
+
+```html
+<!-- Jerarquía completa de encabezados -->
+<h1>Título Principal (H1) - Solo uno por página</h1>
+
+<h2>Sección Principal (H2)</h2>
+<p>Contenido de la sección...</p>
+
+<h3>Subsección (H3)</h3>
+<p>Contenido de la subsección...</p>
+
+<h4>Sub-subsección (H4)</h4>
+<p>Más detalles...</p>
+
+<h5>Título Menor (H5)</h5>
+<p>Información adicional...</p>
+
+<h6>Título Más Pequeño (H6)</h6>
+<p>Detalles finales...</p>
+```
+
+**Reglas de jerarquía:**
+
+| Nivel | Uso | Cantidad recomendada |
+|-------|-----|---------------------|
+| `<h1>` | Título principal de la página | **Solo 1** por página |
+| `<h2>` | Secciones principales | Múltiples |
+| `<h3>` | Subsecciones | Múltiples |
+| `<h4>` | Sub-subsecciones | Según necesidad |
+| `<h5>` | Títulos menores | Raro |
+| `<h6>` | Títulos más pequeños | Muy raro |
+
+<Aside type="caution">
+⚠️ **Importante:** No saltes niveles. No uses `<h1>` seguido de `<h3>` sin un `<h2>` en medio.
+</Aside>
+
+</TabItem>
+
+<TabItem label="Buenas prácticas">
+
+### ✅ Estructura correcta
+
+```html
+<!-- ✅ BUENO: Jerarquía lógica -->
+<h1>Guía de HTML5</h1>
+
+<h2>Introducción</h2>
+<p>Contenido de introducción...</p>
+
+<h2>Elementos Básicos</h2>
+<p>Explicación de elementos...</p>
+
+<h3>Etiquetas de Texto</h3>
+<p>Detalles sobre texto...</p>
+
+<h3>Etiquetas de Formato</h3>
+<p>Detalles sobre formato...</p>
+
+<h2>Conclusión</h2>
+<p>Resumen final...</p>
+```
+
+### ❌ Errores comunes
+
+```html
+<!-- ❌ MALO: Múltiples H1 -->
+<h1>Título 1</h1>
+<h1>Título 2</h1>
+<h1>Título 3</h1>
+
+<!-- ✅ CORRECTO: Un H1, resto H2 -->
+<h1>Título Principal</h1>
+<h2>Sección 1</h2>
+<h2>Sección 2</h2>
+
+<!-- ❌ MALO: Saltar niveles -->
+<h1>Título</h1>
+<h3>Subsección</h3> <!-- Falta H2 -->
+
+<!-- ✅ CORRECTO: Orden secuencial -->
+<h1>Título</h1>
+<h2>Sección</h2>
+<h3>Subsección</h3>
+
+<!-- ❌ MALO: Usar encabezados solo por tamaño -->
+<h5>Texto pequeño</h5>
+
+<!-- ✅ CORRECTO: Usar CSS para tamaño -->
+<p style="font-size: 14px;">Texto pequeño</p>
+
+<!-- ❌ MALO: Encabezados vacíos -->
+<h2></h2>
+
+<!-- ✅ CORRECTO: Siempre con contenido -->
+<h2>Título Descriptivo</h2>
+```
+
+### 📐 Estructura de documento típica
+
+```html
+<body>
+  <!-- Título principal -->
+  <h1>Mi Blog de Tecnología</h1>
+  
+  <!-- Artículo -->
+  <article>
+    <h2>Cómo Aprender JavaScript</h2>
+    
+    <h3>Fundamentos</h3>
+    <p>Contenido sobre fundamentos...</p>
+    
+    <h3>Práctica</h3>
+    <p>Contenido sobre práctica...</p>
+    
+    <h4>Ejercicios Básicos</h4>
+    <p>Lista de ejercicios...</p>
+    
+    <h4>Proyectos</h4>
+    <p>Ideas de proyectos...</p>
+  </article>
+  
+  <!-- Otro artículo -->
+  <article>
+    <h2>Guía de CSS Grid</h2>
+    <p>Contenido del artículo...</p>
+  </article>
+</body>
+```
+
+</TabItem>
+
+<TabItem label="SEO y accesibilidad">
+
+### Importancia para SEO
+
+**Los encabezados son cruciales para:**
+- 🔍 **SEO**: Google usa H1-H6 para entender la estructura
+- ♿ **Accesibilidad**: Lectores de pantalla navegan por encabezados
+- 📖 **Legibilidad**: Usuarios escanean títulos
+
+**Mejores prácticas SEO:**
+
+```html
+<!-- ✅ BUENO: H1 descriptivo con palabra clave -->
+<h1>Guía Completa de HTML5 para Principiantes 2024</h1>
+
+<!-- ✅ BUENO: H2 con palabras clave relevantes -->
+<h2>¿Qué es HTML5 y para qué sirve?</h2>
+
+<!-- ✅ BUENO: H3 específicos -->
+<h3>Ventajas de HTML5 sobre versiones anteriores</h3>
+
+<!-- ❌ MALO: Títulos genéricos -->
+<h1>Página</h1>
+<h2>Sección 1</h2>
+<h3>Parte A</h3>
+
+<!-- ❌ MALO: Títulos demasiado largos -->
+<h2>
+  Esta es una sección muy larga que explica absolutamente todo 
+  sobre HTML5 incluyendo todos los detalles posibles
+</h2>
+```
+
+**Longitud recomendada:**
+- `<h1>`: 20-70 caracteres
+- `<h2>`: 20-60 caracteres
+- `<h3>-<h6>`: 20-50 caracteres
+
+</TabItem>
+
+<TabItem label="Ejemplo visual">
+
+<LivePreview 
+  title="🎨 Jerarquía de encabezados"
+  html={`<div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f8f9fa;">
+  
+  <!-- H1 - Título principal -->
+  <h1 style="font-size: 36px; color: #2c3e50; margin: 0 0 30px 0; padding-bottom: 15px; border-bottom: 3px solid #3498db;">
+    📚 Guía Completa de HTML5
+  </h1>
+  
+  <!-- H2 - Sección principal -->
+  <h2 style="font-size: 28px; color: #34495e; margin: 30px 0 15px 0; padding-left: 10px; border-left: 4px solid #3498db;">
+    Introducción a HTML
+  </h2>
+  <p style="color: #555; line-height: 1.6; margin: 0 0 20px 0;">
+    HTML es el lenguaje de marcado estándar para crear páginas web...
+  </p>
+  
+  <!-- H3 - Subsección -->
+  <h3 style="font-size: 22px; color: #34495e; margin: 25px 0 12px 0;">
+    ¿Qué es HTML?
+  </h3>
+  <p style="color: #555; line-height: 1.6; margin: 0 0 15px 0;">
+    HTML significa HyperText Markup Language...
+  </p>
+  
+  <!-- H4 - Sub-subsección -->
+  <h4 style="font-size: 18px; color: #555; margin: 20px 0 10px 0;">
+    Historia de HTML
+  </h4>
+  <p style="color: #666; line-height: 1.6; margin: 0 0 15px 0;">
+    HTML fue creado por Tim Berners-Lee en 1991...
+  </p>
+  
+  <!-- H5 - Título menor -->
+  <h5 style="font-size: 16px; color: #666; margin: 15px 0 8px 0;">
+    Versiones de HTML
+  </h5>
+  <p style="color: #666; line-height: 1.6; margin: 0 0 15px 0; font-size: 14px;">
+    HTML ha evolucionado desde HTML 1.0 hasta HTML5...
+  </p>
+  
+  <!-- H6 - Título más pequeño -->
+  <h6 style="font-size: 14px; color: #777; margin: 12px 0 6px 0; text-transform: uppercase; letter-spacing: 1px;">
+    Nota adicional
+  </h6>
+  <p style="color: #777; line-height: 1.6; margin: 0; font-size: 13px;">
+    Este es el nivel más bajo de encabezado, raramente usado.
+  </p>
+  
+  <!-- Visualización de tamaños -->
+  <div style="margin-top: 40px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h4 style="margin: 0 0 15px 0; color: #2c3e50;">Comparación de tamaños:</h4>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <span style="font-weight: bold; width: 40px;">H1:</span>
+        <div style="flex: 1; height: 36px; background: linear-gradient(90deg, #3498db, #2980b9); border-radius: 4px;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <span style="font-weight: bold; width: 40px;">H2:</span>
+        <div style="flex: 1; height: 28px; background: linear-gradient(90deg, #3498db, #2980b9); border-radius: 4px;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <span style="font-weight: bold; width: 40px;">H3:</span>
+        <div style="flex: 1; height: 22px; background: linear-gradient(90deg, #3498db, #2980b9); border-radius: 4px;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <span style="font-weight: bold; width: 40px;">H4:</span>
+        <div style="flex: 1; height: 18px; background: linear-gradient(90deg, #3498db, #2980b9); border-radius: 4px;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <span style="font-weight: bold; width: 40px;">H5:</span>
+        <div style="flex: 1; height: 16px; background: linear-gradient(90deg, #3498db, #2980b9); border-radius: 4px;"></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <span style="font-weight: bold; width: 40px;">H6:</span>
+        <div style="flex: 1; height: 14px; background: linear-gradient(90deg, #3498db, #2980b9); border-radius: 4px;"></div>
+      </div>
+    </div>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎨 Etiquetas de Formato
+
+Las etiquetas de formato dan énfasis y estilo al texto.
+
+<Tabs>
+<TabItem label="Énfasis y importancia">
+
+### Etiquetas semánticas de formato
+
+```html
+<!-- Strong - Importancia fuerte (negrita) -->
+<p>Este texto es <strong>muy importante</strong>.</p>
+
+<!-- Em - Énfasis (cursiva) -->
+<p>Este texto tiene <em>énfasis</em>.</p>
+
+<!-- Mark - Texto resaltado -->
+<p>Este texto está <mark>resaltado</mark> como referencia.</p>
+
+<!-- Small - Texto pequeño (letra chica) -->
+<p>Precio: $99.99 <small>(IVA incluido)</small></p>
+
+<!-- Del - Texto eliminado (tachado) -->
+<p>Precio anterior: <del>$150</del> Ahora: $99</p>
+
+<!-- Ins - Texto insertado (subrayado) -->
+<p>El precio es <ins>$99.99</ins></p>
+
+<!-- Sub - Subíndice -->
+<p>Fórmula del agua: H<sub>2</sub>O</p>
+
+<!-- Sup - Superíndice -->
+<p>Ecuación: x<sup>2</sup> + y<sup>2</sup> = z<sup>2</sup></p>
+
+<!-- Code - Código inline -->
+<p>Usa la función <code>console.log()</code> para depurar.</p>
+
+<!-- Kbd - Tecla del teclado -->
+<p>Presiona <kbd>Ctrl</kbd> + <kbd>C</kbd> para copiar.</p>
+
+<!-- Samp - Salida de programa -->
+<p>El sistema devolvió: <samp>Error 404</samp></p>
+
+<!-- Var - Variable -->
+<p>La variable <var>x</var> representa el valor desconocido.</p>
+```
+
+**Diferencias importantes:**
+
+| Etiqueta | Significado | Visual | Uso |
+|----------|-------------|--------|-----|
+| `<strong>` | Importancia fuerte | **Negrita** | Texto importante |
+| `<b>` | Negrita (sin significado) | **Negrita** | Solo estilo |
+| `<em>` | Énfasis | *Cursiva* | Énfasis en lectura |
+| `<i>` | Cursiva (sin significado) | *Cursiva* | Solo estilo |
+
+<Aside type="tip">
+💡 **Tip:** Usa `<strong>` y `<em>` en lugar de `<b>` e `<i>` para mejor semántica y SEO.
+</Aside>
+
+</TabItem>
+
+<TabItem label="Saltos y líneas">
+
+### `<br>` - Salto de línea
+
+```html
+<!-- Salto de línea simple -->
+<p>
+  Primera línea<br>
+  Segunda línea<br>
+  Tercera línea
+</p>
+
+<!-- Dirección con saltos -->
+<address>
+  Juan Pérez<br>
+  Calle Principal 123<br>
+  Madrid, España<br>
+  CP: 28001
+</address>
+
+<!-- Poema con saltos -->
+<p>
+  Roses are red,<br>
+  Violets are blue,<br>
+  HTML is awesome,<br>
+  And so are you!
+</p>
+```
+
+**Cuándo usar `<br>`:**
+- ✅ Direcciones postales
+- ✅ Poemas o versos
+- ✅ Letras de canciones
+- ❌ NO para espaciado entre párrafos (usa CSS)
+- ❌ NO para layout (usa CSS)
+
+### `<hr>` - Línea horizontal
+
+```html
+<!-- Separador temático -->
+<p>Contenido de la primera sección.</p>
+<hr>
+<p>Contenido de la segunda sección.</p>
+
+<!-- Con estilos -->
+<hr style="border: none; height: 2px; background: #3498db;">
+
+<!-- Línea decorativa -->
+<hr style="border: none; height: 1px; background: linear-gradient(90deg, transparent, #3498db, transparent);">
+```
+
+**Cuándo usar `<hr>`:**
+- ✅ Cambio de tema o sección
+- ✅ Separación de contenido
+- ✅ Transición entre ideas
+- ❌ NO solo para decoración (usa CSS borders)
+
+</TabItem>
+
+<TabItem label="Ejemplo completo">
+
+<LivePreview 
+  title="🎨 Etiquetas de formato en acción"
+  html={`<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+  
+  <h2 style="color: #2c3e50; margin: 0 0 25px 0;">Demostración de Formato de Texto</h2>
+  
+  <!-- Strong y Em -->
+  <p style="line-height: 1.8; color: #34495e; margin-bottom: 20px;">
+    Este es un texto con <strong style="color: #e74c3c;">palabras importantes</strong> y 
+    <em style="color: #3498db;">énfasis en ciertas partes</em>. También puedes combinar 
+    <strong><em>ambos estilos</em></strong> cuando sea necesario.
+  </p>
+  
+  <!-- Mark -->
+  <p style="line-height: 1.8; color: #34495e; margin-bottom: 20px;">
+    Puedes <mark style="background: #fff3cd; padding: 2px 4px; border-radius: 3px;">resaltar texto importante</mark> 
+    como si usaras un marcador fluorescente.
+  </p>
+  
+  <!-- Del e Ins -->
+  <p style="line-height: 1.8; color: #34495e; margin-bottom: 20px;">
+    Precio original: <del style="color: #95a5a6;">$150.00</del> 
+    <ins style="color: #27ae60; text-decoration: none; font-weight: bold;">$99.99</ins> 
+    <small style="color: #7f8c8d;">(35% de descuento)</small>
+  </p>
+  
+  <!-- Sub y Sup -->
+  <p style="line-height: 1.8; color: #34495e; margin-bottom: 20px;">
+    Fórmulas científicas: H<sub>2</sub>O (agua) y E=mc<sup>2</sup> (energía).
+    También funciona para notas al pie<sup style="color: #3498db;">1</sup>.
+  </p>
+  
+  <!-- Code, Kbd, Var -->
+  <p style="line-height: 1.8; color: #34495e; margin-bottom: 20px;">
+    Usa el comando <code style="background: #ecf0f1; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; color: #e74c3c;">git commit</code> 
+    o presiona <kbd style="background: #34495e; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px; font-family: monospace;">Ctrl</kbd> + 
+    <kbd style="background: #34495e; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px; font-family: monospace;">S</kbd> 
+    para guardar. La variable <var style="font-style: italic; color: #8e44ad;">x</var> representa el resultado.
+  </p>
+  
+  <hr style="border: none; height: 2px; background: linear-gradient(90deg, transparent, #bdc3c7, transparent); margin: 30px 0;">
+  
+  <!-- Dirección con BR -->
+  <div style="background: #ecf0f1; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+    <h4 style="margin: 0 0 10px 0; color: #2c3e50;">📍 Dirección de Contacto:</h4>
+    <address style="font-style: normal; color: #34495e; line-height: 1.6;">
+      <strong>Empresa XYZ</strong><br>
+      Calle Principal 123<br>
+      28001 Madrid, España<br>
+      Tel: <a href="tel:+34123456789" style="color: #3498db; text-decoration: none;">+34 123 456 789</a><br>
+      Email: <a href="mailto:info@ejemplo.com" style="color: #3498db; text-decoration: none;">info@ejemplo.com</a>
+    </address>
+  </div>
+  
+  <!-- Poema con BR -->
+  <div style="background: #e8f4f8; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db;">
+    <h4 style="margin: 0 0 15px 0; color: #2c3e50;">📝 Ejemplo de Poema:</h4>
+    <p style="font-style: italic; color: #34495e; line-height: 2; margin: 0;">
+      HTML estructura el contenido,<br>
+      CSS le da el color y el viento,<br>
+      JavaScript lo hace vivir,<br>
+      Juntos crean páginas sin fin.
+    </p>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 📋 Listas
+
+Las listas organizan información de forma estructurada.
+
+<Tabs>
+<TabItem label="Listas desordenadas">
+
+### `<ul>` - Lista desordenada (viñetas)
+
+```html
+<!-- Lista simple -->
+<ul>
+  <li>Primer elemento</li>
+  <li>Segundo elemento</li>
+  <li>Tercer elemento</li>
+</ul>
+
+<!-- Lista con contenido complejo -->
+<ul>
+  <li>
+    <strong>HTML</strong>: Lenguaje de marcado
+  </li>
+  <li>
+    <strong>CSS</strong>: Hojas de estilo
+  </li>
+  <li>
+    <strong>JavaScript</strong>: Lenguaje de programación
+  </li>
+</ul>
+
+<!-- Lista anidada -->
+<ul>
+  <li>Frontend
+    <ul>
+      <li>HTML</li>
+      <li>CSS</li>
+      <li>JavaScript</li>
+    </ul>
+  </li>
+  <li>Backend
+    <ul>
+      <li>Node.js</li>
+      <li>Python</li>
+      <li>PHP</li>
+    </ul>
+  </li>
+</ul>
+```
+
+**Tipos de viñetas (CSS):**
+
+```html
+<!-- Viñeta por defecto (disco) -->
+<ul style="list-style-type: disc;">
+  <li>Elemento con disco ●</li>
+</ul>
+
+<!-- Viñeta circular -->
+<ul style="list-style-type: circle;">
+  <li>Elemento con círculo ○</li>
+</ul>
+
+<!-- Viñeta cuadrada -->
+<ul style="list-style-type: square;">
+  <li>Elemento con cuadrado ■</li>
+</ul>
+
+<!-- Sin viñetas -->
+<ul style="list-style-type: none;">
+  <li>Elemento sin viñeta</li>
+</ul>
+
+<!-- Viñeta personalizada -->
+<ul style="list-style-type: '✓ ';">
+  <li>Elemento con check</li>
+</ul>
+```
+
+</TabItem>
+
+<TabItem label="Listas ordenadas">
+
+### `<ol>` - Lista ordenada (numerada)
+
+```html
+<!-- Lista numerada simple -->
+<ol>
+  <li>Primer paso</li>
+  <li>Segundo paso</li>
+  <li>Tercer paso</li>
+</ol>
+
+<!-- Comenzar desde un número específico -->
+<ol start="5">
+  <li>Quinto elemento</li>
+  <li>Sexto elemento</li>
+  <li>Séptimo elemento</li>
+</ol>
+
+<!-- Lista en orden inverso -->
+<ol reversed>
+  <li>Tercer lugar</li>
+  <li>Segundo lugar</li>
+  <li>Primer lugar</li>
+</ol>
+
+<!-- Lista anidada -->
+<ol>
+  <li>Preparación
+    <ol>
+      <li>Reunir materiales</li>
+      <li>Leer instrucciones</li>
+    </ol>
+  </li>
+  <li>Ejecución
+    <ol>
+      <li>Paso 1</li>
+      <li>Paso 2</li>
+    </ol>
+  </li>
+  <li>Finalización</li>
+</ol>
+```
+
+**Tipos de numeración (CSS):**
+
+```html
+<!-- Números decimales (por defecto) -->
+<ol style="list-style-type: decimal;">
+  <li>Elemento 1</li>
+  <li>Elemento 2</li>
+</ol>
+
+<!-- Números romanos mayúsculas -->
+<ol style="list-style-type: upper-roman;">
+  <li>Elemento I</li>
+  <li>Elemento II</li>
+  <li>Elemento III</li>
+</ol>
+
+<!-- Números romanos minúsculas -->
+<ol style="list-style-type: lower-roman;">
+  <li>Elemento i</li>
+  <li>Elemento ii</li>
+  <li>Elemento iii</li>
+</ol>
+
+<!-- Letras mayúsculas -->
+<ol style="list-style-type: upper-alpha;">
+  <li>Elemento A</li>
+  <li>Elemento B</li>
+  <li>Elemento C</li>
+</ol>
+
+<!-- Letras minúsculas -->
+<ol style="list-style-type: lower-alpha;">
+  <li>Elemento a</li>
+  <li>Elemento b</li>
+  <li>Elemento c</li>
+</ol>
+
+<!-- Ceros a la izquierda -->
+<ol style="list-style-type: decimal-leading-zero;">
+  <li>Elemento 01</li>
+  <li>Elemento 02</li>
+</ol>
+```
+
+**Atributos de `<ol>`:**
+
+| Atributo | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `start` | Número inicial | `start="5"` |
+| `reversed` | Orden inverso | `reversed` |
+| `type` | Tipo de numeración | `type="A"` |
+
+</TabItem>
+
+<TabItem label="Listas de definición">
+
+### `<dl>` - Lista de definición
+
+```html
+<!-- Lista de términos y definiciones -->
+<dl>
+  <dt>HTML</dt>
+  <dd>HyperText Markup Language - Lenguaje de marcado para páginas web.</dd>
+  
+  <dt>CSS</dt>
+  <dd>Cascading Style Sheets - Hojas de estilo en cascada para diseño.</dd>
+  
+  <dt>JavaScript</dt>
+  <dd>Lenguaje de programación para añadir interactividad.</dd>
+</dl>
+
+<!-- Múltiples definiciones para un término -->
+<dl>
+  <dt>HTML5</dt>
+  <dd>Quinta versión de HTML.</dd>
+  <dd>Incluye nuevas etiquetas semánticas.</dd>
+  <dd>Soporta multimedia nativa.</dd>
+</dl>
+
+<!-- Múltiples términos para una definición -->
+<dl>
+  <dt>Frontend</dt>
+  <dt>Client-side</dt>
+  <dd>Parte de la aplicación que se ejecuta en el navegador del usuario.</dd>
+</dl>
+```
+
+**Estructura:**
+- `<dl>` - Description List (contenedor)
+- `<dt>` - Description Term (término)
+- `<dd>` - Description Definition (definición)
+
+</TabItem>
+
+<TabItem label="Ejemplo visual">
+
+<LivePreview 
+  title="🎨 Listas en acción"
+  html={`<div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 30px; background: #f8f9fa;">
+  
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px;">
+    
+    <!-- Lista desordenada -->
+    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <h3 style="margin: 0 0 20px 0; color: #2c3e50; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 24px;">📝</span> Lista Desordenada
+      </h3>
+      <ul style="color: #34495e; line-height: 2; margin: 0; padding-left: 25px;">
+        <li>HTML para estructura</li>
+        <li>CSS para diseño</li>
+        <li>JavaScript para interactividad</li>
+        <li>Frameworks modernos
+          <ul style="margin-top: 10px;">
+            <li>React</li>
+            <li>Vue</li>
+            <li>Angular</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- Lista ordenada -->
+    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <h3 style="margin: 0 0 20px 0; color: #2c3e50; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 24px;">🔢</span> Lista Ordenada
+      </h3>
+      <ol style="color: #34495e; line-height: 2; margin: 0; padding-left: 25px;">
+        <li>Aprende HTML básico</li>
+        <li>Domina CSS
+          <ol style="margin-top: 10px; list-style-type: lower-alpha;">
+            <li>Flexbox</li>
+            <li>Grid</li>
+            <li>Animaciones</li>
+          </ol>
+        </li>
+        <li>Practica JavaScript</li>
+        <li>Construye proyectos</li>
+      </ol>
+    </div>
+    
+  </div>
+  
+  <!-- Lista de definición -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px;">
+    <h3 style="margin: 0 0 20px 0; color: #2c3e50; display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 24px;">📚</span> Lista de Definiciones
+    </h3>
+    <dl style="margin: 0;">
+      <dt style="font-weight: bold; color: #2c3e50; margin-bottom: 8px; font-size: 18px;">
+        🌐 HTML5
+      </dt>
+      <dd style="color: #555; line-height: 1.6; margin: 0 0 20px 30px;">
+        Lenguaje de marcado estándar para crear páginas web. Incluye etiquetas semánticas y soporte multimedia nativo.
+      </dd>
+      
+      <dt style="font-weight: bold; color: #2c3e50; margin-bottom: 8px; font-size: 18px;">
+        🎨 CSS3
+      </dt>
+      <dd style="color: #555; line-height: 1.6; margin: 0 0 20px 30px;">
+        Hojas de estilo en cascada para diseñar y dar formato a páginas web. Incluye flexbox, grid y animaciones.
+      </dd>
+      
+      <dt style="font-weight: bold; color: #2c3e50; margin-bottom: 8px; font-size: 18px;">
+        ⚡ JavaScript
+      </dt>
+      <dd style="color: #555; line-height: 1.6; margin: 0 0 0 30px;">
+        Lenguaje de programación que añade interactividad y comportamiento dinámico a las páginas web.
+      </dd>
+    </dl>
+  </div>
+  
+  <!-- Tipos de viñetas -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h3 style="margin: 0 0 20px 0; color: #2c3e50;">Tipos de Viñetas y Numeración</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+      
+      <div>
+        <h4 style="margin: 0 0 10px 0; color: #555; font-size: 14px;">Disco (●)</h4>
+        <ul style="list-style-type: disc; color: #34495e; padding-left: 20px; margin: 0;">
+          <li>Item 1</li>
+          <li>Item 2</li>
+        </ul>
+      </div>
+      
+      <div>
+        <h4 style="margin: 0 0 10px 0; color: #555; font-size: 14px;">Círculo (○)</h4>
+        <ul style="list-style-type: circle; color: #34495e; padding-left: 20px; margin: 0;">
+          <li>Item 1</li>
+          <li>Item 2</li>
+        </ul>
+      </div>
+      
+      <div>
+        <h4 style="margin: 0 0 10px 0; color: #555; font-size: 14px;">Cuadrado (■)</h4>
+        <ul style="list-style-type: square; color: #34495e; padding-left: 20px; margin: 0;">
+          <li>Item 1</li>
+          <li>Item 2</li>
+        </ul>
+      </div>
+      
+      <div>
+        <h4 style="margin: 0 0 10px 0; color: #555; font-size: 14px;">Decimal (1, 2)</h4>
+        <ol style="list-style-type: decimal; color: #34495e; padding-left: 20px; margin: 0;">
+          <li>Item 1</li>
+          <li>Item 2</li>
+        </ol>
+      </div>
+      
+      <div>
+        <h4 style="margin: 0 0 10px 0; color: #555; font-size: 14px;">Romano (I, II)</h4>
+        <ol style="list-style-type: upper-roman; color: #34495e; padding-left: 20px; margin: 0;">
+          <li>Item 1</li>
+          <li>Item 2</li>
+        </ol>
+      </div>
+      
+      <div>
+        <h4 style="margin: 0 0 10px 0; color: #555; font-size: 14px;">Letras (A, B)</h4>
+        <ol style="list-style-type: upper-alpha; color: #34495e; padding-left: 20px; margin: 0;">
+          <li>Item 1</li>
+          <li>Item 2</li>
+        </ol>
+      </div>
+      
+    </div>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 💬 Citas y Abreviaciones
+
+Elementos para citas, referencias y abreviaciones.
+
+<Tabs>
+<TabItem label="Citas">
+
+### `<blockquote>` - Cita en bloque
+
+```html
+<!-- Cita simple -->
+<blockquote>
+  <p>La mejor manera de predecir el futuro es inventarlo.</p>
+</blockquote>
+
+<!-- Cita con atribución -->
+<blockquote cite="https://ejemplo.com/fuente">
+  <p>El código es poesía.</p>
+  <footer>— <cite>WordPress</cite></footer>
+</blockquote>
+
+<!-- Cita completa con autor y fuente -->
+<blockquote cite="https://www.ejemplo.com">
+  <p>
+    "La simplicidad es la máxima sofisticación. El diseño no es solo cómo 
+    se ve o cómo se siente. El diseño es cómo funciona."
+  </p>
+  <footer>
+    — <cite>Steve Jobs</cite>, cofundador de Apple
+  </footer>
+</blockquote>
+```
+
+### `<q>` - Cita corta (inline)
+
+```html
+<!-- Cita inline -->
+<p>
+  Como dijo Einstein: <q>La imaginación es más importante que el conocimiento</q>.
+</p>
+
+<!-- Cita con cite -->
+<p>
+  El lema de Google es <q cite="https://google.com">Don't be evil</q>.
+</p>
+
+<!-- Múltiples citas -->
+<p>
+  <q>HTML</q> estructura, <q>CSS</q> diseña, y <q>JavaScript</q> da vida.
+</p>
+```
+
+**Diferencias:**
+
+| Etiqueta | Uso | Renderizado |
+|----------|-----|-------------|
+| `<blockquote>` | Citas largas (bloque) | Indentado, bloque |
+| `<q>` | Citas cortas (inline) | Comillas automáticas |
+| `<cite>` | Título de obra | Cursiva |
+
+</TabItem>
+
+<TabItem label="Abreviaciones">
+
+### `<abbr>` - Abreviación
+
+```html
+<!-- Abreviación simple -->
+<p>
+  <abbr title="HyperText Markup Language">HTML</abbr> es el lenguaje de marcado.
+</p>
+
+<!-- Múltiples abreviaciones -->
+<p>
+  Aprende <abbr title="HyperText Markup Language">HTML</abbr>, 
+  <abbr title="Cascading Style Sheets">CSS</abbr> y 
+  <abbr title="JavaScript">JS</abbr> para desarrollo web.
+</p>
+
+<!-- Abreviación con definición -->
+<p>
+  La <abbr title="World Wide Web Consortium">W3C</abbr> es la organización 
+  que desarrolla estándares web.
+</p>
+
+<!-- Abreviación de unidades -->
+<p>
+  El archivo pesa 5 <abbr title="Megabytes">MB</abbr> y se descarga a 
+  100 <abbr title="Megabits por segundo">Mbps</abbr>.
+</p>
+
+<!-- Abreviación de términos técnicos -->
+<p>
+  Usa <abbr title="Application Programming Interface">API</abbr> para 
+  conectar con servicios externos mediante <abbr title="HyperText Transfer Protocol">HTTP</abbr>.
+</p>
+```
+
+**Características:**
+- ✅ Muestra tooltip al pasar el mouse
+- ✅ Mejora la accesibilidad
+- ✅ Útil para términos técnicos
+- ✅ Suele mostrarse con subrayado punteado
+
+### `<dfn>` - Definición de término
+
+```html
+<!-- Definir un término -->
+<p>
+  <dfn>HTML</dfn> es el lenguaje de marcado estándar para crear páginas web.
+</p>
+
+<!-- Definición con abbr -->
+<p>
+  <dfn><abbr title="Cascading Style Sheets">CSS</abbr></dfn> es un lenguaje 
+  de hojas de estilo usado para describir la presentación de documentos HTML.
+</p>
+
+<!-- Definición en contexto -->
+<p>
+  El término <dfn id="responsive">diseño responsive</dfn> se refiere a la 
+  técnica de crear sitios web que se adaptan a diferentes tamaños de pantalla.
+</p>
+```
+
+</TabItem>
+
+<TabItem label="Ejemplo visual">
+
+<LivePreview 
+  title="🎨 Citas y abreviaciones"
+  html={`<div style="font-family: Georgia, serif; max-width: 800px; margin: 0 auto; padding: 30px; background: #f8f9fa;">
+  
+  <!-- Blockquote estilizado -->
+  <blockquote style="background: white; margin: 0 0 30px 0; padding: 25px 30px; border-left: 5px solid #3498db; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); position: relative;">
+    <div style="font-size: 48px; color: #3498db; opacity: 0.2; position: absolute; top: 10px; left: 15px;">"</div>
+    <p style="font-size: 20px; line-height: 1.6; color: #2c3e50; margin: 0 0 15px 0; font-style: italic; position: relative; z-index: 1;">
+      La mejor manera de predecir el futuro es inventarlo. El diseño no es solo cómo se ve o cómo se siente. El diseño es cómo funciona.
+    </p>
+    <footer style="text-align: right; color: #7f8c8d; font-size: 16px; font-style: normal;">
+      — <cite style="font-weight: bold; color: #34495e;">Steve Jobs</cite>, Cofundador de Apple
+    </footer>
+  </blockquote>
+  
+  <!-- Citas inline -->
+  <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px;">
+    <h3 style="margin: 0 0 15px 0; color: #2c3e50;">Citas Inline</h3>
+    <p style="line-height: 1.8; color: #34495e; margin: 0 0 15px 0;">
+      Como dijo Albert Einstein: <q style="font-style: italic; color: #3498db;">La imaginación es más importante que el conocimiento</q>.
+    </p>
+    <p style="line-height: 1.8; color: #34495e; margin: 0;">
+      El lema de WordPress es <q style="font-style: italic; color: #3498db;">Code is Poetry</q>, 
+      reflejando su filosofía de desarrollo.
+    </p>
+  </div>
+  
+  <!-- Abreviaciones -->
+  <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px;">
+    <h3 style="margin: 0 0 15px 0; color: #2c3e50;">Abreviaciones (pasa el mouse)</h3>
+    <p style="line-height: 1.8; color: #34495e; margin: 0 0 15px 0;">
+      Para desarrollar sitios web necesitas aprender 
+      <abbr title="HyperText Markup Language" style="text-decoration: underline dotted; cursor: help; color: #3498db;">HTML</abbr>, 
+      <abbr title="Cascading Style Sheets" style="text-decoration: underline dotted; cursor: help; color: #3498db;">CSS</abbr> y 
+      <abbr title="JavaScript" style="text-decoration: underline dotted; cursor: help; color: #3498db;">JS</abbr>.
+    </p>
+    <p style="line-height: 1.8; color: #34495e; margin: 0;">
+      La <abbr title="World Wide Web Consortium" style="text-decoration: underline dotted; cursor: help; color: #3498db;">W3C</abbr> 
+      desarrolla estándares web usando 
+      <abbr title="Application Programming Interface" style="text-decoration: underline dotted; cursor: help; color: #3498db;">APIs</abbr> 
+      y protocolos como 
+      <abbr title="HyperText Transfer Protocol" style="text-decoration: underline dotted; cursor: help; color: #3498db;">HTTP</abbr>.
+    </p>
+  </div>
+  
+  <!-- Definiciones -->
+  <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h3 style="margin: 0 0 15px 0; color: #2c3e50;">Definiciones de Términos</h3>
+    <p style="line-height: 1.8; color: #34495e; margin: 0 0 15px 0;">
+      <dfn style="font-weight: bold; color: #2c3e50; font-style: italic;">Diseño Responsive</dfn> 
+      es la técnica de crear sitios web que se adaptan automáticamente a diferentes 
+      tamaños de pantalla y dispositivos.
+    </p>
+    <p style="line-height: 1.8; color: #34495e; margin: 0;">
+      <dfn style="font-weight: bold; color: #2c3e50; font-style: italic;">
+        <abbr title="Search Engine Optimization" style="text-decoration: underline dotted; cursor: help;">SEO</abbr>
+      </dfn> 
+      (Search Engine Optimization) es el proceso de optimizar un sitio web para 
+      mejorar su visibilidad en los motores de búsqueda.
+    </p>
+  </div>
+  
+  <!-- Nota informativa -->
+  <div style="margin-top: 30px; padding: 20px; background: #e8f4f8; border-radius: 8px; border-left: 4px solid #3498db;">
+    <p style="margin: 0; color: #2c3e50; line-height: 1.6;">
+      <strong>💡 Tip:</strong> Las abreviaciones con el atributo <code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;">title</code> 
+      muestran un tooltip al pasar el mouse, mejorando la accesibilidad y comprensión del contenido.
+    </p>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+### Etiquetas de Texto
+✅ **`<p>`** - Párrafos (un párrafo por idea)  
+✅ **`<h1>-<h6>`** - Encabezados jerárquicos  
+✅ Solo **un `<h1>`** por página  
+✅ No saltar niveles de encabezados  
+
+### Etiquetas de Formato
+✅ **`<strong>`** - Importancia fuerte (negrita semántica)  
+✅ **`<em>`** - Énfasis (cursiva semántica)  
+✅ **`<mark>`** - Texto resaltado  
+✅ **`<br>`** - Salto de línea (solo para direcciones/poemas)  
+✅ **`<hr>`** - Separador temático  
+✅ **`<sub>`** y **`<sup>`** - Subíndice y superíndice  
+✅ **`<code>`** - Código inline  
+
+### Listas
+✅ **`<ul>`** - Lista desordenada (viñetas)  
+✅ **`<ol>`** - Lista ordenada (números)  
+✅ **`<dl>`** - Lista de definiciones  
+✅ **`<li>`** - Elemento de lista  
+✅ Listas anidadas para jerarquía  
+
+### Citas y Abreviaciones
+✅ **`<blockquote>`** - Cita en bloque  
+✅ **`<q>`** - Cita corta inline  
+✅ **`<cite>`** - Título de obra  
+✅ **`<abbr>`** - Abreviación con tooltip  
+✅ **`<dfn>`** - Definición de término  
+
+### Patrones comunes
+```html
+<!-- Estructura de contenido -->
+<h1>Título Principal</h1>
+
+<h2>Sección 1</h2>
+<p>Párrafo con <strong>texto importante</strong> y <em>énfasis</em>.</p>
+
+<h3>Subsección</h3>
+<ul>
+  <li>Elemento 1</li>
+  <li>Elemento 2</li>
+</ul>
+
+<blockquote>
+  <p>Cita relevante</p>
+  <footer>— <cite>Autor</cite></footer>
+</blockquote>
+
+<p>
+  Término técnico: <abbr title="Descripción">ABBR</abbr>
+</p>
+```
+
+</Aside>
+
+---
+
+## 🚀 Próximos pasos
+
+Ahora que dominas el contenido del cuerpo, aprenderás:
+- ✅ Enlaces e imágenes
+- ✅ Navegación entre páginas
+- ✅ Atributos de enlaces
+- ✅ Optimización de imágenes

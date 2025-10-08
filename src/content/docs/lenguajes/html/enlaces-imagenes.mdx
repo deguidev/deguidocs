@@ -1,0 +1,1265 @@
+---
+title: 5. Enlaces e Imágenes
+description: Etiqueta a, img, rutas relativas y absolutas, imágenes como enlaces
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
+
+Los **enlaces** e **imágenes** son elementos fundamentales de la web. Los enlaces conectan páginas entre sí, mientras que las imágenes enriquecen el contenido visual.
+
+<Aside type="tip">
+🔗 **Concepto clave:** Los enlaces (`<a>`) permiten la navegación entre páginas, creando la "red" de la World Wide Web. Las imágenes (`<img>`) añaden contenido visual.
+</Aside>
+
+---
+
+## 🔗 Etiqueta `<a>` - Enlaces
+
+La etiqueta `<a>` (anchor/ancla) crea hipervínculos que permiten navegar entre páginas.
+
+<Tabs>
+<TabItem label="Sintaxis básica">
+
+### Estructura del enlace
+
+```html
+<a href="destino.html">Texto del enlace</a>
+```
+
+**Componentes:**
+- `<a>` - Etiqueta de apertura
+- `href` - Atributo que indica el destino (obligatorio)
+- Texto del enlace - Contenido visible y clickeable
+- `</a>` - Etiqueta de cierre
+
+### Ejemplos básicos
+
+```html
+<!-- Enlace a otra página -->
+<a href="contacto.html">Contacto</a>
+
+<!-- Enlace a un sitio externo -->
+<a href="https://www.google.com">Ir a Google</a>
+
+<!-- Enlace a email -->
+<a href="mailto:info@ejemplo.com">Enviar email</a>
+
+<!-- Enlace a teléfono -->
+<a href="tel:+34123456789">Llamar: +34 123 456 789</a>
+
+<!-- Enlace a WhatsApp -->
+<a href="https://wa.me/34123456789">Chatear en WhatsApp</a>
+
+<!-- Enlace a sección de la misma página -->
+<a href="#seccion">Ir a sección</a>
+
+<!-- Enlace para descargar archivo -->
+<a href="documento.pdf" download>Descargar PDF</a>
+```
+
+<Aside type="note">
+💡 **Importante:** El atributo `href` es obligatorio. Sin él, el enlace no funcionará.
+</Aside>
+
+</TabItem>
+
+<TabItem label="Atributos principales">
+
+### Atributos del enlace `<a>`
+
+```html
+<!-- href: Destino del enlace (OBLIGATORIO) -->
+<a href="https://ejemplo.com">Enlace</a>
+
+<!-- target: Dónde abrir el enlace -->
+<a href="pagina.html" target="_blank">Abrir en nueva pestaña</a>
+<a href="pagina.html" target="_self">Abrir en misma pestaña (default)</a>
+<a href="pagina.html" target="_parent">Abrir en marco padre</a>
+<a href="pagina.html" target="_top">Abrir en ventana completa</a>
+
+<!-- rel: Relación con el destino -->
+<a href="https://externo.com" rel="nofollow">No seguir (SEO)</a>
+<a href="https://externo.com" rel="noopener">Seguridad para target="_blank"</a>
+<a href="https://externo.com" rel="noreferrer">No enviar referrer</a>
+<a href="https://externo.com" rel="noopener noreferrer">Combinado</a>
+
+<!-- download: Descargar archivo -->
+<a href="archivo.pdf" download>Descargar</a>
+<a href="imagen.jpg" download="mi-imagen.jpg">Descargar con nombre</a>
+
+<!-- title: Tooltip al pasar el mouse -->
+<a href="pagina.html" title="Ir a la página de inicio">Inicio</a>
+
+<!-- hreflang: Idioma del destino -->
+<a href="en/about.html" hreflang="en">About (English)</a>
+
+<!-- type: Tipo MIME del destino -->
+<a href="documento.pdf" type="application/pdf">Ver PDF</a>
+```
+
+**Tabla de atributos:**
+
+| Atributo | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `href` | URL de destino (obligatorio) | `href="pagina.html"` |
+| `target` | Dónde abrir el enlace | `target="_blank"` |
+| `rel` | Relación con el destino | `rel="noopener"` |
+| `download` | Descargar en lugar de navegar | `download` |
+| `title` | Texto del tooltip | `title="Más info"` |
+| `hreflang` | Idioma del destino | `hreflang="en"` |
+| `type` | Tipo MIME | `type="application/pdf"` |
+
+### Valores de `target`
+
+| Valor | Comportamiento |
+|-------|----------------|
+| `_self` | Misma pestaña (por defecto) |
+| `_blank` | Nueva pestaña/ventana |
+| `_parent` | Marco padre |
+| `_top` | Ventana completa (sin marcos) |
+
+<Aside type="caution">
+⚠️ **Seguridad:** Siempre usa `rel="noopener noreferrer"` con `target="_blank"` para evitar vulnerabilidades de seguridad.
+</Aside>
+
+</TabItem>
+
+<TabItem label="Tipos de enlaces">
+
+### Enlaces internos (misma página)
+
+```html
+<!-- Enlace a ID en la misma página -->
+<a href="#seccion1">Ir a Sección 1</a>
+<a href="#contacto">Ir a Contacto</a>
+
+<!-- Sección destino -->
+<section id="seccion1">
+  <h2>Sección 1</h2>
+  <p>Contenido...</p>
+</section>
+
+<!-- Volver arriba -->
+<a href="#top">Volver arriba ↑</a>
+```
+
+### Enlaces a email y teléfono
+
+```html
+<!-- Email simple -->
+<a href="mailto:info@ejemplo.com">Enviar email</a>
+
+<!-- Email con asunto y cuerpo -->
+<a href="mailto:info@ejemplo.com?subject=Consulta&body=Hola, tengo una pregunta...">
+  Contactar
+</a>
+
+<!-- Email con CC y BCC -->
+<a href="mailto:info@ejemplo.com?cc=copia@ejemplo.com&bcc=oculta@ejemplo.com">
+  Email con copias
+</a>
+
+<!-- Teléfono -->
+<a href="tel:+34123456789">+34 123 456 789</a>
+
+<!-- SMS -->
+<a href="sms:+34123456789">Enviar SMS</a>
+<a href="sms:+34123456789?body=Hola">SMS con texto</a>
+```
+
+### Enlaces a redes sociales
+
+```html
+<!-- WhatsApp -->
+<a href="https://wa.me/34123456789">WhatsApp</a>
+<a href="https://wa.me/34123456789?text=Hola">WhatsApp con mensaje</a>
+
+<!-- Telegram -->
+<a href="https://t.me/usuario">Telegram</a>
+
+<!-- Compartir en redes -->
+<a href="https://www.facebook.com/sharer/sharer.php?u=https://ejemplo.com">
+  Compartir en Facebook
+</a>
+
+<a href="https://twitter.com/intent/tweet?url=https://ejemplo.com&text=Mira esto">
+  Compartir en Twitter
+</a>
+
+<a href="https://www.linkedin.com/sharing/share-offsite/?url=https://ejemplo.com">
+  Compartir en LinkedIn
+</a>
+```
+
+### Enlaces especiales
+
+```html
+<!-- Descargar archivo -->
+<a href="documento.pdf" download>Descargar PDF</a>
+
+<!-- Abrir en nueva pestaña (seguro) -->
+<a href="https://externo.com" target="_blank" rel="noopener noreferrer">
+  Sitio externo
+</a>
+
+<!-- Enlace sin seguir (SEO) -->
+<a href="https://sponsor.com" rel="nofollow">Patrocinador</a>
+
+<!-- Enlace deshabilitado (con CSS) -->
+<a href="#" onclick="return false;" style="pointer-events: none; color: gray;">
+  Enlace deshabilitado
+</a>
+```
+
+</TabItem>
+
+<TabItem label="Ejemplo visual">
+
+<LivePreview 
+  title="🎨 Enlaces en acción"
+  html={`<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 30px; background: #f8f9fa;">
+  
+  <h2 style="color: #2c3e50; margin: 0 0 25px 0;">Tipos de Enlaces</h2>
+  
+  <!-- Enlaces básicos -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">🔗 Enlaces Básicos</h3>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <a href="#" style="color: #3498db; text-decoration: none; padding: 10px 15px; background: #ecf0f1; border-radius: 5px; transition: all 0.3s;">
+        → Enlace interno (misma pestaña)
+      </a>
+      <a href="#" target="_blank" style="color: #3498db; text-decoration: none; padding: 10px 15px; background: #ecf0f1; border-radius: 5px; transition: all 0.3s;">
+        → Enlace externo (nueva pestaña) ↗
+      </a>
+      <a href="#seccion" style="color: #3498db; text-decoration: none; padding: 10px 15px; background: #ecf0f1; border-radius: 5px; transition: all 0.3s;">
+        → Enlace a sección (#seccion)
+      </a>
+    </div>
+  </div>
+  
+  <!-- Enlaces de contacto -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">📧 Enlaces de Contacto</h3>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      <a href="mailto:info@ejemplo.com" style="color: #e74c3c; text-decoration: none; padding: 10px 15px; background: #fadbd8; border-radius: 5px; transition: all 0.3s;">
+        ✉️ Enviar Email
+      </a>
+      <a href="tel:+34123456789" style="color: #27ae60; text-decoration: none; padding: 10px 15px; background: #d5f4e6; border-radius: 5px; transition: all 0.3s;">
+        📞 Llamar: +34 123 456 789
+      </a>
+      <a href="https://wa.me/34123456789" style="color: #25d366; text-decoration: none; padding: 10px 15px; background: #d4f8e8; border-radius: 5px; transition: all 0.3s;">
+        💬 WhatsApp
+      </a>
+    </div>
+  </div>
+  
+  <!-- Botones de enlace -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">🎨 Enlaces Estilizados</h3>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <a href="#" style="display: inline-block; padding: 12px 24px; background: #3498db; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; transition: all 0.3s;">
+        Primario
+      </a>
+      <a href="#" style="display: inline-block; padding: 12px 24px; background: #2ecc71; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; transition: all 0.3s;">
+        Éxito
+      </a>
+      <a href="#" style="display: inline-block; padding: 12px 24px; background: #e74c3c; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; transition: all 0.3s;">
+        Peligro
+      </a>
+      <a href="#" style="display: inline-block; padding: 12px 24px; background: transparent; color: #3498db; text-decoration: none; border: 2px solid #3498db; border-radius: 5px; font-weight: bold; transition: all 0.3s;">
+        Outline
+      </a>
+    </div>
+  </div>
+  
+  <!-- Enlaces con iconos -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">🌐 Redes Sociales</h3>
+    <div style="display: flex; gap: 15px;">
+      <a href="#" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; background: #3b5998; color: white; text-decoration: none; border-radius: 50%; font-weight: bold; transition: all 0.3s;">
+        f
+      </a>
+      <a href="#" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; background: #1da1f2; color: white; text-decoration: none; border-radius: 50%; font-weight: bold; transition: all 0.3s;">
+        𝕏
+      </a>
+      <a href="#" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; background: #0077b5; color: white; text-decoration: none; border-radius: 50%; font-weight: bold; transition: all 0.3s;">
+        in
+      </a>
+      <a href="#" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; background: #e4405f; color: white; text-decoration: none; border-radius: 50%; font-weight: bold; transition: all 0.3s;">
+        📷
+      </a>
+    </div>
+  </div>
+  
+  <!-- Sección destino -->
+  <div id="seccion" style="margin-top: 40px; padding: 20px; background: #e8f4f8; border-radius: 8px; border-left: 4px solid #3498db;">
+    <h4 style="margin: 0 0 10px 0; color: #2c3e50;">📍 Sección de Destino</h4>
+    <p style="margin: 0; color: #34495e;">
+      Has navegado a esta sección usando un enlace interno (#seccion).
+    </p>
+  </div>
+  
+</div>`}
+  css={`a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}`}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 📂 Rutas Relativas vs Absolutas
+
+Las rutas indican la ubicación de archivos y recursos.
+
+<Tabs>
+<TabItem label="Rutas Absolutas">
+
+### Rutas absolutas (URL completa)
+
+**Incluyen el protocolo y dominio completo:**
+
+```html
+<!-- Ruta absoluta externa -->
+<a href="https://www.google.com">Google</a>
+<img src="https://ejemplo.com/imagenes/logo.png" alt="Logo">
+
+<!-- Ruta absoluta con protocolo -->
+<a href="http://sitio.com/pagina.html">Página</a>
+
+<!-- Ruta absoluta sin protocolo (heredará http/https) -->
+<a href="//cdn.ejemplo.com/archivo.js">Script</a>
+```
+
+**Características:**
+- ✅ URL completa con dominio
+- ✅ Funcionan desde cualquier ubicación
+- ✅ Ideales para recursos externos
+- ✅ Necesarias para enlaces a otros sitios
+- ❌ Más largas y difíciles de mantener
+- ❌ No funcionan bien en desarrollo local
+
+**Cuándo usar:**
+- Enlaces a sitios externos
+- Recursos en CDN
+- APIs externas
+- Imágenes en otros dominios
+
+</TabItem>
+
+<TabItem label="Rutas Relativas">
+
+### Rutas relativas (desde el archivo actual)
+
+**Relativas al archivo actual:**
+
+```html
+<!-- Archivo en la misma carpeta -->
+<a href="contacto.html">Contacto</a>
+<img src="logo.png" alt="Logo">
+
+<!-- Archivo en subcarpeta -->
+<a href="blog/articulo.html">Artículo</a>
+<img src="imagenes/foto.jpg" alt="Foto">
+
+<!-- Archivo en carpeta padre -->
+<a href="../index.html">Inicio</a>
+<img src="../assets/icono.png" alt="Icono">
+
+<!-- Archivo dos niveles arriba -->
+<a href="../../paginas/about.html">Acerca de</a>
+
+<!-- Combinación -->
+<a href="../blog/post.html">Post</a>
+<img src="../../img/banner.jpg" alt="Banner">
+```
+
+**Símbolos:**
+- `.` = Carpeta actual
+- `..` = Carpeta padre (un nivel arriba)
+- `/` = Separador de carpetas
+
+**Características:**
+- ✅ Más cortas y fáciles de escribir
+- ✅ Funcionan en desarrollo local
+- ✅ Fáciles de mover entre servidores
+- ✅ Ideales para sitios estáticos
+- ❌ Dependen de la ubicación del archivo
+- ❌ Pueden romperse al mover archivos
+
+</TabItem>
+
+<TabItem label="Rutas desde la Raíz">
+
+### Rutas desde la raíz del sitio
+
+**Comienzan con `/` (desde la raíz del dominio):**
+
+```html
+<!-- Desde la raíz del sitio -->
+<a href="/index.html">Inicio</a>
+<a href="/blog/articulo.html">Artículo</a>
+<img src="/imagenes/logo.png" alt="Logo">
+<link rel="stylesheet" href="/css/estilos.css">
+<script src="/js/app.js"></script>
+
+<!-- Estructura de ejemplo -->
+<!-- 
+/
+├── index.html
+├── contacto.html
+├── blog/
+│   └── articulo.html
+├── imagenes/
+│   └── logo.png
+├── css/
+│   └── estilos.css
+└── js/
+    └── app.js
+-->
+```
+
+**Características:**
+- ✅ Siempre desde la raíz del sitio
+- ✅ No dependen de la ubicación del archivo
+- ✅ Fáciles de mantener
+- ✅ Funcionan en cualquier página
+- ❌ No funcionan en desarrollo local sin servidor
+- ❌ Requieren servidor web
+
+**Cuándo usar:**
+- Sitios con muchas carpetas
+- Recursos compartidos (CSS, JS)
+- Navegación principal
+- Sitios dinámicos
+
+</TabItem>
+
+<TabItem label="Comparación">
+
+### Comparación visual
+
+**Estructura de carpetas:**
+
+```
+mi-sitio/
+├── index.html
+├── contacto.html
+├── paginas/
+│   ├── about.html
+│   └── servicios.html
+├── blog/
+│   ├── index.html
+│   └── posts/
+│       └── articulo.html
+└── assets/
+    ├── css/
+    │   └── estilos.css
+    ├── js/
+    │   └── app.js
+    └── img/
+        ├── logo.png
+        └── fotos/
+            └── banner.jpg
+```
+
+**Desde `index.html` (raíz):**
+
+```html
+<!-- Relativa -->
+<a href="contacto.html">Contacto</a>
+<a href="paginas/about.html">About</a>
+<img src="assets/img/logo.png" alt="Logo">
+
+<!-- Desde raíz -->
+<a href="/contacto.html">Contacto</a>
+<a href="/paginas/about.html">About</a>
+<img src="/assets/img/logo.png" alt="Logo">
+
+<!-- Absoluta -->
+<a href="https://ejemplo.com/contacto.html">Contacto</a>
+<img src="https://ejemplo.com/assets/img/logo.png" alt="Logo">
+```
+
+**Desde `blog/posts/articulo.html`:**
+
+```html
+<!-- Relativa (subir 2 niveles) -->
+<a href="../../index.html">Inicio</a>
+<a href="../../contacto.html">Contacto</a>
+<img src="../../assets/img/logo.png" alt="Logo">
+
+<!-- Desde raíz (más simple) -->
+<a href="/index.html">Inicio</a>
+<a href="/contacto.html">Contacto</a>
+<img src="/assets/img/logo.png" alt="Logo">
+```
+
+**Tabla comparativa:**
+
+| Tipo | Ejemplo | Ventajas | Desventajas |
+|------|---------|----------|-------------|
+| **Absoluta** | `https://ejemplo.com/img.jpg` | Funciona siempre | Larga, difícil mantener |
+| **Relativa** | `../img/foto.jpg` | Corta, portable | Depende de ubicación |
+| **Desde raíz** | `/assets/img/foto.jpg` | Independiente de ubicación | Requiere servidor |
+
+<Aside type="tip">
+💡 **Recomendación:** Usa rutas desde la raíz (`/`) para sitios web y rutas relativas para proyectos pequeños o desarrollo local.
+</Aside>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🖼️ Etiqueta `<img>` - Imágenes
+
+La etiqueta `<img>` inserta imágenes en la página.
+
+<Tabs>
+<TabItem label="Sintaxis básica">
+
+### Estructura de la imagen
+
+```html
+<img src="ruta/imagen.jpg" alt="Descripción">
+```
+
+**Atributos obligatorios:**
+- `src` - Ruta de la imagen (source)
+- `alt` - Texto alternativo (alternative)
+
+### Ejemplos básicos
+
+```html
+<!-- Imagen simple -->
+<img src="foto.jpg" alt="Foto de paisaje">
+
+<!-- Imagen con tamaño -->
+<img src="logo.png" alt="Logo" width="200" height="100">
+
+<!-- Imagen externa -->
+<img src="https://ejemplo.com/imagen.jpg" alt="Imagen externa">
+
+<!-- Imagen con título -->
+<img src="icono.png" alt="Icono" title="Haz clic para ampliar">
+
+<!-- Imagen responsive -->
+<img src="banner.jpg" alt="Banner" style="max-width: 100%; height: auto;">
+
+<!-- Imagen con carga diferida -->
+<img src="grande.jpg" alt="Imagen grande" loading="lazy">
+```
+
+<Aside type="caution">
+⚠️ **Importante:** El atributo `alt` es obligatorio para accesibilidad. Describe la imagen para lectores de pantalla y se muestra si la imagen no carga.
+</Aside>
+
+</TabItem>
+
+<TabItem label="Atributos principales">
+
+### Atributos de `<img>`
+
+```html
+<!-- src: Ruta de la imagen (OBLIGATORIO) -->
+<img src="imagen.jpg" alt="Descripción">
+
+<!-- alt: Texto alternativo (OBLIGATORIO) -->
+<img src="foto.jpg" alt="Descripción para accesibilidad">
+<img src="decorativa.jpg" alt=""> <!-- Imagen decorativa: alt vacío -->
+
+<!-- width y height: Dimensiones en píxeles -->
+<img src="logo.png" alt="Logo" width="300" height="200">
+
+<!-- title: Tooltip al pasar el mouse -->
+<img src="icono.png" alt="Icono" title="Información adicional">
+
+<!-- loading: Carga diferida (lazy loading) -->
+<img src="imagen.jpg" alt="Imagen" loading="lazy">
+<img src="hero.jpg" alt="Hero" loading="eager"> <!-- Cargar inmediatamente -->
+
+<!-- decoding: Cómo decodificar la imagen -->
+<img src="foto.jpg" alt="Foto" decoding="async"> <!-- Asíncrono -->
+<img src="foto.jpg" alt="Foto" decoding="sync"> <!-- Síncrono -->
+
+<!-- srcset: Imágenes responsive -->
+<img 
+  src="imagen-small.jpg" 
+  srcset="imagen-small.jpg 480w, imagen-medium.jpg 800w, imagen-large.jpg 1200w"
+  sizes="(max-width: 600px) 480px, (max-width: 900px) 800px, 1200px"
+  alt="Imagen responsive"
+>
+
+<!-- crossorigin: CORS -->
+<img src="https://cdn.com/img.jpg" alt="Imagen" crossorigin="anonymous">
+
+<!-- referrerpolicy: Política de referrer -->
+<img src="imagen.jpg" alt="Imagen" referrerpolicy="no-referrer">
+```
+
+**Tabla de atributos:**
+
+| Atributo | Descripción | Obligatorio | Ejemplo |
+|----------|-------------|-------------|---------|
+| `src` | Ruta de la imagen | ✅ Sí | `src="foto.jpg"` |
+| `alt` | Texto alternativo | ✅ Sí | `alt="Descripción"` |
+| `width` | Ancho en píxeles | ❌ No | `width="300"` |
+| `height` | Alto en píxeles | ❌ No | `height="200"` |
+| `loading` | Carga diferida | ❌ No | `loading="lazy"` |
+| `title` | Tooltip | ❌ No | `title="Info"` |
+| `srcset` | Imágenes responsive | ❌ No | `srcset="img-2x.jpg 2x"` |
+| `sizes` | Tamaños responsive | ❌ No | `sizes="(max-width: 600px) 100vw"` |
+
+### Valores de `loading`
+
+| Valor | Descripción |
+|-------|-------------|
+| `lazy` | Carga cuando está cerca del viewport (recomendado) |
+| `eager` | Carga inmediatamente (por defecto) |
+| `auto` | El navegador decide |
+
+</TabItem>
+
+<TabItem label="Formatos de imagen">
+
+### Formatos de imagen web
+
+```html
+<!-- JPEG/JPG - Fotografías -->
+<img src="foto.jpg" alt="Fotografía">
+<!-- ✅ Bueno para: Fotos, imágenes con muchos colores -->
+<!-- ❌ Malo para: Transparencias, texto, logos -->
+
+<!-- PNG - Transparencias -->
+<img src="logo.png" alt="Logo con transparencia">
+<!-- ✅ Bueno para: Logos, iconos, transparencias -->
+<!-- ❌ Malo para: Fotos (archivo grande) -->
+
+<!-- GIF - Animaciones -->
+<img src="animacion.gif" alt="Animación">
+<!-- ✅ Bueno para: Animaciones simples -->
+<!-- ❌ Malo para: Fotos, muchos colores -->
+
+<!-- SVG - Vectores -->
+<img src="icono.svg" alt="Icono vectorial">
+<!-- ✅ Bueno para: Iconos, logos, escalables -->
+<!-- ✅ Se ve perfecto en cualquier tamaño -->
+
+<!-- WebP - Moderno (mejor compresión) -->
+<img src="imagen.webp" alt="Imagen WebP">
+<!-- ✅ Bueno para: Todo (mejor que JPG y PNG) -->
+<!-- ❌ Soporte limitado en navegadores antiguos -->
+
+<!-- AVIF - Más moderno aún -->
+<img src="imagen.avif" alt="Imagen AVIF">
+<!-- ✅ Mejor compresión que WebP -->
+<!-- ❌ Soporte aún más limitado -->
+```
+
+**Tabla comparativa:**
+
+| Formato | Uso ideal | Transparencia | Animación | Tamaño |
+|---------|-----------|---------------|-----------|--------|
+| **JPEG** | Fotografías | ❌ No | ❌ No | Medio |
+| **PNG** | Logos, iconos | ✅ Sí | ❌ No | Grande |
+| **GIF** | Animaciones simples | ✅ Sí | ✅ Sí | Medio |
+| **SVG** | Vectores, iconos | ✅ Sí | ✅ Sí | Pequeño |
+| **WebP** | Todo (moderno) | ✅ Sí | ✅ Sí | Pequeño |
+| **AVIF** | Todo (más moderno) | ✅ Sí | ✅ Sí | Muy pequeño |
+
+### Imágenes responsive con `<picture>`
+
+```html
+<!-- Diferentes formatos con fallback -->
+<picture>
+  <source srcset="imagen.avif" type="image/avif">
+  <source srcset="imagen.webp" type="image/webp">
+  <img src="imagen.jpg" alt="Imagen con fallback">
+</picture>
+
+<!-- Diferentes tamaños según viewport -->
+<picture>
+  <source media="(min-width: 1200px)" srcset="imagen-large.jpg">
+  <source media="(min-width: 768px)" srcset="imagen-medium.jpg">
+  <img src="imagen-small.jpg" alt="Imagen responsive">
+</picture>
+```
+
+</TabItem>
+
+<TabItem label="Ejemplo visual">
+
+<LivePreview 
+  title="🎨 Imágenes en acción"
+  html={`<div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 30px; background: #f8f9fa;">
+  
+  <h2 style="color: #2c3e50; margin: 0 0 25px 0;">Galería de Imágenes</h2>
+  
+  <!-- Imagen con tamaño fijo -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">📐 Imagen con Tamaño Fijo</h3>
+    <img 
+      src="https://via.placeholder.com/400x200/3498db/ffffff?text=Imagen+400x200" 
+      alt="Imagen de ejemplo"
+      width="400"
+      height="200"
+      style="border-radius: 8px; display: block;"
+    >
+    <p style="margin: 10px 0 0 0; color: #7f8c8d; font-size: 14px;">
+      <code>width="400" height="200"</code>
+    </p>
+  </div>
+  
+  <!-- Imagen responsive -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">📱 Imagen Responsive</h3>
+    <img 
+      src="https://via.placeholder.com/800x300/2ecc71/ffffff?text=Imagen+Responsive" 
+      alt="Imagen responsive"
+      style="max-width: 100%; height: auto; border-radius: 8px; display: block;"
+    >
+    <p style="margin: 10px 0 0 0; color: #7f8c8d; font-size: 14px;">
+      <code>style="max-width: 100%; height: auto;"</code>
+    </p>
+  </div>
+  
+  <!-- Grid de imágenes -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">🖼️ Galería Grid</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+      <img 
+        src="https://via.placeholder.com/250x250/e74c3c/ffffff?text=1" 
+        alt="Imagen 1"
+        style="width: 100%; height: auto; border-radius: 8px;"
+      >
+      <img 
+        src="https://via.placeholder.com/250x250/9b59b6/ffffff?text=2" 
+        alt="Imagen 2"
+        style="width: 100%; height: auto; border-radius: 8px;"
+      >
+      <img 
+        src="https://via.placeholder.com/250x250/f39c12/ffffff?text=3" 
+        alt="Imagen 3"
+        style="width: 100%; height: auto; border-radius: 8px;"
+      >
+    </div>
+  </div>
+  
+  <!-- Imagen con efectos -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">✨ Imagen con Efectos</h3>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+      <div style="text-align: center;">
+        <img 
+          src="https://via.placeholder.com/150x150/3498db/ffffff?text=Normal" 
+          alt="Normal"
+          style="border-radius: 8px; display: block; margin-bottom: 8px;"
+        >
+        <span style="font-size: 12px; color: #7f8c8d;">Normal</span>
+      </div>
+      <div style="text-align: center;">
+        <img 
+          src="https://via.placeholder.com/150x150/3498db/ffffff?text=Circular" 
+          alt="Circular"
+          style="border-radius: 50%; display: block; margin-bottom: 8px;"
+        >
+        <span style="font-size: 12px; color: #7f8c8d;">Circular</span>
+      </div>
+      <div style="text-align: center;">
+        <img 
+          src="https://via.placeholder.com/150x150/3498db/ffffff?text=Sombra" 
+          alt="Con sombra"
+          style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: block; margin-bottom: 8px;"
+        >
+        <span style="font-size: 12px; color: #7f8c8d;">Con Sombra</span>
+      </div>
+      <div style="text-align: center;">
+        <img 
+          src="https://via.placeholder.com/150x150/3498db/ffffff?text=Borde" 
+          alt="Con borde"
+          style="border-radius: 8px; border: 4px solid #3498db; display: block; margin-bottom: 8px;"
+        >
+        <span style="font-size: 12px; color: #7f8c8d;">Con Borde</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Imagen con caption -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">📝 Imagen con Descripción</h3>
+    <figure style="margin: 0;">
+      <img 
+        src="https://via.placeholder.com/600x300/34495e/ffffff?text=Imagen+con+Figcaption" 
+        alt="Paisaje hermoso"
+        style="width: 100%; height: auto; border-radius: 8px; display: block;"
+      >
+      <figcaption style="margin-top: 12px; color: #7f8c8d; font-size: 14px; text-align: center; font-style: italic;">
+        Descripción de la imagen usando &lt;figcaption&gt;
+      </figcaption>
+    </figure>
+  </div>
+  
+</div>`}
+  css={`img {
+  transition: transform 0.3s ease;
+}
+
+img:hover {
+  transform: scale(1.05);
+}`}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔗🖼️ Imágenes como Enlaces
+
+Combinar imágenes y enlaces para crear imágenes clickeables.
+
+<Tabs>
+<TabItem label="Sintaxis básica">
+
+### Imagen dentro de un enlace
+
+```html
+<!-- Sintaxis básica -->
+<a href="destino.html">
+  <img src="imagen.jpg" alt="Descripción">
+</a>
+
+<!-- Imagen clickeable que abre en nueva pestaña -->
+<a href="https://ejemplo.com" target="_blank" rel="noopener noreferrer">
+  <img src="logo.png" alt="Logo de Ejemplo">
+</a>
+
+<!-- Logo que va al inicio -->
+<a href="index.html">
+  <img src="logo.png" alt="Logo - Ir al inicio" width="150">
+</a>
+
+<!-- Imagen que descarga archivo -->
+<a href="documento.pdf" download>
+  <img src="icono-pdf.png" alt="Descargar PDF">
+</a>
+
+<!-- Thumbnail que abre imagen grande -->
+<a href="imagen-grande.jpg" target="_blank">
+  <img src="thumbnail.jpg" alt="Ver imagen completa" width="200">
+</a>
+```
+
+**Características:**
+- ✅ Toda la imagen es clickeable
+- ✅ Útil para logos, banners, galerías
+- ✅ El `alt` describe tanto la imagen como el destino
+- ✅ Puedes añadir estilos al enlace o la imagen
+
+</TabItem>
+
+<TabItem label="Casos de uso">
+
+### Casos de uso comunes
+
+**1. Logo clickeable (ir al inicio)**
+
+```html
+<header>
+  <a href="/" title="Ir al inicio">
+    <img src="logo.png" alt="Logo de Mi Empresa - Inicio" height="50">
+  </a>
+</header>
+```
+
+**2. Banner publicitario**
+
+```html
+<a href="https://promocion.com" target="_blank" rel="noopener noreferrer">
+  <img 
+    src="banner-promocion.jpg" 
+    alt="Promoción especial - Haz clic para más información"
+    style="max-width: 100%; height: auto;"
+  >
+</a>
+```
+
+**3. Galería de imágenes**
+
+```html
+<div class="galeria">
+  <a href="foto1-grande.jpg" target="_blank">
+    <img src="foto1-thumb.jpg" alt="Ver foto 1 en tamaño completo" width="200">
+  </a>
+  
+  <a href="foto2-grande.jpg" target="_blank">
+    <img src="foto2-thumb.jpg" alt="Ver foto 2 en tamaño completo" width="200">
+  </a>
+  
+  <a href="foto3-grande.jpg" target="_blank">
+    <img src="foto3-thumb.jpg" alt="Ver foto 3 en tamaño completo" width="200">
+  </a>
+</div>
+```
+
+**4. Botones de redes sociales**
+
+```html
+<div class="redes-sociales">
+  <a href="https://facebook.com/usuario" target="_blank" rel="noopener noreferrer">
+    <img src="icono-facebook.png" alt="Síguenos en Facebook" width="40">
+  </a>
+  
+  <a href="https://twitter.com/usuario" target="_blank" rel="noopener noreferrer">
+    <img src="icono-twitter.png" alt="Síguenos en Twitter" width="40">
+  </a>
+  
+  <a href="https://instagram.com/usuario" target="_blank" rel="noopener noreferrer">
+    <img src="icono-instagram.png" alt="Síguenos en Instagram" width="40">
+  </a>
+</div>
+```
+
+**5. Tarjetas de producto**
+
+```html
+<div class="producto">
+  <a href="producto-detalle.html">
+    <img src="producto.jpg" alt="Ver detalles del producto" width="300">
+    <h3>Nombre del Producto</h3>
+    <p>$99.99</p>
+  </a>
+</div>
+```
+
+**6. Mapa de imagen (image map)**
+
+```html
+<!-- Imagen con áreas clickeables -->
+<img src="mapa.jpg" alt="Mapa interactivo" usemap="#mapa">
+
+<map name="mapa">
+  <area shape="rect" coords="0,0,100,100" href="seccion1.html" alt="Sección 1">
+  <area shape="circle" coords="200,200,50" href="seccion2.html" alt="Sección 2">
+  <area shape="poly" coords="300,0,400,100,300,200" href="seccion3.html" alt="Sección 3">
+</map>
+```
+
+</TabItem>
+
+<TabItem label="Estilos y efectos">
+
+### Estilos para imágenes clickeables
+
+```html
+<!-- Imagen con efecto hover -->
+<a href="destino.html" style="display: inline-block;">
+  <img 
+    src="imagen.jpg" 
+    alt="Imagen con efecto"
+    style="transition: transform 0.3s, opacity 0.3s;"
+    onmouseover="this.style.transform='scale(1.1)'; this.style.opacity='0.8';"
+    onmouseout="this.style.transform='scale(1)'; this.style.opacity='1';"
+  >
+</a>
+
+<!-- Imagen con borde al hover -->
+<style>
+  .img-link {
+    display: inline-block;
+    border: 3px solid transparent;
+    transition: border-color 0.3s;
+  }
+  .img-link:hover {
+    border-color: #3498db;
+  }
+  .img-link img {
+    display: block;
+  }
+</style>
+
+<a href="destino.html" class="img-link">
+  <img src="imagen.jpg" alt="Imagen con borde hover">
+</a>
+
+<!-- Imagen con overlay -->
+<style>
+  .img-overlay {
+    position: relative;
+    display: inline-block;
+  }
+  .img-overlay::after {
+    content: '🔍 Ver más';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .img-overlay:hover::after {
+    opacity: 1;
+  }
+</style>
+
+<a href="destino.html" class="img-overlay">
+  <img src="imagen.jpg" alt="Imagen con overlay">
+</a>
+```
+
+**Buenas prácticas:**
+- ✅ Indica visualmente que la imagen es clickeable
+- ✅ Usa cursor pointer
+- ✅ Añade efectos hover sutiles
+- ✅ El `alt` debe describir el destino
+- ✅ Usa `title` para información adicional
+
+</TabItem>
+
+<TabItem label="Ejemplo visual">
+
+<LivePreview 
+  title="🎨 Imágenes como enlaces"
+  html={`<div style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 30px; background: #f8f9fa;">
+  
+  <h2 style="color: #2c3e50; margin: 0 0 25px 0;">Imágenes Clickeables</h2>
+  
+  <!-- Logo clickeable -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">🏠 Logo Clickeable</h3>
+    <a href="#" style="display: inline-block; transition: transform 0.3s;">
+      <img 
+        src="https://via.placeholder.com/200x80/3498db/ffffff?text=LOGO" 
+        alt="Logo - Ir al inicio"
+        style="display: block;"
+        onmouseover="this.parentElement.style.transform='scale(1.05)'"
+        onmouseout="this.parentElement.style.transform='scale(1)'"
+      >
+    </a>
+    <p style="margin: 15px 0 0 0; color: #7f8c8d; font-size: 14px;">
+      Haz clic en el logo para ir al inicio
+    </p>
+  </div>
+  
+  <!-- Galería de thumbnails -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">🖼️ Galería de Imágenes</h3>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+      <a href="#" style="display: block; position: relative; overflow: hidden; border-radius: 8px; transition: transform 0.3s;">
+        <img 
+          src="https://via.placeholder.com/200x200/e74c3c/ffffff?text=Foto+1" 
+          alt="Ver foto 1"
+          style="width: 100%; display: block; transition: transform 0.3s;"
+          onmouseover="this.style.transform='scale(1.1)'"
+          onmouseout="this.style.transform='scale(1)'"
+        >
+      </a>
+      <a href="#" style="display: block; position: relative; overflow: hidden; border-radius: 8px; transition: transform 0.3s;">
+        <img 
+          src="https://via.placeholder.com/200x200/3498db/ffffff?text=Foto+2" 
+          alt="Ver foto 2"
+          style="width: 100%; display: block; transition: transform 0.3s;"
+          onmouseover="this.style.transform='scale(1.1)'"
+          onmouseout="this.style.transform='scale(1)'"
+        >
+      </a>
+      <a href="#" style="display: block; position: relative; overflow: hidden; border-radius: 8px; transition: transform 0.3s;">
+        <img 
+          src="https://via.placeholder.com/200x200/2ecc71/ffffff?text=Foto+3" 
+          alt="Ver foto 3"
+          style="width: 100%; display: block; transition: transform 0.3s;"
+          onmouseover="this.style.transform='scale(1.1)'"
+          onmouseout="this.style.transform='scale(1)'"
+        >
+      </a>
+      <a href="#" style="display: block; position: relative; overflow: hidden; border-radius: 8px; transition: transform 0.3s;">
+        <img 
+          src="https://via.placeholder.com/200x200/f39c12/ffffff?text=Foto+4" 
+          alt="Ver foto 4"
+          style="width: 100%; display: block; transition: transform 0.3s;"
+          onmouseover="this.style.transform='scale(1.1)'"
+          onmouseout="this.style.transform='scale(1)'"
+        >
+      </a>
+    </div>
+    <p style="margin: 15px 0 0 0; color: #7f8c8d; font-size: 14px;">
+      Haz clic en cualquier imagen para verla en tamaño completo
+    </p>
+  </div>
+  
+  <!-- Tarjetas de producto -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">🛍️ Productos</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+      
+      <a href="#" style="text-decoration: none; color: inherit; display: block; border: 2px solid transparent; border-radius: 8px; padding: 15px; transition: all 0.3s;">
+        <img 
+          src="https://via.placeholder.com/250x250/9b59b6/ffffff?text=Producto+1" 
+          alt="Producto 1"
+          style="width: 100%; border-radius: 8px; margin-bottom: 12px;"
+        >
+        <h4 style="margin: 0 0 8px 0; color: #2c3e50;">Producto 1</h4>
+        <p style="margin: 0; color: #27ae60; font-weight: bold; font-size: 18px;">$99.99</p>
+      </a>
+      
+      <a href="#" style="text-decoration: none; color: inherit; display: block; border: 2px solid transparent; border-radius: 8px; padding: 15px; transition: all 0.3s;">
+        <img 
+          src="https://via.placeholder.com/250x250/e67e22/ffffff?text=Producto+2" 
+          alt="Producto 2"
+          style="width: 100%; border-radius: 8px; margin-bottom: 12px;"
+        >
+        <h4 style="margin: 0 0 8px 0; color: #2c3e50;">Producto 2</h4>
+        <p style="margin: 0; color: #27ae60; font-weight: bold; font-size: 18px;">$149.99</p>
+      </a>
+      
+      <a href="#" style="text-decoration: none; color: inherit; display: block; border: 2px solid transparent; border-radius: 8px; padding: 15px; transition: all 0.3s;">
+        <img 
+          src="https://via.placeholder.com/250x250/16a085/ffffff?text=Producto+3" 
+          alt="Producto 3"
+          style="width: 100%; border-radius: 8px; margin-bottom: 12px;"
+        >
+        <h4 style="margin: 0 0 8px 0; color: #2c3e50;">Producto 3</h4>
+        <p style="margin: 0; color: #27ae60; font-weight: bold; font-size: 18px;">$79.99</p>
+      </a>
+      
+    </div>
+  </div>
+  
+  <!-- Redes sociales -->
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h3 style="margin: 0 0 15px 0; color: #34495e;">🌐 Síguenos en Redes Sociales</h3>
+    <div style="display: flex; gap: 15px; justify-content: center;">
+      <a href="#" style="display: block; transition: transform 0.3s;">
+        <img 
+          src="https://via.placeholder.com/60x60/3b5998/ffffff?text=f" 
+          alt="Facebook"
+          style="border-radius: 50%; display: block;"
+          onmouseover="this.parentElement.style.transform='translateY(-5px)'"
+          onmouseout="this.parentElement.style.transform='translateY(0)'"
+        >
+      </a>
+      <a href="#" style="display: block; transition: transform 0.3s;">
+        <img 
+          src="https://via.placeholder.com/60x60/1da1f2/ffffff?text=𝕏" 
+          alt="Twitter"
+          style="border-radius: 50%; display: block;"
+          onmouseover="this.parentElement.style.transform='translateY(-5px)'"
+          onmouseout="this.parentElement.style.transform='translateY(0)'"
+        >
+      </a>
+      <a href="#" style="display: block; transition: transform 0.3s;">
+        <img 
+          src="https://via.placeholder.com/60x60/0077b5/ffffff?text=in" 
+          alt="LinkedIn"
+          style="border-radius: 50%; display: block;"
+          onmouseover="this.parentElement.style.transform='translateY(-5px)'"
+          onmouseout="this.parentElement.style.transform='translateY(0)'"
+        >
+      </a>
+      <a href="#" style="display: block; transition: transform 0.3s;">
+        <img 
+          src="https://via.placeholder.com/60x60/e4405f/ffffff?text=📷" 
+          alt="Instagram"
+          style="border-radius: 50%; display: block;"
+          onmouseover="this.parentElement.style.transform='translateY(-5px)'"
+          onmouseout="this.parentElement.style.transform='translateY(0)'"
+        >
+      </a>
+    </div>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+### Enlaces `<a>`
+✅ **`href`** - Atributo obligatorio con el destino  
+✅ **`target="_blank"`** - Abrir en nueva pestaña  
+✅ **`rel="noopener noreferrer"`** - Seguridad con target="_blank"  
+✅ **`download`** - Descargar archivo  
+✅ Enlaces a email: `mailto:`, teléfono: `tel:`, WhatsApp  
+
+### Rutas
+✅ **Absolutas** - URL completa con dominio  
+✅ **Relativas** - Desde el archivo actual (`../`)  
+✅ **Desde raíz** - Desde la raíz del sitio (`/`)  
+✅ Usar rutas desde raíz para sitios web  
+
+### Imágenes `<img>`
+✅ **`src`** - Ruta de la imagen (obligatorio)  
+✅ **`alt`** - Texto alternativo (obligatorio)  
+✅ **`width` y `height`** - Dimensiones  
+✅ **`loading="lazy"`** - Carga diferida  
+✅ Formatos: JPG (fotos), PNG (transparencias), SVG (vectores), WebP (moderno)  
+
+### Imágenes como Enlaces
+✅ Imagen dentro de `<a>` para hacerla clickeable  
+✅ Útil para logos, galerías, productos  
+✅ El `alt` describe imagen y destino  
+✅ Añadir efectos hover para indicar interactividad  
+
+### Patrones comunes
+```html
+<!-- Enlace externo seguro -->
+<a href="https://externo.com" target="_blank" rel="noopener noreferrer">
+  Sitio externo
+</a>
+
+<!-- Imagen responsive -->
+<img 
+  src="foto.jpg" 
+  alt="Descripción" 
+  style="max-width: 100%; height: auto;"
+  loading="lazy"
+>
+
+<!-- Logo clickeable -->
+<a href="/">
+  <img src="logo.png" alt="Logo - Inicio" height="50">
+</a>
+
+<!-- Galería -->
+<a href="foto-grande.jpg" target="_blank">
+  <img src="thumbnail.jpg" alt="Ver imagen completa" width="200">
+</a>
+```
+
+</Aside>
+
+---
+
+## 🚀 Próximos pasos
+
+Ahora que dominas enlaces e imágenes, aprenderás:
+- ✅ Tablas en HTML
+- ✅ Estructura de tablas
+- ✅ Celdas y filas
+- ✅ Tablas responsive

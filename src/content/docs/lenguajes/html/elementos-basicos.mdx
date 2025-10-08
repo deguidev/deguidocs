@@ -1,0 +1,1048 @@
+---
+title: 2. Elementos Básicos de HTML
+description: Etiquetas, sintaxis, semántica, comentarios y anidamiento correcto
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
+
+Los **elementos HTML** son los bloques de construcción fundamentales de cualquier página web. Cada elemento está compuesto por etiquetas que definen su propósito y comportamiento.
+
+<Aside type="tip">
+🏷️ **Concepto clave:** Un elemento HTML = Etiqueta de apertura + Contenido + Etiqueta de cierre. Ejemplo: `<p>Contenido</p>`
+</Aside>
+
+---
+
+## 🏷️ Etiquetas y su Sintaxis
+
+### Anatomía de una etiqueta HTML
+
+Una etiqueta HTML tiene una estructura específica que debes conocer:
+
+```html
+<nombre atributo="valor">Contenido</nombre>
+  ↑        ↑        ↑        ↑        ↑
+  |        |        |        |        └─ Etiqueta de cierre
+  |        |        |        └────────── Contenido del elemento
+  |        |        └─────────────────── Valor del atributo
+  |        └──────────────────────────── Atributo
+  └───────────────────────────────────── Etiqueta de apertura
+```
+
+### Tipos de etiquetas
+
+<Tabs>
+<TabItem label="Etiquetas con cierre">
+
+**Etiquetas que requieren apertura y cierre:**
+
+```html
+<!-- Párrafo -->
+<p>Este es un párrafo de texto.</p>
+
+<!-- Título -->
+<h1>Este es un título</h1>
+
+<!-- Enlace -->
+<a href="https://ejemplo.com">Visitar sitio</a>
+
+<!-- División -->
+<div>Contenedor genérico</div>
+
+<!-- Span -->
+<span>Texto en línea</span>
+
+<!-- Lista -->
+<ul>
+  <li>Elemento 1</li>
+  <li>Elemento 2</li>
+</ul>
+
+<!-- Tabla -->
+<table>
+  <tr>
+    <td>Celda</td>
+  </tr>
+</table>
+```
+
+**Características:**
+- ✅ Tienen etiqueta de apertura `<tag>`
+- ✅ Tienen etiqueta de cierre `</tag>`
+- ✅ Pueden contener texto u otros elementos
+- ✅ Son la mayoría de las etiquetas HTML
+
+</TabItem>
+
+<TabItem label="Etiquetas auto-cerradas">
+
+**Etiquetas que no requieren cierre (self-closing):**
+
+```html
+<!-- Imagen -->
+<img src="imagen.jpg" alt="Descripción">
+
+<!-- Salto de línea -->
+<br>
+
+<!-- Línea horizontal -->
+<hr>
+
+<!-- Input de formulario -->
+<input type="text" placeholder="Nombre">
+
+<!-- Meta información -->
+<meta charset="UTF-8">
+
+<!-- Enlace a hoja de estilos -->
+<link rel="stylesheet" href="estilos.css">
+
+<!-- Área de mapa -->
+<area shape="rect" coords="0,0,100,100" href="link.html">
+
+<!-- Columna de tabla -->
+<col span="2">
+
+<!-- Incrustar contenido -->
+<embed src="archivo.pdf">
+
+<!-- Parámetro -->
+<param name="autoplay" value="true">
+
+<!-- Fuente multimedia -->
+<source src="video.mp4" type="video/mp4">
+
+<!-- Track de subtítulos -->
+<track src="subtitulos.vtt" kind="subtitles">
+
+<!-- Salto de palabra -->
+<wbr>
+```
+
+**Características:**
+- ✅ No tienen etiqueta de cierre
+- ✅ No pueden contener contenido
+- ✅ Todos sus datos van en atributos
+- ✅ También llamadas "void elements"
+
+<Aside type="note">
+💡 **Nota:** En HTML5, puedes escribir `<br>` o `<br />`. Ambas formas son válidas, aunque `<br>` es más común.
+</Aside>
+
+</TabItem>
+
+<TabItem label="Atributos">
+
+**Los atributos proporcionan información adicional:**
+
+```html
+<!-- Atributos comunes -->
+<elemento 
+  id="identificador-unico"
+  class="clase1 clase2"
+  style="color: blue;"
+  title="Texto al pasar el mouse"
+  data-custom="valor-personalizado"
+>
+  Contenido
+</elemento>
+
+<!-- Atributos específicos -->
+<a href="https://ejemplo.com" target="_blank" rel="noopener">
+  Enlace externo
+</a>
+
+<img 
+  src="imagen.jpg" 
+  alt="Descripción de la imagen"
+  width="300"
+  height="200"
+  loading="lazy"
+>
+
+<input 
+  type="email"
+  name="correo"
+  placeholder="tu@email.com"
+  required
+  maxlength="50"
+>
+
+<button 
+  type="submit"
+  disabled
+  onclick="alert('Clic')"
+>
+  Enviar
+</button>
+```
+
+**Atributos globales (funcionan en cualquier etiqueta):**
+
+| Atributo | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `id` | Identificador único | `id="header"` |
+| `class` | Clases CSS | `class="btn primary"` |
+| `style` | Estilos inline | `style="color: red;"` |
+| `title` | Tooltip | `title="Más info"` |
+| `data-*` | Datos personalizados | `data-user="123"` |
+| `hidden` | Ocultar elemento | `hidden` |
+| `contenteditable` | Editable | `contenteditable="true"` |
+| `draggable` | Arrastrable | `draggable="true"` |
+| `lang` | Idioma | `lang="es"` |
+| `tabindex` | Orden de tabulación | `tabindex="1"` |
+
+</TabItem>
+
+<TabItem label="Ejemplo Interactivo">
+
+<LivePreview 
+  title="🎨 Sintaxis de etiquetas HTML"
+  html={`<div style="padding: 20px; font-family: Arial;">
+  
+  <!-- Etiqueta con contenido -->
+  <h2 style="color: #2c3e50; margin-bottom: 15px;">
+    Título con etiqueta de cierre
+  </h2>
+  
+  <!-- Etiqueta con atributos -->
+  <p style="color: #34495e; line-height: 1.6; margin-bottom: 20px;">
+    Este párrafo tiene el atributo <code>style</code> que aplica estilos CSS.
+  </p>
+  
+  <!-- Etiqueta auto-cerrada -->
+  <img 
+    src="https://via.placeholder.com/300x150/3498db/ffffff?text=Imagen+HTML" 
+    alt="Ejemplo de imagen"
+    style="border-radius: 8px; margin-bottom: 20px; max-width: 100%;"
+  >
+  
+  <!-- Etiqueta con múltiples atributos -->
+  <a 
+    href="#" 
+    class="btn"
+    title="Haz clic aquí"
+    style="display: inline-block; background: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-bottom: 20px;"
+  >
+    Botón con atributos
+  </a>
+  
+  <!-- Salto de línea (auto-cerrada) -->
+  <br>
+  
+  <!-- Línea horizontal (auto-cerrada) -->
+  <hr style="border: none; height: 2px; background: #ecf0f1; margin: 20px 0;">
+  
+  <!-- Input (auto-cerrada) -->
+  <input 
+    type="text" 
+    placeholder="Escribe algo..."
+    style="padding: 10px; border: 2px solid #3498db; border-radius: 5px; width: 100%; max-width: 300px;"
+  >
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎯 Etiquetas Semánticas vs No Semánticas
+
+### ¿Qué es la semántica en HTML?
+
+La **semántica** se refiere al significado de las etiquetas. Una etiqueta semántica describe claramente su propósito tanto para el navegador como para el desarrollador.
+
+<Tabs>
+<TabItem label="Comparación">
+
+### Etiquetas No Semánticas ❌
+
+**No describen su contenido:**
+
+```html
+<!-- Div genérico - no dice nada sobre su contenido -->
+<div>
+  <div>
+    <div>Título del sitio</div>
+    <div>
+      <div>Inicio</div>
+      <div>Servicios</div>
+    </div>
+  </div>
+  
+  <div>
+    <div>Artículo principal</div>
+  </div>
+  
+  <div>Copyright 2024</div>
+</div>
+
+<!-- Span genérico - no indica propósito -->
+<span>Texto importante</span>
+<span>Fecha: 15/01/2024</span>
+```
+
+**Problemas:**
+- ❌ No se entiende el propósito del contenido
+- ❌ Difícil de mantener
+- ❌ Malo para SEO
+- ❌ Mala accesibilidad
+
+### Etiquetas Semánticas ✅
+
+**Describen claramente su contenido:**
+
+```html
+<!-- Estructura semántica clara -->
+<body>
+  <header>
+    <h1>Título del sitio</h1>
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#servicios">Servicios</a>
+    </nav>
+  </header>
+  
+  <main>
+    <article>
+      <h2>Artículo principal</h2>
+      <p>Contenido...</p>
+    </article>
+  </main>
+  
+  <footer>
+    <p>Copyright 2024</p>
+  </footer>
+</body>
+
+<!-- Etiquetas semánticas específicas -->
+<strong>Texto importante</strong>
+<time datetime="2024-01-15">15/01/2024</time>
+```
+
+**Beneficios:**
+- ✅ Código autodescriptivo
+- ✅ Fácil de mantener
+- ✅ Mejor SEO
+- ✅ Mayor accesibilidad
+
+</TabItem>
+
+<TabItem label="Tabla Completa">
+
+### Etiquetas Semánticas HTML5
+
+| Etiqueta | Propósito | Ejemplo de uso |
+|----------|-----------|----------------|
+| `<header>` | Encabezado de página/sección | Logo, navegación principal |
+| `<nav>` | Navegación principal | Menú del sitio |
+| `<main>` | Contenido principal | Contenido único de la página |
+| `<article>` | Contenido independiente | Post de blog, noticia |
+| `<section>` | Sección temática | Capítulo, grupo de contenido |
+| `<aside>` | Contenido relacionado | Sidebar, información adicional |
+| `<footer>` | Pie de página/sección | Copyright, enlaces legales |
+| `<figure>` | Contenido multimedia | Imagen con descripción |
+| `<figcaption>` | Leyenda de figura | Descripción de imagen |
+| `<time>` | Fecha/hora | `<time datetime="2024-01-15">` |
+| `<mark>` | Texto resaltado | Búsqueda, destacado |
+| `<address>` | Información de contacto | Email, dirección física |
+| `<details>` | Contenido expandible | Acordeón, FAQ |
+| `<summary>` | Resumen de details | Título del acordeón |
+| `<dialog>` | Cuadro de diálogo | Modal, popup |
+
+### Etiquetas de Texto Semánticas
+
+| Etiqueta | Significado | Visual |
+|----------|-------------|--------|
+| `<strong>` | Importancia fuerte | **Negrita** |
+| `<em>` | Énfasis | *Cursiva* |
+| `<mark>` | Texto marcado | <mark>Resaltado</mark> |
+| `<small>` | Texto pequeño | Letra pequeña |
+| `<del>` | Texto eliminado | ~~Tachado~~ |
+| `<ins>` | Texto insertado | Subrayado |
+| `<sub>` | Subíndice | H₂O |
+| `<sup>` | Superíndice | x² |
+| `<code>` | Código | `código` |
+| `<kbd>` | Tecla del teclado | <kbd>Ctrl</kbd> |
+| `<abbr>` | Abreviación | HTML (HyperText...) |
+| `<cite>` | Cita de obra | Título de libro |
+| `<q>` | Cita corta | "Cita textual" |
+| `<blockquote>` | Cita larga | Bloque de cita |
+
+</TabItem>
+
+<TabItem label="Ejemplo Visual">
+
+<LivePreview 
+  title="🎨 Semánticas vs No Semánticas"
+  html={`<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; font-family: Arial;">
+  
+  <!-- NO SEMÁNTICO -->
+  <div style="background: #ffe6e6; padding: 20px; border-radius: 8px;">
+    <div style="font-weight: bold; color: #c0392b; margin-bottom: 15px;">
+      ❌ No Semántico
+    </div>
+    
+    <div style="background: white; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
+      <div style="font-size: 18px; font-weight: bold;">Título</div>
+      <div style="color: #666;">Contenido del artículo...</div>
+    </div>
+    
+    <div style="background: white; padding: 10px; border-radius: 5px; font-size: 12px; color: #999;">
+      Copyright 2024
+    </div>
+    
+    <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px;">
+      <span style="font-weight: bold;">Importante:</span>
+      <span>Este texto es relevante</span>
+    </div>
+  </div>
+  
+  <!-- SEMÁNTICO -->
+  <div style="background: #e6ffe6; padding: 20px; border-radius: 8px;">
+    <div style="font-weight: bold; color: #27ae60; margin-bottom: 15px;">
+      ✅ Semántico
+    </div>
+    
+    <article style="background: white; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
+      <h2 style="font-size: 18px; margin: 0 0 10px 0;">Título</h2>
+      <p style="margin: 0; color: #666;">Contenido del artículo...</p>
+    </article>
+    
+    <footer style="background: white; padding: 10px; border-radius: 5px; font-size: 12px; color: #999;">
+      Copyright 2024
+    </footer>
+    
+    <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px;">
+      <strong>Importante:</strong>
+      <em>Este texto es relevante</em>
+    </div>
+  </div>
+  
+</div>
+
+<div style="padding: 20px; background: #f8f9fa; border-radius: 8px; margin-top: 20px;">
+  <h3 style="margin: 0 0 15px 0; color: #2c3e50;">Etiquetas de texto semánticas:</h3>
+  
+  <p style="line-height: 2; color: #34495e;">
+    <strong>Texto importante</strong> • 
+    <em>Texto con énfasis</em> • 
+    <mark style="background: #fff3cd; padding: 2px 5px;">Texto resaltado</mark> • 
+    <code style="background: #e9ecef; padding: 2px 5px; border-radius: 3px;">código</code> • 
+    <small>Texto pequeño</small> • 
+    <del>Texto eliminado</del> • 
+    <ins style="text-decoration: none; border-bottom: 2px solid #2ecc71;">Texto insertado</ins> • 
+    H<sub>2</sub>O • 
+    x<sup>2</sup>
+  </p>
+</div>`}
+  css={``}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 💬 Comentarios en HTML
+
+Los **comentarios** son notas en el código que el navegador ignora. Son útiles para documentar y organizar el código.
+
+### Sintaxis de comentarios
+
+```html
+<!-- Este es un comentario de una línea -->
+
+<!-- 
+  Este es un comentario
+  de múltiples líneas
+  que puede abarcar varias líneas
+-->
+
+<!-- Comentario con información útil -->
+<header>
+  <!-- Navegación principal del sitio -->
+  <nav>
+    <a href="#inicio">Inicio</a>
+  </nav>
+</header>
+```
+
+<Tabs>
+<TabItem label="Usos comunes">
+
+### Usos prácticos de los comentarios
+
+**1. Documentar secciones** 📝
+
+```html
+<!-- ==================== -->
+<!-- HEADER - Encabezado  -->
+<!-- ==================== -->
+<header>
+  <h1>Mi Sitio</h1>
+</header>
+
+<!-- ==================== -->
+<!-- MAIN - Contenido     -->
+<!-- ==================== -->
+<main>
+  <p>Contenido principal</p>
+</main>
+
+<!-- ==================== -->
+<!-- FOOTER - Pie         -->
+<!-- ==================== -->
+<footer>
+  <p>Copyright 2024</p>
+</footer>
+```
+
+**2. Desactivar código temporalmente** 🔧
+
+```html
+<!-- Código desactivado temporalmente
+<div class="banner-promocional">
+  <p>¡Oferta especial!</p>
+</div>
+-->
+
+<div class="contenido-principal">
+  <p>Contenido activo</p>
+</div>
+```
+
+**3. Dejar notas para el equipo** 👥
+
+```html
+<!-- TODO: Agregar imagen del producto -->
+<div class="producto">
+  <h3>Nombre del producto</h3>
+  <!-- FIXME: El precio debe venir de la base de datos -->
+  <p>Precio: $99.99</p>
+</div>
+
+<!-- NOTE: Esta sección se actualiza cada semana -->
+<section class="noticias">
+  <h2>Últimas noticias</h2>
+</section>
+```
+
+**4. Marcar inicio y fin de secciones** 🏁
+
+```html
+<!-- START: Sección de servicios -->
+<section id="servicios">
+  <h2>Nuestros Servicios</h2>
+  <div class="servicio">...</div>
+  <div class="servicio">...</div>
+</section>
+<!-- END: Sección de servicios -->
+
+<!-- START: Sección de contacto -->
+<section id="contacto">
+  <h2>Contacto</h2>
+  <form>...</form>
+</section>
+<!-- END: Sección de contacto -->
+```
+
+**5. Explicar código complejo** 🧩
+
+```html
+<!-- 
+  Este formulario usa validación HTML5
+  - required: campo obligatorio
+  - pattern: validación con expresión regular
+  - minlength: longitud mínima
+-->
+<form>
+  <input 
+    type="email" 
+    required 
+    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+  >
+</form>
+```
+
+</TabItem>
+
+<TabItem label="Buenas prácticas">
+
+### ✅ Buenas prácticas
+
+```html
+<!-- ✅ Comentario claro y conciso -->
+<!-- Navegación principal -->
+<nav>...</nav>
+
+<!-- ✅ Separador visual -->
+<!-- ================================ -->
+<!-- SECCIÓN DE PRODUCTOS             -->
+<!-- ================================ -->
+
+<!-- ✅ Información útil -->
+<!-- Última actualización: 15/01/2024 -->
+<div class="estadisticas">...</div>
+
+<!-- ✅ Advertencia importante -->
+<!-- ⚠️ NO MODIFICAR: Este código es generado automáticamente -->
+<div id="widget-externo">...</div>
+```
+
+### ❌ Malas prácticas
+
+```html
+<!-- ❌ Comentario obvio (no aporta valor) -->
+<!-- Este es un párrafo -->
+<p>Texto del párrafo</p>
+
+<!-- ❌ Comentario desactualizado -->
+<!-- Este botón es rojo -->
+<button class="btn-blue">Clic</button>
+
+<!-- ❌ Código comentado sin explicación -->
+<!--
+<div>
+  <p>Algo</p>
+</div>
+<span>Otra cosa</span>
+-->
+
+<!-- ❌ Comentario demasiado largo y confuso -->
+<!-- Este es un comentario muy largo que explica muchas cosas innecesarias y que probablemente nadie va a leer porque es demasiado extenso y no está bien organizado ni estructurado de manera clara -->
+```
+
+</TabItem>
+
+<TabItem label="Ejemplo Interactivo">
+
+<LivePreview 
+  title="🎨 Comentarios en HTML"
+  html={`<!-- ================================ -->
+<!-- PÁGINA DE EJEMPLO CON COMENTARIOS -->
+<!-- ================================ -->
+
+<div style="font-family: Arial; padding: 20px; max-width: 800px; margin: 0 auto;">
+  
+  <!-- HEADER: Encabezado del sitio -->
+  <header style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+    <h1 style="margin: 0;">Mi Sitio Web</h1>
+    <!-- Navegación principal -->
+    <nav style="margin-top: 10px;">
+      <a href="#" style="color: white; margin-right: 15px;">Inicio</a>
+      <a href="#" style="color: white; margin-right: 15px;">Servicios</a>
+      <a href="#" style="color: white;">Contacto</a>
+    </nav>
+  </header>
+  
+  <!-- MAIN: Contenido principal -->
+  <main>
+    
+    <!-- Sección de bienvenida -->
+    <section style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+      <h2 style="color: #2c3e50; margin-top: 0;">Bienvenido</h2>
+      <p style="color: #34495e; line-height: 1.6;">
+        Este ejemplo muestra cómo usar comentarios en HTML para documentar tu código.
+      </p>
+    </section>
+    
+    <!-- TODO: Agregar más secciones aquí -->
+    
+    <!-- 
+      NOTA: Esta sección está desactivada temporalmente
+      <section>
+        <h2>Promociones</h2>
+        <p>Contenido de promociones...</p>
+      </section>
+    -->
+    
+  </main>
+  
+  <!-- FOOTER: Pie de página -->
+  <footer style="background: #2c3e50; color: white; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px;">
+    <p style="margin: 0;">© 2024 Mi Sitio Web</p>
+    <!-- Última actualización: 15/01/2024 -->
+  </footer>
+  
+</div>
+
+<!-- FIN DEL DOCUMENTO -->`}
+  css={``}
+  js={``}
+/>
+
+<div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #f39c12;">
+  <strong>💡 Tip:</strong> Los comentarios son invisibles en el navegador, pero visibles en el código fuente (clic derecho → Ver código fuente).
+</div>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎯 Anidamiento Correcto de Etiquetas
+
+El **anidamiento** se refiere a colocar elementos dentro de otros elementos. Debe hacerse correctamente para que el HTML sea válido.
+
+### Reglas de anidamiento
+
+<Tabs>
+<TabItem label="Reglas básicas">
+
+### ✅ Anidamiento correcto
+
+```html
+<!-- ✅ CORRECTO: Cierre en orden inverso -->
+<div>
+  <p>
+    <strong>Texto en negrita</strong>
+  </p>
+</div>
+
+<!-- ✅ CORRECTO: Elementos en línea dentro de bloque -->
+<p>
+  Este es un <strong>texto importante</strong> con <em>énfasis</em>.
+</p>
+
+<!-- ✅ CORRECTO: Listas anidadas -->
+<ul>
+  <li>Elemento 1</li>
+  <li>Elemento 2
+    <ul>
+      <li>Sub-elemento 2.1</li>
+      <li>Sub-elemento 2.2</li>
+    </ul>
+  </li>
+  <li>Elemento 3</li>
+</ul>
+
+<!-- ✅ CORRECTO: Estructura semántica -->
+<article>
+  <header>
+    <h2>Título del artículo</h2>
+    <p>Fecha: <time datetime="2024-01-15">15/01/2024</time></p>
+  </header>
+  <p>Contenido del artículo...</p>
+  <footer>
+    <p>Autor: Juan Pérez</p>
+  </footer>
+</article>
+```
+
+### ❌ Anidamiento incorrecto
+
+```html
+<!-- ❌ INCORRECTO: Cierre en orden equivocado -->
+<div>
+  <p>
+    <strong>Texto</p>
+  </strong>
+</div>
+
+<!-- ❌ INCORRECTO: Elementos de bloque dentro de inline -->
+<span>
+  <div>Esto no es válido</div>
+</span>
+
+<!-- ❌ INCORRECTO: <p> no puede contener otros <p> -->
+<p>
+  Párrafo 1
+  <p>Párrafo 2</p>
+</p>
+
+<!-- ❌ INCORRECTO: <a> no puede contener otro <a> -->
+<a href="#">
+  Enlace externo
+  <a href="#">Enlace interno</a>
+</a>
+
+<!-- ❌ INCORRECTO: Etiquetas cruzadas -->
+<strong><em>Texto</strong></em>
+```
+
+</TabItem>
+
+<TabItem label="Elementos de bloque vs inline">
+
+### Elementos de Bloque (Block)
+
+**Ocupan todo el ancho disponible y comienzan en nueva línea:**
+
+```html
+<!-- Elementos de bloque -->
+<div>División</div>
+<p>Párrafo</p>
+<h1>Título</h1>
+<ul>Lista</ul>
+<section>Sección</section>
+<article>Artículo</article>
+<header>Encabezado</header>
+<footer>Pie</footer>
+<nav>Navegación</nav>
+<main>Principal</main>
+<aside>Lateral</aside>
+<form>Formulario</form>
+<table>Tabla</table>
+<blockquote>Cita</blockquote>
+<pre>Preformateado</pre>
+<hr>
+```
+
+**Reglas:**
+- ✅ Pueden contener elementos inline
+- ✅ Pueden contener otros elementos de bloque
+- ✅ Comienzan en nueva línea
+
+### Elementos en Línea (Inline)
+
+**Ocupan solo el espacio necesario, no rompen la línea:**
+
+```html
+<!-- Elementos inline -->
+<span>Span</span>
+<a href="#">Enlace</a>
+<strong>Negrita</strong>
+<em>Cursiva</em>
+<code>Código</code>
+<img src="img.jpg" alt="Imagen">
+<input type="text">
+<button>Botón</button>
+<label>Etiqueta</label>
+<abbr>Abreviación</abbr>
+<cite>Cita</cite>
+<mark>Marcado</mark>
+<small>Pequeño</small>
+<sub>Subíndice</sub>
+<sup>Superíndice</sup>
+<time>Tiempo</time>
+```
+
+**Reglas:**
+- ✅ Pueden contener solo elementos inline
+- ❌ NO pueden contener elementos de bloque
+- ✅ No rompen la línea
+
+### Tabla de compatibilidad
+
+| Contenedor | Puede contener |
+|------------|----------------|
+| Bloque | Bloque + Inline |
+| Inline | Solo Inline |
+| `<p>` | Solo Inline (excepción) |
+| `<a>` | Inline (no otro `<a>`) |
+| `<button>` | Inline (no interactivos) |
+
+</TabItem>
+
+<TabItem label="Ejemplo Visual">
+
+<LivePreview 
+  title="🎨 Anidamiento correcto vs incorrecto"
+  html={`<div style="font-family: Arial; padding: 20px;">
+  
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+    
+    <!-- CORRECTO -->
+    <div style="background: #e6ffe6; padding: 20px; border-radius: 8px; border: 2px solid #27ae60;">
+      <div style="font-weight: bold; color: #27ae60; margin-bottom: 15px;">
+        ✅ Anidamiento Correcto
+      </div>
+      
+      <div style="background: white; padding: 15px; border-radius: 5px;">
+        <p style="margin: 0 0 10px 0;">
+          Este es un <strong>texto importante</strong> con <em>énfasis</em>.
+        </p>
+        <p style="margin: 0;">
+          Cierre en orden: <code>&lt;p&gt;&lt;strong&gt;&lt;/strong&gt;&lt;/p&gt;</code>
+        </p>
+      </div>
+    </div>
+    
+    <!-- INCORRECTO -->
+    <div style="background: #ffe6e6; padding: 20px; border-radius: 8px; border: 2px solid #c0392b;">
+      <div style="font-weight: bold; color: #c0392b; margin-bottom: 15px;">
+        ❌ Anidamiento Incorrecto
+      </div>
+      
+      <div style="background: white; padding: 15px; border-radius: 5px;">
+        <p style="margin: 0 0 10px 0; color: #c0392b;">
+          Etiquetas cruzadas (no válido)
+        </p>
+        <p style="margin: 0;">
+          <code>&lt;strong&gt;&lt;em&gt;&lt;/strong&gt;&lt;/em&gt;</code>
+        </p>
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- Ejemplo de estructura correcta -->
+  <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+    <h3 style="margin: 0 0 15px 0; color: #2c3e50;">Estructura correcta completa:</h3>
+    
+    <article style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <header style="border-bottom: 2px solid #ecf0f1; padding-bottom: 15px; margin-bottom: 15px;">
+        <h2 style="margin: 0 0 10px 0; color: #2c3e50;">Título del Artículo</h2>
+        <p style="margin: 0; color: #7f8c8d; font-size: 14px;">
+          Publicado el <time datetime="2024-01-15">15 de Enero, 2024</time>
+        </p>
+      </header>
+      
+      <section>
+        <p style="line-height: 1.6; color: #34495e;">
+          Este es un ejemplo de <strong>anidamiento correcto</strong> con 
+          <em>múltiples niveles</em> de elementos.
+        </p>
+        
+        <ul style="color: #34495e;">
+          <li>Elemento de lista 1</li>
+          <li>Elemento de lista 2
+            <ul>
+              <li>Sub-elemento 2.1</li>
+              <li>Sub-elemento 2.2</li>
+            </ul>
+          </li>
+          <li>Elemento de lista 3</li>
+        </ul>
+      </section>
+      
+      <footer style="border-top: 2px solid #ecf0f1; padding-top: 15px; margin-top: 15px;">
+        <p style="margin: 0; color: #7f8c8d; font-size: 14px;">
+          Autor: <strong>Juan Pérez</strong>
+        </p>
+      </footer>
+    </article>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+
+</TabItem>
+
+<TabItem label="Validación">
+
+### Cómo validar tu HTML
+
+**Herramientas de validación:**
+
+1. **W3C Validator** 🔍
+   - URL: https://validator.w3.org/
+   - Valida sintaxis y anidamiento
+   - Detecta errores comunes
+
+2. **Extensiones de navegador** 🔧
+   - HTML Validator (Chrome/Firefox)
+   - Valida en tiempo real
+
+3. **DevTools del navegador** 🛠️
+   - F12 → Console
+   - Muestra advertencias de HTML
+
+**Errores comunes detectados:**
+
+```html
+<!-- Error: Etiqueta no cerrada -->
+<div>
+  <p>Texto
+</div>
+
+<!-- Error: Anidamiento incorrecto -->
+<p><div>Bloque dentro de inline</div></p>
+
+<!-- Error: Atributo duplicado -->
+<img src="img.jpg" src="otra.jpg" alt="Imagen">
+
+<!-- Error: Etiqueta desconocida -->
+<custom-tag>Contenido</custom-tag>
+```
+
+<div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196f3;">
+  <strong>💡 Tip:</strong> Usa un editor de código con validación HTML integrada (VS Code, Sublime Text) para detectar errores mientras escribes.
+</div>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+### Etiquetas y Sintaxis
+✅ **Etiquetas con cierre**: `<p>Contenido</p>`  
+✅ **Etiquetas auto-cerradas**: `<img>`, `<br>`, `<hr>`  
+✅ **Atributos**: `<a href="url" target="_blank">`  
+✅ **Atributos globales**: `id`, `class`, `style`, `title`  
+
+### Semántica
+✅ **Etiquetas semánticas** describen su contenido ⭐  
+✅ **Mejor SEO** y accesibilidad  
+✅ Usar `<header>`, `<nav>`, `<main>`, `<article>`, `<footer>`  
+✅ Evitar `<div>` y `<span>` genéricos cuando hay alternativa  
+
+### Comentarios
+✅ **Sintaxis**: `<!-- Comentario -->`  
+✅ Documentar secciones y código  
+✅ Desactivar código temporalmente  
+✅ No abusar de comentarios obvios  
+
+### Anidamiento
+✅ **Cerrar en orden inverso** ⭐  
+✅ Bloque puede contener bloque + inline  
+✅ Inline solo puede contener inline  
+✅ Validar con W3C Validator  
+
+### Patrones comunes
+```html
+<!-- Estructura básica -->
+<article>
+  <header>
+    <h2>Título</h2>
+  </header>
+  <p>Contenido...</p>
+  <footer>Autor</footer>
+</article>
+
+<!-- Texto con formato -->
+<p>
+  Este es <strong>importante</strong> y 
+  <em>con énfasis</em>.
+</p>
+
+<!-- Lista anidada -->
+<ul>
+  <li>Item 1</li>
+  <li>Item 2
+    <ul>
+      <li>Sub-item</li>
+    </ul>
+  </li>
+</ul>
+```
+
+</Aside>
+
+---
+
+## 🚀 Próximos pasos
+
+Ahora que dominas los elementos básicos, aprenderás:
+- ✅ Cabecera del documento (`<head>`)
+- ✅ Metadatos y configuración
+- ✅ Importación de estilos y scripts
+- ✅ SEO y optimización

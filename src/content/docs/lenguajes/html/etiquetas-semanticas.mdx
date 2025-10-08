@@ -1,0 +1,1220 @@
+---
+title: 9. Etiquetas Semánticas
+description: Semántica web, header, main, footer, section, article, aside, nav y beneficios SEO
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
+
+# 🏗️ Etiquetas Semánticas HTML5
+
+Las etiquetas semánticas son elementos HTML que describen claramente su significado tanto para el navegador como para los desarrolladores. HTML5 introdujo elementos semánticos que mejoran la estructura, accesibilidad y SEO de las páginas web.
+
+---
+
+## 📖 Introducción a la Semántica Web
+
+La **semántica web** se refiere al uso de etiquetas HTML que tienen un significado específico sobre el contenido que contienen, en lugar de solo definir cómo se ve.
+
+### ¿Por qué usar HTML Semántico?
+
+<Tabs>
+<TabItem label="Antes (HTML4)">
+<Code code={`<!-- HTML no semántico -->
+<div id="header">
+  <div id="nav">
+    <a href="/">Inicio</a>
+    <a href="/blog">Blog</a>
+  </div>
+</div>
+
+<div id="content">
+  <div class="post">
+    <h2>Título del artículo</h2>
+    <p>Contenido...</p>
+  </div>
+</div>
+
+<div id="sidebar">
+  <div class="widget">
+    <h3>Enlaces</h3>
+  </div>
+</div>
+
+<div id="footer">
+  <p>&copy; 2024</p>
+</div>`} lang="html" title="html4-no-semantico.html" />
+
+<Aside type="caution" title="❌ Problemas">
+- No hay significado claro en los `<div>`
+- Difícil para motores de búsqueda
+- Mala accesibilidad para lectores de pantalla
+- Requiere clases/IDs para identificar secciones
+</Aside>
+</TabItem>
+
+<TabItem label="Ahora (HTML5)">
+<Code code={`<!-- HTML semántico -->
+<header>
+  <nav>
+    <a href="/">Inicio</a>
+    <a href="/blog">Blog</a>
+  </nav>
+</header>
+
+<main>
+  <article>
+    <h2>Título del artículo</h2>
+    <p>Contenido...</p>
+  </article>
+</main>
+
+<aside>
+  <section>
+    <h3>Enlaces</h3>
+  </section>
+</aside>
+
+<footer>
+  <p>&copy; 2024</p>
+</footer>`} lang="html" title="html5-semantico.html" />
+
+<Aside type="tip" title="✅ Ventajas">
+- **Significado claro** del contenido
+- **Mejor SEO** para motores de búsqueda
+- **Accesibilidad mejorada** para tecnologías asistivas
+- **Código más limpio** y mantenible
+</Aside>
+</TabItem>
+</Tabs>
+
+### Comparación Visual
+
+| Aspecto | HTML No Semántico | HTML Semántico |
+|---------|-------------------|----------------|
+| **Claridad** | ❌ `<div class="header">` | ✅ `<header>` |
+| **SEO** | ⚠️ Limitado | ✅ Optimizado |
+| **Accesibilidad** | ❌ Requiere ARIA | ✅ Nativa |
+| **Mantenibilidad** | ⚠️ Compleja | ✅ Simple |
+| **Legibilidad** | ❌ Confusa | ✅ Clara |
+
+---
+
+## 🎯 Contenedores Semánticos Principales
+
+### `<header>` - Encabezado
+
+El elemento `<header>` representa contenido introductorio o de navegación. Puede contener logos, títulos, navegación y formularios de búsqueda.
+
+<Tabs>
+<TabItem label="Sintaxis">
+<Code code={`<!-- Header de página -->
+<header>
+  <h1>Mi Sitio Web</h1>
+  <nav>
+    <a href="/">Inicio</a>
+    <a href="/about">Acerca</a>
+    <a href="/contact">Contacto</a>
+  </nav>
+</header>
+
+<!-- Header de artículo -->
+<article>
+  <header>
+    <h2>Título del Artículo</h2>
+    <p>Por Juan Pérez - 15 de Octubre, 2024</p>
+  </header>
+  <p>Contenido del artículo...</p>
+</article>`} lang="html" title="header.html" />
+</TabItem>
+
+<TabItem label="Características">
+| Característica | Descripción |
+|----------------|-------------|
+| **Ubicación** | Inicio de página, sección o artículo |
+| **Contenido típico** | Logo, título, navegación, búsqueda |
+| **Múltiples** | ✅ Puede haber varios en una página |
+| **Anidamiento** | ❌ No debe contener otro `<header>` o `<footer>` |
+
+<Aside type="note" title="💡 Uso Múltiple">
+Puedes usar múltiples `<header>` en una página: uno para el sitio y otros para artículos o secciones individuales.
+</Aside>
+</TabItem>
+</Tabs>
+
+---
+
+### `<nav>` - Navegación
+
+El elemento `<nav>` define un conjunto de enlaces de navegación principales del sitio.
+
+<Tabs>
+<TabItem label="Sintaxis">
+<Code code={`<!-- Navegación principal -->
+<nav>
+  <ul>
+    <li><a href="/">Inicio</a></li>
+    <li><a href="/productos">Productos</a></li>
+    <li><a href="/servicios">Servicios</a></li>
+    <li><a href="/contacto">Contacto</a></li>
+  </ul>
+</nav>
+
+<!-- Navegación secundaria -->
+<nav aria-label="Navegación de breadcrumb">
+  <ol>
+    <li><a href="/">Inicio</a></li>
+    <li><a href="/productos">Productos</a></li>
+    <li>Detalles</li>
+  </ol>
+</nav>`} lang="html" title="nav.html" />
+</TabItem>
+
+<TabItem label="Buenas Prácticas">
+<Aside type="tip" title="✅ Recomendaciones">
+- Usa `<nav>` solo para navegación **principal**
+- No uses `<nav>` para todos los enlaces
+- Incluye `aria-label` si hay múltiples `<nav>`
+- Usa listas `<ul>` o `<ol>` dentro de `<nav>`
+</Aside>
+
+<Code code={`<!-- ✅ Correcto: Navegación principal -->
+<nav aria-label="Navegación principal">
+  <ul>
+    <li><a href="/">Inicio</a></li>
+  </ul>
+</nav>
+
+<!-- ❌ Incorrecto: Enlaces no son navegación principal -->
+<nav>
+  <a href="/terminos">Términos</a>
+  <a href="/privacidad">Privacidad</a>
+</nav>
+
+<!-- ✅ Correcto: Usa footer para enlaces secundarios -->
+<footer>
+  <a href="/terminos">Términos</a>
+  <a href="/privacidad">Privacidad</a>
+</footer>`} lang="html" title="nav-buenas-practicas.html" />
+</TabItem>
+</Tabs>
+
+---
+
+### `<main>` - Contenido Principal
+
+El elemento `<main>` representa el contenido principal y único de la página. Solo debe haber **uno** por página.
+
+<Tabs>
+<TabItem label="Sintaxis">
+<Code code={`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <title>Mi Sitio</title>
+</head>
+<body>
+  <header>
+    <h1>Mi Sitio Web</h1>
+    <nav>...</nav>
+  </header>
+  
+  <!-- Contenido principal único -->
+  <main>
+    <h2>Bienvenido</h2>
+    <p>Este es el contenido principal de la página.</p>
+    
+    <article>
+      <h3>Artículo destacado</h3>
+      <p>Contenido del artículo...</p>
+    </article>
+  </main>
+  
+  <aside>
+    <h3>Sidebar</h3>
+  </aside>
+  
+  <footer>
+    <p>&copy; 2024</p>
+  </footer>
+</body>
+</html>`} lang="html" title="main.html" />
+</TabItem>
+
+<TabItem label="Reglas Importantes">
+<Aside type="caution" title="⚠️ Reglas de `<main>`">
+- **Solo uno** por página (sin atributo `hidden`)
+- **No puede** estar dentro de `<article>`, `<aside>`, `<footer>`, `<header>`, `<nav>`
+- **Debe** ser descendiente directo de `<body>` (o `<div>`, `<form>`)
+- **Contiene** el contenido único de la página
+</Aside>
+
+<Code code={`<!-- ✅ Correcto -->
+<body>
+  <header>...</header>
+  <main>
+    <article>Contenido principal</article>
+  </main>
+  <footer>...</footer>
+</body>
+
+<!-- ❌ Incorrecto: main dentro de article -->
+<article>
+  <main>...</main>
+</article>
+
+<!-- ❌ Incorrecto: múltiples main visibles -->
+<main>Contenido 1</main>
+<main>Contenido 2</main>`} lang="html" title="main-reglas.html" />
+</TabItem>
+</Tabs>
+
+---
+
+### `<article>` - Artículo Independiente
+
+El elemento `<article>` representa contenido independiente y auto-contenido que podría distribuirse o reutilizarse de forma independiente.
+
+<Tabs>
+<TabItem label="Sintaxis">
+<Code code={`<!-- Artículo de blog -->
+<article>
+  <header>
+    <h2>Título del Artículo</h2>
+    <p>
+      <time datetime="2024-10-15">15 de Octubre, 2024</time>
+      por <span>Juan Pérez</span>
+    </p>
+  </header>
+  
+  <p>Contenido del artículo...</p>
+  
+  <footer>
+    <p>Etiquetas: <a href="/tag/html">HTML</a>, <a href="/tag/web">Web</a></p>
+  </footer>
+</article>
+
+<!-- Comentario de usuario -->
+<article class="comment">
+  <header>
+    <h4>María García</h4>
+    <time datetime="2024-10-15T14:30">Hace 2 horas</time>
+  </header>
+  <p>Excelente artículo, muy útil!</p>
+</article>`} lang="html" title="article.html" />
+</TabItem>
+
+<TabItem label="Casos de Uso">
+| Uso | Ejemplo |
+|-----|---------|
+| **Posts de blog** | Artículos completos |
+| **Noticias** | Historias de noticias |
+| **Comentarios** | Comentarios de usuarios |
+| **Widgets** | Widgets independientes |
+| **Productos** | Fichas de productos |
+
+<Aside type="tip" title="🤔 ¿Cuándo usar `<article>`?">
+Pregúntate: ¿Este contenido tendría sentido si se extrae y se publica en otro lugar? Si la respuesta es sí, usa `<article>`.
+</Aside>
+</TabItem>
+
+<TabItem label="Anidamiento">
+<Code code={`<!-- Artículo con comentarios anidados -->
+<article>
+  <header>
+    <h2>Post Principal</h2>
+  </header>
+  
+  <p>Contenido del post...</p>
+  
+  <section>
+    <h3>Comentarios</h3>
+    
+    <!-- Comentarios como articles anidados -->
+    <article class="comment">
+      <header>
+        <h4>Usuario 1</h4>
+        <time>Hace 1 hora</time>
+      </header>
+      <p>Primer comentario</p>
+    </article>
+    
+    <article class="comment">
+      <header>
+        <h4>Usuario 2</h4>
+        <time>Hace 30 min</time>
+      </header>
+      <p>Segundo comentario</p>
+    </article>
+  </section>
+</article>`} lang="html" title="article-anidado.html" />
+</TabItem>
+</Tabs>
+
+---
+
+### `<section>` - Sección Temática
+
+El elemento `<section>` representa una sección temática de contenido, generalmente con un encabezado.
+
+<Tabs>
+<TabItem label="Sintaxis">
+<Code code={`<!-- Secciones de una página -->
+<main>
+  <section>
+    <h2>Sobre Nosotros</h2>
+    <p>Información sobre la empresa...</p>
+  </section>
+  
+  <section>
+    <h2>Nuestros Servicios</h2>
+    <ul>
+      <li>Servicio 1</li>
+      <li>Servicio 2</li>
+    </ul>
+  </section>
+  
+  <section>
+    <h2>Contacto</h2>
+    <form>...</form>
+  </section>
+</main>`} lang="html" title="section.html" />
+</TabItem>
+
+<TabItem label="Section vs Article">
+| Criterio | `<section>` | `<article>` |
+|----------|-------------|-------------|
+| **Propósito** | Agrupar contenido temático | Contenido independiente |
+| **Reutilización** | Parte del contexto | Auto-contenido |
+| **Encabezado** | Generalmente tiene `<h2>`-`<h6>` | Generalmente tiene `<h1>`-`<h2>` |
+| **Ejemplo** | Sección "Servicios" | Post de blog completo |
+
+<Aside type="note" title="💡 Regla General">
+- Usa `<section>` para **agrupar contenido relacionado** dentro de una página
+- Usa `<article>` para **contenido que puede existir independientemente**
+</Aside>
+</TabItem>
+
+<TabItem label="Combinación">
+<Code code={`<!-- Article con múltiples sections -->
+<article>
+  <header>
+    <h1>Guía Completa de HTML5</h1>
+  </header>
+  
+  <section>
+    <h2>Introducción</h2>
+    <p>HTML5 es...</p>
+  </section>
+  
+  <section>
+    <h2>Características</h2>
+    <p>Las principales características...</p>
+  </section>
+  
+  <section>
+    <h2>Ejemplos</h2>
+    <p>Veamos algunos ejemplos...</p>
+  </section>
+</article>`} lang="html" title="section-article.html" />
+</TabItem>
+</Tabs>
+
+---
+
+### `<aside>` - Contenido Complementario
+
+El elemento `<aside>` representa contenido relacionado indirectamente con el contenido principal, como barras laterales, notas o publicidad.
+
+<Tabs>
+<TabItem label="Sintaxis">
+<Code code={`<!-- Sidebar de página -->
+<aside>
+  <section>
+    <h3>Artículos Relacionados</h3>
+    <ul>
+      <li><a href="/post1">Post 1</a></li>
+      <li><a href="/post2">Post 2</a></li>
+    </ul>
+  </section>
+  
+  <section>
+    <h3>Categorías</h3>
+    <ul>
+      <li><a href="/cat/html">HTML</a></li>
+      <li><a href="/cat/css">CSS</a></li>
+    </ul>
+  </section>
+</aside>
+
+<!-- Nota dentro de un artículo -->
+<article>
+  <h2>Historia de HTML</h2>
+  <p>HTML fue creado en 1991...</p>
+  
+  <aside>
+    <h4>Dato curioso</h4>
+    <p>Tim Berners-Lee creó HTML en el CERN.</p>
+  </aside>
+  
+  <p>Continuando con la historia...</p>
+</article>`} lang="html" title="aside.html" />
+</TabItem>
+
+<TabItem label="Casos de Uso">
+| Contexto | Uso de `<aside>` |
+|----------|------------------|
+| **Página completa** | Sidebar con widgets |
+| **Dentro de article** | Notas, definiciones, citas |
+| **Publicidad** | Banners relacionados |
+| **Navegación secundaria** | Enlaces relacionados |
+
+<Aside type="tip" title="🎯 Ubicación">
+- `<aside>` a nivel de página = Sidebar general
+- `<aside>` dentro de `<article>` = Contenido tangencialmente relacionado
+</Aside>
+</TabItem>
+</Tabs>
+
+---
+
+### `<footer>` - Pie de Página
+
+El elemento `<footer>` representa información de pie para su sección más cercana o para el documento completo.
+
+<Tabs>
+<TabItem label="Sintaxis">
+<Code code={`<!-- Footer de página -->
+<footer>
+  <nav aria-label="Enlaces del footer">
+    <a href="/about">Acerca</a>
+    <a href="/privacy">Privacidad</a>
+    <a href="/terms">Términos</a>
+  </nav>
+  
+  <p>&copy; 2024 Mi Empresa. Todos los derechos reservados.</p>
+  
+  <div class="social">
+    <a href="https://twitter.com/miempresa">Twitter</a>
+    <a href="https://facebook.com/miempresa">Facebook</a>
+  </div>
+</footer>
+
+<!-- Footer de artículo -->
+<article>
+  <header>
+    <h2>Mi Artículo</h2>
+  </header>
+  
+  <p>Contenido...</p>
+  
+  <footer>
+    <p>Publicado el <time datetime="2024-10-15">15 de Octubre, 2024</time></p>
+    <p>Autor: Juan Pérez</p>
+    <p>Etiquetas: HTML, Web Development</p>
+  </footer>
+</article>`} lang="html" title="footer.html" />
+</TabItem>
+
+<TabItem label="Contenido Típico">
+| Elemento | Descripción |
+|----------|-------------|
+| **Copyright** | Información de derechos de autor |
+| **Enlaces** | Términos, privacidad, contacto |
+| **Redes sociales** | Enlaces a perfiles sociales |
+| **Información de contacto** | Dirección, teléfono, email |
+| **Metadatos** | Autor, fecha, categorías (en artículos) |
+
+<Aside type="note" title="💡 Múltiples Footers">
+Al igual que `<header>`, puedes tener múltiples `<footer>` en una página: uno para el sitio y otros para artículos o secciones.
+</Aside>
+</TabItem>
+</Tabs>
+
+---
+
+## 🎨 Ejemplo Completo de Estructura Semántica
+
+<LivePreview html={`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estructura Semántica HTML5</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+    
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    header h1 {
+      margin-bottom: 10px;
+    }
+    
+    /* Navigation */
+    nav {
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      border-radius: 5px;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 15px;
+      margin-right: 10px;
+      border-radius: 3px;
+      transition: background 0.3s;
+    }
+    
+    nav a:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    
+    /* Layout */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    
+    /* Main */
+    main {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    /* Article */
+    article {
+      margin-bottom: 30px;
+      padding-bottom: 30px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    article:last-child {
+      border-bottom: none;
+    }
+    
+    article header {
+      background: #f8f9fa;
+      color: #333;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      box-shadow: none;
+    }
+    
+    article header h2 {
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+    
+    article header .meta {
+      font-size: 0.9em;
+      color: #666;
+    }
+    
+    article footer {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #e0e0e0;
+      font-size: 0.9em;
+      color: #666;
+    }
+    
+    /* Section */
+    section {
+      margin-bottom: 20px;
+    }
+    
+    section h3 {
+      color: #764ba2;
+      margin-bottom: 10px;
+    }
+    
+    /* Aside */
+    aside {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+    }
+    
+    aside section {
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    aside section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    
+    aside h3 {
+      color: #667eea;
+      font-size: 1.1em;
+      margin-bottom: 10px;
+    }
+    
+    aside ul {
+      list-style: none;
+    }
+    
+    aside ul li {
+      padding: 5px 0;
+    }
+    
+    aside ul li a {
+      color: #666;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    aside ul li a:hover {
+      color: #667eea;
+    }
+    
+    /* Footer */
+    body > footer {
+      background: #2c3e50;
+      color: white;
+      padding: 30px 20px;
+      margin-top: 40px;
+      text-align: center;
+    }
+    
+    body > footer nav {
+      margin-bottom: 15px;
+    }
+    
+    body > footer nav a {
+      color: #ecf0f1;
+      margin: 0 10px;
+    }
+    
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      background: #667eea;
+      color: white;
+      border-radius: 3px;
+      font-size: 0.8em;
+      margin-right: 5px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      
+      aside {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header del sitio -->
+  <header>
+    <h1>🏗️ Mi Blog Semántico</h1>
+    <nav aria-label="Navegación principal">
+      <a href="#home">🏠 Inicio</a>
+      <a href="#blog">📝 Blog</a>
+      <a href="#about">👤 Acerca</a>
+      <a href="#contact">📧 Contacto</a>
+    </nav>
+  </header>
+  
+  <div class="container">
+    <!-- Contenido principal -->
+    <main>
+      <h2>📚 Artículos Recientes</h2>
+      
+      <!-- Artículo 1 -->
+      <article>
+        <header>
+          <h2>Introducción a HTML5 Semántico</h2>
+          <p class="meta">
+            📅 <time datetime="2024-10-15">15 de Octubre, 2024</time> | 
+            👤 Por Juan Pérez
+          </p>
+        </header>
+        
+        <section>
+          <h3>¿Qué es HTML Semántico?</h3>
+          <p>HTML semántico utiliza etiquetas que describen claramente su significado, mejorando la accesibilidad y el SEO de tu sitio web.</p>
+        </section>
+        
+        <section>
+          <h3>Beneficios Principales</h3>
+          <ul>
+            <li>✅ Mejor posicionamiento en buscadores</li>
+            <li>✅ Mayor accesibilidad para usuarios</li>
+            <li>✅ Código más limpio y mantenible</li>
+          </ul>
+        </section>
+        
+        <footer>
+          <p>
+            🏷️ Etiquetas: 
+            <span class="badge">HTML5</span>
+            <span class="badge">Semántica</span>
+            <span class="badge">Web</span>
+          </p>
+        </footer>
+      </article>
+      
+      <!-- Artículo 2 -->
+      <article>
+        <header>
+          <h2>Estructura de una Página Web Moderna</h2>
+          <p class="meta">
+            📅 <time datetime="2024-10-14">14 de Octubre, 2024</time> | 
+            👤 Por María García
+          </p>
+        </header>
+        
+        <p>Una página web moderna utiliza elementos semánticos como &lt;header&gt;, &lt;main&gt;, &lt;article&gt;, &lt;aside&gt; y &lt;footer&gt; para crear una estructura clara y significativa.</p>
+        
+        <section>
+          <h3>Elementos Clave</h3>
+          <p>Los elementos semánticos más importantes son:</p>
+          <ul>
+            <li><strong>&lt;header&gt;</strong> - Encabezado de la página o sección</li>
+            <li><strong>&lt;nav&gt;</strong> - Navegación principal</li>
+            <li><strong>&lt;main&gt;</strong> - Contenido principal único</li>
+            <li><strong>&lt;article&gt;</strong> - Contenido independiente</li>
+            <li><strong>&lt;aside&gt;</strong> - Contenido complementario</li>
+            <li><strong>&lt;footer&gt;</strong> - Pie de página</li>
+          </ul>
+        </section>
+        
+        <footer>
+          <p>
+            🏷️ Etiquetas: 
+            <span class="badge">Estructura</span>
+            <span class="badge">Layout</span>
+            <span class="badge">Best Practices</span>
+          </p>
+        </footer>
+      </article>
+    </main>
+    
+    <!-- Barra lateral -->
+    <aside>
+      <section>
+        <h3>📌 Artículos Populares</h3>
+        <ul>
+          <li><a href="#">Guía de CSS Grid</a></li>
+          <li><a href="#">JavaScript Moderno</a></li>
+          <li><a href="#">Responsive Design</a></li>
+          <li><a href="#">Accesibilidad Web</a></li>
+        </ul>
+      </section>
+      
+      <section>
+        <h3>📂 Categorías</h3>
+        <ul>
+          <li><a href="#">HTML (15)</a></li>
+          <li><a href="#">CSS (23)</a></li>
+          <li><a href="#">JavaScript (31)</a></li>
+          <li><a href="#">Accesibilidad (8)</a></li>
+        </ul>
+      </section>
+      
+      <section>
+        <h3>🔗 Enlaces Útiles</h3>
+        <ul>
+          <li><a href="#">MDN Web Docs</a></li>
+          <li><a href="#">W3C Standards</a></li>
+          <li><a href="#">Can I Use</a></li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+  
+  <!-- Footer del sitio -->
+  <footer>
+    <nav aria-label="Enlaces del footer">
+      <a href="#privacy">Privacidad</a>
+      <a href="#terms">Términos</a>
+      <a href="#contact">Contacto</a>
+    </nav>
+    <p>&copy; 2024 Mi Blog Semántico. Todos los derechos reservados.</p>
+    <p>Hecho con ❤️ usando HTML5 Semántico</p>
+  </footer>
+</body>
+</html>`} />
+
+---
+
+## 🚀 Beneficios para SEO y Accesibilidad
+
+### SEO (Search Engine Optimization)
+
+<Tabs>
+<TabItem label="Mejoras SEO">
+| Beneficio | Descripción | Impacto |
+|-----------|-------------|---------|
+| **🎯 Comprensión del contenido** | Los motores de búsqueda entienden mejor la estructura | ⭐⭐⭐⭐⭐ |
+| **📊 Indexación mejorada** | Contenido organizado se indexa más eficientemente | ⭐⭐⭐⭐ |
+| **🔍 Rich Snippets** | Facilita la generación de fragmentos enriquecidos | ⭐⭐⭐⭐ |
+| **📱 Mobile-First** | Estructura clara beneficia indexación móvil | ⭐⭐⭐⭐⭐ |
+| **⚡ Core Web Vitals** | Código limpio mejora rendimiento | ⭐⭐⭐⭐ |
+
+<Aside type="tip" title="💡 Google y HTML Semántico">
+Google utiliza elementos semánticos para entender mejor tu contenido y puede mostrar resultados enriquecidos en las búsquedas.
+</Aside>
+</TabItem>
+
+<TabItem label="Ejemplo SEO">
+<Code code={`<!-- Estructura optimizada para SEO -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Guía Completa de HTML5 | Mi Blog</title>
+  <meta name="description" content="Aprende HTML5 semántico con ejemplos prácticos y mejora el SEO de tu sitio web.">
+</head>
+<body>
+  <!-- Google entiende que esto es el header -->
+  <header>
+    <h1>Mi Blog de Desarrollo Web</h1>
+    <nav>
+      <!-- Google identifica la navegación principal -->
+      <a href="/">Inicio</a>
+      <a href="/blog">Blog</a>
+    </nav>
+  </header>
+  
+  <!-- Google sabe que este es el contenido principal -->
+  <main>
+    <!-- Google identifica artículos individuales -->
+    <article>
+      <header>
+        <h1>Guía Completa de HTML5</h1>
+        <!-- Google puede mostrar la fecha en resultados -->
+        <time datetime="2024-10-15">15 de Octubre, 2024</time>
+      </header>
+      
+      <!-- Secciones bien estructuradas -->
+      <section>
+        <h2>Introducción</h2>
+        <p>Contenido...</p>
+      </section>
+      
+      <section>
+        <h2>Características</h2>
+        <p>Contenido...</p>
+      </section>
+    </article>
+  </main>
+  
+  <!-- Google identifica contenido complementario -->
+  <aside>
+    <h3>Artículos Relacionados</h3>
+    <ul>
+      <li><a href="/css-grid">CSS Grid</a></li>
+    </ul>
+  </aside>
+  
+  <!-- Google reconoce información del footer -->
+  <footer>
+    <p>&copy; 2024 Mi Blog</p>
+  </footer>
+</body>
+</html>`} lang="html" title="seo-optimizado.html" />
+</TabItem>
+</Tabs>
+
+### Accesibilidad (A11y)
+
+<Tabs>
+<TabItem label="Beneficios A11y">
+| Beneficio | Descripción | Usuarios Beneficiados |
+|-----------|-------------|----------------------|
+| **🔊 Lectores de pantalla** | Navegación más eficiente por landmarks | Usuarios ciegos |
+| **⌨️ Navegación por teclado** | Saltar entre secciones fácilmente | Usuarios con movilidad reducida |
+| **🎯 Orientación** | Saber en qué parte de la página están | Usuarios con discapacidad cognitiva |
+| **📱 Tecnologías asistivas** | Mejor soporte para dispositivos especiales | Todos los usuarios |
+
+<Aside type="tip" title="♿ ARIA Landmarks">
+Los elementos semánticos crean automáticamente **ARIA landmarks** que los lectores de pantalla usan para navegar.
+</Aside>
+</TabItem>
+
+<TabItem label="Landmarks">
+<Code code={`<!-- Elementos semánticos = ARIA Landmarks automáticos -->
+
+<!-- <header> = role="banner" -->
+<header>
+  <h1>Mi Sitio</h1>
+</header>
+
+<!-- <nav> = role="navigation" -->
+<nav>
+  <a href="/">Inicio</a>
+</nav>
+
+<!-- <main> = role="main" -->
+<main>
+  <h2>Contenido Principal</h2>
+</main>
+
+<!-- <aside> = role="complementary" -->
+<aside>
+  <h3>Sidebar</h3>
+</aside>
+
+<!-- <footer> = role="contentinfo" -->
+<footer>
+  <p>&copy; 2024</p>
+</footer>
+
+<!-- Los lectores de pantalla pueden saltar entre estos landmarks -->
+<!-- Ejemplo: "Ir a navegación", "Ir a contenido principal", etc. -->`} lang="html" title="landmarks.html" />
+
+<Aside type="note" title="🎯 Navegación Rápida">
+Los usuarios de lectores de pantalla pueden presionar teclas para saltar entre landmarks:
+- **H** = Siguiente heading
+- **R** = Siguiente landmark/region
+- **N** = Siguiente navegación
+- **M** = Siguiente main
+</Aside>
+</TabItem>
+
+<TabItem label="Comparación">
+<Code code={`<!-- ❌ Sin semántica - Difícil para lectores de pantalla -->
+<div class="header">
+  <div class="nav">
+    <a href="/">Inicio</a>
+  </div>
+</div>
+<div class="content">
+  <div class="post">
+    <h2>Título</h2>
+    <p>Contenido...</p>
+  </div>
+</div>
+<div class="sidebar">
+  <h3>Enlaces</h3>
+</div>
+<div class="footer">
+  <p>&copy; 2024</p>
+</div>
+
+<!-- ✅ Con semántica - Fácil navegación -->
+<header>
+  <nav>
+    <a href="/">Inicio</a>
+  </nav>
+</header>
+<main>
+  <article>
+    <h2>Título</h2>
+    <p>Contenido...</p>
+  </article>
+</main>
+<aside>
+  <h3>Enlaces</h3>
+</aside>
+<footer>
+  <p>&copy; 2024</p>
+</footer>
+
+<!-- El lector de pantalla anuncia:
+     "Banner landmark", "Navigation", "Main landmark", 
+     "Complementary landmark", "Content info" -->`} lang="html" title="comparacion-accesibilidad.html" />
+</TabItem>
+</Tabs>
+
+---
+
+## 📊 Tabla Comparativa de Elementos Semánticos
+
+| Elemento | Propósito | Múltiples | Anidable | Landmark ARIA |
+|----------|-----------|-----------|----------|---------------|
+| `<header>` | Encabezado introductorio | ✅ Sí | ❌ No en sí mismo | `banner` (si es hijo de body) |
+| `<nav>` | Navegación principal | ✅ Sí | ✅ Sí | `navigation` |
+| `<main>` | Contenido principal único | ❌ Solo uno visible | ✅ Sí | `main` |
+| `<article>` | Contenido independiente | ✅ Sí | ✅ Sí | `article` |
+| `<section>` | Sección temática | ✅ Sí | ✅ Sí | `region` (si tiene label) |
+| `<aside>` | Contenido complementario | ✅ Sí | ✅ Sí | `complementary` |
+| `<footer>` | Pie de página/sección | ✅ Sí | ❌ No en sí mismo | `contentinfo` (si es hijo de body) |
+
+---
+
+## ✅ Mejores Prácticas
+
+<Steps>
+
+1. **Usa elementos semánticos siempre que sea posible**
+   
+   Reemplaza `<div>` genéricos con elementos semánticos apropiados.
+   
+   ```html
+   <!-- ❌ Evitar -->
+   <div class="header">...</div>
+   
+   <!-- ✅ Preferir -->
+   <header>...</header>
+   ```
+
+2. **Un solo `<main>` por página**
+   
+   El contenido principal debe ser único y estar en un solo `<main>`.
+   
+   ```html
+   <body>
+     <header>...</header>
+     <main>
+       <!-- Todo el contenido principal aquí -->
+     </main>
+     <footer>...</footer>
+   </body>
+   ```
+
+3. **Usa `<article>` para contenido independiente**
+   
+   Si el contenido tiene sentido fuera de contexto, usa `<article>`.
+   
+   ```html
+   <article>
+     <h2>Post de Blog</h2>
+     <p>Este post puede existir independientemente...</p>
+   </article>
+   ```
+
+4. **Agrupa contenido relacionado con `<section>`**
+   
+   Usa `<section>` para dividir contenido en partes temáticas.
+   
+   ```html
+   <main>
+     <section>
+       <h2>Sobre Nosotros</h2>
+       <p>...</p>
+     </section>
+     <section>
+       <h2>Servicios</h2>
+       <p>...</p>
+     </section>
+   </main>
+   ```
+
+5. **Incluye encabezados en secciones**
+   
+   Cada `<section>` y `<article>` debe tener un encabezado.
+   
+   ```html
+   <section>
+     <h2>Título de la Sección</h2>
+     <p>Contenido...</p>
+   </section>
+   ```
+
+6. **Usa `<nav>` solo para navegación principal**
+   
+   No uses `<nav>` para todos los enlaces, solo para navegación importante.
+   
+   ```html
+   <!-- ✅ Correcto -->
+   <nav>
+     <a href="/">Inicio</a>
+     <a href="/productos">Productos</a>
+   </nav>
+   
+   <!-- ❌ Incorrecto -->
+   <nav>
+     <a href="/terminos">Términos</a>
+   </nav>
+   ```
+
+7. **Añade `aria-label` a múltiples `<nav>`**
+   
+   Si tienes varios `<nav>`, diferéncialos con etiquetas.
+   
+   ```html
+   <nav aria-label="Navegación principal">...</nav>
+   <nav aria-label="Navegación de breadcrumb">...</nav>
+   ```
+
+8. **Combina semántica con accesibilidad**
+   
+   Usa atributos ARIA cuando sea necesario para mejorar la accesibilidad.
+   
+   ```html
+   <section aria-labelledby="about-heading">
+     <h2 id="about-heading">Acerca de Nosotros</h2>
+     <p>...</p>
+   </section>
+   ```
+
+</Steps>
+
+---
+
+## 🎯 Checklist de HTML Semántico
+
+- ✅ Usar `<header>` para encabezados de página y secciones
+- ✅ Usar `<nav>` para navegación principal
+- ✅ Usar un solo `<main>` para contenido principal
+- ✅ Usar `<article>` para contenido independiente
+- ✅ Usar `<section>` para agrupar contenido temático
+- ✅ Usar `<aside>` para contenido complementario
+- ✅ Usar `<footer>` para información de pie
+- ✅ Incluir encabezados en todas las secciones
+- ✅ Evitar `<div>` cuando existe un elemento semántico apropiado
+- ✅ Añadir `aria-label` a elementos duplicados
+- ✅ Validar HTML con herramientas de accesibilidad
+- ✅ Probar con lectores de pantalla
+
+---
+
+## 🚀 Próximos Pasos
+
+Ahora que dominas las etiquetas semánticas, puedes continuar con:
+
+- **[APIs de HTML5](/lenguajes/html/apis)** - Geolocalización, almacenamiento local, drag & drop
+- **[Canvas y SVG](/lenguajes/html/graficos)** - Gráficos y animaciones
+- **[Web Components](/lenguajes/html/web-components)** - Componentes reutilizables
+
+---
+
+## 📚 Recursos Adicionales
+
+- [MDN - HTML Semantics](https://developer.mozilla.org/es/docs/Glossary/Semantics#sem%C3%A1ntica_en_html)
+- [W3C - HTML5 Semantic Elements](https://www.w3.org/TR/html5/sections.html)
+- [WebAIM - Semantic Structure](https://webaim.org/techniques/semanticstructure/)
+- [HTML5 Doctor - Element Index](http://html5doctor.com/element-index/)
+- [ARIA Landmarks Example](https://www.w3.org/WAI/ARIA/apg/example-index/landmarks/)

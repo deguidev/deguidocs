@@ -1,8 +1,1186 @@
 ---
-title: Multimedia
-description: Cómo integrar audio, video y otros elementos multimedia en HTML.
+title: 8. Multimedia en HTML
+description: Etiquetas audio, video, atributos y integración de contenido externo
 ---
 
 import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
 
-# Multimedia en HTML
+# 🎬 Multimedia en HTML
+
+HTML5 introdujo etiquetas nativas para reproducir contenido multimedia sin necesidad de plugins externos como Flash. Las etiquetas `<audio>` y `<video>` permiten integrar archivos de audio y video directamente en las páginas web con controles nativos del navegador.
+
+---
+
+## 🎵 Etiqueta `<audio>`
+
+La etiqueta `<audio>` permite reproducir archivos de audio en una página web. Soporta múltiples formatos y ofrece controles nativos para reproducción, pausa, volumen y más.
+
+### Sintaxis Básica
+
+<Tabs>
+<TabItem label="Sintaxis Simple">
+<Code code={`<audio src="ruta/al/archivo.mp3" controls>
+  Tu navegador no soporta el elemento de audio.
+</audio>`} lang="html" title="audio-basico.html" />
+
+<Aside type="tip" title="💡 Mensaje Alternativo">
+El texto dentro de `<audio>` solo se muestra si el navegador no soporta la etiqueta.
+</Aside>
+</TabItem>
+
+<TabItem label="Múltiples Fuentes">
+<Code code={`<audio controls>
+  <source src="audio.mp3" type="audio/mpeg">
+  <source src="audio.ogg" type="audio/ogg">
+  <source src="audio.wav" type="audio/wav">
+  Tu navegador no soporta el elemento de audio.
+</audio>`} lang="html" title="audio-multiples-fuentes.html" />
+
+<Aside type="note" title="🔄 Compatibilidad">
+Usar múltiples `<source>` asegura que el navegador elija el formato que mejor soporte.
+</Aside>
+</TabItem>
+
+<TabItem label="Con Todos los Atributos">
+<Code code={`<audio 
+  controls 
+  autoplay 
+  loop 
+  muted 
+  preload="auto"
+  id="miAudio">
+  <source src="musica.mp3" type="audio/mpeg">
+  <source src="musica.ogg" type="audio/ogg">
+  Tu navegador no soporta el elemento de audio.
+</audio>`} lang="html" title="audio-completo.html" />
+</TabItem>
+</Tabs>
+
+### Atributos de `<audio>`
+
+| Atributo | Tipo | Descripción | Ejemplo |
+|----------|------|-------------|---------|
+| **`src`** | URL | Ruta del archivo de audio | `src="audio.mp3"` |
+| **`controls`** | Booleano | Muestra controles de reproducción | `controls` |
+| **`autoplay`** | Booleano | Reproduce automáticamente al cargar | `autoplay` |
+| **`loop`** | Booleano | Reproduce en bucle continuo | `loop` |
+| **`muted`** | Booleano | Inicia silenciado | `muted` |
+| **`preload`** | Texto | Cómo precargar: `none`, `metadata`, `auto` | `preload="auto"` |
+| **`volume`** | Número | Volumen inicial (0.0 a 1.0) | `volume="0.5"` |
+
+<Aside type="caution" title="⚠️ Autoplay Restringido">
+La mayoría de navegadores bloquean `autoplay` a menos que el audio esté `muted`. Esto mejora la experiencia del usuario evitando sonidos inesperados.
+</Aside>
+
+### Formatos de Audio Soportados
+
+| Formato | Extensión | Tipo MIME | Compatibilidad |
+|---------|-----------|-----------|----------------|
+| **MP3** | `.mp3` | `audio/mpeg` | ✅ Excelente (todos los navegadores) |
+| **OGG Vorbis** | `.ogg` | `audio/ogg` | ✅ Buena (Firefox, Chrome, Opera) |
+| **WAV** | `.wav` | `audio/wav` | ✅ Buena (sin compresión, archivos grandes) |
+| **AAC** | `.aac`, `.m4a` | `audio/aac` | ✅ Buena (Safari, Chrome) |
+| **WebM** | `.webm` | `audio/webm` | ✅ Buena (Chrome, Firefox, Opera) |
+
+### Ejemplo Interactivo
+
+<LivePreview html={`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reproductor de Audio</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    h2 {
+      color: white;
+      text-align: center;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .audio-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    audio {
+      width: 100%;
+      margin: 20px 0;
+      border-radius: 25px;
+      outline: none;
+    }
+    
+    .info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .info p {
+      margin: 8px 0;
+      color: #333;
+      font-size: 14px;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      flex: 1;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.2s;
+      min-width: 100px;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <h2>🎵 Reproductor de Audio HTML5</h2>
+  
+  <div class="audio-container">
+    <audio id="miAudio" controls>
+      <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+      Tu navegador no soporta el elemento de audio.
+    </audio>
+    
+    <div class="controls">
+      <button onclick="document.getElementById('miAudio').play()">▶️ Play</button>
+      <button onclick="document.getElementById('miAudio').pause()">⏸️ Pause</button>
+      <button onclick="document.getElementById('miAudio').volume += 0.1">🔊 Vol+</button>
+      <button onclick="document.getElementById('miAudio').volume -= 0.1">🔉 Vol-</button>
+      <button onclick="document.getElementById('miAudio').currentTime = 0">⏮️ Reiniciar</button>
+    </div>
+    
+    <div class="info">
+      <p><strong>🎼 Formato:</strong> MP3 (audio/mpeg)</p>
+      <p><strong>🎚️ Controles:</strong> Nativos del navegador + JavaScript</p>
+      <p><strong>📱 Responsive:</strong> Se adapta a todos los dispositivos</p>
+    </div>
+  </div>
+</body>
+</html>`} />
+
+---
+
+## 🎥 Etiqueta `<video>`
+
+La etiqueta `<video>` permite reproducir archivos de video directamente en el navegador sin necesidad de plugins externos. Ofrece controles nativos y soporte para múltiples formatos.
+
+### Sintaxis Básica
+
+<Tabs>
+<TabItem label="Sintaxis Simple">
+<Code code={`<video src="ruta/al/video.mp4" controls width="640" height="360">
+  Tu navegador no soporta el elemento de video.
+</video>`} lang="html" title="video-basico.html" />
+</TabItem>
+
+<TabItem label="Múltiples Fuentes">
+<Code code={`<video controls width="640" height="360">
+  <source src="video.mp4" type="video/mp4">
+  <source src="video.webm" type="video/webm">
+  <source src="video.ogg" type="video/ogg">
+  Tu navegador no soporta el elemento de video.
+</video>`} lang="html" title="video-multiples-fuentes.html" />
+</TabItem>
+
+<TabItem label="Con Poster y Subtítulos">
+<Code code={`<video 
+  controls 
+  width="640" 
+  height="360"
+  poster="miniatura.jpg"
+  preload="metadata">
+  <source src="video.mp4" type="video/mp4">
+  <source src="video.webm" type="video/webm">
+  
+  <!-- Subtítulos -->
+  <track 
+    kind="subtitles" 
+    src="subtitulos-es.vtt" 
+    srclang="es" 
+    label="Español" 
+    default>
+  <track 
+    kind="subtitles" 
+    src="subtitulos-en.vtt" 
+    srclang="en" 
+    label="English">
+  
+  Tu navegador no soporta el elemento de video.
+</video>`} lang="html" title="video-completo.html" />
+
+<Aside type="tip" title="🖼️ Poster">
+El atributo `poster` muestra una imagen mientras el video se carga o antes de reproducirse.
+</Aside>
+</TabItem>
+</Tabs>
+
+### Atributos de `<video>`
+
+| Atributo | Tipo | Descripción | Ejemplo |
+|----------|------|-------------|---------|
+| **`src`** | URL | Ruta del archivo de video | `src="video.mp4"` |
+| **`controls`** | Booleano | Muestra controles de reproducción | `controls` |
+| **`autoplay`** | Booleano | Reproduce automáticamente | `autoplay` |
+| **`loop`** | Booleano | Reproduce en bucle | `loop` |
+| **`muted`** | Booleano | Inicia silenciado | `muted` |
+| **`poster`** | URL | Imagen de vista previa | `poster="thumb.jpg"` |
+| **`width`** | Píxeles | Ancho del video | `width="640"` |
+| **`height`** | Píxeles | Alto del video | `height="360"` |
+| **`preload`** | Texto | `none`, `metadata`, `auto` | `preload="metadata"` |
+| **`playsinline`** | Booleano | Reproduce en línea en móviles | `playsinline` |
+
+### Formatos de Video Soportados
+
+| Formato | Extensión | Tipo MIME | Compatibilidad |
+|---------|-----------|-----------|----------------|
+| **MP4 (H.264)** | `.mp4` | `video/mp4` | ✅ Excelente (todos los navegadores) |
+| **WebM (VP8/VP9)** | `.webm` | `video/webm` | ✅ Buena (Chrome, Firefox, Opera) |
+| **OGG (Theora)** | `.ogg`, `.ogv` | `video/ogg` | ⚠️ Limitada (Firefox, Chrome antiguo) |
+| **AVI** | `.avi` | `video/x-msvideo` | ❌ No recomendado (sin soporte nativo) |
+
+<Aside type="note" title="🎯 Recomendación">
+Usa **MP4 (H.264)** como formato principal y **WebM** como alternativa para máxima compatibilidad.
+</Aside>
+
+### Ejemplo Interactivo
+
+<LivePreview html={`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reproductor de Video</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border-radius: 15px;
+    }
+    
+    h2 {
+      color: white;
+      text-align: center;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .video-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    video {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    button {
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+    }
+    
+    .info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      border-left: 4px solid #f5576c;
+    }
+    
+    .info p {
+      margin: 8px 0;
+      color: #333;
+      font-size: 14px;
+    }
+    
+    #status {
+      text-align: center;
+      padding: 10px;
+      background: #e9ecef;
+      border-radius: 5px;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #495057;
+    }
+  </style>
+</head>
+<body>
+  <h2>🎥 Reproductor de Video HTML5</h2>
+  
+  <div class="video-container">
+    <video id="miVideo" controls poster="https://via.placeholder.com/640x360/f093fb/ffffff?text=Video+Placeholder">
+      <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+      Tu navegador no soporta el elemento de video.
+    </video>
+    
+    <div class="controls">
+      <button onclick="playVideo()">▶️ Play</button>
+      <button onclick="pauseVideo()">⏸️ Pause</button>
+      <button onclick="stopVideo()">⏹️ Stop</button>
+      <button onclick="rewindVideo()">⏪ -10s</button>
+      <button onclick="forwardVideo()">⏩ +10s</button>
+      <button onclick="slowVideo()">🐌 0.5x</button>
+      <button onclick="normalVideo()">▶️ 1x</button>
+      <button onclick="fastVideo()">🐇 2x</button>
+    </div>
+    
+    <div id="status">⏸️ Pausado</div>
+    
+    <div class="info">
+      <p><strong>🎬 Formato:</strong> MP4 (video/mp4)</p>
+      <p><strong>📐 Dimensiones:</strong> Responsive (se adapta al contenedor)</p>
+      <p><strong>🎮 Controles:</strong> Nativos + JavaScript personalizado</p>
+      <p><strong>🖼️ Poster:</strong> Imagen de vista previa antes de reproducir</p>
+    </div>
+  </div>
+  
+  <script>
+    const video = document.getElementById('miVideo');
+    const status = document.getElementById('status');
+    
+    function playVideo() {
+      video.play();
+      status.textContent = '▶️ Reproduciendo';
+      status.style.background = '#d4edda';
+      status.style.color = '#155724';
+    }
+    
+    function pauseVideo() {
+      video.pause();
+      status.textContent = '⏸️ Pausado';
+      status.style.background = '#fff3cd';
+      status.style.color = '#856404';
+    }
+    
+    function stopVideo() {
+      video.pause();
+      video.currentTime = 0;
+      status.textContent = '⏹️ Detenido';
+      status.style.background = '#f8d7da';
+      status.style.color = '#721c24';
+    }
+    
+    function rewindVideo() {
+      video.currentTime -= 10;
+    }
+    
+    function forwardVideo() {
+      video.currentTime += 10;
+    }
+    
+    function slowVideo() {
+      video.playbackRate = 0.5;
+      status.textContent = '🐌 Velocidad: 0.5x';
+    }
+    
+    function normalVideo() {
+      video.playbackRate = 1.0;
+      status.textContent = '▶️ Velocidad: 1x';
+    }
+    
+    function fastVideo() {
+      video.playbackRate = 2.0;
+      status.textContent = '🐇 Velocidad: 2x';
+    }
+    
+    // Event listeners
+    video.addEventListener('ended', () => {
+      status.textContent = '✅ Finalizado';
+      status.style.background = '#d1ecf1';
+      status.style.color = '#0c5460';
+    });
+  </script>
+</body>
+</html>`} />
+
+---
+
+## ⚙️ Atributos Comunes de Multimedia
+
+Los atributos `controls`, `autoplay`, `loop` y `muted` son fundamentales para controlar el comportamiento de elementos multimedia.
+
+### Tabla Comparativa de Atributos
+
+| Atributo | `<audio>` | `<video>` | Descripción | Uso Recomendado |
+|----------|-----------|-----------|-------------|-----------------|
+| **`controls`** | ✅ | ✅ | Muestra controles de reproducción | Siempre recomendado para accesibilidad |
+| **`autoplay`** | ✅ | ✅ | Reproduce automáticamente | Solo con `muted` para evitar molestias |
+| **`loop`** | ✅ | ✅ | Reproduce en bucle infinito | Música de fondo, videos decorativos |
+| **`muted`** | ✅ | ✅ | Inicia sin sonido | Necesario para `autoplay` en la mayoría de navegadores |
+| **`preload`** | ✅ | ✅ | Controla la precarga | `metadata` para optimizar carga |
+| **`poster`** | ❌ | ✅ | Imagen de vista previa | Siempre usar para mejor UX |
+| **`playsinline`** | ❌ | ✅ | Reproduce en línea (iOS) | Importante para móviles |
+
+### Ejemplos de Uso
+
+<Tabs>
+<TabItem label="controls">
+<Code code={`<!-- Sin controles (no recomendado sin JavaScript) -->
+<video src="video.mp4" width="640" height="360">
+</video>
+
+<!-- Con controles (recomendado) -->
+<video src="video.mp4" controls width="640" height="360">
+</video>`} lang="html" title="controls.html" />
+
+<Aside type="tip" title="♿ Accesibilidad">
+Siempre incluye `controls` para que los usuarios puedan controlar la reproducción.
+</Aside>
+</TabItem>
+
+<TabItem label="autoplay">
+<Code code={`<!-- Autoplay sin muted (bloqueado por navegadores) -->
+<video src="video.mp4" autoplay controls>
+</video>
+
+<!-- Autoplay con muted (funciona) -->
+<video src="video.mp4" autoplay muted controls>
+</video>
+
+<!-- Autoplay con muted y playsinline (iOS) -->
+<video src="video.mp4" autoplay muted playsinline controls>
+</video>`} lang="html" title="autoplay.html" />
+
+<Aside type="caution" title="🚫 Política de Autoplay">
+Los navegadores modernos bloquean `autoplay` con sonido. Debes usar `muted` o esperar interacción del usuario.
+</Aside>
+</TabItem>
+
+<TabItem label="loop">
+<Code code={`<!-- Audio en bucle para música de fondo -->
+<audio src="musica-fondo.mp3" loop autoplay muted controls>
+</audio>
+
+<!-- Video en bucle para fondos animados -->
+<video src="fondo-animado.mp4" loop autoplay muted playsinline>
+</video>`} lang="html" title="loop.html" />
+</TabItem>
+
+<TabItem label="preload">
+<Code code={`<!-- No precargar (ahorra ancho de banda) -->
+<video src="video.mp4" preload="none" controls>
+</video>
+
+<!-- Precargar solo metadatos (duración, dimensiones) -->
+<video src="video.mp4" preload="metadata" controls>
+</video>
+
+<!-- Precargar todo el video (solo si es crítico) -->
+<video src="video.mp4" preload="auto" controls>
+</video>`} lang="html" title="preload.html" />
+
+<Aside type="note" title="📊 Rendimiento">
+Usa `preload="metadata"` para equilibrar experiencia de usuario y consumo de datos.
+</Aside>
+</TabItem>
+</Tabs>
+
+### Ejemplo Comparativo
+
+<LivePreview html={`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atributos de Multimedia</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    h2 {
+      color: white;
+      text-align: center;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    .card h3 {
+      margin-top: 0;
+      color: #667eea;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    
+    video {
+      width: 100%;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    
+    .attributes {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    
+    .attributes code {
+      background: #e9ecef;
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #d63384;
+    }
+  </style>
+</head>
+<body>
+  <h2>⚙️ Comparación de Atributos Multimedia</h2>
+  
+  <div class="grid">
+    <div class="card">
+      <h3>🎬 Solo Controls</h3>
+      <video controls poster="https://via.placeholder.com/300x169/667eea/ffffff?text=Video+1">
+        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+      </video>
+      <div class="attributes">
+        <strong>Atributos:</strong><br>
+        <code>controls</code>
+      </div>
+      <p>✅ Usuario controla reproducción</p>
+    </div>
+    
+    <div class="card">
+      <h3>🔇 Autoplay + Muted</h3>
+      <video autoplay muted loop playsinline poster="https://via.placeholder.com/300x169/764ba2/ffffff?text=Video+2">
+        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" type="video/mp4">
+      </video>
+      <div class="attributes">
+        <strong>Atributos:</strong><br>
+        <code>autoplay muted loop playsinline</code>
+      </div>
+      <p>🔄 Reproduce automáticamente sin sonido</p>
+    </div>
+    
+    <div class="card">
+      <h3>🔊 Loop + Controls</h3>
+      <video controls loop poster="https://via.placeholder.com/300x169/f093fb/ffffff?text=Video+3">
+        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4" type="video/mp4">
+      </video>
+      <div class="attributes">
+        <strong>Atributos:</strong><br>
+        <code>controls loop</code>
+      </div>
+      <p>🔁 Reproduce en bucle con controles</p>
+    </div>
+  </div>
+</body>
+</html>`} />
+
+---
+
+## 🌐 Integración de Contenido Externo
+
+HTML permite integrar contenido de plataformas externas como YouTube, Vimeo, Google Maps y más usando la etiqueta `<iframe>`.
+
+### Etiqueta `<iframe>`
+
+El elemento `<iframe>` (inline frame) permite incrustar otra página HTML dentro de la página actual.
+
+<Code code={`<iframe 
+  src="URL_del_contenido" 
+  width="560" 
+  height="315"
+  title="Descripción del contenido"
+  frameborder="0"
+  allowfullscreen>
+</iframe>`} lang="html" title="iframe-basico.html" />
+
+### Atributos de `<iframe>`
+
+| Atributo | Descripción | Ejemplo |
+|----------|-------------|---------|
+| **`src`** | URL del contenido a incrustar | `src="https://example.com"` |
+| **`width`** | Ancho del iframe | `width="560"` |
+| **`height`** | Alto del iframe | `height="315"` |
+| **`title`** | Descripción para accesibilidad | `title="Video tutorial"` |
+| **`frameborder`** | Borde del iframe (obsoleto, usar CSS) | `frameborder="0"` |
+| **`allowfullscreen`** | Permite pantalla completa | `allowfullscreen` |
+| **`loading`** | Carga diferida | `loading="lazy"` |
+| **`sandbox`** | Restricciones de seguridad | `sandbox="allow-scripts"` |
+| **`allow`** | Permisos de características | `allow="autoplay; encrypted-media"` |
+
+<Aside type="caution" title="🔒 Seguridad">
+Usa el atributo `sandbox` para limitar las capacidades del contenido incrustado y proteger tu sitio.
+</Aside>
+
+### Integración de YouTube
+
+<Tabs>
+<TabItem label="Básico">
+<Code code={`<!-- Video de YouTube -->
+<iframe 
+  width="560" 
+  height="315" 
+  src="https://www.youtube.com/embed/VIDEO_ID" 
+  title="Video de YouTube" 
+  frameborder="0" 
+  allowfullscreen>
+</iframe>`} lang="html" title="youtube-basico.html" />
+
+<Aside type="tip" title="🎯 ID del Video">
+El `VIDEO_ID` se encuentra en la URL de YouTube: `youtube.com/watch?v=VIDEO_ID`
+</Aside>
+</TabItem>
+
+<TabItem label="Con Parámetros">
+<Code code={`<!-- Video con autoplay, sin controles y en bucle -->
+<iframe 
+  width="560" 
+  height="315" 
+  src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1&controls=0&loop=1&playlist=VIDEO_ID" 
+  title="Video de YouTube" 
+  frameborder="0" 
+  allow="autoplay; encrypted-media" 
+  allowfullscreen>
+</iframe>`} lang="html" title="youtube-parametros.html" />
+
+**Parámetros comunes de YouTube:**
+- `autoplay=1` - Reproduce automáticamente
+- `controls=0` - Oculta controles
+- `loop=1` - Reproduce en bucle (requiere `playlist`)
+- `mute=1` - Inicia silenciado
+- `start=30` - Inicia en el segundo 30
+- `end=60` - Termina en el segundo 60
+- `rel=0` - No muestra videos relacionados
+</TabItem>
+
+<TabItem label="Responsive">
+<Code code={`<!-- Contenedor responsive para YouTube -->
+<style>
+  .video-responsive {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+    overflow: hidden;
+  }
+  
+  .video-responsive iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<div class="video-responsive">
+  <iframe 
+    src="https://www.youtube.com/embed/VIDEO_ID" 
+    title="Video de YouTube" 
+    frameborder="0" 
+    allowfullscreen>
+  </iframe>
+</div>`} lang="html" title="youtube-responsive.html" />
+</TabItem>
+</Tabs>
+
+### Integración de Vimeo
+
+<Code code={`<!-- Video de Vimeo -->
+<iframe 
+  src="https://player.vimeo.com/video/VIDEO_ID" 
+  width="640" 
+  height="360" 
+  frameborder="0" 
+  allow="autoplay; fullscreen; picture-in-picture" 
+  allowfullscreen
+  title="Video de Vimeo">
+</iframe>
+
+<!-- Con parámetros -->
+<iframe 
+  src="https://player.vimeo.com/video/VIDEO_ID?autoplay=1&loop=1&muted=1" 
+  width="640" 
+  height="360" 
+  frameborder="0" 
+  allowfullscreen>
+</iframe>`} lang="html" title="vimeo.html" />
+
+### Integración de Google Maps
+
+<Code code={`<!-- Mapa de Google Maps -->
+<iframe 
+  src="https://www.google.com/maps/embed?pb=CODIGO_DEL_MAPA" 
+  width="600" 
+  height="450" 
+  style="border:0;" 
+  allowfullscreen="" 
+  loading="lazy" 
+  referrerpolicy="no-referrer-when-downgrade"
+  title="Mapa de ubicación">
+</iframe>`} lang="html" title="google-maps.html" />
+
+<Aside type="tip" title="🗺️ Obtener Código">
+1. Ve a Google Maps
+2. Busca la ubicación
+3. Clic en "Compartir" → "Insertar un mapa"
+4. Copia el código `<iframe>`
+</Aside>
+
+### Ejemplo Interactivo Completo
+
+<LivePreview html={`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Integración de Contenido Externo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 30px 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      color: white;
+      text-align: center;
+      margin-bottom: 40px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      font-size: 2.5em;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition: transform 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      font-size: 1.3em;
+      font-weight: bold;
+    }
+    
+    .card-body {
+      padding: 20px;
+    }
+    
+    .video-responsive {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+    
+    .video-responsive iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .map-responsive {
+      position: relative;
+      padding-bottom: 75%;
+      height: 0;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+    
+    .map-responsive iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .info {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .info p {
+      margin: 5px 0;
+      color: #495057;
+      font-size: 14px;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      background: #667eea;
+      color: white;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌐 Integración de Contenido Externo</h1>
+    
+    <div class="grid">
+      <!-- YouTube -->
+      <div class="card">
+        <div class="card-header">
+          📺 YouTube Video
+        </div>
+        <div class="card-body">
+          <div class="video-responsive">
+            <iframe 
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+              title="Video de YouTube" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="info">
+            <p><strong>🎬 Plataforma:</strong> YouTube</p>
+            <p><strong>📱 Responsive:</strong> ✅ Se adapta a todos los tamaños</p>
+            <p><strong>🎮 Controles:</strong> Nativos de YouTube</p>
+            <span class="badge">16:9 Aspect Ratio</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Vimeo -->
+      <div class="card">
+        <div class="card-header">
+          🎥 Vimeo Video
+        </div>
+        <div class="card-body">
+          <div class="video-responsive">
+            <iframe 
+              src="https://player.vimeo.com/video/148751763" 
+              title="Video de Vimeo"
+              allow="autoplay; fullscreen; picture-in-picture" 
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="info">
+            <p><strong>🎬 Plataforma:</strong> Vimeo</p>
+            <p><strong>📱 Responsive:</strong> ✅ Se adapta a todos los tamaños</p>
+            <p><strong>🎨 Calidad:</strong> Alta definición</p>
+            <span class="badge">Professional Video</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Google Maps -->
+      <div class="card">
+        <div class="card-header">
+          🗺️ Google Maps
+        </div>
+        <div class="card-body">
+          <div class="map-responsive">
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3762.8876746394447!2d-99.16558368509308!3d19.42847998688031!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ff35f5bd1563%3A0x6c366f0e2de02ff7!2sMonumento%20a%20la%20Revoluci%C3%B3n!5e0!3m2!1ses!2smx!4v1234567890123!5m2!1ses!2smx" 
+              title="Mapa de ubicación"
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+          <div class="info">
+            <p><strong>🗺️ Servicio:</strong> Google Maps</p>
+            <p><strong>📍 Ubicación:</strong> Monumento a la Revolución</p>
+            <p><strong>🔍 Interactivo:</strong> Zoom, navegación</p>
+            <span class="badge">Lazy Loading</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`} />
+
+---
+
+## 🎯 Mejores Prácticas
+
+<Steps>
+
+1. **Siempre incluye el atributo `controls`**
+   
+   Permite a los usuarios controlar la reproducción y mejora la accesibilidad.
+   
+   ```html
+   <video src="video.mp4" controls></video>
+   ```
+
+2. **Usa múltiples formatos para compatibilidad**
+   
+   Proporciona alternativas para diferentes navegadores.
+   
+   ```html
+   <video controls>
+     <source src="video.mp4" type="video/mp4">
+     <source src="video.webm" type="video/webm">
+   </video>
+   ```
+
+3. **Optimiza el atributo `preload`**
+   
+   Usa `metadata` para equilibrar rendimiento y experiencia.
+   
+   ```html
+   <video src="video.mp4" preload="metadata" controls></video>
+   ```
+
+4. **Añade `poster` a los videos**
+   
+   Mejora la presentación visual antes de la reproducción.
+   
+   ```html
+   <video src="video.mp4" poster="miniatura.jpg" controls></video>
+   ```
+
+5. **Usa `muted` con `autoplay`**
+   
+   Evita que los navegadores bloqueen la reproducción automática.
+   
+   ```html
+   <video src="video.mp4" autoplay muted playsinline></video>
+   ```
+
+6. **Implementa diseño responsive para iframes**
+   
+   Usa técnicas CSS para que el contenido se adapte a todos los dispositivos.
+   
+   ```css
+   .video-responsive {
+     position: relative;
+     padding-bottom: 56.25%; /* 16:9 */
+     height: 0;
+   }
+   
+   .video-responsive iframe {
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+   }
+   ```
+
+7. **Añade `title` a los iframes**
+   
+   Mejora la accesibilidad para lectores de pantalla.
+   
+   ```html
+   <iframe src="..." title="Descripción del contenido"></iframe>
+   ```
+
+8. **Usa `loading="lazy"` para iframes**
+   
+   Mejora el rendimiento cargando contenido solo cuando sea necesario.
+   
+   ```html
+   <iframe src="..." loading="lazy"></iframe>
+   ```
+
+</Steps>
+
+---
+
+## ♿ Consideraciones de Accesibilidad
+
+<Aside type="tip" title="🎯 Accesibilidad">
+La accesibilidad en multimedia es crucial para usuarios con discapacidades visuales o auditivas.
+</Aside>
+
+### Subtítulos y Transcripciones
+
+<Code code={`<!-- Video con subtítulos -->
+<video controls>
+  <source src="video.mp4" type="video/mp4">
+  
+  <!-- Subtítulos en español -->
+  <track 
+    kind="subtitles" 
+    src="subtitulos-es.vtt" 
+    srclang="es" 
+    label="Español" 
+    default>
+  
+  <!-- Subtítulos en inglés -->
+  <track 
+    kind="subtitles" 
+    src="subtitulos-en.vtt" 
+    srclang="en" 
+    label="English">
+  
+  <!-- Descripciones de audio -->
+  <track 
+    kind="descriptions" 
+    src="descripciones.vtt" 
+    srclang="es" 
+    label="Descripciones">
+</video>`} lang="html" title="subtitulos.html" />
+
+### Formato VTT (WebVTT)
+
+<Code code={`WEBVTT
+
+00:00:00.000 --> 00:00:05.000
+Bienvenidos a este tutorial de HTML5
+
+00:00:05.000 --> 00:00:10.000
+Hoy aprenderemos sobre multimedia
+
+00:00:10.000 --> 00:00:15.000
+Comenzaremos con la etiqueta <video>`} lang="txt" title="subtitulos.vtt" />
+
+### Checklist de Accesibilidad
+
+- ✅ Incluir `controls` para permitir control del usuario
+- ✅ Proporcionar subtítulos con `<track>`
+- ✅ Añadir transcripciones de texto
+- ✅ Usar `title` descriptivo en iframes
+- ✅ Evitar `autoplay` con sonido
+- ✅ Proporcionar alternativas de texto
+- ✅ Asegurar contraste adecuado en controles personalizados
+- ✅ Permitir navegación por teclado
+
+---
+
+## 📊 Comparación: Nativo vs. Externo
+
+| Característica | Video/Audio Nativo | YouTube/Vimeo (iframe) |
+|----------------|-------------------|------------------------|
+| **Control total** | ✅ Total | ⚠️ Limitado |
+| **Personalización** | ✅ CSS/JS completo | ❌ Limitado |
+| **Hosting** | ❌ Requiere servidor | ✅ Gratis |
+| **Ancho de banda** | ❌ Tu servidor | ✅ Plataforma externa |
+| **SEO** | ✅ Mejor | ⚠️ Moderado |
+| **Privacidad** | ✅ Total | ❌ Cookies de terceros |
+| **Analytics** | ❌ Manual | ✅ Integrado |
+| **Monetización** | ❌ Manual | ✅ Ads automáticos |
+| **Compatibilidad** | ⚠️ Múltiples formatos | ✅ Automática |
+
+---
+
+## 🚀 Próximos Pasos
+
+Ahora que dominas multimedia en HTML, puedes continuar con:
+
+- **[Elementos Semánticos HTML5](/lenguajes/html/semantica)** - `<header>`, `<nav>`, `<article>`, `<section>`
+- **[Canvas y SVG](/lenguajes/html/graficos)** - Gráficos y animaciones
+- **[APIs de HTML5](/lenguajes/html/apis)** - Geolocalización, almacenamiento local, drag & drop
+
+---
+
+## 📚 Recursos Adicionales
+
+- [MDN - Video Element](https://developer.mozilla.org/es/docs/Web/HTML/Element/video)
+- [MDN - Audio Element](https://developer.mozilla.org/es/docs/Web/HTML/Element/audio)
+- [Can I Use - Video/Audio](https://caniuse.com/?search=video)
+- [WebVTT Specification](https://www.w3.org/TR/webvtt1/)
+- [YouTube Embed Parameters](https://developers.google.com/youtube/player_parameters)

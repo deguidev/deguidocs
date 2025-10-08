@@ -1,0 +1,1561 @@
+---
+title: 10. Estructura Avanzada
+description: Organización modular, anclas, navegación interna, fuentes externas e íconos
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
+
+# 🏛️ Estructura Avanzada de Páginas
+
+Una estructura avanzada de páginas web va más allá de los elementos básicos, incorporando organización modular, navegación interna eficiente, tipografías personalizadas e iconografía profesional para crear experiencias web completas y pulidas.
+
+---
+
+## 📦 Organización Modular de Contenido
+
+La organización modular consiste en dividir el contenido en componentes reutilizables y bien estructurados que facilitan el mantenimiento y la escalabilidad.
+
+### Principios de Modularidad
+
+<Tabs>
+<TabItem label="Conceptos Clave">
+| Principio | Descripción | Beneficio |
+|-----------|-------------|-----------|
+| **🧩 Separación de Responsabilidades** | Cada módulo tiene un propósito específico | Código más mantenible |
+| **🔄 Reutilización** | Componentes que se usan en múltiples lugares | Menos código duplicado |
+| **📐 Consistencia** | Estructura uniforme en toda la aplicación | Mejor experiencia de usuario |
+| **🎯 Independencia** | Módulos funcionan de forma autónoma | Fácil testing y debugging |
+
+<Aside type="tip" title="💡 Pensamiento Modular">
+Piensa en tu página como un conjunto de bloques LEGO: cada pieza tiene su función y puede combinarse con otras para crear estructuras complejas.
+</Aside>
+</TabItem>
+
+<TabItem label="Estructura Recomendada">
+<Code code={`<!-- Estructura modular de una página -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sitio Modular</title>
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+</head>
+<body>
+  <!-- Módulo: Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header__logo">...</div>
+      <nav class="header__nav">...</nav>
+    </div>
+  </header>
+  
+  <!-- Módulo: Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero__title">...</h1>
+      <p class="hero__subtitle">...</p>
+      <a href="#" class="hero__cta">...</a>
+    </div>
+  </section>
+  
+  <!-- Módulo: Features -->
+  <section class="features">
+    <div class="container">
+      <div class="feature-card">...</div>
+      <div class="feature-card">...</div>
+      <div class="feature-card">...</div>
+    </div>
+  </section>
+  
+  <!-- Módulo: Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer__links">...</div>
+      <div class="footer__social">...</div>
+      <div class="footer__legal">...</div>
+    </div>
+  </footer>
+</body>
+</html>`} lang="html" title="estructura-modular.html" />
+
+<Aside type="note" title="🎨 Nomenclatura BEM">
+Usa metodologías como **BEM** (Block Element Modifier) para nombrar clases: `.block__element--modifier`
+</Aside>
+</TabItem>
+</Tabs>
+
+### Patrones de Organización
+
+<Tabs>
+<TabItem label="Componentes Comunes">
+<Code code={`<!-- Card Component -->
+<article class="card">
+  <div class="card__image">
+    <img src="image.jpg" alt="Descripción">
+  </div>
+  <div class="card__content">
+    <h3 class="card__title">Título</h3>
+    <p class="card__description">Descripción...</p>
+    <a href="#" class="card__link">Leer más</a>
+  </div>
+</article>
+
+<!-- Button Component -->
+<button class="btn btn--primary btn--large">
+  <span class="btn__icon">🚀</span>
+  <span class="btn__text">Comenzar</span>
+</button>
+
+<!-- Alert Component -->
+<div class="alert alert--success">
+  <span class="alert__icon">✅</span>
+  <p class="alert__message">Operación exitosa</p>
+  <button class="alert__close">×</button>
+</div>
+
+<!-- Navigation Component -->
+<nav class="navbar">
+  <ul class="navbar__list">
+    <li class="navbar__item navbar__item--active">
+      <a href="#" class="navbar__link">Inicio</a>
+    </li>
+    <li class="navbar__item">
+      <a href="#" class="navbar__link">Servicios</a>
+    </li>
+  </ul>
+</nav>`} lang="html" title="componentes.html" />
+</TabItem>
+
+<TabItem label="Layout Containers">
+<Code code={`<!-- Container System -->
+<div class="container">
+  <!-- Ancho máximo con padding lateral -->
+</div>
+
+<div class="container-fluid">
+  <!-- Ancho completo con padding lateral -->
+</div>
+
+<div class="container-narrow">
+  <!-- Ancho reducido para contenido de lectura -->
+</div>
+
+<!-- Grid System -->
+<div class="row">
+  <div class="col-12 col-md-6 col-lg-4">
+    <!-- Columna responsive -->
+  </div>
+  <div class="col-12 col-md-6 col-lg-8">
+    <!-- Columna responsive -->
+  </div>
+</div>
+
+<!-- Flexbox Layout -->
+<div class="flex-container">
+  <div class="flex-item">Item 1</div>
+  <div class="flex-item">Item 2</div>
+  <div class="flex-item">Item 3</div>
+</div>
+
+<!-- CSS Grid Layout -->
+<div class="grid-container">
+  <div class="grid-item">Item 1</div>
+  <div class="grid-item">Item 2</div>
+  <div class="grid-item">Item 3</div>
+</div>`} lang="html" title="layouts.html" />
+</TabItem>
+</Tabs>
+
+---
+
+## ⚓ Anclas y Navegación Interna
+
+Las anclas permiten crear enlaces a secciones específicas dentro de la misma página, mejorando la navegación y la experiencia del usuario.
+
+### Sintaxis de Anclas
+
+<Tabs>
+<TabItem label="Básico">
+<Code code={`<!-- Definir el destino con ID -->
+<section id="sobre-nosotros">
+  <h2>Sobre Nosotros</h2>
+  <p>Contenido de la sección...</p>
+</section>
+
+<section id="servicios">
+  <h2>Nuestros Servicios</h2>
+  <p>Contenido de la sección...</p>
+</section>
+
+<section id="contacto">
+  <h2>Contacto</h2>
+  <p>Contenido de la sección...</p>
+</section>
+
+<!-- Enlaces a las anclas -->
+<nav>
+  <a href="#sobre-nosotros">Sobre Nosotros</a>
+  <a href="#servicios">Servicios</a>
+  <a href="#contacto">Contacto</a>
+</nav>
+
+<!-- Volver al inicio -->
+<a href="#top">⬆️ Volver arriba</a>
+<a href="#">⬆️ Volver arriba (alternativa)</a>`} lang="html" title="anclas-basicas.html" />
+
+<Aside type="tip" title="💡 ID Únicos">
+Cada `id` debe ser único en la página. Usa nombres descriptivos en kebab-case: `mi-seccion-especial`
+</Aside>
+</TabItem>
+
+<TabItem label="Navegación Suave">
+<Code code={`<!-- HTML -->
+<nav class="table-of-contents">
+  <h3>Tabla de Contenidos</h3>
+  <ul>
+    <li><a href="#introduccion">📖 Introducción</a></li>
+    <li><a href="#caracteristicas">✨ Características</a></li>
+    <li><a href="#ejemplos">💻 Ejemplos</a></li>
+    <li><a href="#conclusiones">🎯 Conclusiones</a></li>
+  </ul>
+</nav>
+
+<article>
+  <section id="introduccion">
+    <h2>Introducción</h2>
+    <p>Contenido...</p>
+  </section>
+  
+  <section id="caracteristicas">
+    <h2>Características</h2>
+    <p>Contenido...</p>
+  </section>
+  
+  <section id="ejemplos">
+    <h2>Ejemplos</h2>
+    <p>Contenido...</p>
+  </section>
+  
+  <section id="conclusiones">
+    <h2>Conclusiones</h2>
+    <p>Contenido...</p>
+  </section>
+</article>
+
+<!-- CSS para scroll suave -->
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Offset para headers fijos */
+  section {
+    scroll-margin-top: 80px;
+  }
+</style>`} lang="html" title="scroll-suave.html" />
+</TabItem>
+
+<TabItem label="JavaScript Avanzado">
+<Code code={`<!-- HTML -->
+<nav id="nav-interno">
+  <a href="#seccion1" class="nav-link">Sección 1</a>
+  <a href="#seccion2" class="nav-link">Sección 2</a>
+  <a href="#seccion3" class="nav-link">Sección 3</a>
+</nav>
+
+<section id="seccion1">...</section>
+<section id="seccion2">...</section>
+<section id="seccion3">...</section>
+
+<!-- JavaScript -->
+<script>
+  // Scroll suave con JavaScript
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+        
+        // Actualizar URL sin scroll
+        history.pushState(null, null, this.getAttribute('href'));
+      }
+    });
+  });
+  
+  // Resaltar enlace activo al hacer scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+  
+  window.addEventListener('scroll', () => {
+    let current = '';
+    
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.clientHeight;
+      
+      if (pageYOffset >= sectionTop - 100) {
+        current = section.getAttribute('id');
+      }
+    });
+    
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === \`#\${current}\`) {
+        link.classList.add('active');
+      }
+    });
+  });
+</script>`} lang="html" title="scroll-avanzado.html" />
+</TabItem>
+</Tabs>
+
+### Ejemplo Interactivo
+
+<LivePreview html={`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Navegación Interna</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+    
+    /* Navigation */
+    .nav-fixed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 15px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .nav-brand {
+      color: white;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+    
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+    
+    .nav-links a:hover,
+    .nav-links a.active {
+      background: rgba(255,255,255,0.2);
+    }
+    
+    /* Sections */
+    section {
+      min-height: 100vh;
+      padding: 100px 20px 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      scroll-margin-top: 60px;
+    }
+    
+    .section-content {
+      max-width: 800px;
+      text-align: center;
+    }
+    
+    section h2 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      color: #667eea;
+    }
+    
+    section p {
+      font-size: 1.2em;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    
+    /* Colors */
+    #inicio {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    #inicio h2,
+    #inicio p {
+      color: white;
+    }
+    
+    #sobre {
+      background: #f8f9fa;
+    }
+    
+    #servicios {
+      background: white;
+    }
+    
+    #portafolio {
+      background: #f8f9fa;
+    }
+    
+    #contacto {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+    }
+    
+    #contacto h2,
+    #contacto p {
+      color: white;
+    }
+    
+    /* Back to top button */
+    .back-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #667eea;
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 1.5em;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: all 0.3s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .back-to-top.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .back-to-top:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    }
+    
+    /* Cards */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-icon {
+      font-size: 3em;
+      margin-bottom: 15px;
+    }
+    
+    .card h3 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navegación fija -->
+  <nav class="nav-fixed">
+    <div class="nav-container">
+      <div class="nav-brand">⚓ Mi Sitio</div>
+      <ul class="nav-links">
+        <li><a href="#inicio" class="nav-link active">🏠 Inicio</a></li>
+        <li><a href="#sobre" class="nav-link">👤 Sobre</a></li>
+        <li><a href="#servicios" class="nav-link">💼 Servicios</a></li>
+        <li><a href="#portafolio" class="nav-link">🎨 Portafolio</a></li>
+        <li><a href="#contacto" class="nav-link">📧 Contacto</a></li>
+      </ul>
+    </div>
+  </nav>
+  
+  <!-- Secciones -->
+  <section id="inicio">
+    <div class="section-content">
+      <h2>🚀 Bienvenido</h2>
+      <p>Navega por las diferentes secciones usando el menú superior</p>
+      <p>El scroll es suave y el enlace activo se resalta automáticamente</p>
+    </div>
+  </section>
+  
+  <section id="sobre">
+    <div class="section-content">
+      <h2>👤 Sobre Nosotros</h2>
+      <p>Esta sección demuestra la navegación interna con anclas</p>
+      <p>Cada sección tiene un ID único que permite enlazar directamente</p>
+    </div>
+  </section>
+  
+  <section id="servicios">
+    <div class="section-content">
+      <h2>💼 Nuestros Servicios</h2>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">🎨</div>
+          <h3>Diseño</h3>
+          <p>Diseño web moderno</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">💻</div>
+          <h3>Desarrollo</h3>
+          <p>Código limpio</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🚀</div>
+          <h3>Deploy</h3>
+          <p>Hosting rápido</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section id="portafolio">
+    <div class="section-content">
+      <h2>🎨 Portafolio</h2>
+      <p>Aquí mostramos nuestros proyectos destacados</p>
+      <p>Observa cómo el menú superior resalta la sección actual</p>
+    </div>
+  </section>
+  
+  <section id="contacto">
+    <div class="section-content">
+      <h2>📧 Contacto</h2>
+      <p>¿Tienes un proyecto en mente?</p>
+      <p>¡Contáctanos y hagámoslo realidad!</p>
+    </div>
+  </section>
+  
+  <!-- Botón volver arriba -->
+  <a href="#inicio" class="back-to-top" id="backToTop">⬆️</a>
+  
+  <script>
+    // Resaltar enlace activo
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    window.addEventListener('scroll', () => {
+      let current = '';
+      
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        
+        if (pageYOffset >= sectionTop - 100) {
+          current = section.getAttribute('id');
+        }
+      });
+      
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+      
+      // Mostrar/ocultar botón volver arriba
+      const backToTop = document.getElementById('backToTop');
+      if (window.pageYOffset > 300) {
+        backToTop.classList.add('visible');
+      } else {
+        backToTop.classList.remove('visible');
+      }
+    });
+  </script>
+</body>
+</html>`} />
+
+---
+
+## 🔤 Importación de Fuentes Externas
+
+Las fuentes personalizadas mejoran significativamente la estética y la identidad visual de tu sitio web.
+
+### Google Fonts
+
+<Tabs>
+<TabItem label="Método 1: Link">
+<Code code={`<!-- En el <head> -->
+<head>
+  <meta charset="UTF-8">
+  <title>Mi Sitio</title>
+  
+  <!-- Importar una fuente -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  
+  <!-- Importar múltiples fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<!-- Usar en CSS -->
+<style>
+  body {
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  h1, h2, h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+  }
+  
+  p {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+  }
+</style>`} lang="html" title="google-fonts-link.html" />
+
+<Aside type="tip" title="⚡ Rendimiento">
+Usa `preconnect` para establecer conexiones tempranas con Google Fonts y mejorar el rendimiento.
+</Aside>
+</TabItem>
+
+<TabItem label="Método 2: @import">
+<Code code={`<!-- En tu CSS -->
+<style>
+  /* Importar fuentes */
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
+  
+  /* Usar las fuentes */
+  body {
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+  }
+</style>`} lang="css" title="google-fonts-import.css" />
+
+<Aside type="caution" title="⚠️ Rendimiento">
+El método `@import` puede ser más lento que `<link>`. Úsalo solo si es necesario.
+</Aside>
+</TabItem>
+
+<TabItem label="Método 3: @font-face">
+<Code code={`<!-- Descargar y hospedar fuentes localmente -->
+<style>
+  @font-face {
+    font-family: 'MiFuentePersonalizada';
+    src: url('fonts/mifuente.woff2') format('woff2'),
+         url('fonts/mifuente.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'MiFuentePersonalizada';
+    src: url('fonts/mifuente-bold.woff2') format('woff2'),
+         url('fonts/mifuente-bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  body {
+    font-family: 'MiFuentePersonalizada', sans-serif;
+  }
+</style>`} lang="css" title="font-face.css" />
+
+<Aside type="tip" title="🎯 Ventajas">
+- Mayor control sobre el rendimiento
+- No depende de servicios externos
+- Mejor privacidad para los usuarios
+</Aside>
+</TabItem>
+</Tabs>
+
+### Fuentes Populares y Combinaciones
+
+| Fuente Principal | Fuente Secundaria | Uso Recomendado |
+|------------------|-------------------|-----------------|
+| **Montserrat** | Open Sans | Sitios modernos y corporativos |
+| **Playfair Display** | Lato | Blogs y sitios editoriales |
+| **Roboto** | Roboto Slab | Aplicaciones y dashboards |
+| **Poppins** | Inter | Sitios tech y startups |
+| **Raleway** | Merriweather | Portafolios creativos |
+
+### Optimización de Fuentes
+
+<Code code={`<!-- Optimización de carga de fuentes -->
+<head>
+  <!-- 1. Preconnect para conexión temprana -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- 2. Solo cargar pesos necesarios -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- 3. Usar font-display: swap -->
+  <style>
+    @font-face {
+      font-family: 'MiFuente';
+      src: url('fuente.woff2') format('woff2');
+      font-display: swap; /* Muestra texto inmediatamente */
+    }
+  </style>
+  
+  <!-- 4. Preload para fuentes críticas -->
+  <link rel="preload" href="fonts/mifuente.woff2" as="font" type="font/woff2" crossorigin>
+</head>`} lang="html" title="optimizacion-fuentes.html" />
+
+---
+
+## 🎨 Integración de Íconos
+
+Los íconos mejoran la interfaz visual y facilitan la comprensión del contenido.
+
+### Font Awesome
+
+<Tabs>
+<TabItem label="CDN">
+<Code code={`<!-- Importar Font Awesome desde CDN -->
+<head>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <!-- Íconos sólidos -->
+  <i class="fa-solid fa-house"></i>
+  <i class="fa-solid fa-user"></i>
+  <i class="fa-solid fa-heart"></i>
+  <i class="fa-solid fa-star"></i>
+  
+  <!-- Íconos regulares -->
+  <i class="fa-regular fa-heart"></i>
+  <i class="fa-regular fa-star"></i>
+  
+  <!-- Íconos de marcas -->
+  <i class="fa-brands fa-facebook"></i>
+  <i class="fa-brands fa-twitter"></i>
+  <i class="fa-brands fa-github"></i>
+  
+  <!-- Tamaños -->
+  <i class="fa-solid fa-home fa-xs"></i>
+  <i class="fa-solid fa-home fa-sm"></i>
+  <i class="fa-solid fa-home fa-lg"></i>
+  <i class="fa-solid fa-home fa-2x"></i>
+  <i class="fa-solid fa-home fa-3x"></i>
+  
+  <!-- Colores y estilos -->
+  <i class="fa-solid fa-heart" style="color: red;"></i>
+  <i class="fa-solid fa-spinner fa-spin"></i>
+  <i class="fa-solid fa-heart fa-beat"></i>
+</body>`} lang="html" title="fontawesome-cdn.html" />
+</TabItem>
+
+<TabItem label="Con Texto">
+<Code code={`<!-- Íconos con texto -->
+<button class="btn">
+  <i class="fa-solid fa-download"></i>
+  Descargar
+</button>
+
+<a href="#" class="link">
+  <i class="fa-solid fa-arrow-right"></i>
+  Leer más
+</a>
+
+<div class="alert">
+  <i class="fa-solid fa-circle-exclamation"></i>
+  <span>Mensaje de advertencia</span>
+</div>
+
+<!-- Listas con íconos -->
+<ul class="icon-list">
+  <li>
+    <i class="fa-solid fa-check"></i>
+    Característica 1
+  </li>
+  <li>
+    <i class="fa-solid fa-check"></i>
+    Característica 2
+  </li>
+  <li>
+    <i class="fa-solid fa-check"></i>
+    Característica 3
+  </li>
+</ul>
+
+<!-- Redes sociales -->
+<div class="social-links">
+  <a href="#"><i class="fa-brands fa-facebook fa-2x"></i></a>
+  <a href="#"><i class="fa-brands fa-twitter fa-2x"></i></a>
+  <a href="#"><i class="fa-brands fa-instagram fa-2x"></i></a>
+  <a href="#"><i class="fa-brands fa-linkedin fa-2x"></i></a>
+</div>`} lang="html" title="fontawesome-texto.html" />
+</TabItem>
+
+<TabItem label="Estilos CSS">
+<Code code={`<style>
+  /* Botón con ícono */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .btn:hover {
+    background: #764ba2;
+    transform: translateY(-2px);
+  }
+  
+  /* Lista con íconos */
+  .icon-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .icon-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+  }
+  
+  .icon-list i {
+    color: #28a745;
+    font-size: 1.2em;
+  }
+  
+  /* Redes sociales */
+  .social-links {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .social-links a {
+    color: #333;
+    transition: all 0.3s;
+  }
+  
+  .social-links a:hover {
+    color: #667eea;
+    transform: scale(1.2);
+  }
+  
+  /* Ícono animado */
+  .icon-animated {
+    animation: bounce 1s infinite;
+  }
+  
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+</style>`} lang="css" title="fontawesome-estilos.css" />
+</TabItem>
+</Tabs>
+
+### Íconos SVG
+
+<Tabs>
+<TabItem label="SVG Inline">
+<Code code={`<!-- SVG directamente en HTML -->
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2"/>
+  <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2"/>
+  <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2"/>
+</svg>
+
+<!-- SVG con estilos -->
+<svg class="icon icon-heart" viewBox="0 0 24 24">
+  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>
+</svg>
+
+<style>
+  .icon {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+  }
+  
+  .icon-heart {
+    color: #e74c3c;
+  }
+  
+  .icon-heart:hover {
+    color: #c0392b;
+    transform: scale(1.2);
+    transition: all 0.3s;
+  }
+</style>`} lang="html" title="svg-inline.html" />
+</TabItem>
+
+<TabItem label="SVG como Imagen">
+<Code code={`<!-- SVG como archivo externo -->
+<img src="icons/logo.svg" alt="Logo" width="100" height="100">
+
+<!-- SVG en CSS background -->
+<style>
+  .icon-bg {
+    width: 50px;
+    height: 50px;
+    background-image: url('icons/icon.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+</style>
+
+<div class="icon-bg"></div>
+
+<!-- SVG con <object> (permite interacción) -->
+<object data="icons/interactive.svg" type="image/svg+xml">
+  Fallback content
+</object>
+
+<!-- SVG Sprite -->
+<svg style="display: none;">
+  <symbol id="icon-home" viewBox="0 0 24 24">
+    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+  </symbol>
+  <symbol id="icon-user" viewBox="0 0 24 24">
+    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+  </symbol>
+</svg>
+
+<!-- Usar sprites -->
+<svg class="icon"><use href="#icon-home"/></svg>
+<svg class="icon"><use href="#icon-user"/></svg>`} lang="html" title="svg-imagen.html" />
+</TabItem>
+
+<TabItem label="Librerías SVG">
+<Code code={`<!-- Lucide Icons (Recomendado) -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<i data-lucide="heart"></i>
+<i data-lucide="user"></i>
+<i data-lucide="settings"></i>
+<script>
+  lucide.createIcons();
+</script>
+
+<!-- Heroicons -->
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+</svg>
+
+<!-- Feather Icons -->
+<script src="https://unpkg.com/feather-icons"></script>
+<i data-feather="heart"></i>
+<i data-feather="star"></i>
+<script>
+  feather.replace();
+</script>
+
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<span class="material-icons">home</span>
+<span class="material-icons">favorite</span>
+<span class="material-icons">settings</span>`} lang="html" title="svg-librerias.html" />
+</TabItem>
+</Tabs>
+
+### Comparación de Soluciones de Íconos
+
+| Solución | Ventajas | Desventajas | Mejor Para |
+|----------|----------|-------------|------------|
+| **Font Awesome** | Fácil de usar, gran variedad | Archivo grande, fuente | Proyectos rápidos |
+| **SVG Inline** | Personalizable, ligero | Más código HTML | Íconos únicos |
+| **SVG Sprites** | Reutilizable, eficiente | Configuración inicial | Proyectos grandes |
+| **Lucide/Feather** | Moderno, ligero | Menos íconos | Diseños minimalistas |
+| **Material Icons** | Consistente, familiar | Estilo específico | Apps estilo Material |
+
+---
+
+## 🎨 Ejemplo Completo Integrado
+
+<LivePreview html={`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estructura Avanzada Completa</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+    
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
+    }
+    
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    
+    .header__container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header__logo {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #667eea;
+    }
+    
+    .header__nav {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+    }
+    
+    .header__nav a {
+      color: #333;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.3s;
+    }
+    
+    .header__nav a:hover {
+      color: #667eea;
+    }
+    
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-align: center;
+      padding: 100px 20px 50px;
+    }
+    
+    .hero__title {
+      font-size: 3.5em;
+      margin-bottom: 20px;
+    }
+    
+    .hero__subtitle {
+      font-size: 1.3em;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+    
+    .hero__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 30px;
+      background: white;
+      color: #667eea;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .hero__cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    
+    /* Features */
+    .features {
+      padding: 80px 20px;
+      background: #f8f9fa;
+    }
+    
+    .features__container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .features__title {
+      text-align: center;
+      font-size: 2.5em;
+      margin-bottom: 50px;
+      color: #667eea;
+    }
+    
+    .features__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+    }
+    
+    .feature-card {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+    
+    .feature-card__icon {
+      font-size: 3em;
+      color: #667eea;
+      margin-bottom: 20px;
+    }
+    
+    .feature-card__title {
+      font-size: 1.5em;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    
+    .feature-card__description {
+      color: #666;
+    }
+    
+    /* Services */
+    .services {
+      padding: 80px 20px;
+      background: white;
+    }
+    
+    .services__container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .services__title {
+      text-align: center;
+      font-size: 2.5em;
+      margin-bottom: 50px;
+      color: #667eea;
+    }
+    
+    .services__list {
+      list-style: none;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .services__item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      transition: all 0.3s;
+    }
+    
+    .services__item:hover {
+      background: #667eea;
+      color: white;
+      transform: translateX(10px);
+    }
+    
+    .services__item i {
+      font-size: 1.5em;
+      color: #28a745;
+    }
+    
+    .services__item:hover i {
+      color: white;
+    }
+    
+    /* Footer */
+    .footer {
+      background: #2c3e50;
+      color: white;
+      padding: 50px 20px 20px;
+    }
+    
+    .footer__container {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    
+    .footer__social {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .footer__social a {
+      color: white;
+      font-size: 1.5em;
+      transition: all 0.3s;
+    }
+    
+    .footer__social a:hover {
+      color: #667eea;
+      transform: scale(1.2);
+    }
+    
+    .footer__copyright {
+      opacity: 0.7;
+      font-size: 0.9em;
+    }
+    
+    /* Back to top */
+    .back-to-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      background: #667eea;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 1.2em;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s;
+    }
+    
+    .back-to-top.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .back-to-top:hover {
+      transform: translateY(-5px);
+      background: #764ba2;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header__container">
+      <div class="header__logo">
+        <i class="fa-solid fa-rocket"></i> MiSitio
+      </div>
+      <nav>
+        <ul class="header__nav">
+          <li><a href="#inicio"><i class="fa-solid fa-house"></i> Inicio</a></li>
+          <li><a href="#features"><i class="fa-solid fa-star"></i> Features</a></li>
+          <li><a href="#servicios"><i class="fa-solid fa-briefcase"></i> Servicios</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+  <!-- Hero -->
+  <section id="inicio" class="hero">
+    <div class="hero__content">
+      <h1 class="hero__title">🚀 Estructura Avanzada</h1>
+      <p class="hero__subtitle">Organización modular, fuentes personalizadas e íconos profesionales</p>
+      <a href="#features" class="hero__cta">
+        Explorar Features
+        <i class="fa-solid fa-arrow-down"></i>
+      </a>
+    </div>
+  </section>
+  
+  <!-- Features -->
+  <section id="features" class="features">
+    <div class="features__container">
+      <h2 class="features__title">✨ Características Principales</h2>
+      <div class="features__grid">
+        <div class="feature-card">
+          <div class="feature-card__icon">
+            <i class="fa-solid fa-cubes"></i>
+          </div>
+          <h3 class="feature-card__title">Modular</h3>
+          <p class="feature-card__description">Componentes reutilizables y bien organizados</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-card__icon">
+            <i class="fa-solid fa-font"></i>
+          </div>
+          <h3 class="feature-card__title">Tipografía</h3>
+          <p class="feature-card__description">Fuentes de Google Fonts integradas</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-card__icon">
+            <i class="fa-solid fa-icons"></i>
+          </div>
+          <h3 class="feature-card__title">Íconos</h3>
+          <p class="feature-card__description">Font Awesome para iconografía profesional</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Services -->
+  <section id="servicios" class="services">
+    <div class="services__container">
+      <h2 class="services__title">💼 Nuestros Servicios</h2>
+      <ul class="services__list">
+        <li class="services__item">
+          <i class="fa-solid fa-check-circle"></i>
+          <span>Diseño web responsive y moderno</span>
+        </li>
+        <li class="services__item">
+          <i class="fa-solid fa-check-circle"></i>
+          <span>Desarrollo con las mejores prácticas</span>
+        </li>
+        <li class="services__item">
+          <i class="fa-solid fa-check-circle"></i>
+          <span>Optimización de rendimiento</span>
+        </li>
+        <li class="services__item">
+          <i class="fa-solid fa-check-circle"></i>
+          <span>SEO y accesibilidad incluidos</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer__container">
+      <div class="footer__social">
+        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#"><i class="fa-brands fa-github"></i></a>
+        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+      </div>
+      <p class="footer__copyright">
+        © 2024 MiSitio. Hecho con <i class="fa-solid fa-heart" style="color: #e74c3c;"></i> y HTML5
+      </p>
+    </div>
+  </footer>
+  
+  <!-- Back to top -->
+  <a href="#inicio" class="back-to-top" id="backToTop">
+    <i class="fa-solid fa-arrow-up"></i>
+  </a>
+  
+  <script>
+    // Mostrar/ocultar botón volver arriba
+    window.addEventListener('scroll', () => {
+      const backToTop = document.getElementById('backToTop');
+      if (window.pageYOffset > 300) {
+        backToTop.classList.add('visible');
+      } else {
+        backToTop.classList.remove('visible');
+      }
+    });
+  </script>
+</body>
+</html>`} />
+
+---
+
+## ✅ Mejores Prácticas
+
+<Steps>
+
+1. **Organiza tu código de forma modular**
+   
+   Divide tu HTML, CSS y JavaScript en componentes reutilizables.
+   
+   ```html
+   <!-- ✅ Buena organización -->
+   <article class="card">
+     <div class="card__header">...</div>
+     <div class="card__body">...</div>
+     <div class="card__footer">...</div>
+   </article>
+   ```
+
+2. **Usa IDs únicos para anclas**
+   
+   Cada ID debe ser único y descriptivo.
+   
+   ```html
+   <section id="sobre-nosotros">...</section>
+   <section id="nuestros-servicios">...</section>
+   ```
+
+3. **Implementa scroll suave**
+   
+   Mejora la experiencia de navegación interna.
+   
+   ```css
+   html {
+     scroll-behavior: smooth;
+   }
+   ```
+
+4. **Optimiza la carga de fuentes**
+   
+   Usa `preconnect` y carga solo los pesos necesarios.
+   
+   ```html
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+   ```
+
+5. **Elige la solución de íconos adecuada**
+   
+   - Font Awesome: Proyectos rápidos
+   - SVG: Máxima personalización
+   - Sprites: Proyectos grandes
+
+6. **Mantén consistencia visual**
+   
+   Usa un sistema de diseño coherente con fuentes e íconos.
+
+7. **Considera el rendimiento**
+   
+   - Minimiza el número de fuentes
+   - Usa `font-display: swap`
+   - Carga íconos de forma eficiente
+
+8. **Prueba la accesibilidad**
+   
+   - Asegura contraste adecuado
+   - Usa texto alternativo para íconos
+   - Verifica navegación por teclado
+
+</Steps>
+
+---
+
+## 🎯 Checklist de Estructura Avanzada
+
+- ✅ Código organizado en módulos/componentes
+- ✅ Nomenclatura consistente (BEM o similar)
+- ✅ Anclas con IDs únicos y descriptivos
+- ✅ Scroll suave implementado
+- ✅ Navegación interna funcional
+- ✅ Fuentes personalizadas optimizadas
+- ✅ Solo pesos de fuente necesarios
+- ✅ Íconos implementados correctamente
+- ✅ Tamaños de íconos consistentes
+- ✅ Botón "volver arriba" funcional
+- ✅ Responsive en todos los dispositivos
+- ✅ Rendimiento optimizado
+
+---
+
+## 🚀 Próximos Pasos
+
+Ahora que dominas la estructura avanzada, puedes continuar con:
+
+- **[Optimización y Rendimiento](/lenguajes/html/optimizacion)** - Técnicas de optimización web
+- **[Accesibilidad Avanzada](/lenguajes/html/accesibilidad)** - ARIA y mejores prácticas
+- **[Progressive Web Apps](/lenguajes/html/pwa)** - Convertir tu sitio en PWA
+
+---
+
+## 📚 Recursos Adicionales
+
+- [Google Fonts](https://fonts.google.com/) - Biblioteca de fuentes gratuitas
+- [Font Awesome](https://fontawesome.com/) - Biblioteca de íconos
+- [Lucide Icons](https://lucide.dev/) - Íconos SVG modernos
+- [Heroicons](https://heroicons.com/) - Íconos SVG de Tailwind
+- [BEM Methodology](http://getbem.com/) - Nomenclatura de CSS
+- [CSS-Tricks - Smooth Scrolling](https://css-tricks.com/snippets/jquery/smooth-scrolling/) - Guía de scroll suave

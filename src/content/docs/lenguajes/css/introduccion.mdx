@@ -1,0 +1,789 @@
+---
+title: 1. Introducción a CSS
+description: ¿Qué es CSS y para qué sirve? Cómo se integra CSS en HTML y anatomía de una regla CSS
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## ¿Qué es CSS y para qué sirve?
+
+**CSS** (Cascading Style Sheets - Hojas de Estilo en Cascada) es el lenguaje que se utiliza para **dar estilo y diseño visual** a las páginas web. Mientras que HTML define la estructura y el contenido, CSS se encarga de la presentación: colores, tipografías, espaciados, posicionamiento y animaciones.
+
+<Aside type="tip">
+**Analogía práctica:** Si HTML es el esqueleto de una casa (paredes, puertas, ventanas), CSS es la decoración (pintura, muebles, iluminación).
+</Aside>
+
+### Propósitos principales de CSS
+
+- **Separar contenido de presentación**: Mantener el HTML limpio y semántico
+- **Reutilización de estilos**: Aplicar el mismo diseño a múltiples elementos
+- **Mantenimiento eficiente**: Cambiar el diseño completo modificando solo CSS
+- **Diseño responsivo**: Adaptar la apariencia a diferentes dispositivos
+- **Mejorar la experiencia de usuario**: Crear interfaces atractivas y funcionales
+
+### Evolución de CSS
+
+```plaintext
+CSS1 (1996)  → Propiedades básicas de texto y color
+CSS2 (1998)  → Posicionamiento y media types
+CSS3 (1999+) → Módulos independientes (Flexbox, Grid, Animaciones)
+CSS4+        → Nuevas características modulares continuas
+```
+
+---
+
+## Cómo se integra CSS en HTML
+
+Existen **tres formas principales** de integrar CSS en un documento HTML, cada una con sus ventajas y casos de uso específicos.
+
+### 1. CSS Inline (En línea)
+
+Se aplica directamente en el atributo `style` de un elemento HTML.
+
+```html
+<p style="color: blue; font-size: 18px;">
+  Este texto es azul y de 18 píxeles.
+</p>
+
+<div style="background-color: #f0f0f0; padding: 20px; border-radius: 8px;">
+  Contenedor con estilos inline
+</div>
+```
+
+<Aside type="caution">
+**Desventajas:**
+- Dificulta el mantenimiento
+- No se puede reutilizar
+- Mezcla contenido con presentación
+- Mayor especificidad (difícil de sobrescribir)
+
+**Cuándo usarlo:** Solo para pruebas rápidas o estilos dinámicos generados por JavaScript.
+</Aside>
+
+### 2. CSS Internal (Interno)
+
+Se define dentro de la etiqueta `<style>` en el `<head>` del documento HTML.
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CSS Interno</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>Mi Página</h1>
+  <div class="card">
+    <p>Contenido de la tarjeta</p>
+  </div>
+</body>
+</html>
+```
+
+<Aside type="note">
+**Ventajas:**
+- Útil para páginas únicas o prototipos
+- No requiere archivos adicionales
+- Los estilos se cargan con el HTML
+
+**Desventajas:**
+- No se reutiliza entre páginas
+- Aumenta el tamaño del HTML
+- Dificulta el mantenimiento en sitios grandes
+</Aside>
+
+### 3. CSS External (Externo) - ⭐ Recomendado
+
+Se crea un archivo `.css` separado y se vincula al HTML mediante la etiqueta `<link>`.
+
+<Tabs>
+<TabItem label="index.html">
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CSS Externo</title>
+  <!-- Vinculación del archivo CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <h1>Mi Sitio Web</h1>
+    <nav class="nav">
+      <a href="#inicio">Inicio</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+  </header>
+  
+  <main class="container">
+    <section class="card">
+      <h2>Bienvenido</h2>
+      <p>Este es un ejemplo de CSS externo.</p>
+    </section>
+  </main>
+</body>
+</html>
+```
+</TabItem>
+
+<TabItem label="styles.css">
+```css
+/* Archivo CSS externo */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  line-height: 1.6;
+}
+
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  text-align: center;
+}
+
+.nav {
+  margin-top: 1rem;
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  margin: 0 15px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.nav a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 20px;
+}
+
+.card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+```
+</TabItem>
+</Tabs>
+
+<Aside type="tip">
+**✅ Ventajas del CSS Externo:**
+- **Reutilización**: Un archivo CSS para múltiples páginas
+- **Mantenimiento**: Cambios centralizados
+- **Rendimiento**: El navegador cachea el archivo CSS
+- **Organización**: Separación clara de responsabilidades
+- **Colaboración**: Diferentes personas pueden trabajar en HTML y CSS
+
+**Esta es la forma profesional y recomendada de trabajar con CSS.**
+</Aside>
+
+### Múltiples archivos CSS
+
+Puedes vincular varios archivos CSS para organizar mejor tu código:
+
+```html
+<head>
+  <!-- CSS base -->
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  
+  <!-- CSS de componentes -->
+  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/cards.css">
+  
+  <!-- CSS de páginas específicas -->
+  <link rel="stylesheet" href="css/home.css">
+</head>
+```
+
+---
+
+## Anatomía de una regla CSS
+
+Una **regla CSS** está compuesta por un selector y un bloque de declaraciones. Entender su estructura es fundamental.
+
+```css
+selector {
+  propiedad: valor;
+  propiedad: valor;
+}
+```
+
+### Estructura detallada
+
+```css
+/* Selector: indica QUÉ elementos se van a estilizar */
+h1 {
+  /* Declaración 1 */
+  color: #2c3e50;           /* propiedad: valor; */
+  
+  /* Declaración 2 */
+  font-size: 32px;
+  
+  /* Declaración 3 */
+  text-align: center;
+  
+  /* Declaración 4 */
+  margin-bottom: 20px;
+}
+/* Fin del bloque de declaraciones */
+```
+
+### Componentes de una regla CSS
+
+<Steps>
+
+1. **Selector** <Badge text="Obligatorio" variant="danger" />
+   - Define **qué elementos** HTML serán afectados
+   - Ejemplos: `h1`, `.clase`, `#id`, `div p`, etc.
+
+2. **Llaves `{ }`** <Badge text="Obligatorio" variant="danger" />
+   - Delimitan el bloque de declaraciones
+   - Todo lo que esté dentro se aplicará al selector
+
+3. **Propiedad** <Badge text="Obligatorio" variant="danger" />
+   - Define **qué aspecto** se va a modificar
+   - Ejemplos: `color`, `font-size`, `margin`, `background`
+
+4. **Valor** <Badge text="Obligatorio" variant="danger" />
+   - Define **cómo** se modificará la propiedad
+   - Ejemplos: `red`, `16px`, `center`, `#fff`
+
+5. **Punto y coma `;`** <Badge text="Recomendado" variant="caution" />
+   - Separa las declaraciones
+   - Opcional en la última declaración, pero es buena práctica incluirlo
+
+</Steps>
+
+### Ejemplos de reglas CSS
+
+<Tabs>
+<TabItem label="Selector de elemento">
+```css
+/* Aplica a TODOS los párrafos */
+p {
+  color: #333;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+```
+</TabItem>
+
+<TabItem label="Selector de clase">
+```css
+/* Aplica a elementos con class="destacado" */
+.destacado {
+  background-color: #fffacd;
+  border-left: 4px solid #ffd700;
+  padding: 15px;
+  font-weight: bold;
+}
+```
+</TabItem>
+
+<TabItem label="Selector de ID">
+```css
+/* Aplica al elemento con id="encabezado-principal" */
+#encabezado-principal {
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  color: white;
+  padding: 40px 20px;
+  text-align: center;
+  font-size: 48px;
+}
+```
+</TabItem>
+
+<TabItem label="Múltiples selectores">
+```css
+/* Aplica a h1, h2 y h3 */
+h1, h2, h3 {
+  font-family: 'Georgia', serif;
+  color: #2c3e50;
+  font-weight: 700;
+  margin-top: 0;
+}
+```
+</TabItem>
+</Tabs>
+
+### Regla con múltiples declaraciones
+
+```css
+.boton {
+  /* Tipografía */
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  
+  /* Colores */
+  color: white;
+  background-color: #3498db;
+  
+  /* Espaciado */
+  padding: 12px 24px;
+  margin: 10px 0;
+  
+  /* Bordes */
+  border: none;
+  border-radius: 6px;
+  
+  /* Efectos */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.boton:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+```
+
+---
+
+## Comentarios en CSS
+
+Los comentarios son texto que el navegador **ignora** pero que ayuda a los desarrolladores a entender el código.
+
+### Sintaxis de comentarios
+
+```css
+/* Este es un comentario de una línea */
+
+/*
+  Este es un comentario
+  de múltiples líneas
+  que puede abarcar varios renglones
+*/
+
+/* ========================================
+   SECCIÓN: ESTILOS DEL HEADER
+   ======================================== */
+
+.header {
+  background: #333;
+  /* color: red; */ /* Código comentado temporalmente */
+  color: white; /* Color activo */
+}
+```
+
+### Usos prácticos de los comentarios
+
+<Tabs>
+<TabItem label="Organización">
+```css
+/* ==========================================
+   1. RESET Y ESTILOS GLOBALES
+   ========================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   2. TIPOGRAFÍA
+   ========================================== */
+
+body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+}
+
+/* ==========================================
+   3. COMPONENTES
+   ========================================== */
+
+/* --- Botones --- */
+.btn { /* ... */ }
+
+/* --- Tarjetas --- */
+.card { /* ... */ }
+```
+</TabItem>
+
+<TabItem label="Documentación">
+```css
+/**
+ * Componente: Card
+ * Descripción: Tarjeta reutilizable para contenido
+ * Uso: <div class="card">...</div>
+ * Modificadores: .card--large, .card--dark
+ */
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Variante grande */
+.card--large {
+  padding: 40px;
+  font-size: 1.2em;
+}
+
+/* Variante oscura */
+.card--dark {
+  background: #2c3e50;
+  color: white;
+}
+```
+</TabItem>
+
+<TabItem label="Debugging">
+```css
+.elemento {
+  /* TODO: Revisar este color con el diseñador */
+  background-color: #ff6b6b;
+  
+  /* FIXME: Este margin causa problemas en mobile */
+  /* margin-top: 50px; */
+  
+  /* HACK: Solución temporal hasta refactorizar */
+  position: relative;
+  z-index: 999;
+  
+  /* NOTE: Este padding debe coincidir con el del footer */
+  padding: 20px;
+}
+```
+</TabItem>
+
+<TabItem label="Desactivar código">
+```css
+.boton {
+  background: #3498db;
+  color: white;
+  
+  /* Estilos antiguos - mantener por si acaso
+  background: linear-gradient(to bottom, #3498db, #2980b9);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  */
+  
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+```
+</TabItem>
+</Tabs>
+
+<Aside type="caution">
+**⚠️ Importante:** CSS **NO** soporta comentarios de una línea con `//` como en JavaScript. Solo se usa `/* */`.
+
+```css
+/* ✅ Correcto */
+.clase { color: red; }
+
+// ❌ Incorrecto - Esto causará errores
+.clase { color: red; }
+```
+</Aside>
+
+---
+
+## Buenas prácticas iniciales
+
+Adoptar buenas prácticas desde el principio te ahorrará muchos problemas a futuro.
+
+### 1. Usa CSS externo
+
+```html
+<!-- ✅ Recomendado -->
+<link rel="stylesheet" href="styles.css">
+
+<!-- ❌ Evitar -->
+<p style="color: red;">Texto</p>
+```
+
+### 2. Organiza tu código con comentarios
+
+```css
+/* ==========================================
+   VARIABLES Y CONFIGURACIÓN
+   ========================================== */
+
+/* ==========================================
+   RESET Y BASE
+   ========================================== */
+
+/* ==========================================
+   LAYOUT
+   ========================================== */
+
+/* ==========================================
+   COMPONENTES
+   ========================================== */
+
+/* ==========================================
+   UTILIDADES
+   ========================================== */
+```
+
+### 3. Usa nombres de clase descriptivos
+
+```css
+/* ✅ Buenos nombres */
+.boton-primario { }
+.tarjeta-producto { }
+.encabezado-principal { }
+.lista-navegacion { }
+
+/* ❌ Malos nombres */
+.btn1 { }
+.azul { }
+.grande { }
+.div1 { }
+```
+
+### 4. Mantén la consistencia en la indentación
+
+```css
+/* ✅ Bien indentado */
+.contenedor {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contenedor .item {
+  padding: 10px;
+  margin: 5px;
+}
+
+/* ❌ Mal indentado */
+.contenedor{
+display:flex;
+    justify-content:center;
+align-items: center;}
+```
+
+### 5. Agrupa propiedades relacionadas
+
+```css
+.elemento {
+  /* Posicionamiento */
+  position: relative;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  
+  /* Modelo de caja */
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 20px;
+  margin: 10px 0;
+  
+  /* Tipografía */
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333;
+  
+  /* Visual */
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  
+  /* Efectos */
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+```
+
+### 6. Usa shorthand properties cuando sea apropiado
+
+<Tabs>
+<TabItem label="Shorthand ✅">
+```css
+/* Forma corta (recomendada) */
+.elemento {
+  margin: 10px 20px 10px 20px;
+  padding: 15px;
+  background: #fff url('imagen.jpg') no-repeat center;
+  border: 2px solid #333;
+  font: bold 16px/1.5 Arial, sans-serif;
+}
+```
+</TabItem>
+
+<TabItem label="Longhand ❌">
+```css
+/* Forma larga (innecesariamente verbosa) */
+.elemento {
+  margin-top: 10px;
+  margin-right: 20px;
+  margin-bottom: 10px;
+  margin-left: 20px;
+  
+  padding-top: 15px;
+  padding-right: 15px;
+  padding-bottom: 15px;
+  padding-left: 15px;
+  
+  background-color: #fff;
+  background-image: url('imagen.jpg');
+  background-repeat: no-repeat;
+  background-position: center;
+  
+  border-width: 2px;
+  border-style: solid;
+  border-color: #333;
+  
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 1.5;
+  font-family: Arial, sans-serif;
+}
+```
+</TabItem>
+</Tabs>
+
+### 7. Evita el uso excesivo de `!important`
+
+```css
+/* ❌ Mal uso */
+.texto {
+  color: red !important;
+  font-size: 20px !important;
+}
+
+/* ✅ Mejor: Usa especificidad correcta */
+.contenedor .texto {
+  color: red;
+  font-size: 20px;
+}
+
+/* ⚠️ Uso aceptable: Sobrescribir estilos de librerías */
+.bootstrap-override {
+  margin: 0 !important; /* Necesario para sobrescribir Bootstrap */
+}
+```
+
+### 8. Usa unidades relativas cuando sea apropiado
+
+```css
+/* ✅ Responsive y escalable */
+.contenedor {
+  width: 90%;
+  max-width: 1200px;
+  padding: 2rem;
+  font-size: 1.125rem; /* 18px si base es 16px */
+}
+
+/* ❌ Rígido y difícil de mantener */
+.contenedor {
+  width: 1000px;
+  padding: 32px;
+  font-size: 18px;
+}
+```
+
+### 9. Valida tu CSS
+
+Usa herramientas como:
+- **W3C CSS Validator**: https://jigsaw.w3.org/css-validator/
+- **Extensiones de VS Code**: CSS Lint, Stylelint
+- **DevTools del navegador**: Para depurar estilos
+
+### 10. Mantén un orden lógico de propiedades
+
+Sigue un orden consistente (ejemplo: orden alfabético o por categorías):
+
+```css
+.elemento {
+  /* 1. Posicionamiento */
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  
+  /* 2. Display y Box Model */
+  display: flex;
+  width: 100%;
+  height: auto;
+  padding: 20px;
+  margin: 10px;
+  
+  /* 3. Tipografía */
+  font-family: Arial;
+  font-size: 16px;
+  color: #333;
+  text-align: center;
+  
+  /* 4. Visual */
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  
+  /* 5. Otros */
+  cursor: pointer;
+  transition: all 0.3s;
+}
+```
+
+---
+
+## Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+✅ **CSS** es el lenguaje para dar estilo a páginas web  
+✅ Existen **3 formas** de integrar CSS: inline, internal y external  
+✅ El **CSS externo** es la forma profesional y recomendada  
+✅ Una **regla CSS** tiene: selector, propiedades y valores  
+✅ Los **comentarios** ayudan a organizar y documentar el código  
+✅ Las **buenas prácticas** desde el inicio facilitan el mantenimiento  
+
+**Próximo paso:** En la siguiente lección aprenderás sobre selectores y especificidad en CSS.
+</Aside>

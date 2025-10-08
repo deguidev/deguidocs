@@ -1,0 +1,1207 @@
+---
+title: 5. Cajas y Modelo de Caja (Box Model)
+description: Propiedades width, height, padding, border, margin y box-sizing en CSS
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+El **Box Model** (Modelo de Caja) es uno de los conceptos más fundamentales de CSS. Entenderlo es esencial para controlar el diseño y espaciado de los elementos.
+
+<Aside type="tip">
+📦 **Concepto clave:** En CSS, **todo es una caja**. Cada elemento HTML se representa como una caja rectangular con contenido, padding, borde y margen.
+</Aside>
+
+---
+
+## 📦 ¿Qué es el Box Model?
+
+El Box Model define cómo se calculan las dimensiones de un elemento. Cada caja tiene **4 áreas** concéntricas:
+
+```plaintext
+┌─────────────────────────────────────┐
+│          MARGIN (exterior)          │  ← Espacio fuera del elemento
+│  ┌───────────────────────────────┐  │
+│  │      BORDER (borde)           │  │  ← Línea del borde
+│  │  ┌─────────────────────────┐  │  │
+│  │  │   PADDING (relleno)     │  │  │  ← Espacio interno
+│  │  │  ┌───────────────────┐  │  │  │
+│  │  │  │    CONTENT        │  │  │  │  ← Contenido (texto, imágenes)
+│  │  │  │   (width/height)  │  │  │  │
+│  │  │  └───────────────────┘  │  │  │
+│  │  └─────────────────────────┘  │  │
+│  └───────────────────────────────┘  │
+└─────────────────────────────────────┘
+```
+
+<Steps>
+
+1. **Content (Contenido)** <Badge text="Centro" variant="tip" />
+   - El área donde aparece el contenido (texto, imágenes)
+   - Controlado por `width` y `height`
+
+2. **Padding (Relleno)** <Badge text="Interno" variant="note" />
+   - Espacio transparente entre el contenido y el borde
+   - Aumenta el tamaño visual del elemento
+   - Hereda el color de fondo del elemento
+
+3. **Border (Borde)** <Badge text="Línea" variant="caution" />
+   - Línea que rodea el padding y el contenido
+   - Puede tener color, estilo y grosor
+   - Aumenta el tamaño total del elemento
+
+4. **Margin (Margen)** <Badge text="Externo" variant="danger" />
+   - Espacio transparente fuera del borde
+   - Separa el elemento de otros elementos
+   - **No** tiene color de fondo (siempre transparente)
+
+</Steps>
+
+<Aside type="note">
+💡 **Fórmula del tamaño total:**
+
+**Ancho total** = width + padding-left + padding-right + border-left + border-right + margin-left + margin-right
+
+**Alto total** = height + padding-top + padding-bottom + border-top + border-bottom + margin-top + margin-bottom
+</Aside>
+
+---
+
+## 📐 Propiedades de dimensión
+
+### `width` y `height` - Ancho y alto
+
+Definen las dimensiones del **área de contenido**.
+
+```css
+/* Valores de width y height */
+.elemento {
+  width: 300px;        /* Ancho fijo */
+  height: 200px;       /* Alto fijo */
+  
+  width: 50%;          /* Porcentaje del padre */
+  height: 100vh;       /* Porcentaje del viewport */
+  
+  width: auto;         /* Automático (default) */
+  height: auto;        /* Automático (default) */
+}
+```
+
+<Tabs>
+<TabItem label="Unidades comunes">
+```css
+/* Píxeles - Tamaño fijo */
+.caja-fija {
+  width: 400px;
+  height: 300px;
+}
+
+/* Porcentaje - Relativo al padre */
+.caja-fluida {
+  width: 80%;
+  height: 50%;
+}
+
+/* Viewport - Relativo a la ventana */
+.caja-pantalla {
+  width: 100vw;   /* 100% del ancho de la ventana */
+  height: 100vh;  /* 100% del alto de la ventana */
+}
+
+/* Auto - Ajusta al contenido */
+.caja-auto {
+  width: auto;    /* Se ajusta al contenido o al padre */
+  height: auto;   /* Se ajusta al contenido */
+}
+```
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+```css
+/* Contenedor centrado con ancho máximo */
+.contenedor {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Imagen responsiva */
+img {
+  width: 100%;
+  height: auto;  /* Mantiene proporción */
+}
+
+/* Tarjeta de tamaño fijo */
+.tarjeta {
+  width: 300px;
+  height: 400px;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+}
+
+/* Hero full screen */
+.hero {
+  width: 100%;
+  height: 100vh;
+}
+```
+</TabItem>
+</Tabs>
+
+### `max-width`, `min-width`, `max-height`, `min-height`
+
+Establecen límites para las dimensiones.
+
+```css
+/* Límites de ancho */
+.elemento {
+  min-width: 200px;    /* Ancho mínimo */
+  max-width: 800px;    /* Ancho máximo */
+  
+  min-height: 100px;   /* Alto mínimo */
+  max-height: 500px;   /* Alto máximo */
+}
+```
+
+<Tabs>
+<TabItem label="max-width">
+```css
+/* Contenedor responsivo con límite */
+.contenedor {
+  width: 100%;
+  max-width: 1200px;  /* No más ancho que 1200px */
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Imagen que no excede su tamaño */
+img {
+  max-width: 100%;  /* No más ancha que su contenedor */
+  height: auto;
+}
+
+/* Texto con ancho máximo para legibilidad */
+.articulo {
+  max-width: 65ch;  /* Máximo 65 caracteres */
+  margin: 0 auto;
+}
+```
+
+<Aside type="tip">
+✨ **Tip:** `max-width: 100%` en imágenes es esencial para diseño responsivo. Evita que las imágenes se desborden de su contenedor.
+</Aside>
+</TabItem>
+
+<TabItem label="min-width">
+```css
+/* Botón con ancho mínimo */
+.boton {
+  min-width: 120px;  /* Al menos 120px de ancho */
+  padding: 10px 20px;
+}
+
+/* Input con ancho mínimo */
+input[type="text"] {
+  min-width: 200px;
+  width: 100%;
+}
+
+/* Columna que no se encoge demasiado */
+.columna {
+  min-width: 250px;
+  flex: 1;
+}
+```
+</TabItem>
+
+<TabItem label="max-height y min-height">
+```css
+/* Área de texto con altura limitada */
+.comentarios {
+  max-height: 300px;  /* Máximo 300px */
+  overflow-y: auto;   /* Scroll si excede */
+}
+
+/* Sección con altura mínima */
+.seccion {
+  min-height: 400px;  /* Al menos 400px */
+}
+
+/* Hero con altura mínima y máxima */
+.hero {
+  min-height: 400px;
+  max-height: 80vh;
+  height: 60vh;
+}
+
+/* Sidebar con altura mínima */
+.sidebar {
+  min-height: 100vh;  /* Al menos la altura de la ventana */
+}
+```
+</TabItem>
+
+<TabItem label="Combinaciones">
+```css
+/* Contenedor flexible con límites */
+.contenedor-flexible {
+  width: 90%;
+  min-width: 320px;   /* No menos de 320px (mobile) */
+  max-width: 1400px;  /* No más de 1400px */
+  margin: 0 auto;
+}
+
+/* Modal con dimensiones controladas */
+.modal {
+  width: 90%;
+  max-width: 600px;
+  min-width: 300px;
+  
+  height: auto;
+  max-height: 90vh;
+  min-height: 200px;
+  
+  overflow-y: auto;
+}
+
+/* Galería de imágenes */
+.imagen-galeria {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  min-height: 200px;
+}
+```
+</TabItem>
+</Tabs>
+
+<Aside type="note">
+📏 **Orden de prioridad:**
+1. `min-width` / `min-height` (más alta prioridad)
+2. `max-width` / `max-height`
+3. `width` / `height` (más baja prioridad)
+
+Si hay conflicto, `min-*` siempre gana.
+</Aside>
+
+---
+
+## 🎨 Padding (Relleno interno)
+
+El **padding** es el espacio entre el contenido y el borde. Aumenta el área visible del elemento.
+
+### Sintaxis de padding
+
+```css
+/* Padding individual */
+.elemento {
+  padding-top: 10px;
+  padding-right: 20px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+}
+
+/* Padding abreviado (shorthand) */
+.elemento {
+  padding: 10px 20px 10px 20px;  /* top right bottom left (sentido horario) */
+  padding: 10px 20px;             /* vertical horizontal */
+  padding: 10px;                  /* todos los lados iguales */
+}
+```
+
+<Tabs>
+<TabItem label="Sintaxis shorthand">
+```css
+/* 1 valor: Todos los lados */
+.padding-1 {
+  padding: 20px;
+  /* top: 20px, right: 20px, bottom: 20px, left: 20px */
+}
+
+/* 2 valores: Vertical | Horizontal */
+.padding-2 {
+  padding: 10px 20px;
+  /* top: 10px, right: 20px, bottom: 10px, left: 20px */
+}
+
+/* 3 valores: Top | Horizontal | Bottom */
+.padding-3 {
+  padding: 10px 20px 30px;
+  /* top: 10px, right: 20px, bottom: 30px, left: 20px */
+}
+
+/* 4 valores: Top | Right | Bottom | Left (sentido horario ⏰) */
+.padding-4 {
+  padding: 10px 20px 30px 40px;
+  /* top: 10px, right: 20px, bottom: 30px, left: 40px */
+}
+```
+
+<Aside type="tip">
+🕐 **Truco mnemotécnico:** Piensa en un reloj: empieza arriba (12) y gira en sentido horario → Top, Right, Bottom, Left.
+</Aside>
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+```css
+/* Botón con padding uniforme */
+.boton {
+  padding: 12px 24px;  /* Vertical 12px, Horizontal 24px */
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+}
+
+/* Tarjeta con padding */
+.tarjeta {
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Contenedor con padding responsive */
+.contenedor {
+  padding: 20px;
+}
+
+@media (min-width: 768px) {
+  .contenedor {
+    padding: 40px;
+  }
+}
+
+/* Input con padding interno */
+input[type="text"] {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Sección con padding vertical */
+.seccion {
+  padding: 60px 0;  /* Solo arriba y abajo */
+}
+```
+</TabItem>
+
+<TabItem label="Padding con porcentaje">
+```css
+/* Padding con porcentaje (relativo al ANCHO del padre) */
+.elemento {
+  padding: 5%;  /* 5% del ancho del padre en todos los lados */
+}
+
+/* Crear proporción 16:9 con padding */
+.video-16-9 {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;  /* 9/16 = 0.5625 = 56.25% */
+  height: 0;
+}
+
+.video-16-9 iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Crear cuadrado con padding */
+.cuadrado {
+  width: 100%;
+  padding-bottom: 100%;  /* Mismo que el ancho */
+  height: 0;
+  position: relative;
+}
+```
+
+<Aside type="note">
+⚠️ **Importante:** El padding en porcentaje **siempre se calcula basándose en el ancho del padre**, incluso para `padding-top` y `padding-bottom`.
+</Aside>
+</TabItem>
+</Tabs>
+
+### Características del padding
+
+<Tabs>
+<TabItem label="Hereda el fondo">
+```css
+/* El padding hereda el color de fondo */
+.caja {
+  background-color: #3498db;
+  padding: 30px;
+  color: white;
+}
+/* El área de padding también será azul */
+
+/* Con imagen de fondo */
+.caja-imagen {
+  background-image: url('patron.png');
+  padding: 40px;
+}
+/* La imagen se extiende al área de padding */
+```
+</TabItem>
+
+<TabItem label="No acepta valores negativos">
+```css
+/* ❌ Incorrecto: No se permiten valores negativos */
+.elemento {
+  padding: -10px;  /* No funciona */
+}
+
+/* ✅ Correcto: Solo valores positivos o cero */
+.elemento {
+  padding: 0;
+  padding: 10px;
+  padding: 2rem;
+}
+```
+</TabItem>
+
+<TabItem label="Aumenta el tamaño">
+```css
+/* El padding aumenta el tamaño total del elemento */
+.caja {
+  width: 200px;
+  height: 100px;
+  padding: 20px;
+  border: 2px solid black;
+}
+
+/* Tamaño total:
+   Ancho: 200px (content) + 20px (padding-left) + 20px (padding-right) + 2px (border-left) + 2px (border-right) = 244px
+   Alto: 100px (content) + 20px (padding-top) + 20px (padding-bottom) + 2px (border-top) + 2px (border-bottom) = 144px
+*/
+```
+</TabItem>
+</Tabs>
+
+---
+
+## 🔲 Border (Borde)
+
+El **border** es una línea que rodea el padding y el contenido.
+
+### Propiedades de border
+
+```css
+/* Propiedades individuales */
+.elemento {
+  border-width: 2px;           /* Grosor */
+  border-style: solid;         /* Estilo */
+  border-color: #3498db;       /* Color */
+}
+
+/* Shorthand (forma corta) */
+.elemento {
+  border: 2px solid #3498db;
+  /* grosor estilo color */
+}
+```
+
+<Tabs>
+<TabItem label="border-style">
+```css
+/* Estilos de borde */
+.solido    { border: 3px solid black; }      /* ──── Línea sólida */
+.punteado  { border: 3px dotted black; }     /* ···· Puntos */
+.discontinuo { border: 3px dashed black; }   /* ---- Guiones */
+.doble     { border: 3px double black; }     /* ════ Línea doble */
+.ranura    { border: 3px groove black; }     /* Efecto 3D ranura */
+.cresta    { border: 3px ridge black; }      /* Efecto 3D cresta */
+.insertado { border: 3px inset black; }      /* Efecto 3D insertado */
+.resaltado { border: 3px outset black; }     /* Efecto 3D resaltado */
+.ninguno   { border: none; }                 /* Sin borde */
+.oculto    { border: hidden; }               /* Oculto (para tablas) */
+```
+
+<Aside type="note">
+📝 **Nota:** `border-style` es **obligatorio** para que el borde sea visible. Sin él, el borde no se mostrará aunque definas width y color.
+</Aside>
+</TabItem>
+
+<TabItem label="Bordes individuales">
+```css
+/* Borde en un solo lado */
+.top    { border-top: 2px solid red; }
+.right  { border-right: 2px solid blue; }
+.bottom { border-bottom: 2px solid green; }
+.left   { border-left: 2px solid yellow; }
+
+/* Bordes diferentes en cada lado */
+.variado {
+  border-top: 3px solid #e74c3c;
+  border-right: 2px dashed #3498db;
+  border-bottom: 4px double #2ecc71;
+  border-left: 1px dotted #f39c12;
+}
+
+/* Borde solo abajo (común en inputs) */
+input {
+  border: none;
+  border-bottom: 2px solid #3498db;
+  padding: 8px 0;
+}
+
+/* Tarjeta con borde izquierdo de acento */
+.tarjeta-acento {
+  border-left: 4px solid #3498db;
+  padding: 20px;
+  background: #f8f9fa;
+}
+```
+</TabItem>
+
+<TabItem label="border-radius">
+```css
+/* Bordes redondeados */
+.redondeado {
+  border: 2px solid #3498db;
+  border-radius: 8px;  /* Todas las esquinas */
+}
+
+/* Esquinas individuales */
+.esquinas-custom {
+  border-radius: 10px 20px 30px 40px;
+  /* top-left | top-right | bottom-right | bottom-left */
+}
+
+/* Círculo perfecto */
+.circulo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #3498db;
+}
+
+/* Píldora (pill) */
+.pildora {
+  border-radius: 9999px;  /* Valor muy alto */
+  padding: 8px 20px;
+  background: #2ecc71;
+  color: white;
+}
+
+/* Esquinas específicas */
+.esquina-superior {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+```
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+```css
+/* Botón con borde */
+.boton-outline {
+  padding: 10px 20px;
+  border: 2px solid #3498db;
+  background: transparent;
+  color: #3498db;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.boton-outline:hover {
+  background: #3498db;
+  color: white;
+}
+
+/* Tarjeta con sombra y borde */
+.tarjeta {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Alerta con borde de color */
+.alerta-exito {
+  border: 1px solid #d4edda;
+  border-left: 4px solid #28a745;
+  background: #d4edda;
+  color: #155724;
+  padding: 15px;
+  border-radius: 4px;
+}
+
+/* Input con borde que cambia al focus */
+input {
+  border: 2px solid #ddd;
+  padding: 10px;
+  border-radius: 4px;
+  transition: border-color 0.3s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+```
+</TabItem>
+</Tabs>
+
+### Border con imágenes
+
+```css
+/* border-image (avanzado) */
+.borde-imagen {
+  border: 10px solid transparent;
+  border-image: url('borde-decorativo.png') 30 round;
+}
+
+/* Degradado como borde */
+.borde-degradado {
+  border: 4px solid;
+  border-image: linear-gradient(45deg, #3498db, #2ecc71) 1;
+}
+```
+
+---
+
+## 📏 Margin (Margen externo)
+
+El **margin** es el espacio transparente fuera del borde. Separa el elemento de otros elementos.
+
+### Sintaxis de margin
+
+```css
+/* Margin individual */
+.elemento {
+  margin-top: 10px;
+  margin-right: 20px;
+  margin-bottom: 10px;
+  margin-left: 20px;
+}
+
+/* Margin abreviado (shorthand) */
+.elemento {
+  margin: 10px 20px 10px 20px;  /* top right bottom left */
+  margin: 10px 20px;             /* vertical horizontal */
+  margin: 10px;                  /* todos los lados */
+}
+```
+
+<Tabs>
+<TabItem label="Centrar elementos">
+```css
+/* Centrar horizontalmente con margin auto */
+.contenedor-centrado {
+  width: 800px;
+  margin: 0 auto;  /* top/bottom: 0, left/right: auto */
+}
+
+/* Centrar con max-width */
+.contenedor-responsive {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 20px;
+}
+
+/* ❌ No funciona para centrar verticalmente */
+.no-funciona {
+  height: 200px;
+  margin: auto 0;  /* No centra verticalmente */
+}
+```
+
+<Aside type="tip">
+✨ **Tip:** `margin: 0 auto` solo centra horizontalmente elementos de **bloque** con un `width` definido.
+</Aside>
+</TabItem>
+
+<TabItem label="Márgenes negativos">
+```css
+/* Los márgenes SÍ pueden ser negativos */
+.superpuesto {
+  margin-top: -20px;  /* Mueve el elemento hacia arriba */
+}
+
+/* Superposición de elementos */
+.tarjeta-superpuesta {
+  margin-top: -50px;
+  position: relative;
+  z-index: 10;
+}
+
+/* Expandir más allá del contenedor */
+.imagen-expandida {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+/* Ajustar espaciado */
+.lista-compacta li {
+  margin-bottom: -5px;
+}
+```
+</TabItem>
+
+<TabItem label="Colapso de márgenes">
+```css
+/* Los márgenes verticales se colapsan (collapse) */
+.elemento-1 {
+  margin-bottom: 30px;
+}
+
+.elemento-2 {
+  margin-top: 20px;
+}
+
+/* Espacio entre ellos: 30px (no 50px)
+   Se usa el margen mayor, no la suma */
+```
+
+<Aside type="caution">
+⚠️ **Colapso de márgenes:** Los márgenes verticales adyacentes se fusionan. El espacio final es el **mayor** de los dos, no la suma.
+
+**Cuándo ocurre:**
+- Entre hermanos verticales
+- Entre padre e hijo (si no hay padding/border que los separe)
+- En elementos vacíos
+
+**Cómo evitarlo:**
+- Usar padding en lugar de margin
+- Agregar border o padding al padre
+- Usar `display: flex` o `display: grid`
+- Usar `overflow: hidden` en el padre
+</Aside>
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+```css
+/* Espaciado entre secciones */
+.seccion {
+  margin-bottom: 60px;
+}
+
+/* Espaciado entre párrafos */
+p {
+  margin-bottom: 1rem;
+}
+
+p:last-child {
+  margin-bottom: 0;  /* Sin margen en el último */
+}
+
+/* Espaciado en listas */
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+li {
+  margin-bottom: 10px;
+}
+
+/* Botón con margen */
+.boton {
+  margin: 10px 5px;
+}
+
+/* Grid con márgenes */
+.grid-item {
+  width: calc(33.333% - 20px);
+  margin: 10px;
+  float: left;
+}
+```
+</TabItem>
+</Tabs>
+
+### Diferencias entre padding y margin
+
+| Característica | Padding 🎨 | Margin 📏 |
+|----------------|-----------|----------|
+| **Ubicación** | Dentro del borde | Fuera del borde |
+| **Color de fondo** | Hereda el fondo del elemento | Siempre transparente |
+| **Valores negativos** | ❌ No permitidos | ✅ Permitidos |
+| **Click area** | ✅ Parte del elemento clickeable | ❌ No es clickeable |
+| **Colapso** | ❌ No colapsa | ✅ Márgenes verticales colapsan |
+| **Uso común** | Espacio interno | Separación entre elementos |
+
+---
+
+## ⚙️ Box-sizing: content-box vs border-box
+
+La propiedad `box-sizing` cambia cómo se calculan las dimensiones de un elemento.
+
+### `content-box` (default)
+
+```css
+/* content-box: width/height solo afectan al contenido */
+.content-box {
+  box-sizing: content-box;  /* Default */
+  width: 200px;
+  padding: 20px;
+  border: 5px solid black;
+}
+
+/* Tamaño total:
+   200px (width) + 40px (padding) + 10px (border) = 250px
+*/
+```
+
+### `border-box` ⭐ (recomendado)
+
+```css
+/* border-box: width/height incluyen padding y border */
+.border-box {
+  box-sizing: border-box;
+  width: 200px;
+  padding: 20px;
+  border: 5px solid black;
+}
+
+/* Tamaño total: 200px
+   El contenido se ajusta: 200px - 40px (padding) - 10px (border) = 150px
+*/
+```
+
+<Tabs>
+<TabItem label="Comparación visual">
+```css
+/* CONTENT-BOX (default) */
+.caja-content {
+  box-sizing: content-box;
+  width: 200px;
+  padding: 20px;
+  border: 5px solid #3498db;
+  background: #ecf0f1;
+}
+/* 
+┌─────────────────────────────────┐
+│ Border: 5px                     │ ← +5px cada lado
+│ ┌───────────────────────────┐   │
+│ │ Padding: 20px             │   │ ← +20px cada lado
+│ │ ┌─────────────────────┐   │   │
+│ │ │ Content: 200px      │   │   │ ← Width definido
+│ │ └─────────────────────┘   │   │
+│ └───────────────────────────┘   │
+└─────────────────────────────────┘
+Tamaño total: 250px
+*/
+
+/* BORDER-BOX (recomendado) */
+.caja-border {
+  box-sizing: border-box;
+  width: 200px;
+  padding: 20px;
+  border: 5px solid #3498db;
+  background: #ecf0f1;
+}
+/* 
+┌─────────────────────────────────┐
+│ Border: 5px                     │ ← Incluido en 200px
+│ ┌───────────────────────────┐   │
+│ │ Padding: 20px             │   │ ← Incluido en 200px
+│ │ ┌─────────────────────┐   │   │
+│ │ │ Content: 150px      │   │   │ ← Ajustado automáticamente
+│ │ └─────────────────────┘   │   │
+│ └───────────────────────────┘   │
+└─────────────────────────────────┘
+Tamaño total: 200px (como definiste)
+*/
+```
+</TabItem>
+
+<TabItem label="Reset universal">
+```css
+/* ⭐ Recomendación: Aplicar border-box globalmente */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* O solo en el root */
+html {
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+```
+
+<Aside type="tip">
+✨ **Mejor práctica:** Usa `box-sizing: border-box` en todos tus proyectos. Hace que el cálculo de dimensiones sea mucho más intuitivo y predecible.
+
+**Ventajas:**
+- ✅ `width: 50%` significa exactamente 50% (incluye padding y border)
+- ✅ Más fácil crear layouts responsivos
+- ✅ No necesitas calcular manualmente el tamaño total
+- ✅ Los porcentajes funcionan como esperas
+</Aside>
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+```css
+/* Sin border-box: Difícil de calcular */
+.columna-content {
+  box-sizing: content-box;
+  width: 50%;
+  padding: 20px;
+  border: 2px solid black;
+  float: left;
+}
+/* Problema: 50% + 40px padding + 4px border = Se desborda! */
+
+/* Con border-box: Funciona perfectamente */
+.columna-border {
+  box-sizing: border-box;
+  width: 50%;
+  padding: 20px;
+  border: 2px solid black;
+  float: left;
+}
+/* Perfecto: Exactamente 50% del contenedor */
+
+/* Grid de 3 columnas con border-box */
+.grid-item {
+  box-sizing: border-box;
+  width: 33.333%;
+  padding: 15px;
+  border: 1px solid #ddd;
+  float: left;
+}
+/* Funciona sin problemas */
+
+/* Input con border-box */
+input, textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ddd;
+}
+/* El input ocupa exactamente 100% del contenedor */
+```
+</TabItem>
+</Tabs>
+
+---
+
+## 🔍 Visualización con DevTools
+
+Las herramientas de desarrollador del navegador son esenciales para entender y depurar el Box Model.
+
+<Steps>
+
+1. **Abrir DevTools** <Badge text="F12" variant="tip" />
+   - **Chrome/Edge:** F12 o Ctrl+Shift+I (Cmd+Option+I en Mac)
+   - **Firefox:** F12 o Ctrl+Shift+I (Cmd+Option+I en Mac)
+   - **Safari:** Cmd+Option+I (habilitar menú Desarrollo primero)
+
+2. **Seleccionar elemento**
+   - Clic en el icono de selector (🔍)
+   - Hover sobre el elemento en la página
+   - O clic derecho → "Inspeccionar elemento"
+
+3. **Ver el Box Model**
+   - Panel "Computed" o "Calculado"
+   - Diagrama visual del Box Model
+   - Valores exactos de cada área
+
+4. **Editar en vivo**
+   - Clic en cualquier valor para editarlo
+   - Ver cambios en tiempo real
+   - Experimentar sin modificar el código
+
+</Steps>
+
+### Interpretando el diagrama del Box Model
+
+```plaintext
+Diagrama en DevTools:
+
+        ┌─────────────────────────┐
+        │    margin: 20          │  ← Margen (naranja)
+        │  ┌───────────────────┐  │
+        │  │  border: 5        │  │  ← Borde (amarillo/dorado)
+        │  │ ┌───────────────┐ │  │
+        │  │ │ padding: 10   │ │  │  ← Padding (verde)
+        │  │ │ ┌───────────┐ │ │  │
+        │  │ │ │  300×200  │ │ │  │  ← Contenido (azul)
+        │  │ │ └───────────┘ │ │  │
+        │  │ └───────────────┘ │  │
+        │  └───────────────────┘  │
+        └─────────────────────────┘
+```
+
+<Tabs>
+<TabItem label="Colores en DevTools">
+```plaintext
+🔵 AZUL - Content (Contenido)
+   - Área del contenido
+   - Definida por width y height
+
+🟢 VERDE - Padding (Relleno)
+   - Espacio interno
+   - Entre contenido y borde
+
+🟡 AMARILLO - Border (Borde)
+   - Línea del borde
+   - Grosor definido por border-width
+
+🟠 NARANJA - Margin (Margen)
+   - Espacio externo
+   - Separación con otros elementos
+```
+</TabItem>
+
+<TabItem label="Información mostrada">
+```plaintext
+En el panel Computed verás:
+
+┌─────────────────────────────────┐
+│ Box Model                       │
+├─────────────────────────────────┤
+│         margin                  │
+│    20    20    20    20        │
+│       ┌──────────┐              │
+│       │  border  │              │
+│    5  │    5     │  5           │
+│       │ ┌──────┐ │              │
+│       │ │padding│ │              │
+│   10  │ │  10  │ │  10          │
+│       │ │┌────┐│ │              │
+│       │ ││300 ││ │              │
+│       │ ││×   ││ │              │
+│       │ ││200 ││ │              │
+│       │ │└────┘│ │              │
+│       │ └──────┘ │              │
+│       └──────────┘              │
+└─────────────────────────────────┘
+
+Tamaño total: 370 × 270
+```
+</TabItem>
+
+<TabItem label="Tips de depuración">
+```css
+/* 1. Hover sobre valores en DevTools */
+/* Muestra qué archivo y línea define ese valor */
+
+/* 2. Checkbox para desactivar propiedades */
+/* Prueba qué pasa sin esa propiedad */
+
+/* 3. Editar valores directamente */
+/* Cambia 20px a 40px y ve el resultado */
+
+/* 4. Ver propiedades computadas */
+/* Valores finales después de herencia y cascada */
+
+/* 5. Usar el selector de color */
+/* Para border-color y background */
+
+/* 6. Ver box-sizing activo */
+/* Indica si es content-box o border-box */
+```
+
+<Aside type="tip">
+🔍 **Tip profesional:** Usa DevTools para:
+- ✅ Entender por qué un elemento tiene cierto tamaño
+- ✅ Detectar márgenes colapsados
+- ✅ Ver si box-sizing está aplicado
+- ✅ Experimentar con valores antes de escribir código
+- ✅ Copiar valores computados exactos
+</Aside>
+</TabItem>
+</Tabs>
+
+### Atajos útiles en DevTools
+
+<Tabs>
+<TabItem label="Teclado">
+```plaintext
+⬆️ ⬇️ - Incrementar/decrementar valor en 1
+Shift + ⬆️⬇️ - Incrementar/decrementar en 10
+Alt + ⬆️⬇️ - Incrementar/decrementar en 0.1
+Ctrl + Click - Editar múltiples valores
+Esc - Cerrar panel
+```
+</TabItem>
+
+<TabItem label="Visualización">
+```plaintext
+Hover sobre elemento:
+- Muestra el Box Model con colores
+- Dimensiones exactas
+- Posición en la página
+
+Clic en dimensión:
+- Editar valor directamente
+- Ver cambios en tiempo real
+
+Panel "Layout":
+- Grid inspector
+- Flexbox inspector
+- Box Model detallado
+```
+</TabItem>
+</Tabs>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+### Box Model
+✅ **4 áreas:** Content, Padding, Border, Margin  
+✅ **Tamaño total** = content + padding + border + margin  
+✅ **Todo es una caja** en CSS  
+
+### Dimensiones
+✅ **width/height** - Tamaño del contenido  
+✅ **max-width** - Límite máximo (útil para responsive)  
+✅ **min-width** - Límite mínimo  
+✅ **max/min-height** - Control de altura  
+
+### Padding
+✅ **Espacio interno** entre contenido y borde  
+✅ **Hereda el fondo** del elemento  
+✅ **No acepta negativos**  
+✅ **Shorthand:** `padding: top right bottom left`  
+
+### Border
+✅ **Línea** que rodea padding y contenido  
+✅ **3 propiedades:** width, style, color  
+✅ **border-radius** para esquinas redondeadas  
+✅ **border-style** es obligatorio  
+
+### Margin
+✅ **Espacio externo** fuera del borde  
+✅ **Siempre transparente**  
+✅ **Acepta negativos** ✅  
+✅ **Colapso vertical** entre elementos adyacentes  
+✅ **`margin: 0 auto`** para centrar horizontalmente  
+
+### Box-sizing
+✅ **content-box** (default) - width no incluye padding/border  
+✅ **border-box** ⭐ (recomendado) - width incluye padding/border  
+✅ **Mejor práctica:** Aplicar `border-box` globalmente  
+
+### DevTools
+✅ **F12** para abrir  
+✅ **Diagrama visual** del Box Model con colores  
+✅ **Edición en vivo** de valores  
+✅ **Depuración** de problemas de espaciado  
+
+**Próximo paso:** En la siguiente lección aprenderás sobre posicionamiento y display en CSS.
+</Aside>

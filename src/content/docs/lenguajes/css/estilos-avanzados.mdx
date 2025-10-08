@@ -1,0 +1,1044 @@
+---
+title: 9. Estilos Avanzados
+description: Bordes redondeados, sombras, degradados, imágenes de fondo y filtros visuales
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
+
+**Estilos Avanzados** en CSS permiten crear interfaces modernas y atractivas con efectos visuales profesionales como bordes redondeados, sombras, degradados y filtros.
+
+<Aside type="tip">
+🎨 **Concepto clave:** Los estilos avanzados transforman elementos simples en componentes visuales impactantes sin necesidad de imágenes externas.
+</Aside>
+
+---
+
+## 🔲 Bordes Redondeados (border-radius)
+
+### `border-radius` - Esquinas redondeadas
+
+Crea esquinas redondeadas en elementos. Es una de las propiedades más usadas en diseño moderno.
+
+```css
+.elemento {
+  border-radius: 10px;              /* Todas las esquinas */
+  border-radius: 10px 20px;         /* Superior-izq/inferior-der | Superior-der/inferior-izq */
+  border-radius: 10px 20px 30px 40px; /* Cada esquina individualmente */
+  border-radius: 50%;               /* Círculo perfecto */
+}
+```
+
+<Tabs>
+<TabItem label="Valores comunes">
+```css
+/* Bordes redondeados básicos */
+.card {
+  border-radius: 8px;  /* Suave y moderno */
+}
+
+.button {
+  border-radius: 4px;  /* Botones sutiles */
+}
+
+.badge {
+  border-radius: 12px; /* Pills/badges */
+}
+
+.circle {
+  border-radius: 50%;  /* Círculo perfecto */
+  width: 100px;
+  height: 100px;
+}
+
+/* Esquinas individuales */
+.elemento {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+```
+
+**Valores:**
+- ✅ `px` - Píxeles fijos
+- ✅ `%` - Porcentaje (50% = círculo)
+- ✅ `em/rem` - Relativo al tamaño de fuente
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 border-radius - Esquinas redondeadas"
+  html={`<h4>Diferentes valores de border-radius</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; padding: 20px;">
+  
+  <div style="background: #3498db; color: white; padding: 30px; text-align: center; border-radius: 0;">
+    0px<br>(sin redondeo)
+  </div>
+  
+  <div style="background: #2ecc71; color: white; padding: 30px; text-align: center; border-radius: 8px;">
+    8px<br>(suave)
+  </div>
+  
+  <div style="background: #e74c3c; color: white; padding: 30px; text-align: center; border-radius: 20px;">
+    20px<br>(redondeado)
+  </div>
+  
+  <div style="background: #f39c12; color: white; padding: 30px; text-align: center; border-radius: 50%;">
+    50%<br>(círculo)
+  </div>
+  
+  <div style="background: #9b59b6; color: white; padding: 30px; text-align: center; border-radius: 20px 0 20px 0;">
+    20px 0<br>20px 0
+  </div>
+  
+  <div style="background: #1abc9c; color: white; padding: 30px; text-align: center; border-radius: 50% 0 50% 0;">
+    50% 0<br>50% 0
+  </div>
+  
+</div>
+
+<h4>Casos de uso comunes</h4>
+<div style="display: flex; flex-direction: column; gap: 15px; padding: 20px;">
+  
+  <button style="background: #3498db; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px;">
+    Botón (4px)
+  </button>
+  
+  <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <strong>Card (12px)</strong>
+    <p style="margin: 10px 0 0 0; color: #666;">Tarjeta con bordes redondeados suaves</p>
+  </div>
+  
+  <div style="display: inline-flex; align-items: center; gap: 10px;">
+    <div style="width: 50px; height: 50px; background: #e74c3c; border-radius: 50%;"></div>
+    <span>Avatar circular (50%)</span>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🌑 Sombras (box-shadow)
+
+### `box-shadow` - Sombras en elementos
+
+Agrega sombras a elementos para crear profundidad y jerarquía visual.
+
+```css
+.elemento {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* offset-x | offset-y | blur | spread | color */
+  
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);        /* Sombra básica */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);      /* Sombra elevada */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);  /* Sombra interna */
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);    /* Glow/resplandor */
+}
+```
+
+<Tabs>
+<TabItem label="Anatomía de box-shadow">
+```css
+.elemento {
+  box-shadow: 2px 4px 8px 0px rgba(0, 0, 0, 0.2);
+  /*          ↑   ↑   ↑   ↑   ↑
+              │   │   │   │   └─ Color (rgba recomendado)
+              │   │   │   └───── Spread (expansión)
+              │   │   └───────── Blur (desenfoque)
+              │   └───────────── Offset Y (vertical)
+              └───────────────── Offset X (horizontal)
+  */
+}
+
+/* Múltiples sombras */
+.elemento {
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Sombra interna */
+.elemento {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+```
+
+**Parámetros:**
+- ✅ **offset-x** - Desplazamiento horizontal
+- ✅ **offset-y** - Desplazamiento vertical
+- ✅ **blur** - Desenfoque (0 = nítida)
+- ✅ **spread** - Expansión (opcional)
+- ✅ **color** - Color de la sombra
+- ✅ **inset** - Sombra interna (opcional)
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 box-shadow - Sombras y profundidad"
+  html={`<h4>Niveles de elevación (Material Design)</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; padding: 20px; background: #f5f5f5;">
+  
+  <div style="background: white; padding: 20px; text-align: center; box-shadow: none;">
+    <strong>Nivel 0</strong>
+    <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Sin sombra</p>
+  </div>
+  
+  <div style="background: white; padding: 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.12);">
+    <strong>Nivel 1</strong>
+    <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Sutil</p>
+  </div>
+  
+  <div style="background: white; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <strong>Nivel 2</strong>
+    <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Moderada</p>
+  </div>
+  
+  <div style="background: white; padding: 20px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.15);">
+    <strong>Nivel 3</strong>
+    <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Elevada</p>
+  </div>
+  
+  <div style="background: white; padding: 20px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+    <strong>Nivel 4</strong>
+    <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Muy elevada</p>
+  </div>
+  
+</div>
+
+<h4>Efectos especiales</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; padding: 20px; background: #2c3e50;">
+  
+  <div style="background: white; padding: 20px; text-align: center; box-shadow: 0 0 20px rgba(52, 152, 219, 0.6);">
+    <strong style="color: #3498db;">Glow Azul</strong>
+  </div>
+  
+  <div style="background: white; padding: 20px; text-align: center; box-shadow: 0 0 20px rgba(46, 204, 113, 0.6);">
+    <strong style="color: #2ecc71;">Glow Verde</strong>
+  </div>
+  
+  <div style="background: white; padding: 20px; text-align: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);">
+    <strong>Sombra Interna</strong>
+  </div>
+  
+  <div style="background: white; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.1);">
+    <strong>Múltiples</strong>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🌈 Degradados (Gradients)
+
+### `linear-gradient` - Degradado lineal
+
+Crea transiciones suaves de color en línea recta.
+
+```css
+.elemento {
+  background: linear-gradient(to right, #3498db, #2ecc71);
+  /* Dirección | Color inicial | Color final */
+  
+  background: linear-gradient(45deg, #e74c3c, #f39c12);
+  background: linear-gradient(to bottom, #9b59b6, #3498db, #2ecc71);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+```
+
+<Tabs>
+<TabItem label="Direcciones y sintaxis">
+```css
+/* Direcciones con palabras clave */
+.elemento {
+  background: linear-gradient(to right, blue, red);
+  background: linear-gradient(to bottom, blue, red);
+  background: linear-gradient(to top, blue, red);
+  background: linear-gradient(to left, blue, red);
+  background: linear-gradient(to bottom right, blue, red);
+}
+
+/* Direcciones con grados */
+.elemento {
+  background: linear-gradient(0deg, blue, red);    /* Arriba */
+  background: linear-gradient(90deg, blue, red);   /* Derecha */
+  background: linear-gradient(180deg, blue, red);  /* Abajo */
+  background: linear-gradient(45deg, blue, red);   /* Diagonal */
+}
+
+/* Múltiples colores con stops */
+.elemento {
+  background: linear-gradient(
+    to right,
+    #e74c3c 0%,
+    #f39c12 50%,
+    #2ecc71 100%
+  );
+}
+```
+
+**Características:**
+- ✅ Dirección: to right, 45deg, etc.
+- ✅ Múltiples colores
+- ✅ Color stops (posiciones específicas)
+- ✅ Transparencia con rgba()
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 linear-gradient - Degradados lineales"
+  html={`<h4>Direcciones básicas</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 20px;">
+  
+  <div style="background: linear-gradient(to right, #3498db, #2ecc71); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px;">
+    to right →
+  </div>
+  
+  <div style="background: linear-gradient(to bottom, #e74c3c, #f39c12); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px;">
+    to bottom ↓
+  </div>
+  
+  <div style="background: linear-gradient(45deg, #9b59b6, #3498db); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px;">
+    45deg ↗
+  </div>
+  
+  <div style="background: linear-gradient(135deg, #1abc9c, #16a085); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px;">
+    135deg ↘
+  </div>
+  
+</div>
+
+<h4>Degradados populares</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; padding: 20px;">
+  
+  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px;">
+    Purple Dream
+  </div>
+  
+  <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px;">
+    Pink Sunset
+  </div>
+  
+  <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px;">
+    Ocean Blue
+  </div>
+  
+  <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px;">
+    Fresh Mint
+  </div>
+  
+  <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px;">
+    Warm Flame
+  </div>
+  
+  <div style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px;">
+    Deep Space
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+### `radial-gradient` - Degradado radial
+
+Crea degradados circulares o elípticos desde un punto central.
+
+```css
+.elemento {
+  background: radial-gradient(circle, #3498db, #2ecc71);
+  /* Forma | Color inicial | Color final */
+  
+  background: radial-gradient(circle at center, blue, red);
+  background: radial-gradient(ellipse at top, blue, red);
+  background: radial-gradient(circle at 30% 40%, blue, red);
+}
+```
+
+<Tabs>
+<TabItem label="Formas y posiciones">
+```css
+/* Formas */
+.elemento {
+  background: radial-gradient(circle, blue, red);
+  background: radial-gradient(ellipse, blue, red);
+}
+
+/* Posiciones */
+.elemento {
+  background: radial-gradient(circle at center, blue, red);
+  background: radial-gradient(circle at top left, blue, red);
+  background: radial-gradient(circle at 50% 50%, blue, red);
+}
+
+/* Tamaños */
+.elemento {
+  background: radial-gradient(circle closest-side, blue, red);
+  background: radial-gradient(circle farthest-corner, blue, red);
+}
+```
+
+**Características:**
+- ✅ Forma: circle, ellipse
+- ✅ Posición: at center, at top, at 50% 50%
+- ✅ Múltiples colores
+- ✅ Efectos de spotlight
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 radial-gradient - Degradados radiales"
+  html={`<h4>Formas y posiciones</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 20px;">
+  
+  <div style="background: radial-gradient(circle, #3498db, #2c3e50); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px; height: 150px; display: flex; align-items: center; justify-content: center;">
+    circle<br>center
+  </div>
+  
+  <div style="background: radial-gradient(circle at top left, #e74c3c, #2c3e50); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px; height: 150px; display: flex; align-items: center; justify-content: center;">
+    circle<br>top left
+  </div>
+  
+  <div style="background: radial-gradient(ellipse, #2ecc71, #27ae60); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px; height: 150px; display: flex; align-items: center; justify-content: center;">
+    ellipse<br>center
+  </div>
+  
+  <div style="background: radial-gradient(circle at bottom right, #f39c12, #e67e22); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px; height: 150px; display: flex; align-items: center; justify-content: center;">
+    circle<br>bottom right
+  </div>
+  
+</div>
+
+<h4>Efectos especiales</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; padding: 20px;">
+  
+  <div style="background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(52,152,219,0.9) 100%); padding: 40px; text-align: center; color: #2c3e50; font-weight: bold; border-radius: 8px; height: 150px; display: flex; align-items: center; justify-content: center;">
+    Spotlight
+  </div>
+  
+  <div style="background: radial-gradient(circle, #f39c12 0%, #e74c3c 50%, #2c3e50 100%); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px; height: 150px; display: flex; align-items: center; justify-content: center;">
+    Sunset
+  </div>
+  
+  <div style="background: radial-gradient(circle at 30% 30%, #3498db, #9b59b6, #2c3e50); padding: 40px; text-align: center; color: white; font-weight: bold; border-radius: 8px; height: 150px; display: flex; align-items: center; justify-content: center;">
+    Galaxy
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🖼️ Imágenes de Fondo (background)
+
+### Propiedades de `background` completas
+
+Control total sobre imágenes y fondos de elementos.
+
+```css
+.elemento {
+  background-image: url('imagen.jpg');
+  background-size: cover;           /* cover, contain, 100px, 50% */
+  background-position: center;      /* center, top, left, 50% 50% */
+  background-repeat: no-repeat;     /* repeat, no-repeat, repeat-x, repeat-y */
+  background-attachment: fixed;     /* scroll, fixed, local */
+  
+  /* Shorthand */
+  background: url('imagen.jpg') center/cover no-repeat fixed;
+}
+```
+
+<Tabs>
+<TabItem label="Propiedades principales">
+```css
+/* background-size */
+.elemento {
+  background-size: cover;      /* Cubre todo el elemento */
+  background-size: contain;    /* Contiene la imagen completa */
+  background-size: 100px 200px; /* Ancho y alto específicos */
+  background-size: 50%;        /* Porcentaje */
+}
+
+/* background-position */
+.elemento {
+  background-position: center;
+  background-position: top left;
+  background-position: 50% 50%;
+  background-position: 100px 200px;
+}
+
+/* background-repeat */
+.elemento {
+  background-repeat: no-repeat;  /* No repetir */
+  background-repeat: repeat;     /* Repetir en ambos ejes */
+  background-repeat: repeat-x;   /* Solo horizontal */
+  background-repeat: repeat-y;   /* Solo vertical */
+}
+
+/* background-attachment */
+.elemento {
+  background-attachment: scroll; /* Se mueve con scroll */
+  background-attachment: fixed;  /* Fijo (parallax) */
+}
+
+/* Múltiples fondos */
+.elemento {
+  background: 
+    url('capa1.png') center/cover no-repeat,
+    url('capa2.png') bottom/contain no-repeat,
+    linear-gradient(to right, blue, red);
+}
+```
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 background - Imágenes de fondo"
+  html={`<h4>background-size</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 20px;">
+  
+  <div style="background: url('https://picsum.photos/300/200?random=1') center/cover no-repeat; height: 150px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+    cover
+  </div>
+  
+  <div style="background: url('https://picsum.photos/300/200?random=2') center/contain no-repeat #f0f0f0; height: 150px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #333; font-weight: bold;">
+    contain
+  </div>
+  
+  <div style="background: url('https://picsum.photos/300/200?random=3') center/100px no-repeat #f0f0f0; height: 150px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #333; font-weight: bold;">
+    100px
+  </div>
+  
+</div>
+
+<h4>background-position</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 20px;">
+  
+  <div style="background: url('https://picsum.photos/400/300?random=4') top left/cover no-repeat; height: 150px; border-radius: 8px; display: flex; align-items: flex-end; justify-content: center; color: white; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); padding: 10px;">
+    top left
+  </div>
+  
+  <div style="background: url('https://picsum.photos/400/300?random=5') center/cover no-repeat; height: 150px; border-radius: 8px; display: flex; align-items: flex-end; justify-content: center; color: white; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); padding: 10px;">
+    center
+  </div>
+  
+  <div style="background: url('https://picsum.photos/400/300?random=6') bottom right/cover no-repeat; height: 150px; border-radius: 8px; display: flex; align-items: flex-end; justify-content: center; color: white; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); padding: 10px;">
+    bottom right
+  </div>
+  
+</div>
+
+<h4>Combinación con degradados</h4>
+<div style="background: linear-gradient(135deg, rgba(52, 152, 219, 0.8), rgba(142, 68, 173, 0.8)), url('https://picsum.photos/800/400?random=7') center/cover no-repeat; height: 200px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+  Degradado + Imagen
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🎭 Filtros Visuales (filter)
+
+### `filter` - Efectos visuales
+
+Aplica efectos visuales como desenfoque, escala de grises, brillo, contraste y más.
+
+```css
+.elemento {
+  filter: blur(5px);              /* Desenfoque */
+  filter: grayscale(100%);        /* Escala de grises */
+  filter: brightness(150%);       /* Brillo */
+  filter: contrast(200%);         /* Contraste */
+  filter: saturate(200%);         /* Saturación */
+  filter: hue-rotate(90deg);      /* Rotación de tono */
+  filter: invert(100%);           /* Invertir colores */
+  filter: sepia(100%);            /* Efecto sepia */
+  filter: opacity(50%);           /* Opacidad */
+  
+  /* Múltiples filtros */
+  filter: blur(2px) brightness(120%) contrast(110%);
+}
+```
+
+<Tabs>
+<TabItem label="Filtros disponibles">
+```css
+/* blur - Desenfoque */
+.elemento {
+  filter: blur(5px);  /* 0px = nítido, mayor = más borroso */
+}
+
+/* grayscale - Escala de grises */
+.elemento {
+  filter: grayscale(100%);  /* 0% = color, 100% = gris */
+}
+
+/* brightness - Brillo */
+.elemento {
+  filter: brightness(150%);  /* 100% = normal, >100% = más brillante */
+}
+
+/* contrast - Contraste */
+.elemento {
+  filter: contrast(200%);  /* 100% = normal, >100% = más contraste */
+}
+
+/* saturate - Saturación */
+.elemento {
+  filter: saturate(200%);  /* 100% = normal, 0% = gris, >100% = saturado */
+}
+
+/* hue-rotate - Rotación de color */
+.elemento {
+  filter: hue-rotate(90deg);  /* 0deg-360deg */
+}
+
+/* invert - Invertir colores */
+.elemento {
+  filter: invert(100%);  /* 0% = normal, 100% = invertido */
+}
+
+/* sepia - Efecto sepia/vintage */
+.elemento {
+  filter: sepia(100%);  /* 0% = normal, 100% = sepia */
+}
+
+/* drop-shadow - Sombra (como box-shadow) */
+.elemento {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+```
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 filter - Filtros visuales"
+  html={`<h4>Filtros individuales</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 20px; background: #f5f5f5;">
+  
+  <div style="text-align: center;">
+    <img src="https://picsum.photos/150/150?random=10" style="width: 100%; border-radius: 8px; filter: none;" />
+    <p style="margin: 10px 0 0 0; font-weight: bold;">Original</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <img src="https://picsum.photos/150/150?random=10" style="width: 100%; border-radius: 8px; filter: blur(3px);" />
+    <p style="margin: 10px 0 0 0; font-weight: bold;">blur(3px)</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <img src="https://picsum.photos/150/150?random=10" style="width: 100%; border-radius: 8px; filter: grayscale(100%);" />
+    <p style="margin: 10px 0 0 0; font-weight: bold;">grayscale(100%)</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <img src="https://picsum.photos/150/150?random=10" style="width: 100%; border-radius: 8px; filter: brightness(150%);" />
+    <p style="margin: 10px 0 0 0; font-weight: bold;">brightness(150%)</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <img src="https://picsum.photos/150/150?random=10" style="width: 100%; border-radius: 8px; filter: contrast(200%);" />
+    <p style="margin: 10px 0 0 0; font-weight: bold;">contrast(200%)</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <img src="https://picsum.photos/150/150?random=10" style="width: 100%; border-radius: 8px; filter: saturate(300%);" />
+    <p style="margin: 10px 0 0 0; font-weight: bold;">saturate(300%)</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <img src="https://picsum.photos/150/150?random=10" style="width: 100%; border-radius: 8px; filter: hue-rotate(90deg);" />
+    <p style="margin: 10px 0 0 0; font-weight: bold;">hue-rotate(90deg)</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <img src="https://picsum.photos/150/150?random=10" style="width: 100%; border-radius: 8px; filter: sepia(100%);" />
+    <p style="margin: 10px 0 0 0; font-weight: bold;">sepia(100%)</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <img src="https://picsum.photos/150/150?random=10" style="width: 100%; border-radius: 8px; filter: invert(100%);" />
+    <p style="margin: 10px 0 0 0; font-weight: bold;">invert(100%)</p>
+  </div>
+  
+</div>
+
+<h4>Combinación de filtros</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; padding: 20px; background: #f5f5f5;">
+  
+  <div style="text-align: center;">
+    <img src="https://picsum.photos/200/200?random=11" style="width: 100%; border-radius: 8px; filter: blur(2px) brightness(120%);" />
+    <p style="margin: 10px 0 0 0; font-weight: bold;">blur + brightness</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <img src="https://picsum.photos/200/200?random=11" style="width: 100%; border-radius: 8px; filter: grayscale(100%) contrast(150%);" />
+    <p style="margin: 10px 0 0 0; font-weight: bold;">grayscale + contrast</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <img src="https://picsum.photos/200/200?random=11" style="width: 100%; border-radius: 8px; filter: sepia(100%) saturate(150%) brightness(110%);" />
+    <p style="margin: 10px 0 0 0; font-weight: bold;">Efecto vintage</p>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🪟 Efecto Blur con Transparencia (backdrop-filter)
+
+### `backdrop-filter` - Efecto de vidrio esmerilado (Glassmorphism)
+
+Aplica efectos visuales al fondo detrás de un elemento, creando el popular efecto de vidrio esmerilado o "glassmorphism".
+
+```css
+.elemento {
+  background: rgba(255, 255, 255, 0.1);  /* Fondo semi-transparente */
+  backdrop-filter: blur(10px);           /* Desenfoque del fondo */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  /* Otros efectos de backdrop-filter */
+  backdrop-filter: blur(10px) saturate(180%);
+  backdrop-filter: blur(5px) brightness(120%);
+  backdrop-filter: blur(8px) contrast(90%);
+}
+```
+
+<Tabs>
+<TabItem label="Propiedades disponibles">
+```css
+/* backdrop-filter: blur - Desenfoque del fondo */
+.glass {
+  backdrop-filter: blur(10px);  /* Efecto de vidrio esmerilado */
+}
+
+/* backdrop-filter: saturate - Saturación del fondo */
+.glass {
+  backdrop-filter: blur(10px) saturate(180%);
+}
+
+/* backdrop-filter: brightness - Brillo del fondo */
+.glass {
+  backdrop-filter: blur(10px) brightness(120%);
+}
+
+/* backdrop-filter: contrast - Contraste del fondo */
+.glass {
+  backdrop-filter: blur(10px) contrast(90%);
+}
+
+/* Efecto glassmorphism completo */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px) saturate(180%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+```
+
+**Características:**
+- ✅ Desenfoca el contenido detrás del elemento
+- ✅ Crea efecto de vidrio esmerilado
+- ✅ Se combina con transparencia (rgba)
+- ✅ Perfecto para modales, cards, navbars
+- ✅ Soporta los mismos filtros que `filter`
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 backdrop-filter - Efecto de vidrio esmerilado (Glassmorphism)"
+  html={`<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; border-radius: 12px; position: relative;">
+  
+  <!-- Imagen de fondo para demostrar el blur -->
+  <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('https://picsum.photos/800/400?random=20') center/cover; border-radius: 12px; opacity: 0.3;"></div>
+  
+  <h4 style="color: white; margin: 0 0 20px 0; position: relative; z-index: 1;">Efecto Glassmorphism</h4>
+  
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; position: relative; z-index: 1;">
+    
+    <!-- Card con backdrop-filter: blur(5px) -->
+    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+      <strong style="color: white;">blur(5px)</strong>
+      <p style="margin: 10px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Desenfoque suave</p>
+    </div>
+    
+    <!-- Card con backdrop-filter: blur(10px) -->
+    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+      <strong style="color: white;">blur(10px)</strong>
+      <p style="margin: 10px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Desenfoque medio</p>
+    </div>
+    
+    <!-- Card con backdrop-filter: blur(20px) -->
+    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+      <strong style="color: white;">blur(20px)</strong>
+      <p style="margin: 10px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">Desenfoque fuerte</p>
+    </div>
+    
+  </div>
+  
+  <h4 style="color: white; margin: 30px 0 20px 0; position: relative; z-index: 1;">Variaciones de Glassmorphism</h4>
+  
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; position: relative; z-index: 1;">
+    
+    <!-- Vidrio claro -->
+    <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px) saturate(180%); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+      <strong style="color: white;">Vidrio Claro</strong>
+      <p style="margin: 10px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">blur + saturate</p>
+    </div>
+    
+    <!-- Vidrio oscuro -->
+    <div style="background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px) brightness(80%); padding: 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);">
+      <strong style="color: white;">Vidrio Oscuro</strong>
+      <p style="margin: 10px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">blur + brightness</p>
+    </div>
+    
+    <!-- Vidrio colorido -->
+    <div style="background: rgba(52, 152, 219, 0.2); backdrop-filter: blur(10px) saturate(200%); padding: 20px; border-radius: 12px; border: 1px solid rgba(52, 152, 219, 0.3); box-shadow: 0 8px 32px rgba(52, 152, 219, 0.2);">
+      <strong style="color: white;">Vidrio Colorido</strong>
+      <p style="margin: 10px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 14px;">blur + color</p>
+    </div>
+    
+  </div>
+  
+</div>
+
+<h4>Casos de uso comunes</h4>
+<div style="background: url('https://picsum.photos/800/300?random=21') center/cover; padding: 40px; border-radius: 12px; position: relative; min-height: 200px;">
+  
+  <!-- Navbar con glassmorphism -->
+  <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 15px 20px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <strong style="color: white;">Logo</strong>
+    <div style="display: flex; gap: 20px; color: white;">
+      <span>Inicio</span>
+      <span>Productos</span>
+      <span>Contacto</span>
+    </div>
+  </div>
+  
+  <!-- Modal con glassmorphism -->
+  <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); padding: 30px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); max-width: 400px; margin: 0 auto;">
+    <h3 style="margin: 0 0 15px 0; color: white;">Modal con Glassmorphism</h3>
+    <p style="margin: 0 0 20px 0; color: rgba(255, 255, 255, 0.9);">Este modal tiene un efecto de vidrio esmerilado que permite ver el fondo difuminado.</p>
+    <button style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+      Aceptar
+    </button>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+
+<TabItem label="Receta Glassmorphism">
+```css
+/* Receta completa para efecto glassmorphism */
+.glass-card {
+  /* 1. Fondo semi-transparente */
+  background: rgba(255, 255, 255, 0.1);
+  
+  /* 2. Desenfoque del fondo (clave del efecto) */
+  backdrop-filter: blur(10px) saturate(180%);
+  
+  /* 3. Borde semi-transparente */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  /* 4. Bordes redondeados */
+  border-radius: 12px;
+  
+  /* 5. Sombra suave */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  
+  /* 6. Padding y otros estilos */
+  padding: 20px;
+}
+
+/* Variante oscura */
+.glass-card-dark {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px) brightness(80%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Variante colorida */
+.glass-card-colored {
+  background: rgba(52, 152, 219, 0.2);
+  backdrop-filter: blur(10px) saturate(200%);
+  border: 1px solid rgba(52, 152, 219, 0.3);
+  box-shadow: 0 8px 32px rgba(52, 152, 219, 0.2);
+}
+```
+
+**Tips para glassmorphism:**
+- ✅ Usa `rgba()` con alpha entre 0.1 y 0.2
+- ✅ `backdrop-filter: blur()` entre 5px y 20px
+- ✅ Combina con `saturate(180%)` para más viveza
+- ✅ Agrega borde semi-transparente
+- ✅ Funciona mejor sobre fondos con textura o imágenes
+</TabItem>
+</Tabs>
+
+<Aside type="note">
+⚠️ **Compatibilidad:** `backdrop-filter` tiene buen soporte en navegadores modernos, pero puede requerir prefijos en algunos casos. Para Safari, usa `-webkit-backdrop-filter`.
+
+```css
+.glass {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+```
+</Aside>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+### Bordes redondeados
+✅ **border-radius** - Esquinas redondeadas (px, %, em)  
+✅ **50%** - Círculo perfecto  
+✅ Valores individuales por esquina  
+✅ Uso común: 4px (botones), 8-12px (cards), 50% (avatares)  
+
+### Sombras
+✅ **box-shadow** - Sombras en elementos  
+✅ Parámetros: offset-x, offset-y, blur, spread, color  
+✅ **inset** - Sombra interna  
+✅ Múltiples sombras separadas por comas  
+✅ Material Design: Niveles de elevación  
+
+### Degradados
+✅ **linear-gradient** - Degradado lineal ⭐  
+✅ **radial-gradient** - Degradado radial  
+✅ Direcciones: to right, 45deg, etc.  
+✅ Múltiples colores con color stops  
+✅ Combinable con imágenes  
+
+### Imágenes de fondo
+✅ **background-image** - Imagen de fondo  
+✅ **background-size** - cover, contain, px, %  
+✅ **background-position** - center, top, 50% 50%  
+✅ **background-repeat** - no-repeat, repeat  
+✅ **background-attachment** - scroll, fixed (parallax)  
+✅ Múltiples fondos (capas)  
+
+### Filtros visuales
+✅ **filter: blur()** - Desenfoque ⭐  
+✅ **filter: grayscale()** - Escala de grises  
+✅ **filter: brightness()** - Brillo  
+✅ **filter: contrast()** - Contraste  
+✅ **filter: saturate()** - Saturación  
+✅ **filter: hue-rotate()** - Rotación de color  
+✅ **filter: sepia()** - Efecto vintage  
+✅ **filter: invert()** - Invertir colores  
+✅ Múltiples filtros combinables  
+
+### Efecto Glassmorphism (backdrop-filter)
+✅ **backdrop-filter: blur()** - Desenfoque del fondo ⭐  
+✅ Efecto de vidrio esmerilado  
+✅ Se combina con `rgba()` transparente  
+✅ Variantes: claro, oscuro, colorido  
+✅ Perfecto para: modales, navbars, cards  
+✅ Receta: rgba + blur + border + shadow  
+
+### Patrones comunes
+```css
+/* Card moderna */
+.card {
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+/* Botón con degradado */
+.button {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Imagen con overlay */
+.hero {
+  background: 
+    linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+    url('imagen.jpg') center/cover no-repeat;
+}
+
+/* Efecto hover con filtros */
+.image:hover {
+  filter: brightness(110%) saturate(120%);
+  transition: filter 0.3s;
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px) saturate(180%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+```
+
+### Casos de uso
+🎨 **border-radius** - Cards, botones, avatares, modales  
+🌑 **box-shadow** - Elevación, profundidad, jerarquía visual  
+🌈 **Degradados** - Fondos modernos, botones, headers  
+🖼️ **Background** - Heroes, banners, patrones  
+🎭 **Filtros** - Efectos hover, estados, galería de imágenes  
+🪟 **Glassmorphism** - Modales, navbars, overlays, cards premium  
+
+</Aside>
+
+---
+
+## 🚀 Próximos pasos
+
+Ahora que dominas los estilos avanzados, puedes:
+- ✅ Crear interfaces modernas y atractivas
+- ✅ Aplicar efectos visuales profesionales
+- ✅ Diseñar componentes con profundidad y jerarquía
+- ✅ Usar degradados y filtros creativamente
+
+<Aside type="tip">
+💡 **Tip profesional:** Combina border-radius, box-shadow y degradados para crear componentes modernos. Los filtros son perfectos para efectos hover y estados interactivos.
+</Aside>

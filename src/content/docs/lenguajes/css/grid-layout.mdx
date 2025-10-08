@@ -1,0 +1,705 @@
+---
+title: 8. Grid Layout
+description: Display grid, grid-template, gap, áreas de grid, minmax, auto-fit y auto-fill
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
+
+**CSS Grid Layout** es un sistema de diseño bidimensional que permite crear layouts complejos con filas y columnas de manera simple y poderosa.
+
+<Aside type="tip">
+🎯 **Concepto clave:** Grid es perfecto para layouts bidimensionales (filas Y columnas), mientras que Flexbox es ideal para layouts unidimensionales (una fila O una columna).
+</Aside>
+
+---
+
+## 🎨 Introducción a Grid
+
+### ¿Qué es CSS Grid?
+
+CSS Grid permite:
+- ✅ Crear layouts bidimensionales (filas y columnas)
+- ✅ Controlar el tamaño y posición de elementos
+- ✅ Crear diseños responsivos sin media queries
+- ✅ Superponer elementos fácilmente
+- ✅ Alinear contenido en ambos ejes
+
+### Activar Grid
+
+```css
+.contenedor {
+  display: grid;  /* Activa Grid */
+}
+
+/* O en línea */
+.contenedor-inline {
+  display: inline-grid;  /* Grid inline */
+}
+```
+
+<Aside type="note">
+💡 **Importante:** Al aplicar `display: grid` a un contenedor:
+- El contenedor se convierte en **grid container**
+- Sus hijos directos se convierten en **grid items**
+- Solo los hijos directos son afectados (no los nietos)
+</Aside>
+
+---
+
+## 📐 Grid Template - Definir filas y columnas
+
+### `grid-template-columns` - Define las columnas
+
+Controla el número y tamaño de las columnas.
+
+```css
+.contenedor {
+  display: grid;
+  grid-template-columns: 200px 200px 200px;  /* 3 columnas de 200px */
+  grid-template-columns: 1fr 1fr 1fr;        /* 3 columnas iguales */
+  grid-template-columns: 1fr 2fr 1fr;        /* Columna central más ancha */
+  grid-template-columns: repeat(3, 1fr);     /* 3 columnas iguales (shorthand) */
+}
+```
+
+<Tabs>
+<TabItem label="Unidades fijas">
+```css
+.grid {
+  display: grid;
+  grid-template-columns: 200px 300px 200px;  /* Píxeles fijos */
+}
+```
+
+**Características:**
+- ✅ Tamaño fijo en píxeles
+- ❌ No se adapta al contenedor
+- 📱 Puede causar overflow en pantallas pequeñas
+</TabItem>
+
+<TabItem label="Unidad fr (fracción)">
+```css
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;  /* Proporcional */
+}
+```
+
+**Características:**
+- ✅ `fr` = fracción del espacio disponible
+- ✅ Se adapta al tamaño del contenedor
+- ✅ Responsive por defecto
+- 📊 1fr + 2fr + 1fr = 4 partes (25% + 50% + 25%)
+</TabItem>
+
+<TabItem label="Función repeat()">
+```css
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);  /* 4 columnas iguales */
+  grid-template-columns: repeat(3, 200px); /* 3 columnas de 200px */
+  grid-template-columns: repeat(2, 1fr 2fr); /* Patrón repetido */
+}
+```
+
+**Características:**
+- ✅ Evita repetir valores
+- ✅ Más legible y mantenible
+- ✅ Puede repetir patrones complejos
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 grid-template-columns - Define las columnas"
+  html={`<h4>3 columnas fijas (200px cada una)</h4>
+<div style="display: grid; grid-template-columns: 200px 200px 200px; gap: 10px; border: 2px solid blue; padding: 10px;">
+  <div style="background: lightblue; padding: 20px; text-align: center;">1</div>
+  <div style="background: lightgreen; padding: 20px; text-align: center;">2</div>
+  <div style="background: lightcoral; padding: 20px; text-align: center;">3</div>
+</div>
+
+<h4>3 columnas con fr (1fr 2fr 1fr)</h4>
+<div style="display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 10px; border: 2px solid green; padding: 10px;">
+  <div style="background: lightblue; padding: 20px; text-align: center;">1fr</div>
+  <div style="background: lightgreen; padding: 20px; text-align: center;">2fr (doble)</div>
+  <div style="background: lightcoral; padding: 20px; text-align: center;">1fr</div>
+</div>
+
+<h4>4 columnas iguales con repeat()</h4>
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; border: 2px solid orange; padding: 10px;">
+  <div style="background: lightblue; padding: 20px; text-align: center;">1</div>
+  <div style="background: lightgreen; padding: 20px; text-align: center;">2</div>
+  <div style="background: lightcoral; padding: 20px; text-align: center;">3</div>
+  <div style="background: lightyellow; padding: 20px; text-align: center;">4</div>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+### `grid-template-rows` - Define las filas
+
+Controla el número y tamaño de las filas.
+
+```css
+.contenedor {
+  display: grid;
+  grid-template-rows: 100px 200px 100px;  /* 3 filas de diferentes alturas */
+  grid-template-rows: repeat(3, 150px);   /* 3 filas de 150px */
+  grid-template-rows: auto 1fr auto;      /* Primera y última auto, media flexible */
+}
+```
+
+<Tabs>
+<TabItem label="Características">
+```css
+.grid {
+  display: grid;
+  grid-template-rows: 100px 200px 100px;
+}
+
+/* Características:
+   ✅ Define la altura de cada fila
+   ✅ Funciona igual que grid-template-columns
+   ✅ Puede usar px, fr, auto, %, etc.
+   ✅ Se puede combinar con grid-template-columns
+*/
+```
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 grid-template-rows - Define las filas"
+  html={`<h4>3 filas de diferentes alturas (80px, 120px, 80px)</h4>
+<div style="display: grid; grid-template-rows: 80px 120px 80px; grid-template-columns: 1fr; gap: 10px; border: 2px solid blue; padding: 10px;">
+  <div style="background: lightblue; padding: 20px; text-align: center;">Fila 1 (80px)</div>
+  <div style="background: lightgreen; padding: 20px; text-align: center;">Fila 2 (120px)</div>
+  <div style="background: lightcoral; padding: 20px; text-align: center;">Fila 3 (80px)</div>
+</div>
+
+<h4>Grid 2x2 (columnas y filas)</h4>
+<div style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 100px 100px; gap: 10px; border: 2px solid green; padding: 10px;">
+  <div style="background: lightblue; padding: 20px; text-align: center;">1</div>
+  <div style="background: lightgreen; padding: 20px; text-align: center;">2</div>
+  <div style="background: lightcoral; padding: 20px; text-align: center;">3</div>
+  <div style="background: lightyellow; padding: 20px; text-align: center;">4</div>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 📏 Gap - Espaciado entre elementos
+
+### `gap` - Espacio entre filas y columnas
+
+Controla el espaciado entre grid items (antes se llamaba `grid-gap`).
+
+```css
+.contenedor {
+  display: grid;
+  gap: 20px;              /* 20px entre filas y columnas */
+  gap: 10px 20px;         /* 10px filas, 20px columnas */
+  row-gap: 10px;          /* Solo entre filas */
+  column-gap: 20px;       /* Solo entre columnas */
+}
+```
+
+<Tabs>
+<TabItem label="Características">
+```css
+.grid {
+  display: grid;
+  gap: 20px;  /* Espacio entre items */
+}
+
+/* Características:
+   ✅ Espacio entre elementos (no en los bordes)
+   ✅ Más simple que usar margin
+   ✅ No afecta los bordes externos
+   ✅ Puede ser diferente para filas y columnas
+   ✅ Funciona también en Flexbox
+*/
+```
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 gap - Espaciado entre elementos"
+  html={`<h4>Sin gap</h4>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); border: 2px solid blue; padding: 10px;">
+  <div style="background: lightblue; padding: 20px; text-align: center;">1</div>
+  <div style="background: lightgreen; padding: 20px; text-align: center;">2</div>
+  <div style="background: lightcoral; padding: 20px; text-align: center;">3</div>
+</div>
+
+<h4>Con gap: 10px</h4>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border: 2px solid green; padding: 10px;">
+  <div style="background: lightblue; padding: 20px; text-align: center;">1</div>
+  <div style="background: lightgreen; padding: 20px; text-align: center;">2</div>
+  <div style="background: lightcoral; padding: 20px; text-align: center;">3</div>
+</div>
+
+<h4>Con gap: 5px 20px (filas 5px, columnas 20px)</h4>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px 20px; border: 2px solid orange; padding: 10px;">
+  <div style="background: lightblue; padding: 20px; text-align: center;">1</div>
+  <div style="background: lightgreen; padding: 20px; text-align: center;">2</div>
+  <div style="background: lightcoral; padding: 20px; text-align: center;">3</div>
+  <div style="background: lightyellow; padding: 20px; text-align: center;">4</div>
+  <div style="background: lightpink; padding: 20px; text-align: center;">5</div>
+  <div style="background: lightcyan; padding: 20px; text-align: center;">6</div>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🎯 Alineación en Grid
+
+### `justify-items` - Alinea items en el eje horizontal (inline)
+
+Controla cómo se alinean los items dentro de sus celdas en el eje horizontal.
+
+```css
+.contenedor {
+  display: grid;
+  justify-items: start;    /* Al inicio (izquierda) */
+  justify-items: end;      /* Al final (derecha) */
+  justify-items: center;   /* Centrado */
+  justify-items: stretch;  /* Estirar (default) */
+}
+```
+
+### `align-items` - Alinea items en el eje vertical (block)
+
+Controla cómo se alinean los items dentro de sus celdas en el eje vertical.
+
+```css
+.contenedor {
+  display: grid;
+  align-items: start;    /* Al inicio (arriba) */
+  align-items: end;      /* Al final (abajo) */
+  align-items: center;   /* Centrado */
+  align-items: stretch;  /* Estirar (default) */
+}
+```
+
+<Tabs>
+<TabItem label="Características">
+```css
+.grid {
+  display: grid;
+  justify-items: center;  /* Horizontal */
+  align-items: center;    /* Vertical */
+}
+
+/* Características:
+   ✅ justify-items: Alineación horizontal dentro de la celda
+   ✅ align-items: Alineación vertical dentro de la celda
+   ✅ Afecta a TODOS los items del grid
+   ✅ Los items pueden usar justify-self y align-self para sobrescribir
+*/
+```
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 justify-items y align-items - Alineación en Grid"
+  html={`<h4>justify-items: start (izquierda)</h4>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; justify-items: start; border: 2px solid blue; padding: 10px; height: 100px;">
+  <div style="background: lightblue; padding: 15px;">1</div>
+  <div style="background: lightgreen; padding: 15px;">2</div>
+  <div style="background: lightcoral; padding: 15px;">3</div>
+</div>
+
+<h4>justify-items: center + align-items: center</h4>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; justify-items: center; align-items: center; border: 2px solid green; padding: 10px; height: 100px;">
+  <div style="background: lightblue; padding: 15px;">1</div>
+  <div style="background: lightgreen; padding: 15px;">2</div>
+  <div style="background: lightcoral; padding: 15px;">3</div>
+</div>
+
+<h4>justify-items: stretch (default)</h4>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; justify-items: stretch; border: 2px solid orange; padding: 10px; height: 100px;">
+  <div style="background: lightblue; padding: 15px; text-align: center;">1</div>
+  <div style="background: lightgreen; padding: 15px; text-align: center;">2</div>
+  <div style="background: lightcoral; padding: 15px; text-align: center;">3</div>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🗺️ Áreas de Grid (grid-template-areas)
+
+### `grid-template-areas` - Define áreas con nombres
+
+Permite crear layouts complejos usando nombres descriptivos para las áreas.
+
+```css
+.contenedor {
+  display: grid;
+  grid-template-areas:
+    "header header header"
+    "sidebar main main"
+    "footer footer footer";
+}
+
+.header  { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.main    { grid-area: main; }
+.footer  { grid-area: footer; }
+```
+
+<Tabs>
+<TabItem label="Características">
+```css
+.grid {
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr;
+  grid-template-rows: 80px 1fr 60px;
+  grid-template-areas:
+    "header header header"
+    "sidebar main main"
+    "footer footer footer";
+}
+
+/* Características:
+   ✅ Nombres descriptivos para áreas
+   ✅ Visualización clara del layout en el código
+   ✅ Fácil de reorganizar
+   ✅ Usa "." para celdas vacías
+   ✅ Perfecto para layouts complejos
+*/
+```
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 grid-template-areas - Layout con áreas nombradas"
+  html={`<div style="display: grid; grid-template-columns: 150px 1fr; grid-template-rows: 60px 1fr 50px; grid-template-areas: 'header header' 'sidebar main' 'footer footer'; gap: 10px; height: 300px; border: 2px solid blue; padding: 10px;">
+  <div style="grid-area: header; background: #2c3e50; color: white; display: flex; align-items: center; padding: 0 20px;">
+    Header
+  </div>
+  
+  <div style="grid-area: sidebar; background: #34495e; color: white; padding: 15px;">
+    Sidebar
+  </div>
+  
+  <div style="grid-area: main; background: #ecf0f1; padding: 20px;">
+    Main Content
+  </div>
+  
+  <div style="grid-area: footer; background: #2c3e50; color: white; display: flex; align-items: center; padding: 0 20px;">
+    Footer
+  </div>
+</div>
+
+<p><strong>Ventaja:</strong> El código muestra visualmente la estructura del layout.</p>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🔧 Funciones Avanzadas de Grid
+
+### `minmax()` - Tamaño mínimo y máximo
+
+Define un rango de tamaño para columnas o filas.
+
+```css
+.contenedor {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) minmax(300px, 2fr);
+  /* Mínimo 200px, máximo 1fr | Mínimo 300px, máximo 2fr */
+}
+```
+
+<Tabs>
+<TabItem label="Características">
+```css
+.grid {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(200px, 2fr);
+}
+
+/* Características:
+   ✅ minmax(min, max) - Define rango de tamaño
+   ✅ Evita que columnas sean muy pequeñas o muy grandes
+   ✅ Perfecto para diseños responsivos
+   ✅ Puede usar px, fr, %, auto, etc.
+*/
+```
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 minmax() - Tamaño mínimo y máximo"
+  html={`<h4>Sin minmax (columnas pueden ser muy pequeñas)</h4>
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px; border: 2px solid blue; padding: 10px; width: 300px;">
+  <div style="background: lightblue; padding: 15px; text-align: center;">1fr</div>
+  <div style="background: lightgreen; padding: 15px; text-align: center;">2fr</div>
+</div>
+
+<h4>Con minmax(150px, 1fr) minmax(200px, 2fr)</h4>
+<div style="display: grid; grid-template-columns: minmax(150px, 1fr) minmax(200px, 2fr); gap: 10px; border: 2px solid green; padding: 10px; width: 300px;">
+  <div style="background: lightblue; padding: 15px; text-align: center;">min: 150px</div>
+  <div style="background: lightgreen; padding: 15px; text-align: center;">min: 200px</div>
+</div>
+
+<p><strong>Observa:</strong> Con minmax, las columnas tienen un tamaño mínimo garantizado.</p>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+### `auto-fit` y `auto-fill` - Columnas automáticas
+
+Crean columnas automáticamente según el espacio disponible.
+
+```css
+/* auto-fill: Crea todas las columnas posibles (incluso vacías) */
+.grid-fill {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+/* auto-fit: Crea solo las columnas necesarias y las expande */
+.grid-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+```
+
+<Tabs>
+<TabItem label="Diferencias">
+```css
+/* auto-fill: Mantiene columnas vacías */
+.grid-fill {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  /* Si hay espacio, crea columnas vacías */
+}
+
+/* auto-fit: Colapsa columnas vacías */
+.grid-fit {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  /* Si hay espacio, expande las columnas existentes */
+}
+
+/* Características:
+   ✅ auto-fill: Crea todas las columnas posibles
+   ✅ auto-fit: Solo columnas necesarias (más común)
+   ✅ Perfecto para grids responsivos
+   ✅ Se combina con minmax()
+*/
+```
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 auto-fit - Columnas automáticas responsivas"
+  html={`<h4>repeat(auto-fit, minmax(150px, 1fr))</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; border: 2px solid blue; padding: 10px;">
+  <div style="background: lightblue; padding: 20px; text-align: center;">1</div>
+  <div style="background: lightgreen; padding: 20px; text-align: center;">2</div>
+  <div style="background: lightcoral; padding: 20px; text-align: center;">3</div>
+  <div style="background: lightyellow; padding: 20px; text-align: center;">4</div>
+</div>
+
+<p><strong>Responsive automático:</strong> Las columnas se ajustan al ancho disponible (mínimo 150px).</p>
+
+<h4>Grid de tarjetas responsive</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; border: 2px solid green; padding: 10px;">
+  <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+    <div style="width: 40px; height: 40px; background: lightblue; border-radius: 50%; margin: 0 auto 10px;"></div>
+    <strong>Card 1</strong>
+  </div>
+  <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+    <div style="width: 40px; height: 40px; background: lightgreen; border-radius: 50%; margin: 0 auto 10px;"></div>
+    <strong>Card 2</strong>
+  </div>
+  <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+    <div style="width: 40px; height: 40px; background: lightcoral; border-radius: 50%; margin: 0 auto 10px;"></div>
+    <strong>Card 3</strong>
+  </div>
+  <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+    <div style="width: 40px; height: 40px; background: lightyellow; border-radius: 50%; margin: 0 auto 10px;"></div>
+    <strong>Card 4</strong>
+  </div>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🔀 Combinar Grid y Flexbox
+
+Grid y Flexbox se complementan perfectamente. Usa Grid para el layout general y Flexbox para componentes internos.
+
+<LivePreview 
+  title="🎨 Grid + Flexbox - Combinación perfecta"
+  html={`<div style="display: grid; grid-template-columns: 200px 1fr; grid-template-rows: 60px 1fr 50px; grid-template-areas: 'header header' 'sidebar main' 'footer footer'; gap: 10px; height: 350px; border: 2px solid purple; padding: 10px;">
+  
+  <!-- Header con Flexbox -->
+  <div style="grid-area: header; background: #2c3e50; color: white; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+    <strong>Logo</strong>
+    <div style="display: flex; gap: 15px;">
+      <span>Inicio</span>
+      <span>Productos</span>
+      <span>Contacto</span>
+    </div>
+  </div>
+  
+  <!-- Sidebar con Flexbox -->
+  <div style="grid-area: sidebar; background: #34495e; color: white; padding: 15px; display: flex; flex-direction: column; gap: 10px;">
+    <div style="padding: 10px; background: rgba(255,255,255,0.1); border-radius: 4px;">📊 Dashboard</div>
+    <div style="padding: 10px; background: rgba(255,255,255,0.1); border-radius: 4px;">📁 Archivos</div>
+    <div style="padding: 10px; background: rgba(255,255,255,0.1); border-radius: 4px;">⚙️ Config</div>
+  </div>
+  
+  <!-- Main con Grid interno -->
+  <div style="grid-area: main; background: #ecf0f1; padding: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
+    <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+      <div style="font-size: 24px; font-weight: bold; color: #3498db;">42</div>
+      <div style="font-size: 12px; color: #7f8c8d;">Users</div>
+    </div>
+    <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+      <div style="font-size: 24px; font-weight: bold; color: #2ecc71;">128</div>
+      <div style="font-size: 12px; color: #7f8c8d;">Sales</div>
+    </div>
+    <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+      <div style="font-size: 24px; font-weight: bold; color: #e74c3c;">5</div>
+      <div style="font-size: 12px; color: #7f8c8d;">Alerts</div>
+    </div>
+  </div>
+  
+  <!-- Footer con Flexbox -->
+  <div style="grid-area: footer; background: #2c3e50; color: white; display: flex; justify-content: center; align-items: center;">
+    © 2024 - Todos los derechos reservados
+  </div>
+  
+</div>
+
+<p><strong>🎯 Estrategia:</strong> Grid para layout principal, Flexbox para componentes internos.</p>`}
+  css={``}
+  js={``}
+/>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+### Conceptos básicos
+✅ **display: grid** - Activa Grid en el contenedor  
+✅ **Grid container** - El elemento padre  
+✅ **Grid items** - Los hijos directos  
+✅ **Grid lines** - Líneas que dividen el grid  
+✅ **Grid cells** - Intersección de fila y columna  
+✅ **Grid areas** - Áreas rectangulares del grid  
+
+### Definir estructura
+✅ **grid-template-columns** - Define columnas (px, fr, %, auto)  
+✅ **grid-template-rows** - Define filas  
+✅ **repeat()** - Repite patrones (ej: repeat(3, 1fr))  
+✅ **fr** - Unidad de fracción (espacio disponible)  
+✅ **gap** - Espacio entre items (row-gap, column-gap)  
+
+### Alineación
+✅ **justify-items** - Alineación horizontal dentro de celdas  
+✅ **align-items** - Alineación vertical dentro de celdas  
+✅ **justify-content** - Alineación del grid completo (horizontal)  
+✅ **align-content** - Alineación del grid completo (vertical)  
+
+### Áreas nombradas
+✅ **grid-template-areas** - Define áreas con nombres ⭐  
+✅ **grid-area** - Asigna un item a un área  
+✅ Visualización clara del layout en el código  
+
+### Funciones avanzadas
+✅ **minmax(min, max)** - Tamaño mínimo y máximo ⭐  
+✅ **auto-fit** - Columnas automáticas (colapsa vacías)  
+✅ **auto-fill** - Columnas automáticas (mantiene vacías)  
+✅ **repeat(auto-fit, minmax(200px, 1fr))** - Grid responsive perfecto ⭐  
+
+### Combinación con Flexbox
+✅ **Grid** - Para layout general (bidimensional)  
+✅ **Flexbox** - Para componentes internos (unidimensional)  
+✅ Se complementan perfectamente  
+
+### Patrones comunes
+```css
+/* Grid responsive automático */
+.grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+/* Layout con áreas */
+.layout {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+}
+
+/* Grid centrado */
+.grid-centrado {
+  display: grid;
+  place-items: center;  /* justify-items + align-items */
+}
+```
+
+### Cuándo usar Grid vs Flexbox
+📊 **Grid** - Layouts bidimensionales (filas Y columnas)  
+📏 **Flexbox** - Layouts unidimensionales (una fila O una columna)  
+🎯 **Ambos** - Se pueden combinar en el mismo proyecto  
+
+</Aside>
+
+---
+
+## 🚀 Próximos pasos
+
+Ahora que dominas Grid Layout, puedes:
+- ✅ Crear layouts complejos sin frameworks
+- ✅ Diseños responsivos sin media queries
+- ✅ Combinar Grid y Flexbox eficientemente
+- ✅ Usar áreas nombradas para código más legible
+
+<Aside type="tip">
+💡 **Tip profesional:** Grid es perfecto para el layout general de la página, mientras que Flexbox brilla en componentes individuales como navbars, cards y botones.
+</Aside>

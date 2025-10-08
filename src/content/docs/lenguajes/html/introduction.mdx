@@ -1,85 +1,528 @@
 ---
-title: Introducción a HTML
-description: Conceptos básicos y fundamentos del lenguaje de marcado HTML.
+title: 1. Introducción a HTML
+description: ¿Qué es HTML? Historia, estructura básica y relación con CSS y JavaScript
 ---
 
 import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
 
-# Introducción a HTML
+**HTML (HyperText Markup Language)** es el lenguaje de marcado estándar para crear páginas web. Define la estructura y el contenido de las páginas.
 
-## ¿Qué es HTML?
+<Aside type="tip">
+🌐 **Concepto clave:** HTML no es un lenguaje de programación, es un lenguaje de **marcado** que estructura el contenido usando etiquetas.
+</Aside>
 
-HTML (HyperText Markup Language) es el lenguaje estándar utilizado para crear y diseñar páginas web. No es un lenguaje de programación, sino un lenguaje de marcado que define la estructura y el contenido de una página web mediante el uso de etiquetas.
+---
 
-## Historia de HTML
+## 🌐 ¿Qué es HTML y para qué sirve?
 
-- **1991**: Tim Berners-Lee crea HTML como un medio para compartir documentos entre científicos.
-- **1995**: HTML 2.0 se convierte en el primer estándar oficial.
-- **1997**: HTML 3.2 introduce tablas y más opciones de formato.
-- **1999**: HTML 4.01 mejora la accesibilidad y los scripts.
-- **2014**: HTML5 se convierte en la recomendación oficial del W3C, introduciendo nuevos elementos semánticos y capacidades multimedia.
+### Definición
 
-## Características principales
+**HTML** significa:
+- 📄 **HyperText**: Texto con enlaces
+- 🏷️ **Markup**: Sistema de etiquetas
+- 💬 **Language**: Lenguaje con sintaxis
 
-- **Estructura**: Define la organización y jerarquía del contenido.
-- **Semántica**: Proporciona significado a diferentes partes del documento.
-- **Enlaces**: Permite la navegación entre páginas mediante hipervinculos.
-- **Multimedia**: Facilita la inclusión de imágenes, videos y audio.
-- **Formularios**: Permite la interacción del usuario mediante la entrada de datos.
+### Usos principales
 
-## Estructura básica de un documento HTML
+✅ Estructurar contenido web  
+✅ Crear hipertexto y navegación  
+✅ Insertar multimedia  
+✅ Crear formularios interactivos  
 
-<Code code={`<!DOCTYPE html>
+<LivePreview 
+  title="🎨 Primer documento HTML"
+  html={`<!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi primera página web</title>
+  <meta charset="UTF-8">
+  <title>Mi Primera Página</title>
 </head>
 <body>
-    <h1>Hola Mundo</h1>
-    <p>Esta es mi primera página web creada con HTML.</p>
+  <h1>¡Hola Mundo! 👋</h1>
+  <p>Esta es mi primera página web.</p>
+  <ul>
+    <li>Crear títulos</li>
+    <li>Insertar imágenes</li>
+    <li>Hacer listas</li>
+  </ul>
 </body>
-</html>`} lang="html" title="Estructura básica de HTML" />
+</html>`}
+  css={`body { font-family: Arial; padding: 20px; }
+h1 { color: #2c3e50; }`}
+  js={``}
+/>
 
-## Elementos fundamentales
+---
 
-### Etiquetas de estructura
+## 📜 Historia Breve
 
-- <Code code="<!DOCTYPE html>" lang="html" /> Declara el tipo de documento.
-- <Code code="<html>" lang="html" /> Elemento raíz que contiene todo el documento.
-- <Code code="<head>" lang="html" /> Contiene metadatos, título y enlaces a recursos externos.
-- <Code code="<body>" lang="html" /> Contiene todo el contenido visible de la página.
+<Steps>
 
-### Etiquetas de texto
+1. **1991 - HTML 1.0** 🎂  
+   Creado por Tim Berners-Lee, 18 etiquetas básicas
 
-- <Code code="<h1>" lang="html" /> a <Code code="<h6>" lang="html" />: Encabezados de diferentes niveles.
-- <Code code="<p>" lang="html" />: Párrafos de texto.
-- <Code code="<strong>" lang="html" />: Texto en negrita con importancia semántica.
-- <Code code="<em>" lang="html" />: Texto en cursiva con énfasis semántico.
+2. **1995 - HTML 2.0** 📝  
+   Primera versión estandarizada, formularios y tablas
 
-### Etiquetas de enlace
+3. **1997 - HTML 3.2** 🎨  
+   Tablas complejas, scripts básicos
 
-- <Code code={`<a href="url">Texto del enlace</a>`} lang="html" />: Crea un hipervínculo.
+4. **1999 - HTML 4.01** 🚀  
+   Separación contenido/presentación, mejor CSS
 
-### Etiquetas de imagen
+5. **2014 - HTML5** ⭐ **(Actual)**  
+   Etiquetas semánticas, multimedia nativa, APIs JavaScript
 
-- <Code code={`<img src="ruta-imagen.jpg" alt="Descripción">`} lang="html" />: Inserta una imagen.
+</Steps>
 
-## Herramientas para trabajar con HTML
+---
 
-- **Editores de código**: Visual Studio Code, Sublime Text, Atom.
-- **Navegadores web**: Chrome, Firefox, Safari, Edge (con herramientas de desarrollo).
-- **Validadores**: W3C Markup Validation Service para verificar que el código cumple con los estándares.
+## 🏗️ Estructura Básica
 
-## Prácticas recomendadas 🌻
+```html
+<!DOCTYPE html>           <!-- Tipo de documento -->
+<html lang="es">          <!-- Elemento raíz -->
+<head>                    <!-- Metadatos -->
+  <meta charset="UTF-8">
+  <title>Título</title>
+</head>
+<body>                    <!-- Contenido visible -->
+  <h1>Título</h1>
+  <p>Párrafo</p>
+</body>
+</html>
+```
 
-1. **Usar HTML semántico**: Utilizar las etiquetas adecuadas para cada tipo de contenido.
-2. **Mantener la accesibilidad**: Asegurar que el sitio sea accesible para todos los usuarios.
-3. **Separar estructura (HTML), presentación (CSS) y comportamiento (JavaScript)**.
-4. **Validar el código**: Comprobar que cumple con los estándares web.
-5. **Optimizar para dispositivos móviles**: Diseñar pensando en diferentes tamaños de pantalla. 
+---
 
-## Conclusión
+## 🔗 Relación con CSS y JavaScript
 
-HTML es la base fundamental de cualquier página web. Dominar este lenguaje de marcado es el primer paso para convertirse en un desarrollador web competente. A medida que avances, podrás combinar HTML con CSS para el diseño y JavaScript para la interactividad, creando experiencias web completas y atractivas.
+### El trío fundamental de la web
+
+**HTML** 🏗️ - Estructura  
+**CSS** 🎨 - Presentación  
+**JavaScript** ⚡ - Interactividad  
+
+<LivePreview 
+  title="🎨 HTML + CSS + JavaScript"
+  html={`<div class="card">
+  <h2>Card Interactiva</h2>
+  <p>Pasa el mouse sobre mí</p>
+  <button onclick="cambiarColor()">Cambiar Color</button>
+</div>`}
+  css={`.card {
+  background: #3498db;
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+.card:hover {
+  transform: scale(1.05);
+}`}
+  js={`function cambiarColor() {
+  const card = document.querySelector('.card');
+  const colores = ['#3498db', '#2ecc71', '#e74c3c', '#f39c12'];
+  const random = colores[Math.floor(Math.random() * colores.length)];
+  card.style.background = random;
+}`}
+/>
+
+---
+
+## 📌 Versiones de HTML
+
+### HTML5 - Versión Actual ⭐
+
+**HTML5** es la quinta y actual versión de HTML, publicada en 2014. Representa una evolución significativa que moderniza la web.
+
+#### Novedades principales de HTML5
+
+**1. Etiquetas Semánticas** 📝
+- `<header>` - Encabezado de página o sección
+- `<nav>` - Navegación principal
+- `<main>` - Contenido principal único
+- `<article>` - Contenido independiente
+- `<section>` - Sección temática
+- `<aside>` - Contenido complementario
+- `<footer>` - Pie de página
+- `<figure>` y `<figcaption>` - Imágenes con leyenda
+
+**2. Multimedia Nativa** 🎬
+- `<video>` - Videos sin Flash
+- `<audio>` - Audio sin plugins
+- `<source>` - Múltiples formatos
+- Controles nativos del navegador
+
+**3. Gráficos y Visualización** 🎨
+- `<canvas>` - Dibujo 2D con JavaScript
+- `<svg>` - Gráficos vectoriales
+- Animaciones CSS3
+
+**4. Formularios Mejorados** 📋
+- Nuevos tipos: `email`, `url`, `date`, `number`, `range`, `color`
+- Validación nativa con `required`, `pattern`, `min`, `max`
+- Atributos: `placeholder`, `autofocus`, `autocomplete`
+
+**5. APIs de JavaScript** ⚡
+- Geolocalización
+- Almacenamiento local (localStorage, sessionStorage)
+- Drag and Drop
+- Web Workers
+- WebSockets
+
+<Tabs>
+<TabItem label="HTML5 Semántico Completo">
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estructura HTML5 Semántica</title>
+</head>
+<body>
+  
+  <!-- Encabezado principal del sitio -->
+  <header>
+    <h1>Mi Sitio Web</h1>
+    <p>Subtítulo o descripción</p>
+    
+    <!-- Navegación principal -->
+    <nav>
+      <ul>
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a href="#blog">Blog</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </nav>
+  </header>
+  
+  <!-- Contenido principal (único por página) -->
+  <main>
+    
+    <!-- Sección de introducción -->
+    <section id="inicio">
+      <h2>Bienvenido</h2>
+      <p>Contenido de la sección de inicio...</p>
+    </section>
+    
+    <!-- Sección de servicios -->
+    <section id="servicios">
+      <h2>Nuestros Servicios</h2>
+      
+      <!-- Artículo independiente -->
+      <article>
+        <header>
+          <h3>Desarrollo Web</h3>
+          <p><time datetime="2024-01-15">15 de Enero, 2024</time></p>
+        </header>
+        <p>Descripción del servicio de desarrollo web...</p>
+        
+        <!-- Figura con imagen -->
+        <figure>
+          <img src="desarrollo.jpg" alt="Desarrollo Web">
+          <figcaption>Proceso de desarrollo web moderno</figcaption>
+        </figure>
+        
+        <footer>
+          <p>Autor: Juan Pérez</p>
+        </footer>
+      </article>
+      
+      <article>
+        <header>
+          <h3>Diseño UX/UI</h3>
+          <p><time datetime="2024-01-20">20 de Enero, 2024</time></p>
+        </header>
+        <p>Descripción del servicio de diseño...</p>
+      </article>
+      
+    </section>
+    
+    <!-- Sección de blog -->
+    <section id="blog">
+      <h2>Blog</h2>
+      
+      <article>
+        <h3>Título del Post</h3>
+        <p>Contenido del artículo del blog...</p>
+        <a href="post.html">Leer más</a>
+      </article>
+      
+    </section>
+    
+  </main>
+  
+  <!-- Contenido complementario (sidebar) -->
+  <aside>
+    <h2>Información Adicional</h2>
+    
+    <section>
+      <h3>Categorías</h3>
+      <ul>
+        <li><a href="#web">Desarrollo Web</a></li>
+        <li><a href="#mobile">Apps Móviles</a></li>
+        <li><a href="#design">Diseño</a></li>
+      </ul>
+    </section>
+    
+    <section>
+      <h3>Últimas Noticias</h3>
+      <p>Contenido de noticias recientes...</p>
+    </section>
+  </aside>
+  
+  <!-- Pie de página -->
+  <footer>
+    <section>
+      <h3>Contacto</h3>
+      <address>
+        Email: <a href="mailto:info@ejemplo.com">info@ejemplo.com</a><br>
+        Teléfono: <a href="tel:+123456789">+1 234 567 89</a>
+      </address>
+    </section>
+    
+    <section>
+      <h3>Redes Sociales</h3>
+      <nav>
+        <a href="#">Facebook</a>
+        <a href="#">Twitter</a>
+        <a href="#">LinkedIn</a>
+      </nav>
+    </section>
+    
+    <p>&copy; 2024 Mi Sitio Web. Todos los derechos reservados.</p>
+  </footer>
+  
+</body>
+</html>
+```
+
+**Elementos clave explicados:**
+
+📌 **`<header>`** - Encabezado del sitio o sección  
+📌 **`<nav>`** - Menú de navegación principal  
+📌 **`<main>`** - Contenido principal (solo uno por página)  
+📌 **`<section>`** - Agrupa contenido temático  
+📌 **`<article>`** - Contenido independiente y reutilizable  
+📌 **`<aside>`** - Contenido complementario (sidebar)  
+📌 **`<footer>`** - Pie de página  
+📌 **`<figure>`** y **`<figcaption>`** - Imágenes con descripción  
+📌 **`<time>`** - Fechas y horas semánticas  
+📌 **`<address>`** - Información de contacto  
+
+</TabItem>
+
+<TabItem label="Ejemplo Visual">
+
+<LivePreview 
+  title="🎨 HTML5 Semántico en Acción"
+  html={`<div style="max-width: 900px; margin: 0 auto;">
+  
+  <header style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 30px; border-radius: 12px 12px 0 0;">
+    <h1 style="margin: 0 0 10px 0;">Mi Blog Personal</h1>
+    <p style="margin: 0; opacity: 0.9;">Compartiendo conocimiento sobre desarrollo web</p>
+    
+    <nav style="margin-top: 20px;">
+      <a href="#" style="color: white; margin-right: 20px; text-decoration: none; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 4px;">Inicio</a>
+      <a href="#" style="color: white; margin-right: 20px; text-decoration: none; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 4px;">Artículos</a>
+      <a href="#" style="color: white; text-decoration: none; padding: 8px 16px; background: rgba(255,255,255,0.2); border-radius: 4px;">Contacto</a>
+    </nav>
+  </header>
+  
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px;">
+    
+    <main>
+      <article style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+        <header>
+          <h2 style="color: #2c3e50; margin: 0 0 10px 0;">Introducción a HTML5</h2>
+          <p style="color: #7f8c8d; font-size: 14px; margin: 0 0 15px 0;">
+            <time datetime="2024-01-15">15 de Enero, 2024</time> • Por Juan Pérez
+          </p>
+        </header>
+        
+        <p style="line-height: 1.6; color: #34495e;">
+          HTML5 revolucionó el desarrollo web con etiquetas semánticas que mejoran 
+          la estructura, accesibilidad y SEO de nuestros sitios.
+        </p>
+        
+        <figure style="margin: 20px 0;">
+          <div style="width: 100%; height: 150px; background: linear-gradient(135deg, #3498db, #2ecc71); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
+            📊 Imagen del artículo
+          </div>
+          <figcaption style="text-align: center; color: #7f8c8d; font-size: 14px; margin-top: 8px;">
+            Estructura semántica de HTML5
+          </figcaption>
+        </figure>
+        
+        <footer style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ecf0f1;">
+          <a href="#" style="color: #3498db; text-decoration: none;">Leer más →</a>
+        </footer>
+      </article>
+      
+      <article style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2 style="color: #2c3e50; margin: 0 0 10px 0;">CSS Grid Layout</h2>
+        <p style="color: #7f8c8d; font-size: 14px; margin: 0 0 15px 0;">
+          <time datetime="2024-01-10">10 de Enero, 2024</time>
+        </p>
+        <p style="line-height: 1.6; color: #34495e;">
+          Aprende a crear layouts modernos y responsivos con CSS Grid.
+        </p>
+      </article>
+    </main>
+    
+    <aside style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+      <section style="margin-bottom: 25px;">
+        <h3 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 18px;">📚 Categorías</h3>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          <li style="margin-bottom: 10px;">
+            <a href="#" style="color: #3498db; text-decoration: none;">HTML5 (12)</a>
+          </li>
+          <li style="margin-bottom: 10px;">
+            <a href="#" style="color: #3498db; text-decoration: none;">CSS3 (8)</a>
+          </li>
+          <li style="margin-bottom: 10px;">
+            <a href="#" style="color: #3498db; text-decoration: none;">JavaScript (15)</a>
+          </li>
+        </ul>
+      </section>
+      
+      <section>
+        <h3 style="color: #2c3e50; margin: 0 0 15px 0; font-size: 18px;">ℹ️ Sobre mí</h3>
+        <p style="color: #7f8c8d; font-size: 14px; line-height: 1.6;">
+          Desarrollador web apasionado por crear experiencias digitales increíbles.
+        </p>
+      </section>
+    </aside>
+    
+  </div>
+  
+  <footer style="background: #2c3e50; color: white; padding: 25px; border-radius: 0 0 12px 12px; margin-top: 20px; text-align: center;">
+    <p style="margin: 0 0 10px 0;">© 2024 Mi Blog Personal</p>
+    <address style="font-style: normal; font-size: 14px; opacity: 0.8;">
+      Email: <a href="mailto:info@ejemplo.com" style="color: #3498db;">info@ejemplo.com</a>
+    </address>
+  </footer>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+
+**Beneficios del HTML Semántico:**
+
+✅ **SEO mejorado** - Los motores de búsqueda entienden mejor el contenido  
+✅ **Accesibilidad** - Lectores de pantalla navegan mejor  
+✅ **Mantenibilidad** - Código más legible y organizado  
+✅ **Estructura clara** - Fácil de entender para desarrolladores  
+
+</TabItem>
+
+<TabItem label="Comparación: Antes vs Ahora">
+
+```html
+<!-- ❌ HTML4 - Sin semántica -->
+<div id="header">
+  <div id="nav">
+    <a href="#">Inicio</a>
+  </div>
+</div>
+
+<div id="content">
+  <div class="post">
+    <h2>Título</h2>
+    <p>Contenido...</p>
+  </div>
+</div>
+
+<div id="sidebar">
+  <div class="widget">
+    <h3>Categorías</h3>
+  </div>
+</div>
+
+<div id="footer">
+  <p>Copyright 2024</p>
+</div>
+```
+
+```html
+<!-- ✅ HTML5 - Semántico -->
+<header>
+  <nav>
+    <a href="#">Inicio</a>
+  </nav>
+</header>
+
+<main>
+  <article>
+    <h2>Título</h2>
+    <p>Contenido...</p>
+  </article>
+</main>
+
+<aside>
+  <section>
+    <h3>Categorías</h3>
+  </section>
+</aside>
+
+<footer>
+  <p>Copyright 2024</p>
+</footer>
+```
+
+**Diferencias clave:**
+
+| HTML4 (Antiguo) | HTML5 (Moderno) |
+|-----------------|-----------------|
+| `<div id="header">` | `<header>` |
+| `<div id="nav">` | `<nav>` |
+| `<div id="content">` | `<main>` |
+| `<div class="post">` | `<article>` |
+| `<div id="sidebar">` | `<aside>` |
+| `<div id="footer">` | `<footer>` |
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave:**
+
+✅ HTML estructura el contenido web  
+✅ Usa etiquetas para marcar elementos  
+✅ HTML5 es la versión actual (2014)  
+✅ Se combina con CSS y JavaScript  
+✅ Etiquetas semánticas mejoran SEO  
+
+**Estructura básica:**
+```html
+<!DOCTYPE html>
+<html>
+  <head><!-- Metadatos --></head>
+  <body><!-- Contenido --></body>
+</html>
+```
+</Aside>
+
+---
+
+## 🚀 Próximos pasos
+
+Ahora que conoces HTML, aprenderás:
+- ✅ Elementos básicos y etiquetas
+- ✅ Estructura del documento
+- ✅ Contenido y formato
+- ✅ Enlaces e imágenes

@@ -1,0 +1,880 @@
+---
+title: 11. Responsive Design y Media Queries
+description: Diseño responsivo, @media, breakpoints, diseño fluido y Mobile First
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
+
+**Responsive Design** es la técnica de crear sitios web que se adaptan automáticamente a diferentes tamaños de pantalla y dispositivos, proporcionando una experiencia óptima en móviles, tablets y escritorio.
+
+<Aside type="tip">
+📱 **Concepto clave:** El diseño responsivo no es opcional en 2024. Más del 60% del tráfico web proviene de dispositivos móviles, por lo que tu sitio debe verse bien en todas las pantallas.
+</Aside>
+
+---
+
+## 📱 Introducción al Responsive Design
+
+### ¿Qué es el Responsive Design?
+
+El diseño responsivo permite que un sitio web:
+- ✅ Se adapte a diferentes tamaños de pantalla
+- ✅ Reorganice el contenido según el dispositivo
+- ✅ Optimice imágenes y recursos
+- ✅ Mejore la experiencia del usuario
+- ✅ Mantenga una sola base de código
+
+### Viewport Meta Tag
+
+**Fundamental** para el diseño responsivo. Debe estar en el `<head>` de tu HTML:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+
+**Parámetros:**
+- ✅ `width=device-width` - Ancho igual al dispositivo
+- ✅ `initial-scale=1.0` - Zoom inicial al 100%
+- ✅ `maximum-scale=5.0` - Zoom máximo permitido
+- ✅ `user-scalable=yes` - Permite zoom (accesibilidad)
+
+<Aside type="caution">
+⚠️ **Importante:** Nunca uses `user-scalable=no` o `maximum-scale=1.0`, ya que impide el zoom y afecta la accesibilidad.
+</Aside>
+
+---
+
+## 🎯 Media Queries (@media)
+
+### `@media` - Reglas CSS condicionales
+
+Las media queries permiten aplicar estilos diferentes según las características del dispositivo.
+
+```css
+/* Sintaxis básica */
+@media (max-width: 768px) {
+  .elemento {
+    font-size: 14px;
+  }
+}
+
+/* Múltiples condiciones */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .elemento {
+    font-size: 16px;
+  }
+}
+
+/* Orientación */
+@media (orientation: portrait) {
+  .elemento {
+    width: 100%;
+  }
+}
+```
+
+<Tabs>
+<TabItem label="Tipos de media queries">
+```css
+/* Por ancho de pantalla */
+@media (max-width: 768px) {
+  /* Pantallas menores o iguales a 768px */
+}
+
+@media (min-width: 769px) {
+  /* Pantallas mayores o iguales a 769px */
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* Entre 768px y 1024px */
+}
+
+/* Por altura */
+@media (max-height: 600px) {
+  /* Pantallas con altura menor o igual a 600px */
+}
+
+/* Por orientación */
+@media (orientation: portrait) {
+  /* Modo vertical (móviles) */
+}
+
+@media (orientation: landscape) {
+  /* Modo horizontal (tablets, desktop) */
+}
+
+/* Por resolución */
+@media (min-resolution: 2dppx) {
+  /* Pantallas retina (alta resolución) */
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  /* Usuario prefiere modo oscuro */
+}
+
+/* Reducir movimiento (accesibilidad) */
+@media (prefers-reduced-motion: reduce) {
+  /* Usuario prefiere menos animaciones */
+}
+```
+
+**Operadores:**
+- ✅ `and` - Combina condiciones (ambas deben cumplirse)
+- ✅ `or` - Alternativa (al menos una debe cumplirse)
+- ✅ `not` - Negación
+- ✅ `,` (coma) - Funciona como OR
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 Media Queries en acción"
+  html={`<style>
+.responsive-box {
+  background: #3498db;
+  color: white;
+  padding: 30px;
+  text-align: center;
+  border-radius: 12px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+/* Desktop (mayor a 1024px) */
+@media (min-width: 1025px) {
+  .responsive-box {
+    background: #2ecc71;
+  }
+  .responsive-box::before {
+    content: '🖥️ Desktop (>1024px)';
+    display: block;
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+}
+
+/* Tablet (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .responsive-box {
+    background: #f39c12;
+  }
+  .responsive-box::before {
+    content: '📱 Tablet (768-1024px)';
+    display: block;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+}
+
+/* Mobile (menor a 768px) */
+@media (max-width: 767px) {
+  .responsive-box {
+    background: #e74c3c;
+  }
+  .responsive-box::before {
+    content: '📱 Mobile (<768px)';
+    display: block;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+}
+</style>
+
+<div class="responsive-box">
+  Redimensiona la ventana del navegador para ver los cambios
+</div>
+
+<div style="margin-top: 20px; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+  <strong>Breakpoints comunes:</strong>
+  <ul style="margin: 10px 0 0 20px;">
+    <li>📱 Mobile: < 768px</li>
+    <li>📱 Tablet: 768px - 1024px</li>
+    <li>🖥️ Desktop: > 1024px</li>
+  </ul>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 📏 Breakpoints Estándar
+
+### Breakpoints más usados en la industria
+
+Los breakpoints son los puntos donde el diseño cambia para adaptarse a diferentes tamaños de pantalla.
+
+```css
+/* Mobile First (recomendado) */
+/* Mobile: estilos base */
+.elemento {
+  font-size: 14px;
+  padding: 10px;
+}
+
+/* Tablet: 768px+ */
+@media (min-width: 768px) {
+  .elemento {
+    font-size: 16px;
+    padding: 15px;
+  }
+}
+
+/* Desktop: 1024px+ */
+@media (min-width: 1024px) {
+  .elemento {
+    font-size: 18px;
+    padding: 20px;
+  }
+}
+
+/* Large Desktop: 1440px+ */
+@media (min-width: 1440px) {
+  .elemento {
+    font-size: 20px;
+    padding: 25px;
+  }
+}
+```
+
+<Tabs>
+<TabItem label="Breakpoints comunes">
+```css
+/* Sistema de breakpoints estándar */
+
+/* Extra Small (móviles pequeños) */
+@media (max-width: 575px) {
+  /* < 576px */
+}
+
+/* Small (móviles) */
+@media (min-width: 576px) {
+  /* ≥ 576px */
+}
+
+/* Medium (tablets) */
+@media (min-width: 768px) {
+  /* ≥ 768px */
+}
+
+/* Large (desktop) */
+@media (min-width: 992px) {
+  /* ≥ 992px */
+}
+
+/* Extra Large (desktop grande) */
+@media (min-width: 1200px) {
+  /* ≥ 1200px */
+}
+
+/* Extra Extra Large */
+@media (min-width: 1400px) {
+  /* ≥ 1400px */
+}
+```
+
+**Frameworks populares:**
+- 📱 **Bootstrap**: 576px, 768px, 992px, 1200px, 1400px
+- 📱 **Tailwind CSS**: 640px, 768px, 1024px, 1280px, 1536px
+- 📱 **Material Design**: 600px, 960px, 1280px, 1920px
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 Sistema de breakpoints responsive"
+  html={`<style>
+.grid-responsive {
+  display: grid;
+  gap: 15px;
+  padding: 20px;
+}
+
+/* Mobile: 1 columna */
+.grid-responsive {
+  grid-template-columns: 1fr;
+}
+
+/* Tablet: 2 columnas */
+@media (min-width: 768px) {
+  .grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Desktop: 3 columnas */
+@media (min-width: 1024px) {
+  .grid-responsive {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Large Desktop: 4 columnas */
+@media (min-width: 1440px) {
+  .grid-responsive {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.card-responsive {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+</style>
+
+<div class="grid-responsive">
+  <div class="card-responsive">
+    <div style="width: 50px; height: 50px; background: #3498db; border-radius: 8px; margin: 0 auto 15px;"></div>
+    <strong>Card 1</strong>
+  </div>
+  
+  <div class="card-responsive">
+    <div style="width: 50px; height: 50px; background: #2ecc71; border-radius: 8px; margin: 0 auto 15px;"></div>
+    <strong>Card 2</strong>
+  </div>
+  
+  <div class="card-responsive">
+    <div style="width: 50px; height: 50px; background: #e74c3c; border-radius: 8px; margin: 0 auto 15px;"></div>
+    <strong>Card 3</strong>
+  </div>
+  
+  <div class="card-responsive">
+    <div style="width: 50px; height: 50px; background: #f39c12; border-radius: 8px; margin: 0 auto 15px;"></div>
+    <strong>Card 4</strong>
+  </div>
+  
+  <div class="card-responsive">
+    <div style="width: 50px; height: 50px; background: #9b59b6; border-radius: 8px; margin: 0 auto 15px;"></div>
+    <strong>Card 5</strong>
+  </div>
+  
+  <div class="card-responsive">
+    <div style="width: 50px; height: 50px; background: #1abc9c; border-radius: 8px; margin: 0 auto 15px;"></div>
+    <strong>Card 6</strong>
+  </div>
+</div>
+
+<div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px; text-align: center;">
+  <strong>Redimensiona la ventana para ver cómo cambia el grid:</strong>
+  <p style="margin: 10px 0 0 0;">📱 Mobile: 1 columna | 📱 Tablet: 2 columnas | 🖥️ Desktop: 3 columnas | 🖥️ Large: 4 columnas</p>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 💧 Diseño Fluido
+
+### Unidades relativas para diseño fluido
+
+El diseño fluido usa unidades relativas en lugar de fijas para que los elementos se adapten proporcionalmente.
+
+```css
+/* ❌ Diseño fijo (no responsive) */
+.container {
+  width: 1200px;
+  padding: 20px;
+  font-size: 16px;
+}
+
+/* ✅ Diseño fluido (responsive) */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  padding: 5%;
+  font-size: clamp(14px, 2vw, 18px);
+}
+```
+
+<Tabs>
+<TabItem label="Unidades fluidas">
+```css
+/* Unidades relativas */
+
+/* Porcentajes (%) */
+.elemento {
+  width: 80%;  /* 80% del contenedor padre */
+}
+
+/* Viewport Width (vw) */
+.elemento {
+  width: 50vw;  /* 50% del ancho de la ventana */
+  font-size: 2vw;  /* 2% del ancho de la ventana */
+}
+
+/* Viewport Height (vh) */
+.elemento {
+  height: 100vh;  /* 100% de la altura de la ventana */
+}
+
+/* vmin y vmax */
+.elemento {
+  font-size: 3vmin;  /* 3% del lado más pequeño */
+  width: 50vmax;     /* 50% del lado más grande */
+}
+
+/* clamp() - Tamaño fluido con límites */
+.elemento {
+  font-size: clamp(14px, 2vw, 24px);
+  /* Mínimo 14px, ideal 2vw, máximo 24px */
+  
+  width: clamp(300px, 80%, 1200px);
+  /* Mínimo 300px, ideal 80%, máximo 1200px */
+}
+
+/* min() y max() */
+.elemento {
+  width: min(90%, 1200px);  /* El menor de los dos */
+  padding: max(20px, 2vw);  /* El mayor de los dos */
+}
+```
+
+**Ventajas:**
+- ✅ Se adapta a cualquier tamaño de pantalla
+- ✅ Menos breakpoints necesarios
+- ✅ Transiciones suaves entre tamaños
+- ✅ Más mantenible
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 Diseño fluido con unidades relativas"
+  html={`<style>
+.fluid-container {
+  width: min(90%, 1200px);
+  margin: 0 auto;
+  padding: clamp(15px, 3vw, 30px);
+  background: #f5f5f5;
+  border-radius: 12px;
+}
+
+.fluid-title {
+  font-size: clamp(20px, 4vw, 36px);
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.fluid-text {
+  font-size: clamp(14px, 2vw, 18px);
+  line-height: 1.6;
+  color: #7f8c8d;
+  margin-bottom: 20px;
+}
+
+.fluid-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: clamp(10px, 2vw, 20px);
+}
+
+.fluid-card {
+  background: white;
+  padding: clamp(15px, 3vw, 25px);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+</style>
+
+<div class="fluid-container">
+  <h2 class="fluid-title">Diseño Fluido Responsive</h2>
+  <p class="fluid-text">
+    Este contenedor usa <code>min(90%, 1200px)</code> para el ancho, 
+    <code>clamp()</code> para el padding y font-size. 
+    Redimensiona la ventana para ver cómo se adapta suavemente.
+  </p>
+  
+  <div class="fluid-grid">
+    <div class="fluid-card">
+      <strong style="color: #3498db;">Card 1</strong>
+      <p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">Ancho fluido</p>
+    </div>
+    
+    <div class="fluid-card">
+      <strong style="color: #2ecc71;">Card 2</strong>
+      <p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">Padding fluido</p>
+    </div>
+    
+    <div class="fluid-card">
+      <strong style="color: #e74c3c;">Card 3</strong>
+      <p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">Gap fluido</p>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px;">
+  <strong>💡 Tip:</strong> El diseño fluido reduce la necesidad de múltiples breakpoints
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 📱 Mobile First
+
+### Estrategia Mobile First
+
+Mobile First significa diseñar primero para móviles y luego agregar estilos para pantallas más grandes.
+
+```css
+/* ✅ Mobile First (recomendado) */
+/* Estilos base para móvil */
+.elemento {
+  font-size: 14px;
+  padding: 10px;
+  flex-direction: column;
+}
+
+/* Tablet y superior */
+@media (min-width: 768px) {
+  .elemento {
+    font-size: 16px;
+    padding: 20px;
+    flex-direction: row;
+  }
+}
+
+/* Desktop y superior */
+@media (min-width: 1024px) {
+  .elemento {
+    font-size: 18px;
+    padding: 30px;
+  }
+}
+```
+
+```css
+/* ❌ Desktop First (no recomendado) */
+/* Estilos base para desktop */
+.elemento {
+  font-size: 18px;
+  padding: 30px;
+  flex-direction: row;
+}
+
+/* Tablet y menor */
+@media (max-width: 1023px) {
+  .elemento {
+    font-size: 16px;
+    padding: 20px;
+  }
+}
+
+/* Móvil y menor */
+@media (max-width: 767px) {
+  .elemento {
+    font-size: 14px;
+    padding: 10px;
+    flex-direction: column;
+  }
+}
+```
+
+<Tabs>
+<TabItem label="Ventajas Mobile First">
+```css
+/* Ventajas de Mobile First */
+
+/* 1. Mejor rendimiento en móviles */
+/* Los estilos base son ligeros, se agregan más para desktop */
+
+/* 2. Progressive Enhancement */
+/* Mejora progresiva: funciona en todos los dispositivos */
+
+/* 3. Más fácil de mantener */
+/* min-width es más intuitivo que max-width */
+
+/* 4. Prioriza el contenido */
+/* Te obliga a pensar en lo esencial primero */
+
+/* Ejemplo completo Mobile First */
+.navbar {
+  /* Mobile: menú hamburguesa */
+  flex-direction: column;
+  padding: 10px;
+}
+
+.navbar-menu {
+  display: none;  /* Oculto en móvil */
+}
+
+.navbar-toggle {
+  display: block;  /* Botón hamburguesa visible */
+}
+
+/* Tablet: menú horizontal */
+@media (min-width: 768px) {
+  .navbar {
+    flex-direction: row;
+    padding: 15px 30px;
+  }
+  
+  .navbar-menu {
+    display: flex;  /* Menú visible */
+  }
+  
+  .navbar-toggle {
+    display: none;  /* Botón oculto */
+  }
+}
+```
+
+**Por qué Mobile First:**
+- 📱 **Rendimiento**: Carga más rápida en móviles
+- 📱 **SEO**: Google prioriza mobile-first indexing
+- 📱 **UX**: Mejor experiencia en dispositivos móviles
+- 📱 **Mantenimiento**: Código más limpio y escalable
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 Mobile First en acción"
+  html={`<style>
+/* Mobile First: estilos base para móvil */
+.mf-container {
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.mf-grid {
+  display: grid;
+  grid-template-columns: 1fr;  /* 1 columna en móvil */
+  gap: 15px;
+}
+
+.mf-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.mf-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.mf-text {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Tablet: 768px+ */
+@media (min-width: 768px) {
+  .mf-container {
+    padding: 25px;
+  }
+  
+  .mf-grid {
+    grid-template-columns: repeat(2, 1fr);  /* 2 columnas */
+    gap: 20px;
+  }
+  
+  .mf-title {
+    font-size: 20px;
+  }
+  
+  .mf-text {
+    font-size: 15px;
+  }
+}
+
+/* Desktop: 1024px+ */
+@media (min-width: 1024px) {
+  .mf-container {
+    padding: 35px;
+  }
+  
+  .mf-grid {
+    grid-template-columns: repeat(3, 1fr);  /* 3 columnas */
+    gap: 25px;
+  }
+  
+  .mf-title {
+    font-size: 22px;
+  }
+  
+  .mf-text {
+    font-size: 16px;
+  }
+}
+</style>
+
+<div class="mf-container">
+  <h3 style="margin: 0 0 20px 0; text-align: center;">📱 Mobile First Design</h3>
+  
+  <div class="mf-grid">
+    <div class="mf-card">
+      <div class="mf-title" style="color: #3498db;">📱 Mobile</div>
+      <div class="mf-text">1 columna, padding pequeño</div>
+    </div>
+    
+    <div class="mf-card">
+      <div class="mf-title" style="color: #2ecc71;">📱 Tablet</div>
+      <div class="mf-text">2 columnas, padding medio</div>
+    </div>
+    
+    <div class="mf-card">
+      <div class="mf-title" style="color: #e74c3c;">🖥️ Desktop</div>
+      <div class="mf-text">3 columnas, padding grande</div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+  <strong>📱 Mobile First:</strong> Los estilos base son para móvil, luego se agregan mejoras para pantallas más grandes con <code>min-width</code>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+### Fundamentos
+✅ **Viewport meta tag** - Esencial para responsive design ⭐  
+✅ **width=device-width** - Ancho igual al dispositivo  
+✅ **initial-scale=1.0** - Zoom inicial al 100%  
+✅ Nunca bloquear el zoom (accesibilidad)  
+
+### Media Queries
+✅ **@media** - Reglas CSS condicionales ⭐  
+✅ **min-width** - Desde este tamaño hacia arriba  
+✅ **max-width** - Hasta este tamaño  
+✅ **and** - Combina condiciones  
+✅ **orientation** - portrait, landscape  
+✅ **prefers-color-scheme** - Modo oscuro  
+
+### Breakpoints
+✅ **Mobile**: < 768px  
+✅ **Tablet**: 768px - 1024px  
+✅ **Desktop**: > 1024px  
+✅ **Large Desktop**: > 1440px  
+✅ Usar breakpoints de frameworks populares  
+
+### Diseño fluido
+✅ **Unidades relativas**: %, vw, vh, vmin, vmax ⭐  
+✅ **clamp()** - Tamaño fluido con límites  
+✅ **min()** - El menor de los valores  
+✅ **max()** - El mayor de los valores  
+✅ Menos breakpoints necesarios  
+
+### Mobile First
+✅ **Diseñar primero para móvil** ⭐  
+✅ **min-width** en media queries  
+✅ **Progressive Enhancement** - Mejora progresiva  
+✅ Mejor rendimiento y SEO  
+✅ Código más limpio y mantenible  
+
+### Patrones comunes
+```css
+/* Mobile First básico */
+.elemento {
+  /* Estilos móvil */
+  font-size: 14px;
+  padding: 10px;
+}
+
+@media (min-width: 768px) {
+  .elemento {
+    /* Estilos tablet+ */
+    font-size: 16px;
+    padding: 20px;
+  }
+}
+
+/* Grid responsive */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;  /* Mobile */
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);  /* Tablet */
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);  /* Desktop */
+  }
+}
+
+/* Diseño fluido */
+.container {
+  width: min(90%, 1200px);
+  padding: clamp(15px, 3vw, 30px);
+  font-size: clamp(14px, 2vw, 18px);
+}
+
+/* Ocultar/mostrar según dispositivo */
+.mobile-only {
+  display: block;
+}
+
+.desktop-only {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none;
+  }
+  
+  .desktop-only {
+    display: block;
+  }
+}
+```
+
+### Buenas prácticas
+📱 **Siempre** usa viewport meta tag  
+📱 **Diseña** Mobile First  
+📱 **Prueba** en dispositivos reales  
+📱 **Usa** unidades relativas  
+📱 **Optimiza** imágenes para cada tamaño  
+📱 **Considera** touch targets (mínimo 44x44px)  
+📱 **Testea** en Chrome DevTools (responsive mode)  
+
+</Aside>
+
+---
+
+## 🚀 Próximos pasos
+
+Ahora que dominas Responsive Design, puedes:
+- ✅ Crear sitios que funcionen en todos los dispositivos
+- ✅ Implementar estrategia Mobile First
+- ✅ Usar media queries efectivamente
+- ✅ Aplicar diseño fluido con unidades relativas
+
+<Aside type="tip">
+💡 **Tip profesional:** Usa Chrome DevTools (F12) y activa el modo responsive (Ctrl+Shift+M) para probar tu diseño en diferentes tamaños de pantalla sin necesidad de dispositivos físicos.
+</Aside>

@@ -1,0 +1,1125 @@
+---
+title: 10. Transiciones y Animaciones
+description: Transition, animation, @keyframes y estados dinámicos con hover, active y focus
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
+
+**Transiciones y Animaciones** en CSS permiten crear movimiento y dinamismo en las interfaces web, mejorando la experiencia del usuario con efectos suaves y atractivos.
+
+<Aside type="tip">
+✨ **Concepto clave:** Las transiciones son para cambios de estado simples (hover, focus), mientras que las animaciones permiten crear secuencias complejas con múltiples pasos.
+</Aside>
+
+---
+
+## 🔄 Transiciones (transition)
+
+### `transition` - Efectos suaves entre estados
+
+Las transiciones crean cambios suaves entre valores de propiedades CSS cuando cambia el estado de un elemento.
+
+```css
+.elemento {
+  transition: property duration timing-function delay;
+  
+  /* Ejemplos */
+  transition: all 0.3s ease;
+  transition: background-color 0.5s ease-in-out;
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Múltiples propiedades */
+  transition: background-color 0.3s, transform 0.5s, opacity 0.2s;
+}
+```
+
+<Tabs>
+<TabItem label="Propiedades de transition">
+```css
+/* Sintaxis completa */
+.elemento {
+  transition-property: background-color;  /* Qué animar */
+  transition-duration: 0.3s;              /* Duración */
+  transition-timing-function: ease;       /* Curva de tiempo */
+  transition-delay: 0s;                   /* Retraso */
+}
+
+/* Shorthand (forma corta) */
+.elemento {
+  transition: background-color 0.3s ease 0s;
+}
+
+/* Timing functions (funciones de tiempo) */
+.elemento {
+  transition-timing-function: ease;           /* Suave (default) */
+  transition-timing-function: linear;         /* Lineal */
+  transition-timing-function: ease-in;        /* Acelera al inicio */
+  transition-timing-function: ease-out;       /* Desacelera al final */
+  transition-timing-function: ease-in-out;    /* Acelera y desacelera */
+  transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Personalizada */
+}
+
+/* Animar todas las propiedades */
+.elemento {
+  transition: all 0.3s ease;
+}
+```
+
+**Parámetros:**
+- ✅ **property** - Propiedad a animar (all, background, transform, etc.)
+- ✅ **duration** - Duración (0.3s, 500ms)
+- ✅ **timing-function** - Curva de animación
+- ✅ **delay** - Retraso antes de iniciar (opcional)
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 transition - Efectos suaves entre estados"
+  html={`<h4>Transiciones básicas (hover sobre los elementos)</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; padding: 20px;">
+  
+  <div style="background: #3498db; color: white; padding: 30px; text-align: center; border-radius: 8px; transition: background-color 0.3s ease; cursor: pointer;" onmouseover="this.style.backgroundColor='#2ecc71'" onmouseout="this.style.backgroundColor='#3498db'">
+    <strong>Color</strong>
+    <p style="margin: 10px 0 0 0; font-size: 12px;">0.3s ease</p>
+  </div>
+  
+  <div style="background: #e74c3c; color: white; padding: 30px; text-align: center; border-radius: 8px; transition: transform 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+    <strong>Scale</strong>
+    <p style="margin: 10px 0 0 0; font-size: 12px;">0.3s ease</p>
+  </div>
+  
+  <div style="background: #f39c12; color: white; padding: 30px; text-align: center; border-radius: 8px; transition: transform 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+    <strong>Move</strong>
+    <p style="margin: 10px 0 0 0; font-size: 12px;">0.3s ease</p>
+  </div>
+  
+  <div style="background: #9b59b6; color: white; padding: 30px; text-align: center; border-radius: 8px; transition: transform 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='rotate(5deg)'" onmouseout="this.style.transform='rotate(0deg)'">
+    <strong>Rotate</strong>
+    <p style="margin: 10px 0 0 0; font-size: 12px;">0.3s ease</p>
+  </div>
+  
+  <div style="background: #1abc9c; color: white; padding: 30px; text-align: center; border-radius: 8px; transition: border-radius 0.3s ease; cursor: pointer;" onmouseover="this.style.borderRadius='50%'" onmouseout="this.style.borderRadius='8px'">
+    <strong>Radius</strong>
+    <p style="margin: 10px 0 0 0; font-size: 12px;">0.3s ease</p>
+  </div>
+  
+  <div style="background: #34495e; color: white; padding: 30px; text-align: center; border-radius: 8px; transition: box-shadow 0.3s ease; cursor: pointer;" onmouseover="this.style.boxShadow='0 10px 30px rgba(0,0,0,0.3)'" onmouseout="this.style.boxShadow='none'">
+    <strong>Shadow</strong>
+    <p style="margin: 10px 0 0 0; font-size: 12px;">0.3s ease</p>
+  </div>
+  
+</div>
+
+<h4>Timing functions (funciones de tiempo)</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; padding: 20px;">
+  
+  <div style="background: #3498db; color: white; padding: 20px; text-align: center; border-radius: 8px; transition: transform 1s linear; cursor: pointer;" onmouseover="this.style.transform='translateX(20px)'" onmouseout="this.style.transform='translateX(0)'">
+    <strong>linear</strong>
+  </div>
+  
+  <div style="background: #2ecc71; color: white; padding: 20px; text-align: center; border-radius: 8px; transition: transform 1s ease; cursor: pointer;" onmouseover="this.style.transform='translateX(20px)'" onmouseout="this.style.transform='translateX(0)'">
+    <strong>ease</strong>
+  </div>
+  
+  <div style="background: #e74c3c; color: white; padding: 20px; text-align: center; border-radius: 8px; transition: transform 1s ease-in; cursor: pointer;" onmouseover="this.style.transform='translateX(20px)'" onmouseout="this.style.transform='translateX(0)'">
+    <strong>ease-in</strong>
+  </div>
+  
+  <div style="background: #f39c12; color: white; padding: 20px; text-align: center; border-radius: 8px; transition: transform 1s ease-out; cursor: pointer;" onmouseover="this.style.transform='translateX(20px)'" onmouseout="this.style.transform='translateX(0)'">
+    <strong>ease-out</strong>
+  </div>
+  
+</div>
+
+<h4>Múltiples propiedades</h4>
+<div style="padding: 20px;">
+  <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 30px; text-align: center; border-radius: 8px; transition: transform 0.3s ease, box-shadow 0.3s ease, border-radius 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.3)'; this.style.borderRadius='20px'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'; this.style.borderRadius='8px'">
+    <strong>Hover para ver múltiples transiciones</strong>
+    <p style="margin: 10px 0 0 0;">transform + box-shadow + border-radius</p>
+  </div>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+
+<TabItem label="Más ejemplos">
+
+<LivePreview 
+  title="🎨 Más ejemplos de transiciones"
+  html={`<h4>Efectos de botones avanzados (hover sobre ellos)</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; padding: 20px;">
+  
+  <button style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-weight: bold;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 10px 25px rgba(102, 126, 234, 0.5)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+    Gradient Hover
+  </button>
+  
+  <button style="background: white; color: #3498db; border: 2px solid #3498db; padding: 15px 30px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-weight: bold;" onmouseover="this.style.background='#3498db'; this.style.color='white'" onmouseout="this.style.background='white'; this.style.color='#3498db'">
+    Fill Effect
+  </button>
+  
+  <button style="background: #2ecc71; color: white; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; transition: all 0.3s ease; font-weight: bold;" onmouseover="this.style.borderRadius='8px'; this.style.background='#27ae60'" onmouseout="this.style.borderRadius='50px'; this.style.background='#2ecc71'">
+    Morph Shape
+  </button>
+  
+  <button style="background: #e74c3c; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); font-weight: bold;" onmouseover="this.style.transform='rotate(5deg) scale(1.1)'" onmouseout="this.style.transform='rotate(0deg) scale(1)'">
+    Bounce Rotate
+  </button>
+  
+</div>
+
+<h4>Cards con efectos creativos</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px;">
+  
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent;" onmouseover="this.style.borderColor='#3498db'; this.style.transform='translateY(-10px)'" onmouseout="this.style.borderColor='transparent'; this.style.transform='translateY(0)'">
+    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #3498db, #2980b9); border-radius: 12px; margin-bottom: 15px;"></div>
+    <strong>Border Glow</strong>
+    <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">Hover para ver borde</p>
+  </div>
+  
+  <div style="background: linear-gradient(135deg, #f093fb, #f5576c); padding: 25px; border-radius: 12px; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 15px 35px rgba(240, 147, 251, 0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none'">
+    <strong style="color: white;">Gradient Scale</strong>
+    <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">Efecto de zoom</p>
+  </div>
+  
+  <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.background='#2ecc71'; this.style.color='white'; this.style.transform='rotate(-2deg)'" onmouseout="this.style.background='white'; this.style.color='black'; this.style.transform='rotate(0deg)'">
+    <strong>Color Shift</strong>
+    <p style="margin: 10px 0 0 0; font-size: 14px;">Cambia todo</p>
+  </div>
+  
+</div>
+
+<h4>Efectos de texto</h4>
+<div style="display: flex; flex-direction: column; gap: 20px; padding: 20px;">
+  
+  <h2 style="font-size: 32px; font-weight: bold; color: #2c3e50; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.color='#3498db'; this.style.letterSpacing='2px'" onmouseout="this.style.color='#2c3e50'; this.style.letterSpacing='normal'">
+    Hover para espaciado
+  </h2>
+  
+  <p style="font-size: 18px; color: #7f8c8d; transition: all 0.3s ease; cursor: pointer; border-left: 3px solid transparent; padding-left: 15px;" onmouseover="this.style.borderLeftColor='#e74c3c'; this.style.paddingLeft='25px'; this.style.color='#2c3e50'" onmouseout="this.style.borderLeftColor='transparent'; this.style.paddingLeft='15px'; this.style.color='#7f8c8d'">
+    Texto con borde animado al hover
+  </p>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🎬 Animaciones (@keyframes)
+
+### `animation` y `@keyframes` - Animaciones complejas
+
+Las animaciones permiten crear secuencias de movimiento con múltiples pasos usando `@keyframes`.
+
+```css
+/* Definir la animación */
+@keyframes nombre-animacion {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(100px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+}
+
+/* Aplicar la animación */
+.elemento {
+  animation: nombre-animacion 2s ease-in-out infinite;
+}
+```
+
+<Tabs>
+<TabItem label="Propiedades de animation">
+```css
+/* Sintaxis completa */
+.elemento {
+  animation-name: nombre-animacion;           /* Nombre del @keyframes */
+  animation-duration: 2s;                     /* Duración */
+  animation-timing-function: ease-in-out;     /* Curva de tiempo */
+  animation-delay: 0s;                        /* Retraso */
+  animation-iteration-count: infinite;        /* Repeticiones (número o infinite) */
+  animation-direction: normal;                /* Dirección (normal, reverse, alternate) */
+  animation-fill-mode: forwards;              /* Estado final (forwards, backwards, both) */
+  animation-play-state: running;              /* Estado (running, paused) */
+}
+
+/* Shorthand (forma corta) */
+.elemento {
+  animation: nombre 2s ease-in-out 0s infinite normal forwards;
+}
+
+/* @keyframes con porcentajes */
+@keyframes slide {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(100px); }
+  50% { transform: translateX(100px) translateY(50px); }
+  75% { transform: translateX(0) translateY(50px); }
+  100% { transform: translateX(0) translateY(0); }
+}
+
+/* @keyframes con from/to */
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+```
+
+**Parámetros:**
+- ✅ **name** - Nombre del @keyframes
+- ✅ **duration** - Duración (2s, 500ms)
+- ✅ **timing-function** - Curva de animación
+- ✅ **delay** - Retraso antes de iniciar
+- ✅ **iteration-count** - Número de repeticiones (infinite)
+- ✅ **direction** - Dirección (normal, reverse, alternate)
+- ✅ **fill-mode** - Estado final (forwards, backwards, both)
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 animation - Animaciones con @keyframes"
+  html={`<style>
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+</style>
+
+<h4>Animaciones básicas</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 20px; padding: 20px;">
+  
+  <div style="background: #3498db; color: white; padding: 30px; text-align: center; border-radius: 8px; animation: bounce 1s ease-in-out infinite;">
+    <strong>Bounce</strong>
+  </div>
+  
+  <div style="background: #2ecc71; color: white; padding: 30px; text-align: center; border-radius: 8px; animation: spin 2s linear infinite;">
+    <strong>Spin</strong>
+  </div>
+  
+  <div style="background: #e74c3c; color: white; padding: 30px; text-align: center; border-radius: 8px; animation: pulse 1.5s ease-in-out infinite;">
+    <strong>Pulse</strong>
+  </div>
+  
+  <div style="background: #f39c12; color: white; padding: 30px; text-align: center; border-radius: 8px; animation: fadeInOut 2s ease-in-out infinite;">
+    <strong>Fade</strong>
+  </div>
+  
+  <div style="background: #9b59b6; color: white; padding: 30px; text-align: center; border-radius: 8px; animation: shake 0.5s ease-in-out infinite;">
+    <strong>Shake</strong>
+  </div>
+  
+</div>
+
+<h4>Animación de entrada (slideIn)</h4>
+<div style="padding: 20px;">
+  <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 30px; text-align: center; border-radius: 12px; animation: slideIn 1s ease-out;">
+    <strong>Este elemento se desliza al cargar</strong>
+  </div>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+
+<TabItem label="Más ejemplos">
+
+<LivePreview 
+  title="🎨 Más animaciones con @keyframes"
+  html={`<style>
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  10%, 30% { transform: scale(1.1); }
+  20%, 40% { transform: scale(1); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes flipIn {
+  from { transform: perspective(400px) rotateY(90deg); opacity: 0; }
+  to { transform: perspective(400px) rotateY(0deg); opacity: 1; }
+}
+</style>
+
+<h4>Animaciones de flotación y movimiento</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; padding: 20px;">
+  
+  <div style="background: #3498db; color: white; padding: 30px; text-align: center; border-radius: 12px; animation: float 2s ease-in-out infinite;">
+    <strong>Float</strong>
+  </div>
+  
+  <div style="background: #2ecc71; color: white; padding: 30px; text-align: center; border-radius: 12px; animation: wiggle 1s ease-in-out infinite;">
+    <strong>Wiggle</strong>
+  </div>
+  
+  <div style="background: #e74c3c; color: white; padding: 30px; text-align: center; border-radius: 12px; animation: heartbeat 1.5s ease-in-out infinite;">
+    ❤️ <strong>Heartbeat</strong>
+  </div>
+  
+</div>
+
+<h4>Animaciones de entrada</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; padding: 20px;">
+  
+  <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 25px; text-align: center; border-radius: 12px; animation: slideInLeft 1s ease-out;">
+    <strong>Slide Left</strong>
+  </div>
+  
+  <div style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 25px; text-align: center; border-radius: 12px; animation: slideInRight 1s ease-out;">
+    <strong>Slide Right</strong>
+  </div>
+  
+  <div style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; padding: 25px; text-align: center; border-radius: 12px; animation: zoomIn 0.8s ease-out;">
+    <strong>Zoom In</strong>
+  </div>
+  
+  <div style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: white; padding: 25px; text-align: center; border-radius: 12px; animation: flipIn 1s ease-out;">
+    <strong>Flip In</strong>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## ♾️ Animaciones Infinitas y por Pasos
+
+### Animaciones infinitas
+
+Animaciones que se repiten continuamente usando `animation-iteration-count: infinite`.
+
+```css
+.elemento {
+  animation: nombre 2s ease-in-out infinite;
+  /* Se repite infinitamente */
+}
+
+/* Animación alternada (va y viene) */
+.elemento {
+  animation: nombre 2s ease-in-out infinite alternate;
+  /* Va hacia adelante y luego hacia atrás */
+}
+```
+
+### Animaciones por pasos (steps)
+
+Animaciones que avanzan en pasos discretos en lugar de suaves.
+
+```css
+.elemento {
+  animation: nombre 1s steps(4) infinite;
+  /* Avanza en 4 pasos discretos */
+}
+
+/* Útil para sprites */
+.sprite {
+  animation: sprite-walk 0.8s steps(8) infinite;
+}
+
+@keyframes sprite-walk {
+  from { background-position: 0 0; }
+  to { background-position: -800px 0; }
+}
+```
+
+<Tabs>
+<TabItem label="Tipos de animaciones">
+```css
+/* Animación infinita normal */
+.loader {
+  animation: spin 1s linear infinite;
+}
+
+/* Animación infinita alternada */
+.pulse {
+  animation: pulse 2s ease-in-out infinite alternate;
+}
+
+/* Animación por pasos */
+.sprite {
+  animation: walk 1s steps(8) infinite;
+}
+
+/* Animación con retraso */
+.delayed {
+  animation: fade 1s ease 2s infinite;
+  /* Espera 2s antes de cada repetición */
+}
+
+/* Múltiples animaciones */
+.complex {
+  animation: 
+    spin 2s linear infinite,
+    pulse 1s ease-in-out infinite alternate;
+}
+```
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 Animaciones infinitas y por pasos"
+  html={`<style>
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes scaleUpDown {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+@keyframes colorChange {
+  0% { background: #3498db; }
+  33% { background: #2ecc71; }
+  66% { background: #e74c3c; }
+  100% { background: #3498db; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes loading {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+</style>
+
+<h4>Loaders y spinners</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+  
+  <div style="text-align: center;">
+    <div style="width: 50px; height: 50px; border: 5px solid #e0e0e0; border-top-color: #3498db; border-radius: 50%; margin: 0 auto; animation: rotate 1s linear infinite;"></div>
+    <p style="margin: 10px 0 0 0; font-weight: bold;">Spinner</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <div style="width: 50px; height: 50px; background: #2ecc71; border-radius: 8px; margin: 0 auto; animation: scaleUpDown 1s ease-in-out infinite;">
+    </div>
+    <p style="margin: 10px 0 0 0; font-weight: bold;">Scale Pulse</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <div style="width: 50px; height: 50px; border-radius: 8px; margin: 0 auto; animation: colorChange 3s linear infinite;">
+    </div>
+    <p style="margin: 10px 0 0 0; font-weight: bold;">Color Change</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <div style="width: 50px; height: 50px; background: #f39c12; border-radius: 50%; margin: 0 auto; animation: blink 1s ease-in-out infinite;">
+    </div>
+    <p style="margin: 10px 0 0 0; font-weight: bold;">Blink</p>
+  </div>
+  
+</div>
+
+<h4>Barra de progreso animada</h4>
+<div style="padding: 20px;">
+  <div style="background: #e0e0e0; height: 30px; border-radius: 15px; overflow: hidden; position: relative;">
+    <div style="width: 25%; height: 100%; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 15px; position: relative; overflow: hidden;">
+      <div style="width: 25%; height: 100%; background: rgba(255,255,255,0.3); animation: loading 1.5s ease-in-out infinite;"></div>
+    </div>
+  </div>
+</div>
+
+<h4>Puntos de carga (dots)</h4>
+<div style="display: flex; justify-content: center; gap: 10px; padding: 20px;">
+  <div style="width: 15px; height: 15px; background: #3498db; border-radius: 50%; animation: bounce 1s ease-in-out 0s infinite;"></div>
+  <div style="width: 15px; height: 15px; background: #3498db; border-radius: 50%; animation: bounce 1s ease-in-out 0.2s infinite;"></div>
+  <div style="width: 15px; height: 15px; background: #3498db; border-radius: 50%; animation: bounce 1s ease-in-out 0.4s infinite;"></div>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+
+<TabItem label="Más ejemplos">
+
+<LivePreview 
+  title="🎨 Más loaders y animaciones infinitas"
+  html={`<style>
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(30px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(30px) rotate(-360deg); }
+}
+
+@keyframes wave {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-10px); }
+  50% { transform: translateY(0); }
+  75% { transform: translateY(10px); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px #3498db, 0 0 10px #3498db; }
+  50% { box-shadow: 0 0 20px #3498db, 0 0 30px #3498db, 0 0 40px #3498db; }
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes borderRun {
+  0% { border-color: #3498db transparent transparent transparent; }
+  25% { border-color: transparent #2ecc71 transparent transparent; }
+  50% { border-color: transparent transparent #e74c3c transparent; }
+  75% { border-color: transparent transparent transparent #f39c12; }
+  100% { border-color: #3498db transparent transparent transparent; }
+}
+</style>
+
+<h4>Loaders creativos</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px;">
+  
+  <div style="text-align: center;">
+    <div style="width: 60px; height: 60px; position: relative; margin: 0 auto;">
+      <div style="width: 15px; height: 15px; background: #3498db; border-radius: 50%; position: absolute; top: 50%; left: 50%; margin: -7.5px 0 0 -7.5px; animation: orbit 2s linear infinite;"></div>
+    </div>
+    <p style="margin: 10px 0 0 0; font-weight: bold;">Orbit</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <div style="display: flex; justify-content: center; gap: 5px; height: 60px; align-items: center;">
+      <div style="width: 8px; height: 40px; background: #2ecc71; animation: wave 1s ease-in-out 0s infinite;"></div>
+      <div style="width: 8px; height: 40px; background: #2ecc71; animation: wave 1s ease-in-out 0.1s infinite;"></div>
+      <div style="width: 8px; height: 40px; background: #2ecc71; animation: wave 1s ease-in-out 0.2s infinite;"></div>
+      <div style="width: 8px; height: 40px; background: #2ecc71; animation: wave 1s ease-in-out 0.3s infinite;"></div>
+      <div style="width: 8px; height: 40px; background: #2ecc71; animation: wave 1s ease-in-out 0.4s infinite;"></div>
+    </div>
+    <p style="margin: 10px 0 0 0; font-weight: bold;">Wave</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <div style="width: 50px; height: 50px; background: #3498db; border-radius: 8px; margin: 0 auto; animation: glow 2s ease-in-out infinite;"></div>
+    <p style="margin: 10px 0 0 0; font-weight: bold;">Glow Pulse</p>
+  </div>
+  
+  <div style="text-align: center;">
+    <div style="width: 50px; height: 50px; border: 5px solid; border-radius: 8px; margin: 0 auto; animation: borderRun 2s linear infinite;"></div>
+    <p style="margin: 10px 0 0 0; font-weight: bold;">Border Run</p>
+  </div>
+  
+</div>
+
+<h4>Indicadores de progreso</h4>
+<div style="padding: 20px;">
+  <div style="background: #e0e0e0; height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 20px;">
+    <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #3498db 0%, #2ecc71 50%, #e74c3c 100%); background-size: 200% 100%; animation: loading 2s linear infinite;"></div>
+  </div>
+  
+  <div style="display: flex; justify-content: center; gap: 8px;">
+    <div style="width: 12px; height: 12px; background: #3498db; border-radius: 50%; animation: pulse 1.5s ease-in-out 0s infinite;"></div>
+    <div style="width: 12px; height: 12px; background: #2ecc71; border-radius: 50%; animation: pulse 1.5s ease-in-out 0.3s infinite;"></div>
+    <div style="width: 12px; height: 12px; background: #e74c3c; border-radius: 50%; animation: pulse 1.5s ease-in-out 0.6s infinite;"></div>
+    <div style="width: 12px; height: 12px; background: #f39c12; border-radius: 50%; animation: pulse 1.5s ease-in-out 0.9s infinite;"></div>
+  </div>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🎯 Estados Dinámicos (hover, active, focus)
+
+### Pseudo-clases para interactividad
+
+Las pseudo-clases permiten aplicar estilos cuando el elemento está en un estado específico.
+
+```css
+/* :hover - Cuando el cursor está sobre el elemento */
+.boton:hover {
+  background-color: #2ecc71;
+  transform: scale(1.05);
+}
+
+/* :active - Cuando se está haciendo clic */
+.boton:active {
+  transform: scale(0.95);
+}
+
+/* :focus - Cuando el elemento tiene el foco */
+input:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* :focus-visible - Foco solo con teclado */
+button:focus-visible {
+  outline: 2px solid #3498db;
+}
+```
+
+<Tabs>
+<TabItem label="Pseudo-clases comunes">
+```css
+/* :hover - Mouse sobre el elemento */
+.card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px);
+  transition: all 0.3s ease;
+}
+
+/* :active - Elemento siendo clickeado */
+.button:active {
+  transform: scale(0.95);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* :focus - Elemento con foco (input, button) */
+input:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* :focus-within - Contenedor con hijo enfocado */
+.form-group:focus-within {
+  background-color: #f8f9fa;
+}
+
+/* :disabled - Elemento deshabilitado */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* :checked - Checkbox/radio seleccionado */
+input[type="checkbox"]:checked {
+  background-color: #2ecc71;
+}
+
+/* Combinaciones */
+.button:hover:not(:disabled) {
+  background-color: #2ecc71;
+}
+```
+
+**Pseudo-clases principales:**
+- ✅ **:hover** - Mouse sobre el elemento
+- ✅ **:active** - Elemento siendo clickeado
+- ✅ **:focus** - Elemento con foco (teclado/click)
+- ✅ **:focus-visible** - Foco solo con teclado
+- ✅ **:focus-within** - Contenedor con hijo enfocado
+- ✅ **:disabled** - Elemento deshabilitado
+- ✅ **:checked** - Input seleccionado
+</TabItem>
+
+<TabItem label="Ejemplos prácticos">
+
+<LivePreview 
+  title="🎨 Estados dinámicos - hover, active, focus"
+  html={`<style>
+.btn-hover {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
+.btn-hover:hover {
+  background: #2ecc71;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
+}
+.btn-hover:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(46, 204, 113, 0.4);
+}
+
+.card-hover {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.card-hover:hover {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  transform: translateY(-5px);
+}
+
+.input-focus {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+.input-focus:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+</style>
+
+<h4>Botones con estados</h4>
+<div style="display: flex; flex-wrap: wrap; gap: 15px; padding: 20px;">
+  <button class="btn-hover">Hover Me</button>
+  <button class="btn-hover">Click Me</button>
+  <button class="btn-hover" disabled style="opacity: 0.5; cursor: not-allowed;">Disabled</button>
+</div>
+
+<h4>Cards con hover</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px;">
+  <div class="card-hover">
+    <div style="width: 50px; height: 50px; background: #3498db; border-radius: 8px; margin-bottom: 15px;"></div>
+    <strong>Card 1</strong>
+    <p style="margin: 10px 0 0 0; color: #666;">Hover para ver el efecto</p>
+  </div>
+  
+  <div class="card-hover">
+    <div style="width: 50px; height: 50px; background: #2ecc71; border-radius: 8px; margin-bottom: 15px;"></div>
+    <strong>Card 2</strong>
+    <p style="margin: 10px 0 0 0; color: #666;">Hover para ver el efecto</p>
+  </div>
+  
+  <div class="card-hover">
+    <div style="width: 50px; height: 50px; background: #e74c3c; border-radius: 8px; margin-bottom: 15px;"></div>
+    <strong>Card 3</strong>
+    <p style="margin: 10px 0 0 0; color: #666;">Hover para ver el efecto</p>
+  </div>
+</div>
+
+<h4>Inputs con focus</h4>
+<div style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+  <input type="text" class="input-focus" placeholder="Click para enfocar (focus)" />
+  <input type="email" class="input-focus" placeholder="Email con efecto focus" />
+  <textarea class="input-focus" placeholder="Textarea con efecto focus" rows="3"></textarea>
+</div>
+
+<h4>Efectos combinados</h4>
+<div style="padding: 20px;">
+  <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 30px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; text-align: center;" onmouseover="this.style.transform='scale(1.02) rotate(1deg)'; this.style.boxShadow='0 20px 40px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='scale(1) rotate(0deg)'; this.style.boxShadow='none'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1.02) rotate(1deg)'">
+    <strong style="font-size: 20px;">Hover, Active y Transform</strong>
+    <p style="margin: 10px 0 0 0;">Interactúa con este elemento</p>
+  </div>
+</div>
+
+`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+
+<TabItem label="Más ejemplos">
+
+<LivePreview 
+  title="🎨 Más efectos con estados dinámicos"
+  html={`<style>
+.btn-3d {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: bold;
+  box-shadow: 0 5px 0 #4a3a7a;
+  position: relative;
+  top: 0;
+}
+.btn-3d:hover {
+  box-shadow: 0 3px 0 #4a3a7a;
+  top: 2px;
+}
+.btn-3d:active {
+  box-shadow: 0 0 0 #4a3a7a;
+  top: 5px;
+}
+
+.card-flip {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.5s ease;
+  cursor: pointer;
+}
+.card-flip:hover {
+  transform: rotateY(10deg) rotateX(5deg);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.link-underline {
+  color: #3498db;
+  text-decoration: none;
+  position: relative;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #3498db;
+  transition: width 0.3s ease;
+}
+.link-underline:hover {
+  color: #2ecc71;
+}
+.link-underline:hover::after {
+  width: 100%;
+  background: #2ecc71;
+}
+
+.checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #3498db;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.checkbox-custom:checked {
+  background: #2ecc71;
+  border-color: #2ecc71;
+}
+</style>
+
+<h4>Botones 3D con efecto de presión</h4>
+<div style="display: flex; flex-wrap: wrap; gap: 15px; padding: 20px;">
+  <button class="btn-3d">Presióname</button>
+  <button class="btn-3d">Click Me</button>
+  <button class="btn-3d">3D Button</button>
+</div>
+
+<h4>Cards con efecto 3D</h4>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px;">
+  <div class="card-flip">
+    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #3498db, #2980b9); border-radius: 8px; margin-bottom: 15px;"></div>
+    <strong>Hover 3D</strong>
+    <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">Efecto de perspectiva</p>
+  </div>
+  
+  <div class="card-flip">
+    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #2ecc71, #27ae60); border-radius: 8px; margin-bottom: 15px;"></div>
+    <strong>Hover 3D</strong>
+    <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">Efecto de perspectiva</p>
+  </div>
+  
+  <div class="card-flip">
+    <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #e74c3c, #c0392b); border-radius: 8px; margin-bottom: 15px;"></div>
+    <strong>Hover 3D</strong>
+    <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">Efecto de perspectiva</p>
+  </div>
+</div>
+
+<h4>Links con underline animado</h4>
+<div style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+  <a href="#" class="link-underline">Hover para ver underline animado</a>
+  <a href="#" class="link-underline">Link con efecto suave</a>
+  <a href="#" class="link-underline">Animación de subrayado</a>
+</div>
+
+<h4>Inputs y checkboxes personalizados</h4>
+<div style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <input type="checkbox" class="checkbox-custom" />
+    <label>Checkbox con transición</label>
+  </div>
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <input type="checkbox" class="checkbox-custom" />
+    <label>Otro checkbox animado</label>
+  </div>
+</div>`}
+  css={``}
+  js={``}
+/>
+</TabItem>
+</Tabs>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+### Transiciones (transition)
+✅ **transition** - Cambios suaves entre estados ⭐  
+✅ Parámetros: property, duration, timing-function, delay  
+✅ **Timing functions**: ease, linear, ease-in, ease-out, ease-in-out  
+✅ Múltiples propiedades separadas por comas  
+✅ `transition: all 0.3s ease` - Anima todas las propiedades  
+
+### Animaciones (@keyframes)
+✅ **@keyframes** - Define secuencias de animación ⭐  
+✅ **animation** - Aplica la animación al elemento  
+✅ Parámetros: name, duration, timing-function, delay, iteration-count  
+✅ **from/to** o porcentajes (0%, 50%, 100%)  
+✅ **infinite** - Repetición infinita  
+✅ **alternate** - Va y viene  
+
+### Animaciones infinitas
+✅ **iteration-count: infinite** - Repetición continua  
+✅ **direction: alternate** - Animación alternada  
+✅ **steps()** - Animación por pasos discretos  
+✅ Útil para loaders, spinners, sprites  
+
+### Estados dinámicos
+✅ **:hover** - Mouse sobre el elemento ⭐  
+✅ **:active** - Elemento siendo clickeado  
+✅ **:focus** - Elemento con foco (input, button)  
+✅ **:focus-visible** - Foco solo con teclado  
+✅ **:focus-within** - Contenedor con hijo enfocado  
+✅ **:disabled** - Elemento deshabilitado  
+✅ **:checked** - Input seleccionado  
+
+### Patrones comunes
+```css
+/* Botón con hover suave */
+.button {
+  transition: all 0.3s ease;
+}
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Spinner loader */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.loader {
+  animation: spin 1s linear infinite;
+}
+
+/* Card con hover */
+.card {
+  transition: all 0.3s ease;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Input con focus */
+input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+```
+
+### Casos de uso
+🔄 **Transiciones** - Hover effects, cambios de estado, interacciones  
+🎬 **Animaciones** - Loaders, spinners, efectos de entrada/salida  
+♾️ **Infinitas** - Indicadores de carga, pulsos, rotaciones  
+🎯 **Estados** - Feedback visual, accesibilidad, UX mejorada  
+
+### Tips de rendimiento
+⚡ **Anima solo**: transform, opacity (mejor rendimiento)  
+❌ **Evita animar**: width, height, top, left (peor rendimiento)  
+✅ **Usa** `will-change` para animaciones complejas  
+✅ **Reduce motion** para accesibilidad: `prefers-reduced-motion`  
+
+</Aside>
+
+---
+
+## 🚀 Próximos pasos
+
+Ahora que dominas transiciones y animaciones, puedes:
+- ✅ Crear interfaces interactivas y dinámicas
+- ✅ Implementar loaders y spinners personalizados
+- ✅ Mejorar la UX con feedback visual
+- ✅ Crear animaciones complejas con @keyframes
+
+<Aside type="tip">
+💡 **Tip profesional:** Usa transiciones para interacciones simples (hover, focus) y animaciones para efectos más complejos. Mantén las animaciones sutiles y rápidas (200-300ms) para mejor UX.
+</Aside>

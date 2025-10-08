@@ -1,0 +1,1388 @@
+---
+title: 3. Colores y Unidades
+description: Sistemas de color, transparencias, unidades absolutas y relativas, y variables CSS
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+Los **colores** y **unidades** son fundamentales en CSS. Dominar estos conceptos te permitirá crear diseños precisos, escalables y visualmente atractivos.
+
+<Aside type="tip">
+🎨 **Dato curioso:** El ojo humano puede distinguir aproximadamente 10 millones de colores diferentes, pero en CSS podemos representar más de 16 millones de colores con hexadecimal.
+</Aside>
+
+---
+
+## 🎨 Sistemas de color en CSS
+
+CSS ofrece múltiples formas de definir colores. Cada sistema tiene sus ventajas según el contexto.
+
+### 1. Nombres de colores (Keywords)
+
+CSS tiene **140 nombres de colores predefinidos**. Son fáciles de recordar pero limitados.
+
+```css
+.elemento {
+  color: red;
+  background-color: blue;
+  border-color: green;
+}
+
+/* Colores comunes */
+.texto-negro { color: black; }
+.texto-blanco { color: white; }
+.fondo-gris { background-color: gray; }
+.borde-azul { border: 2px solid navy; }
+```
+
+<Tabs>
+<TabItem label="Colores básicos">
+```css
+/* Colores primarios */
+red      /* 🔴 Rojo */
+blue     /* 🔵 Azul */
+yellow   /* 🟡 Amarillo */
+green    /* 🟢 Verde */
+
+/* Colores neutros */
+black    /* ⚫ Negro */
+white    /* ⚪ Blanco */
+gray     /* ⚪ Gris */
+silver   /* 🔘 Plateado */
+```
+</TabItem>
+
+<TabItem label="Colores extendidos">
+```css
+/* Tonos de azul */
+lightblue    /* Azul claro */
+skyblue      /* Azul cielo */
+steelblue    /* Azul acero */
+navy         /* Azul marino */
+midnightblue /* Azul medianoche */
+
+/* Tonos de rojo */
+lightcoral   /* Coral claro */
+crimson      /* Carmesí */
+firebrick    /* Ladrillo */
+darkred      /* Rojo oscuro */
+
+/* Otros */
+tomato       /* 🍅 Tomate */
+orange       /* 🟠 Naranja */
+gold         /* 🟡 Oro */
+lime         /* 🟢 Lima */
+aqua         /* 🔵 Agua */
+violet       /* 🟣 Violeta */
+```
+</TabItem>
+
+<TabItem label="Ejemplo práctico">
+```css
+.boton-peligro {
+  background-color: crimson;
+  color: white;
+}
+
+.alerta-exito {
+  background-color: limegreen;
+  color: white;
+}
+
+.alerta-advertencia {
+  background-color: gold;
+  color: black;
+}
+
+.alerta-info {
+  background-color: dodgerblue;
+  color: white;
+}
+```
+</TabItem>
+</Tabs>
+
+<Aside type="note">
+📝 **Ventajas:** Fáciles de leer y recordar  
+⚠️ **Desventajas:** Opciones limitadas, no todos los navegadores soportan nombres exóticos
+</Aside>
+
+### 2. Hexadecimal (HEX)
+
+El formato más popular en diseño web. Usa 6 dígitos hexadecimales (0-9, A-F).
+
+```css
+/* Formato: #RRGGBB */
+.elemento {
+  color: #FF0000;           /* Rojo puro */
+  background: #00FF00;      /* Verde puro */
+  border-color: #0000FF;    /* Azul puro */
+}
+
+/* Formato corto: #RGB (cuando los pares son iguales) */
+.elemento {
+  color: #F00;              /* = #FF0000 */
+  background: #0F0;         /* = #00FF00 */
+  border-color: #00F;       /* = #0000FF */
+}
+```
+
+#### Cómo funciona HEX
+
+<Steps>
+
+1. **Primer par (RR)** - Cantidad de rojo (00-FF)
+2. **Segundo par (GG)** - Cantidad de verde (00-FF)
+3. **Tercer par (BB)** - Cantidad de azul (00-FF)
+
+</Steps>
+
+<Tabs>
+<TabItem label="Colores puros">
+```css
+#FF0000  /* 🔴 Rojo puro (255, 0, 0) */
+#00FF00  /* 🟢 Verde puro (0, 255, 0) */
+#0000FF  /* 🔵 Azul puro (0, 0, 255) */
+#FFFF00  /* 🟡 Amarillo (255, 255, 0) */
+#FF00FF  /* 🟣 Magenta (255, 0, 255) */
+#00FFFF  /* 🔵 Cyan (0, 255, 255) */
+#000000  /* ⚫ Negro (0, 0, 0) */
+#FFFFFF  /* ⚪ Blanco (255, 255, 255) */
+```
+</TabItem>
+
+<TabItem label="Escala de grises">
+```css
+#000000  /* Negro */
+#333333  /* Gris muy oscuro */
+#666666  /* Gris oscuro */
+#999999  /* Gris medio */
+#CCCCCC  /* Gris claro */
+#F0F0F0  /* Gris muy claro */
+#FFFFFF  /* Blanco */
+```
+</TabItem>
+
+<TabItem label="Paleta moderna">
+```css
+/* Paleta de marca moderna */
+.primario   { color: #3498db; }  /* Azul brillante */
+.secundario { color: #2ecc71; }  /* Verde esmeralda */
+.acento     { color: #e74c3c; }  /* Rojo coral */
+.oscuro     { color: #2c3e50; }  /* Azul oscuro */
+.claro      { color: #ecf0f1; }  /* Gris claro */
+
+/* Paleta pastel */
+.rosa-pastel   { color: #FFB6C1; }
+.azul-pastel   { color: #AEC6CF; }
+.verde-pastel  { color: #B4E7CE; }
+.amarillo-pastel { color: #FFFACD; }
+```
+</TabItem>
+</Tabs>
+
+<Aside type="tip">
+💡 **Tip profesional:** Usa herramientas como [Coolors.co](https://coolors.co) o [Adobe Color](https://color.adobe.com) para generar paletas de colores armoniosas.
+</Aside>
+
+### 3. RGB (Red, Green, Blue)
+
+Define colores mediante valores de rojo, verde y azul (0-255).
+
+```css
+/* Sintaxis: rgb(rojo, verde, azul) */
+.elemento {
+  color: rgb(255, 0, 0);           /* Rojo */
+  background: rgb(0, 255, 0);      /* Verde */
+  border-color: rgb(0, 0, 255);    /* Azul */
+}
+
+/* Valores intermedios */
+.gris {
+  color: rgb(128, 128, 128);       /* Gris medio */
+}
+
+.naranja {
+  color: rgb(255, 165, 0);         /* Naranja */
+}
+
+.morado {
+  color: rgb(128, 0, 128);         /* Morado */
+}
+```
+
+<Tabs>
+<TabItem label="Conversión HEX a RGB">
+```css
+/* HEX → RGB */
+#FF0000  =  rgb(255, 0, 0)    /* Rojo */
+#00FF00  =  rgb(0, 255, 0)    /* Verde */
+#0000FF  =  rgb(0, 0, 255)    /* Azul */
+#3498db  =  rgb(52, 152, 219) /* Azul brillante */
+#2ecc71  =  rgb(46, 204, 113) /* Verde esmeralda */
+#e74c3c  =  rgb(231, 76, 60)  /* Rojo coral */
+```
+</TabItem>
+
+<TabItem label="Colores dinámicos">
+```css
+/* Útil para manipular con JavaScript */
+:root {
+  --r: 52;
+  --g: 152;
+  --b: 219;
+}
+
+.elemento {
+  background: rgb(var(--r), var(--g), var(--b));
+}
+
+/* JavaScript puede cambiar los valores */
+/* document.documentElement.style.setProperty('--r', '231'); */
+```
+</TabItem>
+</Tabs>
+
+<Aside type="note">
+📊 **Ventaja de RGB:** Más intuitivo que HEX para entender la composición del color y fácil de manipular programáticamente.
+</Aside>
+
+### 4. HSL (Hue, Saturation, Lightness)
+
+Define colores mediante **tono**, **saturación** y **luminosidad**. Más intuitivo para diseñadores.
+
+```css
+/* Sintaxis: hsl(tono, saturación%, luminosidad%) */
+.elemento {
+  color: hsl(0, 100%, 50%);        /* Rojo */
+  background: hsl(120, 100%, 50%); /* Verde */
+  border-color: hsl(240, 100%, 50%); /* Azul */
+}
+```
+
+#### Componentes de HSL
+
+<Steps>
+
+1. **Hue (Tono)** <Badge text="0-360°" variant="tip" />
+   - 0° = Rojo 🔴
+   - 120° = Verde 🟢
+   - 240° = Azul 🔵
+   - 360° = Rojo nuevamente (círculo completo)
+
+2. **Saturation (Saturación)** <Badge text="0-100%" variant="note" />
+   - 0% = Gris (sin color)
+   - 100% = Color puro (máxima intensidad)
+
+3. **Lightness (Luminosidad)** <Badge text="0-100%" variant="caution" />
+   - 0% = Negro
+   - 50% = Color normal
+   - 100% = Blanco
+
+</Steps>
+
+<Tabs>
+<TabItem label="Rueda de colores">
+```css
+/* Colores primarios y secundarios */
+hsl(0, 100%, 50%)    /* 🔴 Rojo */
+hsl(30, 100%, 50%)   /* 🟠 Naranja */
+hsl(60, 100%, 50%)   /* 🟡 Amarillo */
+hsl(120, 100%, 50%)  /* 🟢 Verde */
+hsl(180, 100%, 50%)  /* 🔵 Cyan */
+hsl(240, 100%, 50%)  /* 🔵 Azul */
+hsl(300, 100%, 50%)  /* 🟣 Magenta */
+```
+</TabItem>
+
+<TabItem label="Variaciones de saturación">
+```css
+/* Mismo tono (azul), diferente saturación */
+hsl(240, 100%, 50%)  /* Azul saturado */
+hsl(240, 75%, 50%)   /* Azul medio */
+hsl(240, 50%, 50%)   /* Azul apagado */
+hsl(240, 25%, 50%)   /* Azul grisáceo */
+hsl(240, 0%, 50%)    /* Gris (sin color) */
+```
+</TabItem>
+
+<TabItem label="Variaciones de luminosidad">
+```css
+/* Mismo tono (rojo), diferente luminosidad */
+hsl(0, 100%, 10%)    /* Rojo muy oscuro */
+hsl(0, 100%, 25%)    /* Rojo oscuro */
+hsl(0, 100%, 50%)    /* Rojo normal */
+hsl(0, 100%, 75%)    /* Rojo claro */
+hsl(0, 100%, 90%)    /* Rojo muy claro */
+```
+</TabItem>
+
+<TabItem label="Paleta armoniosa">
+```css
+/* Crear variaciones de un color base */
+:root {
+  --color-base: 210;  /* Azul */
+  
+  --color-oscuro: hsl(var(--color-base), 70%, 30%);
+  --color-medio: hsl(var(--color-base), 70%, 50%);
+  --color-claro: hsl(var(--color-base), 70%, 70%);
+  --color-muy-claro: hsl(var(--color-base), 70%, 90%);
+}
+
+.boton-primario { background: var(--color-medio); }
+.boton-hover { background: var(--color-oscuro); }
+.fondo-seccion { background: var(--color-muy-claro); }
+```
+</TabItem>
+</Tabs>
+
+<Aside type="tip">
+✨ **Ventaja de HSL:** Perfecto para crear variaciones de un mismo color (más claro, más oscuro, más saturado) sin calculadora.
+
+```css
+/* Fácil crear tema oscuro/claro */
+.tema-claro { background: hsl(210, 50%, 95%); }
+.tema-oscuro { background: hsl(210, 50%, 15%); }
+/* Solo cambias la luminosidad! */
+```
+</Aside>
+
+---
+
+## 💧 Transparencias y opacidad
+
+La transparencia permite que los elementos se vean a través de otros, creando efectos visuales sofisticados.
+
+### RGBA (RGB con Alpha)
+
+Añade un cuarto valor para la transparencia (0-1).
+
+```css
+/* Sintaxis: rgba(rojo, verde, azul, alpha) */
+.elemento {
+  background: rgba(255, 0, 0, 1);      /* Rojo opaco (100%) */
+  background: rgba(255, 0, 0, 0.8);    /* Rojo 80% opaco */
+  background: rgba(255, 0, 0, 0.5);    /* Rojo 50% opaco */
+  background: rgba(255, 0, 0, 0.2);    /* Rojo 20% opaco */
+  background: rgba(255, 0, 0, 0);      /* Rojo transparente (0%) */
+}
+```
+
+<Tabs>
+<TabItem label="Overlays">
+```css
+/* Superposición oscura sobre imagen */
+.hero {
+  position: relative;
+  background-image: url('fondo.jpg');
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);  /* Negro 50% */
+}
+
+/* Superposición de color */
+.overlay-azul::before {
+  background: rgba(52, 152, 219, 0.7);  /* Azul 70% */
+}
+```
+</TabItem>
+
+<TabItem label="Fondos translúcidos">
+```css
+/* Tarjeta con fondo semitransparente */
+.tarjeta-vidrio {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Efecto glassmorphism */
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px) saturate(180%);
+  border-radius: 12px;
+  border: 1px solid rgba(209, 213, 219, 0.3);
+}
+```
+</TabItem>
+
+<TabItem label="Sombras suaves">
+```css
+/* Sombras con transparencia */
+.tarjeta {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tarjeta-elevada {
+  box-shadow: 
+    0 10px 15px rgba(0, 0, 0, 0.1),
+    0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.tarjeta-flotante {
+  box-shadow: 
+    0 20px 25px rgba(0, 0, 0, 0.15),
+    0 10px 10px rgba(0, 0, 0, 0.04);
+}
+```
+</TabItem>
+</Tabs>
+
+### HSLA (HSL con Alpha)
+
+HSL con canal de transparencia.
+
+```css
+/* Sintaxis: hsla(tono, saturación%, luminosidad%, alpha) */
+.elemento {
+  background: hsla(210, 100%, 50%, 1);     /* Azul opaco */
+  background: hsla(210, 100%, 50%, 0.8);   /* Azul 80% */
+  background: hsla(210, 100%, 50%, 0.5);   /* Azul 50% */
+  background: hsla(210, 100%, 50%, 0.2);   /* Azul 20% */
+}
+
+/* Crear paleta con transparencias */
+:root {
+  --azul-solido: hsla(210, 80%, 50%, 1);
+  --azul-medio: hsla(210, 80%, 50%, 0.5);
+  --azul-suave: hsla(210, 80%, 50%, 0.1);
+}
+```
+
+### Hexadecimal con transparencia
+
+Formato moderno: `#RRGGBBAA` (los últimos 2 dígitos son el alpha).
+
+```css
+/* Formato: #RRGGBBAA */
+.elemento {
+  background: #FF0000FF;  /* Rojo 100% opaco */
+  background: #FF0000CC;  /* Rojo 80% opaco */
+  background: #FF000080;  /* Rojo 50% opaco */
+  background: #FF000033;  /* Rojo 20% opaco */
+  background: #FF000000;  /* Rojo 0% (transparente) */
+}
+
+/* Valores comunes de alpha en HEX */
+/* FF = 100% | CC = 80% | 99 = 60% | 80 = 50% | 66 = 40% | 33 = 20% | 00 = 0% */
+```
+
+<Aside type="note">
+🔍 **Compatibilidad:** El formato `#RRGGBBAA` es soportado por navegadores modernos. Para mayor compatibilidad, usa `rgba()` o `hsla()`.
+</Aside>
+
+### Propiedad `opacity`
+
+Afecta la transparencia de **todo el elemento** (incluido su contenido).
+
+```css
+/* Sintaxis: opacity: 0 a 1 */
+.elemento {
+  opacity: 1;      /* 100% opaco (normal) */
+  opacity: 0.8;    /* 80% opaco */
+  opacity: 0.5;    /* 50% opaco */
+  opacity: 0.2;    /* 20% opaco */
+  opacity: 0;      /* 0% (invisible) */
+}
+```
+
+<Tabs>
+<TabItem label="Diferencia opacity vs rgba">
+```css
+/* opacity: Afecta TODO (contenido + fondo) */
+.caja-opacity {
+  background: rgb(255, 0, 0);
+  opacity: 0.5;  /* ⚠️ El texto también será transparente */
+}
+
+/* rgba: Solo afecta el fondo */
+.caja-rgba {
+  background: rgba(255, 0, 0, 0.5);  /* ✅ Solo el fondo es transparente */
+  color: black;  /* El texto permanece opaco */
+}
+```
+</TabItem>
+
+<TabItem label="Efectos hover">
+```css
+/* Efecto de hover con opacity */
+.imagen {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.imagen:hover {
+  opacity: 0.7;
+}
+
+/* Overlay que aparece al hover */
+.tarjeta-overlay {
+  position: relative;
+}
+
+.tarjeta-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tarjeta-overlay:hover::before {
+  opacity: 1;
+}
+```
+</TabItem>
+</Tabs>
+
+<Aside type="caution">
+⚠️ **Importante:** `opacity` afecta a TODO el elemento y sus hijos. Si solo quieres transparencia en el fondo, usa `rgba()` o `hsla()`.
+
+```css
+/* ❌ Problema: El texto también es transparente */
+.caja {
+  background: blue;
+  opacity: 0.5;
+}
+
+/* ✅ Solución: Solo el fondo es transparente */
+.caja {
+  background: rgba(0, 0, 255, 0.5);
+}
+```
+</Aside>
+
+---
+
+## 📏 Unidades en CSS
+
+Las unidades definen tamaños, espacios y dimensiones. Se dividen en **absolutas** y **relativas**.
+
+### Unidades absolutas
+
+Tienen un tamaño fijo que **no cambia** según el contexto.
+
+<Tabs>
+<TabItem label="px (píxeles)">
+```css
+/* px - Píxel (unidad más común) */
+.elemento {
+  width: 300px;
+  height: 200px;
+  font-size: 16px;
+  padding: 20px;
+  margin: 10px;
+  border: 2px solid black;
+}
+
+/* ✅ Bueno para: */
+/* - Bordes precisos */
+/* - Sombras */
+/* - Elementos de tamaño fijo */
+
+.borde { border: 1px solid #ddd; }
+.sombra { box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+```
+
+<Aside type="note">
+📱 **Nota:** 1px CSS no siempre equivale a 1 píxel físico en pantallas de alta resolución (Retina, 4K).
+</Aside>
+</TabItem>
+
+<TabItem label="Otras absolutas">
+```css
+/* cm - Centímetros */
+.elemento { width: 10cm; }  /* Útil para impresión */
+
+/* mm - Milímetros */
+.elemento { width: 100mm; }
+
+/* in - Pulgadas (inches) */
+.elemento { width: 5in; }   /* 1in = 2.54cm = 96px */
+
+/* pt - Puntos */
+.elemento { font-size: 12pt; }  /* Usado en tipografía */
+
+/* pc - Picas */
+.elemento { width: 5pc; }   /* 1pc = 12pt */
+```
+
+<Aside type="caution">
+⚠️ **Raramente usadas en web:** Estas unidades son más comunes en diseño para impresión. En web, usa `px`, `em`, `rem`, `%`, etc.
+</Aside>
+</TabItem>
+</Tabs>
+
+### Unidades relativas
+
+Su tamaño **depende** de otro valor (elemento padre, viewport, fuente base).
+
+#### `em` - Relativo al tamaño de fuente del elemento padre
+
+```css
+/* 1em = tamaño de fuente del padre */
+.padre {
+  font-size: 16px;
+}
+
+.hijo {
+  font-size: 2em;      /* 2 × 16px = 32px */
+  padding: 1em;        /* 1 × 32px = 32px (usa su propia fuente) */
+  margin: 0.5em;       /* 0.5 × 32px = 16px */
+}
+```
+
+<Tabs>
+<TabItem label="Ejemplo básico">
+```css
+body {
+  font-size: 16px;  /* Base */
+}
+
+h1 {
+  font-size: 2.5em;    /* 2.5 × 16px = 40px */
+  margin-bottom: 0.5em; /* 0.5 × 40px = 20px */
+}
+
+p {
+  font-size: 1em;      /* 1 × 16px = 16px */
+  line-height: 1.5em;  /* 1.5 × 16px = 24px */
+  margin-bottom: 1em;  /* 1 × 16px = 16px */
+}
+```
+</TabItem>
+
+<TabItem label="Anidamiento (cuidado)">
+```css
+/* ⚠️ Problema: El em se multiplica en anidamiento */
+.nivel-1 {
+  font-size: 16px;
+}
+
+.nivel-2 {
+  font-size: 1.5em;  /* 1.5 × 16px = 24px */
+}
+
+.nivel-3 {
+  font-size: 1.5em;  /* 1.5 × 24px = 36px ⚠️ */
+}
+
+.nivel-4 {
+  font-size: 1.5em;  /* 1.5 × 36px = 54px ⚠️⚠️ */
+}
+
+/* Los tamaños crecen exponencialmente */
+```
+</TabItem>
+
+<TabItem label="Uso recomendado">
+```css
+/* ✅ Bueno para: Espaciados proporcionales */
+.boton {
+  font-size: 16px;
+  padding: 0.5em 1em;     /* Padding proporcional al texto */
+  border-radius: 0.25em;  /* Bordes proporcionales */
+}
+
+.boton-grande {
+  font-size: 20px;
+  padding: 0.5em 1em;     /* Mismo código, escala automática */
+}
+
+/* El padding y border-radius escalan con el font-size */
+```
+</TabItem>
+</Tabs>
+
+#### `rem` - Relativo al tamaño de fuente del elemento raíz (`<html>`)
+
+```css
+/* 1rem = tamaño de fuente del <html> */
+html {
+  font-size: 16px;  /* Base (por defecto en navegadores) */
+}
+
+.elemento {
+  font-size: 2rem;      /* 2 × 16px = 32px */
+  padding: 1rem;        /* 1 × 16px = 16px */
+  margin: 0.5rem;       /* 0.5 × 16px = 8px */
+}
+```
+
+<Tabs>
+<TabItem label="Ventaja de rem">
+```css
+/* ✅ rem NO se multiplica en anidamiento */
+html {
+  font-size: 16px;
+}
+
+.nivel-1 { font-size: 1.5rem; }  /* 24px */
+.nivel-2 { font-size: 1.5rem; }  /* 24px (no 36px) */
+.nivel-3 { font-size: 1.5rem; }  /* 24px (no 54px) */
+
+/* Siempre relativo a html, no al padre */
+```
+</TabItem>
+
+<TabItem label="Sistema de espaciado">
+```css
+/* Sistema de espaciado consistente */
+:root {
+  font-size: 16px;
+}
+
+.espaciado-xs  { margin: 0.25rem; }  /* 4px */
+.espaciado-sm  { margin: 0.5rem; }   /* 8px */
+.espaciado-md  { margin: 1rem; }     /* 16px */
+.espaciado-lg  { margin: 1.5rem; }   /* 24px */
+.espaciado-xl  { margin: 2rem; }     /* 32px */
+.espaciado-2xl { margin: 3rem; }     /* 48px */
+```
+</TabItem>
+
+<TabItem label="Responsive con rem">
+```css
+/* Cambiar el tamaño base para responsive */
+html {
+  font-size: 16px;  /* Desktop */
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;  /* Tablet */
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 12px;  /* Mobile */
+  }
+}
+
+/* Todos los rem escalan automáticamente */
+.titulo { font-size: 2rem; }  /* 32px → 28px → 24px */
+.texto { font-size: 1rem; }    /* 16px → 14px → 12px */
+```
+</TabItem>
+</Tabs>
+
+<Aside type="tip">
+✨ **Recomendación:** Usa `rem` para tamaños de fuente y espaciados principales. Es más predecible que `em` y facilita el diseño responsivo.
+
+```css
+/* ✅ Patrón recomendado */
+html { font-size: 16px; }
+
+h1 { font-size: 2.5rem; }    /* 40px */
+h2 { font-size: 2rem; }      /* 32px */
+p { font-size: 1rem; }       /* 16px */
+small { font-size: 0.875rem; } /* 14px */
+
+.contenedor { padding: 2rem; }
+.boton { padding: 0.75rem 1.5rem; }
+```
+</Aside>
+
+#### `%` - Porcentaje relativo al elemento padre
+
+```css
+/* % - Relativo al tamaño del padre */
+.padre {
+  width: 1000px;
+  height: 500px;
+}
+
+.hijo {
+  width: 50%;      /* 50% de 1000px = 500px */
+  height: 80%;     /* 80% de 500px = 400px */
+  font-size: 120%; /* 120% del font-size del padre */
+}
+```
+
+<Tabs>
+<TabItem label="Layouts fluidos">
+```css
+/* Layout de 2 columnas */
+.contenedor {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.columna-izquierda {
+  width: 30%;
+  float: left;
+}
+
+.columna-derecha {
+  width: 70%;
+  float: left;
+}
+
+/* Layout de 3 columnas iguales */
+.columna {
+  width: 33.333%;
+  float: left;
+}
+```
+</TabItem>
+
+<TabItem label="Imágenes responsivas">
+```css
+/* Imagen que se adapta al contenedor */
+img {
+  width: 100%;
+  height: auto;
+}
+
+/* Imagen con ancho máximo */
+.imagen-contenida {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Imagen de fondo que cubre el contenedor */
+.hero {
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+}
+```
+</TabItem>
+</Tabs>
+
+#### `vw` y `vh` - Relativo al viewport
+
+```css
+/* vw - Viewport Width (ancho de la ventana) */
+/* vh - Viewport Height (alto de la ventana) */
+
+/* 1vw = 1% del ancho del viewport */
+/* 1vh = 1% del alto del viewport */
+
+.elemento {
+  width: 50vw;     /* 50% del ancho de la ventana */
+  height: 100vh;   /* 100% del alto de la ventana */
+  font-size: 5vw;  /* 5% del ancho de la ventana */
+}
+```
+
+<Tabs>
+<TabItem label="Hero full screen">
+```css
+/* Sección hero que ocupa toda la pantalla */
+.hero {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url('fondo.jpg');
+  background-size: cover;
+}
+
+.hero h1 {
+  font-size: 8vw;  /* Título que escala con la ventana */
+  color: white;
+}
+```
+</TabItem>
+
+<TabItem label="Tipografía fluida">
+```css
+/* Texto que escala con el viewport */
+h1 {
+  font-size: 5vw;  /* Se adapta al ancho de la ventana */
+  min-font-size: 24px;  /* Mínimo en pantallas pequeñas */
+  max-font-size: 72px;  /* Máximo en pantallas grandes */
+}
+
+/* Mejor con clamp() */
+h1 {
+  font-size: clamp(24px, 5vw, 72px);
+}
+```
+</TabItem>
+
+<TabItem label="Espaciado dinámico">
+```css
+/* Espaciado que se adapta al viewport */
+.seccion {
+  padding: 10vh 5vw;  /* Padding proporcional a la pantalla */
+}
+
+.contenedor {
+  width: 90vw;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Altura mínima */
+.contenido {
+  min-height: 80vh;  /* Al menos 80% de la altura de la ventana */
+}
+```
+</TabItem>
+</Tabs>
+
+#### Otras unidades relativas
+
+```css
+/* vmin - El menor entre vw y vh */
+.elemento {
+  width: 50vmin;  /* 50% del lado más pequeño del viewport */
+}
+
+/* vmax - El mayor entre vw y vh */
+.elemento {
+  width: 50vmax;  /* 50% del lado más grande del viewport */
+}
+
+/* ch - Ancho del carácter "0" en la fuente actual */
+.input {
+  width: 20ch;  /* Ancho de 20 caracteres */
+}
+
+/* ex - Altura de la letra "x" en la fuente actual */
+.elemento {
+  height: 10ex;
+}
+```
+
+### Comparación de unidades
+
+| Unidad | Tipo | Relativo a | Uso recomendado |
+|--------|------|------------|------------------|
+| `px` | Absoluta | Fijo | Bordes, sombras, detalles precisos |
+| `em` | Relativa | Fuente del padre | Espaciados proporcionales al texto |
+| `rem` | Relativa | Fuente del `<html>` | Tamaños de fuente, espaciados generales ⭐ |
+| `%` | Relativa | Elemento padre | Anchos, layouts fluidos |
+| `vw` | Relativa | Ancho del viewport | Elementos full-width, tipografía fluida |
+| `vh` | Relativa | Alto del viewport | Secciones full-height, heros |
+
+<Aside type="tip">
+🎯 **Regla general:**
+- **Fuentes y espaciados:** `rem`
+- **Layouts y anchos:** `%` o `vw`
+- **Alturas completas:** `vh`
+- **Bordes y sombras:** `px`
+- **Espaciados proporcionales al texto:** `em`
+</Aside>
+
+---
+
+## 🎨 Variables CSS (Custom Properties)
+
+Las **variables CSS** permiten almacenar valores reutilizables. Se definen con `--` y se usan con `var()`.
+
+### Sintaxis básica
+
+```css
+/* Definir variables en :root (disponibles globalmente) */
+:root {
+  --color-primario: #3498db;
+  --color-secundario: #2ecc71;
+  --color-acento: #e74c3c;
+  
+  --fuente-principal: 'Arial', sans-serif;
+  --fuente-titulos: 'Georgia', serif;
+  
+  --espaciado-sm: 0.5rem;
+  --espaciado-md: 1rem;
+  --espaciado-lg: 2rem;
+}
+
+/* Usar variables con var() */
+.elemento {
+  color: var(--color-primario);
+  font-family: var(--fuente-principal);
+  padding: var(--espaciado-md);
+}
+```
+
+### Sistema de diseño con variables
+
+<Tabs>
+<TabItem label="Colores">
+```css
+:root {
+  /* Colores de marca */
+  --color-primario: #3498db;
+  --color-secundario: #2ecc71;
+  --color-acento: #e74c3c;
+  --color-advertencia: #f39c12;
+  --color-exito: #27ae60;
+  --color-peligro: #c0392b;
+  
+  /* Colores neutros */
+  --color-texto: #2c3e50;
+  --color-texto-claro: #7f8c8d;
+  --color-fondo: #ffffff;
+  --color-fondo-alt: #f8f9fa;
+  --color-borde: #dee2e6;
+  
+  /* Grises */
+  --gris-100: #f8f9fa;
+  --gris-200: #e9ecef;
+  --gris-300: #dee2e6;
+  --gris-400: #ced4da;
+  --gris-500: #adb5bd;
+  --gris-600: #6c757d;
+  --gris-700: #495057;
+  --gris-800: #343a40;
+  --gris-900: #212529;
+}
+
+/* Uso */
+.boton-primario {
+  background: var(--color-primario);
+  color: white;
+}
+
+.texto-secundario {
+  color: var(--color-texto-claro);
+}
+```
+</TabItem>
+
+<TabItem label="Espaciado">
+```css
+:root {
+  /* Sistema de espaciado (escala de 8px) */
+  --espaciado-0: 0;
+  --espaciado-1: 0.25rem;  /* 4px */
+  --espaciado-2: 0.5rem;   /* 8px */
+  --espaciado-3: 0.75rem;  /* 12px */
+  --espaciado-4: 1rem;     /* 16px */
+  --espaciado-5: 1.5rem;   /* 24px */
+  --espaciado-6: 2rem;     /* 32px */
+  --espaciado-8: 3rem;     /* 48px */
+  --espaciado-10: 4rem;    /* 64px */
+  --espaciado-12: 6rem;    /* 96px */
+}
+
+/* Uso */
+.tarjeta {
+  padding: var(--espaciado-4);
+  margin-bottom: var(--espaciado-6);
+}
+
+.seccion {
+  padding: var(--espaciado-10) var(--espaciado-4);
+}
+```
+</TabItem>
+
+<TabItem label="Tipografía">
+```css
+:root {
+  /* Familias de fuentes */
+  --fuente-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --fuente-serif: 'Georgia', 'Times New Roman', serif;
+  --fuente-mono: 'Courier New', monospace;
+  
+  /* Tamaños de fuente */
+  --texto-xs: 0.75rem;    /* 12px */
+  --texto-sm: 0.875rem;   /* 14px */
+  --texto-base: 1rem;     /* 16px */
+  --texto-lg: 1.125rem;   /* 18px */
+  --texto-xl: 1.25rem;    /* 20px */
+  --texto-2xl: 1.5rem;    /* 24px */
+  --texto-3xl: 1.875rem;  /* 30px */
+  --texto-4xl: 2.25rem;   /* 36px */
+  --texto-5xl: 3rem;      /* 48px */
+  
+  /* Pesos de fuente */
+  --peso-normal: 400;
+  --peso-medio: 500;
+  --peso-semibold: 600;
+  --peso-bold: 700;
+}
+
+/* Uso */
+body {
+  font-family: var(--fuente-sans);
+  font-size: var(--texto-base);
+}
+
+h1 {
+  font-size: var(--texto-4xl);
+  font-weight: var(--peso-bold);
+}
+
+code {
+  font-family: var(--fuente-mono);
+  font-size: var(--texto-sm);
+}
+```
+</TabItem>
+
+<TabItem label="Sombras y efectos">
+```css
+:root {
+  /* Sombras */
+  --sombra-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --sombra-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --sombra-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --sombra-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  
+  /* Bordes redondeados */
+  --radio-sm: 0.25rem;  /* 4px */
+  --radio-md: 0.5rem;   /* 8px */
+  --radio-lg: 1rem;     /* 16px */
+  --radio-full: 9999px; /* Completamente redondeado */
+  
+  /* Transiciones */
+  --transicion-rapida: 150ms ease-in-out;
+  --transicion-normal: 300ms ease-in-out;
+  --transicion-lenta: 500ms ease-in-out;
+}
+
+/* Uso */
+.tarjeta {
+  border-radius: var(--radio-lg);
+  box-shadow: var(--sombra-md);
+  transition: all var(--transicion-normal);
+}
+
+.tarjeta:hover {
+  box-shadow: var(--sombra-xl);
+  transform: translateY(-4px);
+}
+
+.boton {
+  border-radius: var(--radio-md);
+  transition: background-color var(--transicion-rapida);
+}
+```
+</TabItem>
+</Tabs>
+
+### Variables con valores por defecto
+
+```css
+/* Sintaxis: var(--variable, valor-por-defecto) */
+.elemento {
+  color: var(--color-personalizado, #3498db);
+  /* Si --color-personalizado no existe, usa #3498db */
+  
+  padding: var(--espaciado-custom, 1rem);
+  font-size: var(--texto-custom, 16px);
+}
+```
+
+### Variables en diferentes contextos
+
+```css
+/* Variables globales */
+:root {
+  --color-primario: #3498db;
+}
+
+/* Variables específicas de un componente */
+.tarjeta {
+  --color-fondo: #f8f9fa;
+  --padding: 2rem;
+  
+  background: var(--color-fondo);
+  padding: var(--padding);
+}
+
+/* Variables que cambian según el estado */
+.boton {
+  --color-boton: #3498db;
+  background: var(--color-boton);
+}
+
+.boton:hover {
+  --color-boton: #2980b9;  /* Cambia el valor de la variable */
+}
+```
+
+### Tema oscuro con variables
+
+<Tabs>
+<TabItem label="Tema claro (default)">
+```css
+:root {
+  --color-fondo: #ffffff;
+  --color-texto: #2c3e50;
+  --color-borde: #dee2e6;
+  --color-tarjeta: #f8f9fa;
+}
+
+body {
+  background: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+.tarjeta {
+  background: var(--color-tarjeta);
+  border: 1px solid var(--color-borde);
+}
+```
+</TabItem>
+
+<TabItem label="Tema oscuro">
+```css
+/* Tema oscuro */
+[data-theme="dark"] {
+  --color-fondo: #1a1a1a;
+  --color-texto: #e0e0e0;
+  --color-borde: #333333;
+  --color-tarjeta: #2c2c2c;
+}
+
+/* O con media query */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-fondo: #1a1a1a;
+    --color-texto: #e0e0e0;
+    --color-borde: #333333;
+    --color-tarjeta: #2c2c2c;
+  }
+}
+
+/* El CSS no cambia, solo las variables */
+body {
+  background: var(--color-fondo);
+  color: var(--color-texto);
+}
+```
+</TabItem>
+
+<TabItem label="Toggle con JavaScript">
+```html
+<button id="toggle-theme">Cambiar tema</button>
+```
+
+```css
+:root {
+  --color-fondo: #ffffff;
+  --color-texto: #2c3e50;
+}
+
+[data-theme="dark"] {
+  --color-fondo: #1a1a1a;
+  --color-texto: #e0e0e0;
+}
+
+body {
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  transition: background 0.3s, color 0.3s;
+}
+```
+
+```javascript
+// JavaScript para cambiar el tema
+const toggleBtn = document.getElementById('toggle-theme');
+
+toggleBtn.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+});
+```
+</TabItem>
+</Tabs>
+
+### Variables calculadas
+
+```css
+:root {
+  --base: 16px;
+  --multiplicador: 1.5;
+}
+
+.elemento {
+  /* Usar calc() con variables */
+  font-size: calc(var(--base) * var(--multiplicador));  /* 24px */
+  padding: calc(var(--base) / 2);  /* 8px */
+  margin: calc(var(--base) * 2);   /* 32px */
+}
+
+/* Espaciado dinámico */
+:root {
+  --espaciado-base: 1rem;
+}
+
+.pequeno { padding: calc(var(--espaciado-base) * 0.5); }  /* 0.5rem */
+.normal  { padding: var(--espaciado-base); }              /* 1rem */
+.grande  { padding: calc(var(--espaciado-base) * 2); }    /* 2rem */
+```
+
+<Aside type="tip">
+💡 **Ventajas de las variables CSS:**
+
+✅ **Mantenimiento:** Cambia un valor y se actualiza en todo el sitio  
+✅ **Consistencia:** Garantiza el uso de colores y espaciados uniformes  
+✅ **Temas:** Fácil implementación de tema oscuro/claro  
+✅ **Legibilidad:** Nombres descriptivos en lugar de valores mágicos  
+✅ **Dinámicas:** Pueden cambiarse con JavaScript en tiempo real  
+
+```css
+/* ❌ Sin variables: Difícil de mantener */
+.boton { background: #3498db; }
+.enlace { color: #3498db; }
+.borde { border-color: #3498db; }
+/* Si cambias el color, debes buscar y reemplazar en todo el código */
+
+/* ✅ Con variables: Fácil de mantener */
+:root { --color-primario: #3498db; }
+.boton { background: var(--color-primario); }
+.enlace { color: var(--color-primario); }
+.borde { border-color: var(--color-primario); }
+/* Cambias una vez y se actualiza todo */
+```
+</Aside>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+### Sistemas de color
+✅ **Nombres** - Fáciles pero limitados (red, blue, green)  
+✅ **HEX** - Más popular `#FF0000` (formato: #RRGGBB)  
+✅ **RGB** - Intuitivo `rgb(255, 0, 0)` (rojo, verde, azul)  
+✅ **HSL** - Para diseñadores `hsl(0, 100%, 50%)` (tono, saturación, luminosidad)  
+
+### Transparencias
+✅ **RGBA** - RGB con transparencia `rgba(255, 0, 0, 0.5)`  
+✅ **HSLA** - HSL con transparencia `hsla(0, 100%, 50%, 0.5)`  
+✅ **HEX con alpha** - `#FF000080` (últimos 2 dígitos)  
+✅ **opacity** - Afecta todo el elemento (0-1)  
+
+### Unidades absolutas
+✅ **px** - Píxeles (más común para bordes y detalles)  
+
+### Unidades relativas
+✅ **em** - Relativo al padre (cuidado con anidamiento)  
+✅ **rem** - Relativo a `<html>` (⭐ recomendado para fuentes)  
+✅ **%** - Porcentaje del padre (layouts fluidos)  
+✅ **vw/vh** - Relativo al viewport (secciones full-screen)  
+
+### Variables CSS
+✅ **Definir** - `:root { --color: #3498db; }`  
+✅ **Usar** - `color: var(--color);`  
+✅ **Ventajas** - Mantenimiento, consistencia, temas dinámicos  
+✅ **Tema oscuro** - Cambiar variables según `[data-theme="dark"]`  
+
+**Próximo paso:** En la siguiente lección aprenderás sobre tipografía y texto en CSS.
+</Aside>

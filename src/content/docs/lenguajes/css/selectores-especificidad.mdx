@@ -1,0 +1,1335 @@
+---
+title: 2. Selectores y Especificidad
+description: Selectores básicos, combinados, de atributos, pseudoclases, pseudoelementos y especificidad en CSS
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+Los **selectores CSS** son patrones que nos permiten seleccionar elementos HTML para aplicarles estilos. Dominar los selectores es fundamental para escribir CSS eficiente y mantenible.
+
+<Aside type="tip">
+💡 **Analogía:** Los selectores son como direcciones postales. Mientras más específica sea la dirección, más preciso será el destino del estilo.
+</Aside>
+
+---
+
+## 🎯 Selectores básicos
+
+Los selectores básicos son la base de CSS y los más utilizados en el día a día.
+
+### 1. Selector de elemento (tipo)
+
+Selecciona **todos** los elementos de un tipo específico.
+
+```css
+/* Selecciona TODOS los párrafos */
+p {
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Selecciona TODOS los h1 */
+h1 {
+  font-size: 2.5rem;
+  color: #2c3e50;
+}
+
+/* Selecciona TODAS las imágenes */
+img {
+  max-width: 100%;
+  height: auto;
+}
+```
+
+<Tabs>
+<TabItem label="HTML">
+```html
+<h1>Título principal</h1>
+<p>Este es un párrafo.</p>
+<p>Este es otro párrafo.</p>
+<img src="foto.jpg" alt="Foto">
+```
+</TabItem>
+
+<TabItem label="Resultado">
+```plaintext
+✅ Todos los h1 tendrán font-size: 2.5rem
+✅ Todos los p tendrán color: #333
+✅ Todas las img tendrán max-width: 100%
+```
+</TabItem>
+</Tabs>
+
+<Aside type="caution">
+⚠️ **Cuidado:** Los selectores de elemento afectan a **TODOS** los elementos de ese tipo en la página. Úsalos para estilos globales.
+</Aside>
+
+### 2. Selector de clase (`.clase`)
+
+Selecciona elementos que tienen un atributo `class` específico. **Reutilizable** en múltiples elementos.
+
+```css
+/* Selecciona elementos con class="destacado" */
+.destacado {
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 15px;
+  font-weight: bold;
+}
+
+/* Selecciona elementos con class="boton" */
+.boton {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.3s;
+}
+
+.boton:hover {
+  background-color: #0056b3;
+}
+```
+
+<Tabs>
+<TabItem label="HTML">
+```html
+<p class="destacado">Texto importante destacado</p>
+<div class="destacado">También puedo ser un div</div>
+
+<a href="#" class="boton">Soy un enlace</a>
+<button class="boton">Soy un botón</button>
+```
+</TabItem>
+
+<TabItem label="CSS aplicado">
+```css
+/* Ambos elementos con class="destacado" tendrán el mismo estilo */
+.destacado { 
+  background-color: #fff3cd;
+  /* ... */
+}
+
+/* Ambos elementos con class="boton" se verán igual */
+.boton {
+  padding: 12px 24px;
+  /* ... */
+}
+```
+</TabItem>
+</Tabs>
+
+<Aside type="tip">
+✨ **Buena práctica:** Las clases son **reutilizables**. Úsalas para estilos que se repiten en varios elementos.
+
+```html
+<!-- ✅ Correcto: Reutilizar clases -->
+<div class="tarjeta">Producto 1</div>
+<div class="tarjeta">Producto 2</div>
+<div class="tarjeta">Producto 3</div>
+```
+</Aside>
+
+### 3. Selector de ID (`#id`)
+
+Selecciona un **único** elemento con un `id` específico. Debe ser único en la página.
+
+```css
+/* Selecciona el elemento con id="encabezado-principal" */
+#encabezado-principal {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+/* Selecciona el elemento con id="menu-navegacion" */
+#menu-navegacion {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+```
+
+<Tabs>
+<TabItem label="HTML">
+```html
+<header id="encabezado-principal">
+  <h1>Mi Sitio Web</h1>
+</header>
+
+<nav id="menu-navegacion">
+  <a href="#inicio">Inicio</a>
+  <a href="#servicios">Servicios</a>
+</nav>
+```
+</TabItem>
+
+<TabItem label="Características">
+```plaintext
+✅ Un ID debe ser único en la página
+✅ Tiene mayor especificidad que las clases
+⚠️ No se puede reutilizar
+⚠️ Dificulta la reutilización de estilos
+```
+</TabItem>
+</Tabs>
+
+<Aside type="caution">
+🚫 **Evita IDs para estilos:** Prefiere clases para CSS. Reserva los IDs para JavaScript y enlaces internos.
+
+```css
+/* ❌ Evitar */
+#boton-enviar { color: blue; }
+
+/* ✅ Mejor */
+.boton-enviar { color: blue; }
+```
+</Aside>
+
+### 4. Selector universal (`*`)
+
+Selecciona **TODOS** los elementos de la página.
+
+```css
+/* Reset básico: Elimina márgenes y padding de todos los elementos */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Aplicar fuente a todos los elementos */
+* {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+```
+
+<Aside type="note">
+⚡ **Rendimiento:** El selector universal puede afectar el rendimiento en páginas muy grandes. Úsalo con moderación.
+</Aside>
+
+### 5. Selector de múltiples elementos (agrupación)
+
+Aplica los mismos estilos a varios selectores separados por comas.
+
+```css
+/* Aplica a h1, h2, h3, h4, h5 y h6 */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Georgia', serif;
+  color: #2c3e50;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* Aplica a varios elementos de navegación */
+.nav-link, .menu-item, .breadcrumb-link {
+  text-decoration: none;
+  color: #007bff;
+  transition: color 0.3s;
+}
+
+.nav-link:hover, .menu-item:hover, .breadcrumb-link:hover {
+  color: #0056b3;
+}
+```
+
+---
+
+## 🔗 Selectores combinados
+
+Los selectores combinados permiten seleccionar elementos basándose en su relación con otros elementos.
+
+### 1. Selector descendiente (espacio)
+
+Selecciona elementos que están **dentro** de otro elemento (en cualquier nivel).
+
+```css
+/* Selecciona todos los <p> dentro de <article> */
+article p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+/* Selecciona todos los <a> dentro de <nav> */
+nav a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+}
+
+/* Selecciona <span> dentro de <li> dentro de <ul> */
+ul li span {
+  color: #666;
+  font-size: 0.9em;
+}
+```
+
+<Tabs>
+<TabItem label="HTML">
+```html
+<article>
+  <h2>Título del artículo</h2>
+  <p>Este párrafo será estilizado</p>
+  <div>
+    <p>Este párrafo también (está dentro de article)</p>
+  </div>
+</article>
+
+<p>Este párrafo NO será estilizado (fuera de article)</p>
+```
+</TabItem>
+
+<TabItem label="Diagrama">
+```plaintext
+article
+  ├── h2
+  ├── p ✅ (seleccionado)
+  └── div
+      └── p ✅ (seleccionado - descendiente indirecto)
+
+p ❌ (no seleccionado - no está dentro de article)
+```
+</TabItem>
+</Tabs>
+
+### 2. Selector hijo directo (`>`)
+
+Selecciona elementos que son **hijos directos** (primer nivel) de otro elemento.
+
+```css
+/* Solo los <li> que son hijos DIRECTOS de <ul> */
+ul > li {
+  list-style-type: square;
+  margin-bottom: 10px;
+}
+
+/* Solo los <p> que son hijos DIRECTOS de <div class="contenedor"> */
+.contenedor > p {
+  background-color: #f0f0f0;
+  padding: 15px;
+}
+```
+
+<Tabs>
+<TabItem label="HTML">
+```html
+<ul>
+  <li>Item 1 ✅ (hijo directo)</li>
+  <li>Item 2 ✅ (hijo directo)</li>
+  <li>
+    Item 3 ✅ (hijo directo)
+    <ul>
+      <li>Subitem 3.1 ❌ (nieto, no hijo directo del ul principal)</li>
+    </ul>
+  </li>
+</ul>
+```
+</TabItem>
+
+<TabItem label="Comparación">
+```css
+/* Descendiente: Todos los niveles */
+ul li { color: blue; }
+/* ✅ Item 1, Item 2, Item 3, Subitem 3.1 */
+
+/* Hijo directo: Solo primer nivel */
+ul > li { color: red; }
+/* ✅ Item 1, Item 2, Item 3
+   ❌ Subitem 3.1 */
+```
+</TabItem>
+</Tabs>
+
+### 3. Selector hermano adyacente (`+`)
+
+Selecciona el elemento que está **inmediatamente después** de otro elemento (mismo nivel).
+
+```css
+/* El <p> que viene inmediatamente después de <h2> */
+h2 + p {
+  font-size: 1.2rem;
+  color: #555;
+  margin-top: 0;
+}
+
+/* El <div> que viene inmediatamente después de <img> */
+img + div {
+  margin-top: 20px;
+  text-align: center;
+}
+```
+
+<Tabs>
+<TabItem label="HTML">
+```html
+<h2>Título</h2>
+<p>Este párrafo ✅ (inmediatamente después de h2)</p>
+<p>Este párrafo ❌ (no es el inmediato siguiente)</p>
+
+<h2>Otro título</h2>
+<div>Este div ❌ (no es un p)</div>
+<p>Este párrafo ❌ (hay un div en medio)</p>
+```
+</TabItem>
+
+<TabItem label="Visualización">
+```plaintext
+h2
+p ✅ (seleccionado - hermano adyacente)
+p ❌ (no adyacente a h2)
+
+h2
+div ❌ (no es p)
+p ❌ (no es adyacente a h2)
+```
+</TabItem>
+</Tabs>
+
+### 4. Selector hermanos generales (`~`)
+
+Selecciona **todos** los elementos hermanos que vienen después de otro elemento.
+
+```css
+/* Todos los <p> que vienen después de <h2> (mismo nivel) */
+h2 ~ p {
+  color: #666;
+}
+
+/* Todos los <div> que vienen después de <img> */
+img ~ div {
+  border-top: 1px solid #ddd;
+  padding-top: 15px;
+}
+```
+
+<Tabs>
+<TabItem label="HTML">
+```html
+<article>
+  <h2>Título</h2>
+  <p>Párrafo 1 ✅</p>
+  <div>Un div en medio</div>
+  <p>Párrafo 2 ✅</p>
+  <p>Párrafo 3 ✅</p>
+</article>
+```
+</TabItem>
+
+<TabItem label="Comparación">
+```css
+/* Hermano adyacente (+): Solo el inmediato */
+h2 + p { color: red; }
+/* ✅ Solo Párrafo 1 */
+
+/* Hermanos generales (~): Todos los siguientes */
+h2 ~ p { color: blue; }
+/* ✅ Párrafo 1, Párrafo 2, Párrafo 3 */
+```
+</TabItem>
+</Tabs>
+
+---
+
+## 📋 Selectores de atributos
+
+Seleccionan elementos basándose en sus atributos HTML.
+
+### Sintaxis básica
+
+```css
+/* Elementos con el atributo "title" */
+[title] {
+  cursor: help;
+  border-bottom: 1px dotted #999;
+}
+
+/* Elementos con atributo type="text" */
+[type="text"] {
+  border: 2px solid #007bff;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+/* Enlaces con atributo target */
+[target] {
+  background-color: #fff3cd;
+  padding: 2px 6px;
+}
+```
+
+### Variantes de selectores de atributos
+
+<Tabs>
+<TabItem label="Igual (=)">
+```css
+/* Exactamente igual */
+[type="submit"] {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
+
+[class="destacado"] {
+  font-weight: bold;
+}
+```
+
+```html
+<input type="submit" value="Enviar"> ✅
+<input type="button" value="Cancelar"> ❌
+```
+</TabItem>
+
+<TabItem label="Contiene (~=)">
+```css
+/* Contiene la palabra completa (separada por espacios) */
+[class~="activo"] {
+  background-color: #007bff;
+  color: white;
+}
+```
+
+```html
+<div class="menu activo"> ✅
+<div class="activo-menu"> ❌ (no es palabra completa)
+<div class="menu activo destacado"> ✅
+```
+</TabItem>
+
+<TabItem label="Empieza (^=)">
+```css
+/* Empieza con... */
+[href^="https"] {
+  color: green;
+}
+
+[href^="http://"] {
+  color: orange;
+}
+
+[class^="btn-"] {
+  padding: 10px 15px;
+  border-radius: 4px;
+}
+```
+
+```html
+<a href="https://ejemplo.com"> ✅ verde
+<a href="http://ejemplo.com"> ✅ naranja
+<button class="btn-primary"> ✅
+<button class="btn-secondary"> ✅
+```
+</TabItem>
+
+<TabItem label="Termina ($=)">
+```css
+/* Termina con... */
+[href$=".pdf"] {
+  background: url('pdf-icon.png') no-repeat left center;
+  padding-left: 25px;
+}
+
+[src$=".jpg"], [src$=".png"] {
+  border: 2px solid #ddd;
+  border-radius: 8px;
+}
+```
+
+```html
+<a href="documento.pdf"> ✅
+<a href="archivo.doc"> ❌
+<img src="foto.jpg"> ✅
+<img src="imagen.png"> ✅
+```
+</TabItem>
+
+<TabItem label="Contiene (*=)">
+```css
+/* Contiene la subcadena en cualquier parte */
+[href*="youtube"] {
+  color: red;
+  font-weight: bold;
+}
+
+[class*="col-"] {
+  float: left;
+  padding: 15px;
+}
+```
+
+```html
+<a href="https://www.youtube.com/watch"> ✅
+<a href="https://youtu.be/abc123"> ✅
+<div class="col-md-6"> ✅
+<div class="col-lg-4"> ✅
+```
+</TabItem>
+
+<TabItem label="Empieza con palabra (|=)">
+```css
+/* Empieza con la palabra seguida de guion o es exacta */
+[lang|="es"] {
+  font-family: 'Arial', sans-serif;
+}
+```
+
+```html
+<p lang="es"> ✅
+<p lang="es-MX"> ✅
+<p lang="es-ES"> ✅
+<p lang="en"> ❌
+```
+</TabItem>
+</Tabs>
+
+### Ejemplos prácticos
+
+```css
+/* Estilizar enlaces externos */
+a[href^="http"]:not([href*="midominio.com"]) {
+  color: #e74c3c;
+}
+
+a[href^="http"]:not([href*="midominio.com"])::after {
+  content: " 🔗";
+  font-size: 0.8em;
+}
+
+/* Estilizar inputs según su tipo */
+input[type="email"],
+input[type="tel"],
+input[type="url"] {
+  background-color: #f0f8ff;
+  border-left: 3px solid #007bff;
+}
+
+/* Archivos descargables con iconos */
+a[href$=".pdf"]::before { content: "📄 "; }
+a[href$=".doc"]::before,
+a[href$=".docx"]::before { content: "📝 "; }
+a[href$=".zip"]::before { content: "📦 "; }
+```
+
+---
+
+## 🎨 Pseudoclases
+
+Las **pseudoclases** seleccionan elementos en un **estado específico** o posición.
+
+### Pseudoclases de interacción
+
+```css
+/* :hover - Cuando el cursor está sobre el elemento */
+.boton:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* :active - Cuando el elemento está siendo clickeado */
+.boton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* :focus - Cuando el elemento tiene el foco */
+input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* :visited - Enlaces ya visitados */
+a:visited {
+  color: #6f42c1;
+}
+```
+
+### Pseudoclases estructurales
+
+<Tabs>
+<TabItem label=":first-child">
+```css
+/* Primer hijo de su padre */
+li:first-child {
+  font-weight: bold;
+  color: #007bff;
+}
+
+p:first-child {
+  margin-top: 0;
+}
+```
+
+```html
+<ul>
+  <li>Item 1 ✅ (primer hijo)</li>
+  <li>Item 2</li>
+  <li>Item 3</li>
+</ul>
+```
+</TabItem>
+
+<TabItem label=":last-child">
+```css
+/* Último hijo de su padre */
+li:last-child {
+  border-bottom: none;
+}
+
+.menu-item:last-child {
+  margin-right: 0;
+}
+```
+
+```html
+<ul>
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3 ✅ (último hijo)</li>
+</ul>
+```
+</TabItem>
+
+<TabItem label=":nth-child()">
+```css
+/* Elementos pares */
+tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+/* Elementos impares */
+tr:nth-child(odd) {
+  background-color: white;
+}
+
+/* Cada tercer elemento */
+li:nth-child(3n) {
+  color: #e74c3c;
+}
+
+/* Elemento específico (el 5to) */
+li:nth-child(5) {
+  font-weight: bold;
+}
+
+/* Los primeros 3 elementos */
+li:nth-child(-n+3) {
+  color: #28a745;
+}
+```
+
+```html
+<ul>
+  <li>Item 1 ✅ (impar, primeros 3)</li>
+  <li>Item 2 ✅ (par, primeros 3)</li>
+  <li>Item 3 ✅ (impar, múltiplo de 3, primeros 3)</li>
+  <li>Item 4 ✅ (par)</li>
+  <li>Item 5 ✅ (impar, específico)</li>
+  <li>Item 6 ✅ (par, múltiplo de 3)</li>
+</ul>
+```
+</TabItem>
+
+<TabItem label=":nth-of-type()">
+```css
+/* Segundo párrafo de su tipo */
+p:nth-of-type(2) {
+  font-size: 1.2rem;
+  color: #007bff;
+}
+
+/* Cada imagen impar */
+img:nth-of-type(odd) {
+  float: left;
+  margin-right: 20px;
+}
+```
+
+```html
+<div>
+  <h2>Título</h2>
+  <p>Párrafo 1</p>
+  <p>Párrafo 2 ✅ (segundo p)</p>
+  <div>Otro elemento</div>
+  <p>Párrafo 3</p>
+</div>
+```
+</TabItem>
+</Tabs>
+
+### Pseudoclases de formulario
+
+```css
+/* :checked - Checkbox o radio seleccionado */
+input[type="checkbox"]:checked {
+  accent-color: #28a745;
+}
+
+input[type="checkbox"]:checked + label {
+  color: #28a745;
+  font-weight: bold;
+}
+
+/* :disabled - Elemento deshabilitado */
+input:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* :enabled - Elemento habilitado */
+input:enabled {
+  background-color: white;
+}
+
+/* :required - Campo obligatorio */
+input:required {
+  border-left: 3px solid #ffc107;
+}
+
+/* :valid - Campo con valor válido */
+input:valid {
+  border-color: #28a745;
+}
+
+/* :invalid - Campo con valor inválido */
+input:invalid {
+  border-color: #dc3545;
+}
+
+/* :placeholder-shown - Cuando se muestra el placeholder */
+input:placeholder-shown {
+  font-style: italic;
+}
+```
+
+### Otras pseudoclases útiles
+
+```css
+/* :not() - Negación */
+li:not(.especial) {
+  color: #666;
+}
+
+button:not(:disabled):hover {
+  background-color: #0056b3;
+}
+
+/* :empty - Elementos vacíos */
+p:empty {
+  display: none;
+}
+
+/* :only-child - Único hijo */
+li:only-child {
+  list-style: none;
+  text-align: center;
+}
+
+/* :root - Elemento raíz (html) */
+:root {
+  --color-primario: #007bff;
+  --color-secundario: #6c757d;
+}
+```
+
+---
+
+## ✨ Pseudoelementos
+
+Los **pseudoelementos** crean elementos virtuales para estilizar **partes específicas** de un elemento. Se escriben con `::` (doble dos puntos).
+
+<Aside type="note">
+💡 **Nota:** Aunque `::` es la sintaxis moderna, `:` (un solo dos puntos) también funciona por compatibilidad, pero se recomienda usar `::`.
+</Aside>
+
+### `::before` y `::after`
+
+Insertan contenido antes o después del contenido de un elemento.
+
+```css
+/* ::before - Antes del contenido */
+.nota::before {
+  content: "📌 ";
+  font-size: 1.2em;
+  margin-right: 8px;
+}
+
+/* ::after - Después del contenido */
+.enlace-externo::after {
+  content: " 🔗";
+  font-size: 0.8em;
+  color: #007bff;
+}
+
+/* Ejemplo: Comillas decorativas */
+blockquote::before {
+  content: """;
+  font-size: 4rem;
+  color: #007bff;
+  position: absolute;
+  top: -20px;
+  left: -10px;
+  opacity: 0.3;
+}
+
+blockquote::after {
+  content: """;
+  font-size: 4rem;
+  color: #007bff;
+  position: absolute;
+  bottom: -40px;
+  right: -10px;
+  opacity: 0.3;
+}
+```
+
+<Tabs>
+<TabItem label="HTML">
+```html
+<p class="nota">Este es un mensaje importante</p>
+<a href="https://ejemplo.com" class="enlace-externo">Visitar sitio</a>
+
+<blockquote>
+  La vida es como andar en bicicleta. Para mantener el equilibrio, 
+  debes seguir adelante.
+</blockquote>
+```
+</TabItem>
+
+<TabItem label="Resultado visual">
+```plaintext
+📌 Este es un mensaje importante
+
+Visitar sitio 🔗
+
+   "
+     La vida es como andar en bicicleta...
+                                        "
+```
+</TabItem>
+</Tabs>
+
+### Ejemplos prácticos con `::before` y `::after`
+
+<Tabs>
+<TabItem label="Iconos">
+```css
+/* Agregar iconos sin HTML adicional */
+.email::before {
+  content: "✉️ ";
+}
+
+.telefono::before {
+  content: "📱 ";
+}
+
+.ubicacion::before {
+  content: "📍 ";
+}
+
+.descarga::after {
+  content: " ⬇️";
+}
+```
+</TabItem>
+
+<TabItem label="Badges">
+```css
+/* Badge de "nuevo" */
+.producto-nuevo::after {
+  content: "NUEVO";
+  background-color: #28a745;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7em;
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+/* Badge de descuento */
+.con-descuento::before {
+  content: "-50%";
+  background-color: #dc3545;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+```
+</TabItem>
+
+<TabItem label="Separadores">
+```css
+/* Separador entre items */
+.breadcrumb li::after {
+  content: " / ";
+  color: #6c757d;
+  margin: 0 8px;
+}
+
+.breadcrumb li:last-child::after {
+  content: "";
+}
+
+/* Línea decorativa */
+.titulo-seccion::before {
+  content: "";
+  display: block;
+  width: 50px;
+  height: 4px;
+  background-color: #007bff;
+  margin-bottom: 15px;
+}
+```
+</TabItem>
+
+<TabItem label="Tooltips">
+```css
+/* Tooltip simple */
+.tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  font-size: 0.9em;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+```
+
+```html
+<span class="tooltip" data-tooltip="Información adicional">
+  Pasa el mouse aquí
+</span>
+```
+</TabItem>
+</Tabs>
+
+### Otros pseudoelementos
+
+```css
+/* ::first-letter - Primera letra */
+p::first-letter {
+  font-size: 3em;
+  font-weight: bold;
+  color: #007bff;
+  float: left;
+  line-height: 0.8;
+  margin-right: 8px;
+}
+
+/* ::first-line - Primera línea */
+p::first-line {
+  font-weight: bold;
+  color: #2c3e50;
+  text-transform: uppercase;
+}
+
+/* ::selection - Texto seleccionado */
+::selection {
+  background-color: #007bff;
+  color: white;
+}
+
+/* ::placeholder - Placeholder de inputs */
+input::placeholder {
+  color: #999;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* ::marker - Marcador de listas */
+li::marker {
+  color: #007bff;
+  font-size: 1.5em;
+}
+```
+
+---
+
+## 🎯 Especificidad y orden de aplicación
+
+La **especificidad** determina qué estilos se aplican cuando hay conflictos. Es como un sistema de puntos.
+
+### Cálculo de especificidad
+
+<Steps>
+
+1. **Inline styles** <Badge text="1000 puntos" variant="danger" />
+   ```html
+   <p style="color: red;">Texto</p>
+   ```
+
+2. **IDs** <Badge text="100 puntos" variant="caution" />
+   ```css
+   #encabezado { color: blue; }
+   ```
+
+3. **Clases, atributos, pseudoclases** <Badge text="10 puntos" variant="note" />
+   ```css
+   .destacado { color: green; }
+   [type="text"] { color: green; }
+   :hover { color: green; }
+   ```
+
+4. **Elementos y pseudoelementos** <Badge text="1 punto" variant="tip" />
+   ```css
+   p { color: black; }
+   ::before { color: black; }
+   ```
+
+</Steps>
+
+### Ejemplos de cálculo
+
+<Tabs>
+<TabItem label="Ejemplo 1">
+```css
+/* Especificidad: 0-0-0-1 = 1 punto */
+p {
+  color: black;
+}
+
+/* Especificidad: 0-0-1-0 = 10 puntos */
+.texto {
+  color: blue;
+}
+
+/* Especificidad: 0-1-0-0 = 100 puntos */
+#principal {
+  color: red;
+}
+
+/* Especificidad: 1-0-0-0 = 1000 puntos */
+<p style="color: green;">
+```
+
+```html
+<p id="principal" class="texto" style="color: green;">
+  ¿De qué color será? 🤔
+</p>
+```
+
+**Resultado:** 🟢 Verde (inline gana con 1000 puntos)
+</TabItem>
+
+<TabItem label="Ejemplo 2">
+```css
+/* 0-0-1-1 = 11 puntos */
+p.destacado {
+  color: blue;
+}
+
+/* 0-0-2-0 = 20 puntos */
+.contenedor .destacado {
+  color: red;
+}
+
+/* 0-1-1-0 = 110 puntos */
+#articulo .destacado {
+  color: green;
+}
+```
+
+```html
+<div id="articulo" class="contenedor">
+  <p class="destacado">¿De qué color será?</p>
+</div>
+```
+
+**Resultado:** 🟢 Verde (`#articulo .destacado` tiene 110 puntos)
+</TabItem>
+
+<TabItem label="Ejemplo 3">
+```css
+/* 0-0-0-2 = 2 puntos */
+div p {
+  color: black;
+}
+
+/* 0-0-1-1 = 11 puntos */
+div p.importante {
+  color: blue;
+}
+
+/* 0-0-2-1 = 21 puntos */
+.contenedor p.importante {
+  color: red;
+}
+
+/* 0-1-0-1 = 101 puntos */
+#main p {
+  color: green;
+}
+```
+
+**Orden de aplicación:**
+1. `#main p` → 101 puntos ✅ GANA
+2. `.contenedor p.importante` → 21 puntos
+3. `div p.importante` → 11 puntos
+4. `div p` → 2 puntos
+</TabItem>
+</Tabs>
+
+### Tabla de especificidad
+
+| Selector | Inline | IDs | Clases/Attrs/Pseudo | Elementos | Total |
+|----------|--------|-----|---------------------|-----------|-------|
+| `p` | 0 | 0 | 0 | 1 | **1** |
+| `.clase` | 0 | 0 | 1 | 0 | **10** |
+| `#id` | 0 | 1 | 0 | 0 | **100** |
+| `style=""` | 1 | 0 | 0 | 0 | **1000** |
+| `p.clase` | 0 | 0 | 1 | 1 | **11** |
+| `div p.clase` | 0 | 0 | 1 | 2 | **12** |
+| `#id .clase p` | 0 | 1 | 1 | 1 | **111** |
+| `div#id.clase p::before` | 0 | 1 | 1 | 2 | **112** |
+
+### Reglas de cascada
+
+<Aside type="tip">
+📚 **Orden de prioridad (de mayor a menor):**
+
+1. **`!important`** (evitar usar)
+2. **Estilos inline** (`style=""`)
+3. **Especificidad** (IDs > Clases > Elementos)
+4. **Orden de aparición** (el último gana si hay empate)
+5. **Herencia** (valores heredados del padre)
+</Aside>
+
+```css
+/* Mismo nivel de especificidad: El último gana */
+p { color: red; }
+p { color: blue; }  /* ✅ Este se aplica */
+
+/* !important sobrescribe todo (¡evitar!) */
+p { color: red !important; }  /* ✅ Este gana */
+p { color: blue; }
+
+/* Especificidad vs orden */
+.texto { color: red; }      /* 10 puntos */
+p { color: blue; }          /* 1 punto */
+/* ✅ Gana .texto (mayor especificidad) */
+```
+
+### Buenas prácticas de especificidad
+
+```css
+/* ❌ Evitar: Especificidad muy alta */
+#contenedor #articulo div.texto p {
+  color: red;
+}
+
+/* ✅ Mejor: Especificidad baja y reutilizable */
+.articulo-texto {
+  color: red;
+}
+
+/* ❌ Evitar: !important innecesario */
+.boton {
+  background: blue !important;
+}
+
+/* ✅ Mejor: Aumentar especificidad correctamente */
+.contenedor .boton {
+  background: blue;
+}
+
+/* ✅ Usar clases específicas */
+.boton-primario { background: blue; }
+.boton-secundario { background: gray; }
+```
+
+<Aside type="caution">
+⚠️ **Regla de oro:** Mantén la especificidad lo más baja posible. Es más fácil aumentarla que reducirla.
+
+```css
+/* ✅ Inicio con baja especificidad */
+.card { padding: 20px; }
+
+/* ✅ Fácil de sobrescribir cuando sea necesario */
+.card-especial { padding: 40px; }
+
+/* ❌ Alta especificidad desde el inicio */
+#main div.container .card { padding: 20px; }
+/* Muy difícil de sobrescribir después */
+```
+</Aside>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+### Selectores básicos
+✅ **Elemento** (`p`) - Selecciona todos los elementos del tipo  
+✅ **Clase** (`.clase`) - Reutilizable, recomendado para estilos  
+✅ **ID** (`#id`) - Único, evitar para CSS  
+✅ **Universal** (`*`) - Todos los elementos  
+
+### Selectores combinados
+✅ **Descendiente** (`div p`) - Cualquier nivel de anidación  
+✅ **Hijo directo** (`div > p`) - Solo primer nivel  
+✅ **Hermano adyacente** (`h2 + p`) - Inmediatamente después  
+✅ **Hermanos generales** (`h2 ~ p`) - Todos los siguientes  
+
+### Selectores de atributos
+✅ `[attr]` - Tiene el atributo  
+✅ `[attr="valor"]` - Valor exacto  
+✅ `[attr^="inicio"]` - Empieza con  
+✅ `[attr$="fin"]` - Termina con  
+✅ `[attr*="contiene"]` - Contiene  
+
+### Pseudoclases
+✅ `:hover`, `:active`, `:focus` - Interacción  
+✅ `:first-child`, `:last-child` - Posición  
+✅ `:nth-child()` - Patrones numéricos  
+✅ `:checked`, `:disabled`, `:valid` - Estados de formulario  
+
+### Pseudoelementos
+✅ `::before`, `::after` - Contenido generado  
+✅ `::first-letter`, `::first-line` - Partes del texto  
+✅ `::selection` - Texto seleccionado  
+✅ `::placeholder` - Placeholder de inputs  
+
+### Especificidad
+✅ **Inline** (1000) > **ID** (100) > **Clase** (10) > **Elemento** (1)  
+✅ Mantener especificidad baja para facilitar mantenimiento  
+✅ Evitar `!important` salvo casos excepcionales  
+
+**Próximo paso:** En la siguiente lección aprenderás sobre colores y unidades en CSS.
+</Aside>

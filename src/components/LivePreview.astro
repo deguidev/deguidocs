@@ -1,0 +1,360 @@
+---
+// Mini editor interactivo con HTML, CSS y JavaScript
+interface Props {
+  html?: string;
+  css?: string;
+  js?: string;
+  height?: string;
+  title?: string;
+  editable?: boolean;
+}
+
+const { 
+  html = '', 
+  css = '', 
+  js = '', 
+  height = "500px", 
+  title = "Editor en vivo",
+  editable = true 
+} = Astro.props;
+
+// Generar ID único para este editor
+const editorId = `editor-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<!-- Cargar Prism.js para syntax highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+<div class="live-editor" data-editor-id={editorId}>
+  <div class="editor-header">
+    <span class="editor-title">{title}</span>
+    <button class="btn-run" title="Ejecutar código (Ctrl+Enter)">▶ Ejecutar</button>
+  </div>
+  
+  <div class="editor-layout">
+    <!-- Panel de código -->
+    <div class="code-panel">
+      <div class="tabs">
+        <button class="tab active" data-tab="html">HTML</button>
+        <button class="tab" data-tab="css">CSS</button>
+        <button class="tab" data-tab="js">JavaScript</button>
+      </div>
+      
+      <div class="code-editors">
+        <div class="code-editor active" data-editor="html">
+          <pre class="code-highlight"><code class="language-markup">{html}</code></pre>
+          <textarea 
+            class="code-input" 
+            spellcheck="false"
+            readonly={true}
+          >{html}</textarea>
+        </div>
+        
+        <div class="code-editor" data-editor="css">
+          <pre class="code-highlight"><code class="language-css">{css}</code></pre>
+          <textarea 
+            class="code-input" 
+            spellcheck="false"
+            readonly={true}
+          >{css}</textarea>
+        </div>
+        
+        <div class="code-editor" data-editor="js">
+          <pre class="code-highlight"><code class="language-javascript">{js}</code></pre>
+          <textarea 
+            class="code-input" 
+            spellcheck="false"
+            readonly={true}
+          >{js}</textarea>
+        </div>
+      </div>
+    </div>
+    
+        <!-- Panel de vista previa -->
+    <div class="preview-panel">
+      <iframe 
+        class="preview-frame"
+        style={`height: ${height};`}
+        sandbox="allow-scripts allow-modals"
+        title="Preview"
+      ></iframe>
+    </div>
+  </div>
+</div>
+
+<style>
+  .live-editor {
+    margin: 2rem 0;
+    border: 2px solid #2c3e50;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #1e1e1e;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-bottom: 2px solid #5a67d8;
+  }
+
+  .editor-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-run {
+    padding: 0.6rem 1.5rem;
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    text-transform: uppercase;
+  }
+
+  .btn-run:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(46, 204, 113, 0.4);
+  }
+
+  .editor-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+  }
+
+  .code-panel {
+    display: flex;
+    flex-direction: column;
+    height: 350px;
+    border-bottom: 2px solid #2c3e50;
+  }
+
+  .tabs {
+    display: flex;
+    background: #2c3e50;
+    border-bottom: 2px solid #34495e;
+    padding: 0;
+    gap: 0;
+  }
+
+  .tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #95a5a6;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    border-right: 1px solid #34495e;
+  }
+
+
+
+  .tab:hover {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+  }
+
+  .tab.active {
+    background: #1e1e1e;
+    color: #3498db;
+    font-weight: 700;
+    border-bottom: 3px solid #3498db;
+  }
+
+  .code-editors {
+    flex: 1;
+    position: relative;
+    background: #1e1e1e;
+    overflow: hidden;
+  }
+
+  .code-editor {
+    display: none;
+    height: 100%;
+    position: relative;
+  }
+
+  .code-editor.active {
+    display: block;
+  }
+
+  .code-highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 1.5rem !important;
+    background: #1d1f21 !important;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .code-highlight code {
+    font-family: 'Fira Code', 'Consolas', 'Monaco', monospace !important;
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
+  }
+
+  .code-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 1.5rem;
+    background: transparent;
+    color: transparent;
+    border: none;
+    font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+    tab-size: 2;
+    caret-color: #fff;
+    z-index: 2;
+    overflow: auto;
+    white-space: pre;
+  }
+
+  .code-input::selection {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .preview-panel {
+    display: flex;
+    flex-direction: column;
+    background: #f8f9fa;
+    flex: 1;
+  }
+
+  .preview-frame {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: white;
+    min-height: 300px;
+  }
+
+  @media (max-width: 768px) {
+    .editor-layout {
+      min-height: 500px;
+    }
+    .code-panel {
+      height: 300px;
+    }
+  }
+</style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.live-editor').forEach(function(editor) {
+      const tabs = editor.querySelectorAll('.tab');
+      const codeEditors = editor.querySelectorAll('.code-editor');
+      const btnRun = editor.querySelector('.btn-run');
+      const iframe = editor.querySelector('.preview-frame');
+      const textareas = editor.querySelectorAll('.code-input');
+
+      if (!btnRun || !iframe) return;
+
+      // Aplicar Prism.js al cargar
+      if (window.Prism) {
+        editor.querySelectorAll('code').forEach(function(code) {
+          window.Prism.highlightElement(code);
+        });
+      }
+
+      // Cambiar entre tabs
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          const targetTab = tab.getAttribute('data-tab');
+          
+          tabs.forEach(function(t) {
+            t.classList.remove('active');
+          });
+          tab.classList.add('active');
+          
+          codeEditors.forEach(function(e) {
+            e.classList.remove('active');
+            if (e.getAttribute('data-editor') === targetTab) {
+              e.classList.add('active');
+            }
+          });
+        });
+      });
+
+      // Función para ejecutar el código
+      function runCode() {
+        const htmlInput = editor.querySelector('[data-editor="html"] .code-input');
+        const cssInput = editor.querySelector('[data-editor="css"] .code-input');
+        const jsInput = editor.querySelector('[data-editor="js"] .code-input');
+
+        if (!htmlInput || !cssInput || !jsInput) return;
+
+        const htmlCode = htmlInput.value;
+        const cssCode = cssInput.value;
+        const jsCode = jsInput.value;
+
+        const fullCode = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:0;padding:16px;font-family:system-ui,-apple-system,sans-serif;}' + cssCode + '</style></head><body>' + htmlCode + '<script>try{' + jsCode + '}catch(e){document.body.innerHTML+=\'<div style="color:red;padding:10px;background:#fee;border:1px solid red;margin-top:10px;"><strong>Error:</strong> \'+e.message+\'</div>\';}<\/script></body></html>';
+
+        iframe.srcdoc = fullCode;
+      }
+
+      // Ejecutar al hacer clic en el botón
+      btnRun.addEventListener('click', runCode);
+
+      // Sincronizar scroll entre textarea y código coloreado
+      textareas.forEach(function(textarea) {
+        textarea.addEventListener('scroll', function() {
+          const codeEditor = textarea.closest('.code-editor');
+          const pre = codeEditor ? codeEditor.querySelector('.code-highlight') : null;
+          if (pre) {
+            pre.scrollTop = textarea.scrollTop;
+            pre.scrollLeft = textarea.scrollLeft;
+          }
+        });
+
+        // Ejecutar con Ctrl+Enter
+        textarea.addEventListener('keydown', function(e) {
+          if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            runCode();
+          }
+
+          // Permitir Tab
+          if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            textarea.value = textarea.value.substring(0, start) + '  ' + textarea.value.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + 2;
+          }
+        });
+      });
+
+      // Ejecutar automáticamente al cargar
+      runCode();
+    });
+  });
+</script>

@@ -1,0 +1,1775 @@
+---
+title: 7. Formularios y Controles
+description: Estructura de formularios, inputs, textarea, select, botones y validaciones HTML5
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
+
+Los **formularios** permiten a los usuarios interactuar con tu sitio web, enviando información como datos de contacto, búsquedas, registros y más.
+
+<Aside type="tip">
+📝 **Concepto clave:** Los formularios son la principal forma de recopilar información de los usuarios. HTML5 incluye validaciones nativas que mejoran la experiencia sin necesidad de JavaScript.
+</Aside>
+
+---
+
+## 📋 Estructura Básica del `<form>`
+
+El elemento `<form>` es el contenedor de todos los controles de entrada.
+
+<Tabs>
+<TabItem label="Sintaxis básica">
+
+### Estructura del formulario
+
+```html
+<form action="procesar.php" method="POST">
+  <!-- Controles de entrada aquí -->
+  <input type="text" name="nombre">
+  <button type="submit">Enviar</button>
+</form>
+```
+
+**Componentes:**
+- `<form>` - Contenedor del formulario
+- `action` - URL donde se envían los datos
+- `method` - Método HTTP (GET o POST)
+- Controles de entrada - Campos para datos
+- Botón de envío - Para enviar el formulario
+
+### Ejemplo básico
+
+```html
+<!-- Formulario de contacto simple -->
+<form action="/contacto" method="POST">
+  <label for="nombre">Nombre:</label>
+  <input type="text" id="nombre" name="nombre">
+  
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email">
+  
+  <button type="submit">Enviar</button>
+</form>
+```
+
+<Aside type="note">
+💡 **Importante:** Siempre usa el atributo `name` en los controles. Es el nombre con el que se envía el dato al servidor.
+</Aside>
+
+</TabItem>
+
+<TabItem label="Atributos del form">
+
+### Atributos principales
+
+```html
+<!-- action: URL de destino -->
+<form action="/procesar">
+
+<!-- method: GET o POST -->
+<form method="POST">
+<form method="GET">
+
+<!-- enctype: Tipo de codificación (para archivos) -->
+<form enctype="multipart/form-data">
+<form enctype="application/x-www-form-urlencoded">
+<form enctype="text/plain">
+
+<!-- target: Dónde abrir la respuesta -->
+<form target="_blank">
+<form target="_self">
+
+<!-- autocomplete: Autocompletar -->
+<form autocomplete="on">
+<form autocomplete="off">
+
+<!-- novalidate: Desactivar validación HTML5 -->
+<form novalidate>
+
+<!-- name: Nombre del formulario -->
+<form name="formularioContacto">
+```
+
+**Tabla de atributos:**
+
+| Atributo | Descripción | Valores |
+|----------|-------------|---------|
+| `action` | URL donde se envían los datos | URL o ruta |
+| `method` | Método HTTP | `GET`, `POST` |
+| `enctype` | Codificación de datos | `multipart/form-data`, `application/x-www-form-urlencoded` |
+| `target` | Dónde abrir respuesta | `_blank`, `_self`, `_parent`, `_top` |
+| `autocomplete` | Autocompletar campos | `on`, `off` |
+| `novalidate` | Desactivar validación | Booleano |
+| `name` | Nombre del formulario | Texto |
+
+### GET vs POST
+
+**GET:**
+```html
+<form action="/buscar" method="GET">
+  <input type="text" name="q">
+  <button type="submit">Buscar</button>
+</form>
+<!-- URL resultante: /buscar?q=texto -->
+```
+
+- ✅ Datos visibles en la URL
+- ✅ Se puede guardar en marcadores
+- ✅ Ideal para búsquedas
+- ❌ Límite de caracteres (~2000)
+- ❌ No seguro para datos sensibles
+
+**POST:**
+```html
+<form action="/registro" method="POST">
+  <input type="password" name="password">
+  <button type="submit">Registrar</button>
+</form>
+<!-- Datos enviados en el cuerpo de la petición -->
+```
+
+- ✅ Datos ocultos en el cuerpo
+- ✅ Sin límite de tamaño
+- ✅ Más seguro
+- ✅ Para crear/modificar datos
+- ❌ No se puede guardar en marcadores
+
+</TabItem>
+
+<TabItem label="Label y accesibilidad">
+
+### Etiqueta `<label>`
+
+```html
+<!-- Asociar label con input usando 'for' e 'id' -->
+<label for="nombre">Nombre:</label>
+<input type="text" id="nombre" name="nombre">
+
+<!-- Label envolvente (no necesita 'for') -->
+<label>
+  Nombre:
+  <input type="text" name="nombre">
+</label>
+
+<!-- Label con múltiples elementos -->
+<label for="terminos">
+  <input type="checkbox" id="terminos" name="terminos">
+  Acepto los términos y condiciones
+</label>
+```
+
+**Ventajas de usar `<label>`:**
+- ✅ **Accesibilidad**: Lectores de pantalla asocian etiqueta con campo
+- ✅ **Usabilidad**: Click en label activa el campo
+- ✅ **SEO**: Mejor estructura semántica
+- ✅ **Área clickeable**: Más fácil de usar en móviles
+
+### Fieldset y Legend
+
+```html
+<!-- Agrupar campos relacionados -->
+<form>
+  <fieldset>
+    <legend>Información Personal</legend>
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre">
+    
+    <label for="apellido">Apellido:</label>
+    <input type="text" id="apellido" name="apellido">
+  </fieldset>
+  
+  <fieldset>
+    <legend>Información de Contacto</legend>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email">
+    
+    <label for="telefono">Teléfono:</label>
+    <input type="tel" id="telefono" name="telefono">
+  </fieldset>
+</form>
+```
+
+**Elementos:**
+- `<fieldset>` - Agrupa campos relacionados
+- `<legend>` - Título del grupo
+- Crea un borde visual alrededor del grupo
+
+</TabItem>
+
+<TabItem label="Ejemplo visual">
+
+<LivePreview 
+  title="🎨 Formulario básico"
+  html={`<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; background: #f8f9fa;">
+  
+  <form style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <h2 style="margin: 0 0 25px 0; color: #2c3e50; text-align: center;">📝 Formulario de Contacto</h2>
+    
+    <fieldset style="border: 2px solid #ecf0f1; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+      <legend style="padding: 0 10px; color: #3498db; font-weight: bold;">Información Personal</legend>
+      
+      <div style="margin-bottom: 15px;">
+        <label for="nombre" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: 600;">
+          Nombre:
+        </label>
+        <input 
+          type="text" 
+          id="nombre" 
+          name="nombre" 
+          placeholder="Juan Pérez"
+          style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box;"
+        >
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <label for="email" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: 600;">
+          Email:
+        </label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          placeholder="juan@ejemplo.com"
+          style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box;"
+        >
+      </div>
+    </fieldset>
+    
+    <fieldset style="border: 2px solid #ecf0f1; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+      <legend style="padding: 0 10px; color: #3498db; font-weight: bold;">Mensaje</legend>
+      
+      <div style="margin-bottom: 15px;">
+        <label for="asunto" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: 600;">
+          Asunto:
+        </label>
+        <input 
+          type="text" 
+          id="asunto" 
+          name="asunto" 
+          placeholder="Consulta sobre servicios"
+          style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box;"
+        >
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <label for="mensaje" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: 600;">
+          Mensaje:
+        </label>
+        <textarea 
+          id="mensaje" 
+          name="mensaje" 
+          rows="4"
+          placeholder="Escribe tu mensaje aquí..."
+          style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; resize: vertical; box-sizing: border-box;"
+        ></textarea>
+      </div>
+    </fieldset>
+    
+    <div style="text-align: center;">
+      <button 
+        type="submit" 
+        style="padding: 12px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); transition: transform 0.3s;"
+        onmouseover="this.style.transform='translateY(-2px)'"
+        onmouseout="this.style.transform='translateY(0)'"
+      >
+        Enviar Mensaje
+      </button>
+    </div>
+  </form>
+  
+</div>`}
+  css={`input:focus, textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}`}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 📝 Campos de Entrada `<input>`
+
+El elemento `<input>` es el más versátil para capturar datos.
+
+<Tabs>
+<TabItem label="Tipos de texto">
+
+### Campos de texto
+
+```html
+<!-- text: Texto simple -->
+<input type="text" name="nombre" placeholder="Tu nombre">
+
+<!-- password: Contraseña (oculta caracteres) -->
+<input type="password" name="password" placeholder="••••••••">
+
+<!-- email: Email (valida formato) -->
+<input type="email" name="email" placeholder="correo@ejemplo.com">
+
+<!-- tel: Teléfono -->
+<input type="tel" name="telefono" placeholder="+34 123 456 789">
+
+<!-- url: URL (valida formato) -->
+<input type="url" name="sitio" placeholder="https://ejemplo.com">
+
+<!-- search: Búsqueda (con botón de limpiar) -->
+<input type="search" name="buscar" placeholder="Buscar...">
+```
+
+**Atributos comunes:**
+
+```html
+<!-- placeholder: Texto de ayuda -->
+<input type="text" placeholder="Escribe aquí">
+
+<!-- value: Valor inicial -->
+<input type="text" value="Valor predeterminado">
+
+<!-- maxlength: Longitud máxima -->
+<input type="text" maxlength="50">
+
+<!-- minlength: Longitud mínima -->
+<input type="text" minlength="3">
+
+<!-- size: Ancho visual -->
+<input type="text" size="30">
+
+<!-- readonly: Solo lectura -->
+<input type="text" value="No editable" readonly>
+
+<!-- disabled: Deshabilitado -->
+<input type="text" disabled>
+
+<!-- required: Campo obligatorio -->
+<input type="text" required>
+
+<!-- autocomplete: Autocompletar -->
+<input type="email" autocomplete="email">
+<input type="text" autocomplete="name">
+<input type="password" autocomplete="current-password">
+```
+
+**Tabla de tipos de texto:**
+
+| Tipo | Descripción | Validación |
+|------|-------------|------------|
+| `text` | Texto general | Ninguna |
+| `password` | Contraseña oculta | Ninguna |
+| `email` | Correo electrónico | Formato email |
+| `tel` | Teléfono | Ninguna (solo móvil) |
+| `url` | URL | Formato URL |
+| `search` | Búsqueda | Ninguna |
+
+</TabItem>
+
+<TabItem label="Números y fechas">
+
+### Campos numéricos
+
+```html
+<!-- number: Número -->
+<input type="number" name="edad" min="18" max="100" step="1">
+
+<!-- range: Rango (slider) -->
+<input type="range" name="volumen" min="0" max="100" step="5" value="50">
+
+<!-- Atributos numéricos -->
+<input type="number" 
+  name="precio"
+  min="0"           <!-- Valor mínimo -->
+  max="1000"        <!-- Valor máximo -->
+  step="0.01"       <!-- Incremento -->
+  value="10.50"     <!-- Valor inicial -->
+>
+```
+
+### Campos de fecha y hora
+
+```html
+<!-- date: Fecha (YYYY-MM-DD) -->
+<input type="date" name="fecha" min="2024-01-01" max="2024-12-31">
+
+<!-- time: Hora (HH:MM) -->
+<input type="time" name="hora" min="09:00" max="18:00">
+
+<!-- datetime-local: Fecha y hora local -->
+<input type="datetime-local" name="cita">
+
+<!-- month: Mes y año -->
+<input type="month" name="mes">
+
+<!-- week: Semana del año -->
+<input type="week" name="semana">
+
+<!-- Ejemplo con valores -->
+<input type="date" 
+  name="nacimiento"
+  min="1900-01-01"
+  max="2024-12-31"
+  value="2000-01-01"
+>
+```
+
+**Tabla de tipos numéricos y fecha:**
+
+| Tipo | Descripción | Formato |
+|------|-------------|---------|
+| `number` | Número | Decimal |
+| `range` | Slider | Número |
+| `date` | Fecha | YYYY-MM-DD |
+| `time` | Hora | HH:MM |
+| `datetime-local` | Fecha y hora | YYYY-MM-DDTHH:MM |
+| `month` | Mes | YYYY-MM |
+| `week` | Semana | YYYY-W## |
+
+</TabItem>
+
+<TabItem label="Selección">
+
+### Checkboxes y Radio buttons
+
+```html
+<!-- checkbox: Casilla de verificación (múltiple selección) -->
+<label>
+  <input type="checkbox" name="intereses" value="deportes">
+  Deportes
+</label>
+<label>
+  <input type="checkbox" name="intereses" value="musica">
+  Música
+</label>
+<label>
+  <input type="checkbox" name="intereses" value="lectura" checked>
+  Lectura (marcado por defecto)
+</label>
+
+<!-- radio: Botón de opción (una sola selección) -->
+<label>
+  <input type="radio" name="genero" value="masculino">
+  Masculino
+</label>
+<label>
+  <input type="radio" name="genero" value="femenino">
+  Femenino
+</label>
+<label>
+  <input type="radio" name="genero" value="otro" checked>
+  Otro (seleccionado por defecto)
+</label>
+```
+
+**Diferencias:**
+
+| Tipo | Selección | Mismo name | Uso |
+|------|-----------|------------|-----|
+| `checkbox` | Múltiple | Puede ser diferente | Opciones independientes |
+| `radio` | Una sola | **Debe ser igual** | Opciones excluyentes |
+
+### Color y archivo
+
+```html
+<!-- color: Selector de color -->
+<input type="color" name="color" value="#3498db">
+
+<!-- file: Subir archivo -->
+<input type="file" name="archivo">
+
+<!-- file: Múltiples archivos -->
+<input type="file" name="archivos" multiple>
+
+<!-- file: Tipos específicos -->
+<input type="file" name="imagen" accept="image/*">
+<input type="file" name="pdf" accept=".pdf">
+<input type="file" name="docs" accept=".doc,.docx,.pdf">
+```
+
+### Hidden
+
+```html
+<!-- hidden: Campo oculto (no visible) -->
+<input type="hidden" name="id" value="12345">
+<input type="hidden" name="token" value="abc123xyz">
+```
+
+</TabItem>
+
+<TabItem label="Ejemplo visual">
+
+<LivePreview 
+  title="🎨 Tipos de input"
+  html={`<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 30px; background: #f8f9fa;">
+  
+  <form style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <h2 style="margin: 0 0 25px 0; color: #2c3e50; text-align: center;">🎯 Tipos de Input</h2>
+    
+    <!-- Texto -->
+    <div style="margin-bottom: 20px;">
+      <h3 style="color: #34495e; margin: 0 0 15px 0; font-size: 16px;">📝 Campos de Texto</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; margin-bottom: 5px; color: #555; font-size: 14px;">Texto:</label>
+          <input type="text" placeholder="Nombre" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; color: #555; font-size: 14px;">Email:</label>
+          <input type="email" placeholder="correo@ejemplo.com" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; color: #555; font-size: 14px;">Contraseña:</label>
+          <input type="password" placeholder="••••••••" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; color: #555; font-size: 14px;">Teléfono:</label>
+          <input type="tel" placeholder="+34 123 456 789" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Números y fecha -->
+    <div style="margin-bottom: 20px;">
+      <h3 style="color: #34495e; margin: 0 0 15px 0; font-size: 16px;">🔢 Números y Fechas</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; margin-bottom: 5px; color: #555; font-size: 14px;">Número:</label>
+          <input type="number" min="0" max="100" value="50" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; color: #555; font-size: 14px;">Fecha:</label>
+          <input type="date" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;">
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label style="display: block; margin-bottom: 5px; color: #555; font-size: 14px;">Rango (0-100): <span id="rangeValue">50</span></label>
+          <input type="range" min="0" max="100" value="50" oninput="document.getElementById('rangeValue').textContent=this.value" style="width: 100%;">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Selección -->
+    <div style="margin-bottom: 20px;">
+      <h3 style="color: #34495e; margin: 0 0 15px 0; font-size: 16px;">✅ Selección</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; margin-bottom: 8px; color: #555; font-size: 14px; font-weight: 600;">Checkboxes:</label>
+          <label style="display: block; margin-bottom: 5px; cursor: pointer;">
+            <input type="checkbox" name="hobbies" value="deportes" style="margin-right: 8px;">
+            Deportes
+          </label>
+          <label style="display: block; margin-bottom: 5px; cursor: pointer;">
+            <input type="checkbox" name="hobbies" value="musica" checked style="margin-right: 8px;">
+            Música
+          </label>
+          <label style="display: block; cursor: pointer;">
+            <input type="checkbox" name="hobbies" value="lectura" style="margin-right: 8px;">
+            Lectura
+          </label>
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 8px; color: #555; font-size: 14px; font-weight: 600;">Radio buttons:</label>
+          <label style="display: block; margin-bottom: 5px; cursor: pointer;">
+            <input type="radio" name="nivel" value="basico" style="margin-right: 8px;">
+            Básico
+          </label>
+          <label style="display: block; margin-bottom: 5px; cursor: pointer;">
+            <input type="radio" name="nivel" value="intermedio" checked style="margin-right: 8px;">
+            Intermedio
+          </label>
+          <label style="display: block; cursor: pointer;">
+            <input type="radio" name="nivel" value="avanzado" style="margin-right: 8px;">
+            Avanzado
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Color y archivo -->
+    <div style="margin-bottom: 20px;">
+      <h3 style="color: #34495e; margin: 0 0 15px 0; font-size: 16px;">🎨 Color y Archivo</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div>
+          <label style="display: block; margin-bottom: 5px; color: #555; font-size: 14px;">Color:</label>
+          <input type="color" value="#3498db" style="width: 100%; height: 40px; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; color: #555; font-size: 14px;">Archivo:</label>
+          <input type="file" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 14px;">
+        </div>
+      </div>
+    </div>
+    
+  </form>
+  
+</div>`}
+  css={`input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}`}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 📄 Textarea y Select
+
+Elementos para texto largo y listas desplegables.
+
+<Tabs>
+<TabItem label="Textarea">
+
+### `<textarea>` - Área de texto
+
+```html
+<!-- Textarea básico -->
+<textarea name="mensaje" rows="5" cols="50"></textarea>
+
+<!-- Con placeholder -->
+<textarea 
+  name="comentario" 
+  placeholder="Escribe tu comentario aquí..."
+  rows="4"
+></textarea>
+
+<!-- Con valor inicial -->
+<textarea name="descripcion" rows="6">
+Este es el texto inicial que aparecerá
+en el textarea cuando se cargue la página.
+</textarea>
+
+<!-- Atributos -->
+<textarea 
+  name="mensaje"
+  rows="5"              <!-- Filas visibles -->
+  cols="50"             <!-- Columnas visibles -->
+  maxlength="500"       <!-- Longitud máxima -->
+  minlength="10"        <!-- Longitud mínima -->
+  placeholder="..."     <!-- Texto de ayuda -->
+  required              <!-- Obligatorio -->
+  readonly              <!-- Solo lectura -->
+  disabled              <!-- Deshabilitado -->
+  wrap="soft"           <!-- Ajuste de línea (soft/hard) -->
+></textarea>
+```
+
+**Características:**
+- ✅ Para texto de múltiples líneas
+- ✅ Redimensionable por el usuario (CSS: `resize`)
+- ✅ Preserva saltos de línea y espacios
+- ✅ No tiene atributo `value` (contenido entre etiquetas)
+
+**Control de redimensionamiento (CSS):**
+
+```css
+/* Permitir redimensionar */
+textarea {
+  resize: both; /* horizontal, vertical, both, none */
+}
+
+/* Solo vertical */
+textarea {
+  resize: vertical;
+}
+
+/* No redimensionable */
+textarea {
+  resize: none;
+}
+```
+
+</TabItem>
+
+<TabItem label="Select">
+
+### `<select>` - Lista desplegable
+
+```html
+<!-- Select básico -->
+<select name="pais">
+  <option value="es">España</option>
+  <option value="mx">México</option>
+  <option value="ar">Argentina</option>
+</select>
+
+<!-- Con opción por defecto -->
+<select name="ciudad">
+  <option value="">Selecciona una ciudad</option>
+  <option value="madrid">Madrid</option>
+  <option value="barcelona" selected>Barcelona (seleccionada)</option>
+  <option value="valencia">Valencia</option>
+</select>
+
+<!-- Múltiple selección -->
+<select name="idiomas" multiple size="4">
+  <option value="es">Español</option>
+  <option value="en">Inglés</option>
+  <option value="fr">Francés</option>
+  <option value="de">Alemán</option>
+</select>
+
+<!-- Grupos de opciones -->
+<select name="vehiculo">
+  <optgroup label="Coches">
+    <option value="sedan">Sedán</option>
+    <option value="suv">SUV</option>
+    <option value="deportivo">Deportivo</option>
+  </optgroup>
+  <optgroup label="Motos">
+    <option value="scooter">Scooter</option>
+    <option value="deportiva">Deportiva</option>
+    <option value="cruiser">Cruiser</option>
+  </optgroup>
+</select>
+
+<!-- Opciones deshabilitadas -->
+<select name="plan">
+  <option value="basico">Básico - $10/mes</option>
+  <option value="pro">Pro - $30/mes</option>
+  <option value="enterprise" disabled>Enterprise - Contactar</option>
+</select>
+```
+
+**Atributos:**
+
+| Atributo | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `name` | Nombre del campo | `name="pais"` |
+| `multiple` | Selección múltiple | `multiple` |
+| `size` | Opciones visibles | `size="5"` |
+| `required` | Campo obligatorio | `required` |
+| `disabled` | Deshabilitado | `disabled` |
+
+**Atributos de `<option>`:**
+
+| Atributo | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `value` | Valor enviado | `value="es"` |
+| `selected` | Seleccionado por defecto | `selected` |
+| `disabled` | Opción deshabilitada | `disabled` |
+| `label` | Etiqueta alternativa | `label="España"` |
+
+</TabItem>
+
+<TabItem label="Datalist">
+
+### `<datalist>` - Autocompletar
+
+```html
+<!-- Input con sugerencias -->
+<label for="navegador">Navegador favorito:</label>
+<input 
+  type="text" 
+  id="navegador" 
+  name="navegador" 
+  list="navegadores"
+  placeholder="Escribe o selecciona..."
+>
+
+<datalist id="navegadores">
+  <option value="Chrome">
+  <option value="Firefox">
+  <option value="Safari">
+  <option value="Edge">
+  <option value="Opera">
+</datalist>
+
+<!-- Con descripciones -->
+<input type="text" list="ciudades" name="ciudad">
+<datalist id="ciudades">
+  <option value="Madrid" label="Capital de España">
+  <option value="Barcelona" label="Ciudad condal">
+  <option value="Valencia" label="Ciudad de las artes">
+</datalist>
+
+<!-- Para números -->
+<input type="range" list="marcas" min="0" max="100">
+<datalist id="marcas">
+  <option value="0" label="Mín">
+  <option value="25" label="25%">
+  <option value="50" label="50%">
+  <option value="75" label="75%">
+  <option value="100" label="Máx">
+</datalist>
+```
+
+**Características:**
+- ✅ Sugerencias mientras escribes
+- ✅ Usuario puede escribir valor personalizado
+- ✅ Compatible con varios tipos de input
+- ✅ Mejora la experiencia de usuario
+
+</TabItem>
+
+<TabItem label="Ejemplo visual">
+
+<LivePreview 
+  title="🎨 Textarea y Select"
+  html={`<div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto; padding: 30px; background: #f8f9fa;">
+  
+  <form style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <h2 style="margin: 0 0 25px 0; color: #2c3e50; text-align: center;">📝 Formulario Completo</h2>
+    
+    <!-- Select -->
+    <div style="margin-bottom: 20px;">
+      <label for="pais" style="display: block; margin-bottom: 8px; color: #2c3e50; font-weight: 600;">
+        🌍 País:
+      </label>
+      <select 
+        id="pais" 
+        name="pais" 
+        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; background: white; cursor: pointer;"
+      >
+        <option value="">Selecciona un país</option>
+        <optgroup label="Europa">
+          <option value="es">España</option>
+          <option value="fr">Francia</option>
+          <option value="de">Alemania</option>
+        </optgroup>
+        <optgroup label="América">
+          <option value="mx">México</option>
+          <option value="ar">Argentina</option>
+          <option value="co">Colombia</option>
+        </optgroup>
+      </select>
+    </div>
+    
+    <!-- Datalist -->
+    <div style="margin-bottom: 20px;">
+      <label for="ciudad" style="display: block; margin-bottom: 8px; color: #2c3e50; font-weight: 600;">
+        🏙️ Ciudad (con autocompletar):
+      </label>
+      <input 
+        type="text" 
+        id="ciudad" 
+        name="ciudad" 
+        list="ciudades"
+        placeholder="Escribe o selecciona..."
+        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box;"
+      >
+      <datalist id="ciudades">
+        <option value="Madrid">
+        <option value="Barcelona">
+        <option value="Valencia">
+        <option value="Sevilla">
+        <option value="Bilbao">
+      </datalist>
+    </div>
+    
+    <!-- Textarea -->
+    <div style="margin-bottom: 20px;">
+      <label for="mensaje" style="display: block; margin-bottom: 8px; color: #2c3e50; font-weight: 600;">
+        💬 Mensaje:
+      </label>
+      <textarea 
+        id="mensaje" 
+        name="mensaje" 
+        rows="5"
+        placeholder="Escribe tu mensaje aquí... (mínimo 10 caracteres)"
+        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; resize: vertical; font-family: Arial, sans-serif; box-sizing: border-box;"
+      ></textarea>
+      <div style="text-align: right; color: #7f8c8d; font-size: 12px; margin-top: 5px;">
+        <span id="charCount">0</span> caracteres
+      </div>
+    </div>
+    
+    <!-- Select múltiple -->
+    <div style="margin-bottom: 20px;">
+      <label for="idiomas" style="display: block; margin-bottom: 8px; color: #2c3e50; font-weight: 600;">
+        🗣️ Idiomas (mantén Ctrl/Cmd para seleccionar varios):
+      </label>
+      <select 
+        id="idiomas" 
+        name="idiomas" 
+        multiple 
+        size="4"
+        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; background: white;"
+      >
+        <option value="es">Español</option>
+        <option value="en">Inglés</option>
+        <option value="fr">Francés</option>
+        <option value="de">Alemán</option>
+        <option value="it">Italiano</option>
+        <option value="pt">Portugués</option>
+      </select>
+    </div>
+    
+    <div style="text-align: center; margin-top: 25px;">
+      <button 
+        type="submit" 
+        style="padding: 12px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);"
+      >
+        Enviar Formulario
+      </button>
+    </div>
+  </form>
+  
+</div>`}
+  css={`select:focus, textarea:focus, input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+  transition: all 0.3s;
+}`}
+  js={`// Contador de caracteres
+const textarea = document.getElementById('mensaje');
+const charCount = document.getElementById('charCount');
+
+if (textarea && charCount) {
+  textarea.addEventListener('input', function() {
+    charCount.textContent = this.value.length;
+  });
+}`}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔘 Botones
+
+Diferentes tipos de botones para formularios.
+
+<Tabs>
+<TabItem label="Tipos de botones">
+
+### `<button>` - Botón
+
+```html
+<!-- submit: Enviar formulario (por defecto) -->
+<button type="submit">Enviar</button>
+
+<!-- reset: Limpiar formulario -->
+<button type="reset">Limpiar</button>
+
+<!-- button: Botón genérico (para JavaScript) -->
+<button type="button" onclick="alert('Hola!')">Clic aquí</button>
+
+<!-- Con contenido HTML -->
+<button type="submit">
+  <img src="icono.png" alt=""> Enviar con icono
+</button>
+
+<!-- Deshabilitado -->
+<button type="submit" disabled>No disponible</button>
+
+<!-- Con atributos de formulario -->
+<button type="submit" formaction="/otra-ruta" formmethod="POST">
+  Enviar a otra ruta
+</button>
+```
+
+### `<input type="button">` - Alternativa
+
+```html
+<!-- submit: Enviar -->
+<input type="submit" value="Enviar">
+
+<!-- reset: Limpiar -->
+<input type="reset" value="Limpiar">
+
+<!-- button: Genérico -->
+<input type="button" value="Botón" onclick="alert('Hola!')">
+
+<!-- image: Botón con imagen -->
+<input type="image" src="boton.png" alt="Enviar">
+```
+
+**Diferencias:**
+
+| Elemento | Contenido HTML | Estilo | Uso recomendado |
+|----------|----------------|--------|-----------------|
+| `<button>` | ✅ Sí | Más flexible | Preferido |
+| `<input>` | ❌ No (solo texto) | Limitado | Casos simples |
+
+</TabItem>
+
+<TabItem label="Atributos">
+
+### Atributos de botones
+
+```html
+<!-- type: Tipo de botón -->
+<button type="submit">Enviar</button>
+<button type="reset">Limpiar</button>
+<button type="button">Acción</button>
+
+<!-- name y value: Para enviar datos -->
+<button type="submit" name="accion" value="guardar">Guardar</button>
+<button type="submit" name="accion" value="eliminar">Eliminar</button>
+
+<!-- disabled: Deshabilitado -->
+<button disabled>No disponible</button>
+
+<!-- form: Asociar con formulario externo -->
+<button type="submit" form="miFormulario">Enviar</button>
+
+<!-- formaction: URL alternativa -->
+<button type="submit" formaction="/guardar-borrador">
+  Guardar borrador
+</button>
+
+<!-- formmethod: Método alternativo -->
+<button type="submit" formmethod="POST">Enviar POST</button>
+<button type="submit" formmethod="GET">Enviar GET</button>
+
+<!-- formenctype: Codificación alternativa -->
+<button type="submit" formenctype="multipart/form-data">
+  Subir archivo
+</button>
+
+<!-- formtarget: Destino alternativo -->
+<button type="submit" formtarget="_blank">
+  Abrir en nueva pestaña
+</button>
+
+<!-- formnovalidate: Omitir validación -->
+<button type="submit" formnovalidate>
+  Enviar sin validar
+</button>
+
+<!-- autofocus: Foco automático -->
+<button type="submit" autofocus>Enviar</button>
+```
+
+**Tabla de atributos:**
+
+| Atributo | Descripción | Valores |
+|----------|-------------|---------|
+| `type` | Tipo de botón | `submit`, `reset`, `button` |
+| `name` | Nombre del campo | Texto |
+| `value` | Valor enviado | Texto |
+| `disabled` | Deshabilitado | Booleano |
+| `form` | ID del formulario | ID |
+| `formaction` | URL alternativa | URL |
+| `formmethod` | Método alternativo | `GET`, `POST` |
+| `formnovalidate` | Omitir validación | Booleano |
+
+</TabItem>
+
+<TabItem label="Estilos">
+
+### Estilos de botones
+
+```css
+/* Botón básico */
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+/* Botón primario */
+.btn-primary {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+/* Botón secundario */
+.btn-secondary {
+  background-color: #95a5a6;
+  color: white;
+}
+
+/* Botón de éxito */
+.btn-success {
+  background-color: #27ae60;
+  color: white;
+}
+
+/* Botón de peligro */
+.btn-danger {
+  background-color: #e74c3c;
+  color: white;
+}
+
+/* Botón outline */
+.btn-outline {
+  background-color: transparent;
+  border: 2px solid #3498db;
+  color: #3498db;
+}
+
+.btn-outline:hover {
+  background-color: #3498db;
+  color: white;
+}
+
+/* Botón deshabilitado */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Botón con icono */
+button i {
+  margin-right: 8px;
+}
+
+/* Tamaños */
+.btn-small {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.btn-large {
+  padding: 14px 28px;
+  font-size: 18px;
+}
+```
+
+</TabItem>
+
+<TabItem label="Ejemplo visual">
+
+<LivePreview 
+  title="🎨 Botones"
+  html={`<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 30px; background: #f8f9fa;">
+  
+  <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <h2 style="margin: 0 0 25px 0; color: #2c3e50; text-align: center;">🔘 Tipos de Botones</h2>
+    
+    <!-- Botones de formulario -->
+    <div style="margin-bottom: 30px;">
+      <h3 style="color: #34495e; margin: 0 0 15px 0; font-size: 16px;">Botones de Formulario</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button 
+          type="submit" 
+          style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; font-size: 14px; cursor: pointer; transition: all 0.3s;"
+          onmouseover="this.style.background='#2980b9'; this.style.transform='translateY(-2px)'"
+          onmouseout="this.style.background='#3498db'; this.style.transform='translateY(0)'"
+        >
+          ✓ Submit
+        </button>
+        <button 
+          type="reset" 
+          style="padding: 10px 20px; background: #95a5a6; color: white; border: none; border-radius: 5px; font-size: 14px; cursor: pointer; transition: all 0.3s;"
+          onmouseover="this.style.background='#7f8c8d'; this.style.transform='translateY(-2px)'"
+          onmouseout="this.style.background='#95a5a6'; this.style.transform='translateY(0)'"
+        >
+          ↻ Reset
+        </button>
+        <button 
+          type="button" 
+          style="padding: 10px 20px; background: #9b59b6; color: white; border: none; border-radius: 5px; font-size: 14px; cursor: pointer; transition: all 0.3s;"
+          onclick="alert('Botón clickeado!')"
+          onmouseover="this.style.background='#8e44ad'; this.style.transform='translateY(-2px)'"
+          onmouseout="this.style.background='#9b59b6'; this.style.transform='translateY(0)'"
+        >
+          ⚡ Button
+        </button>
+      </div>
+    </div>
+    
+    <!-- Botones por color -->
+    <div style="margin-bottom: 30px;">
+      <h3 style="color: #34495e; margin: 0 0 15px 0; font-size: 16px;">Botones por Estado</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; font-size: 14px; cursor: pointer;">
+          Primario
+        </button>
+        <button style="padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; font-size: 14px; cursor: pointer;">
+          ✓ Éxito
+        </button>
+        <button style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; font-size: 14px; cursor: pointer;">
+          ✕ Peligro
+        </button>
+        <button style="padding: 10px 20px; background: #f39c12; color: white; border: none; border-radius: 5px; font-size: 14px; cursor: pointer;">
+          ⚠ Advertencia
+        </button>
+        <button style="padding: 10px 20px; background: #34495e; color: white; border: none; border-radius: 5px; font-size: 14px; cursor: pointer;">
+          Info
+        </button>
+      </div>
+    </div>
+    
+    <!-- Botones outline -->
+    <div style="margin-bottom: 30px;">
+      <h3 style="color: #34495e; margin: 0 0 15px 0; font-size: 16px;">Botones Outline</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button style="padding: 10px 20px; background: transparent; color: #3498db; border: 2px solid #3498db; border-radius: 5px; font-size: 14px; cursor: pointer; transition: all 0.3s;"
+          onmouseover="this.style.background='#3498db'; this.style.color='white'"
+          onmouseout="this.style.background='transparent'; this.style.color='#3498db'"
+        >
+          Primario
+        </button>
+        <button style="padding: 10px 20px; background: transparent; color: #27ae60; border: 2px solid #27ae60; border-radius: 5px; font-size: 14px; cursor: pointer; transition: all 0.3s;"
+          onmouseover="this.style.background='#27ae60'; this.style.color='white'"
+          onmouseout="this.style.background='transparent'; this.style.color='#27ae60'"
+        >
+          Éxito
+        </button>
+        <button style="padding: 10px 20px; background: transparent; color: #e74c3c; border: 2px solid #e74c3c; border-radius: 5px; font-size: 14px; cursor: pointer; transition: all 0.3s;"
+          onmouseover="this.style.background='#e74c3c'; this.style.color='white'"
+          onmouseout="this.style.background='transparent'; this.style.color='#e74c3c'"
+        >
+          Peligro
+        </button>
+      </div>
+    </div>
+    
+    <!-- Tamaños -->
+    <div style="margin-bottom: 30px;">
+      <h3 style="color: #34495e; margin: 0 0 15px 0; font-size: 16px;">Tamaños</h3>
+      <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <button style="padding: 6px 12px; background: #3498db; color: white; border: none; border-radius: 5px; font-size: 12px; cursor: pointer;">
+          Pequeño
+        </button>
+        <button style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; font-size: 14px; cursor: pointer;">
+          Normal
+        </button>
+        <button style="padding: 14px 28px; background: #3498db; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
+          Grande
+        </button>
+      </div>
+    </div>
+    
+    <!-- Botones especiales -->
+    <div>
+      <h3 style="color: #34495e; margin: 0 0 15px 0; font-size: 16px;">Botones Especiales</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button style="padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 25px; font-size: 14px; cursor: pointer; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
+          Gradiente
+        </button>
+        <button style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 50px; font-size: 14px; cursor: pointer;">
+          Redondeado
+        </button>
+        <button style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; font-size: 14px; cursor: pointer; opacity: 0.5;">
+          Deshabilitado
+        </button>
+        <button style="padding: 10px; background: #3498db; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+          +
+        </button>
+      </div>
+    </div>
+    
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## ✅ Validaciones HTML5
+
+HTML5 incluye validaciones nativas sin necesidad de JavaScript.
+
+<Tabs>
+<TabItem label="Atributos de validación">
+
+### Atributos básicos
+
+```html
+<!-- required: Campo obligatorio -->
+<input type="text" name="nombre" required>
+
+<!-- minlength y maxlength: Longitud -->
+<input type="text" name="usuario" minlength="3" maxlength="20">
+
+<!-- min y max: Valores numéricos -->
+<input type="number" name="edad" min="18" max="100">
+<input type="date" name="fecha" min="2024-01-01" max="2024-12-31">
+
+<!-- step: Incremento -->
+<input type="number" name="precio" step="0.01">
+<input type="range" name="volumen" step="5">
+
+<!-- pattern: Expresión regular -->
+<input type="text" name="codigo" pattern="[A-Z]{3}-[0-9]{4}">
+
+<!-- multiple: Múltiples valores -->
+<input type="email" name="emails" multiple>
+<input type="file" name="archivos" multiple>
+```
+
+### Validación por tipo
+
+```html
+<!-- email: Valida formato de email -->
+<input type="email" name="email" required>
+
+<!-- url: Valida formato de URL -->
+<input type="url" name="sitio" required>
+
+<!-- tel: Teléfono (sin validación automática) -->
+<input type="tel" name="telefono" pattern="[0-9]{9}">
+
+<!-- number: Solo números -->
+<input type="number" name="cantidad" min="1">
+
+<!-- date: Fecha válida -->
+<input type="date" name="nacimiento" max="2024-12-31">
+```
+
+</TabItem>
+
+<TabItem label="Pattern (regex)">
+
+### Expresiones regulares comunes
+
+```html
+<!-- Código postal (España: 5 dígitos) -->
+<input 
+  type="text" 
+  name="cp" 
+  pattern="[0-9]{5}"
+  title="Código postal de 5 dígitos"
+  placeholder="28001"
+>
+
+<!-- Teléfono (España: 9 dígitos) -->
+<input 
+  type="tel" 
+  name="telefono" 
+  pattern="[0-9]{9}"
+  title="Teléfono de 9 dígitos"
+  placeholder="612345678"
+>
+
+<!-- DNI (España: 8 dígitos + letra) -->
+<input 
+  type="text" 
+  name="dni" 
+  pattern="[0-9]{8}[A-Z]"
+  title="8 números seguidos de una letra mayúscula"
+  placeholder="12345678A"
+>
+
+<!-- Usuario (letras, números, guión bajo, 3-20 caracteres) -->
+<input 
+  type="text" 
+  name="usuario" 
+  pattern="[a-zA-Z0-9_]{3,20}"
+  title="3-20 caracteres: letras, números o guión bajo"
+  placeholder="usuario123"
+>
+
+<!-- Contraseña fuerte (mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número) -->
+<input 
+  type="password" 
+  name="password" 
+  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+  title="Mínimo 8 caracteres, 1 mayúscula, 1 minúscula y 1 número"
+>
+
+<!-- Tarjeta de crédito (16 dígitos) -->
+<input 
+  type="text" 
+  name="tarjeta" 
+  pattern="[0-9]{16}"
+  title="16 dígitos"
+  placeholder="1234567890123456"
+>
+
+<!-- Código de producto (formato: ABC-1234) -->
+<input 
+  type="text" 
+  name="codigo" 
+  pattern="[A-Z]{3}-[0-9]{4}"
+  title="Formato: ABC-1234"
+  placeholder="ABC-1234"
+>
+
+<!-- Solo letras (sin números ni símbolos) -->
+<input 
+  type="text" 
+  name="nombre" 
+  pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+  title="Solo letras"
+  placeholder="Juan Pérez"
+>
+
+<!-- Hexadecimal (color) -->
+<input 
+  type="text" 
+  name="color" 
+  pattern="#[0-9A-Fa-f]{6}"
+  title="Color hexadecimal: #RRGGBB"
+  placeholder="#3498db"
+>
+```
+
+**Tabla de patrones comunes:**
+
+| Patrón | Descripción | Ejemplo |
+|--------|-------------|---------|
+| `[0-9]{5}` | 5 dígitos | 28001 |
+| `[A-Z]{3}` | 3 letras mayúsculas | ABC |
+| `[a-z]+` | Una o más letras minúsculas | abc |
+| `[0-9]{2,4}` | 2 a 4 dígitos | 12, 1234 |
+| `\d{3}-\d{4}` | Formato XXX-XXXX | 123-4567 |
+| `.{8,}` | Mínimo 8 caracteres | cualquier8 |
+
+</TabItem>
+
+<TabItem label="Mensajes personalizados">
+
+### Personalizar mensajes de error
+
+```html
+<!-- title: Mensaje de ayuda -->
+<input 
+  type="text" 
+  name="usuario" 
+  pattern="[a-zA-Z0-9]{3,15}"
+  title="Usuario: 3-15 caracteres alfanuméricos"
+  required
+>
+
+<!-- JavaScript para mensajes personalizados -->
+<input 
+  type="email" 
+  id="email" 
+  name="email" 
+  required
+  oninvalid="this.setCustomValidity('Por favor, introduce un email válido')"
+  oninput="this.setCustomValidity('')"
+>
+
+<input 
+  type="password" 
+  id="password" 
+  name="password" 
+  minlength="8"
+  required
+  oninvalid="this.setCustomValidity('La contraseña debe tener al menos 8 caracteres')"
+  oninput="this.setCustomValidity('')"
+>
+```
+
+### CSS para estados de validación
+
+```css
+/* Campo válido */
+input:valid {
+  border-color: #27ae60;
+}
+
+/* Campo inválido */
+input:invalid {
+  border-color: #e74c3c;
+}
+
+/* Solo mostrar error después de interactuar */
+input:not(:placeholder-shown):invalid {
+  border-color: #e74c3c;
+  background-color: #fee;
+}
+
+/* Campo requerido */
+input:required {
+  border-left: 3px solid #3498db;
+}
+
+/* Campo opcional */
+input:optional {
+  border-left: 3px solid #95a5a6;
+}
+
+/* Icono de validación */
+input:valid::after {
+  content: '✓';
+  color: #27ae60;
+}
+```
+
+### Desactivar validación
+
+```html
+<!-- En el formulario -->
+<form novalidate>
+  <!-- Validación desactivada para todo el formulario -->
+</form>
+
+<!-- En un botón específico -->
+<button type="submit" formnovalidate>
+  Guardar sin validar
+</button>
+```
+
+</TabItem>
+
+<TabItem label="Ejemplo visual">
+
+<LivePreview 
+  title="🎨 Validaciones HTML5"
+  html={`<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 30px; background: #f8f9fa;">
+  
+  <form style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <h2 style="margin: 0 0 25px 0; color: #2c3e50; text-align: center;">✅ Formulario con Validación</h2>
+    
+    <!-- Email requerido -->
+    <div style="margin-bottom: 20px;">
+      <label for="email" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: 600;">
+        Email (requerido):
+      </label>
+      <input 
+        type="email" 
+        id="email" 
+        name="email" 
+        required
+        placeholder="correo@ejemplo.com"
+        style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; transition: border-color 0.3s;"
+        onfocus="this.style.borderColor='#3498db'"
+        onblur="this.style.borderColor='#ddd'"
+      >
+      <small style="color: #7f8c8d; font-size: 12px;">Debe ser un email válido</small>
+    </div>
+    
+    <!-- Usuario con pattern -->
+    <div style="margin-bottom: 20px;">
+      <label for="usuario" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: 600;">
+        Usuario (3-15 caracteres):
+      </label>
+      <input 
+        type="text" 
+        id="usuario" 
+        name="usuario" 
+        pattern="[a-zA-Z0-9_]{3,15}"
+        title="3-15 caracteres: letras, números o guión bajo"
+        required
+        placeholder="usuario123"
+        style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; transition: border-color 0.3s;"
+        onfocus="this.style.borderColor='#3498db'"
+        onblur="this.style.borderColor='#ddd'"
+      >
+      <small style="color: #7f8c8d; font-size: 12px;">Solo letras, números y guión bajo</small>
+    </div>
+    
+    <!-- Contraseña con minlength -->
+    <div style="margin-bottom: 20px;">
+      <label for="password" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: 600;">
+        Contraseña (mínimo 8 caracteres):
+      </label>
+      <input 
+        type="password" 
+        id="password" 
+        name="password" 
+        minlength="8"
+        required
+        placeholder="••••••••"
+        style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; transition: border-color 0.3s;"
+        onfocus="this.style.borderColor='#3498db'"
+        onblur="this.style.borderColor='#ddd'"
+      >
+      <small style="color: #7f8c8d; font-size: 12px;">Mínimo 8 caracteres</small>
+    </div>
+    
+    <!-- Edad con min y max -->
+    <div style="margin-bottom: 20px;">
+      <label for="edad" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: 600;">
+        Edad (18-100):
+      </label>
+      <input 
+        type="number" 
+        id="edad" 
+        name="edad" 
+        min="18"
+        max="100"
+        required
+        placeholder="25"
+        style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; transition: border-color 0.3s;"
+        onfocus="this.style.borderColor='#3498db'"
+        onblur="this.style.borderColor='#ddd'"
+      >
+      <small style="color: #7f8c8d; font-size: 12px;">Debes ser mayor de 18 años</small>
+    </div>
+    
+    <!-- Teléfono con pattern -->
+    <div style="margin-bottom: 20px;">
+      <label for="telefono" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: 600;">
+        Teléfono (9 dígitos):
+      </label>
+      <input 
+        type="tel" 
+        id="telefono" 
+        name="telefono" 
+        pattern="[0-9]{9}"
+        title="9 dígitos sin espacios"
+        required
+        placeholder="612345678"
+        style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; transition: border-color 0.3s;"
+        onfocus="this.style.borderColor='#3498db'"
+        onblur="this.style.borderColor='#ddd'"
+      >
+      <small style="color: #7f8c8d; font-size: 12px;">Formato: 612345678</small>
+    </div>
+    
+    <!-- URL -->
+    <div style="margin-bottom: 20px;">
+      <label for="sitio" style="display: block; margin-bottom: 5px; color: #2c3e50; font-weight: 600;">
+        Sitio web (opcional):
+      </label>
+      <input 
+        type="url" 
+        id="sitio" 
+        name="sitio" 
+        placeholder="https://ejemplo.com"
+        style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; transition: border-color 0.3s;"
+        onfocus="this.style.borderColor='#3498db'"
+        onblur="this.style.borderColor='#ddd'"
+      >
+      <small style="color: #7f8c8d; font-size: 12px;">Debe incluir http:// o https://</small>
+    </div>
+    
+    <!-- Términos -->
+    <div style="margin-bottom: 25px;">
+      <label style="display: flex; align-items: center; cursor: pointer;">
+        <input 
+          type="checkbox" 
+          name="terminos" 
+          required
+          style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;"
+        >
+        <span style="color: #2c3e50;">Acepto los términos y condiciones</span>
+      </label>
+    </div>
+    
+    <div style="text-align: center;">
+      <button 
+        type="submit" 
+        style="padding: 12px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); transition: transform 0.3s;"
+        onmouseover="this.style.transform='translateY(-2px)'"
+        onmouseout="this.style.transform='translateY(0)'"
+      >
+        Registrarse
+      </button>
+    </div>
+    
+    <div style="margin-top: 20px; padding: 15px; background: #e8f4f8; border-radius: 8px; border-left: 4px solid #3498db;">
+      <p style="margin: 0; color: #2c3e50; font-size: 13px;">
+        <strong>💡 Tip:</strong> Intenta enviar el formulario sin completar los campos para ver las validaciones en acción.
+      </p>
+    </div>
+  </form>
+  
+</div>`}
+  css={`input:valid:not(:placeholder-shown) {
+  border-color: #27ae60 !important;
+}
+
+input:invalid:not(:placeholder-shown) {
+  border-color: #e74c3c !important;
+}
+
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}`}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+### Estructura del Formulario
+✅ **`<form>`** - Contenedor con action y method  
+✅ **`<label>`** - Etiquetas para accesibilidad  
+✅ **`<fieldset>` y `<legend>`** - Agrupar campos  
+✅ **GET** para búsquedas, **POST** para datos sensibles  
+
+### Campos de Entrada
+✅ **`<input type="text">`** - Texto general  
+✅ **`<input type="email">`** - Email con validación  
+✅ **`<input type="password">`** - Contraseña oculta  
+✅ **`<input type="number">`** - Números con min/max  
+✅ **`<input type="date">`** - Selector de fecha  
+✅ **`<input type="checkbox">`** - Selección múltiple  
+✅ **`<input type="radio">`** - Selección única  
+✅ **`<input type="file">`** - Subir archivos  
+
+### Otros Controles
+✅ **`<textarea>`** - Texto multilínea  
+✅ **`<select>` y `<option>`** - Lista desplegable  
+✅ **`<datalist>`** - Autocompletar  
+✅ **`<button>`** - Botones (submit, reset, button)  
+
+### Validaciones HTML5
+✅ **`required`** - Campo obligatorio  
+✅ **`minlength` y `maxlength`** - Longitud de texto  
+✅ **`min` y `max`** - Valores numéricos  
+✅ **`pattern`** - Expresiones regulares  
+✅ **`type="email/url"`** - Validación de formato  
+
+### Patrón completo
+```html
+<form action="/procesar" method="POST">
+  <fieldset>
+    <legend>Datos Personales</legend>
+    
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre" required>
+    
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+    
+    <label for="edad">Edad:</label>
+    <input type="number" id="edad" name="edad" min="18" max="100">
+    
+    <label for="mensaje">Mensaje:</label>
+    <textarea id="mensaje" name="mensaje" rows="4"></textarea>
+    
+    <label for="pais">País:</label>
+    <select id="pais" name="pais">
+      <option value="es">España</option>
+      <option value="mx">México</option>
+    </select>
+    
+    <label>
+      <input type="checkbox" name="terminos" required>
+      Acepto términos
+    </label>
+  </fieldset>
+  
+  <button type="submit">Enviar</button>
+  <button type="reset">Limpiar</button>
+</form>
+```
+
+</Aside>
+
+---
+
+## 🚀 Próximos pasos
+
+Ahora que dominas los formularios, aprenderás:
+- ✅ Elementos semánticos HTML5
+- ✅ Estructura de página moderna
+- ✅ Header, nav, main, aside, footer
+- ✅ Artículos y secciones

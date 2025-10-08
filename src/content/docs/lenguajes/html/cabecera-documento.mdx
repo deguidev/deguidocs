@@ -1,0 +1,1393 @@
+---
+title: 3. Cabecera del Documento
+description: Etiqueta head, title, meta tags, importación de estilos y scripts
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import LivePreview from "@components/LivePreview.astro";
+
+La **cabecera del documento** (`<head>`) contiene metadatos e información que no se muestra directamente en la página, pero que es crucial para el navegador, motores de búsqueda y redes sociales.
+
+<Aside type="tip">
+🧠 **Concepto clave:** El `<head>` es el "cerebro" de tu página web. Contiene información sobre cómo debe interpretarse, mostrarse y compartirse el documento.
+</Aside>
+
+---
+
+## 🧠 Uso de la Etiqueta `<head>`
+
+La etiqueta `<head>` es el contenedor de todos los metadatos del documento HTML. Va entre `<html>` y `<body>`.
+
+### Estructura básica
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Aquí van todos los metadatos -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Título de la página</title>
+  <link rel="stylesheet" href="estilos.css">
+  <script src="script.js"></script>
+</head>
+<body>
+  <!-- Contenido visible -->
+</body>
+</html>
+```
+
+### ¿Qué va dentro del `<head>`?
+
+<Tabs>
+<TabItem label="Elementos esenciales">
+
+**Elementos que SIEMPRE debes incluir:**
+
+```html
+<head>
+  <!-- 1. Codificación de caracteres (OBLIGATORIO) -->
+  <meta charset="UTF-8">
+  
+  <!-- 2. Título de la página (OBLIGATORIO) -->
+  <title>Título de la Página</title>
+  
+  <!-- 3. Viewport para responsive (RECOMENDADO) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- 4. Descripción para SEO (RECOMENDADO) -->
+  <meta name="description" content="Descripción breve de la página">
+</head>
+```
+
+**Prioridad:**
+1. ⭐ **`charset`** - Primera línea siempre
+2. ⭐ **`title`** - Título único por página
+3. ⭐ **`viewport`** - Para diseño responsive
+4. ⭐ **`description`** - Para SEO
+
+</TabItem>
+
+<TabItem label="Elementos opcionales">
+
+**Elementos adicionales útiles:**
+
+```html
+<head>
+  <!-- SEO y redes sociales -->
+  <meta name="keywords" content="html, css, javascript">
+  <meta name="author" content="Tu Nombre">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph (Facebook, LinkedIn) -->
+  <meta property="og:title" content="Título para redes">
+  <meta property="og:description" content="Descripción">
+  <meta property="og:image" content="imagen.jpg">
+  <meta property="og:url" content="https://ejemplo.com">
+  
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Título">
+  <meta name="twitter:description" content="Descripción">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="apple-icon.png">
+  
+  <!-- Hojas de estilo -->
+  <link rel="stylesheet" href="estilos.css">
+  
+  <!-- Fuentes externas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  
+  <!-- Scripts -->
+  <script src="script.js" defer></script>
+  
+  <!-- Preload de recursos -->
+  <link rel="preload" href="fuente.woff2" as="font" type="font/woff2" crossorigin>
+</head>
+```
+
+</TabItem>
+
+<TabItem label="Ejemplo completo">
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Codificación y viewport -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Título y descripción -->
+  <title>Mi Sitio Web - Inicio</title>
+  <meta name="description" content="Bienvenido a mi sitio web profesional donde comparto proyectos y conocimientos sobre desarrollo web.">
+  
+  <!-- SEO -->
+  <meta name="keywords" content="desarrollo web, html, css, javascript, portfolio">
+  <meta name="author" content="Juan Pérez">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://ejemplo.com">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mi Sitio Web - Inicio">
+  <meta property="og:description" content="Portfolio profesional de desarrollo web">
+  <meta property="og:image" content="https://ejemplo.com/og-image.jpg">
+  <meta property="og:url" content="https://ejemplo.com">
+  <meta property="og:site_name" content="Mi Sitio Web">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@usuario">
+  <meta name="twitter:title" content="Mi Sitio Web">
+  <meta name="twitter:description" content="Portfolio profesional">
+  <meta name="twitter:image" content="https://ejemplo.com/twitter-image.jpg">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/estilos.css">
+  
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Scripts -->
+  <script src="js/app.js" defer></script>
+  
+  <!-- Theme color para navegadores móviles -->
+  <meta name="theme-color" content="#3498db">
+</head>
+<body>
+  <!-- Contenido de la página -->
+</body>
+</html>
+```
+
+</TabItem>
+</Tabs>
+
+---
+
+## 📄 Etiqueta `<title>`
+
+El `<title>` define el título que aparece en la pestaña del navegador y en los resultados de búsqueda.
+
+### Características del título
+
+<Tabs>
+<TabItem label="Uso básico">
+
+```html
+<head>
+  <title>Título de la Página</title>
+</head>
+```
+
+**Dónde se muestra:**
+- 🔖 **Pestaña del navegador**
+- 🔍 **Resultados de Google**
+- 📱 **Marcadores/Favoritos**
+- 🔗 **Compartir en redes sociales**
+
+**Reglas importantes:**
+- ✅ Solo puede haber **UN** `<title>` por página
+- ✅ Solo puede contener **texto** (no HTML)
+- ✅ Debe ser **único** para cada página
+- ✅ Longitud ideal: **50-60 caracteres**
+
+</TabItem>
+
+<TabItem label="Buenas prácticas">
+
+### ✅ Títulos efectivos
+
+```html
+<!-- ✅ BUENO: Descriptivo y específico -->
+<title>Receta de Pastel de Chocolate - Cocina Fácil</title>
+
+<!-- ✅ BUENO: Incluye marca al final -->
+<title>Aprende JavaScript desde Cero | Mi Sitio</title>
+
+<!-- ✅ BUENO: Página de producto -->
+<title>iPhone 15 Pro - 256GB - Negro | TechStore</title>
+
+<!-- ✅ BUENO: Artículo de blog -->
+<title>10 Tips de CSS Grid que Debes Conocer - Blog</title>
+
+<!-- ✅ BUENO: Página de inicio -->
+<title>Mi Sitio Web - Desarrollo Web y Diseño</title>
+```
+
+### ❌ Títulos a evitar
+
+```html
+<!-- ❌ MALO: Demasiado genérico -->
+<title>Inicio</title>
+
+<!-- ❌ MALO: Demasiado largo -->
+<title>Bienvenido a nuestro increíble sitio web donde encontrarás todo lo que necesitas sobre desarrollo web, diseño, programación y mucho más</title>
+
+<!-- ❌ MALO: Keyword stuffing -->
+<title>Zapatos, Zapatos baratos, Comprar zapatos, Zapatos online, Tienda zapatos</title>
+
+<!-- ❌ MALO: Todo en mayúsculas -->
+<title>COMPRA AHORA EN NUESTRA TIENDA</title>
+
+<!-- ❌ MALO: Sin contexto -->
+<title>Página 1</title>
+```
+
+### 📐 Estructura recomendada
+
+**Patrón común:**
+```
+[Título específico] - [Categoría] | [Marca]
+```
+
+**Ejemplos:**
+```html
+<!-- Página de producto -->
+<title>MacBook Pro M3 - Laptops | Apple Store</title>
+
+<!-- Artículo de blog -->
+<title>Guía de Flexbox CSS - Tutoriales | DevBlog</title>
+
+<!-- Página de servicio -->
+<title>Diseño Web Profesional - Servicios | Mi Agencia</title>
+
+<!-- Página de contacto -->
+<title>Contacto - Envíanos un Mensaje | Mi Empresa</title>
+```
+
+</TabItem>
+
+<TabItem label="SEO y títulos">
+
+### Optimización para motores de búsqueda
+
+**Longitud óptima:**
+- 📏 **50-60 caracteres** (Google muestra ~60)
+- ⚠️ Más de 60 caracteres se truncan: "Título muy largo..."
+
+**Estructura para SEO:**
+
+```html
+<!-- Palabra clave al inicio -->
+<title>Curso de Python - Aprende desde Cero | Academia</title>
+
+<!-- Incluye ubicación (negocios locales) -->
+<title>Restaurante Italiano en Madrid - La Trattoria</title>
+
+<!-- Año actual (contenido temporal) -->
+<title>Mejores Smartphones 2024 - Guía de Compra</title>
+
+<!-- Números y listas -->
+<title>7 Trucos de Photoshop para Principiantes</title>
+```
+
+**Ejemplo por tipo de página:**
+
+| Tipo de página | Formato del título |
+|----------------|-------------------|
+| **Inicio** | `[Marca] - [Descripción breve]` |
+| **Producto** | `[Nombre producto] - [Categoría] \| [Marca]` |
+| **Artículo** | `[Título artículo] - [Blog/Categoría]` |
+| **Categoría** | `[Categoría] - [Descripción] \| [Marca]` |
+| **Contacto** | `Contacto - [Marca]` |
+
+<Aside type="note">
+💡 **Tip SEO:** El título es uno de los factores más importantes para el posicionamiento. Incluye palabras clave relevantes al inicio.
+</Aside>
+
+</TabItem>
+
+<TabItem label="Ejemplo dinámico">
+
+<LivePreview 
+  title="🎨 Visualización del título"
+  html={`<div style="font-family: Arial, sans-serif; padding: 20px;">
+  
+  <!-- Simulación de pestaña del navegador -->
+  <div style="background: #f1f3f4; border-radius: 8px 8px 0 0; padding: 10px 15px; margin-bottom: 0; border: 1px solid #dadce0;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div style="width: 16px; height: 16px; background: #3498db; border-radius: 2px;"></div>
+      <span style="font-size: 13px; color: #202124;">📄 Aprende HTML5 desde Cero - Tutorial Completo | DevDocs</span>
+      <div style="margin-left: auto; display: flex; gap: 5px;">
+        <div style="width: 20px; height: 20px; background: #dadce0; border-radius: 50%;"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Simulación de resultado de Google -->
+  <div style="background: white; padding: 20px; border: 1px solid #dadce0; border-top: none; margin-bottom: 30px;">
+    <div style="font-size: 12px; color: #5f6368; margin-bottom: 5px;">
+      https://ejemplo.com › tutoriales › html5
+    </div>
+    <div style="font-size: 20px; color: #1a0dab; margin-bottom: 5px; cursor: pointer;">
+      Aprende HTML5 desde Cero - Tutorial Completo | DevDocs
+    </div>
+    <div style="font-size: 14px; color: #4d5156; line-height: 1.6;">
+      Guía completa de HTML5 con ejemplos prácticos. Aprende etiquetas semánticas, formularios, multimedia y más. Tutorial paso a paso para principiantes.
+    </div>
+  </div>
+  
+  <!-- Simulación de marcador -->
+  <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #dadce0;">
+    <div style="font-weight: bold; margin-bottom: 10px; color: #202124;">
+      📑 Marcadores
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 5px;">
+      <div style="width: 24px; height: 24px; background: #3498db; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">
+        D
+      </div>
+      <div>
+        <div style="font-size: 14px; color: #202124; font-weight: 500;">
+          Aprende HTML5 desde Cero - Tutorial Completo | DevDocs
+        </div>
+        <div style="font-size: 12px; color: #5f6368;">
+          ejemplo.com
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🏷️ Etiquetas `<meta>`
+
+Las etiquetas `<meta>` proporcionan metadatos sobre el documento HTML. Son cruciales para SEO, redes sociales y configuración del navegador.
+
+### Meta tags esenciales
+
+<Tabs>
+<TabItem label="Charset">
+
+### `<meta charset>` - Codificación de caracteres
+
+**La primera línea del `<head>` SIEMPRE:**
+
+```html
+<head>
+  <meta charset="UTF-8">
+  <!-- Resto de metadatos -->
+</head>
+```
+
+**¿Por qué es importante?**
+- ✅ Permite mostrar caracteres especiales: á, é, í, ó, ú, ñ, ¿, ¡
+- ✅ Evita problemas con emojis: 😀 🎉 ⭐
+- ✅ Soporta múltiples idiomas
+- ✅ UTF-8 es el estándar universal
+
+**Problema sin charset:**
+
+```html
+<!-- Sin charset -->
+<head>
+  <title>Página</title>
+</head>
+<body>
+  <p>Hola, ¿cómo estás?</p>
+  <!-- Se muestra: Hola, Â¿cÃ³mo estÃ¡s? -->
+</body>
+```
+
+```html
+<!-- Con charset -->
+<head>
+  <meta charset="UTF-8">
+  <title>Página</title>
+</head>
+<body>
+  <p>Hola, ¿cómo estás?</p>
+  <!-- Se muestra correctamente: Hola, ¿cómo estás? -->
+</body>
+```
+
+**Opciones de charset:**
+
+| Charset | Uso |
+|---------|-----|
+| `UTF-8` | ⭐ **Recomendado** - Universal |
+| `ISO-8859-1` | Latin-1 (obsoleto) |
+| `Windows-1252` | Windows (obsoleto) |
+
+<Aside type="caution">
+⚠️ **Importante:** Siempre usa `UTF-8`. Es el estándar moderno y soporta todos los caracteres del mundo.
+</Aside>
+
+</TabItem>
+
+<TabItem label="Viewport">
+
+### `<meta name="viewport">` - Diseño responsive
+
+**Esencial para dispositivos móviles:**
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+
+**Propiedades del viewport:**
+
+```html
+<!-- Configuración básica (recomendada) -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Con zoom máximo y mínimo -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
+
+<!-- Sin zoom del usuario (NO recomendado) -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<!-- Ancho fijo (NO recomendado) -->
+<meta name="viewport" content="width=1024">
+```
+
+**Propiedades disponibles:**
+
+| Propiedad | Descripción | Valor recomendado |
+|-----------|-------------|-------------------|
+| `width` | Ancho del viewport | `device-width` |
+| `initial-scale` | Zoom inicial | `1.0` |
+| `minimum-scale` | Zoom mínimo | `1.0` |
+| `maximum-scale` | Zoom máximo | `5.0` |
+| `user-scalable` | Permitir zoom | `yes` |
+
+**Comparación con/sin viewport:**
+
+```html
+<!-- ❌ SIN viewport -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Sin Viewport</title>
+</head>
+<body>
+  <h1>Título</h1>
+  <p>Texto muy pequeño en móviles</p>
+</body>
+</html>
+<!-- Resultado: Página se ve diminuta en móviles, usuario debe hacer zoom -->
+
+<!-- ✅ CON viewport -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Con Viewport</title>
+</head>
+<body>
+  <h1>Título</h1>
+  <p>Texto legible en móviles</p>
+</body>
+</html>
+<!-- Resultado: Página se adapta al ancho del dispositivo -->
+```
+
+<Aside type="tip">
+📱 **Tip:** El viewport es obligatorio para diseño responsive. Sin él, tu sitio se verá mal en móviles.
+</Aside>
+
+</TabItem>
+
+<TabItem label="Description (SEO)">
+
+### `<meta name="description">` - Descripción para SEO
+
+**Aparece en resultados de búsqueda:**
+
+```html
+<meta name="description" content="Descripción breve y atractiva de tu página que aparecerá en Google.">
+```
+
+**Características:**
+- 📏 **Longitud ideal:** 150-160 caracteres
+- 🎯 **Única por página**
+- 🔍 **Incluye palabras clave**
+- ✍️ **Atractiva y clara**
+
+**Ejemplos efectivos:**
+
+```html
+<!-- ✅ Página de inicio -->
+<meta name="description" content="Aprende desarrollo web con tutoriales gratuitos de HTML, CSS y JavaScript. Cursos paso a paso para principiantes y avanzados.">
+
+<!-- ✅ Página de producto -->
+<meta name="description" content="iPhone 15 Pro 256GB en Negro. Chip A17 Pro, cámara de 48MP, pantalla Super Retina XDR. Envío gratis. Compra ahora.">
+
+<!-- ✅ Artículo de blog -->
+<meta name="description" content="Descubre 10 trucos de CSS Grid que mejorarán tus layouts. Ejemplos prácticos y código listo para usar. Guía actualizada 2024.">
+
+<!-- ✅ Página de servicio -->
+<meta name="description" content="Diseño web profesional y desarrollo de sitios responsive. Más de 10 años de experiencia. Presupuesto gratuito en 24 horas.">
+```
+
+**Errores comunes:**
+
+```html
+<!-- ❌ Demasiado corta -->
+<meta name="description" content="Sitio web.">
+
+<!-- ❌ Demasiado larga (se trunca) -->
+<meta name="description" content="Bienvenido a nuestro increíble sitio web donde encontrarás absolutamente todo lo que necesitas saber sobre desarrollo web, diseño gráfico, programación, bases de datos, servidores, y muchísimo más contenido de calidad...">
+
+<!-- ❌ Keyword stuffing -->
+<meta name="description" content="Zapatos, zapatos baratos, comprar zapatos, zapatos online, tienda zapatos, zapatos mujer, zapatos hombre.">
+
+<!-- ❌ Genérica (igual en todas las páginas) -->
+<meta name="description" content="Bienvenido a nuestro sitio web.">
+```
+
+**Impacto en Google:**
+
+```
+┌─────────────────────────────────────────────────────┐
+│ https://ejemplo.com › productos › iphone-15         │
+│                                                       │
+│ iPhone 15 Pro 256GB - Negro | TechStore ←── title   │
+│                                                       │
+│ iPhone 15 Pro 256GB en Negro. Chip A17 Pro,         │
+│ cámara de 48MP, pantalla Super Retina XDR.    ←──── description
+│ Envío gratis. Compra ahora.                         │
+└─────────────────────────────────────────────────────┘
+```
+
+<Aside type="note">
+💡 **Tip SEO:** Una buena descripción aumenta el CTR (Click-Through Rate) en resultados de búsqueda.
+</Aside>
+
+</TabItem>
+
+<TabItem label="Otros meta tags SEO">
+
+### Meta tags adicionales para SEO
+
+```html
+<head>
+  <!-- Keywords (menos importante hoy en día) -->
+  <meta name="keywords" content="html, css, javascript, tutorial, desarrollo web">
+  
+  <!-- Autor -->
+  <meta name="author" content="Juan Pérez">
+  
+  <!-- Robots (control de indexación) -->
+  <meta name="robots" content="index, follow">
+  <meta name="robots" content="noindex, nofollow"> <!-- No indexar -->
+  <meta name="googlebot" content="index, follow">
+  
+  <!-- Canonical (URL preferida) -->
+  <link rel="canonical" href="https://ejemplo.com/pagina-original">
+  
+  <!-- Idioma -->
+  <meta http-equiv="content-language" content="es">
+  
+  <!-- Copyright -->
+  <meta name="copyright" content="© 2024 Mi Empresa">
+  
+  <!-- Fecha de publicación -->
+  <meta name="date" content="2024-01-15">
+  
+  <!-- Categoría -->
+  <meta name="category" content="Tecnología">
+  
+  <!-- Refresh (redirigir después de X segundos) -->
+  <meta http-equiv="refresh" content="30;url=https://ejemplo.com">
+  
+  <!-- No traducir (Google Translate) -->
+  <meta name="google" content="notranslate">
+  
+  <!-- Verificación de propiedad -->
+  <meta name="google-site-verification" content="código-de-verificación">
+  <meta name="msvalidate.01" content="código-bing">
+  
+  <!-- Rating de contenido -->
+  <meta name="rating" content="general">
+  
+  <!-- Geo localización -->
+  <meta name="geo.region" content="ES-M">
+  <meta name="geo.placename" content="Madrid">
+  <meta name="geo.position" content="40.416775;-3.703790">
+</head>
+```
+
+**Valores de robots:**
+
+| Valor | Descripción |
+|-------|-------------|
+| `index` | Permitir indexación |
+| `noindex` | No indexar la página |
+| `follow` | Seguir los enlaces |
+| `nofollow` | No seguir los enlaces |
+| `noarchive` | No guardar en caché |
+| `nosnippet` | No mostrar fragmento |
+| `noimageindex` | No indexar imágenes |
+
+</TabItem>
+
+<TabItem label="Open Graph & Twitter">
+
+### Meta tags para redes sociales
+
+**Open Graph (Facebook, LinkedIn, WhatsApp):**
+
+```html
+<head>
+  <!-- Open Graph básico -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Título para redes sociales">
+  <meta property="og:description" content="Descripción atractiva para compartir">
+  <meta property="og:image" content="https://ejemplo.com/imagen-og.jpg">
+  <meta property="og:url" content="https://ejemplo.com/pagina">
+  <meta property="og:site_name" content="Nombre del Sitio">
+  
+  <!-- Open Graph adicional -->
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:locale:alternate" content="en_US">
+  
+  <!-- Para artículos -->
+  <meta property="article:published_time" content="2024-01-15T10:00:00Z">
+  <meta property="article:author" content="Juan Pérez">
+  <meta property="article:section" content="Tecnología">
+  <meta property="article:tag" content="HTML">
+  
+  <!-- Para videos -->
+  <meta property="og:video" content="https://ejemplo.com/video.mp4">
+  <meta property="og:video:width" content="1280">
+  <meta property="og:video:height" content="720">
+  
+  <!-- Dimensiones de imagen recomendadas -->
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Descripción de la imagen">
+</head>
+```
+
+**Twitter Cards:**
+
+```html
+<head>
+  <!-- Twitter Card básico -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@usuario">
+  <meta name="twitter:creator" content="@autor">
+  <meta name="twitter:title" content="Título para Twitter">
+  <meta name="twitter:description" content="Descripción para Twitter">
+  <meta name="twitter:image" content="https://ejemplo.com/twitter-image.jpg">
+  <meta name="twitter:image:alt" content="Descripción de la imagen">
+</head>
+```
+
+**Tipos de Twitter Cards:**
+
+| Tipo | Descripción |
+|------|-------------|
+| `summary` | Card pequeña con imagen cuadrada |
+| `summary_large_image` | Card grande con imagen rectangular |
+| `app` | Para promocionar apps |
+| `player` | Para contenido multimedia |
+
+**Dimensiones de imágenes recomendadas:**
+
+| Plataforma | Tamaño recomendado | Ratio |
+|------------|-------------------|-------|
+| **Open Graph** | 1200 x 630 px | 1.91:1 |
+| **Twitter Large** | 1200 x 628 px | 1.91:1 |
+| **Twitter Summary** | 300 x 300 px | 1:1 |
+
+<LivePreview 
+  title="🎨 Vista previa de compartir en redes"
+  html={`<div style="font-family: Arial, sans-serif; padding: 20px; background: #f0f2f5;">
+  
+  <h3 style="margin: 0 0 20px 0; color: #1c1e21;">Vista previa al compartir:</h3>
+  
+  <!-- Simulación de Facebook/LinkedIn -->
+  <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+    <div style="width: 100%; height: 250px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+      Imagen OG (1200x630)
+    </div>
+    <div style="padding: 15px;">
+      <div style="font-size: 11px; color: #606770; text-transform: uppercase; margin-bottom: 5px;">
+        EJEMPLO.COM
+      </div>
+      <div style="font-size: 16px; font-weight: 600; color: #1c1e21; margin-bottom: 5px;">
+        Aprende HTML5 desde Cero - Tutorial Completo
+      </div>
+      <div style="font-size: 14px; color: #606770; line-height: 1.4;">
+        Guía completa de HTML5 con ejemplos prácticos y ejercicios. Aprende etiquetas semánticas, formularios y más.
+      </div>
+    </div>
+  </div>
+  
+  <!-- Simulación de Twitter -->
+  <div style="background: white; border: 1px solid #e1e8ed; border-radius: 16px; overflow: hidden; padding: 12px;">
+    <div style="font-size: 15px; color: #0f1419; margin-bottom: 12px; line-height: 1.4;">
+      ¡Nuevo tutorial disponible! 🎉
+    </div>
+    <div style="border: 1px solid #e1e8ed; border-radius: 12px; overflow: hidden;">
+      <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: bold;">
+        Imagen Twitter (1200x628)
+      </div>
+      <div style="padding: 12px;">
+        <div style="font-size: 15px; font-weight: 600; color: #0f1419; margin-bottom: 4px;">
+          Aprende HTML5 desde Cero
+        </div>
+        <div style="font-size: 14px; color: #536471; line-height: 1.3; margin-bottom: 4px;">
+          Tutorial completo con ejemplos prácticos
+        </div>
+        <div style="font-size: 13px; color: #536471;">
+          🔗 ejemplo.com
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</div>`}
+  css={``}
+  js={``}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎨 Importación de Hojas de Estilo
+
+La etiqueta `<link>` se usa para vincular archivos CSS externos al documento HTML.
+
+<Tabs>
+<TabItem label="Sintaxis básica">
+
+### Importar CSS externo
+
+```html
+<head>
+  <!-- CSS externo -->
+  <link rel="stylesheet" href="css/estilos.css">
+  
+  <!-- Múltiples hojas de estilo -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/componentes.css">
+  
+  <!-- CSS desde CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+```
+
+**Atributos de `<link>`:**
+
+| Atributo | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `rel` | Relación (stylesheet) | `rel="stylesheet"` |
+| `href` | Ruta del archivo | `href="estilos.css"` |
+| `type` | Tipo MIME (opcional) | `type="text/css"` |
+| `media` | Media query | `media="screen"` |
+| `integrity` | Hash de seguridad | `integrity="sha384-..."` |
+| `crossorigin` | CORS | `crossorigin="anonymous"` |
+
+</TabItem>
+
+<TabItem label="Media queries">
+
+### CSS condicional con media
+
+```html
+<head>
+  <!-- CSS para pantallas -->
+  <link rel="stylesheet" href="screen.css" media="screen">
+  
+  <!-- CSS para impresión -->
+  <link rel="stylesheet" href="print.css" media="print">
+  
+  <!-- CSS para móviles -->
+  <link rel="stylesheet" href="mobile.css" media="(max-width: 768px)">
+  
+  <!-- CSS para tablets -->
+  <link rel="stylesheet" href="tablet.css" media="(min-width: 769px) and (max-width: 1024px)">
+  
+  <!-- CSS para desktop -->
+  <link rel="stylesheet" href="desktop.css" media="(min-width: 1025px)">
+  
+  <!-- CSS para modo oscuro -->
+  <link rel="stylesheet" href="dark.css" media="(prefers-color-scheme: dark)">
+  
+  <!-- CSS para orientación -->
+  <link rel="stylesheet" href="landscape.css" media="(orientation: landscape)">
+</head>
+```
+
+**Valores comunes de media:**
+
+| Media | Descripción |
+|-------|-------------|
+| `screen` | Pantallas |
+| `print` | Impresión |
+| `all` | Todos los dispositivos |
+| `speech` | Lectores de pantalla |
+
+</TabItem>
+
+<TabItem label="Fuentes externas">
+
+### Importar fuentes de Google Fonts
+
+```html
+<head>
+  <!-- Método 1: Link (recomendado) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  
+  <!-- Método 2: @import en CSS (más lento) -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+  </style>
+</head>
+```
+
+**Optimización de fuentes:**
+
+```html
+<head>
+  <!-- Preconnect para mejorar rendimiento -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Fuente con display=swap para evitar FOIT -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Preload de fuente local -->
+  <link rel="preload" href="/fonts/mifuente.woff2" as="font" type="font/woff2" crossorigin>
+</head>
+```
+
+**Parámetros de Google Fonts:**
+
+| Parámetro | Descripción | Ejemplo |
+|-----------|-------------|---------|
+| `family` | Nombre de la fuente | `family=Roboto` |
+| `wght` | Pesos | `wght@300;400;700` |
+| `ital` | Cursivas | `ital,wght@0,400;1,400` |
+| `display` | Comportamiento de carga | `display=swap` |
+
+</TabItem>
+
+<TabItem label="Optimización">
+
+### Técnicas de optimización
+
+```html
+<head>
+  <!-- 1. Preconnect (conectar antes) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdn.ejemplo.com">
+  
+  <!-- 2. DNS-prefetch (resolver DNS) -->
+  <link rel="dns-prefetch" href="https://analytics.google.com">
+  
+  <!-- 3. Preload (cargar recurso crítico) -->
+  <link rel="preload" href="estilos-criticos.css" as="style">
+  <link rel="preload" href="fuente.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="hero-image.jpg" as="image">
+  
+  <!-- 4. Prefetch (cargar para navegación futura) -->
+  <link rel="prefetch" href="pagina-siguiente.html">
+  <link rel="prefetch" href="imagen-proxima.jpg">
+  
+  <!-- 5. CSS crítico inline -->
+  <style>
+    /* CSS crítico para above-the-fold */
+    body { margin: 0; font-family: Arial; }
+    .header { background: #333; color: white; }
+  </style>
+  
+  <!-- 6. CSS no crítico con media print y cambio a all -->
+  <link rel="stylesheet" href="estilos.css" media="print" onload="this.media='all'">
+  
+  <!-- 7. Async CSS loading -->
+  <link rel="preload" href="estilos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="estilos.css"></noscript>
+</head>
+```
+
+**Orden recomendado:**
+
+```html
+<head>
+  <!-- 1. Meta tags esenciales -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- 2. Título y descripción -->
+  <title>Título</title>
+  <meta name="description" content="Descripción">
+  
+  <!-- 3. Preconnect y DNS-prefetch -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://cdn.ejemplo.com">
+  
+  <!-- 4. CSS crítico inline -->
+  <style>
+    /* CSS crítico */
+  </style>
+  
+  <!-- 5. Preload de recursos críticos -->
+  <link rel="preload" href="fuente.woff2" as="font" crossorigin>
+  
+  <!-- 6. CSS externo -->
+  <link rel="stylesheet" href="estilos.css">
+  
+  <!-- 7. Fuentes externas -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+</head>
+```
+
+</TabItem>
+</Tabs>
+
+---
+
+## ⚡ Importación de Scripts
+
+La etiqueta `<script>` se usa para incluir JavaScript en el documento.
+
+<Tabs>
+<TabItem label="Sintaxis básica">
+
+### Formas de incluir JavaScript
+
+```html
+<!-- 1. Script externo -->
+<script src="js/app.js"></script>
+
+<!-- 2. Script inline -->
+<script>
+  console.log('Hola desde JavaScript');
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM cargado');
+  });
+</script>
+
+<!-- 3. Script desde CDN -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+
+<!-- 4. Múltiples scripts -->
+<script src="js/utils.js"></script>
+<script src="js/componentes.js"></script>
+<script src="js/app.js"></script>
+```
+
+**Atributos de `<script>`:**
+
+| Atributo | Descripción | Uso |
+|----------|-------------|-----|
+| `src` | Ruta del archivo | `src="app.js"` |
+| `type` | Tipo de script | `type="module"` |
+| `defer` | Cargar después del HTML | `defer` |
+| `async` | Cargar asíncronamente | `async` |
+| `crossorigin` | CORS | `crossorigin="anonymous"` |
+| `integrity` | Hash de seguridad | `integrity="sha384-..."` |
+| `nomodule` | Fallback para navegadores antiguos | `nomodule` |
+
+</TabItem>
+
+<TabItem label="Defer vs Async">
+
+### `defer` vs `async` vs sin atributo
+
+**Sin atributos (bloquea el parsing):**
+
+```html
+<head>
+  <!-- ❌ Bloquea el parsing del HTML -->
+  <script src="script.js"></script>
+</head>
+```
+
+```
+HTML Parsing: ████████░░░░░░░░░░░░░░░░
+Script Download:      ████
+Script Execution:         ██
+HTML Parsing:               ████████████
+                      ↑ Bloqueado
+```
+
+**Con `defer` (recomendado):**
+
+```html
+<head>
+  <!-- ✅ No bloquea, ejecuta en orden después del HTML -->
+  <script src="script1.js" defer></script>
+  <script src="script2.js" defer></script>
+</head>
+```
+
+```
+HTML Parsing: ████████████████████████
+Script Download: ████████
+Script Execution:                     ██
+                                      ↑ Después del HTML
+```
+
+**Con `async` (para scripts independientes):**
+
+```html
+<head>
+  <!-- ⚠️ No bloquea, pero ejecuta apenas se descarga -->
+  <script src="analytics.js" async></script>
+</head>
+```
+
+```
+HTML Parsing: ████████████░░████████████
+Script Download: ████████
+Script Execution:         ██
+                          ↑ Puede interrumpir
+```
+
+**Comparación:**
+
+| Característica | Sin atributo | `defer` | `async` |
+|----------------|--------------|---------|---------|
+| **Bloquea HTML** | ✅ Sí | ❌ No | ❌ No |
+| **Orden de ejecución** | ✅ Garantizado | ✅ Garantizado | ❌ No garantizado |
+| **Cuándo ejecuta** | Inmediatamente | Después del HTML | Apenas se descarga |
+| **Uso recomendado** | ❌ Evitar | ✅ Scripts normales | ⚠️ Scripts independientes |
+
+**Recomendaciones:**
+
+```html
+<head>
+  <!-- ✅ BUENO: defer para scripts que dependen del DOM -->
+  <script src="app.js" defer></script>
+  
+  <!-- ✅ BUENO: async para scripts independientes -->
+  <script src="analytics.js" async></script>
+  <script src="ads.js" async></script>
+  
+  <!-- ❌ MALO: sin atributos en <head> -->
+  <script src="app.js"></script>
+</head>
+
+<body>
+  <!-- ✅ ALTERNATIVA: script al final del body -->
+  <script src="app.js"></script>
+</body>
+```
+
+</TabItem>
+
+<TabItem label="Módulos ES6">
+
+### JavaScript Modules
+
+```html
+<!-- Módulo ES6 -->
+<script type="module" src="app.js"></script>
+
+<!-- Módulo inline -->
+<script type="module">
+  import { funcion } from './modulo.js';
+  funcion();
+</script>
+
+<!-- Fallback para navegadores antiguos -->
+<script type="module" src="app-modern.js"></script>
+<script nomodule src="app-legacy.js"></script>
+```
+
+**Características de los módulos:**
+
+```html
+<head>
+  <!-- Módulo (defer por defecto) -->
+  <script type="module">
+    // Importar módulos
+    import { Component } from './components.js';
+    import React from 'https://cdn.skypack.dev/react';
+    
+    // Código del módulo
+    const app = new Component();
+  </script>
+  
+  <!-- Import maps (mapear imports) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://cdn.skypack.dev/react",
+        "lodash": "/js/lodash.js"
+      }
+    }
+  </script>
+  
+  <script type="module">
+    // Ahora puedes usar los alias
+    import React from 'react';
+    import _ from 'lodash';
+  </script>
+</head>
+```
+
+**Ventajas de los módulos:**
+
+- ✅ Scope aislado (no contaminan el global)
+- ✅ `defer` por defecto
+- ✅ Strict mode automático
+- ✅ Import/export nativo
+- ✅ Top-level await
+
+</TabItem>
+
+<TabItem label="Ubicación óptima">
+
+### ¿Dónde colocar los scripts?
+
+**Opción 1: `<head>` con `defer` (✅ Recomendado)**
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Título</title>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <h1>Contenido</h1>
+</body>
+</html>
+```
+
+**Ventajas:**
+- ✅ No bloquea el rendering
+- ✅ Scripts organizados en `<head>`
+- ✅ Ejecuta en orden
+- ✅ Ejecuta después del DOM
+
+**Opción 2: Final del `<body>` (✅ Alternativa)**
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Título</title>
+</head>
+<body>
+  <h1>Contenido</h1>
+  
+  <!-- Scripts al final -->
+  <script src="app.js"></script>
+</body>
+</html>
+```
+
+**Ventajas:**
+- ✅ DOM ya está cargado
+- ✅ No bloquea el rendering
+- ✅ Compatible con navegadores antiguos
+
+**Opción 3: `<head>` con `async` (⚠️ Solo para scripts independientes)**
+
+```html
+<head>
+  <script src="analytics.js" async></script>
+</head>
+```
+
+**Uso:**
+- ⚠️ Solo para scripts que no dependen del DOM
+- ⚠️ Analytics, ads, widgets externos
+
+**❌ Evitar: `<head>` sin atributos**
+
+```html
+<head>
+  <!-- ❌ MALO: Bloquea el rendering -->
+  <script src="app.js"></script>
+</head>
+```
+
+**Resumen:**
+
+```html
+<head>
+  <!-- ✅ Scripts normales con defer -->
+  <script src="app.js" defer></script>
+  <script src="utils.js" defer></script>
+  
+  <!-- ✅ Scripts independientes con async -->
+  <script src="analytics.js" async></script>
+  
+  <!-- ✅ Módulos ES6 -->
+  <script type="module" src="main.js"></script>
+</head>
+<body>
+  <h1>Contenido</h1>
+  
+  <!-- ✅ Alternativa: scripts al final -->
+  <!-- <script src="app.js"></script> -->
+</body>
+```
+
+</TabItem>
+
+<TabItem label="Ejemplo completo">
+
+<LivePreview 
+  title="🎨 Carga de scripts en acción"
+  html={`<div style="font-family: Arial, sans-serif; padding: 20px;">
+  
+  <h2 style="color: #2c3e50; margin-bottom: 20px;">Demostración de carga de scripts</h2>
+  
+  <!-- Botones para probar -->
+  <div style="margin-bottom: 30px;">
+    <button onclick="mostrarMensaje()" style="background: #3498db; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px;">
+      Ejecutar función
+    </button>
+    <button onclick="cargarScript()" style="background: #2ecc71; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px;">
+      Cargar script dinámico
+    </button>
+  </div>
+  
+  <!-- Log de eventos -->
+  <div style="background: #2c3e50; color: #2ecc71; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.8; max-height: 300px; overflow-y: auto;">
+    <div id="log">
+      <div>→ DOM cargado ✓</div>
+      <div>→ Scripts inicializados ✓</div>
+      <div>→ Listo para interactuar ✓</div>
+    </div>
+  </div>
+  
+  <!-- Información -->
+  <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196f3;">
+    <strong>💡 Tip:</strong> Los scripts con <code>defer</code> se ejecutan después de que el DOM está completamente cargado.
+  </div>
+  
+</div>`}
+  css={``}
+  js={`function mostrarMensaje() {
+  const log = document.getElementById('log');
+  const tiempo = new Date().toLocaleTimeString();
+  log.innerHTML += '<div>→ [' + tiempo + '] Función ejecutada ✓</div>';
+  log.parentElement.scrollTop = log.parentElement.scrollHeight;
+}
+
+function cargarScript() {
+  const log = document.getElementById('log');
+  const tiempo = new Date().toLocaleTimeString();
+  log.innerHTML += '<div>→ [' + tiempo + '] Cargando script externo...</div>';
+  
+  setTimeout(() => {
+    log.innerHTML += '<div>→ [' + tiempo + '] Script cargado ✓</div>';
+    log.parentElement.scrollTop = log.parentElement.scrollHeight;
+  }, 500);
+}`}
+/>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note">
+**Puntos clave de esta lección:**
+
+### Etiqueta `<head>`
+✅ Contiene metadatos (no visible)  
+✅ Va entre `<html>` y `<body>`  
+✅ Incluye: charset, title, meta, link, script  
+
+### Etiqueta `<title>`
+✅ **Obligatorio** en todo documento  
+✅ Aparece en pestaña y resultados de búsqueda  
+✅ Longitud ideal: **50-60 caracteres**  
+✅ Único por cada página  
+
+### Meta tags esenciales
+✅ **`charset="UTF-8"`** - Primera línea siempre  
+✅ **`viewport`** - Obligatorio para responsive  
+✅ **`description`** - 150-160 caracteres para SEO  
+✅ **Open Graph** - Para redes sociales  
+
+### Importar CSS
+✅ `<link rel="stylesheet" href="estilos.css">`  
+✅ Usar `media` para CSS condicional  
+✅ `preconnect` para optimizar fuentes  
+✅ CSS crítico inline para rendimiento  
+
+### Importar JavaScript
+✅ **`defer`** para scripts normales (recomendado)  
+✅ **`async`** para scripts independientes  
+✅ **`type="module"`** para módulos ES6  
+✅ Colocar en `<head>` con defer o al final del `<body>`  
+
+### Template completo
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Esenciales -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Título - Marca</title>
+  <meta name="description" content="Descripción SEO">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Título">
+  <meta property="og:description" content="Descripción">
+  <meta property="og:image" content="imagen.jpg">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="favicon.ico">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="estilos.css">
+  
+  <!-- JavaScript -->
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <!-- Contenido -->
+</body>
+</html>
+```
+
+</Aside>
+
+---
+
+## 🚀 Próximos pasos
+
+Ahora que dominas la cabecera del documento, aprenderás:
+- ✅ Contenido del cuerpo (`<body>`)
+- ✅ Estructura de contenido
+- ✅ Secciones y artículos
+- ✅ Organización del contenido
