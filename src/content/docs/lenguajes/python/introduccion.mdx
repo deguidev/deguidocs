@@ -1,0 +1,584 @@
+---
+title: 1. Introducción a Python
+description: ¿Qué es Python y qué lo hace especial? Aplicaciones reales, instalación y primeros pasos en programación
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## 🐍 1.1 ¿Qué es Python y qué lo hace especial?
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Definición de Python
+
+**Python** es un lenguaje de programación de alto nivel, interpretado, multiparadigma y de propósito general, creado por **Guido van Rossum** en 1991. Su filosofía de diseño enfatiza la legibilidad del código mediante una sintaxis clara y expresiva, lo que lo convierte en uno de los lenguajes más accesibles para principiantes y, al mismo tiempo, lo suficientemente potente para aplicaciones profesionales complejas.
+
+### Características que lo hacen especial
+
+**🔹 Sintaxis simple y legible**  
+Python utiliza una sintaxis minimalista que se asemeja al lenguaje natural en inglés. No requiere punto y coma al final de las líneas ni llaves para delimitar bloques de código; en su lugar, utiliza la indentación, lo que fuerza a escribir código ordenado y limpio.
+
+**🔹 Lenguaje interpretado**  
+A diferencia de lenguajes compilados como C++ o Java, Python ejecuta el código línea por línea a través de un intérprete, lo que facilita la depuración y permite una retroalimentación inmediata durante el desarrollo.
+
+**🔹 Multiparadigma**  
+Python soporta múltiples paradigmas de programación: imperativo, orientado a objetos y funcional. Esto permite a los desarrolladores elegir el enfoque más adecuado para cada problema.
+
+**🔹 Tipado dinámico**  
+No es necesario declarar el tipo de las variables explícitamente. Python infiere automáticamente el tipo de dato en tiempo de ejecución, lo que agiliza el desarrollo.
+
+**🔹 Amplia biblioteca estándar**  
+Python incluye una extensa colección de módulos y funciones predefinidas (conocida como "batteries included") que cubren desde operaciones matemáticas hasta manejo de archivos, redes y más.
+
+**🔹 Comunidad activa y ecosistema robusto**  
+Cuenta con una de las comunidades de desarrolladores más grandes del mundo, lo que se traduce en abundante documentación, tutoriales, frameworks y librerías de terceros disponibles a través de PyPI (Python Package Index).
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Comparación de sintaxis: Python vs otros lenguajes
+
+**Imprimir "Hola Mundo" en diferentes lenguajes:**
+
+<Code code={`# Python
+print("Hola Mundo")
+
+// Java
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hola Mundo");
+    }
+}
+
+// C++
+#include <iostream>
+int main() {
+    std::cout << "Hola Mundo" << std::endl;
+    return 0;
+}`} lang="python" title="Comparación de sintaxis" />
+
+### Ejemplo de tipado dinámico
+
+<Code code={`# Python infiere automáticamente el tipo de dato
+numero = 42          # int (entero)
+texto = "Python"     # str (cadena)
+decimal = 3.14       # float (decimal)
+activo = True        # bool (booleano)
+
+# Verificar el tipo de dato
+print(type(numero))   # <class 'int'>
+print(type(texto))    # <class 'str'>`} lang="python" title="Tipado dinámico en Python" />
+
+### Legibilidad del código
+
+<Code code={`# Python usa indentación en lugar de llaves
+if edad >= 18:
+    print("Eres mayor de edad")
+    print("Puedes votar")
+else:
+    print("Eres menor de edad")`} lang="python" title="Sintaxis clara y legible" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🌍 1.2 Aplicaciones reales de Python en el mundo
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+Python se ha consolidado como uno de los lenguajes más versátiles y demandados en la industria tecnológica actual. Su facilidad de uso, combinada con su potencia, lo hace ideal para una amplia gama de aplicaciones profesionales.
+
+### Áreas de aplicación principales
+
+**🔬 Ciencia de Datos y Análisis**  
+Python es el lenguaje dominante en ciencia de datos gracias a librerías como **Pandas** (manipulación de datos), **NumPy** (cálculo numérico) y **Matplotlib** (visualización). Empresas como Netflix, Spotify y Uber utilizan Python para analizar grandes volúmenes de datos y tomar decisiones basadas en información.
+
+**🤖 Inteligencia Artificial y Machine Learning**  
+Frameworks como **TensorFlow**, **PyTorch**, **Scikit-learn** y **Keras** han convertido a Python en el estándar de facto para desarrollar modelos de aprendizaje automático, redes neuronales y sistemas de inteligencia artificial. Google, Facebook y OpenAI utilizan Python extensivamente en sus proyectos de IA.
+
+**🌐 Desarrollo Web**  
+Python cuenta con frameworks robustos como **Django** (usado por Instagram y Pinterest) y **Flask** (usado por LinkedIn) que permiten crear aplicaciones web escalables y seguras de manera eficiente.
+
+**⚙️ Automatización y Scripting**  
+Python es ampliamente utilizado para automatizar tareas repetitivas: procesamiento de archivos, web scraping, administración de sistemas, pruebas automatizadas y más. Su sintaxis simple permite crear scripts funcionales en minutos.
+
+**🎮 Desarrollo de Videojuegos**  
+Aunque no es el lenguaje principal para juegos AAA, Python se utiliza en el desarrollo de prototipos, herramientas de desarrollo y juegos independientes mediante librerías como **Pygame**.
+
+**💼 Finanzas y Trading**  
+Bancos y empresas financieras utilizan Python para análisis cuantitativo, modelado de riesgos, trading algorítmico y predicción de mercados. Bloomberg, JP Morgan y Goldman Sachs tienen equipos dedicados a Python.
+
+**🔬 Investigación Científica**  
+Instituciones como NASA, CERN y universidades de todo el mundo utilizan Python para simulaciones, análisis estadístico, procesamiento de imágenes y visualización de datos científicos.
+
+**🌐 Internet de las Cosas (IoT)**  
+Python se ejecuta en dispositivos como Raspberry Pi y Arduino, permitiendo crear proyectos de domótica, robótica y sistemas embebidos.
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Empresas que usan Python
+
+<Aside type="tip" title="🏢 Casos reales de uso">
+- **Google**: Motor de búsqueda, YouTube, Google App Engine
+- **Netflix**: Sistema de recomendaciones y análisis de datos
+- **Instagram**: Backend completo desarrollado en Django
+- **Spotify**: Análisis de datos y recomendaciones musicales
+- **Dropbox**: Cliente de escritorio y backend
+- **NASA**: Análisis de datos espaciales y simulaciones
+- **Uber**: Análisis predictivo y optimización de rutas
+</Aside>
+
+### Ejemplo: Análisis de datos simple
+
+<Code code={`import pandas as pd
+
+# Cargar datos de ventas
+ventas = pd.read_csv('ventas.csv')
+
+# Calcular total de ventas por producto
+total_por_producto = ventas.groupby('producto')['monto'].sum()
+
+# Mostrar los 5 productos más vendidos
+print(total_por_producto.sort_values(ascending=False).head())`} lang="python" title="Análisis de datos con Pandas" />
+
+### Ejemplo: Automatización de tareas
+
+<Code code={`import os
+import shutil
+
+# Organizar archivos por extensión
+carpeta = "Descargas"
+for archivo in os.listdir(carpeta):
+    if archivo.endswith('.pdf'):
+        shutil.move(f"{carpeta}/{archivo}", "Documentos/PDFs/")
+    elif archivo.endswith('.jpg') or archivo.endswith('.png'):
+        shutil.move(f"{carpeta}/{archivo}", "Imagenes/")
+        
+print("Archivos organizados correctamente")`} lang="python" title="Script de automatización" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 💻 1.3 ¿Qué se necesita para programar? Hardware y mentalidad
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Requisitos de Hardware
+
+Contrario a la creencia popular, **no se necesita un equipo de alta gama para aprender a programar en Python**. Los requisitos de hardware son modestos y accesibles para la mayoría de usuarios.
+
+**Requisitos mínimos:**
+- **Procesador**: Cualquier procesador de 1 GHz o superior (Intel, AMD, ARM)
+- **Memoria RAM**: 2 GB mínimo (4 GB recomendado)
+- **Almacenamiento**: 1 GB de espacio libre para Python y herramientas básicas
+- **Sistema Operativo**: Windows 7+, macOS 10.9+, Linux (cualquier distribución moderna)
+
+**Requisitos recomendados para desarrollo profesional:**
+- **Procesador**: Intel Core i5/AMD Ryzen 5 o superior
+- **Memoria RAM**: 8 GB o más
+- **Almacenamiento**: SSD con al menos 20 GB libres
+- **Pantalla**: Resolución mínima de 1920x1080 para mayor comodidad
+
+<Aside type="note">
+Python puede ejecutarse incluso en dispositivos como Raspberry Pi (computadora de $35 USD), lo que demuestra su ligereza y versatilidad.
+</Aside>
+
+### Mentalidad del programador
+
+El hardware es solo una herramienta; **la mentalidad es el factor más importante** para tener éxito en la programación.
+
+**🧠 Pensamiento lógico y resolución de problemas**  
+Programar consiste en descomponer problemas complejos en pasos simples y secuenciales. Se requiere desarrollar la habilidad de analizar situaciones, identificar patrones y diseñar soluciones estructuradas.
+
+**🔄 Mentalidad de aprendizaje continuo**  
+La tecnología evoluciona constantemente. Un buen programador debe estar dispuesto a aprender nuevas herramientas, frameworks y mejores prácticas de forma permanente.
+
+**💪 Perseverancia y tolerancia a la frustración**  
+Los errores (bugs) son parte natural del proceso de desarrollo. Es fundamental desarrollar paciencia para depurar código, leer mensajes de error y buscar soluciones sin rendirse.
+
+**🔍 Atención al detalle**  
+Un solo carácter mal escrito puede generar errores. La programación requiere precisión y cuidado en cada línea de código.
+
+**🤝 Colaboración y comunicación**  
+En el mundo profesional, los programadores trabajan en equipo. Es esencial saber comunicar ideas técnicas, documentar código y colaborar con otros desarrolladores.
+
+**🎯 Orientación a objetivos**  
+Establecer metas claras (crear una aplicación, automatizar una tarea, resolver un problema específico) mantiene la motivación y da dirección al aprendizaje.
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Ejemplo de pensamiento lógico
+
+**Problema**: Determinar si un número es par o impar.
+
+**Descomposición del problema:**
+
+<Steps>
+1. Recibir un número del usuario
+2. Dividir el número entre 2
+3. Si el residuo es 0, el número es par
+4. Si el residuo es 1, el número es impar
+5. Mostrar el resultado
+</Steps>
+
+<Code code={`# Solución en Python
+numero = int(input("Ingresa un número: "))
+
+if numero % 2 == 0:
+    print(f"{numero} es par")
+else:
+    print(f"{numero} es impar")`} lang="python" title="Pensamiento lógico aplicado" />
+
+### Ejemplo de perseverancia: Depuración de errores
+
+<Code code={`# ❌ Código con error
+nombre = "Juan
+print(nombre)
+# SyntaxError: unterminated string literal
+
+# ✅ Código corregido
+nombre = "Juan"  # Faltaba cerrar las comillas
+print(nombre)`} lang="python" title="Aprender de los errores" />
+
+<Aside type="caution" title="💡 Consejo">
+**Los errores son maestros, no enemigos.** Cada error que resuelves te hace un mejor programador. Lee los mensajes de error con atención; Python te indica exactamente qué salió mal y en qué línea.
+</Aside>
+
+### Herramientas que facilitan el aprendizaje
+
+- **Editor de código**: VSCode, PyCharm, IDLE
+- **Documentación oficial**: python.org/docs
+- **Comunidades**: Stack Overflow, Reddit (r/learnpython)
+- **Plataformas de práctica**: HackerRank, LeetCode, Codewars
+
+</TabItem>
+</Tabs>
+
+---
+
+## ⚙️ 1.4 Instalación de Python y configuración del entorno
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Instalación de Python
+
+Python es multiplataforma y puede instalarse en Windows, macOS y Linux. La instalación incluye el intérprete de Python y IDLE (Integrated Development and Learning Environment), un entorno básico para escribir y ejecutar código.
+
+**Versiones de Python:**
+- **Python 2.x**: Versión legacy, descontinuada desde 2020
+- **Python 3.x**: Versión actual y recomendada (3.8, 3.9, 3.10, 3.11, 3.12)
+
+<Aside type="tip">
+Siempre instala la versión más reciente de Python 3 disponible en python.org
+</Aside>
+
+### Entornos de desarrollo
+
+**🔹 IDLE (incluido con Python)**  
+Es el entorno integrado oficial de Python. Ideal para principiantes por su simplicidad, incluye un shell interactivo y un editor básico con resaltado de sintaxis.
+
+**Ventajas**: Ligero, sin configuración adicional, perfecto para aprender  
+**Desventajas**: Funcionalidades limitadas para proyectos grandes
+
+**🔹 Visual Studio Code (VSCode)**  
+Editor de código gratuito y extensible desarrollado por Microsoft. Es el más popular entre desarrolladores Python por su equilibrio entre simplicidad y potencia.
+
+**Ventajas**: Autocompletado inteligente, depurador integrado, extensiones, terminal integrada  
+**Instalación**: Descargar de code.visualstudio.com e instalar la extensión "Python" de Microsoft
+
+**🔹 PyCharm**  
+IDE profesional desarrollado por JetBrains, disponible en versión Community (gratuita) y Professional (paga).
+
+**Ventajas**: Refactorización avanzada, análisis de código, integración con frameworks  
+**Desventajas**: Consume más recursos que VSCode
+
+**🔹 Jupyter Notebook**  
+Entorno interactivo basado en navegador, ideal para ciencia de datos y análisis exploratorio.
+
+### Variables de entorno
+
+Durante la instalación, es crucial marcar la opción **"Add Python to PATH"**. Esto permite ejecutar Python desde cualquier ubicación en la terminal/consola sin especificar la ruta completa del ejecutable.
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Instalación paso a paso en Windows
+
+<Steps>
+1. **Descargar Python**
+   - Visita [python.org/downloads](https://python.org/downloads)
+   - Descarga la última versión de Python 3.x
+
+2. **Ejecutar el instalador**
+   - ✅ **Marca la casilla "Add Python to PATH"** (muy importante)
+   - Click en "Install Now"
+
+3. **Verificar la instalación**
+   - Abre CMD o PowerShell
+   - Ejecuta: `python --version`
+   - Deberías ver algo como: `Python 3.12.0`
+</Steps>
+
+<Code code={`# Verificar instalación de Python
+python --version
+
+# Verificar instalación de pip (gestor de paquetes)
+pip --version
+
+# Abrir el shell interactivo de Python
+python`} lang="bash" title="Comandos de verificación" />
+
+### Configuración de VSCode para Python
+
+<Steps>
+1. **Instalar VSCode**
+   - Descarga desde [code.visualstudio.com](https://code.visualstudio.com)
+
+2. **Instalar extensión de Python**
+   - Abre VSCode
+   - Ve a Extensions (Ctrl+Shift+X)
+   - Busca "Python" (de Microsoft)
+   - Click en "Install"
+
+3. **Crear tu primer archivo**
+   - Crea un archivo llamado `hola.py`
+   - VSCode detectará automáticamente que es Python
+</Steps>
+
+### Primer programa en IDLE
+
+<Code code={`# 1. Abre IDLE desde el menú de inicio
+# 2. Ve a File > New File
+# 3. Escribe el siguiente código:
+
+print("¡Mi primer programa en Python!")
+print("Python es genial")
+
+# 4. Guarda el archivo como "mi_primer_programa.py"
+# 5. Presiona F5 para ejecutar`} lang="python" title="Usando IDLE" />
+
+<Aside type="note" title="🎯 Recomendación">
+Si eres principiante absoluto, comienza con **IDLE** para familiarizarte con Python. Después de 2-3 semanas, migra a **VSCode** para aprovechar herramientas más avanzadas.
+</Aside>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🖨️ 1.5 Primeros pasos: imprimir tu primer mensaje (print)
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### La función print()
+
+La función **`print()`** es una de las funciones más fundamentales en Python. Su propósito es mostrar información en la consola o terminal, permitiendo al programador visualizar resultados, depurar código y comunicarse con el usuario.
+
+**Sintaxis básica:**
+```python
+print(valor)
+```
+
+### Características de print()
+
+**🔹 Acepta múltiples argumentos**  
+Puede recibir uno o más valores separados por comas, que serán mostrados en secuencia separados por un espacio.
+
+**🔹 Conversión automática a cadena**  
+Python convierte automáticamente cualquier tipo de dato (números, booleanos, listas, etc.) a su representación textual antes de imprimirlo.
+
+**🔹 Salto de línea automático**  
+Por defecto, `print()` agrega un salto de línea (`\n`) al final de cada impresión, moviendo el cursor a la siguiente línea.
+
+**🔹 Parámetros opcionales**  
+- **`sep`**: Define el separador entre múltiples argumentos (por defecto es un espacio)
+- **`end`**: Define qué se imprime al final (por defecto es `\n`)
+
+### Secuencias de escape
+
+Python utiliza secuencias de escape para representar caracteres especiales:
+- `\n`: Salto de línea (nueva línea)
+- `\t`: Tabulación horizontal
+- `\\`: Barra invertida literal
+- `\"`: Comillas dobles literales
+- `\'`: Comillas simples literales
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Uso básico de print()
+
+<Code code={`# Imprimir un mensaje simple
+print("Hola Mundo")
+
+# Imprimir números
+print(42)
+print(3.14159)
+
+# Imprimir valores booleanos
+print(True)
+print(False)
+
+# Imprimir sin argumentos (línea en blanco)
+print()`} lang="python" title="Ejemplos básicos" />
+
+### Imprimir múltiples valores
+
+<Code code={`# Múltiples argumentos separados por comas
+print("Python", "es", "genial")
+# Salida: Python es genial
+
+# Combinar texto y números
+nombre = "Ana"
+edad = 25
+print("Mi nombre es", nombre, "y tengo", edad, "años")
+# Salida: Mi nombre es Ana y tengo 25 años
+
+# Operaciones dentro de print
+print("La suma de 5 + 3 es:", 5 + 3)
+# Salida: La suma de 5 + 3 es: 8`} lang="python" title="Múltiples valores" />
+
+### Uso de parámetros sep y end
+
+<Code code={`# Cambiar el separador
+print("Python", "Java", "C++", sep=" | ")
+# Salida: Python | Java | C++
+
+# Cambiar el final (sin salto de línea)
+print("Cargando", end="...")
+print("Completado")
+# Salida: Cargando...Completado
+
+# Crear una barra de progreso simple
+print("[", end="")
+print("====", end="")
+print("]")
+# Salida: [====]`} lang="python" title="Parámetros sep y end" />
+
+### Formato con f-strings (Python 3.6+)
+
+<Code code={`# F-strings para formateo moderno
+nombre = "Carlos"
+edad = 28
+altura = 1.75
+
+print(f"Hola, soy {nombre}")
+print(f"Tengo {edad} años y mido {altura} metros")
+
+# Operaciones dentro de f-strings
+precio = 100
+descuento = 0.15
+precio_final = precio * (1 - descuento)
+print(f"Precio final: {precio_final} pesos")
+
+# Formateo de decimales
+pi = 3.14159265359
+print(f"El valor de pi es aproximadamente {pi:.2f}")
+# Salida: El valor de pi es aproximadamente 3.14`} lang="python" title="F-strings (recomendado)" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 📝 1.6 Comentarios y buenas prácticas desde el inicio
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### ¿Qué son los comentarios?
+
+Los **comentarios** son líneas de texto dentro del código que el intérprete de Python ignora completamente durante la ejecución. Su único propósito es proporcionar información legible para humanos: explicar qué hace el código, por qué se tomó cierta decisión o dejar notas para futuros desarrolladores.
+
+### Tipos de comentarios en Python
+
+**🔹 Comentarios de una línea**  
+Se crean con el símbolo `#`. Todo lo que aparece después de `#` en esa línea es ignorado por Python.
+
+**🔹 Comentarios multilínea**  
+Python no tiene una sintaxis específica para comentarios multilínea, pero se pueden usar múltiples líneas con `#` o cadenas de texto multilínea (docstrings) con `"""` o `'''`.
+
+### Buenas prácticas de programación
+
+**✅ Nombres de variables descriptivos**  
+Usa nombres que expliquen claramente qué contiene la variable.
+
+**✅ Consistencia en el estilo**  
+Python sigue la guía de estilo **PEP 8**, que recomienda usar `snake_case` para nombres de variables y funciones, 4 espacios para indentación.
+
+**✅ Comentarios claros y concisos**  
+Los comentarios deben agregar valor, no repetir lo obvio.
+
+**✅ Mantener el código simple**  
+"Simple es mejor que complejo" (Zen de Python).
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Comentarios de una línea
+
+<Code code={`# Este programa calcula el área de un rectángulo
+
+# Definir las dimensiones
+base = 10  # en metros
+altura = 5  # en metros
+
+# Calcular el área
+area = base * altura
+
+# Mostrar el resultado
+print(f"El área del rectángulo es: {area} m²")`} lang="python" title="Comentarios explicativos" />
+
+### Buenas prácticas aplicadas
+
+<Code code={`# ❌ Código mal escrito
+x=5
+y=10
+z=x+y
+print(z)
+
+# ✅ Código bien escrito
+numero_uno = 5
+numero_dos = 10
+suma_total = numero_uno + numero_dos
+print(f"La suma de {numero_uno} y {numero_dos} es: {suma_total}")`} lang="python" title="Comparación de estilos" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎯 Resumen de la lección
+
+<Aside type="tip" title="📚 Lo que aprendiste">
+En esta lección introductoria has aprendido:
+
+✅ **Qué es Python**: Un lenguaje interpretado, de alto nivel y fácil de aprender  
+✅ **Aplicaciones reales**: Ciencia de datos, IA, web, automatización, finanzas  
+✅ **Requisitos**: Hardware modesto y mentalidad de aprendizaje continuo  
+✅ **Instalación**: Python 3.x, IDLE, VSCode y configuración del entorno  
+✅ **Función print()**: Mostrar información en consola con diferentes formatos  
+✅ **Comentarios**: Documentar código y seguir buenas prácticas desde el inicio  
+
+**Próximo paso**: En la siguiente lección aprenderás sobre variables y tipos de datos en Python.
+</Aside>

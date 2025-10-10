@@ -1,0 +1,771 @@
+---
+title: 10. Manejo de Cadenas de Texto
+description: Operaciones con strings, métodos de cadenas, búsqueda y manipulación de texto
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## 📝 10.1 Qué es una cadena (str)
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Concepto de cadena (string)
+
+Una **cadena** (string o `str`) es un tipo de dato que representa una secuencia de caracteres. Es uno de los tipos de datos más utilizados en programación para trabajar con texto.
+
+### Características de las cadenas
+
+**🔹 Inmutables**: No se pueden modificar después de creadas (se crean nuevas)  
+**🔹 Secuenciales**: Los caracteres tienen un orden y posición (índice)  
+**🔹 Iterables**: Se pueden recorrer carácter por carácter  
+**🔹 Indexables**: Se accede a caracteres mediante índices (desde 0)  
+
+### Formas de crear cadenas
+
+```python
+# Comillas simples
+texto1 = 'Hola'
+
+# Comillas dobles
+texto2 = "Mundo"
+
+# Comillas triples (multilínea)
+texto3 = """Texto
+en varias
+líneas"""
+```
+
+### Propósito
+
+- **Almacenar texto**: Nombres, mensajes, descripciones
+- **Procesar información**: Validar, formatear, transformar
+- **Comunicación**: Mostrar mensajes al usuario
+- **Manipulación de datos**: Limpiar, buscar, extraer información
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Crear cadenas
+
+<Code code={`# Diferentes formas de crear cadenas
+nombre = 'Ana'
+apellido = "García"
+mensaje = "Hola, ¿cómo estás?"
+
+print(nombre)    # Ana
+print(apellido)  # García
+print(mensaje)   # Hola, ¿cómo estás?
+
+# Cadenas con comillas dentro
+texto1 = "Ella dijo: 'Hola'"
+texto2 = 'El libro "Python" es genial'
+print(texto1)
+print(texto2)`} lang="python" title="Crear cadenas" />
+
+### Cadenas multilínea
+
+<Code code={`# Cadenas de varias líneas con triple comilla
+poema = """Roses are red,
+Violets are blue,
+Python is awesome,
+And so are you!"""
+
+print(poema)
+
+# También funciona con comillas simples
+mensaje = '''Este es un mensaje
+que ocupa
+varias líneas'''
+print(mensaje)`} lang="python" title="Multilínea" />
+
+### Acceso por índice
+
+<Code code={`texto = "Python"
+
+# Índices positivos (desde el inicio)
+print(texto[0])   # P (primer carácter)
+print(texto[1])   # y
+print(texto[5])   # n (último carácter)
+
+# Índices negativos (desde el final)
+print(texto[-1])  # n (último)
+print(texto[-2])  # o (penúltimo)
+print(texto[-6])  # P (primero desde el final)`} lang="python" title="Índices" />
+
+### Slicing (rebanado)
+
+<Code code={`texto = "Python Programming"
+
+# Obtener subcadenas
+print(texto[0:6])    # Python
+print(texto[7:18])   # Programming
+print(texto[:6])     # Python (desde inicio)
+print(texto[7:])     # Programming (hasta final)
+print(texto[::2])    # Pto rgamn (cada 2 caracteres)
+print(texto[::-1])   # gnimmargorP nohtyP (invertida)`} lang="python" title="Slicing" />
+
+### Inmutabilidad
+
+<Code code={`texto = "Hola"
+
+# Las cadenas son inmutables
+# texto[0] = 'h'  # Error: no se puede modificar
+
+# Para "modificar", crear nueva cadena
+texto_nuevo = 'h' + texto[1:]
+print(texto_nuevo)  # hola
+
+# O usar métodos que retornan nuevas cadenas
+texto_mayus = texto.upper()
+print(texto)        # Hola (original sin cambios)
+print(texto_mayus)  # HOLA (nueva cadena)`} lang="python" title="Inmutabilidad" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔧 10.2 Operaciones básicas: concatenación, repetición, longitud
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Concatenación
+
+La **concatenación** une dos o más cadenas en una sola usando el operador `+`.
+
+**Sintaxis**: `cadena1 + cadena2`
+
+### Repetición
+
+La **repetición** crea una nueva cadena repitiendo la original usando el operador `*`.
+
+**Sintaxis**: `cadena * numero`
+
+### Longitud
+
+La función **`len()`** retorna el número de caracteres en una cadena.
+
+**Sintaxis**: `len(cadena)`
+
+### Operadores de comparación
+
+Las cadenas se pueden comparar usando operadores relacionales: `==`, `!=`, `<`, `>`, `<=`, `>=` (comparación alfabética).
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Concatenación
+
+<Code code={`# Unir cadenas con +
+nombre = "Ana"
+apellido = "García"
+nombre_completo = nombre + " " + apellido
+print(nombre_completo)  # Ana García
+
+# Concatenar múltiples cadenas
+saludo = "Hola" + ", " + nombre + "!"
+print(saludo)  # Hola, Ana!
+
+# Concatenar con números (requiere conversión)
+edad = 25
+mensaje = nombre + " tiene " + str(edad) + " años"
+print(mensaje)  # Ana tiene 25 años`} lang="python" title="Concatenación" />
+
+### Repetición
+
+<Code code={`# Repetir cadenas con *
+linea = "-" * 30
+print(linea)  # ------------------------------
+
+# Crear patrones
+patron = "Python " * 3
+print(patron)  # Python Python Python 
+
+# Separadores visuales
+print("=" * 40)
+print("TÍTULO IMPORTANTE")
+print("=" * 40)
+
+# Espacios
+espacios = " " * 10
+print("Texto" + espacios + "Alineado")`} lang="python" title="Repetición" />
+
+### Longitud con len()
+
+<Code code={`# Obtener longitud de cadenas
+texto = "Python"
+print(len(texto))  # 6
+
+nombre = "Ana García"
+print(len(nombre))  # 10 (incluye el espacio)
+
+# Validar longitud
+contrasena = input("Ingresa contraseña: ")
+if len(contrasena) < 8:
+    print("La contraseña debe tener al menos 8 caracteres")
+else:
+    print("Contraseña válida")
+
+# Contar caracteres
+mensaje = "Hola, ¿cómo estás?"
+print(f"El mensaje tiene {len(mensaje)} caracteres")`} lang="python" title="len()" />
+
+### Comparación de cadenas
+
+<Code code={`# Comparar cadenas
+texto1 = "Python"
+texto2 = "python"
+texto3 = "Python"
+
+# Igualdad
+print(texto1 == texto3)  # True
+print(texto1 == texto2)  # False (sensible a mayúsculas)
+
+# Diferencia
+print(texto1 != texto2)  # True
+
+# Comparación alfabética
+print("Ana" < "Carlos")  # True (A viene antes que C)
+print("abc" < "abd")     # True
+print("Python" > "Java") # True (P > J)`} lang="python" title="Comparación" />
+
+### Operaciones combinadas
+
+<Code code={`# Combinar operaciones
+nombre = "Ana"
+apellido = "García"
+
+# Concatenación + repetición
+separador = "-" * 20
+nombre_completo = nombre + " " + apellido
+print(separador)
+print(nombre_completo)
+print(separador)
+
+# Longitud + concatenación
+texto = "Python"
+info = texto + " tiene " + str(len(texto)) + " letras"
+print(info)  # Python tiene 6 letras`} lang="python" title="Combinadas" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔤 10.3 Métodos de cadenas: lower(), upper(), replace()
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Métodos de transformación
+
+**lower()**: Convierte toda la cadena a minúsculas  
+**upper()**: Convierte toda la cadena a MAYÚSCULAS  
+**capitalize()**: Primera letra en mayúscula, resto en minúsculas  
+**title()**: Primera letra de cada palabra en mayúscula  
+
+### Método replace()
+
+**replace(viejo, nuevo)**: Reemplaza todas las ocurrencias de una subcadena por otra.
+
+**Sintaxis**: `cadena.replace(buscar, reemplazar)`
+
+### Métodos de limpieza
+
+**strip()**: Elimina espacios al inicio y final  
+**lstrip()**: Elimina espacios al inicio  
+**rstrip()**: Elimina espacios al final  
+
+### Características importantes
+
+**🔹 Retornan nueva cadena**: No modifican la original (inmutabilidad)  
+**🔹 Encadenables**: Se pueden usar varios métodos seguidos  
+**🔹 Case-sensitive**: Distinguen mayúsculas y minúsculas  
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### lower() y upper()
+
+<Code code={`# Convertir a minúsculas
+texto = "PYTHON es GENIAL"
+minusculas = texto.lower()
+print(minusculas)  # python es genial
+
+# Convertir a mayúsculas
+texto = "python es genial"
+mayusculas = texto.upper()
+print(mayusculas)  # PYTHON ES GENIAL
+
+# Comparación insensible a mayúsculas
+usuario = input("Usuario: ")
+if usuario.lower() == "admin":
+    print("Acceso de administrador")
+
+# Normalizar entrada
+email = input("Email: ").lower()
+print(f"Email registrado: {email}")`} lang="python" title="lower() y upper()" />
+
+### capitalize() y title()
+
+<Code code={`# Primera letra en mayúscula
+texto = "python programming"
+print(texto.capitalize())  # Python programming
+
+# Primera letra de cada palabra
+titulo = "aprende python desde cero"
+print(titulo.title())  # Aprende Python Desde Cero
+
+# Formatear nombres
+nombre = "ana maría garcía"
+print(nombre.title())  # Ana María García
+
+# Títulos de libros
+libro = "el arte de la programación"
+print(libro.title())  # El Arte De La Programación`} lang="python" title="capitalize() y title()" />
+
+### replace()
+
+<Code code={`# Reemplazar texto
+texto = "Me gusta Java"
+nuevo = texto.replace("Java", "Python")
+print(nuevo)  # Me gusta Python
+
+# Reemplazar múltiples ocurrencias
+frase = "el gato y el perro y el pájaro"
+nueva = frase.replace("el", "un")
+print(nueva)  # un gato y un perro y un pájaro
+
+# Eliminar caracteres
+telefono = "123-456-7890"
+sin_guiones = telefono.replace("-", "")
+print(sin_guiones)  # 1234567890
+
+# Censurar palabras
+texto = "Esta palabra es mala"
+censurado = texto.replace("mala", "****")
+print(censurado)  # Esta palabra es ****`} lang="python" title="replace()" />
+
+### strip(), lstrip(), rstrip()
+
+<Code code={`# Eliminar espacios en blanco
+texto = "   Python   "
+print(texto.strip())   # "Python"
+print(texto.lstrip())  # "Python   "
+print(texto.rstrip())  # "   Python"
+
+# Limpiar entrada de usuario
+nombre = input("Nombre: ").strip()
+print(f"Hola, {nombre}")
+
+# Eliminar caracteres específicos
+texto = "***Python***"
+print(texto.strip("*"))  # Python
+
+# Limpiar datos
+precio = "$$$100$$$"
+limpio = precio.strip("$")
+print(limpio)  # 100`} lang="python" title="strip()" />
+
+### Métodos encadenados
+
+<Code code={`# Combinar múltiples métodos
+texto = "  PYTHON programming  "
+
+# Limpiar y convertir
+resultado = texto.strip().lower()
+print(resultado)  # python programming
+
+# Transformación completa
+nombre = "  ana GARCÍA  "
+nombre_limpio = nombre.strip().title()
+print(nombre_limpio)  # Ana García
+
+# Normalizar y reemplazar
+email = "  USER@EXAMPLE.COM  "
+email_limpio = email.strip().lower().replace("example", "gmail")
+print(email_limpio)  # user@gmail.com`} lang="python" title="Encadenados" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔍 10.4 Búsqueda de texto: in, find(), startswith()
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Operador in
+
+**in**: Verifica si una subcadena está contenida en otra (retorna `True`/`False`)
+
+**Sintaxis**: `subcadena in cadena`
+
+### Método find()
+
+**find(subcadena)**: Busca la primera ocurrencia y retorna su índice, o `-1` si no se encuentra.
+
+**Sintaxis**: `cadena.find(buscar)`
+
+### Métodos de verificación
+
+**startswith(prefijo)**: Verifica si la cadena comienza con un prefijo  
+**endswith(sufijo)**: Verifica si la cadena termina con un sufijo  
+
+### Método count()
+
+**count(subcadena)**: Cuenta cuántas veces aparece una subcadena.
+
+**Sintaxis**: `cadena.count(buscar)`
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Operador in
+
+<Code code={`# Verificar si contiene subcadena
+texto = "Python es un lenguaje de programación"
+
+print("Python" in texto)      # True
+print("Java" in texto)         # False
+print("programación" in texto) # True
+
+# Uso en condicionales
+email = "usuario@gmail.com"
+if "@" in email:
+    print("Email válido")
+else:
+    print("Email inválido")
+
+# Verificar palabras prohibidas
+comentario = "Este es un comentario"
+palabras_prohibidas = ["spam", "publicidad"]
+
+for palabra in palabras_prohibidas:
+    if palabra in comentario.lower():
+        print(f"Comentario rechazado: contiene '{palabra}'")`} lang="python" title="in" />
+
+### find()
+
+<Code code={`# Buscar posición de subcadena
+texto = "Python es genial"
+
+# Encontrar índice
+posicion = texto.find("es")
+print(posicion)  # 7
+
+# No encontrado
+posicion = texto.find("Java")
+print(posicion)  # -1
+
+# Buscar desde una posición
+texto = "Python Python Python"
+primera = texto.find("Python")
+segunda = texto.find("Python", primera + 1)
+print(f"Primera: {primera}, Segunda: {segunda}")
+
+# Validar y extraer
+email = "usuario@gmail.com"
+arroba = email.find("@")
+if arroba != -1:
+    usuario = email[:arroba]
+    dominio = email[arroba+1:]
+    print(f"Usuario: {usuario}, Dominio: {dominio}")`} lang="python" title="find()" />
+
+### startswith() y endswith()
+
+<Code code={`# Verificar inicio
+texto = "Python es genial"
+print(texto.startswith("Python"))  # True
+print(texto.startswith("Java"))    # False
+
+# Verificar final
+archivo = "documento.pdf"
+print(archivo.endswith(".pdf"))   # True
+print(archivo.endswith(".txt"))   # False
+
+# Validar extensiones de archivo
+archivos = ["imagen.jpg", "video.mp4", "documento.pdf", "script.py"]
+
+for archivo in archivos:
+    if archivo.endswith(".py"):
+        print(f"{archivo} es un archivo Python")
+    elif archivo.endswith((".jpg", ".png")):
+        print(f"{archivo} es una imagen")
+
+# Validar URLs
+url = "https://www.python.org"
+if url.startswith("https://"):
+    print("Conexión segura")
+elif url.startswith("http://"):
+    print("Conexión no segura")`} lang="python" title="startswith() y endswith()" />
+
+### count()
+
+<Code code={`# Contar ocurrencias
+texto = "Python es Python y Python es genial"
+cantidad = texto.count("Python")
+print(f"'Python' aparece {cantidad} veces")  # 3
+
+# Contar caracteres
+frase = "Hola, ¿cómo estás?"
+vocales = "aeiouáéíóú"
+total_vocales = sum(frase.lower().count(v) for v in vocales)
+print(f"Vocales: {total_vocales}")
+
+# Contar palabras
+texto = "Python es un lenguaje de programación"
+palabras = texto.count(" ") + 1
+print(f"Palabras: {palabras}")
+
+# Análisis de texto
+texto = "El gato y el perro y el pájaro"
+print(f"'el' aparece {texto.lower().count('el')} veces")`} lang="python" title="count()" />
+
+### Programa de búsqueda
+
+<Code code={`# Buscador de palabras en texto
+texto = """Python es un lenguaje de programación interpretado.
+Python es fácil de aprender.
+Python tiene una gran comunidad."""
+
+palabra = input("¿Qué palabra buscar? ")
+
+# Verificar si existe
+if palabra in texto.lower():
+    # Contar ocurrencias
+    cantidad = texto.lower().count(palabra.lower())
+    
+    # Encontrar primera posición
+    posicion = texto.lower().find(palabra.lower())
+    
+    print(f"✅ '{palabra}' encontrada")
+    print(f"Aparece {cantidad} veces")
+    print(f"Primera aparición en posición {posicion}")
+else:
+    print(f"❌ '{palabra}' no encontrada")`} lang="python" title="Buscador" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## ✂️ 10.5 Manipulación de texto con split() y join()
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Método split()
+
+**split(separador)**: Divide una cadena en una lista de subcadenas usando un separador.
+
+**Sintaxis**: `cadena.split(separador)`  
+**Por defecto**: Si no se especifica separador, usa espacios en blanco
+
+### Método join()
+
+**join(iterable)**: Une elementos de una lista en una sola cadena usando un separador.
+
+**Sintaxis**: `separador.join(lista)`
+
+### Relación entre split() y join()
+
+Son operaciones inversas:
+- **split()**: Cadena → Lista
+- **join()**: Lista → Cadena
+
+### Casos de uso
+
+**split()**: Procesar CSV, separar palabras, parsear datos  
+**join()**: Construir URLs, crear rutas, formatear salida  
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### split() básico
+
+<Code code={`# Dividir por espacios (por defecto)
+texto = "Python es genial"
+palabras = texto.split()
+print(palabras)  # ['Python', 'es', 'genial']
+
+# Dividir por separador específico
+fecha = "15/01/2024"
+partes = fecha.split("/")
+print(partes)  # ['15', '01', '2024']
+
+# Dividir por comas
+frutas = "manzana,pera,uva,naranja"
+lista_frutas = frutas.split(",")
+print(lista_frutas)  # ['manzana', 'pera', 'uva', 'naranja']
+
+# Procesar entrada del usuario
+entrada = input("Ingresa números separados por espacios: ")
+numeros = entrada.split()
+print(f"Ingresaste {len(numeros)} números")`} lang="python" title="split()" />
+
+### join() básico
+
+<Code code={`# Unir lista con espacios
+palabras = ["Python", "es", "genial"]
+texto = " ".join(palabras)
+print(texto)  # Python es genial
+
+# Unir con guiones
+palabras = ["hola", "mundo", "python"]
+url_slug = "-".join(palabras)
+print(url_slug)  # hola-mundo-python
+
+# Unir con saltos de línea
+lineas = ["Primera línea", "Segunda línea", "Tercera línea"]
+texto = "\\n".join(lineas)
+print(texto)
+
+# Crear ruta de archivo
+carpetas = ["usuarios", "documentos", "python"]
+ruta = "/".join(carpetas)
+print(ruta)  # usuarios/documentos/python`} lang="python" title="join()" />
+
+### split() y join() combinados
+
+<Code code={`# Invertir palabras en una frase
+frase = "Python es un lenguaje genial"
+palabras = frase.split()
+palabras_invertidas = palabras[::-1]
+frase_invertida = " ".join(palabras_invertidas)
+print(frase_invertida)  # genial lenguaje un es Python
+
+# Reemplazar espacios por guiones
+texto = "Hola Mundo Python"
+con_guiones = "-".join(texto.split())
+print(con_guiones)  # Hola-Mundo-Python
+
+# Limpiar espacios extras
+texto = "Python    es    genial"
+limpio = " ".join(texto.split())
+print(limpio)  # Python es genial`} lang="python" title="Combinados" />
+
+### Procesar datos CSV
+
+<Code code={`# Procesar línea CSV
+linea_csv = "Ana,25,Madrid,Ingeniería"
+datos = linea_csv.split(",")
+
+nombre = datos[0]
+edad = int(datos[1])
+ciudad = datos[2]
+carrera = datos[3]
+
+print(f"Nombre: {nombre}")
+print(f"Edad: {edad}")
+print(f"Ciudad: {ciudad}")
+print(f"Carrera: {carrera}")
+
+# Crear CSV desde datos
+persona = ["Carlos", "30", "Barcelona", "Medicina"]
+linea = ",".join(persona)
+print(linea)  # Carlos,30,Barcelona,Medicina`} lang="python" title="CSV" />
+
+### Contar palabras
+
+<Code code={`# Contador de palabras
+texto = """Python es un lenguaje de programación interpretado.
+Su filosofía hace hincapié en la legibilidad del código.
+Python es multiparadigma y multiplataforma."""
+
+# Dividir en palabras
+palabras = texto.split()
+
+# Contar
+total_palabras = len(palabras)
+print(f"Total de palabras: {total_palabras}")
+
+# Palabra más larga
+palabra_mas_larga = max(palabras, key=len)
+print(f"Palabra más larga: {palabra_mas_larga} ({len(palabra_mas_larga)} letras)")
+
+# Palabras únicas
+palabras_unicas = set(palabra.lower() for palabra in palabras)
+print(f"Palabras únicas: {len(palabras_unicas)}")`} lang="python" title="Contador" />
+
+### Formatear nombres
+
+<Code code={`# Formatear nombre completo
+nombre_completo = "ana maría garcía lópez"
+
+# Dividir en palabras
+palabras = nombre_completo.split()
+
+# Capitalizar cada palabra
+palabras_capitalizadas = [palabra.capitalize() for palabra in palabras]
+
+# Unir de nuevo
+nombre_formateado = " ".join(palabras_capitalizadas)
+print(nombre_formateado)  # Ana María García López
+
+# Versión corta
+nombre_formateado = " ".join(palabra.capitalize() 
+                             for palabra in nombre_completo.split())
+print(nombre_formateado)`} lang="python" title="Formatear nombres" />
+
+### Programa completo: Analizador de texto
+
+<Code code={`# Analizador de texto
+print("=== ANALIZADOR DE TEXTO ===\\n")
+
+texto = input("Ingresa un texto: ")
+
+# Dividir en palabras
+palabras = texto.split()
+
+# Estadísticas
+total_palabras = len(palabras)
+total_caracteres = len(texto)
+total_caracteres_sin_espacios = len(texto.replace(" ", ""))
+
+# Palabra más larga y más corta
+palabra_mas_larga = max(palabras, key=len)
+palabra_mas_corta = min(palabras, key=len)
+
+# Resultados
+print(f"\\n{'='*40}")
+print("RESULTADOS DEL ANÁLISIS")
+print(f"{'='*40}")
+print(f"Total de palabras: {total_palabras}")
+print(f"Total de caracteres: {total_caracteres}")
+print(f"Caracteres sin espacios: {total_caracteres_sin_espacios}")
+print(f"Palabra más larga: {palabra_mas_larga} ({len(palabra_mas_larga)} letras)")
+print(f"Palabra más corta: {palabra_mas_corta} ({len(palabra_mas_corta)} letras)")
+print(f"Promedio de letras por palabra: {total_caracteres_sin_espacios/total_palabras:.1f}")
+print(f"{'='*40}")`} lang="python" title="Analizador completo" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎯 Resumen de la lección
+
+<Aside type="tip" title="📚 Lo que aprendiste">
+En esta lección sobre manejo de cadenas de texto has aprendido:
+
+✅ **Cadenas (str)**: Secuencias inmutables de caracteres, indexables e iterables  
+✅ **Operaciones básicas**: Concatenación (+), repetición (*), longitud (len())  
+✅ **Métodos de transformación**: lower(), upper(), replace(), strip()  
+✅ **Búsqueda**: in, find(), startswith(), endswith(), count()  
+✅ **Manipulación**: split() para dividir, join() para unir  
+
+**Próximo paso**: En la siguiente lección aprenderás sobre programación orientada a objetos en Python.
+</Aside>

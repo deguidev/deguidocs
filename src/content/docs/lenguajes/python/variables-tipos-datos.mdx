@@ -1,0 +1,581 @@
+---
+title: 2. Variables y Tipos de Datos
+description: ¿Qué es una variable? Tipos de datos en Python, reglas de nomenclatura y conversión de tipos
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## 📦 2.1 ¿Qué es una variable y cómo se crea?
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Concepto de variable
+
+Una **variable** es un espacio de memoria identificado por un nombre que almacena un valor que puede cambiar durante la ejecución del programa. En términos simples, es como una caja etiquetada donde guardas información para usarla más tarde.
+
+### Características de las variables en Python
+
+**🔹 Asignación dinámica**  
+En Python no es necesario declarar el tipo de dato explícitamente. El intérprete infiere automáticamente el tipo según el valor asignado.
+
+**🔹 Tipado dinámico**  
+Una variable puede cambiar de tipo durante la ejecución del programa. Puedes asignar un número y luego reasignar texto a la misma variable.
+
+**🔹 Referencias a objetos**  
+Las variables en Python son referencias a objetos en memoria, no contenedores directos de valores.
+
+### Sintaxis de creación
+
+La sintaxis para crear una variable es:
+
+```python
+nombre_variable = valor
+```
+
+El operador `=` se llama **operador de asignación** y asigna el valor de la derecha a la variable de la izquierda.
+
+### Propósito de las variables
+
+- **Almacenar datos**: Guardar información para uso posterior
+- **Reutilización**: Usar el mismo valor múltiples veces sin repetirlo
+- **Legibilidad**: Dar nombres significativos a los valores
+- **Cálculos**: Realizar operaciones y guardar resultados
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Creación básica de variables
+
+<Code code={`# Crear una variable con un número
+edad = 25
+
+# Crear una variable con texto
+nombre = "Ana"
+
+# Crear una variable con decimal
+altura = 1.65
+
+# Crear una variable booleana
+es_estudiante = True
+
+print(edad)          # 25
+print(nombre)        # Ana
+print(altura)        # 1.65
+print(es_estudiante) # True`} lang="python" title="Variables básicas" />
+
+### Asignación múltiple
+
+<Code code={`# Asignar el mismo valor a múltiples variables
+x = y = z = 0
+print(x, y, z)  # 0 0 0
+
+# Asignar múltiples valores en una línea
+a, b, c = 10, 20, 30
+print(a)  # 10
+print(b)  # 20
+print(c)  # 30
+
+# Intercambiar valores entre variables
+num1 = 5
+num2 = 10
+num1, num2 = num2, num1
+print(num1)  # 10
+print(num2)  # 5`} lang="python" title="Asignación múltiple" />
+
+### Reasignación de variables
+
+<Code code={`# Una variable puede cambiar de valor
+contador = 0
+print(contador)  # 0
+
+contador = 5
+print(contador)  # 5
+
+contador = contador + 1
+print(contador)  # 6
+
+# Una variable puede cambiar de tipo
+variable = 42        # int
+print(variable)
+
+variable = "texto"   # str
+print(variable)
+
+variable = True      # bool
+print(variable)`} lang="python" title="Reasignación" />
+
+<Aside type="tip" title="💡 Buena práctica">
+Aunque Python permite cambiar el tipo de una variable, es recomendable mantener el mismo tipo para evitar confusiones y errores.
+</Aside>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎯 2.2 Tipos de datos: texto, números y booleanos
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Tipos de datos primitivos en Python
+
+Python incluye varios tipos de datos fundamentales que representan diferentes categorías de información.
+
+### 📝 Cadenas de texto (str)
+
+Las **cadenas** o **strings** representan secuencias de caracteres (texto). Se definen entre comillas simples `'...'` o dobles `"..."`.
+
+**Características:**
+- Inmutables: no se pueden modificar después de creadas
+- Soportan operaciones como concatenación y repetición
+- Pueden contener letras, números, símbolos y espacios
+
+### 🔢 Números enteros (int)
+
+Los **enteros** representan números sin parte decimal. Pueden ser positivos, negativos o cero.
+
+**Características:**
+- Precisión arbitraria: pueden ser tan grandes como la memoria lo permita
+- Soportan operaciones aritméticas estándar
+- No tienen límite de tamaño (a diferencia de otros lenguajes)
+
+### 🔢 Números decimales (float)
+
+Los **flotantes** representan números con parte decimal (punto flotante).
+
+**Características:**
+- Usan notación de punto decimal: `3.14`
+- Soportan notación científica: `1.5e-3` (0.0015)
+- Tienen precisión limitada (aproximadamente 15-17 dígitos)
+
+### ✅ Booleanos (bool)
+
+Los **booleanos** representan valores de verdad: `True` (verdadero) o `False` (falso).
+
+**Características:**
+- Solo dos valores posibles: `True` y `False`
+- Se usan en condiciones y expresiones lógicas
+- Son subclase de int: `True` equivale a 1, `False` a 0
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Cadenas de texto (str)
+
+<Code code={`# Crear cadenas con comillas simples o dobles
+nombre = 'Juan'
+apellido = "Pérez"
+
+# Cadenas con comillas dentro
+mensaje1 = "Él dijo: 'Hola'"
+mensaje2 = 'Ella respondió: "Adiós"'
+
+# Cadenas multilínea con triple comilla
+poema = """Roses are red,
+Violets are blue,
+Python is awesome,
+And so are you!"""
+
+print(nombre)     # Juan
+print(mensaje1)   # Él dijo: 'Hola'
+print(poema)`} lang="python" title="Strings" />
+
+### Números enteros (int)
+
+<Code code={`# Números enteros positivos y negativos
+edad = 25
+temperatura = -5
+anio = 2024
+
+# Números grandes (sin límite)
+poblacion_mundial = 8000000000
+
+# Operaciones con enteros
+suma = 10 + 5      # 15
+resta = 10 - 3     # 7
+multiplicacion = 4 * 5  # 20
+division_entera = 10 // 3  # 3
+modulo = 10 % 3    # 1 (residuo)
+
+print(edad)
+print(suma)
+print(division_entera)`} lang="python" title="Enteros" />
+
+### Números decimales (float)
+
+<Code code={`# Números con punto decimal
+altura = 1.75
+pi = 3.14159
+temperatura = -2.5
+
+# Notación científica
+velocidad_luz = 3e8  # 300000000.0
+atomo = 1.6e-19      # 0.00000000000000000016
+
+# Operaciones con flotantes
+promedio = (8.5 + 9.0 + 7.5) / 3
+print(promedio)  # 8.333333333333334
+
+# División siempre retorna float
+resultado = 10 / 2
+print(resultado)  # 5.0 (float, no int)`} lang="python" title="Flotantes" />
+
+### Booleanos (bool)
+
+<Code code={`# Valores booleanos
+es_mayor_edad = True
+tiene_licencia = False
+
+# Resultado de comparaciones
+es_igual = (5 == 5)      # True
+es_mayor = (10 > 20)     # False
+es_diferente = (3 != 4)  # True
+
+# Booleanos en operaciones lógicas
+resultado1 = True and False  # False
+resultado2 = True or False   # True
+resultado3 = not True        # False
+
+print(es_mayor_edad)  # True
+print(es_mayor)       # False
+print(resultado1)     # False`} lang="python" title="Booleanos" />
+
+### Comparación de tipos
+
+<Code code={`# Diferentes tipos de datos
+texto = "100"
+numero_entero = 100
+numero_decimal = 100.0
+es_verdadero = True
+
+print(texto)           # 100 (string)
+print(numero_entero)   # 100 (int)
+print(numero_decimal)  # 100.0 (float)
+print(es_verdadero)    # True (bool)
+
+# Aunque se ven similares, son tipos diferentes
+print(texto == numero_entero)  # False (tipos diferentes)`} lang="python" title="Comparación" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 📋 2.3 Reglas para nombrar variables correctamente
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Reglas obligatorias (sintaxis)
+
+Python impone reglas estrictas que deben cumplirse para que un nombre de variable sea válido:
+
+**✅ Regla 1: Caracteres permitidos**  
+Los nombres solo pueden contener letras (a-z, A-Z), números (0-9) y guiones bajos (_).
+
+**✅ Regla 2: Primer carácter**  
+Debe comenzar con una letra o guión bajo, nunca con un número.
+
+**✅ Regla 3: Sensibilidad a mayúsculas**  
+Python distingue entre mayúsculas y minúsculas. `edad`, `Edad` y `EDAD` son tres variables diferentes.
+
+**✅ Regla 4: Palabras reservadas**  
+No se pueden usar palabras clave de Python como nombres de variables (`if`, `for`, `while`, `class`, `def`, etc.).
+
+**✅ Regla 5: Sin espacios**  
+Los nombres no pueden contener espacios. Usa guiones bajos para separar palabras.
+
+### Convenciones recomendadas (estilo PEP 8)
+
+Además de las reglas obligatorias, existen convenciones de estilo que mejoran la legibilidad:
+
+**🔹 snake_case para variables**  
+Usa minúsculas con guiones bajos para separar palabras: `nombre_completo`, `edad_usuario`, `precio_total`.
+
+**🔹 Nombres descriptivos**  
+Elige nombres que expliquen claramente qué contiene la variable: `temperatura_maxima` en lugar de `temp` o `t`.
+
+**🔹 Evitar abreviaturas confusas**  
+Prefiere `numero_estudiantes` sobre `num_est`, a menos que la abreviatura sea universalmente conocida.
+
+**🔹 Constantes en MAYÚSCULAS**  
+Para valores que no cambian, usa mayúsculas: `PI = 3.14159`, `MAX_INTENTOS = 3`.
+
+**🔹 Evitar nombres de una letra**  
+Excepto en bucles (`i`, `j`, `k`) o coordenadas (`x`, `y`, `z`), usa nombres más descriptivos.
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Nombres válidos vs inválidos
+
+<Code code={`# ✅ NOMBRES VÁLIDOS
+nombre = "Juan"
+edad_usuario = 25
+_privado = "dato interno"
+numero1 = 10
+camelCase = "válido pero no recomendado en Python"
+CONSTANTE = 100
+
+# ❌ NOMBRES INVÁLIDOS (causan error)
+# 2nombre = "Juan"        # Error: comienza con número
+# nombre-usuario = "Ana"  # Error: contiene guion
+# nombre usuario = "Luis" # Error: contiene espacio
+# for = 10                # Error: palabra reservada
+# class = "Python"        # Error: palabra reservada`} lang="python" title="Válidos vs inválidos" />
+
+### Sensibilidad a mayúsculas
+
+<Code code={`# Python distingue entre mayúsculas y minúsculas
+edad = 25
+Edad = 30
+EDAD = 35
+
+print(edad)  # 25
+print(Edad)  # 30
+print(EDAD)  # 35
+
+# Son tres variables completamente diferentes
+nombre = "Ana"
+Nombre = "Juan"
+NOMBRE = "Luis"
+
+print(nombre, Nombre, NOMBRE)  # Ana Juan Luis`} lang="python" title="Case sensitive" />
+
+### Buenas prácticas de nomenclatura
+
+<Code code={`# ❌ Nombres poco descriptivos
+x = 25
+a = "Juan"
+t = 36.5
+
+# ✅ Nombres descriptivos
+edad_paciente = 25
+nombre_completo = "Juan"
+temperatura_corporal = 36.5
+
+# ❌ Abreviaturas confusas
+num_est = 50
+temp_max = 40
+
+# ✅ Nombres claros
+numero_estudiantes = 50
+temperatura_maxima = 40
+
+# ✅ Constantes en mayúsculas
+PI = 3.14159
+VELOCIDAD_LUZ = 299792458
+MAX_INTENTOS = 3
+NOMBRE_EMPRESA = "TechCorp"`} lang="python" title="Buenas prácticas" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔍 2.4 Función type() y comprobación de tipos
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### La función type()
+
+La función **`type()`** es una función integrada de Python que retorna el tipo de dato de un objeto. Es fundamental para verificar qué tipo de información contiene una variable.
+
+**Sintaxis:**
+```python
+type(objeto)
+```
+
+**Retorna:** La clase del objeto (su tipo de dato)
+
+### Propósito de type()
+
+**🔹 Depuración de código**  
+Permite identificar errores relacionados con tipos de datos incompatibles.
+
+**🔹 Validación de datos**  
+Verifica que una variable tenga el tipo esperado antes de realizar operaciones.
+
+**🔹 Aprendizaje**  
+Ayuda a comprender cómo Python clasifica diferentes valores.
+
+### Tipos de datos comunes retornados
+
+- `<class 'int'>`: Número entero
+- `<class 'float'>`: Número decimal
+- `<class 'str'>`: Cadena de texto
+- `<class 'bool'>`: Booleano
+- `<class 'list'>`: Lista
+- `<class 'NoneType'>`: Valor None (nulo)
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Uso básico de type()
+
+<Code code={`# Verificar el tipo de diferentes valores
+numero = 42
+texto = "Python"
+decimal = 3.14
+booleano = True
+nulo = None
+
+print(type(numero))    # <class 'int'>
+print(type(texto))     # <class 'str'>
+print(type(decimal))   # <class 'float'>
+print(type(booleano))  # <class 'bool'>
+print(type(nulo))      # <class 'NoneType'>`} lang="python" title="type() básico" />
+
+### Uso de isinstance()
+
+<Code code={`# isinstance() para verificar tipos
+edad = 25
+nombre = "Ana"
+altura = 1.65
+
+# Verificar si es de un tipo específico
+print(isinstance(edad, int))      # True
+print(isinstance(nombre, str))    # True
+print(isinstance(altura, float))  # True
+print(isinstance(edad, str))      # False
+
+# Verificar múltiples tipos
+numero = 42
+print(isinstance(numero, (int, float)))  # True`} lang="python" title="isinstance()" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔄 2.5 Conversiones entre tipos (int(), str(), float(), etc.)
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Conversión de tipos (Type Casting)
+
+La **conversión de tipos** o **casting** es el proceso de transformar un valor de un tipo de dato a otro. Python ofrece funciones integradas para realizar estas conversiones.
+
+### Funciones de conversión principales
+
+**🔹 int() - Convertir a entero**  
+Convierte un valor a número entero. Trunca la parte decimal de los flotantes.
+
+**🔹 float() - Convertir a flotante**  
+Convierte un valor a número decimal (punto flotante).
+
+**🔹 str() - Convertir a cadena**  
+Convierte cualquier valor a su representación textual.
+
+**🔹 bool() - Convertir a booleano**  
+Convierte un valor a True o False según reglas específicas.
+
+### Reglas de conversión
+
+**Conversión a int:**
+- Strings numéricos: `"123"` → `123`
+- Flotantes: `3.14` → `3` (trunca decimales)
+- Booleanos: `True` → `1`, `False` → `0`
+
+**Conversión a bool:**
+- Valores "falsos": `0`, `0.0`, `""` (string vacío), `None` → `False`
+- Cualquier otro valor → `True`
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Conversión a int()
+
+<Code code={`# Convertir string a entero
+texto_numero = "123"
+numero = int(texto_numero)
+print(numero)        # 123
+print(type(numero))  # <class 'int'>
+
+# Convertir float a int (trunca decimales)
+decimal = 3.99
+entero = int(decimal)
+print(entero)  # 3 (no redondea, solo trunca)
+
+# Convertir booleano a int
+print(int(True))   # 1
+print(int(False))  # 0`} lang="python" title="Conversión a int" />
+
+### Conversión a float()
+
+<Code code={`# Convertir string a float
+texto = "3.14"
+decimal = float(texto)
+print(decimal)        # 3.14
+print(type(decimal))  # <class 'float'>
+
+# Convertir int a float
+entero = 10
+flotante = float(entero)
+print(flotante)  # 10.0
+
+# Convertir booleano a float
+print(float(True))   # 1.0
+print(float(False))  # 0.0`} lang="python" title="Conversión a float" />
+
+### Conversión a str()
+
+<Code code={`# Convertir número a string
+edad = 25
+texto_edad = str(edad)
+print(texto_edad)        # "25"
+print(type(texto_edad))  # <class 'str'>
+
+# Concatenar después de convertir
+nombre = "Ana"
+edad = 25
+mensaje = nombre + " tiene " + str(edad) + " años"
+print(mensaje)  # Ana tiene 25 años`} lang="python" title="Conversión a str" />
+
+### Aplicación práctica: entrada de usuario
+
+<Code code={`# input() siempre retorna string, hay que convertir
+print("Calculadora de edad")
+
+# Solicitar año de nacimiento
+anio_nacimiento = input("Ingresa tu año de nacimiento: ")
+print(type(anio_nacimiento))  # <class 'str'>
+
+# Convertir a entero para calcular
+anio_nacimiento = int(anio_nacimiento)
+anio_actual = 2024
+edad = anio_actual - anio_nacimiento
+
+print(f"Tienes {edad} años")`} lang="python" title="Conversión de input" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎯 Resumen de la lección
+
+<Aside type="tip" title="📚 Lo que aprendiste">
+En esta lección sobre variables y tipos de datos has aprendido:
+
+✅ **Variables**: Espacios de memoria con nombre para almacenar datos  
+✅ **Tipos de datos**: str (texto), int (enteros), float (decimales), bool (booleanos)  
+✅ **Reglas de nomenclatura**: snake_case, nombres descriptivos, palabras reservadas  
+✅ **Función type()**: Verificar el tipo de dato de una variable  
+✅ **Conversiones**: int(), float(), str(), bool() para cambiar entre tipos  
+
+**Próximo paso**: En la siguiente lección aprenderás sobre operadores y expresiones en Python.
+</Aside>

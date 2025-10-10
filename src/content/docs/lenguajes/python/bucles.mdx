@@ -1,0 +1,636 @@
+---
+title: 6. Control de Flujo (Bucles)
+description: Repetición de tareas con while y for, uso de break, continue y pass
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## 🔁 6.1 ¿Qué es un bucle y por qué es útil?
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Concepto de bucle
+
+Un **bucle** (o ciclo) es una estructura de control que permite ejecutar un bloque de código repetidamente mientras se cumpla una condición o para cada elemento de una secuencia. Es fundamental para automatizar tareas repetitivas.
+
+### Propósito de los bucles
+
+**🔹 Automatización**: Evita escribir el mismo código múltiples veces  
+**🔹 Procesamiento masivo**: Permite trabajar con grandes cantidades de datos  
+**🔹 Eficiencia**: Reduce código y facilita el mantenimiento  
+**🔹 Iteración**: Recorre colecciones de datos elemento por elemento  
+
+### Tipos de bucles en Python
+
+**while**: Repite mientras una condición sea verdadera  
+**for**: Itera sobre una secuencia (lista, rango, cadena, etc.)  
+
+### Componentes de un bucle
+
+**Condición o secuencia**: Determina cuándo continuar o qué recorrer  
+**Bloque de código**: Instrucciones que se repiten  
+**Control de flujo**: break, continue, pass para modificar el comportamiento  
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Sin bucle vs con bucle
+
+<Code code={`# SIN BUCLE (repetitivo y poco práctico)
+print("Hola 1")
+print("Hola 2")
+print("Hola 3")
+print("Hola 4")
+print("Hola 5")
+
+# CON BUCLE (eficiente y escalable)
+for i in range(1, 6):
+    print(f"Hola {i}")`} lang="python" title="Comparación" />
+
+### Casos de uso comunes
+
+<Code code={`# Sumar números del 1 al 10
+suma = 0
+for numero in range(1, 11):
+    suma += numero
+print(f"Suma total: {suma}")  # 55
+
+# Validar entrada hasta que sea correcta
+while True:
+    edad = int(input("Edad (0-120): "))
+    if 0 <= edad <= 120:
+        break
+    print("Edad inválida, intenta de nuevo")
+
+# Procesar lista de nombres
+nombres = ["Ana", "Juan", "María"]
+for nombre in nombres:
+    print(f"Hola, {nombre}")`} lang="python" title="Casos de uso" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## ⏳ 6.2 Bucle while: repetir mientras sea verdadero
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Concepto de while
+
+El bucle **while** ejecuta un bloque de código repetidamente mientras una condición sea verdadera (`True`). Se evalúa la condición antes de cada iteración.
+
+### Sintaxis
+
+```python
+while condicion:
+    # código que se repite
+```
+
+### Características importantes
+
+**🔹 Condición previa**: Se evalúa antes de ejecutar el bloque  
+**🔹 Puede no ejecutarse**: Si la condición es falsa desde el inicio  
+**🔹 Riesgo de bucle infinito**: Si la condición nunca se vuelve falsa  
+**🔹 Control manual**: El programador debe modificar la condición  
+
+### Cuándo usar while
+
+- Cuando no se sabe cuántas iteraciones se necesitan
+- Para validar entradas del usuario
+- Para esperar que ocurra un evento
+- Cuando la condición de parada es compleja
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### while básico
+
+<Code code={`# Contador simple
+contador = 1
+
+while contador <= 5:
+    print(f"Iteración {contador}")
+    contador += 1
+
+print("Bucle terminado")
+
+# Salida:
+# Iteración 1
+# Iteración 2
+# Iteración 3
+# Iteración 4
+# Iteración 5
+# Bucle terminado`} lang="python" title="while básico" />
+
+### Validación de entrada
+
+<Code code={`# Solicitar contraseña hasta que sea correcta
+contrasena_correcta = "python123"
+intentos = 0
+
+while True:
+    contrasena = input("Ingresa la contraseña: ")
+    intentos += 1
+    
+    if contrasena == contrasena_correcta:
+        print("✅ Acceso concedido")
+        break
+    else:
+        print("❌ Contraseña incorrecta")
+        if intentos >= 3:
+            print("Demasiados intentos")
+            break`} lang="python" title="Validación con while" />
+
+### Suma acumulativa
+
+<Code code={`# Sumar números hasta que el usuario ingrese 0
+print("Ingresa números para sumar (0 para terminar)")
+suma = 0
+
+while True:
+    numero = float(input("Número: "))
+    
+    if numero == 0:
+        break
+    
+    suma += numero
+    print(f"Suma parcial: {suma}")
+
+print(f"\\nSuma total: {suma}")`} lang="python" title="Suma acumulativa" />
+
+### Cuenta regresiva
+
+<Code code={`# Cuenta regresiva desde 10
+import time
+
+cuenta = 10
+
+while cuenta > 0:
+    print(cuenta)
+    time.sleep(1)  # Esperar 1 segundo
+    cuenta -= 1
+
+print("¡Despegue! 🚀")`} lang="python" title="Cuenta regresiva" />
+
+<Aside type="caution" title="⚠️ Cuidado con bucles infinitos">
+Asegúrate de que la condición del while eventualmente se vuelva `False`, o usa `break` para salir. Un bucle infinito bloqueará tu programa.
+
+```python
+# ❌ BUCLE INFINITO (evitar)
+while True:
+    print("Esto nunca termina")
+
+# ✅ BUCLE CON SALIDA
+contador = 0
+while True:
+    print(contador)
+    contador += 1
+    if contador >= 10:
+        break
+```
+</Aside>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔄 6.3 Bucle for: recorrer listas y rangos
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Concepto de for
+
+El bucle **for** itera sobre una secuencia (lista, tupla, cadena, rango, etc.) ejecutando el bloque de código para cada elemento.
+
+### Sintaxis
+
+```python
+for variable in secuencia:
+    # código que se repite
+```
+
+### La función range()
+
+**range(n)**: Genera números de 0 a n-1  
+**range(inicio, fin)**: Genera números desde inicio hasta fin-1  
+**range(inicio, fin, paso)**: Con incremento personalizado  
+
+### Características importantes
+
+**🔹 Iteración automática**: Recorre cada elemento sin control manual  
+**🔹 Seguro**: No hay riesgo de bucle infinito  
+**🔹 Versátil**: Funciona con cualquier objeto iterable  
+**🔹 Variable temporal**: La variable del for solo existe dentro del bucle  
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### for con range()
+
+<Code code={`# Imprimir números del 1 al 5
+for i in range(1, 6):
+    print(i)
+
+# Salida: 1, 2, 3, 4, 5
+
+# Tabla de multiplicar del 5
+for i in range(1, 11):
+    print(f"5 x {i} = {5 * i}")
+
+# Números pares del 0 al 10
+for i in range(0, 11, 2):
+    print(i)  # 0, 2, 4, 6, 8, 10`} lang="python" title="for con range()" />
+
+### for con listas
+
+<Code code={`# Recorrer lista de nombres
+nombres = ["Ana", "Juan", "María", "Carlos"]
+
+for nombre in nombres:
+    print(f"Hola, {nombre}")
+
+# Recorrer con índice
+for i in range(len(nombres)):
+    print(f"{i + 1}. {nombres[i]}")
+
+# Usar enumerate() (mejor práctica)
+for indice, nombre in enumerate(nombres, 1):
+    print(f"{indice}. {nombre}")`} lang="python" title="for con listas" />
+
+### for con cadenas
+
+<Code code={`# Recorrer caracteres de una cadena
+palabra = "Python"
+
+for letra in palabra:
+    print(letra)
+
+# Contar vocales
+texto = "Hola Mundo"
+vocales = 0
+
+for letra in texto.lower():
+    if letra in "aeiou":
+        vocales += 1
+
+print(f"Vocales encontradas: {vocales}")`} lang="python" title="for con cadenas" />
+
+### for con diccionarios
+
+<Code code={`# Recorrer diccionario
+estudiante = {
+    "nombre": "Ana",
+    "edad": 20,
+    "carrera": "Ingeniería"
+}
+
+# Solo claves
+for clave in estudiante:
+    print(clave)
+
+# Claves y valores
+for clave, valor in estudiante.items():
+    print(f"{clave}: {valor}")
+
+# Solo valores
+for valor in estudiante.values():
+    print(valor)`} lang="python" title="for con diccionarios" />
+
+### Bucles anidados
+
+<Code code={`# Tabla de multiplicar del 1 al 5
+for i in range(1, 6):
+    for j in range(1, 6):
+        print(f"{i} x {j} = {i * j}")
+    print()  # Línea en blanco
+
+# Patrón de asteriscos
+for i in range(1, 6):
+    print("*" * i)
+
+# Salida:
+# *
+# **
+# ***
+# ****
+# *****`} lang="python" title="Bucles anidados" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## ⚡ 6.4 Instrucciones break, continue y pass
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Instrucciones de control de flujo
+
+Estas instrucciones modifican el comportamiento normal de los bucles:
+
+### break
+
+**Propósito**: Termina el bucle inmediatamente  
+**Uso**: Cuando se cumple una condición de salida  
+**Efecto**: Sale del bucle más interno  
+
+### continue
+
+**Propósito**: Salta a la siguiente iteración  
+**Uso**: Cuando se quiere omitir el resto del código en la iteración actual  
+**Efecto**: Vuelve al inicio del bucle  
+
+### pass
+
+**Propósito**: No hace nada (placeholder)  
+**Uso**: Cuando se necesita una sentencia sintácticamente pero no se quiere ejecutar nada  
+**Efecto**: Continúa normalmente  
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### break - Salir del bucle
+
+<Code code={`# Buscar un número en una lista
+numeros = [3, 7, 12, 5, 9, 15]
+buscar = 5
+
+for num in numeros:
+    if num == buscar:
+        print(f"✅ Número {buscar} encontrado")
+        break
+    print(f"Revisando {num}...")
+else:
+    print(f"❌ Número {buscar} no encontrado")
+
+# Salida:
+# Revisando 3...
+# Revisando 7...
+# Revisando 12...
+# ✅ Número 5 encontrado`} lang="python" title="break" />
+
+### continue - Saltar iteración
+
+<Code code={`# Imprimir solo números impares
+for i in range(1, 11):
+    if i % 2 == 0:
+        continue  # Saltar números pares
+    print(i)
+
+# Salida: 1, 3, 5, 7, 9
+
+# Procesar solo valores válidos
+valores = [10, -5, 20, 0, 15, -3]
+
+for valor in valores:
+    if valor <= 0:
+        continue  # Ignorar valores no positivos
+    print(f"Procesando: {valor}")`} lang="python" title="continue" />
+
+### pass - Placeholder
+
+<Code code={`# Estructura pendiente de implementar
+for i in range(5):
+    if i == 2:
+        pass  # TODO: Implementar lógica especial
+    else:
+        print(i)
+
+# Función vacía (por ahora)
+def funcion_futura():
+    pass  # Se implementará después
+
+# Clase vacía
+class MiClase:
+    pass  # Se agregará contenido luego`} lang="python" title="pass" />
+
+### Comparación de las tres
+
+<Code code={`# Demostración de break, continue y pass
+print("=== BREAK ===")
+for i in range(5):
+    if i == 3:
+        break
+    print(i)
+# Salida: 0, 1, 2
+
+print("\\n=== CONTINUE ===")
+for i in range(5):
+    if i == 3:
+        continue
+    print(i)
+# Salida: 0, 1, 2, 4
+
+print("\\n=== PASS ===")
+for i in range(5):
+    if i == 3:
+        pass
+    print(i)
+# Salida: 0, 1, 2, 3, 4`} lang="python" title="Comparación" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 💪 6.5 Práctica: contar, sumar y generar listas
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Propósito de los ejercicios
+
+Los ejercicios prácticos consolidan el conocimiento de bucles aplicándolos a problemas comunes: conteo, acumulación, generación de secuencias y procesamiento de datos.
+
+### Patrones comunes
+
+**Contador**: Variable que se incrementa en cada iteración  
+**Acumulador**: Variable que suma o concatena valores  
+**Generador**: Crear nuevas listas a partir de condiciones  
+**Búsqueda**: Encontrar elementos que cumplan criterios  
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Ejercicio 1: Contar elementos
+
+<Code code={`# Contar números pares en una lista
+numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+pares = 0
+
+for num in numeros:
+    if num % 2 == 0:
+        pares += 1
+
+print(f"Números pares: {pares}")  # 5
+
+# Contar vocales en un texto
+texto = "Python es genial"
+vocales = 0
+
+for letra in texto.lower():
+    if letra in "aeiou":
+        vocales += 1
+
+print(f"Vocales: {vocales}")`} lang="python" title="Contar elementos" />
+
+### Ejercicio 2: Sumar valores
+
+<Code code={`# Sumar números de una lista
+numeros = [10, 20, 30, 40, 50]
+suma = 0
+
+for num in numeros:
+    suma += num
+
+print(f"Suma total: {suma}")  # 150
+
+# Calcular promedio
+cantidad = len(numeros)
+promedio = suma / cantidad
+print(f"Promedio: {promedio}")  # 30.0
+
+# Sumar solo números positivos
+valores = [10, -5, 20, -3, 15]
+suma_positivos = 0
+
+for valor in valores:
+    if valor > 0:
+        suma_positivos += valor
+
+print(f"Suma de positivos: {suma_positivos}")  # 45`} lang="python" title="Sumar valores" />
+
+### Ejercicio 3: Generar listas
+
+<Code code={`# Generar lista de cuadrados
+cuadrados = []
+for i in range(1, 11):
+    cuadrados.append(i ** 2)
+
+print(cuadrados)  # [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+
+# List comprehension (forma más elegante)
+cuadrados = [i ** 2 for i in range(1, 11)]
+
+# Generar lista de números pares
+pares = []
+for i in range(1, 21):
+    if i % 2 == 0:
+        pares.append(i)
+
+print(pares)  # [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+
+# Con list comprehension
+pares = [i for i in range(1, 21) if i % 2 == 0]`} lang="python" title="Generar listas" />
+
+### Ejercicio 4: Tabla de multiplicar
+
+<Code code={`# Generar tabla de multiplicar
+numero = int(input("¿Qué tabla quieres? "))
+
+print(f"\\nTabla del {numero}:")
+print("=" * 20)
+
+for i in range(1, 11):
+    resultado = numero * i
+    print(f"{numero} x {i:2d} = {resultado:3d}")
+
+# Salida ejemplo (tabla del 7):
+# Tabla del 7:
+# ====================
+# 7 x  1 =   7
+# 7 x  2 =  14
+# 7 x  3 =  21
+# ...`} lang="python" title="Tabla de multiplicar" />
+
+### Ejercicio 5: Factorial
+
+<Code code={`# Calcular factorial de un número
+numero = int(input("Número para factorial: "))
+factorial = 1
+
+for i in range(1, numero + 1):
+    factorial *= i
+
+print(f"El factorial de {numero} es {factorial}")
+
+# Ejemplo: factorial de 5 = 120 (5*4*3*2*1)`} lang="python" title="Factorial" />
+
+### Ejercicio 6: Números primos
+
+<Code code={`# Verificar si un número es primo
+numero = int(input("Ingresa un número: "))
+es_primo = True
+
+if numero < 2:
+    es_primo = False
+else:
+    for i in range(2, numero):
+        if numero % i == 0:
+            es_primo = False
+            break
+
+if es_primo:
+    print(f"{numero} es primo")
+else:
+    print(f"{numero} no es primo")`} lang="python" title="Números primos" />
+
+### Ejercicio 7: Pirámide de números
+
+<Code code={`# Generar pirámide de números
+filas = int(input("Número de filas: "))
+
+for i in range(1, filas + 1):
+    # Espacios
+    print(" " * (filas - i), end="")
+    
+    # Números ascendentes
+    for j in range(1, i + 1):
+        print(j, end="")
+    
+    # Números descendentes
+    for j in range(i - 1, 0, -1):
+        print(j, end="")
+    
+    print()  # Nueva línea
+
+# Salida con 5 filas:
+#     1
+#    121
+#   12321
+#  1234321
+# 123454321`} lang="python" title="Pirámide" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎯 Resumen de la lección
+
+<Aside type="tip" title="📚 Lo que aprendiste">
+En esta lección sobre control de flujo (bucles) has aprendido:
+
+✅ **Concepto de bucle**: Repetir código automáticamente para evitar redundancia  
+✅ **while**: Repetir mientras una condición sea verdadera  
+✅ **for**: Iterar sobre secuencias (listas, rangos, cadenas)  
+✅ **break, continue, pass**: Controlar el flujo dentro de bucles  
+✅ **Ejercicios prácticos**: Contar, sumar, generar listas, tablas y patrones  
+
+**Próximo paso**: En la siguiente lección aprenderás sobre listas y colecciones de datos en Python.
+</Aside>

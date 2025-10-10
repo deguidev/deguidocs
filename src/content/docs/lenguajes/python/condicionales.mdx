@@ -1,0 +1,389 @@
+---
+title: 5. Control de Flujo (Condicionales)
+description: Toma de decisiones en Python con if, elif, else y operadores relacionales
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## 🤔 5.1 Qué es una decisión en programación
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Concepto de decisión en programación
+
+Una **decisión** en programación es un mecanismo que permite al programa elegir entre diferentes caminos de ejecución basándose en la evaluación de condiciones. Es análogo a cómo los humanos tomamos decisiones: "Si llueve, llevo paraguas; si no, no lo llevo".
+
+### Control de flujo
+
+El **control de flujo** altera el orden secuencial de ejecución. Por defecto, las instrucciones se ejecutan línea por línea, pero las estructuras de control permiten tomar decisiones, repetir acciones y saltar secciones de código.
+
+### Propósito de las estructuras condicionales
+
+**🔹 Adaptabilidad**: El programa responde diferente según las circunstancias  
+**🔹 Validación**: Verifican que los datos cumplan criterios específicos  
+**🔹 Lógica de negocio**: Implementan reglas del dominio del problema  
+**🔹 Interactividad**: Responden a las acciones del usuario  
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Flujo secuencial vs condicional
+
+<Code code={`# FLUJO SECUENCIAL (sin decisiones)
+print("Línea 1")
+print("Línea 2")
+print("Línea 3")
+
+# FLUJO CONDICIONAL (con decisiones)
+edad = 17
+
+if edad >= 18:
+    print("Eres mayor de edad")  # No se ejecuta
+else:
+    print("Eres menor de edad")  # Sí se ejecuta`} lang="python" title="Comparación de flujos" />
+
+### Decisión simple
+
+<Code code={`# Decisión con un solo camino
+temperatura = 38
+
+if temperatura > 37:
+    print("⚠️ Tienes fiebre")
+    print("Debes consultar al médico")
+
+print("Programa finalizado")`} lang="python" title="Decisión simple" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔀 5.2 Uso de if, elif, else con ejemplos sencillos
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Estructuras condicionales
+
+**if**: Evalúa una condición y ejecuta código si es `True`  
+**if-else**: Dos caminos: uno si es `True`, otro si es `False`  
+**if-elif-else**: Múltiples condiciones evaluadas en secuencia  
+
+### Sintaxis
+
+```python
+if condicion:
+    # código si es True
+elif otra_condicion:
+    # código si esta es True
+else:
+    # código si todas son False
+```
+
+### Características importantes
+
+**🔹 Indentación obligatoria**: Python usa 4 espacios para delimitar bloques  
+**🔹 Evaluación en cortocircuito**: Se ejecuta el primer `True` encontrado  
+**🔹 else es opcional**: Puedes usar solo `if` o `if-elif`  
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### if simple
+
+<Code code={`# Estructura if básica
+edad = 20
+
+if edad >= 18:
+    print("Eres mayor de edad")
+    print("Puedes votar")
+
+print("Fin del programa")`} lang="python" title="if simple" />
+
+### if-else
+
+<Code code={`# Estructura if-else
+numero = 7
+
+if numero % 2 == 0:
+    print(f"{numero} es par")
+else:
+    print(f"{numero} es impar")
+
+# Salida: 7 es impar`} lang="python" title="if-else" />
+
+### if-elif-else
+
+<Code code={`# Estructura if-elif-else
+nota = 8.5
+
+if nota >= 9.0:
+    print("Calificación: A (Excelente)")
+elif nota >= 8.0:
+    print("Calificación: B (Muy bueno)")
+elif nota >= 7.0:
+    print("Calificación: C (Bueno)")
+elif nota >= 6.0:
+    print("Calificación: D (Aprobado)")
+else:
+    print("Calificación: F (Reprobado)")
+
+# Salida: Calificación: B (Muy bueno)`} lang="python" title="if-elif-else" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## ⚖️ 5.3 Operadores relacionales aplicados a condiciones
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Operadores relacionales
+
+Los operadores relacionales comparan valores y generan expresiones booleanas:
+
+**`==`**: Igual a  
+**`!=`**: Diferente de  
+**`<`**: Menor que  
+**`>`**: Mayor que  
+**`<=`**: Menor o igual  
+**`>=`**: Mayor o igual  
+
+### Operadores adicionales
+
+**`in`**: Verifica si un elemento está en una secuencia  
+**`not in`**: Verifica si NO está  
+**`and`**: Ambas condiciones deben ser True  
+**`or`**: Al menos una debe ser True  
+**`not`**: Invierte el valor booleano  
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Comparaciones numéricas
+
+<Code code={`# Operadores relacionales
+edad = 25
+
+if edad == 25:
+    print("Tienes exactamente 25 años")
+
+if edad >= 18:
+    print("Puedes votar")
+
+if edad < 65:
+    print("No eres adulto mayor")`} lang="python" title="Comparaciones" />
+
+### Operador in
+
+<Code code={`# Verificar pertenencia
+frutas = ["manzana", "pera", "uva"]
+
+if "manzana" in frutas:
+    print("Tenemos manzanas")
+
+email = "usuario@example.com"
+
+if "@" in email:
+    print("Email válido")`} lang="python" title="Operador in" />
+
+### Condiciones compuestas
+
+<Code code={`# Usar and
+edad = 25
+tiene_licencia = True
+
+if edad >= 18 and tiene_licencia:
+    print("Puedes conducir")
+
+# Usar or
+dia = "sábado"
+
+if dia == "sábado" or dia == "domingo":
+    print("Es fin de semana")`} lang="python" title="and y or" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔄 5.4 Anidamiento de condiciones
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Concepto de anidamiento
+
+El **anidamiento** consiste en colocar una estructura condicional dentro de otra, permitiendo crear lógica más compleja donde las decisiones dependen de múltiples niveles de evaluación.
+
+### Cuándo usar anidamiento
+
+**🔹 Decisiones dependientes**: Una decisión solo tiene sentido después de otra  
+**🔹 Validaciones en cascada**: Verificar múltiples criterios en secuencia  
+**🔹 Lógica compleja**: Cuando no puede expresarse con operadores simples  
+
+### Buenas prácticas
+
+- Limitar el anidamiento a 2-3 niveles máximo
+- Considerar usar operadores lógicos en lugar de anidar
+- Refactorizar si hay más de 3 niveles
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Anidamiento básico
+
+<Code code={`# Anidamiento de dos niveles
+edad = 20
+tiene_licencia = True
+
+if edad >= 18:
+    print("Eres mayor de edad")
+    
+    if tiene_licencia:
+        print("✅ Puedes conducir")
+    else:
+        print("❌ Necesitas licencia")
+else:
+    print("Eres menor de edad")`} lang="python" title="Anidamiento básico" />
+
+### Comparación: anidado vs operadores
+
+<Code code={`# Con anidamiento
+if edad >= 18:
+    if tiene_licencia:
+        print("Puedes conducir")
+
+# Con operador and (más simple)
+if edad >= 18 and tiene_licencia:
+    print("Puedes conducir")`} lang="python" title="Anidado vs and" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 💪 5.5 Ejercicios guiados: validar edad, comparar números
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Propósito de los ejercicios
+
+Los ejercicios guiados permiten aplicar los conceptos de estructuras condicionales en problemas prácticos: validación de datos, comparación de valores, clasificación y lógica de negocio.
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Ejercicio 1: Validar edad
+
+<Code code={`# Validar si una persona puede votar
+edad = int(input("Ingresa tu edad: "))
+
+if edad < 0:
+    print("❌ Edad inválida")
+elif edad < 18:
+    print(f"❌ No puedes votar (faltan {18 - edad} años)")
+elif edad <= 120:
+    print("✅ Puedes votar")
+else:
+    print("❌ Edad inválida")`} lang="python" title="Validar edad" />
+
+### Ejercicio 2: Comparar dos números
+
+<Code code={`# Comparar dos números
+num1 = float(input("Primer número: "))
+num2 = float(input("Segundo número: "))
+
+if num1 > num2:
+    print(f"{num1} es MAYOR que {num2}")
+elif num1 < num2:
+    print(f"{num1} es MENOR que {num2}")
+else:
+    print(f"{num1} y {num2} son IGUALES")`} lang="python" title="Comparar números" />
+
+### Ejercicio 3: Clasificar edad
+
+<Code code={`# Clasificar persona según edad
+edad = int(input("Ingresa tu edad: "))
+
+if edad <= 2:
+    categoria = "Bebé 👶"
+elif edad <= 12:
+    categoria = "Niño 🧒"
+elif edad <= 17:
+    categoria = "Adolescente 👦"
+elif edad <= 64:
+    categoria = "Adulto 👨"
+else:
+    categoria = "Adulto mayor 👴"
+
+print(f"Categoría: {categoria}")`} lang="python" title="Clasificar edad" />
+
+### Ejercicio 4: Mayor de tres números
+
+<Code code={`# Encontrar el mayor de tres números
+num1 = float(input("Primer número: "))
+num2 = float(input("Segundo número: "))
+num3 = float(input("Tercer número: "))
+
+if num1 >= num2 and num1 >= num3:
+    mayor = num1
+elif num2 >= num1 and num2 >= num3:
+    mayor = num2
+else:
+    mayor = num3
+
+print(f"El mayor número es: {mayor}")`} lang="python" title="Mayor de tres" />
+
+### Ejercicio 5: Calculadora de IMC
+
+<Code code={`# Calcular IMC y clasificar
+peso = float(input("Peso en kg: "))
+altura = float(input("Altura en metros: "))
+
+if peso <= 0 or altura <= 0:
+    print("❌ Datos inválidos")
+else:
+    imc = peso / (altura ** 2)
+    print(f"Tu IMC es: {imc:.2f}")
+    
+    if imc < 18.5:
+        print("Clasificación: Bajo peso")
+    elif imc < 25:
+        print("Clasificación: Peso normal")
+    elif imc < 30:
+        print("Clasificación: Sobrepeso")
+    else:
+        print("Clasificación: Obesidad")`} lang="python" title="Calculadora IMC" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎯 Resumen de la lección
+
+<Aside type="tip" title="📚 Lo que aprendiste">
+En esta lección sobre control de flujo (condicionales) has aprendido:
+
+✅ **Decisiones en programación**: Concepto y propósito del control de flujo  
+✅ **if, elif, else**: Estructuras condicionales básicas y su sintaxis  
+✅ **Operadores relacionales**: Comparaciones y operadores lógicos en condiciones  
+✅ **Anidamiento**: Condiciones dentro de condiciones y cuándo usarlas  
+✅ **Ejercicios prácticos**: Validación de edad, comparación de números, clasificaciones  
+
+**Próximo paso**: En la siguiente lección aprenderás sobre bucles (for y while) en Python.
+</Aside>

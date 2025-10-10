@@ -1,0 +1,515 @@
+---
+title: Bienvenidos a deguidocs
+description: Tu plataforma completa de documentación técnica para desarrollo de software, bases de datos, frameworks y metodologías.
+---
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+## 🎯 ¿Qué es deguidocs?
+
+**deguidocs** es una plataforma de documentación técnica integral diseñada para desarrolladores, estudiantes y profesionales de TI. Aquí encontrarás guías completas, ejemplos prácticos y referencias detalladas sobre las tecnologías más utilizadas en el desarrollo de software moderno.
+
+<Aside type="tip" title="¡Comienza tu viaje!">
+Explora nuestras secciones organizadas por categorías para encontrar exactamente lo que necesitas. Desde fundamentos hasta conceptos avanzados.
+</Aside>
+
+---
+
+## 📚 Contenido de la Plataforma
+
+### 💾 Base de Datos
+
+Domina los sistemas de gestión de bases de datos más populares del mercado.
+
+<CardGrid>
+  <Card title="Oracle ❤️" icon="database">
+    **12 capítulos completos** que cubren desde introducción hasta objetos avanzados:
+    - Tipos de datos y restricciones
+    - DDL, DML, DCL y TCL
+    - Funciones y procedimientos almacenados
+    - Programación PL/SQL
+    - Triggers, secuencias e índices
+    - Administración de usuarios y permisos
+    
+    <Badge text="12 lecciones" variant="success" />
+  </Card>
+  
+  <Card title="MySQL 🤗" icon="database">
+    Próximamente: Documentación completa de MySQL
+    
+    <Badge text="Próximamente" variant="caution" />
+  </Card>
+</CardGrid>
+
+---
+
+### 🔄 Control de Versiones
+
+Aprende a gestionar tu código de forma profesional con Git y GitHub.
+
+<Card title="GitHub 🐈" icon="github">
+  **6 módulos esenciales** para dominar el control de versiones:
+  - Introducción a Git y GitHub
+  - Configuración inicial y comandos básicos
+  - Fundamentos: commits, staging, historial
+  - Repositorios remotos y sincronización
+  - Ramas: creación, fusión y resolución de conflictos
+  - Trabajo colaborativo: pull requests, code review
+  
+  <Badge text="6 lecciones" variant="success" />
+</Card>
+
+---
+
+### 💻 Lenguajes de Programación
+
+Guías completas de los lenguajes más demandados en la industria.
+
+<CardGrid stagger>
+  <Card title="SQL 📂" icon="seti:sql">
+    **8 capítulos** desde fundamentos hasta optimización:
+    - DDL, DML, DCL y TCL
+    - Consultas avanzadas con JOINs y subconsultas
+    - Vistas, procedimientos y funciones
+    - Seguridad y control de accesos
+    - Transacciones y optimización
+    
+    <Badge text="8 lecciones" variant="success" />
+  </Card>
+
+  <Card title="PHP 🐘" icon="seti:php">
+    **11 lecciones** de PHP moderno:
+    - Sintaxis básica y control de flujo
+    - Funciones, arreglos y strings
+    - Formularios y métodos HTTP
+    - Conexión a bases de datos MySQL
+    - POO: clases, herencia, interfaces
+    - Sesiones, cookies y seguridad
+    - Buenas prácticas y patrones
+    
+    <Badge text="11 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Java 🦊" icon="seti:java">
+    **11 módulos** completos de Java:
+    - Tipos de datos y operadores
+    - Estructuras de control
+    - Programación Orientada a Objetos
+    - Arreglos y colecciones
+    - Manejo de excepciones
+    - Entrada/salida de archivos
+    - JDBC: conexión a bases de datos
+    - Buenas prácticas y herramientas
+    
+    <Badge text="11 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Python 🐍" icon="seti:python">
+    **11 módulos** completos de Python desde cero:
+    - Introducción: qué es Python y aplicaciones reales
+    - Variables y tipos de datos
+    - Operadores y expresiones
+    - Entrada y salida de datos (input, print, f-strings)
+    - Condicionales (if, elif, else)
+    - Bucles (for, while, break, continue)
+    - Listas y colecciones (tuplas, sets, diccionarios)
+    - Funciones y parámetros
+    - Módulos y librerías (math, random, pip)
+    - Manejo de cadenas de texto
+    - Programación Orientada a Objetos (clases, herencia)
+    
+    <Badge text="11 lecciones" variant="success" />
+  </Card>
+
+  <Card title="HTML 🐛" icon="seti:html">
+    **10 capítulos** de HTML5 moderno:
+    - Elementos básicos y estructura
+    - Cabecera y metadatos
+    - Enlaces, imágenes y multimedia
+    - Tablas y formularios
+    - Etiquetas semánticas
+    - Estructura avanzada
+    
+    <Badge text="10 lecciones" variant="success" />
+  </Card>
+
+  <Card title="CSS 🐌" icon="seti:css">
+    **11 lecciones** de CSS3:
+    - Selectores y especificidad
+    - Colores, unidades y tipografía
+    - Modelo de caja y posicionamiento
+    - Flexbox y Grid Layout
+    - Transiciones y animaciones
+    - Responsive Design y Media Queries
+    
+    <Badge text="11 lecciones" variant="success" />
+  </Card>
+
+  <Card title="JavaScript 🌟" icon="seti:javascript">
+    **20 módulos** completos de JavaScript moderno:
+    - Sintaxis, variables y tipos de datos
+    - Estructuras de control y funciones
+    - Arrays, objetos y strings
+    - Manipulación del DOM
+    - Eventos y formularios
+    - JSON y almacenamiento local
+    - Programación asíncrona
+    - POO: clases y módulos
+    - Fetch API y manejo de errores
+    
+    <Badge text="20 lecciones" variant="success" />
+  </Card>
+</CardGrid>
+
+---
+
+### 🛠️ Frameworks y Librerías
+
+Aprende los frameworks más populares para desarrollo web y de aplicaciones.
+
+<CardGrid stagger>
+  <Card title="Vue 3 🐊" icon="seti:vue">
+    **17 capítulos** de Vue 3 con Composition API:
+    - Estructura de componentes y reactividad
+    - Props, eventos y comunicación
+    - Computadas, watchers y ciclo de vida
+    - Formularios y directivas
+    - Slots y composables
+    - Vue Router y Pinia (state management)
+    - Transiciones, animaciones y APIs
+    
+    <Badge text="17 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Laravel 🦋" icon="seti:laravel">
+    **17 módulos** del framework PHP más popular:
+    - Instalación y configuración
+    - Rutas, controladores y modelos
+    - Vistas con Blade
+    - Eloquent ORM y relaciones
+    - Formularios y validación
+    - Autenticación y autorización
+    - Migraciones y seeders
+    - API REST y JSON
+    - Jobs, queues y notificaciones
+    
+    <Badge text="17 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Inertia.js 🐳" icon="rocket">
+    **12 lecciones** para dominar Inertia:
+    - Instalación y configuración
+    - Rutas y controladores
+    - Componentes Vue 3
+    - Layouts y navegación
+    - Formularios con useForm
+    - Props compartidas y lazy loading
+    - Middlewares y autenticación
+    
+    <Badge text="12 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Java Swing 🪸" icon="seti:java">
+    **6 capítulos** para aplicaciones de escritorio:
+    - Introducción a Swing
+    - Componentes básicos
+    - Organización de interfaces
+    - Tablas y modelos personalizados
+    - CRUD con base de datos
+    - Patrones de diseño y arquitecturas
+    
+    <Badge text="6 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Alpine.js 🦉" icon="star">
+    **10 lecciones** del framework ligero:
+    - Instalación y sintaxis básica
+    - Reactividad y estado
+    - Eventos y ciclo de vida
+    - Componentes y scopes
+    - Plugins y extensiones
+    - Casos de uso prácticos
+    
+    <Badge text="10 lecciones" variant="success" />
+  </Card>
+</CardGrid>
+
+---
+
+### 🐞 UML - Modelado de Software
+
+Aprende a diseñar y documentar sistemas con diagramas UML profesionales.
+
+<CardGrid stagger>
+  <Card title="Diagramas de Clases 🦉" icon="puzzle">
+    Modela la estructura estática de tu sistema:
+    - Introducción y conceptos
+    - Elementos básicos: clases, atributos, métodos
+    - Relaciones: asociación, agregación, composición, herencia
+    - Notación UML estándar
+    
+    <Badge text="4 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Diagramas de Casos de Uso 🦌" icon="open-book">
+    Define los requisitos funcionales:
+    - Actores y casos de uso
+    - Relaciones: include, extend, generalización
+    - Límites del sistema
+    - Notación y mejores prácticas
+    
+    <Badge text="4 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Diagramas de Secuencia 🐢" icon="list-format">
+    Visualiza interacciones temporales:
+    - Líneas de vida y mensajes
+    - Tipos de mensajes: síncronos, asíncronos, retorno
+    - Fragmentos combinados
+    - Notación UML 2.x
+    
+    <Badge text="4 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Diagramas de Actividades 🐝" icon="setting">
+    Modela flujos de trabajo y procesos:
+    - Nodos de acción y decisión
+    - Flujos de control y objetos
+    - Particiones (swimlanes)
+    - Notación estándar
+    
+    <Badge text="4 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Diagramas de Componentes 🦋" icon="puzzle">
+    Representa la arquitectura física:
+    - Componentes y sus interfaces
+    - Dependencias entre componentes
+    - Puertos y conectores
+    - Notación UML
+    
+    <Badge text="4 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Diagramas de Despliegue 🐏" icon="rocket">
+    Modela la infraestructura del sistema:
+    - Nodos y dispositivos
+    - Artefactos y manifestaciones
+    - Relaciones de despliegue
+    - Notación estándar
+    
+    <Badge text="4 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Diagramas Entidad-Relación 🐟" icon="seti:db">
+    Diseña modelos de datos:
+    - Entidades y atributos
+    - Relaciones y cardinalidad
+    - Claves primarias y foráneas
+    - Modelo físico y lógico
+    
+    <Badge text="4 lecciones" variant="success" />
+  </Card>
+</CardGrid>
+
+---
+
+### 📚 Ingeniería de Software
+
+Fundamentos teóricos y prácticos para desarrollar software de calidad.
+
+<CardGrid>
+  <Card title="Ingeniería de Software 💻" icon="laptop">
+    **4 temas fundamentales:**
+    - Concepto y propósito
+    - Alcance de la ingeniería de software
+    - Diferencia entre programar e ingeniar
+    - Principales desafíos del desarrollo
+    
+    <Badge text="4 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Ingeniería de Requerimientos 🐘" icon="document">
+    **5 módulos esenciales:**
+    - Concepto y propósito
+    - Tipos de requerimientos (funcionales y no funcionales)
+    - Técnicas de captura
+    - Análisis y priorización
+    - Documentación efectiva
+    
+    <Badge text="5 lecciones" variant="success" />
+  </Card>
+
+  <Card title="Ciclo de Vida del Software 🦒" icon="random">
+    **3 capítulos clave:**
+    - Concepto general del ciclo de vida
+    - Fases principales: análisis, diseño, desarrollo, pruebas, mantenimiento
+    - Modelos de desarrollo: cascada, iterativo, ágil, DevOps
+    
+    <Badge text="3 lecciones" variant="success" />
+  </Card>
+</CardGrid>
+
+---
+
+### 💚 Metodologías
+
+<Aside type="note">
+**Próximamente:** Metodologías ágiles, Scrum, Kanban, XP y más.
+</Aside>
+
+---
+
+### 🍿 Utilidades y Herramientas
+
+Recursos adicionales para potenciar tu desarrollo.
+
+<Tabs>
+  <TabItem label="Librerías CSS">
+    **Frameworks y librerías de estilos:**
+    - **TailwindCSS**: Utility-first CSS framework
+    - **Bootstrap**: Framework CSS más popular
+    - **Bulma**: Framework CSS moderno basado en Flexbox
+    - **Font Awesome**: Iconos vectoriales
+    - **Bootstrap Icons**: Librería de iconos oficial
+    - **Animations**: Animaciones CSS predefinidas
+    - **SweetAlert**: Alertas personalizadas elegantes
+    
+    <Badge text="7 recursos" variant="note" />
+  </TabItem>
+
+  <TabItem label="Ziggy.js">
+    **6 lecciones** para usar rutas de Laravel en JavaScript:
+    - Introducción a Ziggy
+    - Instalación y configuración
+    - Uso básico en JavaScript
+    - Integración con Vue 3
+    - Configuración avanzada
+    - Interacción con API REST
+    
+    <Badge text="6 lecciones" variant="success" />
+  </TabItem>
+</Tabs>
+
+---
+
+## 🚀 Comienza Ahora
+
+<Steps>
+
+1. **Explora el menú lateral**
+   
+   Navega por las categorías y encuentra el tema que necesitas.
+
+2. **Sigue las lecciones en orden**
+   
+   Cada sección está numerada para un aprendizaje progresivo.
+
+3. **Practica con los ejemplos**
+   
+   Todos los temas incluyen código de ejemplo y ejercicios prácticos.
+
+4. **Consulta las referencias**
+   
+   Usa la documentación como referencia rápida cuando lo necesites.
+
+</Steps>
+
+---
+
+## 📊 Estadísticas de Contenido
+
+<CardGrid>
+  <Card title="📚 Total de Lecciones" icon="star">
+    **Más de 150 lecciones** organizadas en categorías
+  </Card>
+  
+  <Card title="💻 Lenguajes Cubiertos" icon="laptop">
+    **7 lenguajes** de programación completos
+  </Card>
+  
+  <Card title="🛠️ Frameworks" icon="rocket">
+    **5 frameworks** modernos con guías completas
+  </Card>
+  
+  <Card title="🐞 Diagramas UML" icon="puzzle">
+    **7 tipos** de diagramas UML con PlantUML
+  </Card>
+</CardGrid>
+
+---
+
+## 💡 Características Destacadas
+
+<Aside type="tip" title="¿Por qué elegir deguidocs?">
+- ✅ **Contenido actualizado** con las últimas versiones
+- ✅ **Ejemplos prácticos** en cada lección
+- ✅ **Diagramas interactivos** con PlantUML
+- ✅ **Código ejecutable** con resaltado de sintaxis
+- ✅ **Navegación intuitiva** y búsqueda rápida
+- ✅ **Diseño responsive** para cualquier dispositivo
+- ✅ **Contenido en español** claro y profesional
+</Aside>
+
+---
+
+## 🎓 ¿Para quién es esta documentación?
+
+<CardGrid>
+  <Card title="Estudiantes" icon="open-book">
+    Aprende desde cero con guías paso a paso y ejemplos claros.
+  </Card>
+  
+  <Card title="Desarrolladores" icon="laptop">
+    Consulta referencias rápidas y mejores prácticas para tu trabajo diario.
+  </Card>
+  
+  <Card title="Profesionales" icon="star">
+    Profundiza en conceptos avanzados y arquitecturas empresariales.
+  </Card>
+  
+  <Card title="Equipos" icon="rocket">
+    Estandariza conocimientos y comparte recursos con tu equipo.
+  </Card>
+</CardGrid>
+
+---
+
+## 🔗 Recursos Adicionales
+
+<Card title="Repositorio en GitHub" icon="github">
+  Visita nuestro repositorio oficial para contribuir, reportar issues o sugerir mejoras:
+  
+  [github.com/deguidev/deguidocs](https://github.com/deguidev/deguidocs)
+</Card>
+
+---
+
+<Aside type="caution" title="Documentación en constante evolución">
+Esta plataforma se actualiza regularmente con nuevo contenido, correcciones y mejoras. ¡Vuelve pronto para descubrir nuevas lecciones!
+</Aside>
+
+---
+
+## 🎯 Próximos Contenidos
+
+Estamos trabajando en:
+
+- 🔜 **MySQL**: Documentación completa
+- 🔜 **Metodologías Ágiles**: Scrum, Kanban, XP
+- 🔜 **Testing**: Unit testing, integration testing, E2E
+- 🔜 **DevOps**: CI/CD, Docker, Kubernetes
+- 🔜 **Arquitecturas**: Microservicios, Clean Architecture, DDD
+
+---
+
+<Card title="¡Comienza tu aprendizaje ahora!" icon="rocket">
+  Selecciona cualquier tema del menú lateral y empieza a explorar. Cada lección está diseñada para ser práctica, clara y directa al punto.
+  
+  **¡Feliz aprendizaje! 🚀**
+</Card>

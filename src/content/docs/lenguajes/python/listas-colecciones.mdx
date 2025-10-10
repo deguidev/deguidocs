@@ -1,0 +1,537 @@
+---
+title: 7. Listas y Colecciones de Datos
+description: Listas, tuplas, sets y diccionarios en Python. Métodos y operaciones básicas
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+## 📋 7.1 ¿Qué es una lista y cómo se crea?
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Concepto de lista
+
+Una **lista** es una estructura de datos que permite almacenar múltiples valores en una sola variable. Es una colección ordenada, mutable (modificable) y que permite elementos duplicados.
+
+### Características de las listas
+
+**🔹 Ordenadas**: Los elementos mantienen el orden en que fueron agregados  
+**🔹 Mutables**: Se pueden modificar después de su creación  
+**🔹 Indexadas**: Cada elemento tiene una posición (índice) comenzando desde 0  
+**🔹 Heterogéneas**: Pueden contener diferentes tipos de datos  
+**🔹 Duplicados permitidos**: Puede haber elementos repetidos  
+
+### Sintaxis de creación
+
+```python
+# Lista vacía
+lista = []
+
+# Lista con elementos
+lista = [elemento1, elemento2, elemento3]
+
+# Con constructor list()
+lista = list()
+```
+
+### Propósito de las listas
+
+- **Agrupar datos relacionados**: Mantener información organizada
+- **Procesamiento secuencial**: Iterar sobre múltiples valores
+- **Almacenamiento dinámico**: Agregar o eliminar elementos según necesidad
+- **Colecciones ordenadas**: Mantener secuencia específica de elementos
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Crear listas
+
+<Code code={`# Lista vacía
+frutas = []
+print(frutas)  # []
+
+# Lista con elementos
+frutas = ["manzana", "pera", "uva"]
+print(frutas)  # ['manzana', 'pera', 'uva']
+
+# Lista con diferentes tipos
+mixta = [1, "texto", 3.14, True]
+print(mixta)  # [1, 'texto', 3.14, True]
+
+# Lista de números
+numeros = [1, 2, 3, 4, 5]
+print(numeros)  # [1, 2, 3, 4, 5]`} lang="python" title="Crear listas" />
+
+### Listas con range()
+
+<Code code={`# Crear lista desde range
+numeros = list(range(1, 6))
+print(numeros)  # [1, 2, 3, 4, 5]
+
+# Números pares del 0 al 10
+pares = list(range(0, 11, 2))
+print(pares)  # [0, 2, 4, 6, 8, 10]`} lang="python" title="Listas con range()" />
+
+### Listas anidadas
+
+<Code code={`# Lista de listas (matriz)
+matriz = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+print(matriz)
+print(matriz[0])  # [1, 2, 3]
+print(matriz[1][1])  # 5`} lang="python" title="Listas anidadas" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔍 7.2 Acceso por índice, modificación y recorrido
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Acceso por índice
+
+Los elementos de una lista se acceden mediante su **índice** (posición). Python usa indexación basada en cero: el primer elemento está en la posición 0.
+
+**Índices positivos**: Comienzan desde 0 (inicio de la lista)  
+**Índices negativos**: Comienzan desde -1 (final de la lista)  
+
+### Slicing (rebanado)
+
+Permite obtener sublistas usando la sintaxis `lista[inicio:fin:paso]`:
+- **inicio**: Índice donde comienza (incluido)
+- **fin**: Índice donde termina (excluido)
+- **paso**: Incremento entre elementos
+
+### Modificación
+
+Las listas son mutables, por lo que sus elementos pueden modificarse directamente asignando nuevos valores a índices específicos.
+
+### Recorrido
+
+Se puede iterar sobre una lista usando bucles `for` o `while`, accediendo a cada elemento secuencialmente.
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Acceso por índice
+
+<Code code={`frutas = ["manzana", "pera", "uva", "naranja", "kiwi"]
+
+# Índices positivos
+print(frutas[0])   # manzana (primer elemento)
+print(frutas[2])   # uva
+print(frutas[4])   # kiwi (último elemento)
+
+# Índices negativos
+print(frutas[-1])  # kiwi (último)
+print(frutas[-2])  # naranja (penúltimo)
+print(frutas[-5])  # manzana (primero desde el final)`} lang="python" title="Acceso por índice" />
+
+### Slicing (rebanado)
+
+<Code code={`numeros = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# Obtener sublista
+print(numeros[2:5])    # [2, 3, 4]
+print(numeros[:3])     # [0, 1, 2] (desde inicio)
+print(numeros[7:])     # [7, 8, 9] (hasta el final)
+print(numeros[::2])    # [0, 2, 4, 6, 8] (cada 2)
+print(numeros[::-1])   # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0] (invertida)`} lang="python" title="Slicing" />
+
+### Modificación de elementos
+
+<Code code={`frutas = ["manzana", "pera", "uva"]
+
+# Modificar un elemento
+frutas[1] = "plátano"
+print(frutas)  # ['manzana', 'plátano', 'uva']
+
+# Modificar múltiples elementos
+frutas[0:2] = ["fresa", "sandía"]
+print(frutas)  # ['fresa', 'sandía', 'uva']
+
+# Modificar con índice negativo
+frutas[-1] = "melón"
+print(frutas)  # ['fresa', 'sandía', 'melón']`} lang="python" title="Modificación" />
+
+### Recorrido de listas
+
+<Code code={`frutas = ["manzana", "pera", "uva"]
+
+# Recorrer con for
+for fruta in frutas:
+    print(fruta)
+
+# Recorrer con índice
+for i in range(len(frutas)):
+    print(f"{i}: {frutas[i]}")
+
+# Recorrer con enumerate
+for indice, fruta in enumerate(frutas):
+    print(f"{indice}: {fruta}")`} lang="python" title="Recorrido" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🛠️ 7.3 Métodos comunes: append(), remove(), sort(), len()
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Métodos principales de listas
+
+**append(elemento)**: Agrega un elemento al final de la lista  
+**insert(índice, elemento)**: Inserta un elemento en una posición específica  
+**remove(elemento)**: Elimina la primera ocurrencia de un elemento  
+**pop(índice)**: Elimina y retorna el elemento en el índice (por defecto el último)  
+**clear()**: Elimina todos los elementos  
+**sort()**: Ordena la lista in-place (modifica la original)  
+**reverse()**: Invierte el orden de los elementos  
+**count(elemento)**: Cuenta cuántas veces aparece un elemento  
+**index(elemento)**: Retorna el índice de la primera ocurrencia  
+
+### Función len()
+
+**len(lista)**: Retorna la cantidad de elementos en la lista (no es un método, es una función)
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### append() - Agregar elementos
+
+<Code code={`frutas = ["manzana", "pera"]
+
+# Agregar al final
+frutas.append("uva")
+print(frutas)  # ['manzana', 'pera', 'uva']
+
+frutas.append("naranja")
+print(frutas)  # ['manzana', 'pera', 'uva', 'naranja']`} lang="python" title="append()" />
+
+### insert() y remove()
+
+<Code code={`frutas = ["manzana", "pera", "uva"]
+
+# Insertar en posición específica
+frutas.insert(1, "plátano")
+print(frutas)  # ['manzana', 'plátano', 'pera', 'uva']
+
+# Eliminar elemento específico
+frutas.remove("pera")
+print(frutas)  # ['manzana', 'plátano', 'uva']`} lang="python" title="insert() y remove()" />
+
+### pop() y clear()
+
+<Code code={`numeros = [1, 2, 3, 4, 5]
+
+# Eliminar y obtener último elemento
+ultimo = numeros.pop()
+print(ultimo)   # 5
+print(numeros)  # [1, 2, 3, 4]
+
+# Eliminar elemento en índice específico
+segundo = numeros.pop(1)
+print(segundo)  # 2
+print(numeros)  # [1, 3, 4]
+
+# Limpiar toda la lista
+numeros.clear()
+print(numeros)  # []`} lang="python" title="pop() y clear()" />
+
+### sort() y reverse()
+
+<Code code={`# Ordenar números
+numeros = [5, 2, 8, 1, 9]
+numeros.sort()
+print(numeros)  # [1, 2, 5, 8, 9]
+
+# Ordenar en reversa
+numeros.sort(reverse=True)
+print(numeros)  # [9, 8, 5, 2, 1]
+
+# Ordenar cadenas
+frutas = ["uva", "manzana", "pera"]
+frutas.sort()
+print(frutas)  # ['manzana', 'pera', 'uva']
+
+# Invertir orden
+frutas.reverse()
+print(frutas)  # ['uva', 'pera', 'manzana']`} lang="python" title="sort() y reverse()" />
+
+### len(), count() e index()
+
+<Code code={`frutas = ["manzana", "pera", "uva", "pera", "kiwi"]
+
+# Longitud de la lista
+print(len(frutas))  # 5
+
+# Contar ocurrencias
+print(frutas.count("pera"))  # 2
+print(frutas.count("uva"))   # 1
+
+# Encontrar índice
+print(frutas.index("uva"))   # 2
+print(frutas.index("pera"))  # 1 (primera ocurrencia)`} lang="python" title="len(), count(), index()" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🗂️ 7.4 Introducción a tuplas, sets y diccionarios (nivel básico)
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Tuplas
+
+**Definición**: Colección ordenada e **inmutable** (no se puede modificar)  
+**Sintaxis**: `tupla = (elemento1, elemento2)`  
+**Uso**: Datos que no deben cambiar, retorno múltiple de funciones  
+
+### Sets (Conjuntos)
+
+**Definición**: Colección **no ordenada** y sin elementos duplicados  
+**Sintaxis**: `conjunto = {elemento1, elemento2}`  
+**Uso**: Eliminar duplicados, operaciones matemáticas de conjuntos  
+
+### Diccionarios
+
+**Definición**: Colección de pares **clave-valor**, no ordenada (antes de Python 3.7)  
+**Sintaxis**: `diccionario = {clave1: valor1, clave2: valor2}`  
+**Uso**: Mapear relaciones, búsquedas rápidas por clave  
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Tuplas
+
+<Code code={`# Crear tupla
+coordenadas = (10, 20)
+print(coordenadas)  # (10, 20)
+
+# Acceder por índice
+print(coordenadas[0])  # 10
+print(coordenadas[1])  # 20
+
+# Las tuplas son inmutables
+# coordenadas[0] = 15  # Error: no se puede modificar
+
+# Desempaquetar tupla
+x, y = coordenadas
+print(f"x={x}, y={y}")  # x=10, y=20
+
+# Tupla de un elemento (requiere coma)
+tupla_uno = (5,)
+print(type(tupla_uno))  # <class 'tuple'>`} lang="python" title="Tuplas" />
+
+### Sets (Conjuntos)
+
+<Code code={`# Crear set
+frutas = {"manzana", "pera", "uva"}
+print(frutas)  # {'manzana', 'pera', 'uva'}
+
+# Eliminar duplicados automáticamente
+numeros = {1, 2, 2, 3, 3, 3, 4}
+print(numeros)  # {1, 2, 3, 4}
+
+# Agregar elemento
+frutas.add("naranja")
+print(frutas)
+
+# Eliminar elemento
+frutas.remove("pera")
+print(frutas)
+
+# Operaciones de conjuntos
+a = {1, 2, 3, 4}
+b = {3, 4, 5, 6}
+
+print(a | b)  # Unión: {1, 2, 3, 4, 5, 6}
+print(a & b)  # Intersección: {3, 4}
+print(a - b)  # Diferencia: {1, 2}`} lang="python" title="Sets" />
+
+### Diccionarios
+
+<Code code={`# Crear diccionario
+estudiante = {
+    "nombre": "Ana",
+    "edad": 20,
+    "carrera": "Ingeniería"
+}
+print(estudiante)
+
+# Acceder por clave
+print(estudiante["nombre"])  # Ana
+print(estudiante["edad"])    # 20
+
+# Agregar o modificar
+estudiante["ciudad"] = "Madrid"
+estudiante["edad"] = 21
+print(estudiante)
+
+# Obtener claves y valores
+print(estudiante.keys())    # dict_keys(['nombre', 'edad', 'carrera', 'ciudad'])
+print(estudiante.values())  # dict_values(['Ana', 21, 'Ingeniería', 'Madrid'])
+
+# Iterar sobre diccionario
+for clave, valor in estudiante.items():
+    print(f"{clave}: {valor}")`} lang="python" title="Diccionarios" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## ⚖️ 7.5 Comparación entre listas, tuplas y conjuntos
+
+<Tabs>
+<TabItem label="👔 Parte Teórica">
+
+### Tabla comparativa
+
+| Característica | Lista | Tupla | Set |
+|---------------|-------|-------|-----|
+| **Sintaxis** | `[]` | `()` | `{}` |
+| **Ordenada** | ✅ Sí | ✅ Sí | ❌ No |
+| **Mutable** | ✅ Sí | ❌ No | ✅ Sí |
+| **Duplicados** | ✅ Sí | ✅ Sí | ❌ No |
+| **Indexable** | ✅ Sí | ✅ Sí | ❌ No |
+| **Uso principal** | Colecciones modificables | Datos inmutables | Eliminar duplicados |
+
+### Cuándo usar cada una
+
+**Listas**: Cuando necesitas una colección ordenada que puede cambiar  
+**Tuplas**: Cuando los datos no deben modificarse (coordenadas, configuración)  
+**Sets**: Cuando necesitas elementos únicos o realizar operaciones de conjuntos  
+**Diccionarios**: Cuando necesitas mapear claves a valores  
+
+</TabItem>
+
+<TabItem label="💡 Ejemplos Prácticos">
+
+### Comparación práctica
+
+<Code code={`# LISTA - Mutable y ordenada
+lista = [1, 2, 3, 2, 1]
+lista.append(4)
+lista[0] = 10
+print(lista)  # [10, 2, 3, 2, 1, 4]
+
+# TUPLA - Inmutable y ordenada
+tupla = (1, 2, 3, 2, 1)
+# tupla.append(4)  # Error: no tiene método append
+# tupla[0] = 10    # Error: no se puede modificar
+print(tupla)  # (1, 2, 3, 2, 1)
+
+# SET - Mutable pero sin orden ni duplicados
+conjunto = {1, 2, 3, 2, 1}
+conjunto.add(4)
+# conjunto[0]  # Error: no es indexable
+print(conjunto)  # {1, 2, 3, 4}`} lang="python" title="Comparación" />
+
+### Conversión entre tipos
+
+<Code code={`# Lista a tupla
+lista = [1, 2, 3]
+tupla = tuple(lista)
+print(tupla)  # (1, 2, 3)
+
+# Tupla a lista
+tupla = (4, 5, 6)
+lista = list(tupla)
+print(lista)  # [4, 5, 6]
+
+# Lista a set (elimina duplicados)
+lista = [1, 2, 2, 3, 3, 3]
+conjunto = set(lista)
+print(conjunto)  # {1, 2, 3}
+
+# Set a lista
+conjunto = {1, 2, 3}
+lista = list(conjunto)
+print(lista)  # [1, 2, 3]`} lang="python" title="Conversiones" />
+
+### Casos de uso específicos
+
+<Code code={`# LISTA: Carrito de compras (puede cambiar)
+carrito = ["manzana", "pan", "leche"]
+carrito.append("huevos")
+carrito.remove("pan")
+print(f"Carrito: {carrito}")
+
+# TUPLA: Coordenadas GPS (no deben cambiar)
+ubicacion = (40.4168, -3.7038)  # Madrid
+latitud, longitud = ubicacion
+print(f"Ubicación: {latitud}, {longitud}")
+
+# SET: Etiquetas únicas
+etiquetas = {"python", "programación", "python", "tutorial"}
+print(f"Etiquetas: {etiquetas}")  # Duplicados eliminados
+
+# DICCIONARIO: Información de usuario
+usuario = {
+    "id": 123,
+    "nombre": "Ana",
+    "email": "ana@example.com"
+}
+print(f"Usuario: {usuario['nombre']}")`} lang="python" title="Casos de uso" />
+
+### Rendimiento y memoria
+
+<Code code={`import sys
+
+# Comparar tamaño en memoria
+lista = [1, 2, 3, 4, 5]
+tupla = (1, 2, 3, 4, 5)
+conjunto = {1, 2, 3, 4, 5}
+
+print(f"Lista: {sys.getsizeof(lista)} bytes")
+print(f"Tupla: {sys.getsizeof(tupla)} bytes")
+print(f"Set: {sys.getsizeof(conjunto)} bytes")
+
+# Las tuplas son más eficientes en memoria
+# Los sets son más rápidos para búsquedas`} lang="python" title="Rendimiento" />
+
+<Aside type="tip" title="💡 Regla general">
+- Usa **listas** por defecto para colecciones ordenadas que necesitas modificar
+- Usa **tuplas** para datos que no deben cambiar o como claves de diccionarios
+- Usa **sets** cuando necesites garantizar elementos únicos o hacer operaciones de conjuntos
+- Usa **diccionarios** cuando necesites asociar claves con valores
+</Aside>
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎯 Resumen de la lección
+
+<Aside type="tip" title="📚 Lo que aprendiste">
+En esta lección sobre listas y colecciones de datos has aprendido:
+
+✅ **Listas**: Colecciones ordenadas y mutables, creación y sintaxis  
+✅ **Acceso e indexación**: Índices positivos/negativos, slicing, modificación  
+✅ **Métodos de listas**: append(), remove(), sort(), len() y más  
+✅ **Otras colecciones**: Tuplas (inmutables), sets (únicos), diccionarios (clave-valor)  
+✅ **Comparación**: Diferencias entre listas, tuplas y sets, cuándo usar cada una  
+
+**Próximo paso**: En la siguiente lección aprenderás sobre funciones en Python.
+</Aside>
