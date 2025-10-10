@@ -1,0 +1,870 @@
+---
+title: 3 Captura de Requerimientos
+description: Entrevistas y reuniones con el cliente, cuestionarios y observación, prototipos y casos de uso
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+## 🎯 Introducción a la Captura de Requerimientos
+
+La **captura de requerimientos** (también conocida como elicitación o descubrimiento) es el proceso sistemático de identificar, recopilar y documentar las necesidades, expectativas y restricciones de los stakeholders para un sistema de software. Es la fase inicial y crítica del ciclo de vida de la ingeniería de requerimientos.
+
+<Aside type="note" title="📚 Definición Formal">
+La elicitación de requerimientos es el proceso de descubrir los requerimientos de un sistema mediante comunicación con clientes, usuarios del sistema y otras partes interesadas. Involucra técnicas activas de investigación y análisis para extraer conocimiento tácito y explícito del dominio del problema.
+</Aside>
+
+### 📊 Técnicas de Captura
+
+<PlantUml code={`
+@startmindmap
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+* 🎯 Técnicas de\\nCaptura de\\nRequerimientos
+
+** 💬 Interactivas
+*** Entrevistas
+*** Reuniones
+*** Workshops
+*** Focus Groups
+
+** 📋 Documentales
+*** Cuestionarios
+*** Encuestas
+*** Análisis de documentos
+*** Benchmarking
+
+** 👁️ Observacionales
+*** Observación directa
+*** Shadowing
+*** Etnografía
+*** Análisis de tareas
+
+** 🎨 Creativas
+*** Prototipos
+*** Mockups
+*** Storyboards
+*** Brainstorming
+
+** 📝 Modelado
+*** Casos de uso
+*** Historias de usuario
+*** Diagramas
+*** Escenarios
+
+@endmindmap
+`} />
+
+---
+
+## 💬 Entrevistas y Reuniones con el Cliente
+
+Las entrevistas y reuniones son técnicas fundamentales de captura de requerimientos que permiten la **interacción directa** con stakeholders para obtener información detallada sobre sus necesidades, expectativas y restricciones.
+
+### 📖 Definición y Propósito
+
+<Aside type="tip" title="🎯 Objetivo Principal">
+Las entrevistas permiten obtener información profunda y contextualizada directamente de los stakeholders, facilitando la comprensión del dominio del problema, identificación de necesidades implícitas y construcción de relaciones de confianza.
+</Aside>
+
+### 🔍 Tipos de Entrevistas
+
+<Steps>
+
+1. **Entrevistas Estructuradas**
+   
+   **Características:**
+   - Conjunto predefinido de preguntas en orden específico
+   - Formato estandarizado para todos los entrevistados
+   - Fácil de analizar y comparar respuestas
+   
+   **Ventajas:**
+   - Consistencia en la recopilación de datos
+   - Menor sesgo del entrevistador
+   - Facilita análisis cuantitativo
+   
+   **Desventajas:**
+   - Menor flexibilidad para explorar temas emergentes
+   - Puede perder información contextual importante
+   
+   **Cuándo usar:** Cuando se necesita información específica y comparable de múltiples stakeholders.
+
+2. **Entrevistas Semi-estructuradas**
+   
+   **Características:**
+   - Guía de temas principales con flexibilidad
+   - Permite preguntas de seguimiento espontáneas
+   - Balance entre estructura y exploración
+   
+   **Ventajas:**
+   - Flexibilidad para profundizar en temas relevantes
+   - Mantiene enfoque en objetivos principales
+   - Permite descubrir requerimientos no anticipados
+   
+   **Desventajas:**
+   - Requiere entrevistadores experimentados
+   - Análisis más complejo
+   
+   **Cuándo usar:** Situación más común en ingeniería de requerimientos, ideal para exploración inicial.
+
+3. **Entrevistas No Estructuradas**
+   
+   **Características:**
+   - Conversación abierta sin guión predefinido
+   - Exploración libre de temas
+   - Altamente flexible
+   
+   **Ventajas:**
+   - Descubrimiento de información inesperada
+   - Comprensión profunda del contexto
+   - Construcción de rapport con stakeholders
+   
+   **Desventajas:**
+   - Difícil de analizar sistemáticamente
+   - Puede desviarse de objetivos
+   - Consume más tiempo
+   
+   **Cuándo usar:** Fases exploratorias iniciales o cuando el dominio es poco conocido.
+
+</Steps>
+
+### 📋 Proceso de Entrevista
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+rectangle "🎯 Proceso de Entrevista" as proceso #E8F5E9 {
+  
+  rectangle "1. Preparación" as prep #81D4FA {
+    card "Definir objetivos"
+    card "Identificar stakeholders"
+    card "Preparar preguntas"
+    card "Agendar sesión"
+  }
+  
+  rectangle "2. Ejecución" as ejec #FFB74D {
+    card "Establecer rapport"
+    card "Hacer preguntas"
+    card "Escuchar activamente"
+    card "Tomar notas"
+  }
+  
+  rectangle "3. Documentación" as doc #81C784 {
+    card "Transcribir notas"
+    card "Identificar requerimientos"
+    card "Clasificar información"
+    card "Crear resumen"
+  }
+  
+  rectangle "4. Validación" as val #CE93D8 {
+    card "Revisar con entrevistado"
+    card "Confirmar interpretación"
+    card "Resolver ambigüedades"
+    card "Obtener aprobación"
+  }
+}
+
+prep -down-> ejec
+ejec -down-> doc
+doc -down-> val
+val -up-> prep : Iteración si es necesario
+
+@enduml
+`} />
+
+### ✅ Mejores Prácticas para Entrevistas
+
+| Práctica | Descripción | Beneficio |
+|----------|-------------|-----------|
+| **Preparación exhaustiva** | Investigar el dominio y stakeholder antes de la entrevista | Mayor credibilidad y preguntas relevantes |
+| **Escucha activa** | Prestar atención completa sin interrumpir | Captura de información completa y precisa |
+| **Preguntas abiertas** | Usar "¿Cómo?", "¿Por qué?", "¿Qué pasaría si...?" | Obtener información detallada y contextual |
+| **Evitar jerga técnica** | Usar lenguaje del dominio del stakeholder | Mejor comunicación y comprensión mutua |
+| **Documentación inmediata** | Tomar notas durante y después de la entrevista | Minimizar pérdida de información |
+| **Validación continua** | Parafrasear y confirmar entendimiento | Reducir malentendidos |
+| **Gestión del tiempo** | Respetar el tiempo asignado | Mantener relación profesional |
+
+### 🤝 Reuniones con Stakeholders
+
+Las reuniones grupales complementan las entrevistas individuales, permitiendo la **colaboración** y **consenso** entre múltiples stakeholders.
+
+<Steps>
+
+1. **Reuniones de Kick-off**
+   
+   **Propósito:** Iniciar el proyecto y alinear expectativas.
+   
+   **Participantes:** Todos los stakeholders clave.
+   
+   **Agenda típica:**
+   - Presentación del equipo
+   - Objetivos del proyecto
+   - Alcance preliminar
+   - Cronograma y metodología
+   - Roles y responsabilidades
+
+2. **Workshops de Requerimientos**
+   
+   **Propósito:** Captura intensiva y colaborativa de requerimientos.
+   
+   **Técnicas utilizadas:**
+   - Brainstorming
+   - Priorización (MoSCoW, Kano)
+   - Modelado colaborativo
+   - Resolución de conflictos
+   
+   **Duración:** Típicamente 2-4 horas con breaks.
+
+3. **Reuniones de Revisión**
+   
+   **Propósito:** Validar requerimientos capturados.
+   
+   **Actividades:**
+   - Presentación de requerimientos documentados
+   - Aclaración de dudas
+   - Identificación de gaps
+   - Obtención de aprobación formal
+
+4. **Focus Groups**
+   
+   **Propósito:** Obtener perspectivas de usuarios finales.
+   
+   **Características:**
+   - 6-10 participantes representativos
+   - Moderador experimentado
+   - Discusión guiada sobre temas específicos
+   - Observación de dinámicas grupales
+
+</Steps>
+
+<Aside type="caution" title="⚠️ Desafíos Comunes">
+**En entrevistas:**
+- Stakeholders que no tienen tiempo disponible
+- Información contradictoria entre diferentes stakeholders
+- Requerimientos vagos o ambiguos
+- Expectativas no realistas
+
+**En reuniones:**
+- Dominación de la conversación por ciertos participantes
+- Conflictos de intereses entre stakeholders
+- Desviación del tema principal
+- Dificultad para llegar a consenso
+
+**Soluciones:**
+- Planificación cuidadosa y facilitación profesional
+- Técnicas de moderación efectivas
+- Documentación clara de decisiones y acuerdos
+- Seguimiento estructurado post-reunión
+</Aside>
+
+---
+
+## 📋 Cuestionarios y Observación
+
+Los cuestionarios y la observación son técnicas complementarias que permiten capturar requerimientos de manera **escalable** y **objetiva**, especialmente útiles cuando hay múltiples stakeholders o cuando se necesita información sobre procesos actuales.
+
+### 📝 Cuestionarios
+
+Los cuestionarios son instrumentos estructurados de recopilación de datos que permiten obtener información de múltiples stakeholders de manera eficiente y estandarizada.
+
+#### 🎯 Características y Ventajas
+
+<Aside type="tip" title="💡 Cuándo Usar Cuestionarios">
+**Situaciones ideales:**
+- Gran número de stakeholders geográficamente dispersos
+- Necesidad de datos cuantitativos
+- Presupuesto o tiempo limitado para entrevistas
+- Validación de información obtenida por otras técnicas
+- Priorización de funcionalidades con usuarios finales
+</Aside>
+
+#### 📊 Tipos de Preguntas
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 10
+
+rectangle "📋 Tipos de Preguntas en Cuestionarios" as tipos #FFE0B2 {
+  
+  rectangle "Cerradas" as cerr #81D4FA {
+    card "Sí/No"
+    card "Opción múltiple"
+    card "Escala Likert"
+    card "Ranking"
+  }
+  
+  rectangle "Abiertas" as abi #FFB74D {
+    card "Texto libre"
+    card "Comentarios"
+    card "Sugerencias"
+  }
+  
+  rectangle "Mixtas" as mix #81C784 {
+    card "Opción múltiple + Otro"
+    card "Escala + Justificación"
+  }
+}
+
+note right of cerr
+  Fáciles de analizar
+  Respuestas cuantificables
+end note
+
+note right of abi
+  Información rica
+  Difíciles de analizar
+end note
+
+note right of mix
+  Balance entre
+  estructura y flexibilidad
+end note
+
+@enduml
+`} />
+
+#### ✅ Mejores Prácticas para Cuestionarios
+
+<Steps>
+
+1. **Diseño del Cuestionario**
+   
+   **Principios clave:**
+   - Preguntas claras y sin ambigüedades
+   - Longitud apropiada (10-15 minutos máximo)
+   - Orden lógico de preguntas (general a específico)
+   - Evitar preguntas sesgadas o tendenciosas
+   - Incluir instrucciones claras
+
+2. **Estructura Recomendada**
+   
+   **Secciones típicas:**
+   - **Introducción:** Propósito y confidencialidad
+   - **Demografía:** Rol, experiencia, departamento
+   - **Contexto:** Uso actual del sistema
+   - **Necesidades:** Funcionalidades requeridas
+   - **Prioridades:** Importancia relativa
+   - **Comentarios:** Espacio para información adicional
+
+3. **Distribución y Recolección**
+   
+   **Métodos:**
+   - Plataformas online (Google Forms, SurveyMonkey, Typeform)
+   - Email con formularios adjuntos
+   - Papel (cuando sea necesario)
+   
+   **Consideraciones:**
+   - Establecer fecha límite clara
+   - Enviar recordatorios amigables
+   - Garantizar anonimato si es apropiado
+   - Ofrecer incentivos si es posible
+
+4. **Análisis de Resultados**
+   
+   **Técnicas:**
+   - Estadísticas descriptivas para preguntas cerradas
+   - Análisis de contenido para preguntas abiertas
+   - Identificación de patrones y tendencias
+   - Visualización de datos (gráficos, tablas)
+
+</Steps>
+
+### 👁️ Observación
+
+La observación es una técnica de captura que implica **observar directamente** a los usuarios en su entorno de trabajo para comprender sus tareas, procesos y necesidades reales.
+
+#### 🔍 Tipos de Observación
+
+<Steps>
+
+1. **Observación Pasiva**
+   
+   **Descripción:** El analista observa sin intervenir en las actividades.
+   
+   **Ventajas:**
+   - No interfiere con el trabajo normal
+   - Comportamiento natural de usuarios
+   - Identificación de procesos reales (vs. teóricos)
+   
+   **Desventajas:**
+   - No se pueden hacer preguntas inmediatas
+   - Puede requerir mucho tiempo
+   - Efecto Hawthorne (cambio de comportamiento por ser observado)
+
+2. **Observación Activa (Shadowing)**
+   
+   **Descripción:** El analista acompaña al usuario y puede hacer preguntas.
+   
+   **Ventajas:**
+   - Comprensión profunda del contexto
+   - Aclaración inmediata de dudas
+   - Identificación de pain points
+   
+   **Desventajas:**
+   - Puede ser intrusivo
+   - Requiere disponibilidad del usuario
+   - Posible sesgo por presencia del observador
+
+3. **Análisis de Tareas**
+   
+   **Descripción:** Descomposición sistemática de tareas en pasos detallados.
+   
+   **Técnicas:**
+   - Diagramas de flujo de trabajo
+   - Análisis jerárquico de tareas (HTA - Hierarchical Task Analysis)
+   - Mapeo de procesos
+   
+   **Resultado:** Documentación detallada de cómo se realizan las tareas actualmente.
+
+4. **Etnografía**
+   
+   **Descripción:** Inmersión prolongada en el entorno del usuario.
+   
+   **Características:**
+   - Observación durante semanas o meses
+   - Comprensión profunda de cultura organizacional
+   - Identificación de necesidades implícitas
+   
+   **Cuándo usar:** Sistemas críticos o complejos donde el contexto es fundamental.
+
+</Steps>
+
+#### 📊 Proceso de Observación
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+rectangle "👁️ Proceso de Observación" as obs #E8F5E9 {
+  
+  rectangle "1. Planificación" as plan #81D4FA {
+    card "Definir objetivos"
+    card "Seleccionar usuarios"
+    card "Obtener permisos"
+    card "Preparar materiales"
+  }
+  
+  rectangle "2. Observación" as obse #FFB74D {
+    card "Observar actividades"
+    card "Tomar notas detalladas"
+    card "Capturar contexto"
+    card "Hacer preguntas (si aplica)"
+  }
+  
+  rectangle "3. Análisis" as anal #81C784 {
+    card "Identificar patrones"
+    card "Detectar ineficiencias"
+    card "Descubrir necesidades"
+    card "Mapear procesos"
+  }
+  
+  rectangle "4. Documentación" as docu #CE93D8 {
+    card "Crear diagramas de flujo"
+    card "Documentar hallazgos"
+    card "Identificar requerimientos"
+    card "Validar con usuarios"
+  }
+}
+
+plan -down-> obse
+obse -down-> anal
+anal -down-> docu
+
+@enduml
+`} />
+
+#### ✅ Mejores Prácticas para Observación
+
+| Práctica | Descripción | Beneficio |
+|----------|-------------|-----------|
+| **Obtener consentimiento** | Explicar propósito y obtener aprobación | Ética y cooperación del usuario |
+| **Ser discreto** | Minimizar interferencia con el trabajo | Comportamiento natural |
+| **Tomar notas detalladas** | Registrar acciones, tiempos, contexto | Análisis preciso posterior |
+| **Observar múltiples usuarios** | No basarse en un solo usuario | Identificar variaciones y patrones |
+| **Combinar con entrevistas** | Aclarar lo observado | Comprensión completa |
+| **Documentar excepciones** | Registrar casos especiales o errores | Identificar edge cases |
+| **Respetar confidencialidad** | Proteger información sensible | Confianza y cumplimiento legal |
+
+<Aside type="note" title="📌 Complementariedad de Técnicas">
+Los cuestionarios y la observación son **complementarios**:
+
+- **Cuestionarios:** Qué quieren los usuarios (necesidades declaradas)
+- **Observación:** Qué necesitan realmente (necesidades reales)
+
+**Ejemplo:** Los usuarios pueden decir en un cuestionario que necesitan más funcionalidades, pero la observación puede revelar que las funcionalidades existentes son difíciles de usar.
+</Aside>
+
+---
+
+## 🎨 Prototipos y Casos de Uso
+
+Los prototipos y casos de uso son técnicas de captura y validación que permiten **visualizar** y **modelar** los requerimientos de manera concreta, facilitando la comunicación entre stakeholders técnicos y no técnicos.
+
+### 🖼️ Prototipos
+
+Los prototipos son **representaciones preliminares** del sistema que permiten a los stakeholders visualizar y experimentar con la solución propuesta antes de su implementación completa.
+
+#### 📊 Tipos de Prototipos
+
+<PlantUml code={`
+@startmindmap
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+* 🎨 Tipos de\\nPrototipos
+
+** 📝 Por Fidelidad
+*** Baja fidelidad
+**** Sketches en papel
+**** Wireframes
+**** Mockups simples
+*** Alta fidelidad
+**** Prototipos interactivos
+**** Diseños detallados
+**** UI completa
+
+** 🔄 Por Evolución
+*** Desechables (Throwaway)
+**** Solo para validación
+**** No se convierte en código
+*** Evolutivos
+**** Base para desarrollo
+**** Se refina iterativamente
+
+** 🎯 Por Alcance
+*** Horizontales
+**** Amplia funcionalidad
+**** Poca profundidad
+*** Verticales
+**** Funcionalidad específica
+**** Implementación completa
+
+@endmindmap
+`} />
+
+#### ✅ Ventajas de los Prototipos
+
+<Steps>
+
+1. **Validación Temprana**
+   
+   **Beneficio:** Identificar problemas de usabilidad y requerimientos incorrectos antes de invertir en desarrollo completo.
+   
+   **Impacto:** Reducción de costos de cambios (recordar la regla del 100x).
+
+2. **Comunicación Efectiva**
+   
+   **Beneficio:** "Una imagen vale más que mil palabras" - los prototipos hacen tangibles conceptos abstractos.
+   
+   **Resultado:** Mejor entendimiento entre stakeholders técnicos y no técnicos.
+
+3. **Descubrimiento de Requerimientos**
+   
+   **Beneficio:** Los usuarios pueden identificar necesidades al interactuar con el prototipo que no habían verbalizado.
+   
+   **Ejemplo:** "Ahora que lo veo, también necesitamos..."
+
+4. **Reducción de Ambigüedad**
+   
+   **Beneficio:** Especificaciones visuales son menos ambiguas que descripciones textuales.
+   
+   **Resultado:** Menos malentendidos y retrabajos.
+
+</Steps>
+
+#### 🛠️ Herramientas de Prototipado
+
+| Categoría | Herramientas | Uso Típico |
+|-----------|--------------|------------|
+| **Wireframing** | Balsamiq, Sketch, Figma | Prototipos de baja fidelidad |
+| **UI/UX Design** | Adobe XD, Figma, Sketch | Prototipos de alta fidelidad |
+| **Interactivos** | InVision, Marvel, Axure | Prototipos clickeables |
+| **Web** | HTML/CSS, Bootstrap | Prototipos funcionales web |
+| **Móvil** | Flinto, Principle, Proto.io | Prototipos de apps móviles |
+| **Papel** | Papel y lápiz | Sketches rápidos |
+
+#### 📋 Proceso de Prototipado
+
+<Steps>
+
+1. **Identificar Objetivos**
+   
+   Definir qué aspectos del sistema se van a prototipar y qué se quiere validar.
+
+2. **Seleccionar Fidelidad**
+   
+   Elegir nivel de detalle apropiado según la fase del proyecto y objetivos.
+
+3. **Crear Prototipo**
+   
+   Desarrollar la representación visual/interactiva del sistema.
+
+4. **Validar con Usuarios**
+   
+   Realizar sesiones de testing con stakeholders y usuarios finales.
+
+5. **Iterar**
+   
+   Refinar el prototipo basándose en feedback recibido.
+
+6. **Documentar Requerimientos**
+   
+   Extraer y formalizar los requerimientos validados.
+
+</Steps>
+
+<Aside type="caution" title="⚠️ Riesgos del Prototipado">
+**Expectativas no realistas:**
+- Stakeholders pueden pensar que el sistema está casi terminado
+- Subestimación del esfuerzo de implementación real
+
+**Solución:** Comunicar claramente que es un prototipo y establecer expectativas realistas.
+
+**Sobre-inversión:**
+- Gastar demasiado tiempo perfeccionando el prototipo
+- Apego emocional a prototipos desechables
+
+**Solución:** Definir tiempo límite y recordar que prototipos de baja fidelidad son suficientes para validación inicial.
+</Aside>
+
+### 📝 Casos de Uso
+
+Los casos de uso son **descripciones narrativas** de las interacciones entre actores (usuarios u otros sistemas) y el sistema para lograr un objetivo específico.
+
+#### 📖 Definición Formal
+
+<Aside type="note" title="📚 Definición UML (Unified Modeling Language)">
+Un caso de uso es una especificación de un conjunto de acciones realizadas por un sistema que produce un resultado observable de valor para un actor particular. Describe el comportamiento del sistema desde la perspectiva del usuario.
+</Aside>
+
+#### 🔍 Componentes de un Caso de Uso
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+rectangle "📝 Caso de Uso" as cu #E8F5E9 {
+  
+  rectangle "Identificación" as id #81D4FA {
+    card "ID: CU-001"
+    card "Nombre: Procesar Pedido"
+    card "Actor: Cliente"
+    card "Prioridad: Alta"
+  }
+  
+  rectangle "Precondiciones" as pre #FFB74D {
+    card "Usuario autenticado"
+    card "Carrito con productos"
+    card "Método de pago válido"
+  }
+  
+  rectangle "Flujo Principal" as fp #81C784 {
+    card "1. Cliente selecciona checkout"
+    card "2. Sistema muestra resumen"
+    card "3. Cliente confirma pedido"
+    card "4. Sistema procesa pago"
+    card "5. Sistema genera confirmación"
+  }
+  
+  rectangle "Flujos Alternativos" as fa #CE93D8 {
+    card "3a. Cliente cancela"
+    card "4a. Pago rechazado"
+    card "4b. Error de conexión"
+  }
+  
+  rectangle "Postcondiciones" as post #FFE082 {
+    card "Pedido registrado"
+    card "Inventario actualizado"
+    card "Email enviado"
+  }
+}
+
+@enduml
+`} />
+
+#### 📋 Plantilla de Caso de Uso
+
+<Code code={`
+ID: CU-XXX
+Nombre: [Nombre descriptivo del caso de uso]
+Actor Principal: [Usuario o sistema que inicia la interacción]
+Actores Secundarios: [Otros actores involucrados]
+Prioridad: [Alta | Media | Baja]
+
+Descripción:
+[Breve descripción del objetivo del caso de uso]
+
+Precondiciones:
+- [Condición que debe cumplirse antes de ejecutar]
+- [Estado requerido del sistema]
+
+Flujo Principal (Escenario de Éxito):
+1. [Actor] [acción]
+2. [Sistema] [respuesta]
+3. [Actor] [acción]
+4. [Sistema] [respuesta]
+...
+N. [Resultado final exitoso]
+
+Flujos Alternativos:
+[Paso]a. [Condición alternativa]
+  1. [Sistema] [manejo de la alternativa]
+  2. [Retorno al flujo principal o fin]
+
+[Paso]b. [Otra condición]
+  1. [Manejo]
+  ...
+
+Flujos de Excepción:
+[Paso]E1. [Condición de error]
+  1. [Sistema] [manejo del error]
+  2. [Fin del caso de uso o recuperación]
+
+Postcondiciones:
+- [Estado del sistema después de ejecución exitosa]
+- [Cambios persistidos]
+
+Requerimientos Relacionados:
+- RF-XXX: [Requerimiento funcional]
+- RNF-XXX: [Requerimiento no funcional]
+
+Notas:
+[Información adicional relevante]
+`} lang="text" title="Plantilla de Caso de Uso" />
+
+#### 🎯 Diagrama de Casos de Uso (UML)
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+left to right direction
+
+actor "Cliente" as cliente
+actor "Administrador" as admin
+actor "Sistema de Pago" as pago
+
+rectangle "Sistema E-commerce" {
+  usecase "Buscar Productos" as UC1
+  usecase "Agregar al Carrito" as UC2
+  usecase "Procesar Pedido" as UC3
+  usecase "Procesar Pago" as UC4
+  usecase "Gestionar Inventario" as UC5
+  usecase "Generar Reportes" as UC6
+}
+
+cliente --> UC1
+cliente --> UC2
+cliente --> UC3
+UC3 ..> UC4 : <<include>>
+UC4 --> pago
+
+admin --> UC5
+admin --> UC6
+UC5 ..> UC1 : <<extend>>
+
+note right of UC3
+  Caso de uso principal
+  que incluye procesamiento
+  de pago
+end note
+
+@enduml
+`} />
+
+#### ✅ Mejores Prácticas para Casos de Uso
+
+<Steps>
+
+1. **Enfoque en el Usuario**
+   
+   Escribir desde la perspectiva del actor, no del sistema interno.
+   
+   **❌ Incorrecto:** "El sistema ejecuta query SQL"
+   **✅ Correcto:** "El sistema muestra lista de productos"
+
+2. **Nivel de Detalle Apropiado**
+   
+   Ni demasiado abstracto ni demasiado detallado.
+   
+   **Regla:** Cada caso de uso debe completarse en una sesión de trabajo (3-10 pasos típicamente).
+
+3. **Identificar Actores Correctamente**
+   
+   **Actores son:**
+   - Roles, no personas específicas
+   - Externos al sistema
+   - Pueden ser humanos u otros sistemas
+   
+   **No son actores:**
+   - Componentes internos del sistema
+   - Bases de datos (a menos que sean externas)
+
+4. **Usar Relaciones Apropiadamente**
+   
+   **`<<include>>`:** Comportamiento que siempre ocurre (obligatorio)
+   
+   **`<<extend>>`:** Comportamiento opcional o condicional
+   
+   **Generalización:** Herencia entre casos de uso
+
+5. **Validar con Stakeholders**
+   
+   Los casos de uso deben ser revisados y aprobados por usuarios y clientes.
+
+6. **Mantener Trazabilidad**
+   
+   Vincular casos de uso con requerimientos funcionales y criterios de aceptación.
+
+</Steps>
+
+### 🔄 Complementariedad: Prototipos + Casos de Uso
+
+<Aside type="tip" title="💡 Sinergia de Técnicas">
+**Prototipos** y **Casos de Uso** se complementan perfectamente:
+
+**Casos de Uso → Prototipos:**
+- Los casos de uso definen QUÉ debe hacer el sistema
+- Los prototipos muestran CÓMO se verá y sentirá
+
+**Prototipos → Casos de Uso:**
+- La interacción con prototipos puede revelar casos de uso no identificados
+- Los prototipos validan que los casos de uso son completos y correctos
+
+**Flujo de trabajo recomendado:**
+1. Identificar casos de uso principales
+2. Crear prototipos de baja fidelidad para casos críticos
+3. Validar con usuarios
+4. Refinar casos de uso basándose en feedback
+5. Crear prototipos de alta fidelidad
+6. Documentar requerimientos finales
+</Aside>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note" title="📌 Puntos Clave">
+- 💬 **Entrevistas y Reuniones**: Técnicas interactivas para obtener información profunda y contextualizada directamente de stakeholders. Tipos: estructuradas, semi-estructuradas y no estructuradas.
+
+- 📋 **Cuestionarios**: Instrumentos escalables para recopilar datos de múltiples stakeholders. Útiles para validación y priorización. Requieren diseño cuidadoso de preguntas.
+
+- 👁️ **Observación**: Técnica para identificar necesidades reales observando usuarios en su entorno. Tipos: pasiva, activa (shadowing), análisis de tareas y etnografía.
+
+- 🎨 **Prototipos**: Representaciones visuales/interactivas del sistema para validación temprana. Reducen ambigüedad y facilitan comunicación. Tipos: baja/alta fidelidad, desechables/evolutivos.
+
+- 📝 **Casos de Uso**: Descripciones narrativas de interacciones actor-sistema. Componentes: precondiciones, flujo principal, flujos alternativos, postcondiciones. Fundamentales para documentación de requerimientos funcionales.
+
+- 🔄 **Complementariedad**: Ninguna técnica es suficiente por sí sola. Combinar múltiples técnicas proporciona validación cruzada y captura completa de requerimientos.
+</Aside>

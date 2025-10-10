@@ -1,0 +1,891 @@
+---
+title: 2 Alcance de la Ingeniería de Software
+description: Áreas de aplicación, relación con otras disciplinas y rol del ingeniero de software
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+## 🌐 Áreas de Aplicación
+
+<Tabs>
+<TabItem label="👔 Visión Profesional">
+
+La Ingeniería de Software tiene un **alcance multidisciplinario** que abarca prácticamente todos los sectores de la economía moderna. Su aplicación se extiende desde sistemas críticos de misión hasta aplicaciones de consumo masivo.
+
+### 📊 Principales Dominios de Aplicación
+
+<PlantUml code={`
+@startmindmap
+skinparam backgroundColor beige
+skinparam defaultFontSize 12
+
+* 🌐 Áreas de\\nAplicación
+
+** 🏥 Salud
+*** Sistemas hospitalarios
+*** Telemedicina
+*** Dispositivos médicos
+*** Historias clínicas
+*** Diagnóstico asistido
+
+** 💰 Finanzas
+*** Banca digital
+*** Trading algorítmico
+*** Blockchain
+*** Pagos móviles
+*** Análisis de riesgo
+
+** 🏭 Industria
+*** Automatización
+*** IoT Industrial
+*** Control de procesos
+*** Manufactura 4.0
+*** Logística
+
+** 🎮 Entretenimiento
+*** Videojuegos
+*** Streaming
+*** Realidad virtual
+*** Redes sociales
+*** Plataformas digitales
+
+** 🚗 Transporte
+*** Vehículos autónomos
+*** Sistemas de navegación
+*** Control aéreo
+*** Logística inteligente
+*** Movilidad urbana
+
+** 🎓 Educación
+*** E-learning
+*** LMS
+*** Simuladores
+*** Evaluación automatizada
+*** Contenido adaptativo
+
+@endmindmap
+`} />
+
+### 🔍 Clasificación por Tipo de Sistema
+
+<Steps>
+
+1. **Sistemas Críticos de Seguridad (Safety-Critical)**
+   
+   Sistemas donde un fallo puede resultar en pérdida de vidas o daños catastróficos:
+   - ✈️ Control de vuelo en aviación
+   - 🏥 Equipos médicos (marcapasos, ventiladores)
+   - ⚡ Sistemas de control nuclear
+   - 🚄 Control ferroviario
+   
+   **Requisitos**: Certificaciones estrictas, pruebas exhaustivas, redundancia
+
+2. **Sistemas Empresariales (Enterprise Systems)**
+   
+   Aplicaciones que gestionan operaciones de negocio:
+   - 📊 ERP (Enterprise Resource Planning)
+   - 👥 CRM (Customer Relationship Management)
+   - 📦 SCM (Supply Chain Management)
+   - 💼 Business Intelligence
+   
+   **Requisitos**: Escalabilidad, integración, seguridad de datos
+
+3. **Sistemas Embebidos (Embedded Systems)**
+   
+   Software integrado en dispositivos de hardware:
+   - 📱 Smartphones y tablets
+   - 🚗 Sistemas automotrices
+   - 🏠 Domótica (IoT)
+   - ⌚ Wearables
+   
+   **Requisitos**: Eficiencia energética, tiempo real, recursos limitados
+
+4. **Aplicaciones Web y Móviles**
+   
+   Plataformas de acceso masivo:
+   - 🌐 Portales web
+   - 📱 Apps móviles
+   - ☁️ SaaS (Software as a Service)
+   - 🛒 E-commerce
+   
+   **Requisitos**: UX/UI, escalabilidad, disponibilidad 24/7
+
+5. **Sistemas de Inteligencia Artificial**
+   
+   Aplicaciones con capacidades de aprendizaje:
+   - 🤖 Machine Learning
+   - 🗣️ Procesamiento de lenguaje natural
+   - 👁️ Visión por computadora
+   - 🎯 Sistemas de recomendación
+   
+   **Requisitos**: Grandes volúmenes de datos, poder computacional, ética
+
+</Steps>
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+package "🌐 Ecosistema de Aplicaciones" {
+  
+  rectangle "⚠️ Críticos" as criticos #FFB6C1 {
+    card "Aviación"
+    card "Medicina"
+    card "Nuclear"
+  }
+  
+  rectangle "🏢 Empresariales" as empresariales #B0E0E6 {
+    card "ERP"
+    card "CRM"
+    card "BI"
+  }
+  
+  rectangle "🔌 Embebidos" as embebidos #DDA0DD {
+    card "IoT"
+    card "Automotriz"
+    card "Wearables"
+  }
+  
+  rectangle "🌐 Web/Móvil" as web #98FB98 {
+    card "SaaS"
+    card "E-commerce"
+    card "Apps"
+  }
+  
+  rectangle "🤖 IA/ML" as ia #FFD700 {
+    card "ML"
+    card "NLP"
+    card "Visión"
+  }
+}
+
+cloud "🎯 Ingeniería de\\nSoftware" as ing
+
+criticos --> ing
+empresariales --> ing
+embebidos --> ing
+web --> ing
+ia --> ing
+
+note bottom of ing
+  Principios y prácticas
+  aplicables a todos
+  los dominios
+end note
+
+@enduml
+`} />
+
+### 🌍 Impacto Sectorial
+
+| Sector | Aplicaciones Clave | Impacto |
+|--------|-------------------|---------|  
+| 🏥 **Salud** | Telemedicina, diagnóstico asistido, gestión hospitalaria | Mejora en atención, reducción de errores médicos |
+| 💰 **Finanzas** | Banca digital, trading, blockchain | Democratización financiera, transacciones instantáneas |
+| 🏭 **Manufactura** | Industria 4.0, automatización, IoT | Eficiencia productiva, calidad mejorada |
+| 🎓 **Educación** | E-learning, LMS, contenido adaptativo | Acceso global, personalización del aprendizaje |
+| 🚗 **Transporte** | Vehículos autónomos, optimización de rutas | Seguridad vial, eficiencia energética |
+| 🌾 **Agricultura** | Agricultura de precisión, drones, sensores | Optimización de recursos, sostenibilidad |
+
+</TabItem>
+<TabItem label="🌟 Explicación Simple">
+
+<Aside type="tip" title="💡 En palabras simples">
+La Ingeniería de Software está **en todas partes**. Desde tu teléfono hasta los aviones, desde los hospitales hasta tu videojuego favorito. ¡Todo necesita software!
+</Aside>
+
+### 🎯 ¿Dónde Trabajan los Ingenieros de Software?
+
+Imagina que el software es como la electricidad: está en casi todo lo que usas. Aquí te muestro dónde:
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 13
+
+rectangle "🏥 Hospitales" as hospital #LightPink {
+  agent "👨‍⚕️ Doctor usa\\nsoftware para\\nver tu historial"
+}
+
+rectangle "🏦 Bancos" as banco #LightBlue {
+  agent "💳 App para\\nver tu dinero\\ny pagar"
+}
+
+rectangle "🎮 Videojuegos" as juegos #LightGreen {
+  agent "🕹️ Fortnite,\\nMinecraft,\\nFIFA"
+}
+
+rectangle "🚗 Autos" as autos #LightYellow {
+  agent "🚙 GPS,\\nsensores,\\nTesla"
+}
+
+rectangle "📱 Celulares" as cel #LightCoral {
+  agent "📲 WhatsApp,\\nTikTok,\\nInstagram"
+}
+
+rectangle "✈️ Aviones" as avion #Lavender {
+  agent "🛫 Piloto\\nautomático,\\nnavegación"
+}
+
+cloud "💻 Ingenieros\\nde Software" as ing
+
+ing --> hospital
+ing --> banco
+ing --> juegos
+ing --> autos
+ing --> cel
+ing --> avion
+
+@enduml
+`} />
+
+### 📱 Ejemplos que Conoces
+
+<Badge text="1" variant="tip" /> **En tu celular** 📱
+- WhatsApp para chatear
+- TikTok para ver videos
+- Spotify para música
+- Juegos que descargas
+
+<Badge text="2" variant="note" /> **En tu casa** 🏠
+- Smart TV con Netflix
+- Consola PlayStation o Xbox
+- Alexa o Google Home
+- WiFi que conecta todo
+
+<Badge text="3" variant="success" /> **En la escuela** 🎓
+- Plataformas como Classroom
+- Zoom para clases online
+- Apps educativas
+- Sistemas de calificaciones
+
+<Badge text="4" variant="caution" /> **En hospitales** 🏥
+- Máquinas que monitorean tu corazón
+- Sistemas para agendar citas
+- Equipos de rayos X digitales
+- Robots que ayudan en cirugías
+
+<Badge text="5" variant="danger" /> **En transporte** 🚗
+- Uber y Didi
+- Google Maps
+- Semáforos inteligentes
+- Aviones con piloto automático
+
+### 🎮 Tipos de Software (Simplificado)
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+
+rectangle "🎮 Apps que Usas\\nTodos los Días" as apps #LightGreen {
+  card "Instagram"
+  card "YouTube"
+  card "Spotify"
+}
+
+rectangle "⚠️ Software Súper\\nImportante" as importante #LightCoral {
+  card "Hospitales"
+  card "Aviones"
+  card "Bancos"
+}
+
+rectangle "🤖 Software\\nInteligente" as inteligente #LightBlue {
+  card "Siri/Alexa"
+  card "Recomendaciones\\nde Netflix"
+  card "Filtros de\\nInstagram"
+}
+
+rectangle "🏠 Software en\\nDispositivos" as dispositivos #LightYellow {
+  card "Smartwatch"
+  card "Consolas"
+  card "Smart TV"
+}
+
+note right of importante
+  ¡Si falla puede ser
+  muy peligroso!
+end note
+
+note right of inteligente
+  Aprende de lo
+  que haces
+end note
+
+@enduml
+`} />
+
+**En resumen**: Los ingenieros de software crean programas para TODO tipo de industrias. ¡Por eso hay tanto trabajo! 🚀
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔗 Relación con Otras Disciplinas
+
+<Tabs>
+<TabItem label="👔 Visión Profesional">
+
+La Ingeniería de Software es una **disciplina interdisciplinaria** que se nutre y colabora estrechamente con múltiples campos del conocimiento. Esta naturaleza transversal es fundamental para el desarrollo de sistemas complejos modernos.
+
+### 🧩 Mapa de Interdependencias
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+package "🎯 Ingeniería de Software" as is {
+  
+  rectangle "📐 Matemáticas" as mat #FFE4B5
+  rectangle "💻 Ciencias de\\nla Computación" as cs #E0FFFF
+  rectangle "🏗️ Ingeniería de\\nSistemas" as sistemas #FFE4E1
+  rectangle "🎨 Diseño UX/UI" as ux #E6E6FA
+  rectangle "📊 Administración\\nde Proyectos" as pm #F0FFF0
+  rectangle "🔒 Ciberseguridad" as sec #FFF0F5
+  rectangle "📈 Ciencia de Datos" as data #FFFACD
+  rectangle "🧠 Psicología\\nCognitiva" as psico #FFE4E1
+  rectangle "⚖️ Derecho\\nInformático" as derecho #E0FFE0
+  rectangle "💼 Administración\\nde Empresas" as admin #FFE4B5
+}
+
+is --> mat : Algoritmos,\\ncomplejidad
+is --> cs : Estructuras de datos,\\nparadigmas
+is --> sistemas : Arquitectura,\\nintegración
+is --> ux : Interfaces,\\nusabilidad
+is --> pm : Metodologías,\\ngestión
+is --> sec : Protección,\\nprivacidad
+is --> data : Analytics,\\nML
+is --> psico : Experiencia\\nde usuario
+is --> derecho : Licencias,\\npropiedad
+is --> admin : Procesos,\\nnegocios
+
+@enduml
+`} />
+
+### 🔬 Disciplinas Fundamentales
+
+<Steps>
+
+1. **📐 Matemáticas y Lógica**
+   
+   **Aportes clave:**
+   - Algoritmos y análisis de complejidad
+   - Teoría de grafos para estructuras de datos
+   - Lógica formal para verificación
+   - Estadística para análisis de datos
+   - Matemáticas discretas
+   
+   **Aplicación:** Optimización de algoritmos, criptografía, IA
+
+2. **💻 Ciencias de la Computación**
+   
+   **Aportes clave:**
+   - Teoría de la computación
+   - Estructuras de datos
+   - Paradigmas de programación
+   - Compiladores e intérpretes
+   - Sistemas operativos
+   
+   **Aplicación:** Fundamentos teóricos del desarrollo de software
+
+3. **🏗️ Ingeniería de Sistemas**
+   
+   **Aportes clave:**
+   - Pensamiento sistémico
+   - Arquitectura de sistemas
+   - Integración de componentes
+   - Análisis de requisitos
+   - Modelado de sistemas
+   
+   **Aplicación:** Diseño de arquitecturas complejas
+
+4. **🎨 Diseño y Experiencia de Usuario (UX/UI)**
+   
+   **Aportes clave:**
+   - Principios de diseño visual
+   - Psicología del usuario
+   - Accesibilidad
+   - Prototipado
+   - Testing de usabilidad
+   
+   **Aplicación:** Interfaces intuitivas y atractivas
+
+5. **📊 Gestión de Proyectos**
+   
+   **Aportes clave:**
+   - Metodologías ágiles (Scrum, Kanban)
+   - Planificación y estimación
+   - Gestión de riesgos
+   - Control de calidad
+   - Liderazgo de equipos
+   
+   **Aplicación:** Entrega exitosa de proyectos
+
+6. **🔒 Ciberseguridad**
+   
+   **Aportes clave:**
+   - Criptografía
+   - Análisis de vulnerabilidades
+   - Protección de datos
+   - Autenticación y autorización
+   - Ethical hacking
+   
+   **Aplicación:** Sistemas seguros y confiables
+
+7. **📈 Ciencia de Datos e IA**
+   
+   **Aportes clave:**
+   - Machine Learning
+   - Big Data
+   - Análisis predictivo
+   - Procesamiento de lenguaje natural
+   - Visión por computadora
+   
+   **Aplicación:** Sistemas inteligentes y adaptativos
+
+8. **💼 Administración y Negocios**
+   
+   **Aportes clave:**
+   - Análisis de procesos de negocio
+   - ROI y métricas de valor
+   - Estrategia empresarial
+   - Gestión del cambio
+   - Modelos de negocio
+   
+   **Aplicación:** Alineación con objetivos empresariales
+
+</Steps>
+
+### 📚 Conocimientos Transversales Requeridos
+
+| Disciplina | Conocimientos Clave | Nivel Requerido |
+|------------|---------------------|-----------------|
+| 📐 **Matemáticas** | Álgebra, cálculo, estadística, lógica | Intermedio-Alto |
+| 💻 **Computación** | Algoritmos, estructuras, paradigmas | Alto |
+| 🎨 **Diseño** | Principios UX/UI, prototipado | Básico-Intermedio |
+| 📊 **Gestión** | Metodologías ágiles, liderazgo | Intermedio |
+| 🔒 **Seguridad** | Criptografía, vulnerabilidades | Intermedio |
+| 💼 **Negocios** | Procesos, análisis de valor | Básico-Intermedio |
+| 🗣️ **Comunicación** | Documentación, presentaciones | Alto |
+
+</TabItem>
+<TabItem label="🌟 Explicación Simple">
+
+<Aside type="tip" title="💡 En palabras simples">
+Un ingeniero de software es como un **director de orquesta**: necesita saber un poco de muchas cosas para que todo suene bien. No trabaja solo, colabora con muchos expertos.
+</Aside>
+
+### 🎭 El Ingeniero de Software: Un Todólogo
+
+Imagina que estás haciendo una película:
+
+- 🎬 **Director** (Ingeniero de Software): Coordina todo
+- 🎨 **Diseñador** (UX/UI): Hace que se vea bonito
+- 📝 **Guionista** (Analista): Define qué debe pasar
+- 🎥 **Camarógrafo** (Programador): Captura las escenas
+- 🎵 **Músico** (Especialista): Agrega efectos especiales
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 13
+
+rectangle "🎯 Crear una App" as app {
+  
+  agent "🎨 Diseñador" as dis #LightBlue
+  agent "👨‍💻 Programador" as prog #LightGreen
+  agent "🔒 Experto en\\nSeguridad" as sec #LightCoral
+  agent "📊 Analista\\nde Datos" as data #LightYellow
+  agent "📋 Coordinador" as coord #Lavender
+}
+
+dis -[hidden]-> prog
+prog -[hidden]-> sec
+sec -[hidden]-> data
+data -[hidden]-> coord
+
+note bottom of dis
+  Hace que se vea
+  bonita y fácil de usar
+end note
+
+note bottom of prog
+  Escribe el código
+  que hace funcionar todo
+end note
+
+note bottom of sec
+  Se asegura que
+  nadie pueda hackearla
+end note
+
+note bottom of data
+  Analiza qué les
+  gusta a los usuarios
+end note
+
+note bottom of coord
+  Organiza el trabajo
+  de todos
+end note
+
+@enduml
+`} />
+
+### 🧩 ¿Qué Necesita Saber un Ingeniero?
+
+<Badge text="1" variant="tip" /> **Un poco de matemáticas** 🔢
+- Para hacer cálculos y algoritmos
+- Como cuando calculas la ruta más rápida en un GPS
+
+<Badge text="2" variant="note" /> **Diseño y arte** 🎨
+- Para que las apps se vean bonitas
+- Como elegir colores y dónde poner los botones
+
+<Badge text="3" variant="success" /> **Comunicación** 🗣️
+- Para explicar ideas al equipo
+- Para entender qué quiere el cliente
+
+<Badge text="4" variant="caution" /> **Seguridad** 🔒
+- Para proteger contraseñas
+- Para que nadie robe información
+
+<Badge text="5" variant="danger" /> **Negocios** 💼
+- Para entender si la app ganará dinero
+- Para saber qué funciones son más importantes
+
+### 🤝 Trabajando en Equipo
+
+<PlantUml code={`
+@startmindmap
+skinparam backgroundColor beige
+skinparam defaultFontSize 12
+
+* 👨‍💻 Ingeniero\\nde Software
+
+** 🎨 Trabaja con\\nDiseñadores
+*** Interfaces bonitas
+*** Fácil de usar
+*** Colores y estilos
+
+** 📊 Trabaja con\\nAnalistas
+*** Qué necesita el cliente
+*** Qué funciones agregar
+*** Cómo mejorar
+
+** 🔒 Trabaja con\\nSeguridad
+*** Proteger datos
+*** Evitar hackers
+*** Cumplir leyes
+
+** 💼 Trabaja con\\nJefes
+*** Reportar avances
+*** Pedir recursos
+*** Cumplir fechas
+
+@endmindmap
+`} />
+
+**La idea**: Un ingeniero de software necesita saber **un poquito de todo** y trabajar bien con **muchas personas diferentes**. ¡Es como ser el capitán de un equipo! ⚽
+
+</TabItem>
+</Tabs>
+
+---
+
+## 👨‍💻 Rol del Ingeniero de Software
+
+<Tabs>
+<TabItem label="👔 Visión Profesional">
+
+El rol del ingeniero de software ha evolucionado significativamente, pasando de ser un simple "programador" a convertirse en un **profesional multifacético** con responsabilidades técnicas, estratégicas y de liderazgo.
+
+### 🎯 Responsabilidades Principales
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+package "👨‍💻 Rol del Ingeniero de Software" {
+  
+  rectangle "🏗️ Arquitectura\\ny Diseño" as arq #B0E0E6 {
+    card "Diseño de sistemas"
+    card "Patrones de diseño"
+    card "Decisiones técnicas"
+  }
+  
+  rectangle "⌨️ Implementación\\ny Desarrollo" as impl #98FB98 {
+    card "Escritura de código"
+    card "Refactorización"
+    card "Code review"
+  }
+  
+  rectangle "🧪 Calidad\\ny Testing" as qa #FFD700 {
+    card "Pruebas unitarias"
+    card "Integración continua"
+    card "Debugging"
+  }
+  
+  rectangle "📋 Gestión\\ny Planificación" as gest #FFB6C1 {
+    card "Estimaciones"
+    card "Priorización"
+    card "Documentación"
+  }
+  
+  rectangle "🤝 Colaboración\\ny Comunicación" as colab #DDA0DD {
+    card "Trabajo en equipo"
+    card "Mentoría"
+    card "Stakeholders"
+  }
+  
+  rectangle "🔧 Mantenimiento\\ny Evolución" as mant #FFA07A {
+    card "Corrección de bugs"
+    card "Optimización"
+    card "Actualización"
+  }
+}
+
+@enduml
+`} />
+
+### 📊 Competencias Clave
+
+**💻 Competencias Técnicas:**
+- Dominio de lenguajes de programación
+- Arquitectura y patrones de diseño
+- Bases de datos y APIs
+- Control de versiones (Git)
+- DevOps y Cloud Computing
+- Testing y calidad de código
+
+**🧠 Competencias Blandas:**
+- Comunicación efectiva
+- Trabajo en equipo
+- Resolución de problemas
+- Pensamiento crítico
+- Adaptabilidad y aprendizaje continuo
+- Gestión del tiempo
+
+### 🎭 Niveles de Experiencia
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 12
+
+rectangle "🌱 Junior" as junior #E8F5E9 {
+  card "Implementa funcionalidades"
+  card "Aprende tecnologías"
+  card "Requiere supervisión"
+  card "1-2 años experiencia"
+}
+
+rectangle "⚡ Mid-Level" as mid #FFF9C4 {
+  card "Diseña componentes"
+  card "Trabaja autónomamente"
+  card "Mentorea juniors"
+  card "3-5 años experiencia"
+}
+
+rectangle "🚀 Senior" as senior #FFCCBC {
+  card "Define arquitectura"
+  card "Toma decisiones técnicas"
+  card "Lidera proyectos"
+  card "5+ años experiencia"
+}
+
+rectangle "🎯 Tech Lead" as lead #E1BEE7 {
+  card "Guía técnica del equipo"
+  card "Coordina stakeholders"
+  card "Define estándares"
+}
+
+junior -down-> mid : Crecimiento
+mid -down-> senior : Experiencia
+senior -down-> lead : Liderazgo
+
+@enduml
+`} />
+
+### 🔧 Especializaciones Comunes
+
+| Especialización | Enfoque | Tecnologías |
+|-----------------|---------|-------------|
+| 🌐 **Frontend** | Interfaces de usuario | React, Vue, Angular |
+| ⚙️ **Backend** | Lógica de negocio, APIs | Node.js, Java, Python |
+| 📱 **Mobile** | Apps móviles | Swift, Kotlin, Flutter |
+| 🗄️ **Data Engineer** | Pipelines de datos | Spark, Kafka, SQL |
+| 🔒 **Security** | Seguridad | OWASP, pentesting |
+| ☁️ **DevOps** | Infraestructura | Docker, Kubernetes |
+| 🤖 **ML Engineer** | Inteligencia Artificial | TensorFlow, PyTorch |
+
+### 📅 Actividades Diarias
+
+<Aside type="note" title="🕐 Un día típico">
+
+**Mañana:**
+- 🔄 Stand-up meeting (15 min)
+- 💻 Desarrollo de features (2-3 horas)
+- 👀 Code review (30 min)
+
+**Tarde:**
+- 🐛 Debugging y corrección (1 hora)
+- 📝 Documentación (30 min)
+- 🤝 Reuniones con equipo (1 hora)
+- 🧪 Testing automatizado (1 hora)
+
+**Continuo:**
+- 📚 Aprendizaje de tecnologías
+- 🔍 Investigación de soluciones
+- 💬 Comunicación con el equipo
+
+</Aside>
+
+</TabItem>
+<TabItem label="🌟 Explicación Simple">
+
+<Aside type="tip" title="💡 En palabras simples">
+El ingeniero de software es como un **constructor de LEGO digital**. Toma piezas (código) y las une para crear algo increíble que la gente pueda usar.
+</Aside>
+
+### 🎮 ¿Qué Hace un Ingeniero de Software Todos los Días?
+
+<PlantUml code={`
+@startmindmap
+skinparam backgroundColor beige
+skinparam defaultFontSize 13
+
+* 👨‍💻 Mi día como\\nIngeniero
+
+** ⌨️ Escribir código
+*** Crear nuevas funciones
+*** Arreglar errores
+*** Mejorar lo que existe
+
+** 🤝 Trabajar en equipo
+*** Reuniones diarias
+*** Ayudar a compañeros
+*** Revisar código de otros
+
+** 🧪 Probar que funcione
+*** Hacer pruebas
+*** Buscar errores
+*** Verificar calidad
+
+** 📚 Aprender cosas nuevas
+*** Leer documentación
+*** Ver tutoriales
+*** Probar tecnologías
+
+@endmindmap
+`} />
+
+### 🎯 Diferentes Tipos de Ingenieros
+
+<Badge text="1" variant="tip" /> **Frontend** 🎨
+- Hace la parte que **ves** de las apps
+- Botones, colores, animaciones
+- Ejemplo: La interfaz de Instagram
+
+<Badge text="2" variant="note" /> **Backend** ⚙️
+- Hace la parte que **no ves**
+- Donde se guardan tus datos
+- Ejemplo: Cuando guardas una foto en la nube
+
+<Badge text="3" variant="success" /> **Mobile** 📱
+- Hace apps para celulares
+- iOS (iPhone) o Android
+- Ejemplo: La app de TikTok
+
+<Badge text="4" variant="caution" /> **DevOps** ☁️
+- Se asegura que todo funcione 24/7
+- Mantiene los servidores
+- Ejemplo: Que Netflix nunca se caiga
+
+<Badge text="5" variant="danger" /> **Seguridad** 🔒
+- Protege contra hackers
+- Cuida tus contraseñas
+- Ejemplo: Que nadie robe tu cuenta
+
+### 📈 Crecimiento Profesional
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 13
+
+rectangle "🌱 Junior" as junior #E8F5E9
+rectangle "⚡ Mid-Level" as mid #FFF9C4
+rectangle "🚀 Senior" as senior #FFCCBC
+
+junior -right-> mid : Crecimiento
+mid -right-> senior : Experiencia
+
+note bottom of junior
+  Principiante
+  1-2 años
+end note
+
+note bottom of mid
+  Intermedio
+  3-5 años
+end note
+
+note bottom of senior
+  Experto
+  5+ años
+end note
+
+@enduml
+`} />
+
+### 💼 ¿Qué Habilidades Necesitas?
+
+**Habilidades Técnicas** 💻
+- Saber programar (Python, Java, JavaScript, etc.)
+- Entender cómo funcionan las computadoras
+- Usar herramientas como Git
+- Saber hacer pruebas
+
+**Habilidades Personales** 🧠
+- **Comunicación**: Explicar tus ideas claramente
+- **Trabajo en equipo**: Colaborar con otros
+- **Resolver problemas**: Encontrar soluciones creativas
+- **Ser curioso**: Siempre querer aprender más
+- **Paciencia**: Los bugs pueden ser frustrantes
+
+### 🎯 ¿Por Qué es Genial Ser Ingeniero de Software?
+
+<Aside type="note" title="✨ Beneficios">
+- 💰 **Buen salario**: Uno de los trabajos mejor pagados
+- 🏠 **Trabajo remoto**: Puedes trabajar desde casa
+- 🌍 **Oportunidades globales**: Trabaja para empresas de todo el mundo
+- 🚀 **Siempre hay algo nuevo**: Nunca te aburres
+- 🎨 **Creatividad**: Creas cosas que millones usan
+</Aside>
+
+**En resumen**: El ingeniero de software crea, arregla y mejora aplicaciones. Es un trabajo emocionante donde siempre estás aprendiendo y construyendo cosas nuevas. 🎉
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note" title="📌 Puntos Clave">
+- 🌐 La Ingeniería de Software se aplica en **todos los sectores**: salud, finanzas, entretenimiento, transporte, educación y más
+- 🔗 Es una disciplina **interdisciplinaria** que requiere conocimientos de matemáticas, diseño, gestión, seguridad y negocios
+- 👨‍💻 El rol del ingeniero incluye diseño, desarrollo, testing, documentación y colaboración en equipo
+- 📈 Existen múltiples **especializaciones**: frontend, backend, mobile, DevOps, seguridad, IA, entre otras
+- 🚀 Es una carrera con **gran demanda**, excelentes salarios y oportunidades de crecimiento continuo
+</Aside>
+

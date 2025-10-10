@@ -1,6 +1,6 @@
 ---
-title: 5. Documentación de Requerimientos
-description: Técnicas para documentar, especificar y versionar requerimientos de software
+title: 5 Documentación de Requerimientos
+description: Especificación de requerimientos (SRS), versionado y trazabilidad, control de cambios
 ---
 
 import { Code } from '@astrojs/starlight/components';
@@ -10,403 +10,1308 @@ import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
 import PlantUml from "@components/PlantUml.astro";
 
+## 🎯 Introducción a la Documentación de Requerimientos
 
-Cuando ya tenemos los requerimientos capturados y priorizados, necesitamos escribirlos bien para que todos entiendan lo mismo. Es como hacer un mapa del tesoro: si está mal dibujado, nadie encontrará el tesoro.
+La **documentación de requerimientos** es el proceso de registrar, estructurar y mantener de forma sistemática todos los requerimientos identificados para un sistema de software. Constituye el contrato formal entre stakeholders y el equipo de desarrollo, sirviendo como referencia única de verdad (single source of truth) durante todo el ciclo de vida del proyecto.
 
-## ¿Por qué documentar los requerimientos?
-
-<Aside type="tip">
-**Recuerda**: La memoria humana es frágil. Lo que no se escribe, se olvida o se malinterpreta. Un buen documento de requerimientos es como un contrato que protege a todos.
+<Aside type="note" title="📚 Definición Formal">
+La documentación de requerimientos es el conjunto de artefactos que especifican de manera completa, consistente y verificable las funcionalidades, restricciones y atributos de calidad que debe poseer un sistema de software, junto con los mecanismos para gestionar su evolución y trazabilidad.
 </Aside>
 
-<PlantUml code={`@startuml
-!theme plain
-skinparam backgroundColor white
+### 🔍 Importancia de la Documentación
 
-rectangle "Beneficios de la Documentación" {
-  card "Entendimiento común" as entendimiento #lightblue
-  card "Referencia permanente" as referencia #lightgreen
-  card "Evita malentendidos" as malentendidos #lightyellow
-  card "Base para pruebas" as pruebas #lightpink
-  card "Guía para nuevos miembros" as guia #lightcyan
-}
+<PlantUml code={`
+@startmindmap
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
 
-actor "Cliente" as cliente
-actor "Equipo" as equipo
+* 📋 ¿Por qué\\nDocumentar?
 
-cliente --> entendimiento : Confirma
-equipo --> entendimiento : Consulta
+** 📞 Comunicación
+*** Lenguaje común
+*** Alineación de expectativas
+*** Reducción de ambigüedad
+*** Base para negociación
 
-entendimiento --> referencia : Sirve como
-referencia --> malentendidos : Previene
-malentendidos --> pruebas : Facilita
-pruebas --> guia : Ayuda como
+** 📐 Diseño y Desarrollo
+*** Guía de implementación
+*** Base para arquitectura
+*** Estimación de esfuerzo
+*** Asignación de tareas
 
-note bottom of entendimiento : "Todos en la misma página"
-note bottom of referencia : "Lo que acordamos hacer"
-note bottom of malentendidos : "No lo que yo creía"
-note bottom of pruebas : "Cómo verificar que funciona"
-@enduml`} />
+** ✅ Validación y Verificación
+*** Criterios de aceptación
+*** Base para testing
+*** Revisiones de calidad
+*** Auditorías
 
-## Documento de Especificación de Requerimientos de Software (SRS)
+** 🔄 Mantenimiento
+*** Comprensión del sistema
+*** Análisis de impacto
+*** Evolución controlada
+*** Documentación histórica
 
-El SRS es como el plano detallado de una casa. Muestra exactamente qué se va a construir, para que todos (arquitectos, albañiles, dueños) entiendan lo mismo.
+** ⚖️ Legal y Contractual
+*** Acuerdos formales
+*** Evidencia de cumplimiento
+*** Resolución de disputas
+*** Cumplimiento regulatorio
 
-### ¿Qué es un SRS?
+@endmindmap
+`} />
 
-<Badge text="Definición" variant="note" /> **Documento formal que describe detalladamente todos los requerimientos del software**
+<Aside type="tip" title="💡 Principio de Documentación Ágil">
+**"La mejor documentación es la suficiente, no la exhaustiva."**
 
-<PlantUml code={`@startuml
-!theme plain
-skinparam backgroundColor white
-
-rectangle "Documento SRS" as srs #lightblue {
-  card "1. Introducción" as intro
-  card "2. Descripción General" as general
-  card "3. Requerimientos Funcionales" as funcionales
-  card "4. Requerimientos No Funcionales" as nofuncionales
-  card "5. Interfaces Externas" as interfaces
-  card "6. Restricciones" as restricciones
-  card "7. Apéndices" as apendices
-}
-
-note bottom of intro : Propósito, alcance, definiciones
-note bottom of general : Contexto, usuarios, limitaciones
-note bottom of funcionales : Lo que el sistema DEBE hacer
-note bottom of nofuncionales : Cómo debe hacerlo
-note bottom of interfaces : Conexiones con otros sistemas
-note bottom of restricciones : Limitaciones técnicas o legales
-note bottom of apendices : Diagramas, glosario, etc.
-@enduml`} />
-
-### Estructura de un buen SRS
-
-<Steps>
-1. **Introducción**
-   - Propósito del documento
-   - Alcance del proyecto
-   - Definiciones y acrónimos
-   - Referencias a otros documentos
-
-2. **Descripción General**
-   - Contexto del producto
-   - Funciones principales
-   - Características de los usuarios
-   - Restricciones generales
-
-3. **Requerimientos Funcionales**
-   - Organizados por módulos o casos de uso
-   - Detallados con la estructura vista anteriormente
-   - Priorizados según lo acordado
-
-4. **Requerimientos No Funcionales**
-   - Rendimiento
-   - Seguridad
-   - Usabilidad
-   - Confiabilidad
-   - Otros atributos de calidad
-
-5. **Interfaces Externas**
-   - Interfaces de usuario
-   - Interfaces con otros sistemas
-   - Interfaces de hardware
-
-6. **Restricciones de Diseño**
-   - Limitaciones técnicas
-   - Estándares a cumplir
-   - Requisitos legales
-
-7. **Apéndices**
-   - Diagramas complementarios
-   - Glosario de términos
-   - Prototipos o mockups
-</Steps>
-
-### Ejemplo simplificado de un SRS
-
-<Tabs>
-<TabItem label="Introducción">
-**1. Introducción**
-
-**1.1 Propósito**
-Este documento describe los requerimientos para la aplicación "SuperTienda", una plataforma de comercio electrónico para venta de productos.
-
-**1.2 Alcance**
-El sistema permitirá a los usuarios buscar productos, agregarlos al carrito, realizar pagos y seguir sus pedidos. No incluye el sistema de inventario ni contabilidad.
-
-**1.3 Definiciones**
-- **Usuario**: Cualquier persona que utiliza la aplicación
-- **Cliente**: Usuario registrado que puede comprar
-- **Administrador**: Usuario con privilegios especiales
-</TabItem>
-<TabItem label="Requerimientos Funcionales">
-**3. Requerimientos Funcionales**
-
-**RF-01: Registro de usuarios**
-- **Descripción**: El sistema debe permitir a los usuarios crear una cuenta con email y contraseña.
-- **Entradas**: Nombre, email, contraseña, teléfono (opcional)
-- **Proceso**: Validar formato de email, verificar que no exista, encriptar contraseña
-- **Salida**: Confirmación de registro y email de verificación
-- **Prioridad**: Alta
-
-**RF-02: Búsqueda de productos**
-- **Descripción**: El sistema debe permitir buscar productos por nombre, categoría o precio.
-- **Entradas**: Término de búsqueda, filtros opcionales
-- **Proceso**: Consultar base de datos y ordenar resultados por relevancia
-- **Salida**: Lista paginada de productos coincidentes
-- **Prioridad**: Alta
-</TabItem>
-<TabItem label="Requerimientos No Funcionales">
-**4. Requerimientos No Funcionales**
-
-**RNF-01: Tiempo de respuesta**
-- **Descripción**: Las búsquedas deben completarse en menos de 2 segundos
-- **Criterio**: 95% de las búsquedas cumplen este tiempo con hasta 500 usuarios simultáneos
-- **Tipo**: Rendimiento
-
-**RNF-02: Disponibilidad**
-- **Descripción**: El sistema debe estar disponible 99.9% del tiempo
-- **Criterio**: Máximo 8.76 horas de caída al año
-- **Tipo**: Confiabilidad
-</TabItem>
-</Tabs>
-
-### Consejos para escribir un buen SRS
-
-<Aside type="caution">
-**Evita estas trampas**: Un SRS malo puede ser peor que no tener ninguno. Asegúrate de que sea claro, completo y actualizado.
+Documentar lo necesario para comunicar efectivamente, sin caer en burocracia excesiva. La documentación debe agregar valor, no ser un fin en sí misma.
 </Aside>
 
-<PlantUml code={`@startuml
-!theme plain
-skinparam backgroundColor white
+---
 
-rectangle "Características de un Buen SRS" {
-  card "Completo" as completo #lightgreen
-  card "Consistente" as consistente #lightblue
-  card "No ambiguo" as noambiguo #lightyellow
-  card "Verificable" as verificable #lightpink
-  card "Modificable" as modificable #lightcyan
-  card "Trazable" as trazable #lightgray
-}
+## 📄 Especificación de Requerimientos de Software (SRS)
 
-note bottom of completo : Todo lo necesario está incluido
-note bottom of consistente : No hay contradicciones
-note bottom of noambiguo : Solo una interpretación posible
-note bottom of verificable : Se puede comprobar si se cumple
-note bottom of modificable : Fácil de actualizar
-note bottom of trazable : Se puede seguir el origen de cada requisito
-@enduml`} />
+El **Software Requirements Specification (SRS)** es el documento formal que describe de manera completa y detallada los requerimientos funcionales y no funcionales de un sistema de software.
 
-#### Consejos prácticos:
+### 📖 Definición según IEEE 830
+
+<Aside type="note" title="📚 Estándar IEEE 830-1998">
+El SRS (Software Requirements Specification) es una especificación para un producto de software particular, programa o conjunto de programas que realiza ciertas funciones en un ambiente específico. El SRS puede ser escrito por uno o más representantes del cliente, uno o más representantes del proveedor, o por ambos.
+</Aside>
+
+### 🎯 Características de un Buen SRS
 
 <Steps>
-1. **Usa lenguaje claro**: Evita jerga técnica cuando sea posible
-2. **Sé específico**: "El sistema debe ser rápido" es malo; "Debe responder en menos de 3 segundos" es bueno
-3. **Usa plantillas**: No reinventes la rueda, usa formatos estándar
-4. **Incluye ejemplos**: Un ejemplo vale más que mil palabras
-5. **Revisa con todos**: Cliente, desarrolladores, testers, todos deben entenderlo
+
+1. **Correcto**
+   
+   Cada requerimiento representa con precisión alguna característica necesaria del sistema.
+   
+   **Verificación:** Cada requerimiento puede ser trazado a su fuente (stakeholder, documento, regulación).
+
+2. **No Ambiguo**
+   
+   Cada requerimiento tiene una única interpretación posible.
+   
+   **Técnicas:**
+   - Usar lenguaje preciso y técnico
+   - Evitar términos vagos ("rápido", "fácil", "robusto")
+   - Incluir diagramas y ejemplos
+   - Definir glosario de términos
+
+3. **Completo**
+   
+   El SRS incluye todos los requerimientos significativos relacionados con funcionalidad, rendimiento, restricciones de diseño, atributos y interfaces externas.
+   
+   **Criterio:** No hay información marcada como "TBD" (To Be Determined) en el documento final.
+
+4. **Consistente**
+   
+   No hay conflictos entre requerimientos individuales.
+   
+   **Tipos de inconsistencia:**
+   - Terminología diferente para el mismo concepto
+   - Conflictos lógicos entre requerimientos
+   - Diferencias en formato o estructura
+
+5. **Clasificado por Importancia**
+   
+   Cada requerimiento tiene asignada una prioridad o nivel de estabilidad.
+   
+   **Escalas comunes:**
+   - Crítico / Alto / Medio / Bajo
+   - Must / Should / Could / Won't (MoSCoW)
+   - Prioridad 1-5
+
+6. **Verificable**
+   
+   Existe un proceso finito y costo-efectivo para verificar que el sistema cumple el requerimiento.
+   
+   **Criterio:** Se puede escribir un caso de prueba para validar el requerimiento.
+
+7. **Modificable**
+   
+   La estructura y estilo del SRS permiten cambios fáciles, completos y consistentes.
+   
+   **Características:**
+   - Organización lógica
+   - No redundancia
+   - Tabla de contenidos
+   - Índice y referencias cruzadas
+
+8. **Trazable**
+   
+   El origen de cada requerimiento es claro y facilita la referencia en desarrollo y documentación futura.
+   
+   **Tipos de trazabilidad:**
+   - Hacia atrás: A su fuente
+   - Hacia adelante: A diseño, código y pruebas
+
 </Steps>
 
-## Versionado de cambios
+### 📊 Estructura del SRS según IEEE 830
 
-Los requerimientos cambian con el tiempo. Es normal y hay que manejarlo bien.
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 10
 
-<Badge text="Definición" variant="caution" /> **El versionado de cambios es el proceso de registrar, aprobar y rastrear modificaciones en los requerimientos**
-
-### ¿Por qué versionar los cambios?
-
-<PlantUml code={`@startuml
-!theme plain
-skinparam backgroundColor white
-
-rectangle "Sin Control de Versiones" {
-  card "Versión 1" as v1a #lightblue
-  card "Versión 2?" as v2a #lightgreen
-  card "Versión 3??" as v3a #lightyellow
-  card "Versión ???" as v4a #lightpink
-}
-
-rectangle "Con Control de Versiones" {
-  card "Versión 1.0" as v1b #lightblue
-  card "Versión 1.1" as v2b #lightgreen
-  card "Versión 2.0" as v3b #lightyellow
-  card "Versión 2.1" as v4b #lightpink
-}
-
-v1a --> v2a : Cambio sin registro
-v2a --> v3a : ¿Quién cambió esto?
-v3a --> v4a : ¿Qué cambió?
-
-v1b --> v2b : Cambio menor (documentado)
-v2b --> v3b : Cambio mayor (aprobado)
-v3b --> v4b : Cambio menor (rastreable)
-
-note bottom of v4a : Caos y confusión
-note bottom of v4b : Orden y claridad
-@enduml`} />
-
-### Elementos de un buen sistema de versionado
-
-<Steps>
-1. **Número de versión**: Identificador único (ej. 1.0, 1.1, 2.0)
-2. **Fecha del cambio**: Cuándo se realizó
-3. **Autor**: Quién lo solicitó y quién lo aprobó
-4. **Descripción del cambio**: Qué se modificó exactamente
-5. **Justificación**: Por qué fue necesario el cambio
-6. **Impacto**: Qué otras partes se ven afectadas
-</Steps>
-
-### Ejemplo de registro de cambios
-
-<Tabs>
-<TabItem label="Tabla de Cambios">
-| Versión | Fecha | Autor | Descripción | Justificación | Impacto |
-|---------|-------|-------|------------|---------------|----------|
-| 1.0 | 10/01/2023 | Juan Pérez | Versión inicial | N/A | N/A |
-| 1.1 | 15/02/2023 | María Gómez | Agregado filtro por precio | Solicitud de usuarios | Bajo - Solo UI |
-| 2.0 | 03/04/2023 | Carlos López | Nuevo sistema de pagos | Cambio de proveedor | Alto - Afecta procesamiento |
-| 2.1 | 22/05/2023 | Laura Martínez | Corrección en RF-05 | Error detectado | Medio - Afecta reportes |
-</TabItem>
-<TabItem label="Detalle de un Cambio">
-**Cambio en Versión 2.0**
-
-**Requerimiento modificado**: RF-08 Procesamiento de pagos
-
-**Cambio realizado**: Se reemplazó el proveedor de pagos de PayPal a Stripe
-
-**Versión anterior**:
-```
-RF-08: El sistema debe procesar pagos a través de PayPal, aceptando tarjetas de crédito y débito.
-```
-
-**Nueva versión**:
-```
-RF-08: El sistema debe procesar pagos a través de Stripe, aceptando tarjetas de crédito, débito y métodos alternativos como Apple Pay y Google Pay.
-```
-
-**Justificación**: Stripe ofrece comisiones más bajas y más métodos de pago.
-
-**Impacto**: Requiere cambios en el módulo de pagos y en la interfaz de usuario.
-
-**Aprobado por**: Comité de Cambios (Acta #45)
-</TabItem>
-</Tabs>
-
-### Estrategias de numeración de versiones
-
-<PlantUml code={`@startuml
-!theme plain
-skinparam backgroundColor white
-
-rectangle "Semántica de Versiones" {
-  card "X.Y.Z" as version
-  card "MAYOR" as mayor #lightcoral
-  card "MENOR" as menor #lightgreen
-  card "PARCHE" as parche #lightblue
-}
-
-version --> mayor
-version --> menor
-version --> parche
-
-note bottom of mayor : Cambios incompatibles (2.0.0)
-note bottom of menor : Nuevas funcionalidades (1.1.0)
-note bottom of parche : Correcciones de errores (1.0.1)
-@enduml`} />
-
-#### Ejemplos de cambios de versión:
-
-<Tabs>
-<TabItem label="Cambio MAYOR (X.0.0)">
-**De 1.9.5 a 2.0.0**
-
-**Tipos de cambios**:
-- Cambios que rompen la compatibilidad
-- Rediseño completo de una funcionalidad
-- Eliminación de características importantes
-
-**Ejemplo**:
-- Cambiar de un sistema de autenticación propio a OAuth
-- Rediseñar completamente la interfaz de usuario
-- Cambiar la arquitectura del sistema
-</TabItem>
-<TabItem label="Cambio MENOR (0.Y.0)">
-**De 1.9.5 a 1.10.0**
-
-**Tipos de cambios**:
-- Nuevas funcionalidades que no rompen compatibilidad
-- Mejoras significativas en funcionalidades existentes
-- Deprecación de funciones (pero sin eliminarlas)
-
-**Ejemplo**:
-- Agregar un nuevo método de pago
-- Implementar un nuevo tipo de búsqueda
-- Añadir exportación a PDF de reportes
-</TabItem>
-<TabItem label="PARCHE (0.0.Z)">
-**De 1.9.5 a 1.9.6**
-
-**Tipos de cambios**:
-- Correcciones de errores
-- Cambios menores que no afectan funcionalidad
-- Mejoras de rendimiento pequeñas
-
-**Ejemplo**:
-- Corregir un error de cálculo
-- Arreglar un problema de visualización
-- Optimizar una consulta a la base de datos
-</TabItem>
-</Tabs>
-
-## Herramientas para documentación y versionado
-
-<PlantUml code={`@startuml
-!theme plain
-skinparam backgroundColor white
-
-rectangle "Herramientas" {
-  card "Documentación" as docs #lightblue {
-    card "Confluence" as confluence
-    card "Microsoft Word" as word
-    card "Google Docs" as gdocs
-    card "Markdown" as markdown
+rectangle "📄 Estructura del SRS (IEEE 830)" as srs #E8F5E9 {
+  
+  rectangle "1. Introducción" as intro #81D4FA {
+    card "1.1 Propósito"
+    card "1.2 Alcance"
+    card "1.3 Definiciones, acrónimos y abreviaturas"
+    card "1.4 Referencias"
+    card "1.5 Visión general del documento"
   }
   
-  card "Control de Versiones" as cv #lightgreen {
-    card "Git" as git
-    card "SVN" as svn
-    card "Jira" as jira
+  rectangle "2. Descripción General" as desc #FFB74D {
+    card "2.1 Perspectiva del producto"
+    card "2.2 Funciones del producto"
+    card "2.3 Características de usuarios"
+    card "2.4 Restricciones"
+    card "2.5 Suposiciones y dependencias"
   }
   
-  card "Especializadas" as esp #lightyellow {
-    card "ReqIF" as reqif
-    card "DOORS" as doors
-    card "Jama" as jama
+  rectangle "3. Requerimientos Específicos" as req #81C784 {
+    card "3.1 Requerimientos funcionales"
+    card "3.2 Requerimientos de interfaces externas"
+    card "3.3 Requerimientos de rendimiento"
+    card "3.4 Restricciones de diseño"
+    card "3.5 Atributos del sistema"
+    card "3.6 Otros requerimientos"
+  }
+  
+  rectangle "Apéndices" as apend #CE93D8 {
+    card "A. Modelos de análisis"
+    card "B. Lista de issues"
+    card "C. Glosario"
   }
 }
 
-note bottom of confluence : Wiki colaborativa
-note bottom of markdown : Simple y versátil
-note bottom of git : Control de cambios
-note bottom of jira : Seguimiento de cambios
-note bottom of doors : Estándar en industrias
-@enduml`} />
+intro -down-> desc
+desc -down-> req
+req -down-> apend
 
-## Consejos finales para documentación efectiva
+@enduml
+`} />
 
-<Aside type="tip">
-**La clave**: Un buen documento de requerimientos debe ser fácil de leer, fácil de mantener y fácil de rastrear. No importa qué herramienta uses, estos principios son universales.
+### 📋 Plantilla de SRS
+
+<Tabs>
+
+<TabItem label="📑 Portada">
+
+<Code code={`
+╔════════════════════════════════════════════════════════════╗
+║                                                            ║
+║        ESPECIFICACIÓN DE REQUERIMIENTOS DE SOFTWARE       ║
+║                          (SRS)                             ║
+║                                                            ║
+║                    [Nombre del Proyecto]                   ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝
+
+Versión: 1.0
+Fecha: [DD/MM/AAAA]
+Estado: [Borrador | En Revisión | Aprobado]
+
+INFORMACIÓN DEL PROYECTO:
+- Cliente: [Nombre de la organización]
+- Patrocinador: [Nombre y cargo]
+- Product Owner: [Nombre]
+- Analista Principal: [Nombre]
+
+CONTROL DE VERSIONES:
+┌─────────┬────────────┬──────────┬─────────────────────────┐
+│ Versión │   Fecha    │  Autor   │      Descripción        │
+├─────────┼────────────┼──────────┼─────────────────────────┤
+│  0.1    │ 01/01/2024 │ J. Pérez │ Versión inicial         │
+│  0.5    │ 15/01/2024 │ M. López │ Revisión stakeholders   │
+│  1.0    │ 30/01/2024 │ J. Pérez │ Versión aprobada        │
+└─────────┴────────────┴──────────┴─────────────────────────┘
+
+APROBACIONES:
+- Cliente: _________________ Fecha: _______
+- Product Owner: ___________ Fecha: _______
+- Arquitecto: ______________ Fecha: _______
+`} lang="text" title="Portada del SRS" />
+
+</TabItem>
+
+<TabItem label="1️⃣ Introducción">
+
+<Code code={`
+1. INTRODUCCIÓN
+
+1.1 Propósito
+Este documento especifica los requerimientos del sistema [Nombre del Sistema].
+Está dirigido a:
+- Stakeholders del negocio (para validación)
+- Equipo de desarrollo (para implementación)
+- Equipo de QA (para diseño de pruebas)
+- Equipo de mantenimiento (para soporte futuro)
+
+1.2 Alcance
+Nombre del sistema: [Nombre]
+Descripción: [Breve descripción del sistema]
+
+Objetivos:
+- [Objetivo 1: Descripción del beneficio esperado]
+- [Objetivo 2: Descripción del beneficio esperado]
+- [Objetivo 3: Descripción del beneficio esperado]
+
+Dentro del alcance:
+- [Funcionalidad incluida 1]
+- [Funcionalidad incluida 2]
+
+Fuera del alcance:
+- [Funcionalidad explícitamente excluida 1]
+- [Funcionalidad explícitamente excluida 2]
+
+1.3 Definiciones, Acrónimos y Abreviaturas
+- API: Application Programming Interface
+- CRUD: Create, Read, Update, Delete
+- JWT: JSON Web Token
+- MFA: Multi-Factor Authentication
+- RNF: Requerimiento No Funcional
+- RF: Requerimiento Funcional
+- SLA: Service Level Agreement
+- TLS: Transport Layer Security
+- UI: User Interface
+- UX: User Experience
+
+1.4 Referencias
+- [IEEE 830-1998] IEEE Recommended Practice for Software Requirements 
+  Specifications
+- [ISO/IEC 25010] Systems and software Quality Requirements and Evaluation
+- [Documento de Visión] v1.0, 15/12/2023
+- [Casos de Uso] v1.2, 20/12/2023
+- [Arquitectura del Sistema] v0.8, 10/01/2024
+
+1.5 Visión General del Documento
+Sección 2: Describe el contexto general del sistema, sus funciones 
+          principales y restricciones.
+Sección 3: Detalla todos los requerimientos específicos funcionales 
+          y no funcionales.
+Apéndices: Contienen información complementaria, modelos y glosario.
+`} lang="text" title="Sección 1: Introducción" />
+
+</TabItem>
+
+<TabItem label="2️⃣ Descripción General">
+
+<Code code={`
+2. DESCRIPCIÓN GENERAL
+
+2.1 Perspectiva del Producto
+[Nombre del Sistema] es un [nuevo sistema independiente | componente de un 
+sistema mayor | reemplazo de sistema existente].
+
+Interfaces del sistema:
+- Interfaces de usuario: [Web responsive, App móvil iOS/Android]
+- Interfaces de hardware: [Lectores de tarjetas, impresoras, etc.]
+- Interfaces de software: [APIs externas, bases de datos, servicios]
+- Interfaces de comunicación: [Protocolos de red, formatos de datos]
+
+Diagrama de contexto:
+[Incluir diagrama mostrando el sistema y sus interfaces externas]
+
+2.2 Funciones del Producto
+Resumen de las funciones principales:
+
+F1. Gestión de Usuarios
+    - Registro y autenticación
+    - Gestión de perfiles
+    - Control de acceso basado en roles
+
+F2. [Función Principal 2]
+    - [Subfunción 2.1]
+    - [Subfunción 2.2]
+
+F3. [Función Principal 3]
+    - [Subfunción 3.1]
+    - [Subfunción 3.2]
+
+2.3 Características de Usuarios
+┌──────────────┬─────────────┬──────────────┬─────────────────┐
+│ Tipo Usuario │ Frecuencia  │ Experiencia  │ Funciones       │
+├──────────────┼─────────────┼──────────────┼─────────────────┤
+│ Administrador│ Diaria      │ Técnica alta │ Todas           │
+│ Usuario Final│ Diaria      │ Básica       │ Operaciones core│
+│ Supervisor   │ Semanal     │ Media        │ Reportes, config│
+│ Invitado     │ Ocasional   │ Ninguna      │ Solo consulta   │
+└──────────────┴─────────────┴──────────────┴─────────────────┘
+
+2.4 Restricciones
+- Regulatorias: [GDPR, PCI-DSS, HIPAA, etc.]
+- Hardware: [Servidores específicos, dispositivos compatibles]
+- Interfaces: [Sistemas legacy que deben integrarse]
+- Operaciones: [Horarios de mantenimiento, disponibilidad]
+- Seguridad: [Estándares de cifrado, autenticación requerida]
+- Presupuesto: [Límite de costos de infraestructura]
+- Cronograma: [Fecha límite de entrega]
+
+2.5 Suposiciones y Dependencias
+Suposiciones:
+- Los usuarios tienen acceso a internet de al menos 5 Mbps
+- Los navegadores soportan JavaScript ES6+
+- La base de datos externa estará disponible 99.9% del tiempo
+
+Dependencias:
+- API de pagos de terceros (Stripe/PayPal)
+- Servicio de email (SendGrid)
+- Servicio de almacenamiento en la nube (AWS S3)
+- Sistema de autenticación corporativo (Active Directory)
+`} lang="text" title="Sección 2: Descripción General" />
+
+</TabItem>
+
+<TabItem label="3️⃣ Requerimientos">
+
+<Code code={`
+3. REQUERIMIENTOS ESPECÍFICOS
+
+3.1 Requerimientos Funcionales
+
+3.1.1 Módulo de Autenticación
+
+RF-001: Login de Usuario
+Prioridad: Crítica
+Descripción: El sistema debe permitir a los usuarios autenticarse mediante 
+email y contraseña.
+
+Precondiciones:
+- Usuario registrado en el sistema
+- Cuenta activa (no bloqueada)
+
+Flujo Principal:
+1. Usuario ingresa email y contraseña
+2. Sistema valida formato de email
+3. Sistema verifica credenciales contra base de datos
+4. Sistema genera token JWT con expiración de 24 horas
+5. Sistema registra login en auditoría
+6. Sistema redirige a dashboard
+
+Flujos Alternativos:
+3a. Credenciales inválidas:
+    1. Sistema incrementa contador de intentos fallidos
+    2. Sistema muestra mensaje "Credenciales incorrectas"
+    3. Si intentos >= 3, bloquear cuenta por 30 minutos
+    
+3b. Cuenta bloqueada:
+    1. Sistema muestra mensaje con tiempo restante de bloqueo
+    2. Sistema envía email de notificación al usuario
+
+Postcondiciones:
+- Usuario autenticado con sesión activa
+- Token JWT almacenado en cliente
+- Evento de login registrado
+
+Criterios de Aceptación:
+- Login exitoso en < 2 segundos
+- Contraseña hasheada con bcrypt (factor 12)
+- Token JWT firmado con RS256
+- Bloqueo automático después de 3 intentos fallidos
+
+Dependencias: RF-002 (Registro de usuario)
+Relacionado: RNF-020 (Seguridad de autenticación)
+
+---
+
+RF-002: Registro de Usuario
+[Estructura similar a RF-001]
+
+---
+
+3.1.2 Módulo de [Otro Módulo]
+[Continuar con otros requerimientos funcionales]
+
+---
+
+3.2 Requerimientos de Interfaces Externas
+
+3.2.1 Interfaces de Usuario
+- Responsive design para pantallas 320px - 2560px
+- Cumplimiento WCAG 2.1 Nivel AA
+- Soporte para navegadores: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
+- Tiempo de carga inicial < 3 segundos
+
+3.2.2 Interfaces de Hardware
+[Si aplica: lectores de código de barras, impresoras, etc.]
+
+3.2.3 Interfaces de Software
+API-001: Integración con Pasarela de Pagos
+- Protocolo: HTTPS REST
+- Formato: JSON
+- Autenticación: API Key + Secret
+- Endpoints: /charge, /refund, /status
+- Timeout: 30 segundos
+- Retry: 3 intentos con backoff exponencial
+
+3.2.4 Interfaces de Comunicación
+- Protocolo: HTTPS/TLS 1.3
+- Formato de datos: JSON (API), HTML (Web)
+- Puerto: 443 (HTTPS)
+- Rate limiting: 1000 requests/minuto por IP
+
+---
+
+3.3 Requerimientos de Rendimiento
+
+RNF-001: Tiempo de Respuesta
+El sistema debe responder a las peticiones de usuarios en:
+- Operaciones de lectura: < 1 segundo (P95)
+- Operaciones de escritura: < 2 segundos (P95)
+- Búsquedas complejas: < 3 segundos (P95)
+
+Condiciones: Carga normal de hasta 5,000 usuarios concurrentes
+
+RNF-002: Throughput
+El sistema debe procesar:
+- 10,000 transacciones por minuto
+- 500 búsquedas simultáneas
+- 1,000 operaciones de escritura por minuto
+
+RNF-003: Capacidad
+El sistema debe soportar:
+- 100,000 usuarios registrados
+- 10,000 usuarios concurrentes
+- 1,000,000 registros en base de datos principal
+- Crecimiento de 20% anual sin degradación
+
+---
+
+3.4 Restricciones de Diseño
+
+RNF-010: Arquitectura
+- Arquitectura de microservicios
+- Contenedores Docker
+- Orquestación con Kubernetes
+- Base de datos PostgreSQL 14+
+
+RNF-011: Estándares de Código
+- Lenguaje: TypeScript 4.5+
+- Framework: Node.js 18 LTS
+- Estilo: ESLint con Airbnb config
+- Cobertura de tests: > 80%
+
+---
+
+3.5 Atributos del Sistema
+
+3.5.1 Disponibilidad
+RNF-020: El sistema debe tener 99.9% de disponibilidad (uptime)
+- Máximo downtime: 8.76 horas/año
+- Mantenimiento programado: Domingos 2am-4am
+- SLA: Penalización si disponibilidad < 99.5%
+
+3.5.2 Seguridad
+RNF-021: Cifrado de Datos
+- Datos en tránsito: TLS 1.3
+- Datos en reposo: AES-256
+- Contraseñas: bcrypt con factor 12
+- Tokens: JWT con RS256
+
+RNF-022: Autenticación y Autorización
+- MFA obligatorio para administradores
+- RBAC con mínimo privilegio
+- Sesiones con timeout de 30 minutos de inactividad
+- Rotación de tokens cada 24 horas
+
+3.5.3 Mantenibilidad
+RNF-030: Logging y Monitoreo
+- Logs estructurados en formato JSON
+- Niveles: ERROR, WARN, INFO, DEBUG
+- Retención: 90 días
+- Monitoreo con Prometheus + Grafana
+
+3.5.4 Portabilidad
+RNF-040: Compatibilidad
+- Contenedores Docker (multiplataforma)
+- Compatible con AWS, Azure, GCP
+- Base de datos: PostgreSQL o MySQL
+
+---
+
+3.6 Otros Requerimientos
+
+3.6.1 Requerimientos de Base de Datos
+- Backups automáticos diarios
+- Retención de backups: 30 días
+- Tiempo de recuperación (RTO): < 4 horas
+- Punto de recuperación (RPO): < 1 hora
+
+3.6.2 Requerimientos de Internacionalización
+- Soporte para idiomas: Español, Inglés
+- Formato de fechas: según locale del usuario
+- Zona horaria: UTC con conversión local
+- Moneda: según país del usuario
+
+3.6.3 Requerimientos Legales
+- Cumplimiento GDPR (derecho al olvido)
+- Logs de auditoría inmutables
+- Consentimiento explícito para cookies
+- Términos y condiciones aceptados al registro
+`} lang="text" title="Sección 3: Requerimientos Específicos" />
+
+</TabItem>
+
+</Tabs>
+
+### ✅ Mejores Prácticas para el SRS
+
+<Aside type="tip" title="🎯 Recomendaciones Clave">
+**1. Usar lenguaje consistente**
+- Definir términos en glosario
+- Usar siempre los mismos términos para los mismos conceptos
+- Evitar sinónimos que generen confusión
+
+**2. Incluir diagramas**
+- Diagramas de casos de uso
+- Diagramas de flujo
+- Modelos de datos
+- Diagramas de arquitectura
+
+**3. Especificar criterios de aceptación**
+- Cada requerimiento debe tener criterios medibles
+- Usar valores cuantitativos cuando sea posible
+- Definir cómo se verificará el cumplimiento
+
+**4. Mantener trazabilidad**
+- Identificadores únicos para cada requerimiento
+- Referencias cruzadas entre requerimientos relacionados
+- Vínculos a casos de uso y diseño
+
+**5. Revisar y validar**
+- Revisiones técnicas con el equipo
+- Validación con stakeholders
+- Inspecciones formales antes de aprobar
 </Aside>
 
+---
+
+## 🔄 Versionado y Trazabilidad
+
+El versionado y la trazabilidad son mecanismos fundamentales para gestionar la evolución de los requerimientos y mantener la coherencia entre diferentes artefactos del proyecto.
+
+### 📌 Versionado de Requerimientos
+
+El versionado es el proceso de identificar y registrar diferentes versiones de los requerimientos a lo largo del tiempo.
+
+<Aside type="note" title="📚 Definición">
+El versionado de requerimientos es la práctica de asignar identificadores únicos a cada versión de un requerimiento o documento de requerimientos, permitiendo rastrear su evolución, cambios y estado a lo largo del ciclo de vida del proyecto.
+</Aside>
+
+#### 🔢 Esquemas de Versionado
+
 <Steps>
-1. **Mantén la documentación actualizada**: Un documento desactualizado es peor que no tener documento
-2. **Usa formatos estándar**: No reinventes la rueda, usa plantillas probadas
-3. **Automatiza lo que puedas**: Usa herramientas que faciliten el versionado
-4. **Comunica los cambios**: Asegúrate de que todos sepan cuando algo cambia
-5. **Mantén un historial accesible**: Cualquiera debe poder ver qué cambió y por qué
+
+1. **Versionado Semántico (SemVer)**
+   
+   Formato: **MAJOR.MINOR.PATCH**
+   
+   **Reglas:**
+   - **MAJOR:** Cambios incompatibles o rediseño significativo
+   - **MINOR:** Nuevas funcionalidades compatibles con versión anterior
+   - **PATCH:** Correcciones menores, clarificaciones
+   
+   **Ejemplo:**
+   ```
+   SRS v1.0.0 → Versión inicial aprobada
+   SRS v1.1.0 → Agregados 5 nuevos requerimientos
+   SRS v1.1.1 → Corrección de errores tipográficos
+   SRS v2.0.0 → Rediseño completo del módulo de pagos
+   ```
+
+2. **Versionado por Fecha**
+   
+   Formato: **YYYY.MM.DD** o **YYYYMMDD**
+   
+   **Ventajas:**
+   - Fácil de entender cronológicamente
+   - No requiere decisión sobre tipo de cambio
+   
+   **Ejemplo:**
+   ```
+   SRS-2024.01.15
+   SRS-2024.02.20
+   SRS-2024.03.10
+   ```
+
+3. **Versionado Incremental Simple**
+   
+   Formato: **v1, v2, v3...**
+   
+   **Uso:** Proyectos pequeños o documentos internos
+   
+   **Ejemplo:**
+   ```
+   SRS v1 → Borrador inicial
+   SRS v2 → Primera revisión
+   SRS v3 → Versión aprobada
+   ```
+
+4. **Versionado por Estado**
+   
+   Combina número de versión con estado del documento.
+   
+   **Ejemplo:**
+   ```
+   SRS v1.0-DRAFT
+   SRS v1.0-REVIEW
+   SRS v1.0-APPROVED
+   SRS v1.1-DRAFT
+   ```
+
 </Steps>
 
-### Recuerda:
+#### 📊 Matriz de Trazabilidad
 
-<Badge text="Consejo final" variant="note" /> **La documentación no es un fin en sí mismo, sino un medio para lograr un mejor software. Si no ayuda a ese objetivo, algo está mal.**
+La matriz de trazabilidad es una herramienta que vincula requerimientos con otros artefactos del proyecto.
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 10
+
+rectangle "🔗 Trazabilidad de Requerimientos" as traz #E8F5E9 {
+  
+  rectangle "⬅️ Trazabilidad Hacia Atrás\\n(Backward Traceability)" as back #81D4FA {
+    card "Stakeholder"
+    card "Necesidad de negocio"
+    card "Caso de uso"
+    card "Documento de visión"
+    card "Entrevistas"
+  }
+  
+  rectangle "📋 Requerimiento\\nRF-001" as req #FFB74D {
+    card "ID: RF-001"
+    card "Versión: 1.2"
+    card "Estado: Aprobado"
+    card "Prioridad: Alta"
+  }
+  
+  rectangle "➡️ Trazabilidad Hacia Adelante\\n(Forward Traceability)" as forw #81C784 {
+    card "Diseño de arquitectura"
+    card "Componentes de código"
+    card "Casos de prueba"
+    card "Documentación de usuario"
+    card "Criterios de aceptación"
+  }
+}
+
+back -right-> req
+req -right-> forw
+
+@enduml
+`} />
+
+#### 📋 Plantilla de Matriz de Trazabilidad
+
+<Code code={`
+MATRIZ DE TRAZABILIDAD DE REQUERIMIENTOS
+Proyecto: [Nombre del Proyecto]
+Versión: 1.0
+Fecha: [DD/MM/AAAA]
+
+┌────────┬─────────────┬──────────┬──────────┬──────────┬──────────┬──────────┐
+│ Req ID │   Fuente    │ Caso Uso │  Diseño  │  Código  │  Prueba  │  Estado  │
+├────────┼─────────────┼──────────┼──────────┼──────────┼──────────┼──────────┤
+│ RF-001 │ ENT-001     │ CU-010   │ DIS-005  │ MOD-Auth │ TC-001   │ Aprobado │
+│        │ Stakeholder │          │          │          │ TC-002   │          │
+│        │ Juan Pérez  │          │          │          │          │          │
+├────────┼─────────────┼──────────┼──────────┼──────────┼──────────┼──────────┤
+│ RF-002 │ ENT-001     │ CU-011   │ DIS-005  │ MOD-Auth │ TC-003   │ Aprobado │
+│        │ DOC-Vision  │          │          │          │ TC-004   │          │
+│        │ Sección 3.2 │          │          │          │          │          │
+├────────┼─────────────┼──────────┼──────────┼──────────┼──────────┼──────────┤
+│ RF-015 │ ENT-003     │ CU-025   │ DIS-012  │ MOD-Pay  │ TC-045   │ En Dev   │
+│        │ Stakeholder │ CU-026   │          │          │ TC-046   │          │
+│        │ María López │          │          │          │ TC-047   │          │
+├────────┼─────────────┼──────────┼──────────┼──────────┼──────────┼──────────┤
+│RNF-020 │ REG-GDPR    │ N/A      │ DIS-SEC  │ MOD-Sec  │ TC-SEC-1 │ Aprobado │
+│        │ Compliance  │          │          │          │ TC-SEC-2 │          │
+└────────┴─────────────┴──────────┴──────────┴──────────┴──────────┴──────────┘
+
+LEYENDA:
+- ENT: Entrevista
+- CU: Caso de Uso
+- DIS: Documento de Diseño
+- MOD: Módulo de Código
+- TC: Test Case (Caso de Prueba)
+- REG: Regulación
+
+ESTADÍSTICAS:
+- Total de requerimientos: 45
+- Trazados completamente: 38 (84%)
+- Trazados parcialmente: 5 (11%)
+- Sin trazabilidad: 2 (5%)
+
+REQUERIMIENTOS SIN TRAZABILIDAD COMPLETA:
+- RF-030: Falta vincular a casos de prueba
+- RF-042: Falta vincular a diseño
+`} lang="text" title="Matriz de Trazabilidad" />
+
+### 🛠️ Herramientas de Gestión
+
+<Tabs>
+
+<TabItem label="🔧 Herramientas Especializadas">
+
+**Herramientas de Gestión de Requerimientos:**
+
+| Herramienta | Tipo | Características Principales | Mejor para |
+|-------------|------|----------------------------|------------|
+| **DOORS (IBM)** | Comercial | Trazabilidad robusta, versionado, colaboración | Proyectos enterprise complejos |
+| **Jama Connect** | Comercial | Gestión de riesgos, cumplimiento, integración | Industrias reguladas |
+| **Helix RM** | Comercial | Análisis de impacto, workflows personalizables | Equipos grandes |
+| **Jira + Confluence** | Comercial/Cloud | Integración ágil, flexible, extensible | Equipos ágiles |
+| **Azure DevOps** | Cloud | Integración CI/CD, boards, repos | Ecosistema Microsoft |
+| **ReqView** | Comercial | Ligero, trazabilidad, exportación | Equipos pequeños/medianos |
+
+</TabItem>
+
+<TabItem label="📂 Control de Versiones">
+
+**Sistemas de Control de Versiones:**
+
+**Git + Markdown/AsciiDoc:**
+```bash
+# Estructura de repositorio
+requirements/
+├── SRS.md
+├── use-cases/
+│   ├── UC-001-login.md
+│   ├── UC-002-register.md
+├── traceability/
+│   └── traceability-matrix.csv
+└── versions/
+    ├── v1.0/
+    ├── v1.1/
+    └── v2.0/
+
+# Comandos útiles
+git log --oneline SRS.md          # Historial de cambios
+git diff v1.0 v1.1 -- SRS.md      # Diferencias entre versiones
+git blame SRS.md                   # Quién cambió qué
+git tag -a v1.0 -m "Release 1.0"  # Etiquetar versión
+```
+
+**Ventajas:**
+- Historial completo de cambios
+- Branching para versiones paralelas
+- Revisión de código (pull requests)
+- Integración con CI/CD
+
+</TabItem>
+
+<TabItem label="📊 Hojas de Cálculo">
+
+**Excel/Google Sheets:**
+
+**Ventajas:**
+- Accesible y familiar
+- Fácil de compartir
+- Filtrado y ordenamiento
+- Fórmulas para métricas
+
+**Estructura recomendada:**
+
+```
+Columnas:
+A: ID Requerimiento
+B: Versión
+C: Fecha Creación
+D: Fecha Última Modificación
+E: Autor
+F: Estado
+G: Prioridad
+H: Descripción
+I: Fuente (Trazabilidad Atrás)
+J: Caso de Uso
+K: Diseño (Trazabilidad Adelante)
+L: Código
+M: Pruebas
+N: Comentarios
+```
+
+**Limitaciones:**
+- No control de versiones robusto
+- Difícil para colaboración simultánea
+- Propenso a errores manuales
+
+</TabItem>
+
+</Tabs>
+
+### ✅ Mejores Prácticas de Trazabilidad
+
+<Aside type="tip" title="🎯 Recomendaciones">
+**1. Establecer trazabilidad desde el inicio**
+- No esperar al final del proyecto
+- Documentar fuentes al capturar requerimientos
+- Vincular a casos de uso inmediatamente
+
+**2. Usar identificadores únicos y persistentes**
+- No reutilizar IDs de requerimientos eliminados
+- Formato consistente (ej: RF-001, RNF-001)
+- Incluir prefijo de proyecto si es necesario
+
+**3. Automatizar cuando sea posible**
+- Herramientas que generen matriz automáticamente
+- Scripts para validar integridad de vínculos
+- Integración con sistemas de desarrollo
+
+**4. Mantener actualizada la matriz**
+- Revisar trazabilidad en cada cambio
+- Incluir en definition of done
+- Auditorías periódicas de completitud
+
+**5. Documentar razones de cambios**
+- No solo QUÉ cambió, sino POR QUÉ
+- Vincular a solicitudes de cambio
+- Mantener historial de decisiones
+</Aside>
+
+---
+
+## 🔄 Control de Cambios
+
+El control de cambios es el proceso formal para gestionar modificaciones a los requerimientos después de que han sido aprobados inicialmente.
+
+<Aside type="note" title="📚 Definición">
+El control de cambios es un proceso sistemático para identificar, evaluar, aprobar e implementar modificaciones a los requerimientos, asegurando que los cambios sean necesarios, beneficiosos y gestionados de manera controlada para minimizar impactos negativos.
+</Aside>
+
+### 🎯 Objetivos del Control de Cambios
+
+<PlantUml code={`
+@startmindmap
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+* 🔄 Control de\\nCambios
+
+** 📋 Gestión
+*** Proceso formal
+*** Documentación completa
+*** Trazabilidad de cambios
+*** Historial auditable
+
+** ⚖️ Evaluación
+*** Análisis de impacto
+*** Costo-beneficio
+*** Riesgos
+*** Alternativas
+
+** ✅ Aprobación
+*** Autoridad clara
+*** Criterios definidos
+*** Stakeholders involucrados
+*** Decisiones documentadas
+
+** 📢 Comunicación
+*** Notificar a afectados
+*** Actualizar documentación
+*** Informar al equipo
+*** Transparencia
+
+** 🎯 Minimizar Impacto
+*** Cambios controlados
+*** Planificación
+*** Mitigación de riesgos
+*** Continuidad del proyecto
+
+@endmindmap
+`} />
+
+### 📋 Proceso de Control de Cambios
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+start
+
+:Solicitud de Cambio\\nRecibida;
+note right
+  Fuentes:
+  - Stakeholder
+  - Equipo desarrollo
+  - Testing
+  - Cliente
+end note
+
+:Registrar Solicitud\\n(Change Request);
+
+:Análisis Preliminar;
+
+if (¿Cambio trivial?) then (sí)
+  :Aprobación Rápida\\n(Fast-track);
+  :Implementar Cambio;
+  :Actualizar Documentación;
+  stop
+else (no)
+endif
+
+:Análisis de Impacto\\nDetallado;
+note right
+  Evaluar:
+  - Alcance
+  - Costo
+  - Cronograma
+  - Riesgos
+  - Dependencias
+end note
+
+:Preparar Propuesta\\nde Cambio;
+
+:Revisión por CCB\\n(Change Control Board);
+
+if (¿Aprobado?) then (sí)
+  :Priorizar Cambio;
+  :Planificar Implementación;
+  :Actualizar Requerimientos;
+  :Actualizar Trazabilidad;
+  :Notificar a Stakeholders;
+  :Implementar Cambio;
+  :Verificar Implementación;
+  :Cerrar Solicitud;
+  stop
+else (no)
+  :Documentar Razón\\nde Rechazo;
+  :Notificar a Solicitante;
+  :Archivar Solicitud;
+  stop
+endif
+
+@enduml
+`} />
+
+### 📄 Plantilla de Solicitud de Cambio
+
+<Code code={`
+SOLICITUD DE CAMBIO DE REQUERIMIENTOS (CR)
+
+CR ID: CR-2024-015
+Fecha de Solicitud: 15/03/2024
+Solicitante: María López (Product Owner)
+Prioridad: Alta
+
+═══════════════════════════════════════════════════════════════
+
+1. INFORMACIÓN DEL CAMBIO
+
+Tipo de Cambio:
+☑ Nuevo requerimiento
+☐ Modificación de requerimiento existente
+☐ Eliminación de requerimiento
+☐ Clarificación/Corrección
+
+Requerimientos Afectados:
+- RF-025: Procesamiento de pagos
+- RNF-030: Integración con pasarela
+
+═══════════════════════════════════════════════════════════════
+
+2. DESCRIPCIÓN DEL CAMBIO
+
+Situación Actual:
+El sistema actualmente solo soporta pagos con tarjeta de crédito/débito
+mediante integración con Stripe.
+
+Cambio Propuesto:
+Agregar soporte para pagos con PayPal como método alternativo de pago.
+
+Justificación:
+- 35% de usuarios abandonan checkout por falta de PayPal
+- Competencia ofrece múltiples métodos de pago
+- Solicitud recurrente en feedback de usuarios
+- Incremento proyectado de conversión: 15-20%
+
+═══════════════════════════════════════════════════════════════
+
+3. ANÁLISIS DE IMPACTO
+
+Alcance:
+- Módulo de pagos (backend)
+- Interfaz de checkout (frontend)
+- Base de datos (nueva tabla payment_methods)
+- Documentación de usuario
+
+Esfuerzo Estimado:
+- Desarrollo: 40 horas (1 semana)
+- Testing: 16 horas (2 días)
+- Documentación: 8 horas (1 día)
+- TOTAL: 64 horas
+
+Costo Estimado:
+- Desarrollo: $4,000
+- Licencia PayPal: $0 (comisión por transacción)
+- Testing: $1,000
+- TOTAL: $5,000
+
+Impacto en Cronograma:
+- Retraso en Sprint actual: 0 días (puede agregarse a próximo sprint)
+- Fecha de entrega original: Sin cambio
+- Fecha de entrega con cambio: +1 sprint (2 semanas)
+
+Riesgos:
+- Riesgo técnico: BAJO (API bien documentada)
+- Riesgo de integración: MEDIO (requiere sandbox testing)
+- Riesgo de seguridad: BAJO (PayPal maneja datos sensibles)
+
+Dependencias:
+- Cuenta PayPal Business aprobada
+- Credenciales API de PayPal
+- Certificación PCI-DSS (ya existente)
+
+═══════════════════════════════════════════════════════════════
+
+4. ALTERNATIVAS CONSIDERADAS
+
+Alternativa 1: No implementar
+- Pros: Sin costo, sin retraso
+- Contras: Pérdida de conversiones, insatisfacción de usuarios
+
+Alternativa 2: Implementar en v2.0
+- Pros: No afecta cronograma actual
+- Contras: Retrasa beneficio, usuarios siguen abandonando
+
+Alternativa 3: Implementar solo PayPal (sin Stripe)
+- Pros: Simplicidad
+- Contras: Usuarios actuales con tarjeta afectados
+
+Recomendación: Implementar PayPal como método adicional (propuesta original)
+
+═══════════════════════════════════════════════════════════════
+
+5. DECISIÓN DEL CCB (Change Control Board)
+
+Fecha de Revisión: 18/03/2024
+Participantes:
+- Product Owner: María López
+- Arquitecto: Carlos Ruiz
+- Líder de Desarrollo: Ana Martínez
+- Representante Cliente: Juan Pérez
+
+Decisión: ☑ APROBADO  ☐ RECHAZADO  ☐ DIFERIDO
+
+Condiciones de Aprobación:
+- Implementar en Sprint 8 (no en Sprint 7 actual)
+- Realizar pruebas exhaustivas en sandbox antes de producción
+- Documentar proceso de configuración para operaciones
+- Incluir feature flag para activar/desactivar PayPal
+
+Comentarios:
+El cambio está justificado por datos de abandono de carrito y feedback
+de usuarios. El costo es razonable y el impacto en cronograma es mínimo
+al diferir un sprint. Aprobado con condiciones mencionadas.
+
+Firmas:
+Product Owner: _________________ Fecha: _______
+Arquitecto: ____________________ Fecha: _______
+Cliente: _______________________ Fecha: _______
+
+═══════════════════════════════════════════════════════════════
+
+6. SEGUIMIENTO DE IMPLEMENTACIÓN
+
+Estado: En Progreso
+Sprint Asignado: Sprint 8
+Responsable: Ana Martínez
+
+Tareas:
+☑ Crear branch feature/paypal-integration
+☑ Implementar backend API PayPal
+☐ Actualizar frontend checkout UI
+☐ Crear casos de prueba
+☐ Testing en sandbox
+☐ Actualizar documentación SRS
+☐ Actualizar matriz de trazabilidad
+☐ Code review
+☐ Deploy a staging
+☐ Testing de aceptación
+☐ Deploy a producción
+
+Fecha de Cierre: [Pendiente]
+`} lang="text" title="Solicitud de Cambio (CR)" />
+
+### 🏛️ Change Control Board (CCB)
+
+El **Change Control Board** es el comité responsable de evaluar y aprobar cambios a los requerimientos.
+
+#### 👥 Composición del CCB
+
+<Steps>
+
+1. **Product Owner / Gerente de Producto**
+   
+   **Rol:** Representar intereses del negocio y usuarios
+   
+   **Responsabilidades:**
+   - Evaluar valor de negocio del cambio
+   - Priorizar cambios aprobados
+   - Comunicar decisiones a stakeholders
+
+2. **Arquitecto de Software**
+   
+   **Rol:** Evaluar impacto técnico y arquitectónico
+   
+   **Responsabilidades:**
+   - Analizar viabilidad técnica
+   - Identificar riesgos arquitectónicos
+   - Estimar esfuerzo técnico
+
+3. **Líder de Desarrollo**
+   
+   **Rol:** Representar al equipo de desarrollo
+   
+   **Responsabilidades:**
+   - Estimar esfuerzo de implementación
+   - Evaluar impacto en cronograma
+   - Identificar dependencias técnicas
+
+4. **Representante del Cliente**
+   
+   **Rol:** Asegurar alineación con necesidades del cliente
+   
+   **Responsabilidades:**
+   - Validar justificación del cambio
+   - Aprobar impacto en costo y cronograma
+   - Priorizar desde perspectiva del cliente
+
+5. **QA / Testing Lead** (Opcional)
+   
+   **Rol:** Evaluar impacto en calidad y testing
+   
+   **Responsabilidades:**
+   - Estimar esfuerzo de testing
+   - Identificar riesgos de calidad
+   - Validar criterios de aceptación
+
+</Steps>
+
+### 📊 Métricas de Control de Cambios
+
+<Code code={`
+MÉTRICAS DE CONTROL DE CAMBIOS - Q1 2024
+
+┌─────────────────────────────────────┬────────┬────────┐
+│ Métrica                             │ Valor  │ Target │
+├─────────────────────────────────────┼────────┼────────┤
+│ Total de Solicitudes de Cambio     │   45   │   N/A  │
+│ Cambios Aprobados                   │   32   │   N/A  │
+│ Cambios Rechazados                  │    8   │   N/A  │
+│ Cambios Diferidos                   │    5   │   N/A  │
+│                                     │        │        │
+│ Tasa de Aprobación                  │  71%   │  60-80%│
+│ Tasa de Rechazo                     │  18%   │  10-20%│
+│                                     │        │        │
+│ Tiempo Promedio de Evaluación      │ 3 días │ < 5 días│
+│ Tiempo Promedio de Implementación  │ 8 días │ < 10 días│
+│                                     │        │        │
+│ Cambios por Categoría:             │        │        │
+│   - Nuevos Requerimientos           │   15   │   N/A  │
+│   - Modificaciones                  │   22   │   N/A  │
+│   - Eliminaciones                   │    3   │   N/A  │
+│   - Clarificaciones                 │    5   │   N/A  │
+│                                     │        │        │
+│ Impacto en Cronograma:              │        │        │
+│   - Sin impacto                     │   18   │   N/A  │
+│   - Retraso < 1 semana              │   10   │   N/A  │
+│   - Retraso 1-2 semanas             │    4   │   N/A  │
+│   - Retraso > 2 semanas             │    0   │   N/A  │
+└─────────────────────────────────────┴────────┴────────┘
+
+ANÁLISIS:
+✅ Tasa de aprobación dentro del rango objetivo
+✅ Tiempo de evaluación por debajo del target
+⚠️  22 modificaciones sugieren requerimientos iniciales incompletos
+📊 Mayoría de cambios sin impacto significativo en cronograma
+`} lang="text" title="Métricas de Control de Cambios" />
+
+### ✅ Mejores Prácticas de Control de Cambios
+
+<Aside type="tip" title="🎯 Recomendaciones Clave">
+**1. Establecer proceso claro desde el inicio**
+- Documentar proceso de control de cambios en plan de proyecto
+- Definir criterios de aprobación
+- Comunicar proceso a todos los stakeholders
+
+**2. Evaluar impacto completo**
+- No solo costo y cronograma
+- Considerar riesgos, dependencias, calidad
+- Análisis de impacto en otros requerimientos
+
+**3. Mantener baseline de requerimientos**
+- Versión aprobada como referencia
+- Todos los cambios se miden contra baseline
+- Actualizar baseline solo después de aprobación formal
+
+**4. Documentar todas las decisiones**
+- Razones de aprobación o rechazo
+- Alternativas consideradas
+- Condiciones y restricciones
+
+**5. Comunicar cambios efectivamente**
+- Notificar a todos los afectados
+- Actualizar documentación inmediatamente
+- Mantener historial de cambios visible
+
+**6. Revisar métricas periódicamente**
+- Identificar patrones de cambios
+- Mejorar proceso de captura inicial
+- Ajustar proceso de control si es necesario
+</Aside>
+
+<Aside type="caution" title="⚠️ Antipatrones a Evitar">
+**1. Scope Creep descontrolado**
+- Aceptar cambios sin evaluación formal
+- "Solo es un pequeño cambio" repetidamente
+- Solución: Proceso riguroso para TODOS los cambios
+
+**2. Cambios sin documentar**
+- Acuerdos verbales sin registro
+- Cambios implementados sin aprobación
+- Solución: "Si no está documentado, no existe"
+
+**3. CCB sin autoridad**
+- Decisiones ignoradas o revertidas
+- Stakeholders que evitan el proceso
+- Solución: Apoyo ejecutivo y consecuencias claras
+
+**4. Proceso demasiado burocrático**
+- Semanas para aprobar cambios triviales
+- Formularios excesivamente complejos
+- Solución: Fast-track para cambios menores
+
+**5. No medir impacto real**
+- Estimaciones optimistas sistemáticamente
+- Ignorar efectos secundarios
+- Solución: Revisión post-implementación de estimaciones
+</Aside>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note" title="📌 Puntos Clave">
+- 📋 **Documentación de Requerimientos**: Registro sistemático y estructurado de requerimientos que sirve como contrato formal y referencia única de verdad durante todo el proyecto.
+
+- 📄 **SRS (Software Requirements Specification)**: Documento formal según IEEE 830 que debe ser correcto, no ambiguo, completo, consistente, clasificado, verificable, modificable y trazable.
+
+- 📊 **Estructura del SRS**: Introducción (propósito, alcance, definiciones), Descripción General (perspectiva, funciones, usuarios, restricciones), Requerimientos Específicos (funcionales, interfaces, rendimiento, diseño, atributos).
+
+- 🔄 **Versionado**: Identificación y registro de diferentes versiones usando esquemas como SemVer (MAJOR.MINOR.PATCH), versionado por fecha, o incremental simple.
+
+- 🔗 **Trazabilidad**: Vinculación de requerimientos con sus fuentes (backward) y con diseño, código y pruebas (forward) mediante matriz de trazabilidad.
+
+- 🛠️ **Herramientas**: Desde especializadas (DOORS, Jama) hasta control de versiones (Git) y hojas de cálculo, según necesidades y recursos del proyecto.
+
+- 🔄 **Control de Cambios**: Proceso formal para gestionar modificaciones mediante solicitudes de cambio (CR), análisis de impacto, evaluación por CCB y seguimiento de implementación.
+
+- 🏛️ **Change Control Board (CCB)**: Comité multidisciplinario (Product Owner, Arquitecto, Líder Dev, Cliente) responsable de evaluar y aprobar cambios basándose en valor, impacto y viabilidad.
+</Aside>

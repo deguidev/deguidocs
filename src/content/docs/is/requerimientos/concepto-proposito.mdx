@@ -1,0 +1,399 @@
+---
+title: 1 Concepto y Propósito
+description: Definición general, objetivo dentro del desarrollo de software e importancia en el éxito del proyecto
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+## 📋 Definición General
+
+La **Ingeniería de Requerimientos** es una disciplina fundamental dentro de la Ingeniería de Software que se enfoca en el proceso sistemático de descubrir, documentar, analizar, validar y gestionar las necesidades y restricciones de los stakeholders para un sistema de software.
+
+### 🎯 Concepto Formal
+
+<Aside type="note" title="📖 Definición IEEE">
+Según el estándar IEEE 830-1998, los requerimientos son:
+
+"Una condición o capacidad que necesita un usuario para resolver un problema o alcanzar un objetivo, o una condición o capacidad que debe cumplir o poseer un sistema para satisfacer un contrato, estándar, especificación u otro documento formalmente impuesto."
+</Aside>
+
+### 📊 Componentes de la Ingeniería de Requerimientos
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+rectangle "🔍 Ingeniería de Requerimientos" as ir #E8F5E9 {
+  rectangle "Elicitación" as elic #81D4FA {
+    card "Descubrimiento"
+    card "Recopilación"
+    card "Identificación"
+  }
+  
+  rectangle "Análisis" as anal #FFB74D {
+    card "Clasificación"
+    card "Priorización"
+    card "Negociación"
+  }
+  
+  rectangle "Especificación" as spec #81C784 {
+    card "Documentación"
+    card "Modelado"
+    card "Formalización"
+  }
+  
+  rectangle "Validación" as valid #CE93D8 {
+    card "Verificación"
+    card "Revisión"
+    card "Aceptación"
+  }
+  
+  rectangle "Gestión" as gest #FFE082 {
+    card "Control cambios"
+    card "Trazabilidad"
+    card "Versionado"
+  }
+}
+
+elic -down-> anal
+anal -down-> spec
+spec -down-> valid
+valid -down-> gest
+gest -up-> elic : Feedback
+
+@enduml
+`} />
+
+### 🔑 Características Fundamentales
+
+<Steps>
+
+1. **Proceso Iterativo**
+   
+   La ingeniería de requerimientos no es un proceso lineal único, sino un ciclo continuo de refinamiento y mejora a lo largo del ciclo de vida del software.
+
+2. **Naturaleza Multidisciplinaria**
+   
+   Requiere habilidades técnicas, de comunicación, negociación y comprensión del dominio del negocio.
+
+3. **Enfoque en Stakeholders**
+   
+   Involucra activamente a todas las partes interesadas: usuarios finales, clientes, desarrolladores, gerentes de proyecto y otros.
+
+4. **Base para el Desarrollo**
+   
+   Los requerimientos constituyen el fundamento sobre el cual se construye todo el sistema de software.
+
+</Steps>
+
+### 📚 Taxonomía de Requerimientos
+
+| Categoría | Descripción | Ejemplos |
+|-----------|-------------|----------|
+| **Funcionales** | Qué debe hacer el sistema | Login, procesamiento de pagos, generación de reportes |
+| **No Funcionales** | Cómo debe comportarse el sistema | Rendimiento, seguridad, usabilidad, escalabilidad |
+| **De Dominio** | Restricciones del área de aplicación | Regulaciones legales, estándares de la industria |
+| **De Usuario** | Necesidades expresadas por usuarios | Facilidad de uso, accesibilidad, experiencia |
+| **De Sistema** | Capacidades técnicas requeridas | Compatibilidad, integración, infraestructura |
+
+---
+
+## 🎯 Objetivo dentro del Desarrollo de Software
+
+La Ingeniería de Requerimientos cumple objetivos estratégicos y tácticos que son críticos para el éxito del proyecto de software.
+
+
+
+### 🎯 Objetivos Específicos
+
+<Steps>
+
+1. **Establecer un Entendimiento Común**
+   
+   **Propósito:** Crear una visión compartida entre todos los stakeholders sobre qué se va a construir.
+   
+   **Actividades:**
+   - Facilitar comunicación efectiva entre partes técnicas y no técnicas
+   - Resolver malentendidos y ambigüedades tempranamente
+   - Alinear expectativas de clientes, usuarios y equipo de desarrollo
+   - Crear un vocabulario común del dominio
+
+2. **Definir el Alcance del Sistema**
+   
+   **Propósito:** Establecer límites claros de lo que el sistema hará y no hará.
+   
+   **Beneficios:**
+   - Prevenir scope creep (expansión no controlada del alcance)
+   - Facilitar estimaciones de tiempo y costo
+   - Identificar interfaces con sistemas externos
+   - Establecer criterios de aceptación
+
+3. **Proporcionar Base para Planificación**
+   
+   **Propósito:** Permitir estimaciones realistas y planificación efectiva del proyecto.
+   
+   **Aplicaciones:**
+   - Estimación de esfuerzo y recursos necesarios
+   - Identificación de riesgos técnicos y de negocio
+   - Priorización de funcionalidades
+   - Planificación de releases e iteraciones
+
+4. **Servir como Contrato**
+   
+   **Propósito:** Establecer un acuerdo formal entre cliente y equipo de desarrollo.
+   
+   **Elementos:**
+   - Especificación de funcionalidades comprometidas
+   - Criterios de aceptación medibles
+   - Restricciones y limitaciones acordadas
+   - Base para gestión de cambios
+
+5. **Facilitar Diseño y Desarrollo**
+   
+   **Propósito:** Proporcionar información necesaria para arquitectura e implementación.
+   
+   **Contribuciones:**
+   - Guiar decisiones de diseño arquitectónico
+   - Identificar componentes y módulos necesarios
+   - Definir interfaces y APIs
+   - Establecer estándares de calidad
+
+6. **Habilitar Testing y Validación**
+   
+   **Propósito:** Proveer criterios objetivos para verificar que el sistema cumple lo esperado.
+   
+   **Usos:**
+   - Creación de casos de prueba
+   - Definición de criterios de aceptación
+   - Validación de funcionalidades implementadas
+   - Verificación de cumplimiento de restricciones
+
+</Steps>
+
+### 📈 Alineación con Objetivos de Negocio
+
+<Aside type="tip" title="💼 Conexión Estratégica">
+Los requerimientos bien gestionados aseguran que el software desarrollado:
+
+- ✅ **Resuelve problemas reales** del negocio
+- ✅ **Genera valor** para la organización
+- ✅ **Se alinea** con objetivos estratégicos
+- ✅ **Justifica la inversión** realizada
+- ✅ **Satisface necesidades** de usuarios finales
+</Aside>
+
+---
+
+## 🏆 Importancia en el Éxito del Proyecto
+
+La calidad de la ingeniería de requerimientos tiene un impacto directo y medible en el éxito o fracaso de proyectos de software.
+
+### 📊 Estadísticas de Impacto
+
+<Aside type="caution" title="⚠️ Datos del Standish Group (Chaos Report)">
+Principales causas de fallo en proyectos de software:
+
+- **13.1%** - Requerimientos incompletos
+- **12.4%** - Falta de participación del usuario
+- **10.6%** - Expectativas no realistas
+- **9.9%** - Cambios en requerimientos y especificaciones
+- **9.3%** - Falta de soporte ejecutivo
+
+**Total relacionado con requerimientos: ~55%**
+</Aside>
+
+### 💰 Impacto Económico
+
+<Aside type="tip" title="💡 ¿Qué significan los multiplicadores (1x, 5x, 10x)?">
+Los números representan **cuántas veces más caro** es corregir un error según la fase en que se detecta.
+
+**Ejemplo:** Si corregir un error en requerimientos cuesta $100:
+- En **Diseño** costará $500 (5 veces más)
+- En **Implementación** costará $1,000 (10 veces más)
+- En **Testing** costará $2,000 (20 veces más)
+- En **Producción** costará $10,000 (100 veces más)
+
+**Conclusión:** Detectar errores temprano ahorra hasta 100 veces el costo.
+</Aside>
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+rectangle "💰 Costo de Corregir Errores en Requerimientos" as costos #FFCDD2 {
+  rectangle "Fase Requerimientos" as req #E8F5E9 {
+    card "Costo: 1x ($100)"
+    card "Esfuerzo: Bajo"
+    card "Cambiar documento"
+  }
+  
+  rectangle "Fase Diseño" as dis #FFF9C4 {
+    card "Costo: 5x ($500)"
+    card "Esfuerzo: Medio"
+    card "Rediseñar arquitectura"
+  }
+  
+  rectangle "Fase Implementación" as impl #FFE0B2 {
+    card "Costo: 10x ($1,000)"
+    card "Esfuerzo: Alto"
+    card "Reescribir código"
+  }
+  
+  rectangle "Fase Testing" as test #FFCCBC {
+    card "Costo: 20x ($2,000)"
+    card "Esfuerzo: Muy Alto"
+    card "Rehacer pruebas"
+  }
+  
+  rectangle "Post-Producción" as prod #FFAB91 {
+    card "Costo: 100x ($10,000)"
+    card "Esfuerzo: Crítico"
+    card "Clientes afectados"
+  }
+}
+
+req -down-> dis : Avanza el tiempo
+dis -down-> impl : Más trabajo hecho
+impl -down-> test : Más difícil cambiar
+test -down-> prod : Sistema en uso
+
+note bottom of costos
+  ⚠️ Mientras más tarde se detecta el error,
+  más caro es corregirlo (hasta 100 veces más)
+end note
+
+@enduml
+`} />
+
+### 🎯 Factores Críticos de Éxito
+
+<Steps>
+
+1. **Reducción de Retrabajo**
+   
+   **Impacto:** Requerimientos claros y validados minimizan cambios costosos durante desarrollo.
+   
+   **Beneficios cuantificables:**
+   - Reducción de 40-60% en defectos
+   - Disminución de 25-40% en tiempo de desarrollo
+   - Ahorro de 30-50% en costos de mantenimiento
+
+2. **Satisfacción del Cliente**
+   
+   **Impacto:** Sistema que cumple expectativas genera confianza y relaciones duraderas.
+   
+   **Indicadores:**
+   - Mayor tasa de aceptación en primera entrega
+   - Menos solicitudes de cambio post-implementación
+   - Mejor percepción de calidad
+   - Incremento en referencias y proyectos futuros
+
+3. **Gestión de Riesgos**
+   
+   **Impacto:** Identificación temprana de problemas potenciales.
+   
+   **Riesgos mitigados:**
+   - Incompatibilidad técnica
+   - Expectativas no realistas
+   - Restricciones regulatorias
+   - Limitaciones de recursos
+   - Conflictos entre stakeholders
+
+4. **Eficiencia en Desarrollo**
+   
+   **Impacto:** Equipo de desarrollo trabaja con claridad y dirección.
+   
+   **Mejoras:**
+   - Menos tiempo en aclaraciones
+   - Decisiones de diseño más rápidas
+   - Código más alineado con necesidades
+   - Testing más efectivo
+
+5. **Trazabilidad y Mantenibilidad**
+   
+   **Impacto:** Facilita evolución y mantenimiento del sistema.
+   
+   **Ventajas:**
+   - Impacto de cambios predecible
+   - Documentación actualizada
+   - Conocimiento preservado
+   - Onboarding más rápido de nuevos miembros
+
+</Steps>
+
+### 📈 Métricas de Calidad de Requerimientos
+
+| Métrica | Descripción | Objetivo |
+|---------|-------------|----------|
+| **Completitud** | % de requerimientos documentados vs. identificados | > 95% |
+| **Consistencia** | Ausencia de contradicciones | 100% |
+| **Claridad** | % de requerimientos sin ambigüedades | > 90% |
+| **Verificabilidad** | % con criterios de aceptación medibles | 100% |
+| **Trazabilidad** | % con origen y destino identificados | > 95% |
+| **Estabilidad** | Tasa de cambios por sprint/iteración | < 10% |
+
+### 🔄 Ciclo Virtuoso de Calidad
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+rectangle "✨ Ciclo Virtuoso" as ciclo #E8F5E9 {
+  card "Requerimientos\\nde Calidad" as req
+  card "Diseño\\nAdecuado" as dis
+  card "Implementación\\nCorrecta" as impl
+  card "Testing\\nEfectivo" as test
+  card "Producto\\nExitoso" as prod
+  card "Cliente\\nSatisfecho" as client
+  
+  req -down-> dis
+  dis -down-> impl
+  impl -down-> test
+  test -down-> prod
+  prod -down-> client
+  client -up-> req : Confianza y\\nColaboración
+}
+
+@enduml
+`} />
+
+### ✅ Beneficios Estratégicos
+
+<Aside type="tip" title="🎯 Valor Agregado">
+Una ingeniería de requerimientos efectiva proporciona:
+
+**A corto plazo:**
+- 📉 Reducción de costos de desarrollo
+- ⏱️ Entregas más predecibles
+- 🎯 Mayor alineación con objetivos
+
+**A mediano plazo:**
+- 🔧 Mantenimiento más eficiente
+- 📈 Mejor escalabilidad del sistema
+- 💼 Relaciones más sólidas con clientes
+
+**A largo plazo:**
+- 🏆 Reputación de calidad
+- 💰 ROI mejorado
+- 🚀 Ventaja competitiva sostenible
+</Aside>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note" title="📌 Puntos Clave">
+- 📋 **Definición**: La Ingeniería de Requerimientos es el proceso sistemático de descubrir, documentar, analizar y gestionar las necesidades de los stakeholders
+- 🎯 **Objetivo**: Establecer un entendimiento común, definir alcance, facilitar planificación y servir como base contractual
+- 🏆 **Importancia**: Impacto directo en el éxito del proyecto - errores en requerimientos pueden costar hasta 100x más si se detectan tarde
+- ✅ **Beneficio**: Reduce retrabajo, aumenta satisfacción del cliente, mejora eficiencia y facilita mantenimiento
+- 🔑 **Clave del éxito**: Invertir tiempo y esfuerzo en requerimientos de calidad genera retornos exponenciales
+</Aside>

@@ -18,7 +18,6 @@ import PlantUml from "@components/PlantUml.astro";
 La distinción fundamental entre programación e ingeniería de software radica en el **alcance y la profundidad del enfoque**. Mientras la programación se centra en la implementación técnica de soluciones, la ingeniería de software adopta una perspectiva holística del ciclo de vida completo del sistema.
 
 ### 🔍 Comparación de Enfoques
-
 <PlantUml code={`
 @startuml
 skinparam backgroundColor beige
@@ -35,7 +34,7 @@ rectangle "🏗️ Ingeniería de Software" as ing #E0F7FA {
   card "Análisis de requisitos"
   card "Diseño de arquitectura"
   card "Gestión de calidad"
-  card "Mantenimiento largo plazo"
+  card "Mantenimiento a largo plazo"
   card "Gestión de riesgos"
   card "Documentación"
 }
@@ -51,7 +50,6 @@ note bottom of ing
   Largo plazo
   Solución sostenible
 end note
-
 @enduml
 `} />
 
@@ -325,6 +323,7 @@ rectangle "🏗️ Ingeniería en Equipo" as ing #E1F5FE {
   po --> (Requisitos)
   
   fe <--> be : Integración
+  fe <--> qa : Integración
   be <--> qa : Validación
   qa <--> ops : CI/CD
   po <--> fe : Feedback

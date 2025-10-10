@@ -1,6 +1,6 @@
 ---
-title: 2. Fases Principales
-description: Las etapas fundamentales en el ciclo de vida del desarrollo de software
+title: 2 Fases del Ciclo de Vida del Software
+description: Análisis, diseño, desarrollo, pruebas, implementación y mantenimiento
 ---
 
 import { Code } from '@astrojs/starlight/components';
@@ -10,422 +10,459 @@ import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
 import PlantUml from "@components/PlantUml.astro";
 
-<Aside type="tip">
-**En palabras simples**: Las fases principales son como los pasos que sigues para construir una casa: primero planificas, luego diseñas, construyes, verificas que todo funcione, te mudas y finalmente la mantienes.
+## 🎯 Introducción a las Fases del Ciclo de Vida
+
+Las **fases del ciclo de vida del software** constituyen las etapas secuenciales y estructuradas que guían el desarrollo de un sistema desde su concepción hasta su operación y mantenimiento. Cada fase tiene objetivos específicos, actividades definidas, roles asignados y entregables concretos que aseguran la calidad y el éxito del proyecto.
+
+<Aside type="note" title="📚 Definición Formal">
+Las fases del SDLC son divisiones temporales y funcionales del proceso de desarrollo que organizan el trabajo en etapas manejables, cada una con criterios de entrada y salida claramente definidos. Estas fases proporcionan estructura, control y puntos de verificación que permiten gestionar la complejidad inherente al desarrollo de software.
 </Aside>
 
-El desarrollo de software sigue una serie de etapas bien definidas que nos ayudan a crear aplicaciones de manera ordenada y eficiente. Cada fase tiene objetivos específicos y produce resultados que alimentan la siguiente etapa.
-
-## Visión General de las Fases
+### 🔄 Visión General de las Fases
 
 <PlantUml code={`
 @startuml
-skinparam componentStyle uml2
+skinparam backgroundColor beige
+skinparam defaultFontSize 10
 
-title Fases Principales del Ciclo de Vida
+rectangle "CICLO DE VIDA DEL SOFTWARE" as sdlc #E8F5E9 {
+  
+  rectangle "1. ANÁLISIS" as analisis #FFB74D {
+    card "Comprensión de\\nnecesidades"
+    card "Requerimientos"
+    card "Viabilidad"
+  }
+  
+  rectangle "2. DISEÑO" as diseno #81D4FA {
+    card "Arquitectura"
+    card "Especificaciones"
+    card "Prototipos"
+  }
+  
+  rectangle "3. DESARROLLO" as desarrollo #81C784 {
+    card "Codificación"
+    card "Integración"
+    card "Documentación"
+  }
+  
+  rectangle "4. PRUEBAS" as pruebas #CE93D8 {
+    card "Verificación"
+    card "Validación"
+    card "Corrección"
+  }
+  
+  rectangle "5. IMPLEMENTACIÓN" as implementacion #FFA726 {
+    card "Despliegue"
+    card "Capacitación"
+    card "Migración"
+  }
+  
+  rectangle "6. MANTENIMIENTO" as mantenimiento #66BB6A {
+    card "Soporte"
+    card "Mejoras"
+    card "Evolución"
+  }
+}
 
-component "1. Analisis" as analisis
-component "2. Diseño" as diseño
-component "3. Desarrollo" as desarrollo
-component "4. Pruebas" as pruebas
-component "5. Implementacion" as implementacion
-component "6. Mantenimiento" as mantenimiento
+analisis -down-> diseno
+diseno -down-> desarrollo
+desarrollo -down-> pruebas
+pruebas -down-> implementacion
+implementacion -down-> mantenimiento
+mantenimiento -up-> analisis : Nuevos\\nrequerimientos
 
-analisis --> diseño : Requisitos
-diseño --> desarrollo : Arquitectura
-desarrollo --> pruebas : Codigo
-pruebas --> implementacion : Software validado
-implementacion --> mantenimiento : Sistema en produccion
-mantenimiento ..> analisis : Nuevos requisitos
 @enduml
 `} />
 
-## 1. Análisis <Badge text="¿Qué necesitamos?" variant="tip" />
+---
 
-El análisis es como ser un detective que investiga exactamente qué necesita el cliente. Es la fase donde descubrimos y documentamos todos los requisitos del software.
+## 📋 Fase 1: Análisis
 
-### ¿Qué hacemos en esta fase?
+La fase de **análisis** es el proceso sistemático de investigación, descubrimiento y documentación de las necesidades, expectativas y restricciones de los stakeholders para definir qué debe hacer el sistema.
 
-<Tabs>
-  <TabItem label="Actividades principales">
-    - **Recopilación de requisitos**: Entrevistas con usuarios y stakeholders
-    - **Análisis de necesidades**: Identificar problemas a resolver
-    - **Documentación**: Crear especificaciones claras y detalladas
-    - **Validación**: Confirmar que entendimos correctamente las necesidades
-  </TabItem>
-  <TabItem label="Técnicas utilizadas">
-    - Entrevistas estructuradas
-    - Encuestas y cuestionarios
-    - Observación directa
-    - Análisis de documentos existentes
-    - Talleres colaborativos
-  </TabItem>
-  <TabItem label="Entregables">
-    - Documento de requisitos funcionales
-    - Especificaciones no funcionales
-    - Casos de uso
-    - Historias de usuario
-    - Criterios de aceptación
-  </TabItem>
-</Tabs>
-
-<Aside type="note">
-**Ejemplo práctico**: Si estamos creando una app de delivery, en esta fase preguntaríamos: ¿Qué tipos de usuarios tendremos? ¿Cómo harán los pedidos? ¿Qué información necesita el repartidor?
+<Aside type="note" title="🎯 Objetivo Principal">
+Comprender profundamente el problema del negocio y las necesidades del usuario para establecer una base sólida de requerimientos que guíe todo el desarrollo posterior.
 </Aside>
 
-## 2. Diseño <Badge text="¿Cómo lo haremos?" variant="note" />
+### 🔍 Comprensión de las Necesidades del Usuario
 
-El diseño es como crear los planos de una casa antes de construirla. Aquí definimos la arquitectura y estructura de nuestro software.
+<Steps>
 
-### ¿Qué hacemos en esta fase?
+1. **Identificación de Stakeholders**
+   
+   Determinar todas las partes interesadas que tienen influencia o se ven afectadas por el sistema.
+   
+   **Tipos de Stakeholders:**
+   - **Usuarios finales:** Quienes operarán el sistema
+   - **Clientes:** Quienes pagan por el sistema
+   - **Gerencia:** Quienes toman decisiones estratégicas
+   - **Equipo técnico:** Desarrolladores, arquitectos, QA
+   - **Reguladores:** Entidades que imponen normativas
+   - **Proveedores:** Sistemas externos que se integrarán
 
-<Tabs>
-  <TabItem label="Actividades principales">
-    - **Diseño arquitectónico**: Definir la estructura general del sistema
-    - **Diseño de interfaces**: Crear mockups y prototipos de UI/UX
-    - **Diseño de base de datos**: Modelar entidades, relaciones y esquemas
-    - **Diseño de algoritmos**: Especificar soluciones a problemas complejos
-    - **Diseño de componentes**: Definir módulos y sus interacciones
-    - **Validación del diseño**: Revisar y aprobar las especificaciones técnicas
-  </TabItem>
-  <TabItem label="Técnicas utilizadas">
-    - Modelado de arquitectura (capas, microservicios)
-    - Wireframing y prototipado
-    - Modelado entidad-relación (ER)
-    - Diagramas de flujo de datos
-    - Patrones de diseño (MVC, Observer, Factory)
-    - Revisiones técnicas y peer reviews
-  </TabItem>
-  <TabItem label="Entregables">
-    - **Diagramas UML**: Clases, Componentes, Despliegue
-    - **Diagramas ER**: Modelo conceptual y físico de BD
-    - Especificaciones técnicas detalladas
-    - Mockups y prototipos de interfaz
-    - Documentación de arquitectura
-    - Estándares de codificación y convenciones
-  </TabItem>
-</Tabs>
+2. **Técnicas de Elicitación**
+   
+   Aplicar métodos sistemáticos para extraer información de los stakeholders.
+   
+   **Técnicas Principales:**
+   - **Entrevistas:** Conversaciones estructuradas o semi-estructuradas
+   - **Cuestionarios:** Recopilación masiva de información
+   - **Talleres (Workshops):** Sesiones colaborativas con múltiples stakeholders
+   - **Observación:** Análisis del trabajo actual de usuarios
+   - **Análisis de documentos:** Revisión de procedimientos y sistemas existentes
+   - **Prototipado:** Maquetas para validar conceptos
 
-### Tipos de diseño
+3. **Análisis del Dominio**
+   
+   Comprender el contexto del negocio y las reglas que gobiernan el sistema.
+   
+   **Aspectos a Analizar:**
+   - Procesos de negocio actuales
+   - Flujos de trabajo y procedimientos
+   - Reglas de negocio y políticas
+   - Terminología del dominio
+   - Restricciones organizacionales
+   - Integración con sistemas existentes
 
-<PlantUml code={`
-@startuml
-title Tipos de Diseño en el Desarrollo de Software
+4. **Especificación de Requerimientos**
+   
+   Documentar formal y estructuradamente lo que el sistema debe hacer.
+   
+   **Tipos de Requerimientos:**
+   - **Funcionales:** Qué debe hacer el sistema
+   - **No funcionales:** Cómo debe comportarse (rendimiento, seguridad, usabilidad)
+   - **De dominio:** Reglas específicas del negocio
+   - **De restricción:** Limitaciones tecnológicas, presupuestarias, legales
 
-rectangle "Diseño de Alto Nivel" as alto {
-  rectangle "Arquitectura del Sistema" as arq
-  rectangle "Modulos Principales" as mod
-  rectangle "Interfaces entre Componentes" as int
-}
+</Steps>
 
-rectangle "Diseño Detallado" as detalle {
-  rectangle "Algoritmos Especificos" as alg
-  rectangle "Estructuras de Datos" as datos
-  rectangle "Interfaces de Usuario" as ui
-}
+---
 
-rectangle "Diseño de Base de Datos" as bd {
-  rectangle "Modelo Entidad-Relacion" as er
-  rectangle "Esquemas de Tablas" as tablas
-  rectangle "Indices y Restricciones" as indices
-}
+## 🎨 Fase 2: Diseño
 
-alto --> detalle
-detalle --> bd
-@enduml
-`} />
+La fase de **diseño** transforma los requerimientos en una arquitectura de software detallada y especificaciones técnicas que guiarán la implementación del sistema.
 
-## 3. Desarrollo <Badge text="¡Construyamos!" variant="success" />
-
-El desarrollo es donde finalmente escribimos el código. Es como la construcción de la casa siguiendo los planos que diseñamos.
-
-### ¿Qué hacemos en esta fase?
-
-<Tabs>
-  <TabItem label="Actividades principales">
-    - **Codificación**: Escribir el código fuente siguiendo las especificaciones
-    - **Implementación de algoritmos**: Convertir diseños en código funcional
-    - **Integración de componentes**: Conectar diferentes módulos del sistema
-    - **Documentación de código**: Comentar y documentar el código fuente
-    - **Control de versiones**: Gestionar cambios y colaboración en el código
-    - **Refactoring**: Mejorar la estructura del código sin cambiar funcionalidad
-  </TabItem>
-  <TabItem label="Técnicas utilizadas">
-    - Programación orientada a objetos
-    - Patrones de diseño (Singleton, Factory, Observer)
-    - Test-Driven Development (TDD)
-    - Pair Programming y Code Reviews
-    - Integración continua (CI/CD)
-    - Metodologías ágiles (Scrum, Kanban)
-  </TabItem>
-  <TabItem label="Entregables">
-    - **Código fuente**: Implementación completa de funcionalidades
-    - **Diagramas UML**: Secuencia (para flujos complejos)
-    - Documentación técnica del código
-    - Scripts de base de datos y migraciones
-    - Configuraciones de ambiente de desarrollo
-    - Reportes de progreso y métricas de código
-  </TabItem>
-</Tabs>
-
-## 4. Pruebas <Badge text="¿Funciona bien?" variant="caution" />
-
-Las pruebas son como inspeccionar la casa antes de habitarla. Verificamos que todo funcione correctamente y cumpla con los requisitos.
-
-### ¿Qué hacemos en esta fase?
-
-<Tabs>
-  <TabItem label="Actividades principales">
-    - **Planificación de pruebas**: Definir estrategias y casos de prueba
-    - **Ejecución de pruebas**: Realizar pruebas unitarias, integración y sistema
-    - **Detección de defectos**: Identificar y documentar errores encontrados
-    - **Verificación de requisitos**: Confirmar que se cumplen las especificaciones
-    - **Pruebas de regresión**: Asegurar que nuevos cambios no rompan funcionalidad existente
-    - **Validación de rendimiento**: Evaluar velocidad, carga y eficiencia del sistema
-  </TabItem>
-  <TabItem label="Técnicas utilizadas">
-    - Testing automatizado (unit tests, integration tests)
-    - Pruebas manuales exploratorias
-    - Test-Driven Development (TDD)
-    - Behavior-Driven Development (BDD)
-    - Pruebas de carga y estrés
-    - Análisis estático de código
-  </TabItem>
-  <TabItem label="Entregables">
-    - **Plan de pruebas**: Estrategia y casos de prueba documentados
-    - **Diagramas UML**: Actividades (para flujos de prueba)
-    - Reportes de defectos y bugs encontrados
-    - Scripts de pruebas automatizadas
-    - Métricas de cobertura de código
-    - Certificación de calidad del software
-  </TabItem>
-</Tabs>
-
-### Pirámide de pruebas
-
-<PlantUml code={`
-@startuml
-title Piramide de Pruebas
-
-rectangle "Pruebas End-to-End" as ete
-rectangle "Pruebas de Integracion" as integracion
-rectangle "Pruebas Unitarias" as unitarias
-
-note right of ete : Pocas, lentas, costosas
-note right of integracion : Moderadas, verifican conexiones
-note right of unitarias : Muchas, rapidas, baratas
-
-ete --> integracion
-integracion --> unitarias
-@enduml
-`} />
-
-<Aside type="caution">
-**Importante**: Las pruebas no solo buscan errores, también confirman que el software hace lo que debe hacer. Es mejor encontrar problemas antes de que los usuarios los descubran.
+<Aside type="note" title="🎯 Objetivo Principal">
+Crear un blueprint técnico completo que defina la estructura, componentes, interfaces y comportamiento del sistema, asegurando que satisfaga todos los requerimientos de manera eficiente y mantenible.
 </Aside>
 
-## 5. Implementación <Badge text="¡A producción!" variant="success" />
+### 🏗️ Planificación de la Estructura del Sistema
 
-La implementación es el momento de "mudarse a la casa". Ponemos el software en funcionamiento para que los usuarios reales puedan usarlo.
+<Steps>
 
-### ¿Qué hacemos en esta fase?
+1. **Diseño Arquitectónico**
+   
+   Definir la estructura de alto nivel del sistema y sus componentes principales.
+   
+   **Decisiones Arquitectónicas:**
+   - Estilo arquitectónico (monolítico, microservicios, cliente-servidor)
+   - Patrones arquitectónicos (MVC, MVVM, Layered)
+   - Tecnologías principales (lenguajes, frameworks, plataformas)
+   - Infraestructura (cloud, on-premise, híbrida)
+   - Estrategias de escalabilidad y seguridad
 
-<Tabs>
-  <TabItem label="Actividades principales">
-    - **Preparación del ambiente**: Configurar servidores y infraestructura de producción
-    - **Despliegue del software**: Instalar y configurar la aplicación en producción
-    - **Migración de datos**: Transferir información del sistema anterior al nuevo
-    - **Capacitación de usuarios**: Entrenar a los usuarios finales en el nuevo sistema
-    - **Monitoreo inicial**: Vigilar rendimiento y detectar problemas tempranamente
-    - **Soporte post-implementación**: Resolver dudas y problemas inmediatos
-  </TabItem>
-  <TabItem label="Técnicas utilizadas">
-    - Automatización de despliegues (CI/CD)
-    - Estrategias de implementación (Blue-Green, Canary)
-    - Monitoreo y logging en tiempo real
-    - Rollback automatizado en caso de fallos
-    - Capacitación estructurada y documentación de usuario
-    - Pruebas de aceptación del usuario (UAT)
-  </TabItem>
-  <TabItem label="Entregables">
-    - **Sistema en producción**: Software funcionando para usuarios reales
-    - **Diagramas UML**: Despliegue (arquitectura de infraestructura)
-    - Documentación de usuario final
-    - Manuales de operación y mantenimiento
-    - Plan de contingencia y rollback
-    - Reportes de implementación y métricas de adopción
-  </TabItem>
-</Tabs>
+2. **Diseño de Componentes**
+   
+   Descomponer el sistema en módulos cohesivos con bajo acoplamiento.
+   
+   **Elementos:**
+   - Módulos funcionales y responsabilidades
+   - Interfaces entre componentes
+   - Dependencias y relaciones
+   - Patrones de diseño aplicables
 
-### Estrategias de implementación
+3. **Diseño de Datos**
+   
+   Definir estructura de datos y esquemas de base de datos.
+   
+   **Modelos:**
+   - Modelo conceptual (entidades y relaciones)
+   - Modelo lógico (normalización)
+   - Modelo físico (tablas, índices)
+   - Estrategia de almacenamiento
 
-<PlantUml code={`
-@startuml
-title Estrategias de Implementacion
+4. **Diseño de Interfaces**
+   
+   Especificar interfaces de usuario y APIs.
+   
+   **UI/UX:** Wireframes, mockups, flujos de navegación
+   
+   **APIs:** Endpoints, métodos HTTP, documentación
 
-rectangle "Big Bang" as bigbang
-rectangle "Implementacion Gradual" as gradual
-rectangle "Por Fases" as fases
-rectangle "Piloto" as piloto  
-rectangle "Paralela" as paralela
-rectangle "Blue-Green" as bluegreen
-rectangle "Canary" as canary
+</Steps>
 
-note bottom of bigbang : Todo de una vez
-note bottom of bluegreen : Dos ambientes identicos
-note bottom of canary : Pequeno grupo primero
+---
 
-gradual --> fases
-gradual --> piloto
-gradual --> paralela
-@enduml
-`} />
+## 💻 Fase 3: Desarrollo
 
-## 6. Mantenimiento <Badge text="Cuidemos el sistema" variant="note" />
+La fase de **desarrollo** es el proceso de construcción del software mediante codificación, siguiendo estándares y mejores prácticas.
 
-El mantenimiento es como cuidar la casa después de mudarse: reparaciones, mejoras y adaptaciones a nuevas necesidades.
-
-### ¿Qué hacemos en esta fase?
-
-<Tabs>
-  <TabItem label="Actividades principales">
-    - **Monitoreo continuo**: Supervisar el rendimiento y funcionamiento del sistema
-    - **Corrección de errores**: Solucionar bugs y problemas reportados por usuarios
-    - **Actualizaciones de seguridad**: Aplicar parches y cerrar vulnerabilidades
-    - **Mejoras de funcionalidad**: Implementar nuevas características solicitadas
-    - **Optimización de rendimiento**: Mejorar velocidad y eficiencia del sistema
-    - **Gestión de cambios**: Controlar y documentar todas las modificaciones
-  </TabItem>
-  <TabItem label="Técnicas utilizadas">
-    - Monitoreo automatizado y alertas
-    - Análisis de logs y métricas de rendimiento
-    - Gestión de incidentes y tickets de soporte
-    - Versionado y control de releases
-    - Análisis de impacto de cambios
-    - Backup y recuperación de datos
-  </TabItem>
-  <TabItem label="Entregables">
-    - **Actualizaciones y parches**: Nuevas versiones del software
-    - **Diagramas UML actualizados**: Clases, Componentes (cuando hay cambios)
-    - Reportes de rendimiento y disponibilidad
-    - Documentación de cambios y versiones
-    - Planes de backup y recuperación
-    - Métricas de satisfacción del usuario
-  </TabItem>
-</Tabs>
-
-### Tipos de mantenimiento
-
-<Tabs>
-  <TabItem label="Correctivo">
-    - **Corrección de errores**: Solucionar bugs reportados por usuarios
-    - **Parches de seguridad**: Cerrar vulnerabilidades descubiertas
-    - **Fixes urgentes**: Resolver problemas críticos rápidamente
-  </TabItem>
-  <TabItem label="Adaptativo">
-    - **Nuevos requisitos**: Agregar funcionalidades solicitadas
-    - **Cambios de tecnología**: Actualizar frameworks y librerías
-    - **Compliance**: Adaptarse a nuevas regulaciones
-  </TabItem>
-  <TabItem label="Perfectivo">
-    - **Optimización**: Mejorar rendimiento y eficiencia
-    - **Refactoring**: Limpiar y organizar mejor el código
-    - **Usabilidad**: Mejorar la experiencia del usuario
-  </TabItem>
-  <TabItem label="Preventivo">
-    - **Monitoreo proactivo**: Detectar problemas antes de que ocurran
-    - **Actualizaciones regulares**: Mantener el sistema actualizado
-    - **Documentación**: Mantener la documentación al día
-  </TabItem>
-</Tabs>
-
-## Interrelación entre Fases
-
-<PlantUml code={`
-@startuml
-title Flujo de Informacion entre Fases
-
-actor "Usuario" as user
-rectangle "Analisis" as analisis
-rectangle "Diseño" as diseño
-rectangle "Desarrollo" as desarrollo
-rectangle "Pruebas" as pruebas
-rectangle "Implementacion" as implementacion
-rectangle "Mantenimiento" as mantenimiento
-
-user --> analisis : Requisitos
-analisis --> diseño : Especificaciones
-diseño --> desarrollo : Planos tecnicos
-desarrollo --> pruebas : Codigo fuente
-pruebas --> implementacion : Software validado
-implementacion --> mantenimiento : Sistema en produccion
-mantenimiento --> user : Valor entregado
-
-mantenimiento ..> analisis : Feedback y nuevos requisitos
-pruebas ..> desarrollo : Errores encontrados
-desarrollo ..> diseño : Problemas de implementacion
-@enduml
-`} />
-
-## Diagramas UML por Fase
-
-Una guía rápida de qué diagramas UML son más útiles en cada fase del desarrollo:
-
-<PlantUml code={`
-@startuml
-title Diagramas UML en las Fases del Ciclo de Vida
-
-rectangle "1. Analisis" as analisis {
-  rectangle "Casos de Uso" as uc
-  rectangle "Actividades" as act1
-}
-
-rectangle "2. Diseño" as diseño {
-  rectangle "Clases" as class
-  rectangle "Componentes" as comp
-  rectangle "Entidad-Relacion" as er
-}
-
-rectangle "3. Desarrollo" as desarrollo {
-  rectangle "Secuencia" as seq
-  rectangle "Colaboracion" as col
-}
-
-rectangle "4. Pruebas" as pruebas {
-  rectangle "Actividades" as act2
-  rectangle "Estados" as state
-}
-
-rectangle "5. Implementacion" as implementacion {
-  rectangle "Despliegue" as deploy
-  rectangle "Componentes" as comp2
-}
-
-rectangle "6. Mantenimiento" as mantenimiento {
-  rectangle "Clases actualizadas" as class2
-  rectangle "Componentes actualizados" as comp3
-}
-
-analisis --> diseño
-diseño --> desarrollo
-desarrollo --> pruebas
-pruebas --> implementacion
-implementacion --> mantenimiento
-@enduml
-`} />
-
-## Resumen
-
-Las seis fases principales del ciclo de vida del software trabajan en conjunto para transformar una idea en un sistema funcional y mantenible:
-
-1. **Análisis**: Entendemos qué necesitamos construir → **UML**: Casos de Uso, Actividades
-2. **Diseño**: Planificamos cómo lo construiremos → **UML**: Clases, Componentes, ER
-3. **Desarrollo**: Construimos el software → **UML**: Secuencia, Colaboración
-4. **Pruebas**: Verificamos que funcione correctamente → **UML**: Actividades, Estados
-5. **Implementación**: Lo ponemos en funcionamiento → **UML**: Despliegue, Componentes
-6. **Mantenimiento**: Lo cuidamos y mejoramos continuamente → **UML**: Actualizaciones de diagramas existentes
-
-<Aside type="tip">
-Recuerda que aunque estas fases se presentan de forma secuencial, en la práctica pueden solaparse, repetirse o ejecutarse de manera iterativa según la metodología de desarrollo que uses. Los diagramas UML son herramientas de comunicación que nos ayudan a visualizar y documentar diferentes aspectos del sistema en cada fase.
+<Aside type="note" title="🎯 Objetivo Principal">
+Transformar las especificaciones de diseño en código fuente funcional, probado y documentado que implemente todos los requerimientos del sistema.
 </Aside>
 
+### ⚙️ Construcción y Codificación del Software
+
+<Steps>
+
+1. **Configuración del Entorno**
+   
+   Preparar infraestructura y herramientas de desarrollo.
+   
+   **Elementos:** IDEs, control de versiones (Git), gestores de dependencias, herramientas de build
+
+2. **Estándares de Codificación**
+   
+   Definir convenciones para código consistente.
+   
+   **Aspectos:** Nomenclatura, formato, comentarios, estructura de archivos, manejo de errores
+
+3. **Implementación de Componentes**
+   
+   Codificar módulos según especificaciones de diseño.
+   
+   **Enfoques:** Bottom-up, top-down, incremental, por prioridad
+
+4. **Integración Continua**
+   
+   Combinar trabajo de desarrolladores frecuentemente.
+   
+   **Prácticas:** Commits frecuentes, builds automáticos, pruebas automáticas, code reviews
+
+5. **Pruebas Unitarias**
+   
+   Verificar unidades individuales de código.
+   
+   **TDD:** Escribir prueba → Implementar código → Refactorizar
+
+6. **Documentación del Código**
+   
+   Facilitar comprensión y mantenimiento.
+   
+   **Tipos:** Comentarios inline, documentación de API, README, guías de contribución
+
+</Steps>
+
+---
+
+## 🧪 Fase 4: Pruebas
+
+La fase de **pruebas** es el proceso sistemático de verificación y validación del software para detectar defectos y garantizar la calidad antes del despliegue.
+
+<Aside type="note" title="🎯 Objetivo Principal">
+Identificar y corregir defectos, verificar que el software cumple todos los requerimientos y validar que satisface las necesidades del usuario.
+</Aside>
+
+### 🔍 Detección y Corrección de Errores
+
+<Steps>
+
+1. **Planificación de Pruebas**
+   
+   Definir estrategia, alcance y recursos para testing.
+   
+   **Elementos:** Alcance, enfoque, recursos, cronograma, criterios de entrada/salida
+
+2. **Diseño de Casos de Prueba**
+   
+   Crear casos que cubran todos los escenarios.
+   
+   **Técnicas:** Partición de equivalencia, valores límite, tablas de decisión, pruebas de estado
+
+3. **Niveles de Pruebas**
+   
+   Ejecutar pruebas en diferentes niveles.
+   
+   | Nivel | Objetivo | Responsable |
+   |-------|----------|-------------|
+   | **Unitarias** | Verificar unidades individuales | Desarrolladores |
+   | **Integración** | Verificar interacción entre módulos | Desarrolladores/QA |
+   | **Sistema** | Verificar sistema completo | QA |
+   | **Aceptación** | Validar con usuario final | Cliente/Usuario |
+
+4. **Gestión de Defectos**
+   
+   Registrar, priorizar y dar seguimiento a bugs.
+   
+   **Ciclo:** Nuevo → Asignado → En progreso → Resuelto → En prueba → Cerrado
+
+5. **Pruebas de Regresión**
+   
+   Verificar que cambios no introdujeron nuevos defectos.
+   
+   **Estrategias:** Automatización, ejecución en cada build, smoke tests
+
+6. **Pruebas No Funcionales**
+   
+   Validar atributos de calidad.
+   
+   **Tipos:** Rendimiento, carga, estrés, seguridad, usabilidad, compatibilidad
+
+</Steps>
+
+---
+
+## 🚀 Fase 5: Implementación
+
+La fase de **implementación** es el proceso de poner el software en producción y hacerlo disponible para usuarios finales.
+
+<Aside type="note" title="🎯 Objetivo Principal">
+Desplegar el sistema en producción de manera controlada y segura, asegurando una transición exitosa con mínima interrupción del negocio.
+</Aside>
+
+### 📦 Puesta en Marcha del Sistema
+
+<Steps>
+
+1. **Preparación del Ambiente**
+   
+   Configurar infraestructura de producción.
+   
+   **Elementos:** Servidores, redes, seguridad, monitoreo, backup, escalabilidad
+
+2. **Migración de Datos**
+   
+   Transferir datos del sistema antiguo al nuevo (si aplica).
+   
+   **Proceso:** Extracción → Transformación → Limpieza → Carga → Validación
+
+3. **Capacitación de Usuarios**
+   
+   Preparar usuarios para operar el nuevo sistema.
+   
+   **Tipos:** Usuarios finales, administradores, soporte técnico, gerencia
+   
+   **Materiales:** Manuales, videos tutoriales, sesiones prácticas, FAQ
+
+4. **Estrategia de Despliegue**
+   
+   Seleccionar enfoque para poner sistema en producción.
+   
+   | Estrategia | Descripción | Ventajas | Desventajas |
+   |------------|-------------|----------|-------------|
+   | **Big Bang** | Todo de una vez | Rápido, simple | Alto riesgo |
+   | **Faseado** | Por módulos o regiones | Riesgo distribuido | Más complejo |
+   | **Paralelo** | Nuevo y viejo simultáneamente | Seguro | Costoso |
+   | **Piloto** | Grupo reducido primero | Validación real | Más tiempo |
+
+5. **Despliegue y Activación**
+   
+   Ejecutar el despliegue según estrategia definida.
+   
+   **Actividades:** Instalación, configuración, activación, verificación, pruebas de humo, monitoreo
+
+6. **Soporte Post-Despliegue**
+   
+   Proporcionar asistencia intensiva durante período inicial.
+   
+   **Actividades:** Monitoreo 24/7, resolución rápida de incidentes, ajustes, recopilación de feedback
+
+</Steps>
+
+---
+
+## 🔧 Fase 6: Mantenimiento
+
+La fase de **mantenimiento** es el proceso continuo de mantener el software operativo, corregir defectos y agregar mejoras a lo largo de su vida útil.
+
+<Aside type="note" title="🎯 Objetivo Principal">
+Asegurar que el sistema continúe funcionando correctamente, se adapte a nuevas necesidades y evolucione con el negocio, maximizando su valor y vida útil.
+</Aside>
+
+### 🔄 Mejoras y Actualización Continua
+
+<Steps>
+
+1. **Mantenimiento Correctivo**
+   
+   Corrección de defectos y errores en producción.
+   
+   **Actividades:** Gestión de incidentes, diagnóstico, corrección, pruebas, despliegue de parches
+   
+   **Priorización:** Crítico (inmediato), Alto (24-48h), Medio (próximo release), Bajo (cuando sea conveniente)
+
+2. **Mantenimiento Adaptativo**
+   
+   Modificaciones para adaptarse a cambios del entorno.
+   
+   **Tipos:** Regulatorios, tecnológicos, organizacionales, integración, compatibilidad
+
+3. **Mantenimiento Perfectivo**
+   
+   Mejoras de funcionalidad, rendimiento y usabilidad.
+   
+   **Áreas:** Nuevas características, optimización de rendimiento, mejoras de UX, refactoring, documentación
+
+4. **Mantenimiento Preventivo**
+   
+   Acciones proactivas para prevenir problemas futuros.
+   
+   **Actividades:** Actualización de dependencias, parches de seguridad, optimización de BD, monitoreo proactivo, auditorías de código
+
+5. **Gestión de Cambios**
+   
+   Proceso formal para gestionar modificaciones.
+   
+   **Proceso:** Solicitud → Análisis de impacto → Aprobación → Implementación → Pruebas → Despliegue → Documentación
+
+6. **Monitoreo y Soporte Continuo**
+   
+   Supervisión constante y asistencia a usuarios.
+   
+   **Aspectos:** Disponibilidad, rendimiento, errores, uso, recursos, seguridad
+
+</Steps>
+
+### 🔧 Tipos de Mantenimiento
+
+<PlantUml code={`
+@startmindmap
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+* 🔧 Mantenimiento
+
+** 🐛 Correctivo
+*** Corrección de bugs
+*** Parches de seguridad
+*** Hotfixes
+*** 20-25% esfuerzo
+
+** 🔄 Adaptativo
+*** Nuevas regulaciones
+*** Cambios de plataforma
+*** Integración
+*** 20-25% esfuerzo
+
+** ⭐ Perfectivo
+*** Nuevas funcionalidades
+*** Mejoras de rendimiento
+*** Optimización
+*** 50-60% esfuerzo
+
+** 🛡️ Preventivo
+*** Actualización de dependencias
+*** Mejoras de seguridad
+*** Reducción deuda técnica
+*** 5-10% esfuerzo
+
+@endmindmap
+`} />
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note" title="📌 Puntos Clave">
+- 📋 **Análisis:** Comprensión profunda de necesidades del usuario mediante elicitación, análisis del dominio y especificación de requerimientos. Entregable clave: SRS.
+
+- 🎨 **Diseño:** Planificación de la estructura del sistema mediante diseño arquitectónico, de componentes, de datos y de interfaces. Entregable clave: Documento de Arquitectura (SAD).
+
+- 💻 **Desarrollo:** Construcción y codificación del software siguiendo estándares, con integración continua, pruebas unitarias y documentación. Entregable clave: Código fuente funcional.
+
+- 🧪 **Pruebas:** Detección y corrección de errores mediante pruebas en múltiples niveles (unitarias, integración, sistema, aceptación) y gestión de defectos. Entregable clave: Software validado.
+
+- 🚀 **Implementación:** Puesta en marcha del sistema mediante preparación de ambientes, migración de datos, capacitación y despliegue controlado. Entregable clave: Sistema en producción.
+
+- 🔧 **Mantenimiento:** Mejoras y actualización continua mediante mantenimiento correctivo, adaptativo, perfectivo y preventivo. Objetivo: Maximizar vida útil del sistema.
+</Aside>

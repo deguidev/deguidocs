@@ -1,0 +1,333 @@
+---
+title: 3 Modelos de Desarrollo de Software
+description: Modelo tradicional (Cascada), metodologías ágiles (SCRUM), diferencias y aplicación práctica
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+## 🎯 Introducción a los Modelos de Desarrollo
+
+Los **modelos de desarrollo de software** son marcos metodológicos que definen el enfoque, las fases, las actividades y los entregables para construir sistemas de software. Cada modelo representa una filosofía diferente sobre cómo organizar el trabajo, gestionar el cambio y entregar valor al cliente.
+
+<Aside type="note" title="📚 Definición Formal">
+Un modelo de desarrollo de software es un paradigma que estructura el proceso de ingeniería de software, definiendo el orden de las fases, los criterios de transición entre ellas, las prácticas de gestión y las técnicas de desarrollo a aplicar. La selección del modelo apropiado depende de factores como naturaleza del proyecto, requisitos del cliente, riesgos y restricciones organizacionales.
+</Aside>
+
+### 🔄 Evolución de los Modelos
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+rectangle "EVOLUCIÓN DE MODELOS DE DESARROLLO" as evol #E8F5E9 {
+  
+  rectangle "Modelos Tradicionales" as trad #81D4FA {
+    card "Cascada"
+    card "V-Model"
+    card "Incremental"
+    card "Espiral"
+  }
+  
+  rectangle "Modelos Ágiles" as agile #81C784 {
+    card "SCRUM"
+    card "XP"
+    card "Kanban"
+    card "Lean"
+  }
+  
+  rectangle "Modelos Híbridos" as hybrid #FFB74D {
+    card "Scrumban"
+    card "Water-Scrum-Fall"
+    card "SAFe"
+    card "DevOps"
+  }
+}
+
+trad -right-> agile : Evolución
+agile -right-> hybrid : Adaptación
+
+@enduml
+`} />
+
+---
+
+## 🌊 Modelo Tradicional: Cascada (Waterfall)
+
+El **modelo en cascada** es el paradigma más antiguo y tradicional de desarrollo de software, caracterizado por un enfoque secuencial y lineal donde cada fase debe completarse antes de iniciar la siguiente.
+
+<Aside type="note" title="🎯 Características Principales">
+El modelo en cascada se basa en la premisa de que los requerimientos pueden ser completamente definidos al inicio del proyecto y que los cambios son costosos. Cada fase produce entregables que sirven como entrada para la siguiente fase, creando un flujo unidireccional como una cascada.
+</Aside>
+
+### 📊 Estructura del Modelo en Cascada
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+rectangle "MODELO EN CASCADA" as waterfall #E8F5E9 {
+  
+  rectangle "1. Análisis de Requerimientos" as req #FFB74D {
+    card "Captura de necesidades"
+    card "Especificación SRS"
+    card "Validación con cliente"
+  }
+  
+  rectangle "2. Diseño del Sistema" as design #81D4FA {
+    card "Arquitectura"
+    card "Diseño detallado"
+    card "Especificaciones técnicas"
+  }
+  
+  rectangle "3. Implementación" as impl #81C784 {
+    card "Codificación"
+    card "Pruebas unitarias"
+    card "Integración"
+  }
+  
+  rectangle "4. Verificación (Testing)" as test #CE93D8 {
+    card "Pruebas de sistema"
+    card "Pruebas de aceptación"
+    card "Corrección de defectos"
+  }
+  
+  rectangle "5. Mantenimiento" as maint #FFA726 {
+    card "Soporte"
+    card "Correcciones"
+    card "Mejoras"
+  }
+}
+
+req -down-> design : Documento de\\nRequerimientos
+design -down-> impl : Especificaciones\\nde Diseño
+impl -down-> test : Software\\nImplementado
+test -down-> maint : Software\\nValidado
+
+@enduml
+`} />
+
+### 🔍 Características del Modelo en Cascada
+
+<Aside type="tip" title="✅ Ventajas">
+**Fortalezas del Modelo:**
+- Simplicidad y facilidad de gestión
+- Documentación exhaustiva y completa
+- Planificación predecible (cronograma y presupuesto)
+- Adecuado para proyectos con requerimientos estables
+- Proceso disciplinado y estructurado
+</Aside>
+
+<Aside type="caution" title="❌ Desventajas">
+**Limitaciones del Modelo:**
+- Inflexibilidad ante cambios (costoso modificar)
+- Feedback tardío del cliente (solo al final)
+- No apto para proyectos complejos o inciertos
+- Tiempo largo hasta primera entrega
+- Alto riesgo de fracaso si requerimientos iniciales están mal
+</Aside>
+
+---
+
+## ⚡ Metodologías Ágiles: SCRUM
+
+**SCRUM** es un marco de trabajo ágil para gestionar proyectos complejos, basado en desarrollo iterativo e incremental, con entregas frecuentes y adaptación continua a cambios.
+
+<Aside type="note" title="🎯 Filosofía Ágil">
+SCRUM se fundamenta en el Manifiesto Ágil, priorizando individuos e interacciones sobre procesos y herramientas, software funcionando sobre documentación exhaustiva, colaboración con el cliente sobre negociación contractual, y respuesta al cambio sobre seguir un plan.
+</Aside>
+
+### 🔄 Estructura de SCRUM
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 10
+
+rectangle "FRAMEWORK SCRUM" as scrum #E8F5E9 {
+  
+  rectangle "Product Backlog" as backlog #FFB74D
+  rectangle "Sprint Planning" as planning #81D4FA
+  rectangle "Sprint (1-4 semanas)" as sprint #81C784
+  rectangle "Sprint Review" as review #CE93D8
+  rectangle "Sprint Retrospective" as retro #FFA726
+  rectangle "Incremento" as increment #66BB6A
+}
+
+backlog -down-> planning
+planning -down-> sprint : Sprint Backlog
+sprint -down-> review : Demo
+review -down-> retro
+retro -down-> increment
+increment -up-> backlog : Feedback
+
+@enduml
+`} />
+
+### 👥 Roles en SCRUM
+
+<Steps>
+
+1. **Product Owner**
+   
+   Responsable de maximizar el valor del producto y gestionar el Product Backlog.
+   
+   **Responsabilidades:** Definir y priorizar backlog, representar al cliente, aceptar trabajo completado
+
+2. **Scrum Master**
+   
+   Facilitador que asegura que el equipo siga principios de SCRUM.
+   
+   **Responsabilidades:** Facilitar eventos, eliminar impedimentos, coaching al equipo, proteger de interrupciones
+
+3. **Development Team**
+   
+   Profesionales multifuncionales que construyen el incremento.
+   
+   **Características:** Auto-organizados, multifuncionales, 3-9 personas, responsabilidad colectiva
+
+</Steps>
+
+### 📅 Eventos de SCRUM
+
+<Aside type="tip" title="🔄 Eventos Principales">
+**1. Sprint Planning (8h max):** Definir qué se entregará y cómo
+
+**2. Daily Scrum (15 min):** Sincronización diaria del equipo
+
+**3. Sprint Review (4h max):** Demostrar incremento y obtener feedback
+
+**4. Sprint Retrospective (3h max):** Inspeccionar proceso y crear plan de mejoras
+
+**5. Sprint (1-4 semanas):** Timeboxing para crear incremento potencialmente entregable
+</Aside>
+
+---
+
+## ⚖️ Diferencias y Aplicación Práctica
+
+Comparación entre Cascada y SCRUM para seleccionar el modelo apropiado según contexto del proyecto.
+
+### 📊 Comparación Clave
+
+| Aspecto | Cascada | SCRUM |
+|---------|---------|-------|
+| **Enfoque** | Predictivo, plan fijo | Adaptativo, plan evolutivo |
+| **Cambios** | Resistente, costosos | Abraza el cambio |
+| **Entregas** | Una al final | Incrementales cada 1-4 semanas |
+| **Feedback** | Tardío (al final) | Temprano y continuo |
+| **Requerimientos** | Congelados al inicio | Emergentes, priorizados |
+| **Documentación** | Exhaustiva | Mínima necesaria |
+| **Equipo** | Jerárquico, especializado | Auto-organizado, multifuncional |
+| **Riesgo** | Alto al final | Distribuido en sprints |
+
+### 🎯 Cuándo Usar Cada Modelo
+
+<Tabs>
+
+<TabItem label="🌊 Usar Cascada">
+
+### Cuándo Usar Cascada
+
+**Proyectos Apropiados:**
+
+✅ **Requerimientos claros y estables**
+- Dominio bien conocido
+- Cliente sabe exactamente qué necesita
+
+✅ **Tecnología madura**
+- Equipo experimentado
+- Bajo riesgo técnico
+
+✅ **Proyectos pequeños y cortos**
+- Duración < 6 meses
+- Alcance limitado
+
+✅ **Regulaciones estrictas**
+- Industrias reguladas (aeroespacial, médica, financiera)
+- Documentación exhaustiva requerida
+
+✅ **Proyectos de migración**
+- Replicar funcionalidad existente
+- Requerimientos bien documentados
+
+</TabItem>
+
+<TabItem label="⚡ Usar SCRUM">
+
+### Cuándo Usar SCRUM
+
+**Proyectos Apropiados:**
+
+✅ **Requerimientos inciertos**
+- Necesidad de exploración y validación
+- Entorno cambiante
+
+✅ **Necesidad de feedback rápido**
+- Validación temprana con usuarios
+- Ajustes basados en aprendizaje
+
+✅ **Innovación y experimentación**
+- Proyectos nuevos e innovadores
+- Alta incertidumbre técnica
+
+✅ **Time-to-market crítico**
+- Necesidad de lanzar rápido
+- Entregas incrementales de valor
+
+✅ **Equipos pequeños y colaborativos**
+- 3-9 personas
+- Colocados o con buena comunicación
+
+</TabItem>
+
+<TabItem label="🔀 Modelo Híbrido">
+
+### Cuándo Considerar Híbrido
+
+**Escenarios Apropiados:**
+
+🔀 **Partes estables e inciertas**
+- Core del sistema estable (Cascada)
+- Nuevas funcionalidades inciertas (SCRUM)
+
+🔀 **Restricciones organizacionales**
+- Cultura tradicional en transición
+- Necesidad de documentación formal
+
+🔀 **Proyectos grandes**
+- Múltiples equipos
+- Diferentes niveles de certidumbre
+
+🔀 **Regulaciones parciales**
+- Algunos componentes regulados
+- Otros componentes flexibles
+
+**Ejemplos:**
+- Water-Scrum-Fall
+- SAFe (Scaled Agile Framework)
+- Scrumban
+
+</TabItem>
+
+</Tabs>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note" title="📌 Puntos Clave">
+- 🌊 **Modelo en Cascada:** Enfoque secuencial y predictivo, ideal para proyectos con requerimientos claros y estables, tecnología madura y necesidad de documentación exhaustiva. Ventajas: simplicidad, planificación predecible. Desventajas: inflexibilidad, feedback tardío.
+
+- ⚡ **SCRUM:** Marco ágil iterativo e incremental, ideal para proyectos con incertidumbre, necesidad de adaptación rápida y feedback continuo. Roles: Product Owner, Scrum Master, Development Team. Eventos: Sprint Planning, Daily Scrum, Sprint Review, Retrospective.
+
+- ⚖️ **Diferencias Clave:** Cascada es predictivo con plan fijo y una entrega final; SCRUM es adaptativo con entregas incrementales cada 1-4 semanas. Cascada resiste cambios; SCRUM los abraza.
+
+- 🎯 **Aplicación Práctica:** Seleccionar modelo según naturaleza del proyecto, claridad de requerimientos, necesidad de flexibilidad, regulaciones, tamaño de equipo y cultura organizacional. Considerar modelos híbridos para proyectos complejos con características mixtas.
+</Aside>

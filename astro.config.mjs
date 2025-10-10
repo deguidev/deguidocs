@@ -402,33 +402,30 @@ export default defineConfig({
 							label: '💻 Ingeniería de Software',
 							collapsed: true,
 							items: [
-								{ label: '1. Concepto y Propósito', link: '/is/ingenieria/concepto-y-proposito/' },
-								{ label: '2. Diferencia entre Programar e Ingeniar Software', link: '/is/ingenieria/diferencia-programar-ingeniar/' },
-								{ label: '3. Objetivos Clave del Ingeniero de Software', link: '/is/ingenieria/objetivos-clave/' },
-								{ label: '4. Problemas Comunes en el Desarrollo', link: '/is/ingenieria/problemas-comunes/' },
-								{ label: '5. Buenas Prácticas de Ingeniería', link: '/is/ingenieria/buenas-practicas/' },
+								{ label: '1 Concepto y Propósito', link: '/is/ingenieria/concepto-y-proposito/' },
+								{ label: '2 Alcance de la Ingeniería de Software', link: '/is/ingenieria/alcance/' },
+								{ label: '3 Diferencia entre Programación e Ingeniería de Software', link: '/is/ingenieria/diferencia-programar-ingeniar/' },
+								{ label: '4 Principales Desafíos del Desarrollo de Software', link: '/is/ingenieria/desafios-desarrollo/' },
 							]
 						},
 						{
 							label: '🐘 Ingeniería de Requerimientos',
 							collapsed: true,
 							items: [
-								{ label: '1. Qué son los Requerimientos', link: '/is/requerimientos/que-son-requerimientos/' },
-								{ label: '2. Tipos de Requerimientos', link: '/is/requerimientos/tipos-requerimientos/' },
-								{ label: '3. Cómo Capturar los Requerimientos', link: '/is/requerimientos/capturar-requerimientos/' },
-								{ label: '4. Análisis y Priorización', link: '/is/requerimientos/analisis-priorizacion/' },
-								{ label: '5. Documentación de Requerimientos', link: '/is/requerimientos/documentacion/' },
+								{ label: '1 Concepto y Propósito', link: '/is/requerimientos/concepto-proposito/' },
+								{ label: '2 Tipos de Requerimientos', link: '/is/requerimientos/tipos-requerimientos/' },
+								{ label: '3 Captura de Requerimientos', link: '/is/requerimientos/captura-requerimientos/' },
+								{ label: '4 Análisis y Priorización', link: '/is/requerimientos/analisis-priorizacion/' },
+								{ label: '5 Documentación de Requerimientos', link: '/is/requerimientos/documentacion/' },
 							]
 						},
 						{
 							label: '🦒 Ciclo de Vida del Software',
 							collapsed: true,
 							items: [
-								{ label: '1. Concepto General del Ciclo de Vida', link: '/is/ciclo/concepto-general/' },
-								{ label: '2. Fases Principales', link: '/is/ciclo/fases-principales/' },
-								{ label: '3. Metodologías Tradicionales', link: '/is/ciclo/metodologias-tradicionales/' },
-								{ label: '4. Metodologías Ágiles', link: '/is/ciclo/metodologias-agiles/' },
-								{ label: '5. Diferencias entre Tradicionales y Ágiles', link: '/is/ciclo/diferencias/' },
+								{ label: '1 Concepto General del Ciclo de Vida', link: '/is/ciclo/concepto-general/' },
+								{ label: '2 Fases del Ciclo de Vida del Software', link: '/is/ciclo/fases-principales/' },
+								{ label: '3 Modelos de Desarrollo de Software', link: '/is/ciclo/modelos-desarrollo/' },
 							]
 						}
 					]

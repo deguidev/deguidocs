@@ -1,6 +1,6 @@
 ---
-title: 2. Tipos de Requerimientos
-description: Clasificación de requerimientos funcionales y no funcionales en el desarrollo de software
+title: 2 Tipos de Requerimientos
+description: Requerimientos funcionales y requerimientos no funcionales
 ---
 
 import { Code } from '@astrojs/starlight/components';
@@ -10,401 +10,796 @@ import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
 import PlantUml from "@components/PlantUml.astro";
 
+## 📊 Clasificación de Requerimientos
 
-Los requerimientos son como las instrucciones para hacer una casa. Hay dos tipos: las que dicen QUÉ debe tener la casa (cuartos, baños, cocina) y las que dicen CÓMO debe ser (bonita, segura, cómoda).
+Los requerimientos de software se clasifican en dos categorías fundamentales que definen aspectos complementarios del sistema: los **requerimientos funcionales** que especifican qué debe hacer el sistema, y los **requerimientos no funcionales** que establecen cómo debe comportarse.
 
-## Los 2 tipos principales
+### 🎯 Taxonomía General
 
-<Aside type="tip">
-**La diferencia clave**: Los funcionales dicen "qué hace", los no funcionales dicen "cómo lo hace".
-</Aside>
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
 
-<PlantUml code={`@startuml
-!theme plain
-skinparam backgroundColor white
-
-rectangle "Tipos de Requerimientos" {
-  card "FUNCIONALES" as funcionales #lightblue
-  card "NO FUNCIONALES" as nofuncionales #lightgreen
-}
-
-rectangle "¿Qué describen?" {
-  card "QUÉ hace el programa" as que #lightblue
-  card "CÓMO lo hace" as como #lightgreen
-}
-
-rectangle "Ejemplos" {
-  card "Login, buscar, comprar" as ejemplos1 #lightblue
-  card "Rápido, seguro, bonito" as ejemplos2 #lightgreen
-}
-
-funcionales --> que : Las acciones
-nofuncionales --> como : Las cualidades
-
-que --> ejemplos1 : Funciones específicas
-como --> ejemplos2 : Características de calidad
-
-note bottom of funcionales : Como los ingredientes de una receta
-note bottom of nofuncionales : Como el sabor y la presentación
-@enduml`} />
-
-## 1. Requerimientos Funcionales
-
-<Badge text="Tipo #1" variant="success" /> **Lo que el programa DEBE HACER**
-
-Son como la lista de tareas de un empleado. Cada función es algo específico que el programa tiene que saber hacer.
-
-### ¿Qué son exactamente?
-
-Los requerimientos funcionales describen:
-- **Acciones** que puede realizar el usuario
-- **Procesos** que debe ejecutar el sistema
-- **Información** que debe manejar
-- **Resultados** que debe producir
-
-### Estructura de un Requerimiento Funcional
-
-Los requerimientos funcionales describen **qué debe hacer el sistema**. Su estructura profesional incluye:
-
-<Steps>
-1. **Identificador**: Código único (RF-01, RF-02, etc.)
-2. **Nombre**: Breve descripción de la funcionalidad
-3. **Descripción**: Explicación clara de lo que debe realizar
-4. **Entradas**: Datos que proporciona el usuario
-5. **Procesamiento**: Acciones que aplica el sistema
-6. **Salidas**: Resultados o respuestas del sistema
-7. **Precondiciones**: Situaciones previas necesarias
-8. **Postcondiciones**: Estado final del sistema
-9. **Prioridad**: Alta, media o baja
-10. **Actores**: Usuarios o sistemas que intervienen
-</Steps>
-
-### Ejemplos profesionales de Requerimientos Funcionales:
-
-<Tabs>
-<TabItem label="RF-01: Login de Usuario">
-**ID**: RF-01  
-**Nombre**: Iniciar sesión de usuario  
-**Descripción**: El sistema debe permitir a los usuarios registrados acceder a la plataforma mediante credenciales válidas.  
-**Entradas**: Email y contraseña  
-**Procesamiento**: Validar formato de email, verificar credenciales en base de datos, generar token de sesión  
-**Salidas**: Acceso al dashboard principal o mensaje de error  
-**Precondiciones**: Usuario debe estar registrado previamente  
-**Postcondiciones**: Usuario autenticado con sesión activa  
-**Prioridad**: Alta  
-**Actores**: Usuario registrado
-</TabItem>
-<TabItem label="RF-02: Búsqueda de Productos">
-**ID**: RF-02  
-**Nombre**: Buscar productos en catálogo  
-**Descripción**: El sistema debe permitir buscar productos por nombre, categoría o código usando filtros.  
-**Entradas**: Término de búsqueda, filtros opcionales (precio, categoría)  
-**Procesamiento**: Consultar base de datos, aplicar filtros, ordenar resultados por relevancia  
-**Salidas**: Lista de productos que coinciden con los criterios  
-**Precondiciones**: Catálogo debe tener productos disponibles  
-**Postcondiciones**: Resultados mostrados al usuario  
-**Prioridad**: Alta  
-**Actores**: Usuario (registrado o invitado)
-</TabItem>
-<TabItem label="RF-03: Procesar Pago">
-**ID**: RF-03  
-**Nombre**: Procesar pago de compra  
-**Descripción**: El sistema debe procesar pagos con tarjeta de crédito de forma segura y generar comprobante.  
-**Entradas**: Datos de tarjeta, monto, productos seleccionados  
-**Procesamiento**: Validar tarjeta, conectar con pasarela de pago, descontar inventario  
-**Salidas**: Confirmación de pago exitoso o mensaje de error  
-**Precondiciones**: Usuario con carrito de compras, productos disponibles  
-**Postcondiciones**: Pago registrado, inventario actualizado, orden creada  
-**Prioridad**: Alta  
-**Actores**: Usuario, sistema de pagos externo
-</TabItem>
-<TabItem label="RF-04: Generar Reporte">
-**ID**: RF-04  
-**Nombre**: Generar reporte de ventas  
-**Descripción**: El sistema debe generar reportes de ventas por período con gráficos y estadísticas.  
-**Entradas**: Rango de fechas, tipo de reporte  
-**Procesamiento**: Consultar transacciones, calcular totales, generar gráficos  
-**Salidas**: Reporte en PDF con estadísticas y gráficos  
-**Precondiciones**: Usuario con permisos de administrador  
-**Postcondiciones**: Reporte generado y disponible para descarga  
-**Prioridad**: Media  
-**Actores**: Administrador
-</TabItem>
-<TabItem label="RF-05: Notificaciones Push">
-**ID**: RF-05  
-**Nombre**: Enviar notificaciones automáticas  
-**Descripción**: El sistema debe enviar notificaciones push cuando ocurran eventos importantes.  
-**Entradas**: Tipo de evento, usuario destinatario, mensaje  
-**Procesamiento**: Verificar preferencias de usuario, formatear mensaje, enviar notificación  
-**Salidas**: Notificación entregada al dispositivo del usuario  
-**Precondiciones**: Usuario con notificaciones habilitadas  
-**Postcondiciones**: Notificación enviada y registrada  
-**Prioridad**: Media  
-**Actores**: Sistema automático, usuario receptor
-</TabItem>
-</Tabs>
-
-### Características de los funcionales:
-
-<Steps>
-1. **Tienen ID y nombre claros**: Como "RF-01: Iniciar sesión de usuario"
-2. **Describen una acción concreta**: "Permitir a usuarios registrados acceder mediante credenciales"
-3. **Especifican entradas precisas**: "Email y contraseña"
-4. **Detallan el procesamiento**: "Validar formato, verificar credenciales, generar token"
-5. **Definen salidas esperadas**: "Acceso al dashboard o mensaje de error"
-6. **Establecen condiciones**: "Usuario debe estar registrado previamente"
-7. **Indican el resultado final**: "Usuario autenticado con sesión activa"
-</Steps>
-
-<PlantUml code={`@startuml
-!theme plain
-skinparam backgroundColor white
-
-rectangle "Anatomía de un Requerimiento Funcional" {
-  card "ACTOR" as actor #lightblue
-  card "ACCIÓN" as accion #lightgreen
-  card "OBJETO" as objeto #lightyellow
-  card "RESULTADO" as resultado #lightpink
-}
-
-actor --> accion : "El usuario"
-accion --> objeto : "debe poder buscar"
-objeto --> resultado : "productos"
-resultado --> actor : "y ver una lista"
-
-rectangle "Ejemplo completo" as ejemplo #lightgray
-
-actor --> ejemplo : "El usuario debe poder buscar productos y ver una lista de resultados"
-
-note bottom of actor : ¿Quién?
-note bottom of accion : ¿Qué hace?
-note bottom of objeto : ¿Con qué?
-note bottom of resultado : ¿Qué obtiene?
-@enduml`} />
-
-## 2. Requerimientos No Funcionales
-
-<Badge text="Tipo #2" variant="note" /> **CÓMO debe funcionar el programa**
-
-Son como las cualidades de una persona. No son cosas que hace, sino cómo es: amable, rápida, confiable, bonita.
-
-### ¿Qué son exactamente?
-
-Los requerimientos no funcionales describen:
-- **Calidad** del funcionamiento
-- **Restricciones** del sistema
-- **Condiciones** del ambiente
-- **Estándares** que debe cumplir
-
-### Las 6 categorías principales:
-
-<PlantUml code={`@startuml
-!theme plain
-skinparam backgroundColor white
-
-rectangle "Tipos de No Funcionales" {
-  card "RENDIMIENTO" as rendimiento #lightblue
-  card "SEGURIDAD" as seguridad #lightgreen
-  card "USABILIDAD" as usabilidad #lightyellow
-  card "CONFIABILIDAD" as confiabilidad #lightpink
-  card "ESCALABILIDAD" as escalabilidad #lightgray
-  card "COMPATIBILIDAD" as compatibilidad #lightcyan
-}
-
-rectangle "¿Qué significan?" {
-  card "Qué tan rápido" as rapido
-  card "Qué tan protegido" as protegido
-  card "Qué tan fácil de usar" as facil
-  card "Qué tan estable" as estable
-  card "Cuántos usuarios soporta" as usuarios
-  card "Con qué funciona" as funciona
-}
-
-rendimiento --> rapido : Velocidad de respuesta
-seguridad --> protegido : Protección de datos
-usabilidad --> facil : Experiencia del usuario
-confiabilidad --> estable : Disponibilidad del sistema
-escalabilidad --> usuarios : Capacidad de crecimiento
-compatibilidad --> funciona : Integración con otros sistemas
-
-note bottom of rendimiento : Como la velocidad de un carro
-note bottom of seguridad : Como las cerraduras de tu casa
-note bottom of usabilidad : Como un control remoto simple
-@enduml`} />
-
-### Estructura de un Requerimiento No Funcional
-
-Los no funcionales definen **cómo debe comportarse el sistema**. Su estructura profesional incluye:
-
-<Steps>
-1. **Identificador**: Código único (RNF-01, RNF-02, etc.)
-2. **Nombre**: Resumen del aspecto a controlar
-3. **Descripción**: Detalle de la característica o restricción
-4. **Criterios de aceptación**: Cómo se evaluará el cumplimiento
-5. **Prioridad**: Nivel de importancia o impacto
-6. **Tipo de atributo**: Clasificación (seguridad, rendimiento, etc.)
-</Steps>
-
-### Ejemplos profesionales de Requerimientos No Funcionales:
-
-<Tabs>
-<TabItem label="RNF-01: Tiempo de Respuesta">
-**ID**: RNF-01  
-**Nombre**: Tiempo de respuesta del sistema  
-**Descripción**: El sistema debe responder a cualquier solicitud del usuario en menos de 3 segundos bajo condiciones normales de carga.  
-**Criterios de aceptación**: Pruebas de carga deben demostrar que el 95% de las respuestas cumplen el tiempo límite con hasta 500 usuarios concurrentes.  
-**Tipo**: Rendimiento  
-**Prioridad**: Alta
-</TabItem>
-<TabItem label="RNF-02: Seguridad de Datos">
-**ID**: RNF-02  
-**Nombre**: Encriptación de información sensible  
-**Descripción**: Toda información personal y financiera debe estar encriptada usando algoritmos AES-256 tanto en tránsito como en reposo.  
-**Criterios de aceptación**: Auditoría de seguridad debe confirmar que no hay datos sensibles sin encriptar y cumple estándares PCI DSS.  
-**Tipo**: Seguridad  
-**Prioridad**: Alta
-</TabItem>
-<TabItem label="RNF-03: Disponibilidad">
-**ID**: RNF-03  
-**Nombre**: Disponibilidad del sistema  
-**Descripción**: El sistema debe estar disponible 99.9% del tiempo, permitiendo máximo 8.76 horas de inactividad al año.  
-**Criterios de aceptación**: Monitoreo debe registrar uptime mínimo del 99.9% mensual, con alertas automáticas ante caídas.  
-**Tipo**: Confiabilidad  
-**Prioridad**: Alta
-</TabItem>
-<TabItem label="RNF-04: Usabilidad Móvil">
-**ID**: RNF-04  
-**Nombre**: Compatibilidad con dispositivos móviles  
-**Descripción**: La interfaz debe ser completamente funcional y responsive en dispositivos móviles con pantallas desde 4 pulgadas.  
-**Criterios de aceptación**: Pruebas de usabilidad deben confirmar que todas las funciones son accesibles en iOS y Android con satisfacción del usuario >85%.  
-**Tipo**: Usabilidad  
-**Prioridad**: Media
-</TabItem>
-<TabItem label="RNF-05: Escalabilidad">
-**ID**: RNF-05  
-**Nombre**: Capacidad de escalamiento  
-**Descripción**: El sistema debe soportar un crecimiento del 200% en usuarios sin degradación significativa del rendimiento.  
-**Criterios de aceptación**: Arquitectura debe permitir escalamiento horizontal y pruebas deben confirmar soporte para 1500 usuarios concurrentes manteniendo tiempos de respuesta.  
-**Tipo**: Escalabilidad  
-**Prioridad**: Media
-</TabItem>
-</Tabs>
-
-## Comparación práctica
-
-<PlantUml code={`@startuml
-!theme plain
-skinparam backgroundColor white
-
-rectangle "Ejemplo: Sistema de Biblioteca" {
-  rectangle "FUNCIONALES" as func #lightblue {
-    card "Buscar libros"
-    card "Prestar libros"
-    card "Devolver libros"
-    card "Renovar préstamos"
-    card "Ver historial"
+rectangle "📋 Requerimientos de Software" as req #E8F5E9 {
+  rectangle "⚙️ Funcionales" as func #81D4FA {
+    card "QUÉ hace el sistema"
+    card "Funcionalidades"
+    card "Comportamiento"
+    card "Servicios"
   }
   
-  rectangle "NO FUNCIONALES" as nofunc #lightgreen {
-    card "Búsqueda en 2 segundos"
-    card "Disponible 24/7"
-    card "Interfaz intuitiva"
-    card "Datos seguros"
-    card "Soporte 500 usuarios"
+  rectangle "✨ No Funcionales" as nofunc #FFB74D {
+    card "CÓMO lo hace"
+    card "Cualidades"
+    card "Restricciones"
+    card "Atributos de calidad"
   }
 }
 
-rectangle "La diferencia" {
-  card "QUÉ hace" as que #lightblue
-  card "CÓMO lo hace" as como #lightgreen
-}
+note right of func
+  Definen capacidades
+  y operaciones específicas
+end note
 
-func --> que : Acciones específicas
-nofunc --> como : Cualidades del sistema
+note right of nofunc
+  Definen características
+  de calidad del sistema
+end note
 
-note bottom of func : Las funciones son como verbos
-note bottom of nofunc : Las cualidades son como adjetivos
-@enduml`} />
+@enduml
+`} />
 
+---
 
+## ⚙️ Requerimientos Funcionales
 
-## Errores comunes al escribir requerimientos
+Los requerimientos funcionales describen las **capacidades, funciones y servicios** que el sistema debe proporcionar. Especifican el comportamiento del sistema en términos de entradas, procesamiento y salidas.
 
-<Aside type="caution">
-**¡Cuidado!** Muchos requerimientos fallan porque no siguen la estructura profesional. Aquí tienes ejemplos de errores típicos vs. la forma correcta.
+### 📖 Definición Formal
+
+<Aside type="note" title="📚 Definición IEEE/ISO">
+Un requerimiento funcional es una declaración de un servicio que el sistema debe proporcionar, cómo debe reaccionar a entradas particulares y cómo debe comportarse en situaciones específicas. En algunos casos, también puede declarar explícitamente lo que el sistema no debe hacer.
 </Aside>
 
+### 🔍 Características Principales
+
+<Steps>
+
+1. **Especificidad de Comportamiento**
+   
+   Definen acciones concretas y observables que el sistema debe ejecutar en respuesta a entradas o eventos específicos.
+
+2. **Orientación a Funcionalidad**
+   
+   Se centran en las capacidades del sistema desde la perspectiva del usuario o del negocio.
+
+3. **Verificabilidad Directa**
+   
+   Pueden ser probados mediante casos de prueba que validan la presencia o ausencia de la funcionalidad.
+
+4. **Independencia de Implementación**
+   
+   Describen QUÉ debe hacer el sistema, no CÓMO debe implementarse técnicamente.
+
+</Steps>
+
+### 📊 Categorías de Requerimientos Funcionales
+
+<PlantUml code={`
+@startmindmap
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+* ⚙️ Requerimientos\\nFuncionales
+
+** 🔐 Gestión de Usuarios
+*** Autenticación
+*** Autorización
+*** Gestión de perfiles
+*** Recuperación de contraseña
+
+** 💼 Lógica de Negocio
+*** Procesamiento de transacciones
+*** Cálculos y algoritmos
+*** Reglas de negocio
+*** Validaciones
+
+** 📊 Gestión de Datos
+*** CRUD (Create, Read, Update, Delete - Crear, Leer, Actualizar, Eliminar)
+*** Consultas y búsquedas
+*** Importación/Exportación
+*** Respaldos
+
+** 📱 Interfaz de Usuario
+*** Navegación
+*** Formularios
+*** Visualización de datos
+*** Interacciones
+
+** 🔗 Integraciones
+*** APIs (Application Programming Interfaces - Interfaces de Programación de Aplicaciones) externas
+*** Servicios web
+*** Sincronización
+*** Notificaciones
+
+@endmindmap
+`} />
+
+### 📝 Estructura de un Requerimiento Funcional
+
+Un requerimiento funcional bien formulado debe incluir:
+
+| Componente | Descripción | Ejemplo |
+|------------|-------------|---------|
+| **Identificador** | Código único de trazabilidad | RF-001 |
+| **Nombre** | Título descriptivo breve | Login de usuario |
+| **Descripción** | Especificación detallada del comportamiento | El sistema debe permitir a los usuarios autenticarse mediante email y contraseña |
+| **Precondiciones** | Estado requerido antes de ejecutar | Usuario registrado en el sistema |
+| **Entradas** | Datos que recibe la función | Email, contraseña |
+| **Proceso** | Lógica o algoritmo a ejecutar | Validar credenciales contra base de datos |
+| **Salidas** | Resultados esperados | Sesión iniciada o mensaje de error |
+| **Postcondiciones** | Estado del sistema después de ejecutar | Usuario autenticado con sesión activa |
+| **Prioridad** | Importancia relativa | Alta, Media, Baja |
+
+### 💡 Ejemplos de Requerimientos Funcionales
+
+<Steps>
+
+1. **Sistema de E-commerce**
+   
+   **RF-001:** El sistema debe permitir a los usuarios agregar productos al carrito de compras.
+   
+   **RF-002:** El sistema debe calcular automáticamente el total de la compra incluyendo impuestos y costos de envío.
+   
+   **RF-003:** El sistema debe procesar pagos mediante tarjeta de crédito, débito y PayPal.
+
+2. **Sistema Bancario**
+   
+   **RF-010:** El sistema debe permitir transferencias entre cuentas del mismo banco en tiempo real.
+   
+   **RF-011:** El sistema debe generar un comprobante PDF (Portable Document Format) de cada transacción realizada.
+   
+   **RF-012:** El sistema debe bloquear automáticamente una cuenta después de 3 intentos fallidos de login.
+
+3. **Sistema de Gestión Académica**
+   
+   **RF-020:** El sistema debe permitir a los estudiantes inscribirse en cursos disponibles.
+   
+   **RF-021:** El sistema debe calcular automáticamente el promedio ponderado de calificaciones.
+   
+   **RF-022:** El sistema debe generar reportes de asistencia por estudiante y por curso.
+
+</Steps>
+
+### ✅ Criterios de Calidad
+
+Un requerimiento funcional de calidad debe ser:
+
+<Aside type="tip" title="🎯 Características SMART">
+- **Específico (Specific):** Describe una funcionalidad concreta y bien definida
+- **Medible (Measurable):** Puede verificarse objetivamente
+- **Alcanzable (Achievable):** Técnicamente factible con recursos disponibles
+- **Relevante (Relevant):** Aporta valor al negocio o usuario
+- **Temporal (Time-bound):** Con criterios de aceptación claros
+</Aside>
+
+### 📋 Plantilla de Especificación
+
 <Tabs>
-<TabItem label="❌ Requerimientos mal escritos">
-**Funcionales vagos:**
-- "El sistema debe tener login" → Falta estructura completa
-- "Debe buscar productos" → No especifica entradas, salidas, ni procesamiento
-- "Permitir pagos" → No define precondiciones ni actores
+<TabItem label="📝 Plantilla">
 
-**No funcionales imprecisos:**
-- "El sistema debe ser rápido" → No define criterios medibles
-- "Debe ser seguro" → No especifica tipo de seguridad ni estándares
-- "Fácil de usar" → No tiene criterios de aceptación objetivos
+<Code code={`
+ID: RF-XXX
+Nombre: [Nombre descriptivo de la funcionalidad]
+Prioridad: [Alta | Media | Baja]
+Módulo: [Módulo o componente del sistema]
+
+Descripción:
+El sistema debe [verbo de acción] [objeto] [condiciones/restricciones].
+
+Precondiciones:
+- [Estado o condición requerida 1]
+- [Estado o condición requerida 2]
+
+Flujo Principal:
+1. [Paso 1 del proceso]
+2. [Paso 2 del proceso]
+3. [Paso 3 del proceso]
+
+Flujos Alternativos:
+- [Escenario alternativo 1]
+- [Escenario alternativo 2]
+
+Criterios de Aceptación:
+- [Criterio verificable 1]
+- [Criterio verificable 2]
+
+Dependencias:
+- [RF-XXX: Requerimiento relacionado]
+`} lang="text" title="Plantilla de Requerimiento Funcional" />
+
 </TabItem>
-<TabItem label="✅ Requerimientos bien estructurados">
-**Funcional completo:**
-- **ID**: RF-06, **Nombre**: Login con email, **Descripción**: Sistema debe autenticar usuarios con email/contraseña, **Entradas**: Email y contraseña, **Procesamiento**: Validar formato y credenciales, **Salidas**: Acceso o error, **Prioridad**: Alta
 
-**No funcional medible:**
-- **ID**: RNF-06, **Nombre**: Tiempo de autenticación, **Descripción**: Login debe completarse en menos de 2 segundos, **Criterios**: 95% de logins bajo 2s en pruebas, **Tipo**: Rendimiento, **Prioridad**: Alta
+<TabItem label="💼 Ejemplo E-commerce">
+
+<Code code={`
+ID: RF-015
+Nombre: Procesamiento de Pago con Tarjeta
+Prioridad: Alta
+Módulo: Módulo de Pagos
+
+Descripción:
+El sistema debe permitir a los usuarios realizar pagos de sus compras 
+utilizando tarjetas de crédito o débito (Visa, Mastercard, American Express) 
+de forma segura y obtener confirmación inmediata de la transacción.
+
+Precondiciones:
+- Usuario autenticado en el sistema
+- Carrito de compras con al menos un producto
+- Total de compra calculado correctamente
+- Pasarela de pago disponible
+
+Flujo Principal:
+1. Usuario selecciona método de pago "Tarjeta de Crédito/Débito"
+2. Sistema muestra formulario de datos de tarjeta
+3. Usuario ingresa número de tarjeta, fecha de vencimiento, CVV (Card Verification Value - Valor de Verificación de Tarjeta) y nombre
+4. Sistema valida formato de datos ingresados
+5. Sistema envía datos cifrados a pasarela de pago
+6. Pasarela procesa transacción y retorna resultado
+7. Sistema registra transacción en base de datos
+8. Sistema muestra confirmación de pago exitoso al usuario
+9. Sistema envía email de confirmación con número de orden
+
+Flujos Alternativos:
+- Si validación de formato falla: mostrar mensaje de error específico
+- Si pasarela rechaza pago: mostrar razón de rechazo y permitir reintentar
+- Si hay timeout de pasarela: mostrar mensaje y guardar carrito
+- Si usuario cancela: retornar a página de carrito sin procesar pago
+
+Criterios de Aceptación:
+- Transacción completa en menos de 10 segundos
+- Datos de tarjeta cifrados con TLS 1.3 (Transport Layer Security - Seguridad de Capa de Transporte)
+- Número de tarjeta enmascarado (mostrar solo últimos 4 dígitos)
+- Email de confirmación enviado en menos de 1 minuto
+- Registro de auditoría creado para cada intento de pago
+
+Dependencias:
+- RF-012: Cálculo de total de compra
+- RF-008: Autenticación de usuario
+- RNF-025: Integración con pasarela de pago Stripe
+`} lang="text" title="Ejemplo: Procesamiento de Pago" />
+
+</TabItem>
+
+<TabItem label="🏦 Ejemplo Sistema Bancario">
+
+<Code code={`
+ID: RF-042
+Nombre: Transferencia entre Cuentas Propias
+Prioridad: Alta
+Módulo: Módulo de Transferencias
+
+Descripción:
+El sistema debe permitir a los clientes transferir fondos entre sus propias 
+cuentas (ahorro, corriente, inversión) de forma inmediata, con validación 
+de saldos y generación de comprobante.
+
+Precondiciones:
+- Cliente autenticado con token de sesión válido
+- Cliente posee al menos dos cuentas activas
+- Cuenta origen tiene saldo disponible suficiente
+- Sistema de core bancario operativo
+
+Flujo Principal:
+1. Cliente selecciona opción "Transferir entre mis cuentas"
+2. Sistema muestra listado de cuentas del cliente con saldos
+3. Cliente selecciona cuenta origen y cuenta destino
+4. Cliente ingresa monto a transferir
+5. Sistema valida que monto sea mayor a $0 y menor o igual al saldo
+6. Sistema muestra resumen de transferencia para confirmación
+7. Cliente confirma la operación
+8. Sistema debita monto de cuenta origen
+9. Sistema acredita monto en cuenta destino
+10. Sistema genera número de comprobante único
+11. Sistema muestra confirmación con detalles de transferencia
+12. Sistema envía notificación push y email al cliente
+
+Flujos Alternativos:
+- Si saldo insuficiente: mostrar mensaje y saldo disponible
+- Si monto excede límite diario: informar límite y permitir ajustar
+- Si cuenta destino está bloqueada: mostrar mensaje y no permitir
+- Si cliente cancela: retornar a menú principal sin realizar operación
+- Si falla débito: revertir transacción y registrar error
+
+Criterios de Aceptación:
+- Transferencia procesada en tiempo real (< 3 segundos)
+- Saldos actualizados inmediatamente en ambas cuentas
+- Comprobante PDF (Portable Document Format) generado y disponible para descarga
+- Operación registrada en historial de transacciones
+- Notificaciones enviadas en menos de 30 segundos
+- Transacción atómica (todo o nada, sin estados intermedios)
+
+Dependencias:
+- RF-038: Consulta de saldos de cuentas
+- RF-005: Autenticación de cliente
+- RF-044: Generación de comprobantes PDF
+- RNF-018: Disponibilidad del core bancario
+`} lang="text" title="Ejemplo: Transferencia Bancaria" />
+
 </TabItem>
 </Tabs>
 
-## ¿Por qué necesitamos ambos tipos?
+---
+
+## ✨ Requerimientos No Funcionales
+
+Los requerimientos no funcionales especifican **criterios de calidad, restricciones y atributos** que determinan cómo debe comportarse el sistema. Definen las características cualitativas que afectan la experiencia del usuario y la viabilidad técnica.
+
+### 📖 Definición Formal
+
+<Aside type="note" title="📚 Definición IEEE/ISO">
+Un requerimiento no funcional es una restricción sobre los servicios o funciones ofrecidos por el sistema. Incluye restricciones de tiempo, restricciones sobre el proceso de desarrollo y estándares. Los requerimientos no funcionales a menudo se aplican al sistema como un todo, en lugar de características o servicios individuales.
+</Aside>
+
+### 🔍 Características Principales
 
 <Steps>
-1. **Los funcionales** definen QUÉ construir
-2. **Los no funcionales** definen CÓMO construirlo bien
-3. **Sin funcionales** → No sabes qué hacer
-4. **Sin no funcionales** → Funciona, pero mal
-5. **Con ambos** → Sistema completo y de calidad
+
+1. **Cualidades del Sistema**
+   
+   Describen atributos de calidad que el sistema debe poseer (rendimiento, seguridad, usabilidad, etc.).
+
+2. **Restricciones Globales**
+   
+   Frecuentemente se aplican al sistema completo en lugar de funcionalidades específicas.
+
+3. **Impacto en Arquitectura**
+   
+   Influyen significativamente en las decisiones de diseño arquitectónico y tecnológico.
+
+4. **Medición Cuantitativa**
+   
+   Deben especificarse con métricas medibles y verificables.
+
 </Steps>
 
-## Analogía final: Construir un carro
+### 📊 Clasificación según ISO/IEC 25010
 
-<PlantUml code={`@startuml
-!theme plain
-skinparam backgroundColor white
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 10
 
-rectangle "Hacer un Carro" {
-  rectangle "FUNCIONALES" as funcarro #lightblue {
-    card "Acelerar"
-    card "Frenar"
-    card "Girar"
-    card "Encender luces"
-    card "Tocar claxon"
+rectangle "✨ Requerimientos No Funcionales (ISO 25010)" as rnf #FFE0B2 {
+  
+  rectangle "⚡ Rendimiento" as perf #81D4FA {
+    card "Tiempo de respuesta"
+    card "Throughput"
+    card "Capacidad"
   }
   
-  rectangle "NO FUNCIONALES" as nofuncarro #lightgreen {
-    card "Velocidad máxima 180 km/h"
-    card "Frena en 10 metros"
-    card "Consume 15 km/litro"
-    card "Cómodo para 5 personas"
-    card "Bonito diseño"
+  rectangle "🔒 Seguridad" as sec #E57373 {
+    card "Confidencialidad"
+    card "Integridad"
+    card "Autenticación"
+  }
+  
+  rectangle "👥 Usabilidad" as usa #81C784 {
+    card "Facilidad de uso"
+    card "Accesibilidad"
+    card "Estética"
+  }
+  
+  rectangle "🔧 Mantenibilidad" as mant #FFB74D {
+    card "Modularidad"
+    card "Reusabilidad"
+    card "Analizabilidad"
+  }
+  
+  rectangle "🔄 Portabilidad" as port #BA68C8 {
+    card "Adaptabilidad"
+    card "Instalabilidad"
+    card "Reemplazabilidad"
+  }
+  
+  rectangle "✅ Confiabilidad" as conf #4FC3F7 {
+    card "Disponibilidad"
+    card "Tolerancia a fallos"
+    card "Recuperabilidad"
+  }
+  
+  rectangle "⚙️ Compatibilidad" as comp #A5D6A7 {
+    card "Coexistencia"
+    card "Interoperabilidad"
+  }
+  
+  rectangle "📈 Escalabilidad" as esc #FFE082 {
+    card "Horizontal"
+    card "Vertical"
   }
 }
 
-rectangle "Resultado" as resultado #lightyellow
+@enduml
+`} />
 
-funcarro --> resultado : Define las funciones
-nofuncarro --> resultado : Define la calidad
+### 🎯 Categorías Detalladas
 
-note bottom of resultado : Un carro completo y bien hecho
-@enduml`} />
+<Steps>
 
-## Resumen: Los dos son importantes
+1. **⚡ Rendimiento (Performance)**
+   
+   Define la eficiencia del sistema en términos de tiempo y recursos.
+   
+   **Aspectos clave:**
+   - **Tiempo de respuesta:** Latencia máxima aceptable para operaciones
+   - **Throughput:** Número de transacciones por unidad de tiempo
+   - **Utilización de recursos:** CPU, memoria, ancho de banda
+   - **Capacidad:** Número máximo de usuarios concurrentes
+   
+   **Ejemplo:** El sistema debe procesar 1,000 transacciones por segundo con un tiempo de respuesta menor a 2 segundos en el percentil 95.
 
-<Aside type="tip">
-**Recuerda**: Los funcionales son el esqueleto del programa (estructura), los no funcionales son los músculos y la piel (calidad). Necesitas ambos para que funcione bien.
+2. **🔒 Seguridad (Security)**
+   
+   Protección contra accesos no autorizados y amenazas.
+   
+   **Aspectos clave:**
+   - **Autenticación:** Verificación de identidad de usuarios
+   - **Autorización:** Control de acceso basado en roles (RBAC - Role-Based Access Control)
+   - **Confidencialidad:** Cifrado de datos sensibles
+   - **Integridad:** Protección contra modificaciones no autorizadas
+   - **Auditoría:** Registro de acciones críticas
+   
+   **Ejemplo:** Todos los datos personales deben ser cifrados en tránsito (TLS 1.3 - Transport Layer Security) y en reposo (AES-256 - Advanced Encryption Standard).
+
+3. **👥 Usabilidad (Usability)**
+   
+   Facilidad de uso y experiencia del usuario.
+   
+   **Aspectos clave:**
+   - **Curva de aprendizaje:** Tiempo para dominar funcionalidades básicas
+   - **Eficiencia de uso:** Productividad de usuarios experimentados
+   - **Prevención de errores:** Diseño que minimiza equivocaciones
+   - **Accesibilidad:** Cumplimiento de estándares WCAG (Web Content Accessibility Guidelines - Pautas de Accesibilidad para Contenido Web)
+   
+   **Ejemplo:** Un usuario nuevo debe poder completar una transacción básica en menos de 5 minutos sin capacitación previa.
+
+4. **✅ Confiabilidad (Reliability)**
+   
+   Capacidad del sistema para funcionar correctamente bajo condiciones específicas.
+   
+   **Aspectos clave:**
+   - **Disponibilidad:** Porcentaje de tiempo operativo (uptime)
+   - **MTBF (Mean Time Between Failures):** Tiempo medio entre fallos
+   - **MTTR (Mean Time To Repair):** Tiempo medio de reparación
+   - **Tolerancia a fallos:** Capacidad de continuar operando ante fallos parciales
+   
+   **Ejemplo:** El sistema debe tener una disponibilidad de 99.9% (máximo 8.76 horas de downtime al año).
+
+5. **🔧 Mantenibilidad (Maintainability)**
+   
+   Facilidad para modificar, corregir y mejorar el sistema.
+   
+   **Aspectos clave:**
+   - **Modularidad:** Componentes independientes y cohesivos
+   - **Reusabilidad:** Componentes reutilizables en otros contextos
+   - **Analizabilidad:** Facilidad para diagnosticar problemas
+   - **Modificabilidad:** Esfuerzo requerido para implementar cambios
+   
+   **Ejemplo:** El código debe tener una cobertura de pruebas unitarias mínima del 80% y cumplir con estándares de clean code.
+
+6. **🔄 Portabilidad (Portability)**
+   
+   Capacidad de ejecutarse en diferentes entornos.
+   
+   **Aspectos clave:**
+   - **Adaptabilidad:** Funcionamiento en múltiples plataformas
+   - **Instalabilidad:** Facilidad de instalación y configuración
+   - **Reemplazabilidad:** Capacidad de sustituir componentes
+   
+   **Ejemplo:** El sistema debe ser compatible con navegadores Chrome, Firefox, Safari y Edge en sus últimas 3 versiones.
+
+7. **⚙️ Compatibilidad (Compatibility)**
+   
+   Capacidad de coexistir e interoperar con otros sistemas.
+   
+   **Aspectos clave:**
+   - **Interoperabilidad:** Intercambio de información con sistemas externos
+   - **Coexistencia:** Funcionamiento sin conflictos con otros sistemas
+   
+   **Ejemplo:** El sistema debe integrarse con APIs REST (Representational State Transfer) y SOAP (Simple Object Access Protocol), soportando formatos JSON (JavaScript Object Notation) y XML (eXtensible Markup Language).
+
+8. **📈 Escalabilidad (Scalability)**
+   
+   Capacidad de manejar crecimiento de carga o usuarios.
+   
+   **Aspectos clave:**
+   - **Escalabilidad horizontal:** Agregar más servidores
+   - **Escalabilidad vertical:** Aumentar recursos de servidor existente
+   - **Elasticidad:** Ajuste automático de recursos según demanda
+   
+   **Ejemplo:** El sistema debe soportar un crecimiento de 50% en usuarios sin degradación de rendimiento.
+
+</Steps>
+
+### 📊 Tabla Comparativa de Métricas
+
+| Categoría | Métrica | Ejemplo de Especificación |
+|-----------|---------|---------------------------|
+| **Rendimiento** | Tiempo de respuesta | < 2 segundos para 95% de las peticiones |
+| **Rendimiento** | Throughput | 10,000 transacciones/segundo |
+| **Seguridad** | Cifrado | TLS 1.3 (Transport Layer Security) para datos en tránsito |
+| **Seguridad** | Autenticación | MFA (Multi-Factor Authentication - Autenticación Multifactor) obligatorio |
+| **Seguridad** | Tokens | JWT (JSON Web Token) con expiración de 15 minutos |
+| **Disponibilidad** | Uptime | 99.95% (4.38 horas downtime/año) |
+| **Disponibilidad** | RTO (Recovery Time Objective - Tiempo Objetivo de Recuperación) | < 1 hora |
+| **Usabilidad** | Curva aprendizaje | Usuario completa tarea en < 5 minutos |
+| **Usabilidad** | Accesibilidad | WCAG (Web Content Accessibility Guidelines) 2.1 Nivel AA |
+| **Escalabilidad** | Usuarios concurrentes | Soportar 100,000 usuarios simultáneos |
+| **Mantenibilidad** | Cobertura de tests | > 80% de cobertura de código |
+
+### 💡 Ejemplos de Requerimientos No Funcionales
+
+<Code code={`
+RNF-001: Rendimiento
+El sistema debe cargar la página principal en menos de 1.5 segundos 
+en una conexión de 10 Mbps.
+
+RNF-002: Seguridad
+Todas las contraseñas deben ser hasheadas usando bcrypt con un 
+factor de costo mínimo de 12.
+
+RNF-003: Disponibilidad
+El sistema debe tener un SLA de 99.9% de disponibilidad durante 
+horario laboral (8am-8pm).
+
+Nota: SLA = Service Level Agreement (Acuerdo de Nivel de Servicio)
+
+RNF-004: Usabilidad
+La aplicación móvil debe cumplir con las guías de diseño Material 
+Design 3.0 de Google.
+
+RNF-005: Escalabilidad
+El sistema debe soportar un incremento de 100% en la carga sin 
+requerir cambios arquitectónicos.
+
+RNF-006: Compatibilidad
+El sistema debe ser compatible con iOS 14+ y Android 10+.
+
+RNF-007: Mantenibilidad
+El código debe seguir los principios SOLID (Single Responsibility, Open-Closed, Liskov Substitution, Interface Segregation, Dependency Inversion) y tener documentación 
+inline en formato JSDoc (JavaScript Documentation).
+
+RNF-008: Portabilidad
+El sistema debe ejecutarse en contenedores Docker en cualquier 
+plataforma que soporte Docker Engine 20.10+.
+`} lang="text" title="Ejemplos de RNF Específicos" />
+
+### ⚠️ Errores Comunes
+
+<Aside type="caution" title="🚨 Errores Frecuentes en RNF">
+**❌ Demasiado vago:**
+"El sistema debe ser rápido"
+
+**✅ Específico y medible:**
+"El sistema debe responder en menos de 2 segundos para el 95% de las peticiones bajo carga normal (1000 usuarios concurrentes)"
+
+---
+
+**❌ No verificable:**
+"El sistema debe ser fácil de usar"
+
+**✅ Verificable:**
+"El 90% de los usuarios nuevos deben poder completar el proceso de registro en menos de 3 minutos sin ayuda externa"
+
+---
+
+**❌ Ambiguo:**
+"El sistema debe ser seguro"
+
+**✅ Específico:**
+"El sistema debe implementar autenticación de dos factores (2FA) para todos los usuarios con roles administrativos"
 </Aside>
 
-**En pocas palabras**:
-- **Funcionales** = Las cosas que hace (verbos) → "Registrar usuario", "Procesar pago", "Enviar email", "Generar reporte", "Buscar producto"
-- **No funcionales** = Cómo las hace (adjetivos) → "Rápido (3 segundos)", "Seguro (encriptado)", "Disponible (99.9%)", "Fácil de usar (intuitivo)", "Escalable (1500 usuarios)"
+### 📋 Plantilla de Especificación
 
-**La clave**: Un buen sistema necesita ambos tipos. Sin funcionales no sirve para nada, sin no funcionales nadie lo quiere usar.
+<Tabs>
+<TabItem label="📝 Plantilla">
+
+<Code code={`
+ID: RNF-XXX
+Categoría: [Rendimiento | Seguridad | Usabilidad | etc.]
+Prioridad: [Alta | Media | Baja]
+
+Descripción:
+El sistema debe [característica de calidad] [métrica cuantificable] 
+[condiciones de medición].
+
+Métrica:
+- Indicador: [Qué se mide]
+- Valor objetivo: [Valor numérico esperado]
+- Método de medición: [Cómo se verifica]
+
+Restricciones:
+- [Restricción técnica o de negocio 1]
+- [Restricción técnica o de negocio 2]
+
+Impacto en Arquitectura:
+[Descripción de cómo afecta el diseño del sistema]
+
+Criterios de Aceptación:
+- [Criterio medible 1]
+- [Criterio medible 2]
+`} lang="text" title="Plantilla de Requerimiento No Funcional" />
+
+</TabItem>
+
+<TabItem label="⚡ Ejemplo Rendimiento">
+
+<Code code={`
+ID: RNF-008
+Categoría: Rendimiento
+Prioridad: Alta
+
+Descripción:
+El sistema debe procesar y responder a las búsquedas de productos en el 
+catálogo en menos de 1.5 segundos para el 95% de las peticiones, bajo 
+condiciones de carga normal (hasta 5,000 usuarios concurrentes).
+
+Métrica:
+- Indicador: Tiempo de respuesta de endpoint /api/products/search
+- Valor objetivo: Percentil 95 < 1.5 segundos
+- Método de medición: Monitoreo con herramientas APM (Application Performance Monitoring - Monitoreo de Rendimiento de Aplicaciones) como New Relic/Datadog
+  y pruebas de carga con JMeter
+
+Restricciones:
+- Base de datos con hasta 500,000 productos activos
+- Catálogo con 50 categorías y 200 atributos de filtrado
+- Búsqueda debe soportar texto completo y filtros combinados
+- Infraestructura en AWS (Amazon Web Services) con instancias m5.xlarge
+- Presupuesto máximo de $2,000/mes para infraestructura
+
+Impacto en Arquitectura:
+- Implementar caché distribuido con Redis para resultados frecuentes
+- Utilizar Elasticsearch para búsqueda de texto completo
+- Índices optimizados en base de datos PostgreSQL
+- CDN (Content Delivery Network - Red de Distribución de Contenido) para servir imágenes de productos
+- Load balancer con al menos 3 instancias de aplicación
+- Implementar paginación con límite de 50 resultados por página
+
+Criterios de Aceptación:
+- Tiempo de respuesta P95 < 1.5s verificado en producción
+- Tiempo de respuesta P99 < 3.0s
+- Throughput mínimo de 500 búsquedas por segundo
+- Caché con hit rate > 70% para búsquedas populares
+- Pruebas de carga exitosas con 5,000 usuarios concurrentes
+- Monitoreo activo con alertas si P95 > 2.0s por 5 minutos
+`} lang="text" title="Ejemplo: Rendimiento de Búsqueda" />
+
+</TabItem>
+
+<TabItem label="🔒 Ejemplo Seguridad">
+
+<Code code={`
+ID: RNF-023
+Categoría: Seguridad
+Prioridad: Crítica
+
+Descripción:
+El sistema debe proteger todos los datos personales y financieros de los 
+usuarios mediante cifrado en tránsito y en reposo, cumpliendo con estándares 
+PCI-DSS (Payment Card Industry Data Security Standard) nivel 1 y GDPR (General Data Protection Regulation - Reglamento General de Protección de Datos), con auditoría completa de accesos.
+
+Métrica:
+- Indicador: Nivel de cumplimiento de estándares de seguridad
+- Valor objetivo: 100% de cumplimiento PCI-DSS y GDPR
+- Método de medición: Auditoría trimestral por QSA (Qualified Security Assessor - Evaluador de Seguridad Calificado) certificado y 
+  escaneos automáticos semanales con herramientas ASV (Approved Scanning Vendor - Proveedor de Escaneo Aprobado) aprobadas
+
+Restricciones:
+- Datos de tarjetas nunca almacenados en servidores propios
+- Logs de auditoría inmutables y retenidos por 7 años
+- Acceso a datos sensibles solo mediante VPN (Virtual Private Network - Red Privada Virtual) y 2FA (Two-Factor Authentication - Autenticación de Dos Factores)
+- Cumplimiento obligatorio para operar en UE y procesar pagos
+- Certificación PCI-DSS requerida antes de go-live
+
+Impacto en Arquitectura:
+- Implementar TLS 1.3 (Transport Layer Security) para todas las comunicaciones HTTPS (HyperText Transfer Protocol Secure)
+- Cifrado AES-256 (Advanced Encryption Standard) para datos en reposo en base de datos
+- Tokenización de datos de tarjetas mediante Stripe/PayPal
+- Implementar HSM (Hardware Security Module - Módulo de Seguridad de Hardware) para claves criptográficas
+- Sistema de gestión de secretos con HashiCorp Vault
+- WAF (Web Application Firewall - Firewall de Aplicaciones Web) con reglas OWASP (Open Web Application Security Project) Top 10
+- Segregación de red con DMZ (Demilitarized Zone - Zona Desmilitarizada) para servicios públicos
+- Logs centralizados en SIEM (Security Information and Event Management - Gestión de Información y Eventos de Seguridad)
+- Implementar RBAC (Role-Based Access Control - Control de Acceso Basado en Roles) granular
+- Encriptación de backups con claves rotadas mensualmente
+
+Criterios de Aceptación:
+- Certificación PCI-DSS nivel 1 obtenida y vigente
+- 100% de endpoints expuestos con HTTPS (HyperText Transfer Protocol Secure) / TLS 1.3
+- Escaneos de vulnerabilidades sin hallazgos críticos
+- Auditoría de accesos con registro de todas las operaciones sensibles
+- Penetration testing anual sin vulnerabilidades de severidad alta
+- Tiempo de detección de intrusión < 15 minutos
+- Datos personales cifrados verificados mediante inspección de BD
+- Políticas de contraseñas: mínimo 12 caracteres, complejidad alta
+- MFA (Multi-Factor Authentication - Autenticación Multifactor) obligatorio para roles administrativos (100% de adopción)
+- Rotación de credenciales cada 90 días
+`} lang="text" title="Ejemplo: Seguridad de Datos" />
+
+</TabItem>
+</Tabs>
+
+---
+
+## 🔄 Relación entre Requerimientos Funcionales y No Funcionales
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+rectangle "Sistema de Software Completo" as sistema #E8F5E9 {
+  
+  rectangle "⚙️ Requerimientos\\nFuncionales" as rf #81D4FA {
+    card "Login de usuario"
+    card "Procesar pago"
+    card "Generar reporte"
+  }
+  
+  rectangle "✨ Requerimientos\\nNo Funcionales" as rnf #FFB74D {
+    card "Seguridad: 2FA"
+    card "Rendimiento: < 2s"
+    card "Disponibilidad: 99.9%"
+  }
+  
+  rf -[hidden]-> rnf
+}
+
+note bottom of sistema
+  Los RNF restringen y cualifican
+  cómo se implementan los RF
+end note
+
+note right of rf
+  Definen QUÉ hace
+  el sistema
+end note
+
+note right of rnf
+  Definen CÓMO lo hace
+  (calidad y restricciones)
+end note
+
+@enduml
+`} />
+
+### 🎯 Interdependencia
+
+<Aside type="tip" title="💡 Relación Simbiótica">
+Los requerimientos funcionales y no funcionales son **complementarios**:
+
+- **RF sin RNF:** Sistema que funciona pero puede ser lento, inseguro o difícil de usar
+- **RNF sin RF:** Restricciones sin funcionalidad que restringir
+- **RF + RNF:** Sistema completo que funciona correctamente Y cumple estándares de calidad
+
+**Ejemplo integrado:**
+- **RF:** El sistema debe permitir login de usuarios
+- **RNF Seguridad:** El login debe usar cifrado HTTPS (HyperText Transfer Protocol Secure) y 2FA (Two-Factor Authentication - Autenticación de Dos Factores)
+- **RNF Rendimiento:** El proceso de login debe completarse en < 3 segundos
+- **RNF Usabilidad:** La interfaz de login debe cumplir WCAG (Web Content Accessibility Guidelines) 2.1 AA
+</Aside>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note" title="📌 Puntos Clave">
+- ⚙️ **Requerimientos Funcionales**: Definen QUÉ debe hacer el sistema (funcionalidades, servicios, comportamientos específicos)
+- ✨ **Requerimientos No Funcionales**: Definen CÓMO debe comportarse (calidad, rendimiento, seguridad, usabilidad)
+- 📊 **Clasificación RNF**: ISO/IEC 25010 define 8 categorías principales (rendimiento, seguridad, usabilidad, confiabilidad, mantenibilidad, portabilidad, compatibilidad, escalabilidad)
+- 🎯 **Especificidad**: Ambos tipos deben ser medibles, verificables y específicos (evitar ambigüedades)
+- 🔄 **Complementariedad**: RF y RNF trabajan juntos para definir un sistema completo y de calidad
+- ✅ **Verificación**: RF se prueban con casos de prueba funcionales; RNF con métricas cuantitativas
+</Aside>

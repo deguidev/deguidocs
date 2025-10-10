@@ -1,6 +1,6 @@
 ---
-title: 1. Concepto General del Ciclo de Vida
-description: Entendiendo el ciclo de vida del desarrollo de software
+title: 1 Concepto General del Ciclo de Vida
+description: Propósito del ciclo de vida, etapas principales del desarrollo, importancia en la planificación del proyecto
 ---
 
 import { Code } from '@astrojs/starlight/components';
@@ -10,198 +10,631 @@ import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
 import PlantUml from "@components/PlantUml.astro";
 
+## 🎯 Introducción al Ciclo de Vida del Software
 
-<Aside type="tip">
-**En palabras simples**: El ciclo de vida del software es como el viaje que hace un programa desde que es una idea hasta que se usa y mantiene. Es la historia completa de cómo nace, crece y evoluciona un software.
+El **ciclo de vida del software** (Software Development Life Cycle - SDLC) es un marco conceptual que define las fases, actividades y entregables necesarios para desarrollar, implementar y mantener un sistema de software desde su concepción hasta su retiro. Constituye la columna vertebral de la ingeniería de software, proporcionando estructura y disciplina al proceso de desarrollo.
+
+<Aside type="note" title="📚 Definición Formal">
+El ciclo de vida del software es el conjunto de fases, actividades y tareas que se ejecutan de manera sistemática y ordenada para producir software de calidad que satisfaga las necesidades del cliente, dentro de restricciones de tiempo y presupuesto establecidas. Abarca desde la identificación inicial de necesidades hasta el retiro del sistema.
 </Aside>
 
-## ¿Qué es el Ciclo de Vida del Software?
-
-El ciclo de vida del software (SDLC - Software Development Life Cycle) es el proceso completo que sigue un producto de software desde su planificación inicial hasta su eventual retirada. Imagina que es como la vida de una persona: nace (se planifica), crece (se desarrolla), madura (se implementa) y eventualmente se retira o se renueva.
-
-### Características principales
-
-- **Estructurado**: Proporciona un marco ordenado para desarrollar software
-- **Predecible**: Permite estimar tiempos y recursos necesarios
-- **Controlado**: Facilita el seguimiento del progreso y la calidad
-- **Adaptable**: Puede ajustarse según las necesidades del proyecto
-
-## Importancia del Ciclo de Vida
-
-<Tabs>
-  <TabItem label="Para desarrolladores">
-    - Proporciona una hoja de ruta clara
-    - Ayuda a organizar el trabajo en etapas manejables
-    - Facilita la colaboración entre equipos
-    - Permite identificar problemas tempranamente
-  </TabItem>
-  <TabItem label="Para clientes">
-    - Ofrece visibilidad sobre el progreso del proyecto
-    - Permite intervenir en momentos clave
-    - Asegura que el producto final cumpla con las expectativas
-    - Facilita la estimación de costos y tiempos
-  </TabItem>
-  <TabItem label="Para la empresa">
-    - Mejora la gestión de recursos
-    - Reduce riesgos y costos inesperados
-    - Aumenta la calidad del producto final
-    - Facilita el mantenimiento a largo plazo
-  </TabItem>
-</Tabs>
-
-## Visión General del Ciclo de Vida
+### 🔍 Contexto Histórico
 
 <PlantUml code={`
 @startuml
-skinparam roundcorner 20
-skinparam componentStyle uml2
-skinparam ArrowColor #5D8AA8
-skinparam ComponentBorderColor #5D8AA8
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
 
-title Ciclo de Vida del Software - Visión General
+rectangle "📜 Evolución del Ciclo de Vida del Software" as evol #E8F5E9 {
+  
+  rectangle "1950s-1960s\\n🔧 Era Artesanal" as era1 #FFB74D {
+    card "Desarrollo ad-hoc"
+    card "Sin metodología formal"
+    card "Programación individual"
+  }
+  
+  rectangle "1970s\\n📐 Ingeniería de Software" as era2 #81D4FA {
+    card "Modelo en Cascada"
+    card "Formalización de procesos"
+    card "Crisis del software"
+  }
+  
+  rectangle "1980s-1990s\\n🔄 Modelos Iterativos" as era3 #81C784 {
+    card "Modelo Espiral"
+    card "Prototipado"
+    card "RAD (Desarrollo Rápido)"
+  }
+  
+  rectangle "2000s-Presente\\n⚡ Agilidad" as era4 #CE93D8 {
+    card "Metodologías Ágiles"
+    card "DevOps"
+    card "Entrega Continua"
+  }
+}
 
-component "Planificacion Inicial" as plan #DEEAEE
-component "Analisis de Requerimientos" as req #B1CCBA
-component "Diseño" as design #F0B5B3
-component "Desarrollo" as dev #D3E397
-component "Pruebas" as test #F2E1AC
-component "Implementacion" as impl #C9C9FF
-component "Mantenimiento y Evolucion" as mant #FFD9DA
+era1 -down-> era2
+era2 -down-> era3
+era3 -down-> era4
 
-plan -right-> req
-req -right-> design
-design -right-> dev
-dev -right-> test
-test -right-> impl
-impl -right-> mant
-mant -[#FF6347,dashed]-> plan : Nuevas versiones
 @enduml
 `} />
 
-## Modelos de Ciclo de Vida
+---
 
-Existen diferentes formas de organizar el ciclo de vida del software. Cada modelo tiene sus propias características y es adecuado para diferentes tipos de proyectos.
+## 🎯 Propósito del Ciclo de Vida
+
+El ciclo de vida del software cumple múltiples propósitos fundamentales que garantizan el éxito de los proyectos de desarrollo.
+
+### 📋 Objetivos Principales
 
 <Steps>
-1. **Modelo en Cascada**: Secuencial y ordenado, cada fase comienza cuando termina la anterior.
 
-2. **Modelo Iterativo**: Repite ciclos de desarrollo para mejorar el producto gradualmente.
+1. **Estructurar el Proceso de Desarrollo**
+   
+   Proporcionar un marco ordenado y predecible para transformar requerimientos en software funcional.
+   
+   **Beneficios:**
+   - Reduce la complejidad mediante división en fases manejables
+   - Establece puntos de control y revisión
+   - Facilita la planificación y estimación
+   - Permite la asignación eficiente de recursos
 
-3. **Modelo Incremental**: Construye el software por partes funcionales que se van entregando.
+2. **Garantizar la Calidad del Software**
+   
+   Integrar actividades de verificación y validación en cada fase del desarrollo.
+   
+   **Mecanismos:**
+   - Revisiones técnicas en cada fase
+   - Pruebas continuas y sistemáticas
+   - Validación con stakeholders
+   - Cumplimiento de estándares de calidad
 
-4. **Modelo en Espiral**: Combina elementos de diseño y prototipado en iteraciones.
+3. **Gestionar Riesgos Efectivamente**
+   
+   Identificar, evaluar y mitigar riesgos de manera proactiva durante todo el proyecto.
+   
+   **Estrategias:**
+   - Detección temprana de problemas
+   - Prototipado para validar conceptos
+   - Revisiones de arquitectura
+   - Planes de contingencia
 
-5. **Modelos Ágiles**: Adaptables y centrados en la colaboración y respuesta al cambio.
+4. **Facilitar la Comunicación**
+   
+   Establecer un lenguaje común entre todos los participantes del proyecto.
+   
+   **Stakeholders:**
+   - Cliente y usuarios finales
+   - Equipo de desarrollo
+   - Gerencia y patrocinadores
+   - Equipos de soporte y mantenimiento
+
+5. **Optimizar Recursos**
+   
+   Maximizar la eficiencia en el uso de tiempo, personal y presupuesto.
+   
+   **Aspectos:**
+   - Planificación realista de cronogramas
+   - Asignación adecuada de personal
+   - Control de costos
+   - Reutilización de componentes
+
+6. **Asegurar Mantenibilidad**
+   
+   Producir software que pueda ser mantenido y evolucionado eficientemente.
+   
+   **Prácticas:**
+   - Documentación completa
+   - Código limpio y bien estructurado
+   - Arquitectura modular
+   - Transferencia de conocimiento
+
 </Steps>
 
-## Comparación Visual de Modelos
+
+---
+
+## 📊 Etapas Principales del Desarrollo
+
+El ciclo de vida del software se compone de etapas fundamentales que, aunque pueden variar en nombre y alcance según la metodología, representan actividades esenciales en todo proyecto de software.
+
+### 🔄 Fases Universales del SDLC
 
 <PlantUml code={`
 @startuml
-skinparam ArrowColor #5D8AA8
-skinparam ActivityBorderColor #5D8AA8
-skinparam ActivityBackgroundColor #ECECFF
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
 
-title Comparación de Modelos de Ciclo de Vida
+rectangle "1. Planificación y Análisis" as fase1 #FFB74D
+rectangle "2. Diseño" as fase2 #81D4FA
+rectangle "3. Implementación (Desarrollo)" as fase3 #81C784
+rectangle "4. Pruebas" as fase4 #CE93D8
+rectangle "5. Despliegue (Implementación)" as fase5 #FFA726
+rectangle "6. Mantenimiento y Evolución" as fase6 #66BB6A
 
-|Cascada|
-:Requisitos;
-:Diseño;
-:Implementación;
-:Verificacion;
-:Mantenimiento;
+fase1 -down-> fase2 : Especificación de\\nRequerimientos
+fase2 -down-> fase3 : Diseño\\nDetallado
+fase3 -down-> fase4 : Software\\nDesarrollado
+fase4 -down-> fase5 : Software\\nValidado
+fase5 -down-> fase6 : Sistema en\\nProducción
 
-|Iterativo|
-:Planificacion;
-repeat
-  :Requisitos;
-  :Diseño;
-  :Implementacion;
-  :Pruebas;
-repeat while (Producto completo?) is (No)
-:Entrega final;
+note right of fase1
+  Entrada: Necesidad del negocio
+  Salida: Requerimientos documentados
+end note
 
-|Agil|
-:Planificacion inicial;
-repeat
-  :Planificacion de sprint;
-  :Desarrollo;
-  :Revision;
-  :Entrega incremental;
-repeat while (Proyecto terminado?) is (No)
-:Producto final;
+note right of fase6
+  Ciclo continuo hasta
+  retiro del sistema
+end note
+
 @enduml
 `} />
 
-## Beneficios de Seguir un Ciclo de Vida
-
-<Aside type="note">
-Seguir un ciclo de vida estructurado es como usar un mapa para un viaje: te ayuda a llegar a tu destino de manera más eficiente y con menos sorpresas en el camino.
-</Aside>
-
-- **Mejor calidad del software**: Procesos sistemáticos que aseguran revisiones en cada etapa
-- **Detección temprana de problemas**: Identificar y corregir errores cuando son más fáciles y baratos de solucionar
-- **Mayor satisfacción del cliente**: Entregas que cumplen con las expectativas y requisitos
-- **Mejor gestión de recursos**: Planificación adecuada de tiempo, personal y presupuesto
-- **Documentación consistente**: Registro del proceso para referencia futura y mantenimiento
-
-## Factores que Influyen en la Elección del Ciclo de Vida
-
-<PlantUml code={`
-@startuml
-skinparam ArrowColor #5D8AA8
-skinparam rectangleBorderColor #5D8AA8
-skinparam rectangleBackgroundColor #ECECFF
-
-title Factores para Elegir un Modelo de Ciclo de Vida
-
-rectangle "Tamaño del Proyecto" as size
-rectangle "Claridad de Requisitos" as req
-rectangle "Complejidad" as complex
-rectangle "Riesgo" as risk
-rectangle "Tiempo Disponible" as time
-rectangle "Experiencia del Equipo" as exp
-rectangle "Participacion del Cliente" as client
-
-rectangle "Eleccion del Modelo de Ciclo de Vida" as choice
-
-size --> choice
-req --> choice
-complex --> choice
-risk --> choice
-time --> choice
-exp --> choice
-client --> choice
-@enduml
-`} />
-
-## Evolución del Concepto
-
-El concepto de ciclo de vida del software ha evolucionado significativamente desde sus inicios:
+### 📋 Descripción de Etapas Principales
 
 <Tabs>
-  <TabItem label="1960s-1970s">
-    - Enfoque lineal y secuencial (Cascada)
-    - Procesos rígidos y documentación extensa
-    - Poca interacción con el cliente durante el desarrollo
-  </TabItem>
-  <TabItem label="1980s-1990s">
-    - Surgimiento de modelos iterativos e incrementales
-    - Mayor énfasis en la gestión de riesgos
-    - Introducción del modelo en espiral
-  </TabItem>
-  <TabItem label="2000s-Presente">
-    - Adopción generalizada de metodologías ágiles
-    - Ciclos de desarrollo más cortos y frecuentes
-    - Mayor colaboración con el cliente
-    - DevOps y entrega continua
-  </TabItem>
+
+<TabItem label="1️⃣ Planificación y Análisis">
+
+### Planificación y Análisis
+
+**Objetivo:** Comprender el problema, definir el alcance y establecer la viabilidad del proyecto.
+
+**Actividades Clave:**
+
+| Actividad | Descripción | Entregables |
+|-----------|-------------|-------------|
+| **Estudio de Viabilidad** | Evaluar factibilidad técnica, económica y operacional | Documento de viabilidad |
+| **Análisis de Requerimientos** | Capturar y documentar necesidades del cliente | Especificación de Requerimientos (SRS) |
+| **Planificación del Proyecto** | Definir cronograma, recursos y presupuesto | Plan de Proyecto |
+| **Análisis de Riesgos** | Identificar amenazas y oportunidades | Registro de Riesgos |
+
+**Participantes:**
+- Stakeholders del negocio
+- Analistas de sistemas
+- Gerente de proyecto
+- Arquitecto de software
+
+**Criterios de Salida:**
+- ✅ Requerimientos aprobados por el cliente
+- ✅ Plan de proyecto validado
+- ✅ Presupuesto aprobado
+- ✅ Riesgos identificados y priorizados
+
+</TabItem>
+
+<TabItem label="2️⃣ Diseño">
+
+### Diseño
+
+**Objetivo:** Transformar requerimientos en una arquitectura de software detallada y especificaciones de diseño.
+
+**Niveles de Diseño:**
+
+**Diseño de Alto Nivel (Arquitectónico):**
+- Arquitectura del sistema
+- Componentes principales
+- Interfaces entre módulos
+- Tecnologías a utilizar
+
+**Diseño Detallado:**
+- Diseño de clases y objetos
+- Diseño de base de datos
+- Diseño de interfaces de usuario
+- Algoritmos y estructuras de datos
+
+**Entregables:**
+- Documento de Arquitectura de Software (SAD)
+- Diagramas UML (clases, secuencia, componentes)
+- Modelo de datos (ER diagrams)
+- Prototipos de UI/UX
+- Especificaciones de interfaces (APIs)
+
+**Principios de Diseño:**
+- Modularidad y cohesión
+- Bajo acoplamiento
+- Abstracción y encapsulamiento
+- Reutilización
+- Escalabilidad
+
+</TabItem>
+
+<TabItem label="3️⃣ Implementación">
+
+### Implementación (Desarrollo)
+
+**Objetivo:** Construir el software según las especificaciones de diseño mediante codificación.
+
+**Actividades:**
+
+**Codificación:**
+- Implementación de módulos y componentes
+- Desarrollo de interfaces de usuario
+- Integración con sistemas externos
+- Implementación de lógica de negocio
+
+**Estándares y Prácticas:**
+- Convenciones de codificación
+- Revisiones de código (code reviews)
+- Control de versiones (Git)
+- Documentación inline
+
+**Entregables:**
+- Código fuente
+- Bibliotecas y componentes
+- Scripts de base de datos
+- Documentación técnica
+- Pruebas unitarias
+
+**Herramientas:**
+- IDEs (Visual Studio, IntelliJ, VS Code)
+- Sistemas de control de versiones (Git, SVN)
+- Gestores de dependencias (npm, Maven, pip)
+- Frameworks y librerías
+
+</TabItem>
+
+<TabItem label="4️⃣ Pruebas">
+
+### Pruebas
+
+**Objetivo:** Verificar que el software cumple los requerimientos y está libre de defectos.
+
+**Niveles de Pruebas:**
+
+| Nivel | Alcance | Responsable | Objetivo |
+|-------|---------|-------------|----------|
+| **Unitarias** | Funciones/métodos individuales | Desarrolladores | Verificar lógica de código |
+| **Integración** | Interacción entre módulos | Desarrolladores/QA | Validar interfaces |
+| **Sistema** | Sistema completo | QA | Verificar requerimientos |
+| **Aceptación** | Desde perspectiva del usuario | Cliente/Usuario | Validar valor de negocio |
+
+**Tipos de Pruebas:**
+- Funcionales (caja negra)
+- No funcionales (rendimiento, seguridad, usabilidad)
+- Regresión
+- Humo (smoke tests)
+- Estrés y carga
+
+**Entregables:**
+- Plan de pruebas
+- Casos de prueba
+- Reportes de defectos
+- Métricas de calidad
+- Certificación de pruebas
+
+</TabItem>
+
+<TabItem label="5️⃣ Despliegue">
+
+### Despliegue (Implementación)
+
+**Objetivo:** Poner el software en producción y hacerlo disponible para usuarios finales.
+
+**Actividades:**
+
+**Preparación:**
+- Configuración de ambientes
+- Migración de datos
+- Capacitación de usuarios
+- Preparación de documentación
+
+**Despliegue:**
+- Instalación en servidores de producción
+- Configuración de seguridad
+- Activación de servicios
+- Monitoreo inicial
+
+**Estrategias de Despliegue:**
+- **Big Bang:** Todo de una vez
+- **Faseado:** Por módulos o regiones
+- **Paralelo:** Nuevo y viejo sistema simultáneamente
+- **Piloto:** Grupo reducido primero
+
+**Entregables:**
+- Software en producción
+- Manuales de usuario
+- Documentación de operación
+- Plan de rollback
+- Reporte de despliegue
+
+</TabItem>
+
+<TabItem label="6️⃣ Mantenimiento">
+
+### Mantenimiento y Evolución
+
+**Objetivo:** Mantener el software operativo, corregir defectos y agregar mejoras.
+
+**Tipos de Mantenimiento:**
+
+**Correctivo:**
+- Corrección de bugs
+- Parches de seguridad
+- Resolución de incidentes
+
+**Adaptativo:**
+- Cambios por nuevas regulaciones
+- Compatibilidad con nuevas plataformas
+- Integración con nuevos sistemas
+
+**Perfectivo:**
+- Mejoras de rendimiento
+- Optimización de código
+- Refactoring
+
+**Preventivo:**
+- Actualización de dependencias
+- Mejoras de seguridad
+- Optimización proactiva
+
+**Actividades:**
+- Monitoreo del sistema
+- Gestión de incidentes
+- Gestión de cambios
+- Actualizaciones periódicas
+
+**Métricas:**
+- MTBF (Mean Time Between Failures)
+- MTTR (Mean Time To Repair)
+- Tasa de defectos
+- Satisfacción del usuario
+
+</TabItem>
+
 </Tabs>
 
-## Resumen
+---
 
-El ciclo de vida del software es un marco conceptual que define las etapas necesarias para desarrollar y mantener un producto de software. Proporciona estructura, previsibilidad y control al proceso de desarrollo, adaptándose a diferentes necesidades y contextos.
+## 🎯 Importancia en la Planificación del Proyecto
 
-<Aside type="tip">
-Recuerda que no existe un modelo de ciclo de vida "perfecto" para todos los proyectos. La clave está en seleccionar el enfoque que mejor se adapte a las necesidades específicas de tu proyecto y equipo.
+El ciclo de vida del software es fundamental para la planificación efectiva de proyectos, proporcionando la base para estimaciones, asignación de recursos y gestión de riesgos.
+
+### 📊 Impacto en la Planificación
+
+<PlantUml code={`
+@startuml
+skinparam backgroundColor beige
+skinparam defaultFontSize 11
+
+rectangle "🎯 Ciclo de Vida y Planificación del Proyecto" as planning #E8F5E9 {
+  
+  rectangle "📅 Estimación de Tiempos" as tiempo #81D4FA {
+    card "Descomposición en fases"
+    card "Estimación por actividad"
+    card "Identificación de dependencias"
+    card "Cronograma realista"
+  }
+  
+  rectangle "👥 Asignación de Recursos" as recursos #FFB74D {
+    card "Perfiles requeridos por fase"
+    card "Carga de trabajo balanceada"
+    card "Planificación de capacitación"
+    card "Gestión de disponibilidad"
+  }
+  
+  rectangle "💰 Presupuesto" as presupuesto #81C784 {
+    card "Costos por fase"
+    card "Reservas de contingencia"
+    card "Control de gastos"
+    card "ROI proyectado"
+  }
+  
+  rectangle "⚠️ Gestión de Riesgos" as riesgos #CE93D8 {
+    card "Identificación temprana"
+    card "Planes de mitigación"
+    card "Puntos de decisión"
+    card "Estrategias de contingencia"
+  }
+}
+
+@enduml
+`} />
+
+### 🔍 Elementos Clave de Planificación
+
+<Steps>
+
+1. **Definición de Hitos (Milestones)**
+   
+   Los hitos son puntos de control que marcan la finalización de fases importantes.
+   
+   **Ejemplos de Hitos:**
+   - ✅ Aprobación de requerimientos
+   - ✅ Finalización de diseño arquitectónico
+   - ✅ Completitud de desarrollo
+   - ✅ Certificación de pruebas
+   - ✅ Go-live en producción
+   
+   **Beneficios:**
+   - Puntos de revisión formales
+   - Validación de progreso
+   - Toma de decisiones go/no-go
+   - Comunicación con stakeholders
+
+2. **Gestión de Dependencias**
+   
+   Identificar y gestionar relaciones entre actividades y fases.
+   
+   **Tipos de Dependencias:**
+   - **Finish-to-Start (FS):** La más común, una tarea debe terminar antes que otra comience
+   - **Start-to-Start (SS):** Dos tareas comienzan simultáneamente
+   - **Finish-to-Finish (FF):** Dos tareas terminan simultáneamente
+   - **Start-to-Finish (SF):** Poco común, una tarea debe comenzar antes que otra termine
+   
+   **Herramientas:**
+   - Diagramas de Gantt
+   - Ruta crítica (CPM)
+   - PERT (Program Evaluation and Review Technique)
+
+3. **Asignación de Recursos Humanos**
+   
+   Planificar qué roles y cuántas personas se necesitan en cada fase.
+   
+   **Matriz de Roles por Fase:**
+   
+   | Fase | Analista | Arquitecto | Desarrollador | QA | DevOps |
+   |------|----------|------------|---------------|-----|--------|
+   | Análisis | ●●● | ●● | ○ | ○ | ○ |
+   | Diseño | ●● | ●●● | ● | ○ | ○ |
+   | Desarrollo | ○ | ● | ●●● | ● | ● |
+   | Pruebas | ○ | ○ | ● | ●●● | ● |
+   | Despliegue | ○ | ● | ● | ●● | ●●● |
+   | Mantenimiento | ○ | ● | ●● | ●● | ●● |
+   
+   **Leyenda:** ●●● Alto | ●● Medio | ● Bajo | ○ Mínimo
+
+4. **Estimación de Esfuerzo**
+   
+   Calcular el trabajo necesario para completar cada fase.
+   
+   **Técnicas de Estimación:**
+   - **Juicio de Expertos:** Basado en experiencia
+   - **Analogía:** Comparación con proyectos similares
+   - **Paramétrica:** Uso de métricas (COCOMO, puntos de función)
+   - **Bottom-up:** Sumar estimaciones de tareas individuales
+   - **Planning Poker:** Estimación colaborativa (ágil)
+   
+   **Factores que Afectan:**
+   - Complejidad técnica
+   - Experiencia del equipo
+   - Tecnologías utilizadas
+   - Calidad de requerimientos
+   - Restricciones del proyecto
+
+5. **Control de Calidad Integrado**
+   
+   Planificar actividades de aseguramiento de calidad en cada fase.
+   
+   **Puntos de Control:**
+   - Revisiones de requerimientos
+   - Revisiones de diseño
+   - Revisiones de código
+   - Pruebas en cada nivel
+   - Auditorías de proceso
+   
+   **Métricas de Calidad:**
+   - Densidad de defectos
+   - Cobertura de pruebas
+   - Complejidad ciclomática
+   - Deuda técnica
+   - Satisfacción del cliente
+
+6. **Gestión del Cambio**
+   
+   Establecer procesos para manejar cambios durante el proyecto.
+   
+   **Proceso de Control de Cambios:**
+   - Solicitud formal de cambio
+   - Análisis de impacto
+   - Aprobación por comité (CCB)
+   - Actualización de plan
+   - Comunicación a stakeholders
+   
+   **Impacto en Planificación:**
+   - Reestimación de esfuerzo
+   - Ajuste de cronograma
+   - Reasignación de recursos
+   - Actualización de riesgos
+
+</Steps>
+
+### 📈 Métricas de Planificación
+
+<Code code={`
+MÉTRICAS CLAVE DE PLANIFICACIÓN DEL PROYECTO
+
+┌────────────────────────────────────┬──────────┬──────────┬──────────┐
+│ Métrica                            │ Planeado │  Real    │ Variación│
+├────────────────────────────────────┼──────────┼──────────┼──────────┤
+│ Duración Total (semanas)           │    24    │    26    │   +8.3%  │
+│ Esfuerzo Total (persona-mes)       │    48    │    52    │   +8.3%  │
+│ Costo Total ($)                    │ 240,000  │ 255,000  │   +6.3%  │
+│                                    │          │          │          │
+│ FASE: Análisis y Diseño            │          │          │          │
+│   Duración (semanas)               │     6    │     7    │  +16.7%  │
+│   Esfuerzo (persona-mes)           │    12    │    14    │  +16.7%  │
+│                                    │          │          │          │
+│ FASE: Desarrollo                   │          │          │          │
+│   Duración (semanas)               │    10    │    11    │  +10.0%  │
+│   Esfuerzo (persona-mes)           │    24    │    26    │   +8.3%  │
+│                                    │          │          │          │
+│ FASE: Pruebas                      │          │          │          │
+│   Duración (semanas)               │     5    │     5    │   0.0%   │
+│   Esfuerzo (persona-mes)           │     8    │     8    │   0.0%   │
+│                                    │          │          │          │
+│ FASE: Despliegue                   │          │          │          │
+│   Duración (semanas)               │     3    │     3    │   0.0%   │
+│   Esfuerzo (persona-mes)           │     4    │     4    │   0.0%   │
+└────────────────────────────────────┴──────────┴──────────┴──────────┘
+
+INDICADORES DE DESEMPEÑO:
+
+SPI (Schedule Performance Index) = EV / PV = 0.92
+  → Proyecto ligeramente retrasado
+
+CPI (Cost Performance Index) = EV / AC = 0.94
+  → Proyecto ligeramente sobre presupuesto
+
+EAC (Estimate at Completion) = BAC / CPI = $255,319
+  → Costo final proyectado
+
+Variación de Cronograma (SV) = EV - PV = -$19,200
+  → Trabajo pendiente equivalente a $19,200
+
+Variación de Costo (CV) = EV - AC = -$15,000
+  → Sobrecosto de $15,000
+`} lang="text" title="Dashboard de Métricas de Planificación" />
+
+### ✅ Mejores Prácticas de Planificación
+
+<Aside type="tip" title="🎯 Recomendaciones Clave">
+**1. Planificar con el ciclo de vida en mente**
+- Usar el SDLC como estructura base del plan
+- Definir entregables claros por fase
+- Establecer criterios de entrada y salida
+
+**2. Involucrar al equipo en la planificación**
+- Estimaciones colaborativas
+- Validación de factibilidad técnica
+- Compromiso del equipo
+
+**3. Planificar para el cambio**
+- Incluir buffers de tiempo (10-20%)
+- Reservas de contingencia en presupuesto
+- Proceso ágil de gestión de cambios
+
+**4. Basar estimaciones en datos históricos**
+- Métricas de proyectos anteriores
+- Lecciones aprendidas
+- Benchmarks de industria
+
+**5. Comunicar el plan efectivamente**
+- Visualizaciones claras (Gantt, roadmaps)
+- Actualizaciones periódicas
+- Transparencia con stakeholders
+
+**6. Revisar y ajustar continuamente**
+- Retrospectivas al final de cada fase
+- Ajuste de estimaciones basado en realidad
+- Mejora continua del proceso
+</Aside>
+
+---
+
+## 🎓 Resumen
+
+<Aside type="note" title="📌 Puntos Clave">
+- 🎯 **Ciclo de Vida del Software**: Marco conceptual que estructura el desarrollo de software desde la concepción hasta el retiro, proporcionando disciplina y orden al proceso.
+
+- 🎯 **Propósito**: Estructurar el desarrollo, garantizar calidad, gestionar riesgos, facilitar comunicación, optimizar recursos y asegurar mantenibilidad del software.
+
+- 📊 **Etapas Principales**: Planificación y Análisis, Diseño, Implementación, Pruebas, Despliegue y Mantenimiento. Cada fase tiene objetivos, actividades y entregables específicos.
+
+- 🎯 **Importancia en Planificación**: El SDLC es fundamental para estimación de tiempos, asignación de recursos, control de presupuesto y gestión de riesgos en proyectos de software.
+
+- 📈 **Beneficios**: Reduce complejidad, mejora calidad, facilita comunicación, optimiza recursos, permite control de progreso y aumenta probabilidad de éxito del proyecto.
+
+- 🔄 **Evolución Continua**: El concepto de ciclo de vida ha evolucionado desde modelos rígidos (Cascada) hasta enfoques ágiles y adaptativos, pero los principios fundamentales permanecen.
 </Aside>
