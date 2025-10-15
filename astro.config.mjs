@@ -339,7 +339,7 @@ export default defineConfig({
 								{ label: '1. Introducción al Diagrama de Casos de Uso', link: '/uml/diagramas-casos-uso/introduccion/' },
 								{ label: '2. Elementos Básicos de un Diagrama de Casos de Uso', link: '/uml/diagramas-casos-uso/elementos-basicos/' },
 								{ label: '3. Tipos de Relaciones en Casos de Uso', link: '/uml/diagramas-casos-uso/relaciones/' },
-								{ label: '4. Notación UML para Casos de Uso', link: '/uml/diagramas-casos-uso/notacion/' },
+								{ label: '4. Ejemplos de Diagramas de Casos de Uso', link: '/uml/diagramas-casos-uso/ejemplos/' },
 							]
 						},
 						{ 

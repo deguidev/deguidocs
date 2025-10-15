@@ -1,0 +1,868 @@
+---
+title: 4. Ejemplos de diagramas de casos de uso
+description: Ejemplos prácticos de diagramas de casos de uso UML
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+En esta sección exploraremos ejemplos prácticos de diagramas de casos de uso aplicados a diferentes dominios y contextos empresariales. Cada ejemplo demuestra cómo modelar sistemas reales utilizando las relaciones y elementos aprendidos en las secciones anteriores.
+
+## 4.1. Sistema de Gestión Bancaria
+
+Un sistema bancario completo que incluye operaciones de clientes, cajeros y administradores.
+
+<PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Cliente
+actor Cajero
+actor "Administrador" as Admin
+actor "Sistema de Seguridad" as SistemaSeg
+actor "Sistema Externo de Crédito" as SistemaCredito
+
+rectangle "Sistema Bancario" {
+  usecase "Consultar Saldo" as ConsultarSaldo
+  usecase "Realizar Retiro" as RealizarRetiro
+  usecase "Realizar Depósito" as RealizarDeposito
+  usecase "Transferir Fondos" as TransferirFondos
+  usecase "Solicitar Préstamo" as SolicitarPrestamo
+  usecase "Abrir Cuenta" as AbrirCuenta
+  usecase "Cerrar Cuenta" as CerrarCuenta
+  usecase "Generar Reporte" as GenerarReporte
+  
+  usecase "Autenticar Usuario" as AutenticarUsuario
+  usecase "Verificar Fondos" as VerificarFondos
+  usecase "Registrar Transacción" as RegistrarTransaccion
+  usecase "Validar Identidad" as ValidarIdentidad
+  usecase "Consultar Historial Crediticio" as ConsultarHistorial
+  usecase "Notificar Actividad Sospechosa" as NotificarSospecha
+  usecase "Aplicar Comisión" as AplicarComision
+  
+  Cliente --> ConsultarSaldo
+  Cliente --> RealizarRetiro
+  Cliente --> RealizarDeposito
+  Cliente --> TransferirFondos
+  Cliente --> SolicitarPrestamo
+  Cliente --> AbrirCuenta
+  
+  Cajero --> RealizarRetiro
+  Cajero --> RealizarDeposito
+  Cajero --> AbrirCuenta
+  Cajero --> CerrarCuenta
+  
+  Admin --> GenerarReporte
+  Admin --> CerrarCuenta
+  
+  SistemaSeg --> NotificarSospecha
+  SistemaCredito --> ConsultarHistorial
+  
+  RealizarRetiro ..> AutenticarUsuario : <<include>>
+  RealizarRetiro ..> VerificarFondos : <<include>>
+  RealizarRetiro ..> RegistrarTransaccion : <<include>>
+  
+  RealizarDeposito ..> AutenticarUsuario : <<include>>
+  RealizarDeposito ..> RegistrarTransaccion : <<include>>
+  
+  TransferirFondos ..> AutenticarUsuario : <<include>>
+  TransferirFondos ..> VerificarFondos : <<include>>
+  TransferirFondos ..> RegistrarTransaccion : <<include>>
+  
+  SolicitarPrestamo ..> AutenticarUsuario : <<include>>
+  SolicitarPrestamo ..> ConsultarHistorial : <<include>>
+  
+  AbrirCuenta ..> ValidarIdentidad : <<include>>
+  
+  NotificarSospecha ..> RealizarRetiro : <<extend>>
+  AplicarComision ..> TransferirFondos : <<extend>>
+}
+@enduml`} />
+
+<Aside type="note">
+  Este ejemplo muestra un sistema bancario completo con:
+  - **Múltiples actores**: Cliente, Cajero, Administrador y sistemas externos
+  - **Relaciones de inclusión**: Autenticación y verificación obligatorias
+  - **Relaciones de extensión**: Validaciones y comisiones opcionales
+  - **Separación de responsabilidades**: Cada actor tiene casos de uso específicos
+</Aside>
+
+## 4.2. Sistema de Comercio Electrónico
+
+Plataforma de e-commerce con gestión de productos, pedidos y envíos.
+
+<PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Cliente
+actor Vendedor
+actor Administrador
+actor "Sistema de Pago" as SistemaPago
+actor "Sistema de Envío" as SistemaEnvio
+
+rectangle "Plataforma E-Commerce" {
+  usecase "Buscar Productos" as BuscarProductos
+  usecase "Ver Detalles Producto" as VerDetalles
+  usecase "Agregar al Carrito" as AgregarCarrito
+  usecase "Realizar Pedido" as RealizarPedido
+  usecase "Rastrear Envío" as RastrearEnvio
+  usecase "Calificar Producto" as CalificarProducto
+  
+  usecase "Publicar Producto" as PublicarProducto
+  usecase "Actualizar Inventario" as ActualizarInventario
+  usecase "Gestionar Pedidos" as GestionarPedidos
+  
+  usecase "Generar Reportes Ventas" as GenerarReportes
+  usecase "Configurar Promociones" as ConfigurarPromociones
+  
+  usecase "Verificar Disponibilidad" as VerificarDisponibilidad
+  usecase "Procesar Pago" as ProcesarPago
+  usecase "Calcular Envío" as CalcularEnvio
+  usecase "Generar Factura" as GenerarFactura
+  usecase "Aplicar Descuento" as AplicarDescuento
+  usecase "Recomendar Productos" as RecomendarProductos
+  
+  Cliente --> BuscarProductos
+  Cliente --> VerDetalles
+  Cliente --> AgregarCarrito
+  Cliente --> RealizarPedido
+  Cliente --> RastrearEnvio
+  Cliente --> CalificarProducto
+  
+  Vendedor --> PublicarProducto
+  Vendedor --> ActualizarInventario
+  Vendedor --> GestionarPedidos
+  
+  Administrador --> GenerarReportes
+  Administrador --> ConfigurarPromociones
+  
+  SistemaPago --> ProcesarPago
+  SistemaEnvio --> CalcularEnvio
+  
+  RealizarPedido ..> VerificarDisponibilidad : <<include>>
+  RealizarPedido ..> ProcesarPago : <<include>>
+  RealizarPedido ..> CalcularEnvio : <<include>>
+  RealizarPedido ..> GenerarFactura : <<include>>
+  
+  PublicarProducto ..> ActualizarInventario : <<include>>
+  
+  AplicarDescuento ..> RealizarPedido : <<extend>>
+  RecomendarProductos ..> VerDetalles : <<extend>>
+}
+@enduml`} />
+
+<Aside type="tip">
+  Este ejemplo demuestra:
+  - **Integración con sistemas externos**: Pago y envío
+  - **Flujo de compra completo**: Desde búsqueda hasta facturación
+  - **Extensiones opcionales**: Descuentos y recomendaciones
+  - **Roles diferenciados**: Cliente, Vendedor y Administrador
+</Aside>
+
+## 4.3. Sistema de Gestión Hospitalaria
+
+Sistema integral para la gestión de pacientes, citas médicas y tratamientos.
+
+<PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Paciente
+actor Médico
+actor Enfermera
+actor "Personal Administrativo" as Admin
+actor "Sistema de Laboratorio" as SistemaLab
+
+rectangle "Sistema Hospitalario" {
+  usecase "Solicitar Cita" as SolicitarCita
+  usecase "Consultar Historial Médico" as ConsultarHistorial
+  usecase "Realizar Consulta" as RealizarConsulta
+  usecase "Prescribir Medicamentos" as PrescribirMedicamentos
+  usecase "Ordenar Exámenes" as OrdenarExamenes
+  usecase "Registrar Diagnóstico" as RegistrarDiagnostico
+  
+  usecase "Registrar Signos Vitales" as RegistrarSignos
+  usecase "Administrar Medicamentos" as AdministrarMedicamentos
+  usecase "Monitorear Paciente" as MonitorearPaciente
+  
+  usecase "Gestionar Agenda" as GestionarAgenda
+  usecase "Facturar Servicios" as FacturarServicios
+  
+  usecase "Autenticar Usuario" as AutenticarUsuario
+  usecase "Verificar Disponibilidad" as VerificarDisponibilidad
+  usecase "Enviar Notificación" as EnviarNotificacion
+  usecase "Procesar Resultados Lab" as ProcesarResultados
+  usecase "Programar Cirugía" as ProgramarCirugia
+  
+  Paciente --> SolicitarCita
+  Paciente --> ConsultarHistorial
+  
+  Médico --> RealizarConsulta
+  Médico --> PrescribirMedicamentos
+  Médico --> OrdenarExamenes
+  Médico --> RegistrarDiagnostico
+  Médico --> ConsultarHistorial
+  
+  Enfermera --> RegistrarSignos
+  Enfermera --> AdministrarMedicamentos
+  Enfermera --> MonitorearPaciente
+  
+  Admin --> GestionarAgenda
+  Admin --> FacturarServicios
+  Admin --> SolicitarCita
+  
+  SistemaLab --> ProcesarResultados
+  
+  SolicitarCita ..> VerificarDisponibilidad : <<include>>
+  SolicitarCita ..> EnviarNotificacion : <<include>>
+  
+  RealizarConsulta ..> AutenticarUsuario : <<include>>
+  RealizarConsulta ..> ConsultarHistorial : <<include>>
+  RealizarConsulta ..> RegistrarDiagnostico : <<include>>
+  
+  OrdenarExamenes ..> ProcesarResultados : <<include>>
+  
+  ProgramarCirugia ..> RealizarConsulta : <<extend>>
+}
+@enduml`} />
+
+<Aside type="note">
+  Sistema hospitalario que incluye:
+  - **Personal médico diverso**: Médicos, enfermeras y administrativos
+  - **Flujo de atención completo**: Desde cita hasta facturación
+  - **Integración con laboratorios**
+  - **Gestión de historiales médicos compartidos**
+</Aside>
+
+## 4.4. Sistema de Gestión Educativa (Universidad)
+
+Plataforma educativa para gestión de cursos, calificaciones y recursos académicos.
+
+<PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Estudiante
+actor Profesor
+actor "Coordinador Académico" as Coordinador
+actor "Sistema de Biblioteca" as Biblioteca
+
+rectangle "Sistema Educativo Universitario" {
+  usecase "Inscribir Materias" as InscribirMaterias
+  usecase "Consultar Horarios" as ConsultarHorarios
+  usecase "Ver Calificaciones" as VerCalificaciones
+  usecase "Descargar Material" as DescargarMaterial
+  usecase "Entregar Tareas" as EntregarTareas
+  usecase "Realizar Examen" as RealizarExamen
+  
+  usecase "Crear Curso" as CrearCurso
+  usecase "Subir Material" as SubirMaterial
+  usecase "Calificar Tareas" as CalificarTareas
+  usecase "Registrar Asistencia" as RegistrarAsistencia
+  usecase "Generar Actas" as GenerarActas
+  
+  usecase "Aprobar Cursos" as AprobarCursos
+  usecase "Asignar Profesores" as AsignarProfesores
+  usecase "Generar Reportes Académicos" as GenerarReportes
+  
+  usecase "Autenticar Usuario" as AutenticarUsuario
+  usecase "Verificar Prerrequisitos" as VerificarPrerrequisitos
+  usecase "Verificar Cupos" as VerificarCupos
+  usecase "Calcular Promedio" as CalcularPromedio
+  usecase "Enviar Notificación" as EnviarNotificacion
+  usecase "Consultar Recursos Biblioteca" as ConsultarRecursos
+  usecase "Solicitar Prórroga" as SolicitarProrroga
+  
+  Estudiante --> InscribirMaterias
+  Estudiante --> ConsultarHorarios
+  Estudiante --> VerCalificaciones
+  Estudiante --> DescargarMaterial
+  Estudiante --> EntregarTareas
+  Estudiante --> RealizarExamen
+  
+  Profesor --> CrearCurso
+  Profesor --> SubirMaterial
+  Profesor --> CalificarTareas
+  Profesor --> RegistrarAsistencia
+  Profesor --> GenerarActas
+  
+  Coordinador --> AprobarCursos
+  Coordinador --> AsignarProfesores
+  Coordinador --> GenerarReportes
+  
+  Biblioteca --> ConsultarRecursos
+  
+  InscribirMaterias ..> AutenticarUsuario : <<include>>
+  InscribirMaterias ..> VerificarPrerrequisitos : <<include>>
+  InscribirMaterias ..> VerificarCupos : <<include>>
+  InscribirMaterias ..> EnviarNotificacion : <<include>>
+  
+  CalificarTareas ..> CalcularPromedio : <<include>>
+  CalificarTareas ..> EnviarNotificacion : <<include>>
+  
+  GenerarActas ..> CalcularPromedio : <<include>>
+  
+  SolicitarProrroga ..> EntregarTareas : <<extend>>
+  ConsultarRecursos ..> DescargarMaterial : <<extend>>
+}
+@enduml`} />
+
+<Aside type="tip">
+  Este sistema educativo muestra:
+  - **Gestión académica completa**: Inscripciones, calificaciones y certificados
+  - **Roles académicos**: Estudiantes, profesores y coordinadores
+  - **Validaciones automáticas**: Prerrequisitos y cupos
+  - **Integración con biblioteca**
+</Aside>
+
+## 4.5. Sistema de Gestión de Proyectos (Metodología Ágil)
+
+Herramienta para gestión de proyectos con metodologías ágiles y Scrum.
+
+<Tabs>
+  <TabItem label="Vista General">
+    <PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Miembro del Equipo" as Miembro
+actor "Scrum Master" as ScrumMaster
+actor "Product Owner" as ProductOwner
+actor "Sistema de CI/CD" as SistemaCI
+
+rectangle "Sistema de Gestión de Proyectos" {
+  usecase "Crear Proyecto" as CrearProyecto
+  usecase "Gestionar Backlog" as GestionarBacklog
+  usecase "Crear Sprint" as CrearSprint
+  usecase "Asignar Tareas" as AsignarTareas
+  usecase "Actualizar Estado Tarea" as ActualizarTarea
+  usecase "Registrar Tiempo" as RegistrarTiempo
+  usecase "Realizar Daily Standup" as DailyStandup
+  usecase "Realizar Retrospectiva" as Retrospectiva
+  usecase "Generar Burndown Chart" as GenerarBurndown
+  usecase "Revisar Sprint" as RevisarSprint
+  
+  usecase "Autenticar Usuario" as AutenticarUsuario
+  usecase "Notificar Cambios" as NotificarCambios
+  usecase "Calcular Velocidad" as CalcularVelocidad
+  usecase "Validar Capacidad" as ValidarCapacidad
+  usecase "Ejecutar Tests" as EjecutarTests
+  
+  Miembro --> AsignarTareas
+  Miembro --> ActualizarTarea
+  Miembro --> RegistrarTiempo
+  Miembro --> DailyStandup
+  
+  ScrumMaster --> CrearSprint
+  ScrumMaster --> Retrospectiva
+  ScrumMaster --> GenerarBurndown
+  ScrumMaster --> RevisarSprint
+  
+  ProductOwner --> CrearProyecto
+  ProductOwner --> GestionarBacklog
+  ProductOwner --> RevisarSprint
+  
+  SistemaCI --> EjecutarTests
+  
+  CrearProyecto ..> AutenticarUsuario : <<include>>
+  CrearSprint ..> ValidarCapacidad : <<include>>
+  CrearSprint ..> NotificarCambios : <<include>>
+  ActualizarTarea ..> NotificarCambios : <<include>>
+  RevisarSprint ..> GenerarBurndown : <<include>>
+  RevisarSprint ..> CalcularVelocidad : <<include>>
+  
+  EjecutarTests ..> ActualizarTarea : <<extend>>
+}
+@enduml`} />
+  </TabItem>
+  
+  <TabItem label="Con Generalizaciones">
+    <PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Usuario
+actor "Miembro del Equipo" as Miembro
+actor "Scrum Master" as ScrumMaster
+actor "Product Owner" as ProductOwner
+
+Usuario <|-- Miembro
+Miembro <|-- ScrumMaster
+Miembro <|-- ProductOwner
+
+rectangle "Sistema de Gestión de Proyectos" {
+  usecase "Ver Dashboard" as VerDashboard
+  usecase "Gestionar Tareas" as GestionarTareas
+  usecase "Gestionar Sprint" as GestionarSprint
+  usecase "Gestionar Backlog" as GestionarBacklog
+  
+  usecase "Actualizar Tarea" as ActualizarTarea
+  usecase "Crear Tarea" as CrearTarea
+  usecase "Eliminar Tarea" as EliminarTarea
+  
+  usecase "Crear Sprint" as CrearSprint
+  usecase "Cerrar Sprint" as CerrarSprint
+  
+  Usuario --> VerDashboard
+  Miembro --> GestionarTareas
+  ScrumMaster --> GestionarSprint
+  ProductOwner --> GestionarBacklog
+  
+  ActualizarTarea --|> GestionarTareas
+  CrearTarea --|> GestionarTareas
+  EliminarTarea --|> GestionarTareas
+  
+  CrearSprint --|> GestionarSprint
+  CerrarSprint --|> GestionarSprint
+}
+@enduml`} />
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Sistema de gestión de proyectos ágiles que incluye:
+  - **Roles Scrum**: Product Owner, Scrum Master y miembros del equipo
+  - **Ceremonias ágiles**: Daily standup y retrospectivas
+  - **Métricas**: Burndown charts y cálculo de velocidad
+  - **Integración continua**: Ejecución automática de tests
+</Aside>
+
+## 4.6. Sistema de Reservas de Hotel
+
+Sistema completo para gestión de reservas hoteleras con múltiples servicios.
+
+<PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Huésped
+actor Recepcionista
+actor "Gerente Hotel" as Gerente
+actor "Sistema de Pago" as SistemaPago
+
+rectangle "Sistema de Gestión Hotelera" {
+  usecase "Buscar Disponibilidad" as BuscarDisponibilidad
+  usecase "Realizar Reserva" as RealizarReserva
+  usecase "Modificar Reserva" as ModificarReserva
+  usecase "Cancelar Reserva" as CancelarReserva
+  usecase "Realizar Check-in" as CheckIn
+  usecase "Realizar Check-out" as CheckOut
+  usecase "Solicitar Servicios" as SolicitarServicios
+  usecase "Calificar Estancia" as CalificarEstancia
+  
+  usecase "Gestionar Habitaciones" as GestionarHabitaciones
+  usecase "Asignar Habitación" as AsignarHabitacion
+  usecase "Procesar Pago" as ProcesarPago
+  usecase "Emitir Factura" as EmitirFactura
+  
+  usecase "Ver Ocupación" as VerOcupacion
+  usecase "Configurar Tarifas" as ConfigurarTarifas
+  usecase "Generar Reportes Ingresos" as GenerarReportes
+  
+  usecase "Verificar Disponibilidad" as VerificarDisponibilidad
+  usecase "Calcular Tarifa" as CalcularTarifa
+  usecase "Enviar Confirmación" as EnviarConfirmacion
+  usecase "Ofrecer Upgrade" as OfrecerUpgrade
+  usecase "Aplicar Descuento Temporada" as DescuentoTemporada
+  
+  Huésped --> BuscarDisponibilidad
+  Huésped --> RealizarReserva
+  Huésped --> ModificarReserva
+  Huésped --> CancelarReserva
+  Huésped --> CheckIn
+  Huésped --> CheckOut
+  Huésped --> SolicitarServicios
+  Huésped --> CalificarEstancia
+  
+  Recepcionista --> RealizarReserva
+  Recepcionista --> CheckIn
+  Recepcionista --> CheckOut
+  Recepcionista --> GestionarHabitaciones
+  Recepcionista --> AsignarHabitacion
+  
+  Gerente --> VerOcupacion
+  Gerente --> ConfigurarTarifas
+  Gerente --> GenerarReportes
+  
+  SistemaPago --> ProcesarPago
+  
+  RealizarReserva ..> VerificarDisponibilidad : <<include>>
+  RealizarReserva ..> CalcularTarifa : <<include>>
+  RealizarReserva ..> EnviarConfirmacion : <<include>>
+  
+  CheckIn ..> AsignarHabitacion : <<include>>
+  CheckOut ..> ProcesarPago : <<include>>
+  CheckOut ..> EmitirFactura : <<include>>
+  
+  OfrecerUpgrade ..> CheckIn : <<extend>>
+  DescuentoTemporada ..> CalcularTarifa : <<extend>>
+}
+@enduml`} />
+
+<Aside type="tip">
+  Sistema hotelero que demuestra:
+  - **Gestión de reservas completa**: Desde búsqueda hasta check-out
+  - **Roles hoteleros**: Huésped, recepcionista y gerente
+  - **Servicios opcionales**: Upgrades y descuentos por temporada
+  - **Integración con sistema de pagos**
+</Aside>
+
+## 4.7. Sistema de Biblioteca Digital
+
+Plataforma para gestión de recursos bibliográficos y préstamos digitales.
+
+<PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Lector
+actor Bibliotecario
+actor "Administrador" as Admin
+actor "Sistema de Multas" as SistemaMultas
+
+rectangle "Sistema de Biblioteca Digital" {
+  usecase "Buscar Libro" as BuscarLibro
+  usecase "Reservar Libro" as ReservarLibro
+  usecase "Prestar Libro" as PrestarLibro
+  usecase "Devolver Libro" as DevolverLibro
+  usecase "Renovar Préstamo" as RenovarPrestamo
+  usecase "Descargar eBook" as DescargarEbook
+  usecase "Consultar Historial" as ConsultarHistorial
+  
+  usecase "Catalogar Material" as CatalogarMaterial
+  usecase "Gestionar Préstamos" as GestionarPrestamos
+  usecase "Procesar Devolución" as ProcesarDevolucion
+  usecase "Gestionar Reservas" as GestionarReservas
+  
+  usecase "Generar Reportes" as GenerarReportes
+  usecase "Gestionar Usuarios" as GestionarUsuarios
+  usecase "Configurar Sistema" as ConfigurarSistema
+  
+  usecase "Verificar Disponibilidad" as VerificarDisponibilidad
+  usecase "Autenticar Usuario" as AutenticarUsuario
+  usecase "Verificar Límite Préstamos" as VerificarLimite
+  usecase "Enviar Recordatorio" as EnviarRecordatorio
+  usecase "Calcular Multa" as CalcularMulta
+  usecase "Solicitar Compra" as SolicitarCompra
+  
+  Lector --> BuscarLibro
+  Lector --> ReservarLibro
+  Lector --> PrestarLibro
+  Lector --> DevolverLibro
+  Lector --> RenovarPrestamo
+  Lector --> DescargarEbook
+  Lector --> ConsultarHistorial
+  
+  Bibliotecario --> CatalogarMaterial
+  Bibliotecario --> GestionarPrestamos
+  Bibliotecario --> ProcesarDevolucion
+  Bibliotecario --> GestionarReservas
+  
+  Admin --> GenerarReportes
+  Admin --> GestionarUsuarios
+  Admin --> ConfigurarSistema
+  
+  SistemaMultas --> CalcularMulta
+  
+  PrestarLibro ..> AutenticarUsuario : <<include>>
+  PrestarLibro ..> VerificarDisponibilidad : <<include>>
+  PrestarLibro ..> VerificarLimite : <<include>>
+  
+  DevolverLibro ..> ProcesarDevolucion : <<include>>
+  
+  RenovarPrestamo ..> VerificarLimite : <<include>>
+  
+  CalcularMulta ..> DevolverLibro : <<extend>>
+  EnviarRecordatorio ..> PrestarLibro : <<extend>>
+  SolicitarCompra ..> BuscarLibro : <<extend>>
+}
+@enduml`} />
+
+<Aside type="note">
+  Sistema de biblioteca digital que incluye:
+  - **Gestión de préstamos**: Físicos y digitales (eBooks)
+  - **Control de límites**: Verificación de cupos de préstamo
+  - **Sistema de multas**: Cálculo automático por retraso
+  - **Sugerencias de compra**: Cuando un libro no está disponible
+</Aside>
+
+## 4.8. Sistema de Transporte Público (Metro/Bus)
+
+Sistema para gestión de transporte público con tarjetas y rutas.
+
+<PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Pasajero
+actor "Operador de Estación" as Operador
+actor Conductor
+actor "Supervisor" as Supervisor
+actor "Sistema de Pago" as SistemaPago
+
+rectangle "Sistema de Transporte Público" {
+  usecase "Consultar Rutas" as ConsultarRutas
+  usecase "Planificar Viaje" as PlanificarViaje
+  usecase "Recargar Tarjeta" as RecargarTarjeta
+  usecase "Validar Tarjeta" as ValidarTarjeta
+  usecase "Consultar Saldo" as ConsultarSaldo
+  usecase "Reportar Incidencia" as ReportarIncidencia
+  
+  usecase "Gestionar Tarjetas" as GestionarTarjetas
+  usecase "Atender Reclamos" as AtenderReclamos
+  usecase "Emitir Tarjeta Nueva" as EmitirTarjeta
+  
+  usecase "Registrar Recorrido" as RegistrarRecorrido
+  usecase "Reportar Estado Vehículo" as ReportarEstado
+  usecase "Actualizar Ubicación" as ActualizarUbicacion
+  
+  usecase "Monitorear Flota" as MonitorearFlota
+  usecase "Generar Reportes Operación" as GenerarReportes
+  usecase "Gestionar Horarios" as GestionarHorarios
+  
+  usecase "Procesar Pago" as ProcesarPago
+  usecase "Verificar Saldo" as VerificarSaldo
+  usecase "Descontar Tarifa" as DescontarTarifa
+  usecase "Calcular Ruta Óptima" as CalcularRuta
+  usecase "Aplicar Tarifa Diferenciada" as TarifaDiferenciada
+  usecase "Ofrecer Pase Mensual" as OfrecerPase
+  
+  Pasajero --> ConsultarRutas
+  Pasajero --> PlanificarViaje
+  Pasajero --> RecargarTarjeta
+  Pasajero --> ValidarTarjeta
+  Pasajero --> ConsultarSaldo
+  Pasajero --> ReportarIncidencia
+  
+  Operador --> GestionarTarjetas
+  Operador --> AtenderReclamos
+  Operador --> EmitirTarjeta
+  
+  Conductor --> RegistrarRecorrido
+  Conductor --> ReportarEstado
+  Conductor --> ActualizarUbicacion
+  
+  Supervisor --> MonitorearFlota
+  Supervisor --> GenerarReportes
+  Supervisor --> GestionarHorarios
+  
+  SistemaPago --> ProcesarPago
+  
+  RecargarTarjeta ..> ProcesarPago : <<include>>
+  ValidarTarjeta ..> VerificarSaldo : <<include>>
+  ValidarTarjeta ..> DescontarTarifa : <<include>>
+  
+  PlanificarViaje ..> CalcularRuta : <<include>>
+  
+  TarifaDiferenciada ..> DescontarTarifa : <<extend>>
+  OfrecerPase ..> RecargarTarjeta : <<extend>>
+}
+@enduml`} />
+
+<Aside type="tip">
+  Sistema de transporte público que muestra:
+  - **Gestión de tarjetas**: Recarga, validación y consulta de saldo
+  - **Planificación de viajes**: Cálculo de rutas óptimas
+  - **Monitoreo de flota**: Ubicación en tiempo real
+  - **Tarifas diferenciadas**: Estudiantes, adultos mayores, etc.
+</Aside>
+
+## 4.9. Sistema de Gestión de Restaurante
+
+Plataforma para gestión de pedidos, reservas y cocina.
+
+<PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Cliente
+actor Mesero
+actor Chef
+actor "Gerente" as Gerente
+actor "Sistema de Delivery" as SistemaDelivery
+
+rectangle "Sistema de Gestión de Restaurante" {
+  usecase "Ver Menú" as VerMenu
+  usecase "Realizar Pedido" as RealizarPedido
+  usecase "Reservar Mesa" as ReservarMesa
+  usecase "Solicitar Cuenta" as SolicitarCuenta
+  usecase "Calificar Servicio" as CalificarServicio
+  usecase "Ordenar Delivery" as OrdenarDelivery
+  
+  usecase "Tomar Orden" as TomarOrden
+  usecase "Servir Platos" as ServirPlatos
+  usecase "Procesar Pago" as ProcesarPago
+  usecase "Gestionar Mesas" as GestionarMesas
+  
+  usecase "Recibir Orden Cocina" as RecibirOrden
+  usecase "Preparar Plato" as PrepararPlato
+  usecase "Notificar Plato Listo" as NotificarListo
+  usecase "Gestionar Inventario Cocina" as GestionarInventario
+  
+  usecase "Ver Reportes Ventas" as VerReportes
+  usecase "Gestionar Personal" as GestionarPersonal
+  usecase "Actualizar Menú" as ActualizarMenu
+  usecase "Configurar Precios" as ConfigurarPrecios
+  
+  usecase "Verificar Disponibilidad Mesa" as VerificarMesa
+  usecase "Enviar a Cocina" as EnviarCocina
+  usecase "Calcular Total" as CalcularTotal
+  usecase "Aplicar Propina" as AplicarPropina
+  usecase "Aplicar Descuento" as AplicarDescuento
+  usecase "Coordinar Entrega" as CoordinarEntrega
+  
+  Cliente --> VerMenu
+  Cliente --> RealizarPedido
+  Cliente --> ReservarMesa
+  Cliente --> SolicitarCuenta
+  Cliente --> CalificarServicio
+  Cliente --> OrdenarDelivery
+  
+  Mesero --> TomarOrden
+  Mesero --> ServirPlatos
+  Mesero --> ProcesarPago
+  Mesero --> GestionarMesas
+  
+  Chef --> RecibirOrden
+  Chef --> PrepararPlato
+  Chef --> NotificarListo
+  Chef --> GestionarInventario
+  
+  Gerente --> VerReportes
+  Gerente --> GestionarPersonal
+  Gerente --> ActualizarMenu
+  Gerente --> ConfigurarPrecios
+  
+  SistemaDelivery --> CoordinarEntrega
+  
+  ReservarMesa ..> VerificarMesa : <<include>>
+  TomarOrden ..> EnviarCocina : <<include>>
+  SolicitarCuenta ..> CalcularTotal : <<include>>
+  SolicitarCuenta ..> ProcesarPago : <<include>>
+  
+  OrdenarDelivery ..> RealizarPedido : <<include>>
+  OrdenarDelivery ..> CoordinarEntrega : <<include>>
+  
+  AplicarPropina ..> CalcularTotal : <<extend>>
+  AplicarDescuento ..> CalcularTotal : <<extend>>
+}
+@enduml`} />
+
+<Aside type="note">
+  Sistema de restaurante que incluye:
+  - **Gestión de pedidos**: Presencial y delivery
+  - **Coordinación cocina**: Envío y notificación de platos
+  - **Gestión de mesas**: Reservas y disponibilidad
+  - **Propinas y descuentos**: Aplicación opcional al total
+</Aside>
+
+## 4.10. Sistema de Red Social
+
+Plataforma de red social con publicaciones, mensajería y grupos.
+
+<PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Usuario
+actor "Usuario Premium" as Premium
+actor Moderador
+actor Administrador
+
+Usuario <|-- Premium
+Usuario <|-- Moderador
+Moderador <|-- Administrador
+
+rectangle "Red Social" {
+  usecase "Crear Publicación" as CrearPublicacion
+  usecase "Comentar Publicación" as Comentar
+  usecase "Dar Me Gusta" as DarLike
+  usecase "Compartir Contenido" as Compartir
+  usecase "Enviar Mensaje" as EnviarMensaje
+  usecase "Buscar Usuarios" as BuscarUsuarios
+  usecase "Seguir Usuario" as SeguirUsuario
+  usecase "Crear Grupo" as CrearGrupo
+  usecase "Unirse a Grupo" as UnirseGrupo
+  
+  usecase "Subir Video HD" as SubirVideoHD
+  usecase "Crear Evento" as CrearEvento
+  usecase "Acceder Estadísticas" as AccederEstadisticas
+  
+  usecase "Revisar Reportes" as RevisarReportes
+  usecase "Eliminar Contenido Inapropiado" as EliminarContenido
+  usecase "Suspender Usuario" as SuspenderUsuario
+  
+  usecase "Gestionar Sistema" as GestionarSistema
+  usecase "Ver Métricas Globales" as VerMetricas
+  
+  usecase "Autenticar Usuario" as AutenticarUsuario
+  usecase "Verificar Permisos" as VerificarPermisos
+  usecase "Notificar Seguidores" as NotificarSeguidores
+  usecase "Filtrar Contenido" as FiltrarContenido
+  usecase "Recomendar Amigos" as RecomendarAmigos
+  usecase "Aplicar Marca de Agua" as MarcaAgua
+  
+  Usuario --> CrearPublicacion
+  Usuario --> Comentar
+  Usuario --> DarLike
+  Usuario --> Compartir
+  Usuario --> EnviarMensaje
+  Usuario --> BuscarUsuarios
+  Usuario --> SeguirUsuario
+  Usuario --> CrearGrupo
+  Usuario --> UnirseGrupo
+  
+  Premium --> SubirVideoHD
+  Premium --> CrearEvento
+  Premium --> AccederEstadisticas
+  
+  Moderador --> RevisarReportes
+  Moderador --> EliminarContenido
+  Moderador --> SuspenderUsuario
+  
+  Administrador --> GestionarSistema
+  Administrador --> VerMetricas
+  
+  CrearPublicacion ..> AutenticarUsuario : <<include>>
+  CrearPublicacion ..> VerificarPermisos : <<include>>
+  CrearPublicacion ..> NotificarSeguidores : <<include>>
+  
+  EnviarMensaje ..> AutenticarUsuario : <<include>>
+  
+  FiltrarContenido ..> CrearPublicacion : <<extend>>
+  RecomendarAmigos ..> BuscarUsuarios : <<extend>>
+  MarcaAgua ..> SubirVideoHD : <<extend>>
+}
+@enduml`} />
+
+<Aside type="tip">
+  Red social que demuestra:
+  - **Jerarquía de usuarios**: Usuario, Premium, Moderador y Administrador
+  - **Funcionalidades sociales**: Publicaciones, comentarios, mensajes y grupos
+  - **Características premium**: Videos HD, eventos y estadísticas
+  - **Moderación de contenido**: Revisión y eliminación de contenido inapropiado
+</Aside>
+
+## Resumen de Buenas Prácticas
+
+<div>
+  <ul>
+    <li><strong>Claridad sobre complejidad</strong>: Prefiera diagramas claros y legibles sobre diagramas exhaustivos</li>
+    <li><strong>Agrupe casos de uso relacionados</strong>: Use paquetes o rectángulos para organizar funcionalidades</li>
+    <li><strong>Nombre descriptivos</strong>: Use verbos en infinitivo para casos de uso (ej: "Realizar Compra")</li>
+    <li><strong>Evite redundancia</strong>: Use «include» para comportamiento común</li>
+    <li><strong>Documente puntos de extensión</strong>: Indique claramente cuándo ocurren las extensiones</li>
+    <li><strong>Valide con stakeholders</strong>: Los diagramas deben ser comprensibles para usuarios no técnicos</li>
+    <li><strong>Mantenga consistencia</strong>: Use las mismas convenciones en todos los diagramas del proyecto</li>
+  </ul>
+</div>
+
+<Aside type="caution">
+  Recuerde que los diagramas de casos de uso son herramientas de comunicación. Su objetivo principal es facilitar el entendimiento entre el equipo de desarrollo y los stakeholders, no documentar cada detalle técnico del sistema.
+</Aside>
+
