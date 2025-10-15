@@ -93,75 +93,191 @@ rectangle "Sistema Bancario" {
 
 ## 4.2. Sistema de Comercio Electrónico
 
-Plataforma de e-commerce con gestión de productos, pedidos y envíos.
+Plataforma completa de e-commerce con gestión de productos, pedidos, pagos, envíos y atención al cliente.
 
 <PlantUml code={`@startuml
 left to right direction
 skinparam packageStyle rectangle
 
-actor Cliente
+actor "Cliente" as Cliente
+actor "Cliente Premium" as ClientePremium
 actor Vendedor
-actor Administrador
+actor "Administrador Tienda" as Admin
+actor "Soporte al Cliente" as Soporte
 actor "Sistema de Pago" as SistemaPago
 actor "Sistema de Envío" as SistemaEnvio
+actor "Sistema de Inventario" as SistemaInventario
+actor "Sistema de Marketing" as SistemaMarketing
+
+Cliente <|-- ClientePremium
 
 rectangle "Plataforma E-Commerce" {
+  usecase "Registrar Cuenta" as RegistrarCuenta
+  usecase "Iniciar Sesión" as IniciarSesion
   usecase "Buscar Productos" as BuscarProductos
+  usecase "Filtrar por Categoría" as FiltrarCategoria
   usecase "Ver Detalles Producto" as VerDetalles
+  usecase "Comparar Productos" as CompararProductos
   usecase "Agregar al Carrito" as AgregarCarrito
+  usecase "Guardar en Lista Deseos" as ListaDeseos
+  usecase "Gestionar Carrito" as GestionarCarrito
+  usecase "Aplicar Cupón" as AplicarCupon
   usecase "Realizar Pedido" as RealizarPedido
+  usecase "Seleccionar Dirección Envío" as SeleccionarDireccion
+  usecase "Elegir Método Pago" as ElegirMetodoPago
   usecase "Rastrear Envío" as RastrearEnvio
   usecase "Calificar Producto" as CalificarProducto
+  usecase "Escribir Reseña" as EscribirResena
+  usecase "Solicitar Devolución" as SolicitarDevolucion
+  usecase "Consultar Historial Compras" as ConsultarHistorial
+  usecase "Gestionar Direcciones" as GestionarDirecciones
+  usecase "Configurar Preferencias" as ConfigurarPreferencias
+  
+  usecase "Acceder Ofertas Exclusivas" as OfertasExclusivas
+  usecase "Envío Gratis" as EnvioGratis
+  usecase "Soporte Prioritario" as SoportePrioritario
   
   usecase "Publicar Producto" as PublicarProducto
   usecase "Actualizar Inventario" as ActualizarInventario
   usecase "Gestionar Pedidos" as GestionarPedidos
+  usecase "Responder Preguntas" as ResponderPreguntas
+  usecase "Procesar Devoluciones" as ProcesarDevoluciones
+  usecase "Ver Estadísticas Ventas" as VerEstadisticas
+  usecase "Configurar Tienda" as ConfigurarTienda
+  usecase "Gestionar Promociones Vendedor" as PromocionesVendedor
   
   usecase "Generar Reportes Ventas" as GenerarReportes
   usecase "Configurar Promociones" as ConfigurarPromociones
+  usecase "Gestionar Usuarios" as GestionarUsuarios
+  usecase "Moderar Reseñas" as ModerarResenas
+  usecase "Gestionar Categorías" as GestionarCategorias
+  usecase "Configurar Métodos Pago" as ConfigurarMetodosPago
+  usecase "Gestionar Proveedores Envío" as GestionarProveedores
+  usecase "Analizar Comportamiento" as AnalizarComportamiento
   
+  usecase "Atender Chat" as AtenderChat
+  usecase "Gestionar Tickets" as GestionarTickets
+  usecase "Procesar Reclamos" as ProcesarReclamos
+  usecase "Autorizar Reembolsos" as AutorizarReembolsos
+  
+  usecase "Autenticar Usuario" as AutenticarUsuario
   usecase "Verificar Disponibilidad" as VerificarDisponibilidad
   usecase "Procesar Pago" as ProcesarPago
+  usecase "Validar Tarjeta" as ValidarTarjeta
   usecase "Calcular Envío" as CalcularEnvio
   usecase "Generar Factura" as GenerarFactura
+  usecase "Enviar Confirmación" as EnviarConfirmacion
+  usecase "Actualizar Stock" as ActualizarStock
   usecase "Aplicar Descuento" as AplicarDescuento
   usecase "Recomendar Productos" as RecomendarProductos
+  usecase "Verificar Fraude" as VerificarFraude
+  usecase "Notificar Vendedor" as NotificarVendedor
+  usecase "Programar Recolección" as ProgramarRecoleccion
+  usecase "Generar Etiqueta Envío" as GenerarEtiqueta
+  usecase "Enviar Email Marketing" as EmailMarketing
+  usecase "Aplicar Puntos Fidelidad" as AplicarPuntos
+  usecase "Ofrecer Financiamiento" as OfrecerFinanciamiento
+  usecase "Verificar Edad" as VerificarEdad
   
+  Cliente --> RegistrarCuenta
+  Cliente --> IniciarSesion
   Cliente --> BuscarProductos
+  Cliente --> FiltrarCategoria
   Cliente --> VerDetalles
+  Cliente --> CompararProductos
   Cliente --> AgregarCarrito
+  Cliente --> ListaDeseos
+  Cliente --> GestionarCarrito
+  Cliente --> AplicarCupon
   Cliente --> RealizarPedido
+  Cliente --> SeleccionarDireccion
+  Cliente --> ElegirMetodoPago
   Cliente --> RastrearEnvio
   Cliente --> CalificarProducto
+  Cliente --> EscribirResena
+  Cliente --> SolicitarDevolucion
+  Cliente --> ConsultarHistorial
+  Cliente --> GestionarDirecciones
+  Cliente --> ConfigurarPreferencias
+  Cliente --> AtenderChat
+  
+  ClientePremium --> OfertasExclusivas
+  ClientePremium --> EnvioGratis
+  ClientePremium --> SoportePrioritario
   
   Vendedor --> PublicarProducto
   Vendedor --> ActualizarInventario
   Vendedor --> GestionarPedidos
+  Vendedor --> ResponderPreguntas
+  Vendedor --> ProcesarDevoluciones
+  Vendedor --> VerEstadisticas
+  Vendedor --> ConfigurarTienda
+  Vendedor --> PromocionesVendedor
   
-  Administrador --> GenerarReportes
-  Administrador --> ConfigurarPromociones
+  Admin --> GenerarReportes
+  Admin --> ConfigurarPromociones
+  Admin --> GestionarUsuarios
+  Admin --> ModerarResenas
+  Admin --> GestionarCategorias
+  Admin --> ConfigurarMetodosPago
+  Admin --> GestionarProveedores
+  Admin --> AnalizarComportamiento
+  
+  Soporte --> AtenderChat
+  Soporte --> GestionarTickets
+  Soporte --> ProcesarReclamos
+  Soporte --> AutorizarReembolsos
   
   SistemaPago --> ProcesarPago
+  SistemaPago --> ValidarTarjeta
   SistemaEnvio --> CalcularEnvio
+  SistemaEnvio --> ProgramarRecoleccion
+  SistemaInventario --> ActualizarStock
+  SistemaMarketing --> EmailMarketing
   
+  IniciarSesion ..> AutenticarUsuario : <<include>>
+  
+  RealizarPedido ..> AutenticarUsuario : <<include>>
   RealizarPedido ..> VerificarDisponibilidad : <<include>>
   RealizarPedido ..> ProcesarPago : <<include>>
   RealizarPedido ..> CalcularEnvio : <<include>>
   RealizarPedido ..> GenerarFactura : <<include>>
+  RealizarPedido ..> EnviarConfirmacion : <<include>>
+  RealizarPedido ..> ActualizarStock : <<include>>
+  RealizarPedido ..> NotificarVendedor : <<include>>
+  
+  ProcesarPago ..> ValidarTarjeta : <<include>>
+  ProcesarPago ..> VerificarFraude : <<include>>
   
   PublicarProducto ..> ActualizarInventario : <<include>>
   
+  GestionarPedidos ..> GenerarEtiqueta : <<include>>
+  GestionarPedidos ..> ProgramarRecoleccion : <<include>>
+  
+  SolicitarDevolucion ..> ProcesarDevoluciones : <<include>>
+  SolicitarDevolucion ..> AutorizarReembolsos : <<include>>
+  
   AplicarDescuento ..> RealizarPedido : <<extend>>
   RecomendarProductos ..> VerDetalles : <<extend>>
+  AplicarPuntos ..> RealizarPedido : <<extend>>
+  OfrecerFinanciamiento ..> ElegirMetodoPago : <<extend>>
+  VerificarEdad ..> RealizarPedido : <<extend>>
 }
 @enduml`} />
 
 <Aside type="tip">
-  Este ejemplo demuestra:
-  - **Integración con sistemas externos**: Pago y envío
-  - **Flujo de compra completo**: Desde búsqueda hasta facturación
-  - **Extensiones opcionales**: Descuentos y recomendaciones
-  - **Roles diferenciados**: Cliente, Vendedor y Administrador
+  Sistema de comercio electrónico completo que demuestra:
+  - **Jerarquía de clientes**: Cliente regular y Cliente Premium con beneficios exclusivos
+  - **Múltiples actores**: Clientes, vendedores, administradores, soporte y sistemas externos
+  - **Gestión completa del carrito**: Agregar, modificar, guardar en lista de deseos
+  - **Proceso de compra robusto**: Selección de dirección, método de pago, validación de fraude
+  - **Sistema de reseñas**: Calificaciones y comentarios moderados
+  - **Devoluciones y reembolsos**: Proceso completo de atención al cliente
+  - **Integraciones externas**: Pagos, envíos, inventario y marketing
+  - **Funcionalidades premium**: Ofertas exclusivas, envío gratis y soporte prioritario
+  - **Seguridad**: Verificación de fraude, validación de tarjetas y verificación de edad
+  - **Marketing**: Recomendaciones, cupones, puntos de fidelidad y email marketing
+  - **Analytics**: Análisis de comportamiento y reportes de ventas
 </Aside>
 
 ## 4.3. Sistema de Gestión Hospitalaria
@@ -241,83 +357,211 @@ rectangle "Sistema Hospitalario" {
 
 ## 4.4. Sistema de Gestión Educativa (Universidad)
 
-Plataforma educativa para gestión de cursos, calificaciones y recursos académicos.
+Plataforma educativa completa para gestión de cursos, calificaciones, recursos académicos y servicios estudiantiles.
 
 <PlantUml code={`@startuml
 left to right direction
 skinparam packageStyle rectangle
 
 actor Estudiante
+actor "Monitor/Tutor" as Monitor
 actor Profesor
 actor "Coordinador Académico" as Coordinador
+actor "Decano" as Decano
+actor "Oficina de Registro" as Registro
+actor "Bienestar Universitario" as Bienestar
 actor "Sistema de Biblioteca" as Biblioteca
+actor "Sistema de Pagos" as SistemaPagos
+actor "Plataforma Virtual" as PlataformaVirtual
+
+Estudiante <|-- Monitor
 
 rectangle "Sistema Educativo Universitario" {
   usecase "Inscribir Materias" as InscribirMaterias
+  usecase "Consultar Pensum" as ConsultarPensum
   usecase "Consultar Horarios" as ConsultarHorarios
   usecase "Ver Calificaciones" as VerCalificaciones
   usecase "Descargar Material" as DescargarMaterial
   usecase "Entregar Tareas" as EntregarTareas
-  usecase "Realizar Examen" as RealizarExamen
+  usecase "Realizar Examen Online" as RealizarExamen
+  usecase "Participar Foro" as ParticiparForo
+  usecase "Asistir Clase Virtual" as AsistirClaseVirtual
+  usecase "Solicitar Tutoría" as SolicitarTutoria
+  usecase "Consultar Notas Parciales" as ConsultarParciales
+  usecase "Solicitar Certificados" as SolicitarCertificados
+  usecase "Evaluar Profesor" as EvaluarProfesor
+  usecase "Solicitar Homologación" as SolicitarHomologacion
+  usecase "Consultar Deuda Académica" as ConsultarDeuda
+  usecase "Reservar Espacios" as ReservarEspacios
+  usecase "Inscribir Actividades Extracurriculares" as ActividadesExtra
+  usecase "Solicitar Beca" as SolicitarBeca
+  usecase "Reportar Problema Técnico" as ReportarProblema
+  
+  usecase "Brindar Tutoría" as BrindarTutoria
+  usecase "Apoyar Laboratorios" as ApoyarLaboratorios
+  usecase "Calificar Trabajos" as CalificarTrabajos
   
   usecase "Crear Curso" as CrearCurso
   usecase "Subir Material" as SubirMaterial
   usecase "Calificar Tareas" as CalificarTareas
   usecase "Registrar Asistencia" as RegistrarAsistencia
+  usecase "Programar Examen" as ProgramarExamen
+  usecase "Crear Foro Discusión" as CrearForo
+  usecase "Realizar Clase Virtual" as RealizarClaseVirtual
   usecase "Generar Actas" as GenerarActas
+  usecase "Subir Notas Parciales" as SubirParciales
+  usecase "Definir Criterios Evaluación" as DefinirCriterios
+  usecase "Gestionar Syllabus" as GestionarSyllabus
+  usecase "Atender Reclamos Notas" as AtenderReclamos
+  usecase "Autorizar Prórrogas" as AutorizarProrrogas
   
   usecase "Aprobar Cursos" as AprobarCursos
   usecase "Asignar Profesores" as AsignarProfesores
   usecase "Generar Reportes Académicos" as GenerarReportes
+  usecase "Configurar Períodos Académicos" as ConfigurarPeriodos
+  usecase "Gestionar Planes Estudio" as GestionarPlanes
+  usecase "Aprobar Homologaciones" as AprobarHomologaciones
+  usecase "Resolver Conflictos Horarios" as ResolverConflictos
+  
+  usecase "Aprobar Programas" as AprobarProgramas
+  usecase "Revisar Indicadores Calidad" as RevisarIndicadores
+  usecase "Autorizar Cambios Curriculares" as AutorizarCambios
+  
+  usecase "Emitir Certificados" as EmitirCertificados
+  usecase "Gestionar Expedientes" as GestionarExpedientes
+  usecase "Validar Documentos" as ValidarDocumentos
+  usecase "Generar Constancias" as GenerarConstancias
+  
+  usecase "Gestionar Becas" as GestionarBecas
+  usecase "Atender Casos Especiales" as AtenderCasos
+  usecase "Coordinar Apoyo Psicológico" as ApoyoPsicologico
   
   usecase "Autenticar Usuario" as AutenticarUsuario
   usecase "Verificar Prerrequisitos" as VerificarPrerrequisitos
   usecase "Verificar Cupos" as VerificarCupos
+  usecase "Validar Cruce Horarios" as ValidarCruce
   usecase "Calcular Promedio" as CalcularPromedio
+  usecase "Calcular Índice Académico" as CalcularIndice
   usecase "Enviar Notificación" as EnviarNotificacion
   usecase "Consultar Recursos Biblioteca" as ConsultarRecursos
   usecase "Solicitar Prórroga" as SolicitarProrroga
+  usecase "Verificar Pago Matrícula" as VerificarPago
+  usecase "Detectar Plagio" as DetectarPlagio
+  usecase "Generar Estadísticas" as GenerarEstadisticas
+  usecase "Registrar Auditoría" as RegistrarAuditoria
+  usecase "Verificar Asistencia Mínima" as VerificarAsistencia
+  usecase "Aplicar Descuento Académico" as DescuentoAcademico
+  usecase "Alertar Bajo Rendimiento" as AlertarRendimiento
   
   Estudiante --> InscribirMaterias
+  Estudiante --> ConsultarPensum
   Estudiante --> ConsultarHorarios
   Estudiante --> VerCalificaciones
   Estudiante --> DescargarMaterial
   Estudiante --> EntregarTareas
   Estudiante --> RealizarExamen
+  Estudiante --> ParticiparForo
+  Estudiante --> AsistirClaseVirtual
+  Estudiante --> SolicitarTutoria
+  Estudiante --> ConsultarParciales
+  Estudiante --> SolicitarCertificados
+  Estudiante --> EvaluarProfesor
+  Estudiante --> SolicitarHomologacion
+  Estudiante --> ConsultarDeuda
+  Estudiante --> ReservarEspacios
+  Estudiante --> ActividadesExtra
+  Estudiante --> SolicitarBeca
+  Estudiante --> ReportarProblema
+  
+  Monitor --> BrindarTutoria
+  Monitor --> ApoyarLaboratorios
+  Monitor --> CalificarTrabajos
   
   Profesor --> CrearCurso
   Profesor --> SubirMaterial
   Profesor --> CalificarTareas
   Profesor --> RegistrarAsistencia
+  Profesor --> ProgramarExamen
+  Profesor --> CrearForo
+  Profesor --> RealizarClaseVirtual
   Profesor --> GenerarActas
+  Profesor --> SubirParciales
+  Profesor --> DefinirCriterios
+  Profesor --> GestionarSyllabus
+  Profesor --> AtenderReclamos
+  Profesor --> AutorizarProrrogas
   
   Coordinador --> AprobarCursos
   Coordinador --> AsignarProfesores
   Coordinador --> GenerarReportes
+  Coordinador --> ConfigurarPeriodos
+  Coordinador --> GestionarPlanes
+  Coordinador --> AprobarHomologaciones
+  Coordinador --> ResolverConflictos
+  
+  Decano --> AprobarProgramas
+  Decano --> RevisarIndicadores
+  Decano --> AutorizarCambios
+  
+  Registro --> EmitirCertificados
+  Registro --> GestionarExpedientes
+  Registro --> ValidarDocumentos
+  Registro --> GenerarConstancias
+  
+  Bienestar --> GestionarBecas
+  Bienestar --> AtenderCasos
+  Bienestar --> ApoyoPsicologico
   
   Biblioteca --> ConsultarRecursos
+  SistemaPagos --> VerificarPago
+  PlataformaVirtual --> RealizarClaseVirtual
+  PlataformaVirtual --> DetectarPlagio
   
   InscribirMaterias ..> AutenticarUsuario : <<include>>
   InscribirMaterias ..> VerificarPrerrequisitos : <<include>>
   InscribirMaterias ..> VerificarCupos : <<include>>
+  InscribirMaterias ..> ValidarCruce : <<include>>
+  InscribirMaterias ..> VerificarPago : <<include>>
   InscribirMaterias ..> EnviarNotificacion : <<include>>
+  InscribirMaterias ..> RegistrarAuditoria : <<include>>
+  
+  EntregarTareas ..> DetectarPlagio : <<include>>
+  EntregarTareas ..> EnviarNotificacion : <<include>>
   
   CalificarTareas ..> CalcularPromedio : <<include>>
   CalificarTareas ..> EnviarNotificacion : <<include>>
   
   GenerarActas ..> CalcularPromedio : <<include>>
+  GenerarActas ..> CalcularIndice : <<include>>
+  GenerarActas ..> VerificarAsistencia : <<include>>
+  
+  VerCalificaciones ..> CalcularIndice : <<include>>
+  
+  GenerarReportes ..> GenerarEstadisticas : <<include>>
+  
+  SolicitarBeca ..> CalcularIndice : <<include>>
+  SolicitarBeca ..> GestionarBecas : <<include>>
   
   SolicitarProrroga ..> EntregarTareas : <<extend>>
   ConsultarRecursos ..> DescargarMaterial : <<extend>>
+  DescuentoAcademico ..> VerificarPago : <<extend>>
+  AlertarRendimiento ..> CalcularPromedio : <<extend>>
 }
 @enduml`} />
 
 <Aside type="tip">
-  Este sistema educativo muestra:
-  - **Gestión académica completa**: Inscripciones, calificaciones y certificados
-  - **Roles académicos**: Estudiantes, profesores y coordinadores
-  - **Validaciones automáticas**: Prerrequisitos y cupos
-  - **Integración con biblioteca**
+  Sistema educativo universitario completo que demuestra:
+  - **Jerarquía académica**: Estudiante, Monitor/Tutor (hereda de Estudiante), Profesor, Coordinador y Decano
+  - **Gestión académica integral**: Inscripciones con validaciones múltiples, pensum, homologaciones
+  - **Plataforma virtual**: Clases virtuales, foros, exámenes online y detección de plagio
+  - **Evaluación completa**: Notas parciales, actas, promedios e índice académico
+  - **Servicios estudiantiles**: Tutorías, becas, bienestar universitario, apoyo psicológico
+  - **Gestión administrativa**: Certificados, constancias, expedientes y validación de documentos
+  - **Control de calidad**: Evaluación de profesores, indicadores de calidad, alertas de bajo rendimiento
+  - **Integraciones externas**: Biblioteca, sistema de pagos y plataforma virtual
+  - **Actividades extracurriculares**: Reserva de espacios y actividades complementarias
+  - **Auditoría y seguridad**: Registro de todas las operaciones críticas
+  - **Casos especiales**: Homologaciones, prórrogas, reclamos de notas y conflictos de horarios
 </Aside>
 
 ## 4.5. Sistema de Gestión de Proyectos (Metodología Ágil)
@@ -674,91 +918,239 @@ rectangle "Sistema de Transporte Público" {
 
 ## 4.9. Sistema de Gestión de Restaurante
 
-Plataforma para gestión de pedidos, reservas y cocina.
+Plataforma completa para gestión de pedidos, reservas, cocina, inventario y operaciones de restaurante.
 
 <PlantUml code={`@startuml
 left to right direction
 skinparam packageStyle rectangle
 
 actor Cliente
+actor "Cliente VIP" as ClienteVIP
 actor Mesero
+actor "Capitán de Meseros" as Capitan
 actor Chef
+actor "Sous Chef" as SousChef
+actor Bartender
+actor Cajero
 actor "Gerente" as Gerente
+actor "Administrador" as Admin
 actor "Sistema de Delivery" as SistemaDelivery
+actor "Sistema de Pago" as SistemaPago
+actor "Proveedor" as Proveedor
+
+Cliente <|-- ClienteVIP
 
 rectangle "Sistema de Gestión de Restaurante" {
-  usecase "Ver Menú" as VerMenu
+  usecase "Ver Menú Digital" as VerMenu
+  usecase "Filtrar por Alergias" as FiltrarAlergias
+  usecase "Ver Información Nutricional" as InfoNutricional
   usecase "Realizar Pedido" as RealizarPedido
+  usecase "Personalizar Plato" as PersonalizarPlato
   usecase "Reservar Mesa" as ReservarMesa
   usecase "Solicitar Cuenta" as SolicitarCuenta
+  usecase "Dividir Cuenta" as DividirCuenta
   usecase "Calificar Servicio" as CalificarServicio
   usecase "Ordenar Delivery" as OrdenarDelivery
+  usecase "Rastrear Pedido" as RastrearPedido
+  usecase "Unirse Lista Espera" as ListaEspera
+  usecase "Solicitar Asistencia" as SolicitarAsistencia
+  usecase "Acumular Puntos" as AcumularPuntos
+  
+  usecase "Acceder Menú Exclusivo" as MenuExclusivo
+  usecase "Reserva Prioritaria" as ReservaPrioritaria
+  usecase "Descuento Especial" as DescuentoEspecial
   
   usecase "Tomar Orden" as TomarOrden
   usecase "Servir Platos" as ServirPlatos
   usecase "Procesar Pago" as ProcesarPago
   usecase "Gestionar Mesas" as GestionarMesas
+  usecase "Atender Solicitudes" as AtenderSolicitudes
+  usecase "Sugerir Maridaje" as SugerirMaridaje
+  usecase "Registrar Preferencias Cliente" as RegistrarPreferencias
+  
+  usecase "Asignar Mesas" as AsignarMesas
+  usecase "Supervisar Servicio" as SupervisarServicio
+  usecase "Resolver Quejas" as ResolverQuejas
+  usecase "Coordinar Meseros" as CoordinarMeseros
   
   usecase "Recibir Orden Cocina" as RecibirOrden
   usecase "Preparar Plato" as PrepararPlato
   usecase "Notificar Plato Listo" as NotificarListo
   usecase "Gestionar Inventario Cocina" as GestionarInventario
+  usecase "Planificar Menú Semanal" as PlanificarMenu
+  usecase "Controlar Calidad" as ControlarCalidad
+  usecase "Gestionar Recetas" as GestionarRecetas
+  
+  usecase "Asistir Preparación" as AsistirPreparacion
+  usecase "Supervisar Estaciones" as SupervisarEstaciones
+  usecase "Verificar Temperaturas" as VerificarTemperaturas
+  
+  usecase "Preparar Bebidas" as PrepararBebidas
+  usecase "Gestionar Bar" as GestionarBar
+  usecase "Crear Cócteles" as CrearCocteles
+  
+  usecase "Procesar Pagos" as ProcesarPagos
+  usecase "Cerrar Caja" as CerrarCaja
+  usecase "Emitir Factura" as EmitirFactura
+  usecase "Gestionar Cambio" as GestionarCambio
   
   usecase "Ver Reportes Ventas" as VerReportes
   usecase "Gestionar Personal" as GestionarPersonal
   usecase "Actualizar Menú" as ActualizarMenu
   usecase "Configurar Precios" as ConfigurarPrecios
+  usecase "Gestionar Turnos" as GestionarTurnos
+  usecase "Revisar Inventario" as RevisarInventario
+  usecase "Aprobar Compras" as AprobarCompras
+  usecase "Analizar Rentabilidad" as AnalizarRentabilidad
+  
+  usecase "Configurar Sistema" as ConfigurarSistema
+  usecase "Gestionar Usuarios" as GestionarUsuarios
+  usecase "Generar Reportes Completos" as GenerarReportesCompletos
+  usecase "Configurar Impuestos" as ConfigurarImpuestos
+  
+  usecase "Consultar Pedidos" as ConsultarPedidos
+  usecase "Actualizar Inventario" as ActualizarInventario
+  usecase "Solicitar Reabastecimiento" as SolicitarReabastecimiento
   
   usecase "Verificar Disponibilidad Mesa" as VerificarMesa
   usecase "Enviar a Cocina" as EnviarCocina
   usecase "Calcular Total" as CalcularTotal
+  usecase "Calcular Impuestos" as CalcularImpuestos
   usecase "Aplicar Propina" as AplicarPropina
   usecase "Aplicar Descuento" as AplicarDescuento
   usecase "Coordinar Entrega" as CoordinarEntrega
+  usecase "Validar Pago" as ValidarPago
+  usecase "Enviar Notificación Cocina" as NotificarCocina
+  usecase "Registrar Tiempo Preparación" as RegistrarTiempo
+  usecase "Verificar Ingredientes" as VerificarIngredientes
+  usecase "Generar Alerta Stock" as AlertaStock
+  usecase "Aplicar Puntos Fidelidad" as AplicarPuntos
+  usecase "Enviar Confirmación Reserva" as ConfirmarReserva
+  usecase "Sugerir Platos Populares" as SugerirPlatos
+  usecase "Verificar Restricciones Dietéticas" as VerificarRestricciones
   
   Cliente --> VerMenu
+  Cliente --> FiltrarAlergias
+  Cliente --> InfoNutricional
   Cliente --> RealizarPedido
+  Cliente --> PersonalizarPlato
   Cliente --> ReservarMesa
   Cliente --> SolicitarCuenta
+  Cliente --> DividirCuenta
   Cliente --> CalificarServicio
   Cliente --> OrdenarDelivery
+  Cliente --> RastrearPedido
+  Cliente --> ListaEspera
+  Cliente --> SolicitarAsistencia
+  Cliente --> AcumularPuntos
+  
+  ClienteVIP --> MenuExclusivo
+  ClienteVIP --> ReservaPrioritaria
+  ClienteVIP --> DescuentoEspecial
   
   Mesero --> TomarOrden
   Mesero --> ServirPlatos
   Mesero --> ProcesarPago
   Mesero --> GestionarMesas
+  Mesero --> AtenderSolicitudes
+  Mesero --> SugerirMaridaje
+  Mesero --> RegistrarPreferencias
+  
+  Capitan --> AsignarMesas
+  Capitan --> SupervisarServicio
+  Capitan --> ResolverQuejas
+  Capitan --> CoordinarMeseros
   
   Chef --> RecibirOrden
   Chef --> PrepararPlato
   Chef --> NotificarListo
   Chef --> GestionarInventario
+  Chef --> PlanificarMenu
+  Chef --> ControlarCalidad
+  Chef --> GestionarRecetas
+  
+  SousChef --> AsistirPreparacion
+  SousChef --> SupervisarEstaciones
+  SousChef --> VerificarTemperaturas
+  
+  Bartender --> PrepararBebidas
+  Bartender --> GestionarBar
+  Bartender --> CrearCocteles
+  
+  Cajero --> ProcesarPagos
+  Cajero --> CerrarCaja
+  Cajero --> EmitirFactura
+  Cajero --> GestionarCambio
   
   Gerente --> VerReportes
   Gerente --> GestionarPersonal
   Gerente --> ActualizarMenu
   Gerente --> ConfigurarPrecios
+  Gerente --> GestionarTurnos
+  Gerente --> RevisarInventario
+  Gerente --> AprobarCompras
+  Gerente --> AnalizarRentabilidad
+  
+  Admin --> ConfigurarSistema
+  Admin --> GestionarUsuarios
+  Admin --> GenerarReportesCompletos
+  Admin --> ConfigurarImpuestos
+  
+  Proveedor --> ConsultarPedidos
+  Proveedor --> ActualizarInventario
   
   SistemaDelivery --> CoordinarEntrega
+  SistemaPago --> ValidarPago
   
   ReservarMesa ..> VerificarMesa : <<include>>
+  ReservarMesa ..> ConfirmarReserva : <<include>>
+  
   TomarOrden ..> EnviarCocina : <<include>>
+  TomarOrden ..> NotificarCocina : <<include>>
+  
   SolicitarCuenta ..> CalcularTotal : <<include>>
+  SolicitarCuenta ..> CalcularImpuestos : <<include>>
   SolicitarCuenta ..> ProcesarPago : <<include>>
+  
+  CalcularTotal ..> CalcularImpuestos : <<include>>
+  
+  ProcesarPago ..> ValidarPago : <<include>>
+  ProcesarPago ..> EmitirFactura : <<include>>
+  
+  PrepararPlato ..> VerificarIngredientes : <<include>>
+  PrepararPlato ..> RegistrarTiempo : <<include>>
+  PrepararPlato ..> ControlarCalidad : <<include>>
   
   OrdenarDelivery ..> RealizarPedido : <<include>>
   OrdenarDelivery ..> CoordinarEntrega : <<include>>
   
+  GestionarInventario ..> SolicitarReabastecimiento : <<include>>
+  
+  VerificarIngredientes ..> AlertaStock : <<include>>
+  
   AplicarPropina ..> CalcularTotal : <<extend>>
   AplicarDescuento ..> CalcularTotal : <<extend>>
+  AplicarPuntos ..> CalcularTotal : <<extend>>
+  SugerirPlatos ..> VerMenu : <<extend>>
+  VerificarRestricciones ..> PersonalizarPlato : <<extend>>
 }
 @enduml`} />
 
 <Aside type="note">
-  Sistema de restaurante que incluye:
-  - **Gestión de pedidos**: Presencial y delivery
-  - **Coordinación cocina**: Envío y notificación de platos
-  - **Gestión de mesas**: Reservas y disponibilidad
-  - **Propinas y descuentos**: Aplicación opcional al total
+  Sistema completo de gestión de restaurante que incluye:
+  - **Jerarquía de clientes**: Cliente regular y Cliente VIP con beneficios exclusivos
+  - **Personal diversificado**: Meseros, Capitán, Chef, Sous Chef, Bartender, Cajero, Gerente y Administrador
+  - **Gestión de pedidos avanzada**: Personalización de platos, filtros por alergias, información nutricional
+  - **Operaciones de cocina**: Control de calidad, verificación de temperaturas, gestión de recetas
+  - **Gestión de bar**: Preparación de bebidas y creación de cócteles
+  - **Sistema de reservas**: Verificación de disponibilidad, lista de espera, confirmaciones
+  - **Punto de venta**: División de cuentas, múltiples métodos de pago, facturación
+  - **Delivery completo**: Rastreo de pedidos y coordinación de entregas
+  - **Inventario inteligente**: Alertas de stock bajo, reabastecimiento automático
+  - **Fidelización**: Programa de puntos, preferencias de clientes, menús exclusivos
+  - **Gestión operativa**: Turnos de personal, reportes de ventas, análisis de rentabilidad
+  - **Integración con proveedores**: Consulta de pedidos y actualización de inventario
+  - **Control de calidad**: Verificación de ingredientes, temperaturas y tiempos de preparación
 </Aside>
 
 ## 4.10. Sistema de Red Social
@@ -846,6 +1238,246 @@ rectangle "Red Social" {
   - **Funcionalidades sociales**: Publicaciones, comentarios, mensajes y grupos
   - **Características premium**: Videos HD, eventos y estadísticas
   - **Moderación de contenido**: Revisión y eliminación de contenido inapropiado
+</Aside>
+
+## 4.11. Sistema de Matrícula Universitaria
+
+Sistema completo para gestión de matrícula académica con validaciones y procesos administrativos.
+
+<PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Estudiante
+actor "Asesor Académico" as Asesor
+actor "Coordinador de Programa" as Coordinador
+actor "Oficina de Registro" as Registro
+actor "Tesorería" as Tesoreria
+actor "Sistema de Pagos" as SistemaPagos
+actor "Sistema Académico" as SistemaAcademico
+
+rectangle "Sistema de Matrícula Universitaria" {
+  usecase "Consultar Oferta Académica" as ConsultarOferta
+  usecase "Simular Horario" as SimularHorario
+  usecase "Inscribir Asignaturas" as InscribirAsignaturas
+  usecase "Modificar Matrícula" as ModificarMatricula
+  usecase "Cancelar Asignatura" as CancelarAsignatura
+  usecase "Solicitar Retiro Total" as SolicitarRetiro
+  usecase "Descargar Certificado Matrícula" as DescargarCertificado
+  usecase "Consultar Estado Matrícula" as ConsultarEstado
+  
+  usecase "Aprobar Matrícula Especial" as AprobarMatricula
+  usecase "Autorizar Sobrecupo" as AutorizarSobrecupo
+  usecase "Asesorar Estudiante" as AsesorarEstudiante
+  usecase "Validar Plan Estudios" as ValidarPlan
+  
+  usecase "Configurar Períodos Matrícula" as ConfigurarPeriodos
+  usecase "Habilitar Asignaturas" as HabilitarAsignaturas
+  usecase "Asignar Cupos" as AsignarCupos
+  usecase "Generar Reportes Matrícula" as GenerarReportes
+  
+  usecase "Verificar Documentos" as VerificarDocumentos
+  usecase "Emitir Certificados" as EmitirCertificados
+  usecase "Procesar Retiros" as ProcesarRetiros
+  
+  usecase "Generar Liquidación" as GenerarLiquidacion
+  usecase "Verificar Pago Matrícula" as VerificarPago
+  usecase "Aplicar Descuentos" as AplicarDescuentos
+  
+  usecase "Autenticar Usuario" as AutenticarUsuario
+  usecase "Verificar Prerrequisitos" as VerificarPrerrequisitos
+  usecase "Verificar Cupos Disponibles" as VerificarCupos
+  usecase "Validar Cruce Horarios" as ValidarCruce
+  usecase "Calcular Carga Académica" as CalcularCarga
+  usecase "Enviar Notificación Email" as EnviarNotificacion
+  usecase "Registrar Auditoría" as RegistrarAuditoria
+  usecase "Solicitar Crédito Educativo" as SolicitarCredito
+  usecase "Aplicar Beca" as AplicarBeca
+  usecase "Validar Promedio Mínimo" as ValidarPromedio
+  
+  Estudiante --> ConsultarOferta
+  Estudiante --> SimularHorario
+  Estudiante --> InscribirAsignaturas
+  Estudiante --> ModificarMatricula
+  Estudiante --> CancelarAsignatura
+  Estudiante --> SolicitarRetiro
+  Estudiante --> DescargarCertificado
+  Estudiante --> ConsultarEstado
+  
+  Asesor --> AprobarMatricula
+  Asesor --> AutorizarSobrecupo
+  Asesor --> AsesorarEstudiante
+  Asesor --> ValidarPlan
+  
+  Coordinador --> ConfigurarPeriodos
+  Coordinador --> HabilitarAsignaturas
+  Coordinador --> AsignarCupos
+  Coordinador --> GenerarReportes
+  
+  Registro --> VerificarDocumentos
+  Registro --> EmitirCertificados
+  Registro --> ProcesarRetiros
+  
+  Tesoreria --> GenerarLiquidacion
+  Tesoreria --> VerificarPago
+  Tesoreria --> AplicarDescuentos
+  
+  SistemaPagos --> VerificarPago
+  SistemaAcademico --> CalcularCarga
+  
+  InscribirAsignaturas ..> AutenticarUsuario : <<include>>
+  InscribirAsignaturas ..> VerificarPrerrequisitos : <<include>>
+  InscribirAsignaturas ..> VerificarCupos : <<include>>
+  InscribirAsignaturas ..> ValidarCruce : <<include>>
+  InscribirAsignaturas ..> CalcularCarga : <<include>>
+  InscribirAsignaturas ..> VerificarPago : <<include>>
+  InscribirAsignaturas ..> EnviarNotificacion : <<include>>
+  InscribirAsignaturas ..> RegistrarAuditoria : <<include>>
+  
+  ModificarMatricula ..> VerificarCupos : <<include>>
+  ModificarMatricula ..> ValidarCruce : <<include>>
+  ModificarMatricula ..> EnviarNotificacion : <<include>>
+  
+  GenerarLiquidacion ..> CalcularCarga : <<include>>
+  
+  SolicitarCredito ..> GenerarLiquidacion : <<extend>>
+  AplicarBeca ..> GenerarLiquidacion : <<extend>>
+  AutorizarSobrecupo ..> InscribirAsignaturas : <<extend>>
+  ValidarPromedio ..> InscribirAsignaturas : <<extend>>
+}
+@enduml`} />
+
+<Aside type="note">
+  Sistema de matrícula universitaria que incluye:
+  - **Validaciones completas**: Prerrequisitos, cupos, cruces de horario y carga académica
+  - **Múltiples actores**: Estudiantes, asesores, coordinadores, registro y tesorería
+  - **Procesos financieros**: Liquidación, pagos, becas y créditos educativos
+  - **Casos especiales**: Sobrecupos, matrículas especiales y retiros
+  - **Auditoría**: Registro de todas las operaciones realizadas
+</Aside>
+
+## 4.12. Sistema de Admisión Universitaria
+
+Sistema integral para gestión del proceso de admisión de nuevos estudiantes.
+
+<PlantUml code={`@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Aspirante
+actor "Evaluador" as Evaluador
+actor "Coordinador de Admisiones" as Coordinador
+actor "Comité de Admisiones" as Comite
+actor "Oficina de Registro" as Registro
+actor "Sistema de Pagos" as SistemaPagos
+actor "Sistema de Evaluación" as SistemaEvaluacion
+
+rectangle "Sistema de Admisión Universitaria" {
+  usecase "Consultar Programas" as ConsultarProgramas
+  usecase "Registrar Solicitud" as RegistrarSolicitud
+  usecase "Cargar Documentos" as CargarDocumentos
+  usecase "Pagar Inscripción" as PagarInscripcion
+  usecase "Presentar Examen Admisión" as PresentarExamen
+  usecase "Consultar Resultados" as ConsultarResultados
+  usecase "Aceptar Cupo" as AceptarCupo
+  usecase "Solicitar Entrevista" as SolicitarEntrevista
+  usecase "Apelar Resultado" as ApelarResultado
+  
+  usecase "Revisar Documentos" as RevisarDocumentos
+  usecase "Calificar Examen" as CalificarExamen
+  usecase "Realizar Entrevista" as RealizarEntrevista
+  usecase "Evaluar Portafolio" as EvaluarPortafolio
+  
+  usecase "Configurar Proceso Admisión" as ConfigurarProceso
+  usecase "Asignar Evaluadores" as AsignarEvaluadores
+  usecase "Generar Reportes Admisión" as GenerarReportes
+  usecase "Gestionar Cupos" as GestionarCupos
+  usecase "Publicar Resultados" as PublicarResultados
+  
+  usecase "Revisar Apelaciones" as RevisarApelaciones
+  usecase "Aprobar Admisiones Especiales" as AprobarEspeciales
+  usecase "Definir Criterios Selección" as DefinirCriterios
+  
+  usecase "Matricular Admitidos" as MatricularAdmitidos
+  usecase "Generar Código Estudiante" as GenerarCodigo
+  usecase "Crear Expediente Académico" as CrearExpediente
+  
+  usecase "Validar Datos Personales" as ValidarDatos
+  usecase "Verificar Requisitos Mínimos" as VerificarRequisitos
+  usecase "Calcular Puntaje Total" as CalcularPuntaje
+  usecase "Verificar Pago" as VerificarPago
+  usecase "Enviar Notificación" as EnviarNotificacion
+  usecase "Generar Certificado Admisión" as GenerarCertificado
+  usecase "Aplicar Descuento Mérito" as DescuentoMerito
+  usecase "Programar Examen" as ProgramarExamen
+  usecase "Verificar Autenticidad Documentos" as VerificarAutenticidad
+  usecase "Solicitar Beca Admisión" as SolicitarBeca
+  
+  Aspirante --> ConsultarProgramas
+  Aspirante --> RegistrarSolicitud
+  Aspirante --> CargarDocumentos
+  Aspirante --> PagarInscripcion
+  Aspirante --> PresentarExamen
+  Aspirante --> ConsultarResultados
+  Aspirante --> AceptarCupo
+  Aspirante --> SolicitarEntrevista
+  Aspirante --> ApelarResultado
+  
+  Evaluador --> RevisarDocumentos
+  Evaluador --> CalificarExamen
+  Evaluador --> RealizarEntrevista
+  Evaluador --> EvaluarPortafolio
+  
+  Coordinador --> ConfigurarProceso
+  Coordinador --> AsignarEvaluadores
+  Coordinador --> GenerarReportes
+  Coordinador --> GestionarCupos
+  Coordinador --> PublicarResultados
+  
+  Comite --> RevisarApelaciones
+  Comite --> AprobarEspeciales
+  Comite --> DefinirCriterios
+  
+  Registro --> MatricularAdmitidos
+  Registro --> GenerarCodigo
+  Registro --> CrearExpediente
+  
+  SistemaPagos --> VerificarPago
+  SistemaEvaluacion --> CalcularPuntaje
+  
+  RegistrarSolicitud ..> ValidarDatos : <<include>>
+  RegistrarSolicitud ..> VerificarRequisitos : <<include>>
+  RegistrarSolicitud ..> EnviarNotificacion : <<include>>
+  
+  CargarDocumentos ..> VerificarAutenticidad : <<include>>
+  
+  PagarInscripcion ..> VerificarPago : <<include>>
+  
+  PresentarExamen ..> ProgramarExamen : <<include>>
+  PresentarExamen ..> CalificarExamen : <<include>>
+  
+  ConsultarResultados ..> CalcularPuntaje : <<include>>
+  
+  AceptarCupo ..> GenerarCertificado : <<include>>
+  AceptarCupo ..> EnviarNotificacion : <<include>>
+  
+  MatricularAdmitidos ..> GenerarCodigo : <<include>>
+  MatricularAdmitidos ..> CrearExpediente : <<include>>
+  
+  SolicitarBeca ..> RegistrarSolicitud : <<extend>>
+  DescuentoMerito ..> CalcularPuntaje : <<extend>>
+  SolicitarEntrevista ..> PresentarExamen : <<extend>>
+}
+@enduml`} />
+
+<Aside type="tip">
+  Sistema de admisión universitaria que demuestra:
+  - **Proceso completo de admisión**: Desde registro hasta matrícula
+  - **Múltiples métodos de evaluación**: Exámenes, entrevistas y portafolios
+  - **Comité de admisiones**: Revisión de casos especiales y apelaciones
+  - **Validaciones rigurosas**: Documentos, requisitos y autenticidad
+  - **Incentivos académicos**: Becas y descuentos por mérito
+  - **Integración con sistemas**: Pagos, evaluación y registro académico
 </Aside>
 
 ## Resumen de Buenas Prácticas
