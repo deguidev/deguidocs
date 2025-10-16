@@ -1,0 +1,713 @@
+---
+title: 4. Ejemplos de diagramas de secuencia
+description: Ejemplos completos de diagramas de secuencia UML con diferentes procesos y sistemas
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+# Ejemplos de Diagramas de Secuencia
+
+Esta sección presenta ejemplos prácticos de diagramas de secuencia UML que ilustran diferentes escenarios y patrones de interacción entre objetos y actores en diversos sistemas.
+
+## 4.1. Sistema de Autenticación de Usuario
+
+Sistema de login con validación de credenciales y manejo de sesiones.
+
+<PlantUml code={`@startuml
+actor Usuario
+participant "Interfaz Web" as UI
+participant "Controlador" as Controller
+participant "Servicio Auth" as AuthService
+database "Base de Datos" as DB
+
+Usuario -> UI: Ingresar credenciales
+activate UI
+
+UI -> Controller: login(usuario, password)
+activate Controller
+
+Controller -> AuthService: validarCredenciales(usuario, password)
+activate AuthService
+
+AuthService -> DB: buscarUsuario(usuario)
+activate DB
+DB --> AuthService: datosUsuario
+deactivate DB
+
+alt Credenciales válidas
+    AuthService -> AuthService: verificarPassword(password, hash)
+    
+    AuthService -> DB: registrarAcceso(usuario)
+    activate DB
+    DB --> AuthService: ok
+    deactivate DB
+    
+    AuthService -> AuthService: generarToken()
+    AuthService --> Controller: token, datosUsuario
+    deactivate AuthService
+    
+    Controller --> UI: sesionIniciada(token, usuario)
+    deactivate Controller
+    
+    UI --> Usuario: Mostrar dashboard
+    deactivate UI
+    
+else Credenciales inválidas
+    AuthService --> Controller: error("Credenciales incorrectas")
+    deactivate AuthService
+    
+    Controller --> UI: errorAutenticacion
+    deactivate Controller
+    
+    UI --> Usuario: Mostrar mensaje de error
+    deactivate UI
+end
+
+@enduml`} />
+
+<Aside type="note">
+  Este diagrama incluye:
+  - **Actores**: Usuario
+  - **Participantes**: Interfaz Web, Controlador, Servicio de Autenticación, Base de Datos
+  - **Mensajes síncronos**: Flechas sólidas con activación
+  - **Mensajes de retorno**: Flechas punteadas
+  - **Fragmento alt**: Manejo de credenciales válidas e inválidas
+  - **Activación**: Barras verticales mostrando tiempo de vida
+  - **Llamadas internas**: Servicio Auth llamándose a sí mismo
+</Aside>
+
+## 4.2. Proceso de Compra en Línea
+
+Sistema de e-commerce con validación de inventario y procesamiento de pago.
+
+<PlantUml code={`@startuml
+actor Cliente
+participant "Carrito" as Cart
+participant "Sistema" as System
+participant "Inventario" as Inventory
+participant "Pasarela Pago" as Payment
+participant "Email" as Email
+
+Cliente -> Cart: Agregar producto
+activate Cart
+Cart --> Cliente: Producto agregado
+deactivate Cart
+
+Cliente -> Cart: Finalizar compra
+activate Cart
+
+Cart -> System: procesarOrden(items)
+activate System
+
+loop Para cada item
+    System -> Inventory: verificarStock(producto)
+    activate Inventory
+    Inventory --> System: stockDisponible
+    deactivate Inventory
+end
+
+alt Stock suficiente
+    System -> System: calcularTotal()
+    
+    System -> Payment: procesarPago(monto, tarjeta)
+    activate Payment
+    
+    Payment -> Payment: validarTarjeta()
+    Payment --> System: pagoAprobado(transaccionId)
+    deactivate Payment
+    
+    System -> Inventory: actualizarStock(items)
+    activate Inventory
+    Inventory --> System: stockActualizado
+    deactivate Inventory
+    
+    System -> System: generarOrden()
+    
+    System -> Email: enviarConfirmacion(cliente, orden)
+    activate Email
+    Email --> System: emailEnviado
+    deactivate Email
+    
+    System --> Cart: ordenCreada(numeroOrden)
+    deactivate System
+    
+    Cart --> Cliente: Compra exitosa
+    deactivate Cart
+    
+else Stock insuficiente
+    System --> Cart: errorStock(productos)
+    deactivate System
+    
+    Cart --> Cliente: Productos no disponibles
+    deactivate Cart
+end
+
+@enduml`} />
+
+<Aside type="tip">
+  Este diagrama demuestra:
+  - **Actores**: Cliente
+  - **Participantes**: Carrito, Sistema, Inventario, Pasarela de Pago, Email
+  - **Loop**: Verificación de stock para múltiples items
+  - **Fragmentos alt anidados**: Stock y pago con múltiples condiciones
+  - **Fragmento par**: Envío de email y registro de venta en paralelo
+  - **Activación y desactivación**: Control del ciclo de vida de objetos
+  - **Llamadas internas**: Cálculos y generación de datos
+</Aside>
+
+## 4.3. Sistema de Reserva de Citas Médicas
+
+Gestión de citas con validación de disponibilidad y notificaciones.
+
+<PlantUml code={`@startuml
+actor Paciente
+participant "App Móvil" as App
+participant "API" as API
+participant "Gestor Citas" as Scheduler
+database "BD Citas" as DB
+participant "Notificaciones" as Notify
+
+Paciente -> App: Solicitar cita
+activate App
+
+App -> API: obtenerMedicos()
+activate API
+API -> DB: listarMedicos()
+activate DB
+DB --> API: medicos
+deactivate DB
+API --> App: lista médicos
+deactivate API
+
+App --> Paciente: Mostrar médicos
+Paciente -> App: Seleccionar médico y fecha
+
+App -> API: verificarDisponibilidad(medico, fecha)
+activate API
+
+API -> Scheduler: consultarAgenda(medico, fecha)
+activate Scheduler
+
+Scheduler -> DB: obtenerCitas(medico, fecha)
+activate DB
+DB --> Scheduler: citasExistentes
+deactivate DB
+
+Scheduler -> Scheduler: calcularHorariosDisponibles()
+Scheduler --> API: horariosDisponibles
+deactivate Scheduler
+
+API --> App: horarios
+deactivate API
+
+App --> Paciente: Mostrar horarios
+
+Paciente -> App: Confirmar horario
+
+App -> API: reservarCita(medico, fecha, hora, paciente)
+activate API
+
+API -> Scheduler: crearCita(datos)
+activate Scheduler
+
+Scheduler -> DB: insertarCita(cita)
+activate DB
+DB --> Scheduler: citaId
+deactivate DB
+
+Scheduler --> API: citaCreada(citaId)
+deactivate Scheduler
+
+API -> Notify: enviarConfirmacion(paciente, cita)
+activate Notify
+Notify -> Notify: enviarSMS()
+Notify -> Notify: enviarEmail()
+Notify --> API: notificacionesEnviadas
+deactivate Notify
+
+API --> App: reservaExitosa(citaId)
+deactivate API
+
+App --> Paciente: Cita confirmada
+deactivate App
+
+@enduml`} />
+
+<Aside type="note">
+  Este diagrama incluye:
+  - **Actores**: Paciente
+  - **Participantes**: App Móvil, API, Gestor de Citas, Base de Datos, Notificaciones
+  - **Múltiples consultas**: Médicos, disponibilidad de horarios
+  - **Llamadas internas**: Cálculo de horarios disponibles
+  - **Activación y desactivación**: Control del ciclo de vida de objetos
+  - **Base de datos**: Representada como participante especial
+  - **Notificaciones**: Envío de SMS y email
+</Aside>
+
+## 4.4. Sistema de Transferencia Bancaria
+
+Transacción bancaria con validación de fondos y actualización de cuentas.
+
+<PlantUml code={`@startuml
+actor Usuario
+participant "App Bancaria" as App
+participant "Servidor" as Server
+participant "Validador" as Validator
+database "BD Cuentas" as DB
+participant "Notificaciones" as Notify
+
+Usuario -> App: Iniciar transferencia
+activate App
+
+App -> Server: solicitarTransferencia(origen, destino, monto)
+activate Server
+
+Server -> Validator: validarCuentas(origen, destino)
+activate Validator
+
+Validator -> DB: verificarCuentas(origen, destino)
+activate DB
+DB --> Validator: cuentasValidas
+deactivate DB
+
+alt Cuentas válidas
+    Validator -> DB: consultarSaldo(origen)
+    activate DB
+    DB --> Validator: saldo
+    deactivate DB
+    
+    alt Saldo suficiente
+        Validator --> Server: validacionOK
+        deactivate Validator
+        
+        Server -> DB: debitarCuenta(origen, monto)
+        activate DB
+        DB --> Server: debitoOK
+        
+        Server -> DB: acreditarCuenta(destino, monto)
+        DB --> Server: creditoOK
+        deactivate DB
+        
+        Server -> Server: generarComprobante()
+        
+        Server -> Notify: notificarUsuarios(origen, destino, monto)
+        activate Notify
+        Notify --> Server: notificado
+        deactivate Notify
+        
+        Server --> App: transferenciaExitosa(comprobante)
+        deactivate Server
+        
+        App --> Usuario: Transferencia completada
+        deactivate App
+        
+    else Saldo insuficiente
+        Validator --> Server: errorSaldo
+        deactivate Validator
+        Server --> App: errorSaldoInsuficiente
+        deactivate Server
+        App --> Usuario: Saldo insuficiente
+        deactivate App
+    end
+    
+else Cuentas inválidas
+    Validator --> Server: errorCuentas
+    deactivate Validator
+    Server --> App: errorCuentasInvalidas
+    deactivate Server
+    App --> Usuario: Cuentas no válidas
+    deactivate App
+end
+
+@enduml`} />
+
+<Aside type="tip">
+  Este diagrama incluye:
+  - **Actores**: Usuario
+  - **Participantes**: App Bancaria, Servidor, Validador, BD Cuentas, Notificaciones
+  - **Fragmentos alt anidados**: Validación de cuentas y saldo
+  - **Llamadas internas**: Generación de comprobante
+  - **Base de datos**: Operaciones de débito y crédito
+  - **Notificaciones**: Aviso a usuarios
+  - **Activación y desactivación**: Control del flujo de ejecución
+</Aside>
+
+## 4.5. Sistema de Gestión de Biblioteca
+
+Préstamo de libros con validación de disponibilidad y registro de transacciones.
+
+<PlantUml code={`@startuml
+actor Usuario
+participant "Sistema" as System
+participant "Catálogo" as Catalog
+database "BD Biblioteca" as DB
+participant "Notificaciones" as Notify
+
+Usuario -> System: Buscar libro
+activate System
+
+System -> Catalog: buscarLibro(titulo)
+activate Catalog
+
+Catalog -> DB: consultarLibros(titulo)
+activate DB
+DB --> Catalog: librosEncontrados
+deactivate DB
+
+Catalog --> System: resultados
+deactivate Catalog
+
+System --> Usuario: Mostrar libros disponibles
+
+Usuario -> System: Solicitar préstamo(libroId)
+
+System -> DB: verificarDisponibilidad(libroId)
+activate DB
+DB --> System: disponible
+deactivate DB
+
+alt Libro disponible
+    System -> DB: verificarUsuario(usuarioId)
+    activate DB
+    DB --> System: estadoUsuario
+    deactivate DB
+    
+    alt Usuario sin multas
+        System -> DB: registrarPrestamo(libroId, usuarioId)
+        activate DB
+        
+        System -> DB: actualizarStock(libroId)
+        DB --> System: prestamoId
+        deactivate DB
+        
+        System -> System: calcularFechaDevolucion()
+        note right: 15 días desde hoy
+        
+        System -> Notify: enviarConfirmacion(usuario, libro, fechaDevolucion)
+        activate Notify
+        Notify --> System: enviado
+        deactivate Notify
+        
+        System --> Usuario: Préstamo exitoso
+        
+    else Usuario con multas
+        System --> Usuario: Error: Tiene multas pendientes
+    end
+    
+else Libro no disponible
+    System -> DB: registrarReserva(libroId, usuarioId)
+    activate DB
+    DB --> System: reservaId
+    deactivate DB
+    
+    System --> Usuario: Libro reservado
+end
+
+deactivate System
+
+@enduml`} />
+
+<Aside type="note">
+  Este diagrama incluye:
+  - **Actores**: Usuario
+  - **Participantes**: Sistema, Catálogo, BD Biblioteca, Notificaciones
+  - **Fragmentos alt anidados**: Disponibilidad y estado del usuario
+  - **Llamadas internas**: Cálculo de fecha de devolución
+  - **Notas**: Explicación de reglas de negocio
+  - **Base de datos**: Consultas y actualizaciones
+  - **Activación y desactivación**: Control del flujo
+</Aside>
+
+## 4.6. Sistema de Registro de Estudiantes
+
+Inscripción de estudiantes con validación de requisitos y asignación de cursos.
+
+<PlantUml code={`@startuml
+actor Estudiante
+participant "Portal Web" as Portal
+participant "Sistema Académico" as Academic
+participant "Validador" as Validator
+database "BD Estudiantes" as DB
+participant "Email" as Email
+
+Estudiante -> Portal: Iniciar registro
+activate Portal
+
+Portal -> Academic: crearSolicitud()
+activate Academic
+
+Academic -> Validator: validarDocumentos(documentos)
+activate Validator
+
+loop Para cada documento
+    Validator -> Validator: verificarFormato()
+    Validator -> Validator: verificarAutenticidad()
+end
+
+alt Documentos válidos
+    Validator --> Academic: documentosOK
+    deactivate Validator
+    
+    Academic -> DB: verificarDuplicado(identificacion)
+    activate DB
+    DB --> Academic: noExiste
+    deactivate DB
+    
+    Academic -> DB: crearEstudiante(datos)
+    activate DB
+    DB --> Academic: estudianteId
+    deactivate DB
+    
+    Academic -> Academic: generarMatricula()
+    
+    Academic -> DB: asignarCursos(estudianteId, cursos)
+    activate DB
+    DB --> Academic: cursosAsignados
+    deactivate DB
+    
+    Academic -> Email: enviarCredenciales(estudiante, matricula)
+    activate Email
+    Email --> Academic: enviado
+    deactivate Email
+    
+    Academic --> Portal: registroExitoso(matricula)
+    deactivate Academic
+    
+    Portal --> Estudiante: Registro completado
+    deactivate Portal
+    
+else Documentos inválidos
+    Validator --> Academic: erroresValidacion
+    deactivate Validator
+    
+    Academic --> Portal: documentosInvalidos
+    deactivate Academic
+    
+    Portal --> Estudiante: Corregir documentos
+    deactivate Portal
+end
+
+@enduml`} />
+
+<Aside type="tip">
+  Este diagrama incluye:
+  - **Actores**: Estudiante
+  - **Participantes**: Portal Web, Sistema Académico, Validador, BD Estudiantes, Email
+  - **Fragmento loop**: Validación de múltiples documentos
+  - **Fragmento alt**: Manejo de documentos válidos e inválidos
+  - **Llamadas internas**: Generación de matrícula
+  - **Base de datos**: Verificación de duplicados y creación de registros
+  - **Notificaciones**: Envío de credenciales por email
+</Aside>
+
+## 4.7. Sistema de Pedidos de Restaurante
+
+Gestión de pedidos con cocina y entrega.
+
+<PlantUml code={`@startuml
+actor Cliente
+participant "App" as App
+participant "Sistema Pedidos" as OrderSys
+participant "Cocina" as Kitchen
+participant "Repartidor" as Delivery
+database "BD Pedidos" as DB
+
+Cliente -> App: Ver menú
+activate App
+
+App -> OrderSys: obtenerMenu()
+activate OrderSys
+OrderSys -> DB: listarPlatosDisponibles()
+activate DB
+DB --> OrderSys: platos
+deactivate DB
+OrderSys --> App: menu
+deactivate OrderSys
+
+App --> Cliente: Mostrar menú
+
+Cliente -> App: Agregar platos al carrito
+Cliente -> App: Confirmar pedido
+
+App -> OrderSys: crearPedido(items, direccion)
+activate OrderSys
+
+OrderSys -> OrderSys: calcularTotal()
+OrderSys -> OrderSys: estimarTiempoPreparacion()
+
+OrderSys -> DB: guardarPedido(pedido)
+activate DB
+DB --> OrderSys: pedidoId
+deactivate DB
+
+OrderSys -> Kitchen: enviarOrden(pedidoId, items)
+activate Kitchen
+
+OrderSys --> App: pedidoConfirmado(pedidoId, tiempoEstimado)
+deactivate OrderSys
+
+App --> Cliente: Pedido confirmado
+deactivate App
+
+Kitchen -> Kitchen: prepararPlatos()
+note right: Preparación en cocina
+
+Kitchen -> DB: actualizarEstado(pedidoId, "Listo")
+activate DB
+DB --> Kitchen: actualizado
+deactivate DB
+
+Kitchen -> Delivery: asignarPedido(pedidoId, direccion)
+activate Delivery
+deactivate Kitchen
+
+Delivery -> Delivery: calcularRuta()
+
+Delivery -> DB: actualizarEstado(pedidoId, "En camino")
+activate DB
+DB --> Delivery: actualizado
+deactivate DB
+
+Delivery -> Cliente: Entregar pedido
+activate Cliente
+
+Cliente -> Delivery: Confirmar recepción
+deactivate Cliente
+
+Delivery -> DB: actualizarEstado(pedidoId, "Entregado")
+activate DB
+DB --> Delivery: actualizado
+deactivate DB
+
+deactivate Delivery
+
+@enduml`} />
+
+<Aside type="note">
+  Este diagrama incluye:
+  - **Actores**: Cliente
+  - **Participantes**: App, Sistema Pedidos, Cocina, Repartidor, BD Pedidos
+  - **Llamadas internas**: Cálculo de total y tiempo de preparación
+  - **Notas**: Explicación de proceso de preparación
+  - **Base de datos**: Actualizaciones de estado del pedido
+  - **Activación y desactivación**: Transferencia de responsabilidad entre participantes
+  - **Flujo secuencial**: Desde pedido hasta entrega
+</Aside>
+
+## 4.8. Sistema de Control de Acceso
+
+Autenticación biométrica con registro de eventos.
+
+<PlantUml code={`@startuml
+actor Empleado
+participant "Lector Biométrico" as Reader
+participant "Controlador" as Controller
+participant "Sistema Seguridad" as Security
+database "BD Accesos" as DB
+participant "Alarma" as Alarm
+
+Empleado -> Reader: Colocar huella
+activate Reader
+
+Reader -> Reader: capturarHuella()
+Reader -> Controller: enviarHuella(huella)
+activate Controller
+
+Controller -> Security: validarHuella(huella)
+activate Security
+
+Security -> DB: buscarEmpleado(huella)
+activate DB
+DB --> Security: empleadoEncontrado
+deactivate DB
+
+alt Huella reconocida
+    Security -> DB: verificarPermisos(empleadoId, puerta)
+    activate DB
+    DB --> Security: permisos
+    deactivate DB
+    
+    alt Tiene permisos
+        Security -> DB: registrarAcceso(empleadoId, puerta, fecha)
+        activate DB
+        DB --> Security: registrado
+        deactivate DB
+        
+        Security --> Controller: accesoPermitido
+        deactivate Security
+        
+        Controller -> Controller: abrirPuerta()
+        note right: Puerta abierta 5 segundos
+        
+        Controller --> Reader: accesoOK
+        deactivate Controller
+        
+        Reader --> Empleado: Luz verde - Acceso permitido
+        deactivate Reader
+        
+    else Sin permisos
+        Security -> DB: registrarIntentoNoAutorizado(empleadoId, puerta)
+        activate DB
+        DB --> Security: registrado
+        deactivate DB
+        
+        Security -> Alarm: activarAlerta(empleadoId, puerta)
+        activate Alarm
+        Alarm --> Security: alertaActivada
+        deactivate Alarm
+        
+        Security --> Controller: accesoDenegado
+        deactivate Security
+        
+        Controller --> Reader: accesoNegado
+        deactivate Controller
+        
+        Reader --> Empleado: Luz roja - Acceso denegado
+        deactivate Reader
+    end
+    
+else Huella no reconocida
+    Security -> DB: registrarIntentoDesconocido(huella, puerta)
+    activate DB
+    DB --> Security: registrado
+    deactivate DB
+    
+    Security --> Controller: huellaNoReconocida
+    deactivate Security
+    
+    Controller --> Reader: error
+    deactivate Controller
+    
+    Reader --> Empleado: Huella no reconocida
+    deactivate Reader
+end
+
+@enduml`} />
+
+<Aside type="tip">
+  Este diagrama incluye:
+  - **Actores**: Empleado
+  - **Participantes**: Lector Biométrico, Controlador, Sistema Seguridad, BD Accesos, Alarma
+  - **Fragmentos alt anidados**: Reconocimiento de huella y verificación de permisos
+  - **Llamadas internas**: Captura de huella, apertura de puerta
+  - **Notas**: Tiempo de apertura de puerta
+  - **Base de datos**: Registro de accesos y eventos de seguridad
+  - **Sistema de alarma**: Activación en caso de acceso no autorizado
+</Aside>
+
+<Aside type="caution">
+  Al crear diagramas de secuencia, recuerde:
+  - Mantener un número manejable de participantes (5-7 máximo)
+  - Usar fragmentos combinados apropiadamente (alt, opt, loop, par, critical, ref)
+  - Mostrar claramente la activación y desactivación de objetos
+  - Incluir mensajes de retorno para mayor claridad
+  - Usar notas para explicar lógica compleja o reglas de negocio
+  - Evitar diagramas excesivamente complejos que dificulten la comprensión
+  - Representar correctamente el flujo temporal de arriba hacia abajo
+</Aside>
+

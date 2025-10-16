@@ -263,44 +263,8 @@ partition "Actor2" {
   </TabItem>
 </Tabs>
 
-## 2.6. Nodos de objeto
 
-Los nodos de objeto representan objetos o datos que son utilizados o producidos por las actividades.
-
-<PlantUml code={`@startuml
-start
-:Crear pedido;
-#palegreen:Pedido;
-:Validar información;
-if (¿Información válida?) then (sí)
-  :Procesar pago;
-  #palegreen:Recibo;
-  :Enviar confirmación;
-else (no)
-  :Solicitar corrección;
-endif
-stop
-@enduml`} />
-
-### Características principales
-
-- Se representan como **rectángulos** (a diferencia de las acciones que tienen esquinas redondeadas)
-- Contienen el nombre del objeto, a veces con su estado entre corchetes
-- Pueden estar conectados a acciones para mostrar entradas y salidas
-
-<Tabs>
-  <TabItem label="Sintaxis">
-    <Code code={`#color:Nombre del objeto;
-#color:Objeto [Estado];`} lang="text" title="Sintaxis de nodos de objeto en PlantUML" />
-  </TabItem>
-  <TabItem label="Ejemplos">
-    <Code code={`#palegreen:Formulario [Completado];
-#pink:Factura [Pendiente];
-#lightblue:Informe [Generado];`} lang="text" title="Ejemplos de nodos de objeto con estados" />
-  </TabItem>
-</Tabs>
-
-## 2.7. Señales y eventos
+## 2.6. Señales y eventos
 
 Las señales y eventos representan la recepción o envío de señales entre actividades o sistemas.
 
@@ -403,7 +367,7 @@ stop`} lang="text" title="Ejemplo de señales en un proceso de pago" />
   Las señales son especialmente útiles para modelar interacciones asíncronas entre diferentes sistemas o actores en un proceso.
 </Aside>
 
-## 2.8. Notas y comentarios
+## 2.7. Notas y comentarios
 
 Las notas y comentarios permiten añadir explicaciones o aclaraciones al diagrama.
 
@@ -449,107 +413,3 @@ note bottom of [elemento]: Nota abajo`} lang="text" title="Posicionamiento de no
   </TabItem>
 </Tabs>
 
-## 2.9. Regiones de expansión
-
-Las regiones de expansión representan actividades que se ejecutan múltiples veces para un conjunto de elementos.
-
-<PlantUml code={`@startuml
-start
-:Obtener lista de productos;
-#lightblue:Lista de productos;
-partition "Región de expansión" {
-  :Verificar disponibilidad;
-  if (¿Disponible?) then (sí)
-    :Añadir a carrito;
-  else (no)
-    :Marcar como agotado;
-  endif
-}
-note right of "Región de expansión"
-  Se ejecuta para cada
-  producto de la lista
-end note
-:Mostrar resumen;
-stop
-@enduml`} />
-
-### Características principales
-
-- Representan operaciones iterativas o bucles
-- Se aplican a colecciones de elementos
-- Pueden contener flujos complejos dentro de ellas
-
-<Tabs>
-  <TabItem label="Sintaxis">
-    <Code code={`partition "Región de expansión" {
-  ' Actividades que se repiten
-}`} lang="text" title="Sintaxis de regiones de expansión en PlantUML" />
-  </TabItem>
-  <TabItem label="Ejemplo con bucle">
-    <Code code={`start
-:Obtener pedidos pendientes;
-while (¿Hay más pedidos?) is (sí)
-  :Procesar siguiente pedido;
-  :Actualizar estado;
-endwhile (no)
-:Generar informe;
-stop`} lang="text" title="Ejemplo con bucle while" />
-  </TabItem>
-</Tabs>
-
-<Aside type="note">
-  En PlantUML, las regiones de expansión pueden representarse usando particiones con nombres descriptivos o mediante estructuras de control como while, repeat o foreach.
-</Aside>
-
-## 2.10. Excepciones y gestión de errores
-
-Los diagramas de actividades también pueden representar el manejo de excepciones y errores.
-
-<PlantUml code={`@startuml
-start
-:Iniciar transacción;
-try
-  :Ejecutar operación;
-  :Confirmar transacción;
-catch
-  :Registrar error;
-  :Revertir transacción;
-endtry
-stop
-@enduml`} />
-
-### Características principales
-
-- Permiten modelar flujos alternativos cuando ocurren errores
-- Ayudan a visualizar mecanismos de recuperación
-- Pueden representar diferentes tipos de excepciones
-
-<Tabs>
-  <TabItem label="Sintaxis">
-    <Code code={`try
-  ' Actividades normales
-catch
-  ' Actividades de manejo de errores
-endtry`} lang="text" title="Sintaxis de manejo de excepciones en PlantUML" />
-  </TabItem>
-  <TabItem label="Ejemplo detallado">
-    <Code code={`start
-:Conectar a base de datos;
-try
-  :Ejecutar consulta;
-  :Procesar resultados;
-catch
-  if (¿Error de conexión?) then (sí)
-    :Reintentar conexión;
-    backward:Conectar a base de datos;
-  else (otro error)
-    :Registrar error en log;
-    :Notificar al administrador;
-  endif
-endtry
-:Cerrar conexión;
-stop`} lang="text" title="Ejemplo de manejo de diferentes tipos de errores" />
-  </TabItem>
-</Tabs>
-
-Estos elementos básicos constituyen el vocabulario fundamental para crear diagramas de actividades efectivos. En las siguientes secciones, exploraremos cómo estos elementos se relacionan entre sí y las diferentes notaciones UML para representarlos.

@@ -349,7 +349,7 @@ export default defineConfig({
 								{ label: '1. Introducción al Diagrama de Secuencia', link: '/uml/diagramas-secuencia/introduccion/' },
 								{ label: '2. Elementos Básicos de un Diagrama de Secuencia', link: '/uml/diagramas-secuencia/elementos-basicos/' },
 								{ label: '3. Tipos de Mensajes en un Diagrama de Secuencia', link: '/uml/diagramas-secuencia/tipos-mensajes/' },
-								{ label: '4. Notación UML para Diagramas de Secuencia', link: '/uml/diagramas-secuencia/notacion/' },
+								{ label: '4. Ejemplos de Diagramas de Secuencia', link: '/uml/diagramas-secuencia/ejemplos/' },
 							]
 						},
 						{
@@ -358,8 +358,7 @@ export default defineConfig({
 							items: [
 								{ label: '1. Introducción al Diagrama de Actividades', link: '/uml/diagramas-actividades/introduccion/' },
 								{ label: '2. Elementos Básicos de un Diagrama de Actividades', link: '/uml/diagramas-actividades/elementos-basicos/' },
-								{ label: '3. Tipos de Relaciones en un Diagrama de Actividades', link: '/uml/diagramas-actividades/relaciones/' },
-								{ label: '4. Notación UML para Diagramas de Actividades', link: '/uml/diagramas-actividades/notacion/' },
+								{ label: '3. Ejemplos de Diagramas de Actividades', link: '/uml/diagramas-actividades/ejemplos/' },
 							]
 						},
 						{ 

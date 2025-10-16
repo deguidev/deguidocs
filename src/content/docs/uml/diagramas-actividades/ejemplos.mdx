@@ -1,0 +1,632 @@
+---
+title: 3. Ejemplos de diagramas de actividades
+description: Ejemplos completos de diagramas de actividades UML con diferentes procesos y sistemas
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+import PlantUml from "@components/PlantUml.astro";
+
+Los siguientes ejemplos demuestran el uso de todos los elementos básicos de los diagramas de actividades en contextos reales. Cada ejemplo incluye **particiones (swimlanes)**, **decisiones**, **bifurcaciones**, **uniones**, **señales**, **eventos** y **notas explicativas**.
+
+## 3.1. Proceso de Compra en Línea
+
+Sistema de comercio electrónico con múltiples actores y procesos paralelos.
+
+<PlantUml code={`@startuml
+|Cliente|
+start
+:Buscar productos;
+note right
+  El cliente puede usar
+  filtros y categorías
+end note
+:Seleccionar producto;
+:Agregar al carrito;
+
+if (¿Continuar comprando?) then (sí)
+  :Buscar más productos;
+  detach
+else (no)
+  :Revisar carrito;
+endif
+
+|Sistema|
+:Calcular total;
+:Aplicar descuentos;
+
+fork
+  :Verificar inventario;
+  note left: Proceso en paralelo
+fork again
+  :Calcular impuestos;
+fork again
+  :Calcular envío;
+end fork
+
+|Cliente|
+:Ingresar datos de envío;
+:Seleccionar método de pago;
+
+|Sistema de Pago|
+:Procesar pago;
+
+if (¿Pago exitoso?) then (sí)
+  |Sistema|
+  :Generar orden;
+  
+  fork
+    :Actualizar inventario;
+  fork again
+    :Enviar confirmación email;
+    note right
+      Email con número
+      de orden y detalles
+    end note
+  fork again
+    |Almacén|
+    :Preparar pedido;
+  end fork
+  
+  |Cliente|
+  :Recibir confirmación;
+  
+else (no)
+  |Sistema|
+  :Registrar error;
+  :Notificar cliente;
+  |Cliente|
+  :Reintentar pago;
+  stop
+endif
+
+|Almacén|
+:Empacar productos;
+:Generar guía de envío;
+
+|Sistema de Envío|
+:Recoger paquete;
+:Enviar paquete;
+
+|Cliente|
+:Recibir producto;
+:Calificar compra;
+
+stop
+@enduml`} />
+
+<Aside type="tip">
+  Este diagrama muestra:
+  - **Particiones**: Cliente, Sistema, Sistema de Pago, Almacén, Sistema de Envío
+  - **Decisiones**: Continuar comprando, Pago exitoso
+  - **Bifurcaciones**: Verificación de inventario, cálculo de impuestos y envío en paralelo
+  - **Notas**: Explicaciones sobre filtros y confirmación por email
+  - **Detach**: Para flujo de continuar comprando
+</Aside>
+
+## 3.2. Proceso de Admisión Universitaria
+
+Sistema educativo con validaciones, aprobaciones y múltiples etapas.
+
+<PlantUml code={`@startuml
+|Aspirante|
+start
+:Registrar solicitud;
+:Cargar documentos;
+
+|Sistema|
+:Validar documentos;
+
+if (¿Documentos completos?) then (no)
+  |Sistema|
+  :Enviar solicitud de documentos; <<sendSignal>>
+  |Aspirante|
+  :Recibir notificación; <<acceptEvent>>
+  :Completar documentos;
+  |Sistema|
+  :Revalidar;
+else (sí)
+endif
+
+:Programar examen;
+
+|Sistema|
+:Enviar notificación de examen; <<sendSignal>>
+|Aspirante|
+:Recibir fecha de examen; <<acceptEvent>>
+:Espera de 3 días; <<timeEvent>>
+note right: Tiempo de preparación
+:Presentar examen;
+
+|Sistema de Evaluación|
+:Calificar examen;
+:Calcular puntaje;
+
+fork
+  :Evaluar conocimientos;
+fork again
+  :Evaluar aptitudes;
+fork again
+  :Evaluar competencias;
+end fork
+
+:Consolidar resultados;
+
+|Sistema|
+if (¿Puntaje >= mínimo?) then (no)
+  :Enviar rechazo; <<sendSignal>>
+  |Aspirante|
+  :Recibir notificación de no admisión; <<acceptEvent>>
+  :Recibir resultado;
+  stop
+else (sí)
+endif
+
+|Comité de Admisiones|
+:Revisar caso;
+
+if (¿Requiere entrevista?) then (sí)
+  |Aspirante|
+  :Asistir a entrevista;
+  |Comité de Admisiones|
+  :Evaluar entrevista;
+else (no)
+endif
+
+:Tomar decisión final;
+
+if (¿Admitido?) then (sí)
+  |Sistema|
+  fork
+    :Generar código estudiante;
+  fork again
+    :Crear expediente;
+  fork again
+    :Enviar notificación de admisión; <<sendSignal>>
+  end fork
+  
+  |Aspirante|
+  :Recibir carta de admisión; <<acceptEvent>>
+  :Aceptar cupo;
+  
+  |Oficina de Registro|
+  :Matricular estudiante;
+  note right
+    Se asignan materias
+    del primer semestre
+  end note
+  
+else (no)
+  |Sistema|
+  :Enviar rechazo; <<sendSignal>>
+  |Aspirante|
+  :Recibir notificación de rechazo; <<acceptEvent>>
+  :Recibir resultado;
+endif
+
+stop
+@enduml`} />
+
+<Aside type="note">
+  Este diagrama incluye:
+  - **Particiones**: Aspirante, Sistema, Sistema de Evaluación, Comité, Oficina de Registro
+  - **Señales de envío** (sendSignal): Notificaciones de documentos, examen, admisión/rechazo
+  - **Señales de recepción** (acceptEvent): Recepción de notificaciones por el aspirante
+  - **Eventos temporales** (timeEvent): Espera de 3 días para preparación del examen
+  - **Bifurcaciones**: Evaluación paralela de conocimientos, aptitudes y competencias
+  - **Decisiones anidadas**: Documentos completos, puntaje mínimo, entrevista, admisión
+  - **Notas**: Explicación sobre asignación de materias
+</Aside>
+
+## 3.3. Proceso de Atención Médica en Hospital
+
+Sistema hospitalario con urgencias, diagnóstico y tratamiento.
+
+<PlantUml code={`@startuml
+|Paciente|
+start
+:Llegar al hospital;
+
+|Recepción|
+:Registrar ingreso;
+
+if (¿Es urgencia?) then (sí)
+  |Triaje|
+  :Evaluar gravedad;
+  :Activar alerta; <<sendSignal>>
+  note right: Código de urgencia
+  
+  |Médico|
+  :Recibir alerta; <<acceptEvent>>
+  :Atención inmediata;
+else (no)
+  |Recepción|
+  :Asignar cita;
+  :Tiempo de espera; <<timeEvent>>
+  note left: 30 minutos aprox.
+endif
+
+|Enfermería|
+fork
+  :Medir presión;
+fork again
+  :Tomar temperatura;
+fork again
+  :Registrar síntomas;
+end fork
+
+|Médico|
+:Examinar paciente;
+:Establecer diagnóstico;
+
+if (¿Requiere exámenes?) then (sí)
+  |Laboratorio|
+  :Realizar análisis;
+  :Generar resultados;
+  
+  |Médico|
+  :Revisar resultados;
+else (no)
+endif
+
+:Prescribir tratamiento;
+
+|Farmacia|
+:Dispensar medicamentos;
+
+|Paciente|
+:Recibir indicaciones;
+
+|Caja|
+:Procesar pago;
+
+|Sistema|
+:Enviar recordatorio; <<sendSignal>>
+
+|Paciente|
+:Recibir recordatorio; <<acceptEvent>>
+
+stop
+@enduml`} />
+
+<Aside type="tip">
+  Este diagrama demuestra:
+  - **Particiones**: Paciente, Recepción, Triaje, Médico, Enfermería, Laboratorio, Farmacia, Caja, Sistema
+  - **Señales de envío** (sendSignal): Alerta de urgencia, recordatorio de cita
+  - **Señales de recepción** (acceptEvent): Recepción de alertas y recordatorios
+  - **Eventos temporales** (timeEvent): Tiempo de espera de 30 minutos
+  - **Bifurcaciones**: Toma de signos vitales en paralelo
+  - **Decisiones**: Urgencia, exámenes requeridos
+  - **Notas**: Código de urgencia, tiempo de espera
+</Aside>
+
+## 3.4. Proceso de Desarrollo de Software (Metodología Ágil)
+
+Sistema de gestión de proyectos con sprints y revisiones.
+
+<PlantUml code={`@startuml
+|Product Owner|
+start
+:Crear Product Backlog;
+
+|Scrum Master|
+:Planificar Sprint;
+
+|Equipo de Desarrollo|
+:Seleccionar historias;
+note right: Planning Poker
+
+fork
+  :Diseñar solución;
+fork again
+  :Definir pruebas;
+end fork
+
+partition "Sprint (2 semanas)" {
+  repeat
+    :Desarrollar funcionalidad;
+    
+    |Sistema CI/CD|
+    :Ejecutar build;
+    
+    if (¿Build exitoso?) then (no)
+      :Enviar alerta; <<sendSignal>>
+      |Equipo de Desarrollo|
+      :Recibir alerta; <<acceptEvent>>
+      :Corregir errores;
+    else (sí)
+      :Ejecutar pruebas;
+    endif
+    
+    |QA Tester|
+    :Probar funcionalidad;
+    
+    if (¿Calidad OK?) then (no)
+      :Reportar bugs;
+      |Equipo de Desarrollo|
+      :Corregir bugs;
+    else (sí)
+      :Aprobar;
+    endif
+    
+    |Scrum Master|
+    :Daily Standup; <<timeEvent>>
+    note right: Reunión diaria
+    
+  repeat while (¿Sprint completado?) is (no)
+}
+
+|Product Owner|
+:Sprint Review;
+
+if (¿Incremento aceptado?) then (no)
+  :Agregar feedback;
+  |Scrum Master|
+  :Planificar siguiente Sprint;
+  detach
+else (sí)
+  |Sistema CI/CD|
+  :Desplegar a producción;
+  :Enviar notificación; <<sendSignal>>
+endif
+
+|Equipo Completo|
+:Sprint Retrospective;
+note right
+  Mejora continua
+end note
+
+stop
+@enduml`} />
+
+<Aside type="note">
+  Este diagrama incluye:
+  - **Particiones**: Product Owner, Scrum Master, Equipo de Desarrollo, Sistema CI/CD, QA Tester, Equipo Completo
+  - **Partition especial**: Sprint de 2 semanas con repeat/while
+  - **Bifurcaciones**: Diseño y definición de pruebas en paralelo
+  - **Señales de envío** (sendSignal): Alertas de build, notificación de despliegue
+  - **Señales de recepción** (acceptEvent): Recepción de alertas por el equipo
+  - **Eventos temporales** (timeEvent): Daily Standup diario
+  - **Bucles**: Iteración dentro del Sprint con repeat/while
+  - **Notas**: Planning Poker, reunión diaria, mejora continua
+  - **Detach**: Para continuar con siguiente Sprint
+  - **Decisiones**: Build exitoso, calidad OK, incremento aceptado
+</Aside>
+
+## 3.5. Proceso de Solicitud de Préstamo Bancario
+
+Sistema financiero con validaciones y aprobaciones.
+
+<PlantUml code={`@startuml
+|Cliente|
+start
+:Solicitar préstamo;
+:Completar formulario;
+
+|Sistema|
+:Validar información;
+
+if (¿Datos completos?) then (no)
+  :Enviar solicitud; <<sendSignal>>
+  |Cliente|
+  :Recibir solicitud; <<acceptEvent>>
+  :Completar datos;
+  |Sistema|
+  :Revalidar;
+else (sí)
+endif
+
+|Oficial de Crédito|
+:Revisar solicitud;
+
+fork
+  :Consultar buró;
+  note right: Score crediticio
+fork again
+  :Verificar ingresos;
+fork again
+  :Calcular capacidad de pago;
+end fork
+
+:Generar análisis;
+
+if (¿Aprobado?) then (no)
+  :Enviar rechazo; <<sendSignal>>
+  |Cliente|
+  :Recibir notificación; <<acceptEvent>>
+  stop
+else (sí)
+endif
+
+|Oficial de Crédito|
+:Calcular monto;
+:Definir tasa;
+
+|Sistema|
+:Generar contrato;
+
+fork
+  :Calcular amortización;
+fork again
+  :Preparar documentos;
+end fork
+
+:Enviar aprobación; <<sendSignal>>
+
+|Cliente|
+:Recibir notificación; <<acceptEvent>>
+:Revisar términos;
+
+if (¿Acepta?) then (no)
+  :Rechazar;
+  stop
+else (sí)
+  :Firmar contrato;
+endif
+
+|Tesorería|
+:Desembolsar fondos;
+
+|Cliente|
+:Recibir fondos;
+
+|Sistema|
+:Recordatorio de pago; <<timeEvent>>
+note right: 30 días
+:Enviar recordatorio; <<sendSignal>>
+
+|Cliente|
+:Recibir recordatorio; <<acceptEvent>>
+
+partition "Ciclo de Pagos" {
+  repeat
+    :Realizar pago;
+    
+    |Sistema|
+    :Registrar pago;
+    
+    if (¿Pago a tiempo?) then (no)
+      :Alerta de mora; <<timeEvent>>
+      :Enviar alerta; <<sendSignal>>
+      |Cobranza|
+      :Recibir alerta; <<acceptEvent>>
+      :Gestionar mora;
+    else (sí)
+      :Aplicar pago;
+    endif
+    
+  repeat while (¿Liquidado?) is (no)
+}
+
+|Sistema|
+:Cerrar préstamo;
+:Enviar confirmación; <<sendSignal>>
+
+|Cliente|
+:Recibir certificado; <<acceptEvent>>
+
+stop
+@enduml`} />
+
+<Aside type="tip">
+  Este diagrama muestra:
+  - **Particiones**: Cliente, Sistema, Oficial de Crédito, Tesorería, Cobranza
+  - **Bifurcaciones**: Verificaciones paralelas (buró, ingresos, capacidad), generación de documentos
+  - **Decisiones**: Datos completos, aprobación, aceptación de términos, pago a tiempo
+  - **Señales de envío** (sendSignal): Solicitud de datos, rechazo, aprobación, recordatorios, alertas
+  - **Señales de recepción** (acceptEvent): Recepción de notificaciones por el cliente y cobranza
+  - **Eventos temporales** (timeEvent): Recordatorio de pago (30 días), alerta de mora
+  - **Partition especial**: Ciclo de pagos con repeat/while
+  - **Notas**: Score crediticio, tiempo de recordatorio
+</Aside>
+
+## 3.6. Proceso de Gestión de Incidentes IT
+
+Sistema de soporte técnico con escalamiento y resolución.
+
+<PlantUml code={`@startuml
+|Usuario|
+start
+:Reportar incidente;
+
+|Sistema de Tickets|
+:Crear ticket;
+:Enviar confirmación; <<sendSignal>>
+
+|Usuario|
+:Recibir confirmación; <<acceptEvent>>
+
+|Sistema|
+:Clasificar incidente;
+
+fork
+  :Determinar prioridad;
+  note right
+    P1: Crítico
+    P2: Alto
+    P3: Medio
+  end note
+fork again
+  :Categorizar tipo;
+end fork
+
+if (¿Prioridad?) then (P1 - Crítico)
+  :Enviar alerta; <<sendSignal>>
+  |Gerente IT|
+  :Recibir alerta; <<acceptEvent>>
+  :Activar protocolo;
+else (P2/P3)
+  :Tiempo de respuesta; <<timeEvent>>
+  note right: Según prioridad
+endif
+
+|Soporte|
+:Revisar ticket;
+:Diagnosticar problema;
+
+if (¿Puede resolver?) then (no)
+  :Escalar a Nivel 2;
+  |Soporte Nivel 2|
+  :Análisis avanzado;
+  :Resolver;
+else (sí)
+  :Aplicar solución;
+endif
+
+:Documentar solución;
+note right: Pasos y causa raíz
+
+|Sistema de Tickets|
+:Cambiar a "Resuelto";
+:Enviar notificación; <<sendSignal>>
+
+|Usuario|
+:Recibir notificación; <<acceptEvent>>
+:Verificar solución;
+
+if (¿Resuelto?) then (no)
+  :Reabrir ticket;
+  detach
+else (sí)
+  :Confirmar;
+endif
+
+|Sistema|
+fork
+  :Generar métricas;
+  note left: Tiempos y SLA
+fork again
+  :Enviar encuesta; <<sendSignal>>
+end fork
+
+|Usuario|
+:Recibir encuesta; <<acceptEvent>>
+:Calificar servicio;
+
+stop
+@enduml`} />
+
+<Aside type="note">
+  Este diagrama incluye:
+  - **Particiones**: Usuario, Sistema de Tickets, Sistema, Gerente IT, Soporte, Soporte Nivel 2
+  - **Decisiones**: Prioridad, capacidad de resolución, verificación de solución
+  - **Bifurcaciones**: Clasificación paralela (prioridad y tipo)
+  - **Señales de envío** (sendSignal): Confirmación, alertas, notificaciones, encuestas
+  - **Señales de recepción** (acceptEvent): Recepción de alertas y notificaciones
+  - **Eventos temporales** (timeEvent): Tiempo de respuesta según prioridad
+  - **Escalamiento**: Soporte → Soporte Nivel 2
+  - **Notas**: Niveles de prioridad, documentación, métricas
+  - **Detach**: Para reapertura de ticket
+</Aside>
+
+<Aside type="caution">
+  Al crear diagramas de actividades, recuerde:
+  - Mantener un nivel de detalle apropiado para la audiencia
+  - Usar particiones para clarificar responsabilidades
+  - Incluir notas solo cuando agreguen valor significativo
+  - Evitar diagramas excesivamente complejos que dificulten la comprensión
+  - Validar que todos los flujos tengan un inicio y un final apropiados
+</Aside>
