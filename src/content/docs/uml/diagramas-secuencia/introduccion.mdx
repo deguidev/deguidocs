@@ -10,9 +10,176 @@ import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
 import PlantUml from "@components/PlantUml.astro";
 
-## Un ejemplo muy sencillo
+## 📋 Definición y propósito del diagrama de secuencia
 
-Imaginemos que queremos representar cómo funciona el proceso de pedir un café en una cafetería. Un diagrama de secuencia nos ayuda a visualizar el orden exacto de los pasos y la interacción entre las personas involucradas:
+El diagrama de secuencia constituye uno de los artefactos fundamentales dentro del Lenguaje Unificado de Modelado (UML, por sus siglas en inglés). Se define como un diagrama de interacción que representa gráficamente la secuencia temporal de mensajes intercambiados entre objetos o componentes durante la ejecución de un escenario específico de un caso de uso.
+
+<Aside type="tip" title="💡 Concepto clave">
+Un diagrama de secuencia modela **cómo** y **cuándo** los objetos colaboran entre sí para cumplir una funcionalidad determinada, enfatizando el orden cronológico de las interacciones.
+</Aside>
+
+El propósito principal de este diagrama es proporcionar una representación visual del comportamiento dinámico del sistema. A diferencia de los diagramas estructurales, que muestran la arquitectura estática, los diagramas de secuencia capturan la dimensión temporal de las interacciones, permitiendo visualizar:
+
+- **La secuencia cronológica** de los mensajes entre objetos participantes
+- **El flujo de control** durante la ejecución de un proceso específico
+- **Las activaciones** que indican cuándo un objeto está procesando una operación
+- **Los retornos de información** entre los componentes del sistema
+
+Este tipo de diagrama resulta especialmente útil durante las fases de análisis y diseño del desarrollo de software, ya que facilita la comprensión de escenarios complejos y permite identificar posibles inconsistencias en la lógica de negocio antes de la implementación.
+
+## 🎯 Importancia del diagrama de secuencia en el modelado UML
+
+La relevancia del diagrama de secuencia en el contexto del modelado UML se fundamenta en múltiples aspectos que lo convierten en una herramienta indispensable para ingenieros de software, arquitectos de sistemas y analistas de negocio.
+
+### Comunicación efectiva entre stakeholders
+
+Los diagramas de secuencia actúan como un lenguaje común que facilita la comunicación entre diferentes actores del proyecto. Su naturaleza visual y estructurada permite que tanto personal técnico como no técnico comprendan el flujo de operaciones sin necesidad de interpretar código fuente o especificaciones textuales extensas.
+
+### Documentación precisa del comportamiento del sistema
+
+Estos diagramas constituyen documentación técnica de alto valor, ya que capturan de manera explícita el comportamiento esperado del sistema. Esta documentación resulta crucial para:
+
+- **Mantenimiento evolutivo**: Facilita la comprensión del sistema a nuevos desarrolladores
+- **Auditorías de calidad**: Permite verificar que la implementación cumple con el diseño especificado
+- **Análisis de impacto**: Ayuda a evaluar las consecuencias de modificaciones en el sistema
+
+### Detección temprana de problemas de diseño
+
+Al modelar las interacciones antes de la codificación, los diagramas de secuencia permiten identificar:
+
+- **Dependencias circulares** entre componentes
+- **Cuellos de botella** en el flujo de mensajes
+- **Responsabilidades mal asignadas** a los objetos
+- **Escenarios de error** no contemplados
+
+<Aside type="caution" title="⚠️ Consideración importante">
+Un diagrama de secuencia bien elaborado puede prevenir costosos errores de diseño que, de detectarse en fases posteriores, requerirían refactorizaciones significativas del código.
+</Aside>
+
+### Validación de requisitos funcionales
+
+Los diagramas de secuencia permiten validar que los casos de uso definidos en la fase de análisis son técnicamente viables y completos. Cada escenario modelado representa una realización concreta de un requisito funcional, lo que facilita la trazabilidad entre requisitos y diseño.
+
+## 🔗 Relación del diagrama de secuencia con otros diagramas UML
+
+El diagrama de secuencia trabaja en conjunto con otros diagramas UML para proporcionar una visión completa del sistema. A continuación se presentan las relaciones más importantes de manera simple y directa.
+
+<PlantUml code={`@startuml
+!define RECTANGLE class
+
+skinparam rectangle {
+    BackgroundColor<<secuencia>> LightBlue
+    BackgroundColor<<estructura>> LightGreen
+    BackgroundColor<<comportamiento>> LightYellow
+    BorderColor Black
+    FontSize 12
+}
+
+rectangle "Diagrama de Casos de Uso" as UC <<estructura>> #LightCoral
+rectangle "Diagrama de Clases" as Class <<estructura>>
+rectangle "Diagrama de Secuencia" as Seq <<secuencia>>
+rectangle "Diagrama de Actividades" as Act <<comportamiento>>
+rectangle "Diagrama de Estados" as State <<comportamiento>>
+
+UC -down-> Seq : "Define QUÉ hacer"
+Seq -up-> UC : "Muestra CÓMO hacerlo"
+
+Class -down-> Seq : "Proporciona participantes y métodos"
+Seq -up-> Class : "Valida métodos necesarios"
+
+Act -right-> Seq : "Describe el flujo general"
+Seq -left-> Act : "Detalla las interacciones"
+
+State -down-> Seq : "Muestra estados de un objeto"
+Seq -up-> State : "Muestra qué mensajes cambian estados"
+
+note right of Seq
+  El diagrama de secuencia
+  es el puente entre la
+  estructura y el comportamiento
+end note
+@enduml`} />
+
+### 📋 Resumen de relaciones clave
+
+<Tabs>
+  <TabItem label="Casos de Uso">
+    **🎯 ¿Para qué sirve?**
+    
+    Convertir funcionalidades abstractas en interacciones concretas.
+    
+    **Puntos clave:**
+    - El caso de uso dice **QUÉ** debe hacer el sistema
+    - El diagrama de secuencia muestra **CÓMO** lo hace paso a paso
+    - Un caso de uso puede tener varios diagramas de secuencia (escenario exitoso, con errores, etc.)
+    
+    **Ejemplo práctico:**
+    - Caso de uso: "Realizar compra"
+    - Diagrama de secuencia: Muestra la interacción entre Cliente → Carrito → Pago → Inventario
+  </TabItem>
+  
+  <TabItem label="Clases">
+    **🏗️ ¿Para qué sirve?**
+    
+    Validar que las clases tienen los métodos necesarios para las interacciones.
+    
+    **Puntos clave:**
+    - El diagrama de clases define la **estructura** (clases, atributos, métodos)
+    - El diagrama de secuencia usa esas clases como **participantes**
+    - Los mensajes del diagrama de secuencia deben corresponder a **métodos** de las clases
+    
+    **Ejemplo práctico:**
+    - Clase: `Usuario` con método `validarCredenciales()`
+    - Secuencia: Mensaje `validarCredenciales()` enviado al objeto Usuario
+  </TabItem>
+  
+  <TabItem label="Actividades">
+    **🔄 ¿Para qué sirve?**
+    
+    Detallar las interacciones específicas dentro de un proceso general.
+    
+    **Puntos clave:**
+    - El diagrama de actividades muestra el **flujo de trabajo** completo
+    - El diagrama de secuencia detalla **quién hace qué** en cada actividad
+    - Actividades se enfoca en el proceso; Secuencia en las interacciones
+    
+    **Ejemplo práctico:**
+    - Actividad: "Procesar pedido"
+    - Secuencia: Detalla cómo Sistema → Inventario → Pago interactúan para procesar
+  </TabItem>
+  
+  <TabItem label="Estados">
+    **🔀 ¿Para qué sirve?**
+    
+    Mostrar qué mensajes provocan cambios de estado en los objetos.
+    
+    **Puntos clave:**
+    - El diagrama de estados muestra los **estados** de un objeto (Pendiente, Aprobado, Rechazado)
+    - El diagrama de secuencia muestra **qué mensajes** causan esos cambios
+    - Estados se enfoca en un objeto; Secuencia en múltiples objetos
+    
+    **Ejemplo práctico:**
+    - Estado: Pedido cambia de "Pendiente" a "Confirmado"
+    - Secuencia: Muestra el mensaje `confirmarPedido()` que causa ese cambio
+  </TabItem>
+</Tabs>
+
+<Aside type="tip" title="💡 Regla simple para recordar">
+**Diagrama de Secuencia = El puente entre estructura y comportamiento**
+
+- Usa la **estructura** del diagrama de clases (participantes y métodos)
+- Implementa el **comportamiento** de los casos de uso (funcionalidades)
+- Detalla las **interacciones** del diagrama de actividades (procesos)
+- Muestra las **transiciones** del diagrama de estados (cambios)
+</Aside>
+
+## 🌟 Ejemplos sencillos
+
+Para comprender mejor la aplicación práctica de los diagramas de secuencia, se presentan tres ejemplos ilustrativos que van desde situaciones cotidianas hasta sistemas informáticos complejos.
+
+### Ejemplo 1: Situación de la vida cotidiana - Pedir un café en una cafetería ☕
+
+Este ejemplo modela el proceso simple y cotidiano de ordenar un café en una cafetería. El escenario involucra tres participantes y muestra cómo se desarrolla la interacción desde que el cliente hace su pedido hasta que recibe su bebida.
 
 <PlantUml code={`@startuml
 actor Cliente
@@ -21,217 +188,201 @@ participant "Barista" as Barista
 
 Cliente -> Cajero: Pedir café
 activate Cajero
+note right of Cajero: El cajero recibe el pedido
 Cajero --> Cliente: Solicitar pago
 Cliente -> Cajero: Entregar dinero
+Cajero -> Cajero: Procesar pago
+activate Cajero #LightBlue
+deactivate Cajero
 Cajero -> Barista: Ordenar café
 activate Barista
+note right of Barista: El barista recibe la orden
 Barista -> Barista: Preparar café
 activate Barista #DarkSalmon
+note right of Barista: Moler granos, preparar espresso
 deactivate Barista
-Barista --> Cajero: Entregar café
+Barista --> Cajero: Entregar café listo
 deactivate Barista
 Cajero --> Cliente: Entregar café
 deactivate Cajero
+
+note over Cliente, Barista: Transacción completada exitosamente
 @enduml`} />
 
-En este sencillo ejemplo:
+**Análisis del diagrama:**
 
-- Tenemos tres **participantes**: `Cliente`, `Cajero` y `Barista`
-- Las **flechas** representan **mensajes** (acciones o comunicación) entre los participantes
-- El **tiempo fluye de arriba hacia abajo**, mostrando el orden exacto de los eventos
-- Las **barras verticales** (activaciones) muestran cuándo cada participante está activamente trabajando
+Este diagrama introductorio ilustra los conceptos más básicos de los diagramas de secuencia:
 
-Este diagrama nos permite entender rápidamente:
-- El orden preciso de los pasos en el proceso
-- Quién interactúa con quién y en qué momento
-- Cuándo cada participante está ocupado realizando una tarea
+- **Participantes simples**: Tres actores claramente definidos (Cliente, Cajero, Barista) que representan roles en el proceso
+- **Flujo lineal**: La secuencia de eventos fluye de manera directa de arriba hacia abajo, sin ramificaciones complejas
+- **Mensajes bidireccionales**: Se observan tanto mensajes de solicitud (flechas sólidas) como mensajes de respuesta (flechas discontinuas)
+- **Activaciones básicas**: Las barras verticales muestran cuándo cada participante está activamente involucrado en el proceso
+- **Auto-llamadas internas**: El Cajero procesa el pago y el Barista prepara el café, operaciones que realizan de manera independiente
+- **Notas explicativas**: Se incluyen anotaciones que clarifican acciones específicas en el proceso
 
-A diferencia de otros diagramas, el diagrama de secuencia se enfoca en mostrar cómo ocurren las interacciones a través del tiempo, lo que es crucial para entender procesos y flujos de trabajo.
+Este ejemplo cotidiano es ideal para comprender la estructura fundamental de un diagrama de secuencia sin la complejidad de sistemas técnicos. Demuestra cómo las interacciones humanas pueden modelarse de manera clara y precisa, estableciendo las bases para entender diagramas más complejos.
 
-## 1.1. Definición y propósito
+### Ejemplo 2: Situación de la vida cotidiana - Solicitar un libro en una biblioteca 📚
 
-Un diagrama de secuencia es un tipo de diagrama de interacción que muestra cómo los procesos operan entre sí y en qué orden. Representa la secuencia de mensajes entre objetos durante un escenario específico de un caso de uso.
-
-<Tabs>
-  <TabItem label="Inicio de sesión">
-      <PlantUml code={`@startuml
-actor Usuario
-participant "Interfaz" as UI
-participant "Sistema" as System
-participant "Validador" as Validator
-database "Base de Datos" as DB
-
-Usuario -> UI: Iniciar sesión(usuario, contraseña)
-activate UI
-note right of UI: El usuario introduce sus credenciales
-UI -> System: validarCredenciales(usuario, contraseña)
-activate System
-System -> Validator: validarFormato(usuario, contraseña)
-activate Validator
-Validator --> System: formatoVálido
-deactivate Validator
-System -> DB: verificarUsuario(usuario)
-activate DB
-DB --> System: datosUsuario
-deactivate DB
-System -> System: verificarContraseña(contraseña, hash)
-activate System #DarkSalmon
-note right of System: Compara la contraseña con el hash almacenado
-deactivate System
-System --> UI: credencialesVálidas + tokenSesión
-deactivate System
-UI -> UI: almacenarToken()
-activate UI #DarkGoldenRod
-deactivate UI
-UI --> Usuario: Acceso concedido + redirección
-deactivate UI
-@enduml`} />
-      Este diagrama muestra el proceso detallado de inicio de sesión de un usuario, incluyendo la validación de formato, verificación en base de datos, comprobación de contraseña y generación de token de sesión.
-  </TabItem>
-  
-  <TabItem label="Proceso de compra">
-      <PlantUml code={`@startuml
-actor Cliente
-participant "Tienda Online" as Store
-participant "Carrito" as Cart
-participant "Sistema de Pagos" as Payment
-participant "Gestor de Inventario" as Inventory
-database "Base de Datos" as DB
-
-Cliente -> Store: buscarProducto(nombre)
-activate Store
-Store -> DB: consultarProductos(nombre)
-activate DB
-DB --> Store: listaProductos
-deactivate DB
-Store --> Cliente: mostrarResultados()
-deactivate Store
-
-Cliente -> Store: seleccionarProducto(id)
-activate Store
-Store -> DB: obtenerDetalles(id)
-activate DB
-DB --> Store: detallesProducto
-deactivate DB
-Store --> Cliente: mostrarDetalles()
-deactivate Store
-
-Cliente -> Store: añadirAlCarrito(id, cantidad)
-activate Store
-Store -> Cart: agregarItem(id, cantidad)
-activate Cart
-Cart -> Inventory: verificarDisponibilidad(id, cantidad)
-activate Inventory
-Inventory -> DB: consultarStock(id)
-activate DB
-DB --> Inventory: cantidadDisponible
-deactivate DB
-Inventory --> Cart: disponibilidadConfirmada
-deactivate Inventory
-Cart -> Cart: calcularTotal()
-Cart --> Store: itemAgregado
-deactivate Cart
-Store --> Cliente: productoAgregado()
-deactivate Store
-
-Cliente -> Store: finalizarCompra()
-activate Store
-Store -> Cart: obtenerResumen()
-activate Cart
-Cart --> Store: resumenCompra
-deactivate Cart
-Store -> Payment: iniciarPago(total)
-activate Payment
-Payment --> Cliente: solicitarDatosPago()
-Cliente -> Payment: proporcionarDatosPago()
-Payment -> Payment: procesarPago()
-activate Payment #DarkSalmon
-deactivate Payment
-Payment --> Store: pagoConfirmado
-deactivate Payment
-Store -> Inventory: actualizarInventario(items)
-activate Inventory
-Inventory -> DB: reducirStock(items)
-activate DB
-DB --> Inventory: stockActualizado
-deactivate DB
-Inventory --> Store: inventarioActualizado
-deactivate Inventory
-Store -> DB: registrarPedido(detalles)
-activate DB
-DB --> Store: pedidoRegistrado
-deactivate DB
-Store --> Cliente: confirmaciónCompra
-deactivate Store
-@enduml`} />
-      Este diagrama detalla el proceso completo de compra en una tienda online, desde la búsqueda de productos hasta la confirmación de la compra, incluyendo la gestión del carrito, verificación de inventario y procesamiento del pago.
-  </TabItem>
-</Tabs>
-
-### Propósitos principales:
-
-- **Visualizar interacciones**: Mostrar cómo los objetos interactúan entre sí para llevar a cabo una funcionalidad.
-- **Documentar escenarios**: Representar la secuencia de eventos para un escenario específico.
-- **Identificar responsabilidades**: Clarificar qué objetos son responsables de qué tareas.
-- **Validar la lógica**: Verificar que la lógica del sistema es correcta y completa.
-
-## 1.2. Importancia en la modelación dinámica
-
-Los diagramas de secuencia son fundamentales para la modelación dinámica de sistemas por varias razones:
-
-<div>
-  <ul>
-    <li><strong>Perspectiva temporal</strong>: A diferencia de otros diagramas UML, los diagramas de secuencia enfatizan explícitamente el orden temporal de los mensajes.</li>
-    <li><strong>Visualización del comportamiento</strong>: Permiten visualizar cómo los objetos colaboran para implementar un comportamiento específico.</li>
-    <li><strong>Detección de problemas</strong>: Ayudan a identificar posibles cuellos de botella, redundancias o ineficiencias en la interacción entre objetos.</li>
-    <li><strong>Validación de requisitos</strong>: Facilitan la verificación de que los requisitos funcionales se cumplen a través de las interacciones modeladas.</li>
-  </ul>
-</div>
-
-<Aside type="tip">
-  Los diagramas de secuencia son especialmente útiles durante las fases de análisis y diseño, ya que permiten refinar los casos de uso y traducirlos en interacciones concretas entre objetos.
-</Aside>
-
-## 1.3. Relación con otros diagramas UML
-
-Los diagramas de secuencia no existen de forma aislada; se complementan con otros diagramas UML para proporcionar una visión completa del sistema:
-
-<div>
-  <ul>
-    <li><strong>Diagramas de casos de uso</strong>: Los diagramas de secuencia suelen desarrollarse para ilustrar escenarios específicos de casos de uso.</li>
-    <li><strong>Diagramas de clases</strong>: Los objetos que aparecen en un diagrama de secuencia son instancias de las clases definidas en el diagrama de clases.</li>
-    <li><strong>Diagramas de actividad</strong>: Mientras que los diagramas de actividad se centran en el flujo de trabajo, los diagramas de secuencia se centran en la interacción entre objetos.</li>
-    <li><strong>Diagramas de comunicación</strong>: Ambos muestran interacciones entre objetos, pero los diagramas de comunicación enfatizan las relaciones estructurales entre objetos, mientras que los diagramas de secuencia enfatizan el orden temporal.</li>
-  </ul>
-</div>
+Este ejemplo modela el proceso que ocurre cuando un usuario desea solicitar un libro prestado en una biblioteca pública. El escenario involucra tres participantes principales y muestra las interacciones secuenciales necesarias para completar la transacción.
 
 <PlantUml code={`@startuml
-skinparam backgroundColor transparent
+actor Usuario
+participant "Bibliotecario" as Bib
+database "Sistema de Catálogo" as Cat
 
-rectangle "Diagramas UML" {
-  rectangle "Diagramas Estructurales" {
-    rectangle "Diagrama de Clases"
-    rectangle "Diagrama de Componentes"
-    rectangle "Diagrama de Objetos"
-  }
-  
-  rectangle "Diagramas de Comportamiento" {
-    rectangle "Diagrama de Casos de Uso"
-    rectangle "Diagrama de Actividad"
-    
-    rectangle "Diagramas de Interacción" {
-      rectangle "Diagrama de Secuencia" as DS
-      rectangle "Diagrama de Comunicación"
-    }
-  }
-}
+Usuario -> Bib: Solicitar libro(título)
+activate Bib
+note right of Bib: El bibliotecario recibe la solicitud del usuario
 
-"Diagrama de Clases" --> DS : proporciona estructura
-"Diagrama de Casos de Uso" --> DS : proporciona escenarios
+Bib -> Cat: Buscar disponibilidad(título)
+activate Cat
+Cat -> Cat: Consultar inventario
+activate Cat #DarkSalmon
+deactivate Cat
+Cat --> Bib: Estado: Disponible + ubicación
+deactivate Cat
+
+Bib -> Cat: Registrar préstamo(ID_usuario, ID_libro)
+activate Cat
+Cat -> Cat: Actualizar estado del libro
+activate Cat #LightBlue
+deactivate Cat
+Cat -> Cat: Generar fecha de devolución
+activate Cat #LightGreen
+deactivate Cat
+Cat --> Bib: Confirmación + fecha límite
+deactivate Cat
+
+Bib -> Bib: Recuperar libro físico
+activate Bib #DarkGoldenRod
+deactivate Bib
+
+Bib --> Usuario: Entregar libro + comprobante
+deactivate Bib
+
+note over Usuario, Cat: El libro debe devolverse en un plazo de 15 días
 @enduml`} />
 
-<Aside type="note">
-  Los diagramas de secuencia son una herramienta poderosa para comunicar ideas complejas de forma visual y accesible, tanto para desarrolladores como para stakeholders no técnicos.
+**Análisis del diagrama:**
+
+Este diagrama ilustra varios conceptos fundamentales:
+
+- **Participantes**: Se identifican tres entidades que interactúan: el Usuario (actor), el Bibliotecario (participante humano) y el Sistema de Catálogo (base de datos)
+- **Flujo temporal**: El tiempo avanza de arriba hacia abajo, mostrando el orden preciso de cada acción
+- **Mensajes síncronos**: Representados con flechas sólidas, indican que el emisor espera una respuesta antes de continuar
+- **Activaciones**: Las barras verticales muestran cuándo cada participante está activamente procesando una operación
+- **Auto-llamadas**: El Sistema de Catálogo realiza operaciones internas (consultar inventario, actualizar estado) representadas como mensajes a sí mismo
+- **Mensajes de retorno**: Las flechas discontinuas indican respuestas que regresan al emisor original
+
+Este ejemplo cotidiano demuestra cómo los diagramas de secuencia pueden modelar procesos del mundo real con mayor complejidad que el ejemplo anterior, facilitando la identificación de pasos, responsabilidades y puntos de decisión cuando intervienen sistemas automatizados.
+
+### Ejemplo 3: Sistema informático - Autenticación de usuario en una aplicación web 🔐
+
+Este ejemplo representa el proceso técnico de autenticación de un usuario en una aplicación web moderna, mostrando la interacción entre múltiples componentes de software.
+
+<PlantUml code={`@startuml
+actor Usuario
+participant "Navegador Web" as Browser
+participant "Servidor Web" as Server
+participant "Controlador de Autenticación" as AuthController
+participant "Servicio de Validación" as ValidationService
+database "Base de Datos" as DB
+participant "Gestor de Sesiones" as SessionManager
+
+Usuario -> Browser: Ingresar credenciales (email, contraseña)
+activate Browser
+
+Browser -> Server: POST /api/login {email, password}
+activate Server
+note right of Server: Solicitud HTTP con credenciales
+
+Server -> AuthController: autenticar(email, password)
+activate AuthController
+
+AuthController -> ValidationService: validarFormato(email, password)
+activate ValidationService
+ValidationService -> ValidationService: Verificar formato email
+activate ValidationService #LightCoral
+deactivate ValidationService
+ValidationService -> ValidationService: Verificar longitud contraseña
+activate ValidationService #LightCoral
+deactivate ValidationService
+ValidationService --> AuthController: Formato válido
+deactivate ValidationService
+
+AuthController -> DB: consultarUsuario(email)
+activate DB
+DB -> DB: SELECT * FROM usuarios WHERE email = ?
+activate DB #DarkSalmon
+deactivate DB
+DB --> AuthController: Datos usuario + hash_contraseña
+deactivate DB
+
+AuthController -> AuthController: compararHash(password, hash_contraseña)
+activate AuthController #LightBlue
+note right of AuthController: Utiliza algoritmo bcrypt para comparación segura
+deactivate AuthController
+
+alt Credenciales válidas
+    AuthController -> SessionManager: crearSesion(ID_usuario)
+    activate SessionManager
+    SessionManager -> SessionManager: Generar token JWT
+    activate SessionManager #LightGreen
+    deactivate SessionManager
+    SessionManager --> AuthController: Token de sesión
+    deactivate SessionManager
+    
+    AuthController --> Server: {success: true, token, userData}
+    deactivate AuthController
+    Server --> Browser: HTTP 200 OK {token, userData}
+    deactivate Server
+    Browser -> Browser: Almacenar token en localStorage
+    activate Browser #DarkGoldenRod
+    deactivate Browser
+    Browser --> Usuario: Redirigir a dashboard
+    deactivate Browser
+else Credenciales inválidas
+    AuthController --> Server: {success: false, error: "Credenciales inválidas"}
+    deactivate AuthController
+    Server --> Browser: HTTP 401 Unauthorized
+    deactivate Server
+    Browser --> Usuario: Mostrar mensaje de error
+    deactivate Browser
+end
+@enduml`} />
+
+**Análisis del diagrama:**
+
+Este ejemplo técnico incorpora elementos más avanzados:
+
+- **Arquitectura multicapa**: Se observa claramente la separación entre capa de presentación (Navegador), capa de aplicación (Servidor, Controlador), capa de negocio (Servicio de Validación) y capa de datos (Base de Datos)
+- **Protocolo de comunicación**: Se especifica el método HTTP (POST) y la ruta del endpoint (/api/login), mostrando detalles de implementación
+- **Fragmento alternativo (alt)**: Representa una estructura condicional que muestra dos flujos posibles según el resultado de la validación de credenciales
+- **Operaciones de seguridad**: Se evidencian prácticas de seguridad como el uso de hash para contraseñas y tokens JWT para gestión de sesiones
+- **Procesamiento interno**: Las auto-llamadas muestran operaciones complejas como consultas SQL y algoritmos criptográficos
+- **Manejo de estados**: El diagrama muestra tanto el flujo exitoso (HTTP 200) como el flujo de error (HTTP 401)
+
+<Aside type="tip" title="🎓 Aplicación práctica">
+Este tipo de diagrama resulta invaluable durante:
+- **Revisiones de seguridad**: Permite identificar vulnerabilidades en el flujo de autenticación
+- **Optimización de rendimiento**: Facilita detectar llamadas redundantes o innecesarias
+- **Documentación de APIs**: Sirve como especificación técnica para desarrolladores frontend y backend
 </Aside>
 
-En las siguientes secciones, exploraremos en detalle los elementos básicos que componen un diagrama de secuencia, los diferentes tipos de mensajes que pueden intercambiarse entre objetos, y la notación UML específica para estos diagramas.
+### Comparación entre los tres ejemplos
+
+Los tres diagramas presentados, aunque representan contextos y niveles de complejidad diferentes, comparten la misma estructura fundamental del diagrama de secuencia:
+
+| Aspecto | Ejemplo 1: Cafetería | Ejemplo 2: Biblioteca | Ejemplo 3: Autenticación web |
+|---------|---------------------|----------------------|------------------------------|
+| **Complejidad** | Muy baja - 3 participantes | Media - 3 participantes | Alta - 6 participantes |
+| **Nivel de detalle** | Básico | Intermedio | Técnico con especificaciones |
+| **Tipo de participantes** | Solo humanos | Humanos + sistema | Componentes de software |
+| **Decisiones** | Ninguna | Implícitas | Explícitas (fragmento alt) |
+| **Auto-llamadas** | Simples | Múltiples con colores | Complejas con operaciones SQL |
+| **Propósito** | Introducción pedagógica | Modelado de procesos | Documentación técnica |
+| **Notas explicativas** | Básicas | Contextuales | Técnicas detalladas |
+
+Esta progresión de ejemplos demuestra la versatilidad del diagrama de secuencia como herramienta de modelado, aplicable desde interacciones humanas simples hasta implementaciones técnicas complejas. Cada nivel de complejidad añade nuevos elementos y conceptos, permitiendo al lector comprender gradualmente todas las capacidades de este tipo de diagrama UML.
+

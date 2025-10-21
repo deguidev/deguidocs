@@ -10,384 +10,157 @@ import { Aside } from '@astrojs/starlight/components';
 import { Steps } from '@astrojs/starlight/components';
 import PlantUml from "@components/PlantUml.astro";
 
-Los mensajes son el elemento central de los diagramas de secuencia, ya que representan la comunicación entre objetos. UML define diferentes tipos de mensajes para modelar distintos patrones de interacción.
+## 💬 Clasificación de mensajes en diagramas de secuencia
 
-## 3.1. Mensajes síncronos
+Los mensajes constituyen el elemento central de los diagramas de secuencia, representando la comunicación entre participantes. UML define diferentes tipos de mensajes según su naturaleza y comportamiento, cada uno con una notación gráfica específica.
 
-Los mensajes síncronos representan llamadas a métodos donde el emisor espera una respuesta antes de continuar su ejecución. Son los más comunes en la programación orientada a objetos tradicional.
+## 🔄 Mensajes síncronos
+
+Los mensajes síncronos representan llamadas bloqueantes donde el emisor espera la respuesta del receptor antes de continuar su ejecución.
 
 <PlantUml code={`@startuml
-participant "Objeto A" as A
-participant "Objeto B" as B
+participant "Emisor" as A
+participant "Receptor" as B
 
 A -> B : mensajeSíncrono()
 activate B
+note right of A
+  El emisor queda bloqueado
+  esperando la respuesta
+end note
 B --> A : respuesta
 deactivate B
 @enduml`} />
 
-<div>
-  <ul>
-    <li>Se representan con una flecha con punta sólida (→).</li>
-    <li>El objeto emisor queda bloqueado hasta recibir una respuesta.</li>
-    <li>Normalmente se acompaña de una activación en el objeto receptor.</li>
-    <li>Suele tener un mensaje de retorno asociado.</li>
-  </ul>
-</div>
+**Características:**
+- **Notación:** Flecha sólida `→`
+- **Comportamiento:** El emisor se bloquea hasta recibir respuesta
+- **Activación:** Genera una activación en el receptor
+- **Retorno:** Siempre tiene un mensaje de retorno asociado
+- **Uso típico:** Llamadas a métodos, consultas a bases de datos, peticiones HTTP síncronas
 
-<Tabs>
-  <TabItem label="Aplicación web">
-    <div>
-      <PlantUml code={`@startuml
-actor "Usuario" as User
-participant "Navegador" as Browser
-participant "Servidor Web" as WebServer
-participant "Servicio de Autenticación" as AuthService
-database "Base de Datos" as DB
+## ⚡ Mensajes asíncronos
 
-User -> Browser : Introducir credenciales
-activate Browser
-Browser -> WebServer : POST /login {usuario, contraseña}
-activate WebServer
-WebServer -> AuthService : autenticar(usuario, contraseña)
-activate AuthService
-AuthService -> DB : buscarUsuario(usuario)
-activate DB
-DB --> AuthService : datosUsuario
-deactivate DB
-AuthService -> AuthService : verificarContraseña(contraseña, hash)
-activate AuthService #DarkSalmon
-deactivate AuthService
-AuthService -> AuthService : generarToken(idUsuario, roles)
-activate AuthService #DarkGoldenRod
-deactivate AuthService
-AuthService --> WebServer : {token, usuario, roles}
-deactivate AuthService
-WebServer -> WebServer : crearSesión(token)
-activate WebServer #DarkSalmon
-deactivate WebServer
-WebServer --> Browser : 200 OK {token, redirectUrl}
-deactivate WebServer
-Browser -> Browser : almacenarToken(token)
-activate Browser #DarkSalmon
-deactivate Browser
-Browser -> WebServer : GET /dashboard
-activate WebServer
-WebServer -> WebServer : validarToken(token)
-activate WebServer #DarkSalmon
-deactivate WebServer
-WebServer --> Browser : HTML Dashboard
-deactivate WebServer
-Browser --> User : Mostrar dashboard
-deactivate Browser
-@enduml`} />
-      <p>Este ejemplo detallado muestra el proceso de autenticación en una aplicación web, con mensajes síncronos entre el navegador, el servidor web, el servicio de autenticación y la base de datos. Incluye la generación de token, creación de sesión y redirección al dashboard.</p>
-    </div>
-  </TabItem>
-  
-  <TabItem label="API REST">
-    <div>
-      <PlantUml code={`@startuml
-participant "Cliente API" as Client
-participant "API Gateway" as Gateway
-participant "Servicio de Usuarios" as UserService
-participant "Servicio de Validación" as ValidationService
-database "Base de Datos" as DB
-
-Client -> Gateway : POST /api/users {nombre, email, rol}
-activate Gateway
-Gateway -> Gateway : validarToken()
-activate Gateway #DarkSalmon
-deactivate Gateway
-Gateway -> ValidationService : validarDatos(payload)
-activate ValidationService
-ValidationService -> ValidationService : validarFormato(email)
-activate ValidationService #DarkSalmon
-deactivate ValidationService
-ValidationService -> ValidationService : validarCamposRequeridos(payload)
-activate ValidationService #DarkGoldenRod
-deactivate ValidationService
-ValidationService --> Gateway : datosVálidos(true)
-deactivate ValidationService
-Gateway -> UserService : crearUsuario(nombre, email, rol)
-activate UserService
-UserService -> DB : verificarEmailDisponible(email)
-activate DB
-DB --> UserService : disponible(true)
-deactivate DB
-UserService -> UserService : generarContraseñaTemporal()
-activate UserService #DarkSalmon
-deactivate UserService
-UserService -> DB : insertarUsuario(datos)
-activate DB
-DB --> UserService : idUsuario
-deactivate DB
-UserService -> UserService : enviarEmailBienvenida(email)
-activate UserService #DarkGoldenRod
-deactivate UserService
-UserService --> Gateway : {id, nombre, email, createdAt}
-deactivate UserService
-Gateway --> Client : 201 Created {id, nombre, email, createdAt}
-deactivate Gateway
-@enduml`} />
-      <p>Este ejemplo muestra una interacción síncronos en una API REST para crear un usuario, incluyendo validación de datos, verificación de disponibilidad de email, generación de contraseña temporal y envío de email de bienvenida.</p>
-    </div>
-  </TabItem>
-  
-  <TabItem label="Aplicación de escritorio">
-    <div>
-      <PlantUml code={`@startuml
-actor Usuario
-participant "Interfaz de Usuario" as UI
-participant "Controlador" as Controller
-participant "Modelo" as Model
-participant "Servicio de Archivos" as FileService
-
-Usuario -> UI : seleccionarArchivo()
-activate UI
-UI -> Controller : obtenerArchivo()
-activate Controller
-Controller -> FileService : mostrarDialogoSeleccion()
-activate FileService
-FileService --> Controller : rutaArchivo
-deactivate FileService
-Controller -> FileService : leerArchivo(rutaArchivo)
-activate FileService
-FileService --> Controller : contenidoArchivo
-deactivate FileService
-Controller -> Model : procesarDatos(contenidoArchivo)
-activate Model
-Model -> Model : validarFormato()
-activate Model #DarkSalmon
-deactivate Model
-Model -> Model : convertirDatos()
-activate Model #DarkGoldenRod
-deactivate Model
-Model --> Controller : datosFormateados
-deactivate Model
-Controller --> UI : actualizarVista(datosFormateados)
-deactivate Controller
-UI --> Usuario : mostrarDatos()
-deactivate UI
-@enduml`} />
-      <p>Este ejemplo ilustra la interacción síncronos en una aplicación de escritorio para seleccionar, leer y procesar un archivo, siguiendo el patrón MVC (Modelo-Vista-Controlador).</p>
-    </div>
-  </TabItem>
-</Tabs>
-
-<Aside type="tip">
-  Los mensajes síncronos son ideales para modelar llamadas a métodos en programación secuencial, donde el flujo de control pasa del emisor al receptor y luego regresa.
-</Aside>
-
-## 3.2. Mensajes asíncronos
-
-Los mensajes asíncronos representan comunicación donde el emisor no espera una respuesta inmediata para continuar su ejecución. Son comunes en sistemas distribuidos, concurrentes o basados en eventos.
+Los mensajes asíncronos representan comunicación no bloqueante donde el emisor continúa su ejecución inmediatamente después de enviar el mensaje, sin esperar respuesta.
 
 <PlantUml code={`@startuml
-participant "Objeto A" as A
-participant "Objeto B" as B
+participant "Emisor" as A
+participant "Receptor" as B
 
 A ->> B : mensajeAsíncrono()
-A -> A : continúaEjecución()
+note right of A
+  El emisor continúa
+  inmediatamente
+end note
+A -> A : continuarEjecución()
+activate A #LightBlue
+deactivate A
 @enduml`} />
 
-<div>
-  <ul>
-    <li>Se representan con una flecha con punta abierta (→>).</li>
-    <li>El objeto emisor no queda bloqueado y continúa su ejecución.</li>
-    <li>No necesariamente tiene un mensaje de retorno asociado.</li>
-    <li>Útil para modelar notificaciones, eventos o comunicación en sistemas distribuidos.</li>
-  </ul>
-</div>
+**Características:**
+- **Notación:** Flecha abierta `->>` o `->>`
+- **Comportamiento:** El emisor no se bloquea
+- **Activación:** Opcional en el receptor
+- **Retorno:** No requiere mensaje de retorno inmediato
+- **Uso típico:** Eventos, notificaciones, mensajería asíncrona, sistemas distribuidos
 
-<Tabs>
-  <TabItem label="Notificación de eventos">
-    <div>
-      <PlantUml code={`@startuml
-participant "Interfaz" as UI
-participant "Gestor de Eventos" as EventManager
-participant "Servicio de Notificaciones" as NotificationService
+<Aside type="note" title="📌 Diferencia clave">
+**Síncrono vs Asíncrono:** En mensajes síncronos, el emisor espera; en asíncronos, el emisor continúa inmediatamente.
+</Aside>
 
-UI ->> EventManager : eventoUsuario()
-activate EventManager
-EventManager ->> NotificationService : notificar()
-EventManager -> EventManager : procesarEvento()
-@enduml`} />
-      <p>Los mensajes asíncronos son ideales para modelar sistemas basados en eventos.</p>
-    </div>
-  </TabItem>
-  
-  <TabItem label="Comunicación distribuida">
-    <div>
-      <PlantUml code={`@startuml
-participant "Servicio A" as A
-participant "Cola de Mensajes" as Queue
-participant "Servicio B" as B
+## ↩️ Mensajes de retorno
 
-A ->> Queue : publicarMensaje()
-A -> A : continuarProcesando()
-...Tiempo después...
-Queue ->> B : entregarMensaje()
-@enduml`} />
-      <p>Los mensajes asíncronos permiten modelar comunicación entre sistemas distribuidos.</p>
-    </div>
-  </TabItem>
-</Tabs>
-
-## 3.3. Mensajes de retorno
-
-Los mensajes de retorno representan la respuesta a un mensaje previo. Indican el valor o resultado que se devuelve al emisor original.
+Los mensajes de retorno representan la respuesta a un mensaje previo, devolviendo el resultado de una operación al emisor original.
 
 <PlantUml code={`@startuml
-participant "Objeto A" as A
-participant "Objeto B" as B
+participant "Emisor" as A
+participant "Receptor" as B
 
-A -> B : solicitud()
+A -> B : calcular(x, y)
 activate B
-B --> A : respuesta
+note right of B: Procesamiento
+B --> A : resultado
 deactivate B
+note left of A: Recibe el resultado
 @enduml`} />
 
-<div>
-  <ul>
-    <li>Se representan con una flecha discontinua (-->).</li>
-    <li>Normalmente van del receptor al emisor del mensaje original.</li>
-    <li>Pueden incluir el valor retornado como etiqueta.</li>
-    <li>Suelen marcar el final de una activación en el objeto receptor.</li>
-  </ul>
-</div>
+**Características:**
+- **Notación:** Flecha discontinua `-->`
+- **Dirección:** Del receptor al emisor original
+- **Contenido:** Puede incluir el valor retornado explícitamente
+- **Activación:** Marca el fin de la activación del receptor
+- **Sintaxis alternativa:** Palabra clave `return` en notación abreviada
 
-<Tabs>
-  <TabItem label="Retorno simple">
-    <div>
-      <PlantUml code={`@startuml
-participant "Vista" as V
-participant "Controlador" as C
+## 🆕 Mensajes de creación
 
-V -> C : obtenerDatos()
-activate C
-C --> V : return datos
-deactivate C
-@enduml`} />
-      <p>Un mensaje de retorno simple que devuelve datos al emisor.</p>
-    </div>
-  </TabItem>
-  
-  <TabItem label="Retorno con valor específico">
-    <div>
-      <PlantUml code={`@startuml
-participant "Cliente" as C
-participant "Calculadora" as Calc
-
-C -> Calc : sumar(5, 3)
-activate Calc
-Calc --> C : return 8
-deactivate Calc
-@enduml`} />
-      <p>El mensaje de retorno puede incluir el valor específico que se devuelve.</p>
-    </div>
-  </TabItem>
-</Tabs>
-
-## 3.4. Creación y destrucción de objetos
-
-Los diagramas de secuencia también pueden representar la creación de nuevos objetos y la destrucción de objetos existentes durante la interacción.
-
-### Creación de objetos
+Los mensajes de creación representan la instanciación de nuevos objetos durante la ejecución. El objeto receptor no existe antes de recibir este mensaje.
 
 <PlantUml code={`@startuml
-participant "Objeto A" as A
-participant "Objeto B" as B
+participant "Creador" as A
+participant "Objeto Nuevo" as B
 
 A -> B ** : crear()
+note right of B
+  ** indica que el objeto
+  es creado en este momento
+end note
+A -> B : configurar()
+B --> A : OK
 @enduml`} />
 
-<div>
-  <ul>
-    <li>Se representa con una flecha discontinua terminada en un objeto.</li>
-    <li>El objeto creado no existe antes de este mensaje.</li>
-    <li>La línea de vida del objeto creado comienza a partir del punto de creación.</li>
-  </ul>
-</div>
+**Características:**
+- **Notación:** Flecha con `**` al final
+- **Efecto:** Instancia un nuevo objeto
+- **Línea de vida:** Comienza en el punto de creación
+- **Sintaxis:** `participante -> nuevoObjeto ** : mensaje()`
+- **Uso típico:** Instanciación de objetos, patrones Factory, inicialización de recursos
 
-<Tabs>
-  <TabItem label="Creación básica">
-    <div>
-      <PlantUml code={`@startuml
-participant "Cliente" as C
+## 🗑️ Mensajes de destrucción
 
-C -> "p:Producto" ** : new Producto()
-@enduml`} />
-      <p>Creación básica de un nuevo objeto.</p>
-    </div>
-  </TabItem>
-  
-  <TabItem label="Creación con parámetros">
-    <div>
-      <PlantUml code={`@startuml
-participant "Fábrica" as F
-participant "Producto" as P
-
-F -> P ** : create(nombre, precio)
-@enduml`} />
-      <p>La creación puede incluir parámetros para el constructor.</p>
-    </div>
-  </TabItem>
-</Tabs>
-
-### Destrucción de objetos
+Los mensajes de destrucción representan la eliminación explícita de objetos durante la ejecución. El objeto deja de existir después de recibir este mensaje.
 
 <PlantUml code={`@startuml
-participant "Objeto A" as A
-participant "Objeto B" as B
+participant "Gestor" as A
+participant "Recurso" as B
 
-A -> B : crear()
+A -> B ** : crear()
+A -> B : utilizar()
 activate B
-B -> B !! : destruir()
+B --> A : Resultado
+deactivate B
+A -> B !! : destruir()
+note right of B
+  !! indica destrucción
+  La línea de vida termina con X
+end note
 @enduml`} />
 
-<div>
-  <ul>
-    <li>Se representa con una X al final de la línea de vida.</li>
-    <li>Indica que el objeto deja de existir en ese punto.</li>
-    <li>La línea de vida no continúa después de la destrucción.</li>
-  </ul>
-</div>
+**Características:**
+- **Notación:** Flecha con `!!` al final
+- **Efecto:** Destruye el objeto receptor
+- **Línea de vida:** Termina con una "X"
+- **Sintaxis:** `participante -> objeto !! : mensaje()`
+- **Relevancia:** Especialmente importante en gestión manual de memoria y liberación de recursos externos
 
-<Tabs>
-  <TabItem label="Autodestrucción">
-    <div>
-      <PlantUml code={`@startuml
-participant "Objeto" as O
-
-activate O
-O -> O !! : destruir()
-@enduml`} />
-      <p>Un objeto puede autodestruirse.</p>
-    </div>
-  </TabItem>
-  
-  <TabItem label="Destrucción por otro objeto">
-    <div>
-      <PlantUml code={`@startuml
-participant "Gestor" as G
-participant "Recurso" as R
-
-G -> R : usar()
-activate R
-G -> R !! : liberar()
-@enduml`} />
-      <p>Un objeto puede ser destruido por otro objeto.</p>
-    </div>
-  </TabItem>
-</Tabs>
-
-<Aside type="caution">
-  La destrucción explícita de objetos es especialmente relevante en lenguajes sin recolección automática de basura o cuando se modelan recursos que deben liberarse explícitamente.
+<Aside type="caution" title="⚠️ Consideración importante">
+La destrucción explícita es crucial en lenguajes sin recolección automática de basura o cuando se gestionan recursos externos que deben liberarse manualmente.
 </Aside>
 
-<Aside type="note">
-  La combinación adecuada de estos diferentes tipos de mensajes permite modelar interacciones complejas y patrones de comunicación variados entre los objetos de un sistema.
+## 📊 Comparativa de tipos de mensajes
+
+| Tipo | Notación | Bloqueo | Retorno | Uso principal |
+|------|----------|---------|---------|---------------|
+| **Síncrono** | `→` | Sí | Obligatorio | Llamadas a métodos, consultas |
+| **Asíncrono** | `->>` | No | Opcional | Eventos, notificaciones, mensajería |
+| **Retorno** | `-->` | N/A | N/A | Respuestas, valores de retorno |
+| **Creación** | `→ **` | Varía | Opcional | Instanciación de objetos |
+| **Destrucción** | `→ !!` | Varía | No | Liberación de recursos |
+
+<Aside type="tip" title="🎯 Criterios de selección">
+- Use **síncrono** cuando necesite el resultado para continuar
+- Use **asíncrono** para operaciones independientes o de larga duración
+- Use **retorno** para clarificar qué información regresa
+- Use **creación** para modelar instanciación de objetos
+- Use **destrucción** para gestión explícita de recursos
 </Aside>
 
-En la siguiente sección, exploraremos en detalle la notación UML específica para diagramas de secuencia, incluyendo elementos avanzados como fragmentos combinados y condiciones.
