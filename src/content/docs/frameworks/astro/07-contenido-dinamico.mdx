@@ -1,0 +1,1073 @@
+---
+title: 07. Contenido Dinámico
+description: Markdown, MDX, colecciones de contenido y consumo de APIs
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+
+## 7.1 Uso de Markdown y MDX
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Markdown y MDX en Astro
+
+    **Markdown** es un lenguaje de marcado ligero para crear contenido formateado, mientras que **MDX** extiende Markdown permitiendo usar componentes JSX dentro del contenido.
+
+    #### 📝 Markdown
+
+    **Propósito**
+    - Escribir contenido de forma simple y legible
+    - Generar HTML automáticamente
+    - Ideal para blogs, documentación y páginas de contenido
+    - Separar contenido de presentación
+
+    **Características**
+    - Sintaxis simple y minimalista
+    - Conversión automática a HTML
+    - Soporte nativo en Astro
+    - Frontmatter para metadatos
+
+    #### ⚡ MDX (Markdown + JSX)
+
+    **Propósito**
+    - Combinar contenido Markdown con componentes interactivos
+    - Reutilizar componentes en documentación
+    - Crear contenido dinámico y rico
+    - Mantener la simplicidad de Markdown con poder de React
+
+    **Características**
+    - Importar y usar componentes React/Vue/Svelte
+    - Usar JavaScript dentro del contenido
+    - Mantener sintaxis Markdown
+    - Validación de tipos con TypeScript
+
+    #### 🔧 Cómo Funciona en Astro
+
+    1. **Archivos `.md`**: Markdown puro, se convierten a HTML
+    2. **Archivos `.mdx`**: Markdown con componentes, se procesan con MDX
+    3. **Frontmatter**: Metadatos en YAML al inicio del archivo
+    4. **Layouts**: Plantillas para envolver el contenido
+    5. **Componentes**: Se pueden importar y usar en MDX
+
+    #### 📋 Frontmatter
+
+    Bloque de metadatos en formato YAML al inicio del archivo:
+
+    ```yaml
+    ---
+    title: Mi Artículo
+    date: 2024-01-15
+    author: Juan Pérez
+    tags: [astro, web]
+    ---
+    ```
+
+    #### 🎯 Ventajas
+
+    | Aspecto | Markdown | MDX |
+    |---------|----------|-----|
+    | **Simplicidad** | ✅ Muy simple | ⚠️ Requiere conocer componentes |
+    | **Interactividad** | ❌ Solo estático | ✅ Componentes dinámicos |
+    | **Rendimiento** | ✅ Muy rápido | ✅ Rápido (SSG) |
+    | **Mantenibilidad** | ✅ Fácil de editar | ✅ Reutilizable |
+    | **Uso recomendado** | Contenido simple | Contenido rico |
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 📝 Archivo Markdown Básico
+
+    **`src/pages/blog/mi-post.md`**
+    ```markdown
+    ---
+    title: Mi Primer Post
+    description: Introducción a Astro
+    pubDate: 2024-01-15
+    author: Juan Pérez
+    image: /images/post1.jpg
+    tags: [astro, web, tutorial]
+    ---
+
+    # Mi Primer Post
+
+    Este es un **post de ejemplo** usando Markdown en Astro.
+
+    ## Características
+
+    - Fácil de escribir
+    - Conversión automática a HTML
+    - Soporte para imágenes
+
+    ![Imagen de ejemplo](/images/ejemplo.jpg)
+
+    ## Código
+
+    ```javascript
+    const mensaje = "Hola Astro";
+    console.log(mensaje);
+    ```
+
+    ## Conclusión
+
+    Markdown es perfecto para contenido simple y legible.
+    ```
+
+    ### ⚡ Archivo MDX con Componentes
+
+    **`src/pages/blog/post-interactivo.mdx`**
+    ```mdx
+    ---
+    title: Post Interactivo
+    description: Usando componentes en MDX
+    pubDate: 2024-01-20
+    ---
+
+    import Counter from '../../components/Counter.jsx';
+    import Alert from '../../components/Alert.astro';
+    import { Code } from '@astrojs/starlight/components';
+
+    # Post Interactivo con MDX
+
+    Este post combina **Markdown** con componentes interactivos.
+
+    ## Componente React
+
+    Aquí hay un contador interactivo:
+
+    <Counter client:load />
+
+    ## Componente Astro
+
+    <Alert type="info">
+      💡 **Tip**: MDX te permite usar componentes directamente en tu contenido.
+    </Alert>
+
+    ## Código con Sintaxis
+
+    <Code code={`
+    function saludar(nombre) {
+      return \`Hola, \${nombre}!\`;
+    }
+    `} lang="js" />
+
+    ## Contenido Normal
+
+    Puedes seguir escribiendo Markdown normal después de usar componentes.
+    ```
+
+    ### 🎨 Layout para Markdown/MDX
+
+    **`src/layouts/BlogLayout.astro`**
+    ```astro
+    ---
+    const { frontmatter } = Astro.props;
+    ---
+
+    <html>
+      <head>
+        <title>{frontmatter.title}</title>
+        <meta name="description" content={frontmatter.description} />
+      </head>
+      <body>
+        <article>
+          <header>
+            <h1>{frontmatter.title}</h1>
+            <p class="meta">
+              Por {frontmatter.author} • {frontmatter.pubDate}
+            </p>
+            {frontmatter.tags && (
+              <div class="tags">
+                {frontmatter.tags.map(tag => (
+                  <span class="tag">{tag}</span>
+                ))}
+              </div>
+            )}
+          </header>
+          
+          <div class="content">
+            <slot />
+          </div>
+        </article>
+      </body>
+    </html>
+    ```
+
+    ### 🔧 Configuración de Layout
+
+    **En archivo Markdown/MDX**
+    ```markdown
+    ---
+    layout: ../../layouts/BlogLayout.astro
+    title: Mi Post
+    ---
+
+    Contenido del post...
+    ```
+
+    **O en `astro.config.mjs`**
+    ```js
+    import { defineConfig } from 'astro/config';
+    import mdx from '@astrojs/mdx';
+
+    export default defineConfig({
+      integrations: [mdx()],
+      markdown: {
+        // Layout por defecto para archivos .md
+        layout: './src/layouts/BlogLayout.astro'
+      }
+    });
+    ```
+
+    ### 🎯 Componentes Personalizados en MDX
+
+    **`src/components/Callout.astro`**
+    ```astro
+    ---
+    const { type = 'info' } = Astro.props;
+    ---
+
+    <div class={`callout callout-${type}`}>
+      <slot />
+    </div>
+
+    <style>
+      .callout {
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+      }
+      .callout-info { background: #e3f2fd; }
+      .callout-warning { background: #fff3e0; }
+      .callout-error { background: #ffebee; }
+    </style>
+    ```
+
+    **Uso en MDX**
+    ```mdx
+    ---
+    title: Tutorial
+    ---
+
+    import Callout from '../components/Callout.astro';
+
+    # Tutorial de Astro
+
+    <Callout type="info">
+      📘 Este es un tutorial para principiantes.
+    </Callout>
+
+    ## Instalación
+
+    <Callout type="warning">
+      ⚠️ Asegúrate de tener Node.js instalado.
+    </Callout>
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Usa Markdown para contenido simple y MDX cuando necesites componentes interactivos o reutilizables.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 7.2 Colecciones de contenido (content collections)
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Content Collections en Astro
+
+    Las **Content Collections** son una forma estructurada y con validación de tipos para gestionar contenido en Astro (blogs, documentación, productos, etc.).
+
+    #### 🎯 Propósito
+
+    - Organizar contenido de forma estructurada
+    - Validar esquemas con Zod
+    - Obtener autocompletado y type-safety
+    - Consultar y filtrar contenido fácilmente
+    - Generar páginas dinámicas automáticamente
+
+    #### ⚙️ Cómo Funciona
+
+    1. **Definición**: Se crean en `src/content/[colección]/`
+    2. **Esquema**: Se define en `src/content/config.ts`
+    3. **Validación**: Zod valida el frontmatter
+    4. **Consulta**: API de `getCollection()` y `getEntry()`
+    5. **Renderizado**: Función `render()` para obtener HTML
+
+    #### 📁 Estructura
+
+    ```
+    src/
+    └── content/
+        ├── config.ts          # Definición de esquemas
+        ├── blog/              # Colección de blog
+        │   ├── post-1.md
+        │   └── post-2.mdx
+        └── docs/              # Colección de docs
+            ├── intro.md
+            └── guide.md
+    ```
+
+    #### 🔍 API de Collections
+
+    **Funciones principales**
+    - `getCollection(name)`: Obtiene todas las entradas de una colección
+    - `getEntry(collection, slug)`: Obtiene una entrada específica
+    - `entry.render()`: Renderiza el contenido a HTML
+
+    #### 📊 Validación con Zod
+
+    **Zod** es una librería de validación de esquemas TypeScript:
+
+    - Define tipos de datos esperados
+    - Valida frontmatter automáticamente
+    - Proporciona errores claros
+    - Genera tipos TypeScript automáticamente
+
+    #### 🌟 Ventajas
+
+    - **Type Safety**: Errores en tiempo de desarrollo
+    - **Autocompletado**: IntelliSense en el editor
+    - **Validación**: Frontmatter correcto garantizado
+    - **Organización**: Estructura clara del contenido
+    - **Rendimiento**: Optimización automática
+    - **Consultas**: API simple y poderosa
+
+    #### 📋 Tipos de Colecciones
+
+    | Tipo | Descripción | Uso |
+    |------|-------------|-----|
+    | **content** | Archivos Markdown/MDX | Blogs, docs |
+    | **data** | Archivos JSON/YAML | Configuración, datos |
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 📋 Definición de Esquema
+
+    **`src/content/config.ts`**
+    ```typescript
+    import { defineCollection, z } from 'astro:content';
+
+    const blogCollection = defineCollection({
+      type: 'content',
+      schema: z.object({
+        title: z.string(),
+        description: z.string(),
+        pubDate: z.date(),
+        author: z.string(),
+        image: z.string().optional(),
+        tags: z.array(z.string()),
+        draft: z.boolean().default(false),
+      }),
+    });
+
+    const docsCollection = defineCollection({
+      type: 'content',
+      schema: z.object({
+        title: z.string(),
+        description: z.string(),
+        order: z.number(),
+        category: z.enum(['tutorial', 'guide', 'reference']),
+      }),
+    });
+
+    export const collections = {
+      blog: blogCollection,
+      docs: docsCollection,
+    };
+    ```
+
+    ### 📝 Entrada de Colección
+
+    **`src/content/blog/primer-post.md`**
+    ```markdown
+    ---
+    title: Mi Primer Post
+    description: Introducción a Astro Content Collections
+    pubDate: 2024-01-15
+    author: Juan Pérez
+    tags: [astro, tutorial, web]
+    draft: false
+    ---
+
+    # Mi Primer Post
+
+    Este es el contenido del post usando Content Collections.
+    ```
+
+    ### 📄 Listar Todas las Entradas
+
+    **`src/pages/blog/index.astro`**
+    ```astro
+    ---
+    import { getCollection } from 'astro:content';
+
+    // Obtener todos los posts
+    const allPosts = await getCollection('blog');
+
+    // Filtrar posts publicados (no drafts)
+    const publishedPosts = allPosts.filter(post => !post.data.draft);
+
+    // Ordenar por fecha
+    const sortedPosts = publishedPosts.sort(
+      (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+    );
+    ---
+
+    <html>
+      <body>
+        <h1>Blog</h1>
+        <ul>
+          {sortedPosts.map(post => (
+            <li>
+              <a href={`/blog/${post.slug}`}>
+                <h2>{post.data.title}</h2>
+                <p>{post.data.description}</p>
+                <time>{post.data.pubDate.toLocaleDateString()}</time>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </body>
+    </html>
+    ```
+
+    ### 📖 Página Individual con `getStaticPaths`
+
+    **`src/pages/blog/[slug].astro`**
+    ```astro
+    ---
+    import { getCollection } from 'astro:content';
+    import BlogLayout from '../../layouts/BlogLayout.astro';
+
+    // Generar rutas para todos los posts
+    export async function getStaticPaths() {
+      const posts = await getCollection('blog');
+      
+      return posts.map(post => ({
+        params: { slug: post.slug },
+        props: { post },
+      }));
+    }
+
+    const { post } = Astro.props;
+    const { Content } = await post.render();
+    ---
+
+    <BlogLayout frontmatter={post.data}>
+      <Content />
+    </BlogLayout>
+    ```
+
+    ### 🔍 Filtrado y Consultas Avanzadas
+
+    ```astro
+    ---
+    import { getCollection } from 'astro:content';
+
+    // Filtrar por tag
+    const astroPost = await getCollection('blog', ({ data }) => {
+      return data.tags.includes('astro');
+    });
+
+    // Filtrar por autor
+    const myPosts = await getCollection('blog', ({ data }) => {
+      return data.author === 'Juan Pérez';
+    });
+
+    // Filtrar por fecha
+    const recentPosts = await getCollection('blog', ({ data }) => {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      return data.pubDate > thirtyDaysAgo;
+    });
+    ---
+    ```
+
+    ### 🏷️ Página de Tags
+
+    **`src/pages/tags/[tag].astro`**
+    ```astro
+    ---
+    import { getCollection } from 'astro:content';
+
+    export async function getStaticPaths() {
+      const allPosts = await getCollection('blog');
+      
+      // Obtener todos los tags únicos
+      const uniqueTags = [...new Set(
+        allPosts.flatMap(post => post.data.tags)
+      )];
+      
+      // Crear una ruta por cada tag
+      return uniqueTags.map(tag => ({
+        params: { tag },
+        props: {
+          posts: allPosts.filter(post => 
+            post.data.tags.includes(tag)
+          )
+        }
+      }));
+    }
+
+    const { tag } = Astro.params;
+    const { posts } = Astro.props;
+    ---
+
+    <html>
+      <body>
+        <h1>Posts con tag: {tag}</h1>
+        <ul>
+          {posts.map(post => (
+            <li>
+              <a href={`/blog/${post.slug}`}>
+                {post.data.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </body>
+    </html>
+    ```
+
+    ### 📊 Colección de Datos (JSON)
+
+    **`src/content/config.ts`**
+    ```typescript
+    const teamCollection = defineCollection({
+      type: 'data',
+      schema: z.object({
+        name: z.string(),
+        role: z.string(),
+        bio: z.string(),
+        avatar: z.string(),
+        social: z.object({
+          twitter: z.string().optional(),
+          github: z.string().optional(),
+        }),
+      }),
+    });
+
+    export const collections = {
+      team: teamCollection,
+    };
+    ```
+
+    **`src/content/team/juan.json`**
+    ```json
+    {
+      "name": "Juan Pérez",
+      "role": "Developer",
+      "bio": "Full-stack developer",
+      "avatar": "/avatars/juan.jpg",
+      "social": {
+        "twitter": "@juanperez",
+        "github": "juanperez"
+      }
+    }
+    ```
+
+    **Uso**
+    ```astro
+    ---
+    import { getCollection } from 'astro:content';
+
+    const team = await getCollection('team');
+    ---
+
+    <div class="team">
+      {team.map(member => (
+        <div class="member">
+          <img src={member.data.avatar} alt={member.data.name} />
+          <h3>{member.data.name}</h3>
+          <p>{member.data.role}</p>
+        </div>
+      ))}
+    </div>
+    ```
+
+    <Aside type="note">
+      📝 **Nota**: Las Content Collections proporcionan type-safety completo. Si el frontmatter no coincide con el esquema, obtendrás un error en tiempo de desarrollo.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 7.3 Consumo de APIs y archivos JSON
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Consumo de APIs y Datos Externos en Astro
+
+    Astro permite consumir datos de **APIs REST**, **archivos JSON locales** y otras fuentes de datos durante el proceso de build para generar páginas estáticas.
+
+    #### 🎯 Propósito
+
+    - Obtener datos de APIs externas (REST, GraphQL)
+    - Cargar datos desde archivos JSON/YAML locales
+    - Generar páginas dinámicas con datos externos
+    - Mantener contenido actualizado desde fuentes externas
+    - Crear sitios estáticos con datos dinámicos
+
+    #### ⚙️ Cómo Funciona
+
+    **En Build Time (SSG)**
+    1. Astro ejecuta código durante el build
+    2. Hace peticiones a APIs o lee archivos
+    3. Procesa y transforma los datos
+    4. Genera HTML estático con los datos
+    5. El resultado es un sitio completamente estático
+
+    **En Runtime (SSR)**
+    1. Las peticiones se hacen cuando el usuario visita la página
+    2. Los datos se obtienen en tiempo real
+    3. Se genera HTML dinámicamente
+    4. Requiere un servidor Node.js
+
+    #### 📊 Métodos de Consumo
+
+    **1. Fetch API**
+    - API nativa de JavaScript
+    - Disponible en el frontmatter de Astro
+    - Ideal para APIs REST
+    - Soporte para async/await
+
+    **2. Archivos JSON Locales**
+    - Importación directa con `import`
+    - Datos estáticos en el proyecto
+    - Sin necesidad de red
+    - Ideal para configuración y datos fijos
+
+    **3. Librerías HTTP**
+    - Axios, node-fetch, etc.
+    - Más funcionalidades que fetch
+    - Interceptores, transformaciones
+    - Manejo avanzado de errores
+
+    #### 🔄 Cuándo Usar Cada Método
+
+    | Método | Cuándo Usar | Ventajas |
+    |--------|-------------|----------|
+    | **Fetch en Build** | Datos que cambian poco | Sitio estático rápido |
+    | **JSON Local** | Datos fijos del proyecto | Sin dependencias externas |
+    | **SSR** | Datos en tiempo real | Siempre actualizado |
+    | **ISR** | Balance actualización/rendimiento | Lo mejor de ambos |
+
+    #### 🌟 Mejores Prácticas
+
+    1. **Caché**: Guarda respuestas para evitar peticiones repetidas
+    2. **Manejo de Errores**: Siempre valida respuestas de APIs
+    3. **Tipos**: Usa TypeScript para validar datos
+    4. **Paginación**: Maneja grandes conjuntos de datos
+    5. **Rate Limiting**: Respeta límites de APIs
+    6. **Variables de Entorno**: Usa `.env` para API keys
+
+    #### 🔒 Seguridad
+
+    - **API Keys**: Nunca expongas en el cliente
+    - **Variables de Entorno**: Usa `import.meta.env`
+    - **Validación**: Valida datos de APIs externas
+    - **CORS**: Considera restricciones de origen cruzado
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🌐 Consumo de API REST con Fetch
+
+    **`src/pages/posts.astro`**
+    ```astro
+    ---
+    // Fetch durante el build
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+    const posts = await response.json();
+    ---
+
+    <html>
+      <body>
+        <h1>Posts desde API</h1>
+        <ul>
+          {posts.map(post => (
+            <li>
+              <h2>{post.title}</h2>
+              <p>{post.body}</p>
+            </li>
+          ))}
+        </ul>
+      </body>
+    </html>
+    ```
+
+    ### 📄 Páginas Dinámicas desde API
+
+    **`src/pages/posts/[id].astro`**
+    ```astro
+    ---
+    export async function getStaticPaths() {
+      // Obtener todos los posts
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+      const posts = await response.json();
+      
+      // Generar una ruta por cada post
+      return posts.map(post => ({
+        params: { id: post.id.toString() },
+        props: { post }
+      }));
+    }
+
+    const { post } = Astro.props;
+    ---
+
+    <html>
+      <body>
+        <article>
+          <h1>{post.title}</h1>
+          <p>{post.body}</p>
+        </article>
+      </body>
+    </html>
+    ```
+
+    ### 📦 Importar JSON Local
+
+    **`src/data/products.json`**
+    ```json
+    [
+      {
+        "id": 1,
+        "name": "Laptop",
+        "price": 999,
+        "category": "electronics"
+      },
+      {
+        "id": 2,
+        "name": "Mouse",
+        "price": 29,
+        "category": "electronics"
+      }
+    ]
+    ```
+
+    **`src/pages/products.astro`**
+    ```astro
+    ---
+    import productsData from '../data/products.json';
+    ---
+
+    <html>
+      <body>
+        <h1>Productos</h1>
+        <div class="products">
+          {productsData.map(product => (
+            <div class="product">
+              <h2>{product.name}</h2>
+              <p>${product.price}</p>
+              <span>{product.category}</span>
+            </div>
+          ))}
+        </div>
+      </body>
+    </html>
+    ```
+
+    ### 🔧 Manejo de Errores y Validación
+
+    ```astro
+    ---
+    interface Post {
+      id: number;
+      title: string;
+      body: string;
+      userId: number;
+    }
+
+    let posts: Post[] = [];
+    let error: string | null = null;
+
+    try {
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      posts = await response.json();
+      
+      // Validar datos
+      if (!Array.isArray(posts)) {
+        throw new Error('La respuesta no es un array');
+      }
+      
+    } catch (e) {
+      error = e instanceof Error ? e.message : 'Error desconocido';
+      console.error('Error al obtener posts:', error);
+    }
+    ---
+
+    <html>
+      <body>
+        {error ? (
+          <div class="error">
+            <p>Error: {error}</p>
+          </div>
+        ) : (
+          <ul>
+            {posts.map(post => (
+              <li>{post.title}</li>
+            ))}
+          </ul>
+        )}
+      </body>
+    </html>
+    ```
+
+    ### 🔑 Uso de Variables de Entorno
+
+    **`.env`**
+    ```env
+    API_KEY=tu_api_key_secreta
+    API_URL=https://api.ejemplo.com
+    ```
+
+    **`src/pages/data.astro`**
+    ```astro
+    ---
+    const API_KEY = import.meta.env.API_KEY;
+    const API_URL = import.meta.env.API_URL;
+
+    const response = await fetch(`${API_URL}/data`, {
+      headers: {
+        'Authorization': `Bearer ${API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+    ---
+
+    <html>
+      <body>
+        <pre>{JSON.stringify(data, null, 2)}</pre>
+      </body>
+    </html>
+    ```
+
+    ### 🚀 Función Auxiliar para Fetch
+
+    **`src/utils/api.ts`**
+    ```typescript
+    export async function fetchAPI<T>(
+      endpoint: string,
+      options?: RequestInit
+    ): Promise<T> {
+      const API_URL = import.meta.env.API_URL || 'https://api.ejemplo.com';
+      
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options?.headers,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+
+      return response.json();
+    }
+
+    export async function fetchWithCache<T>(
+      key: string,
+      fetcher: () => Promise<T>,
+      ttl: number = 3600000 // 1 hora
+    ): Promise<T> {
+      const cached = globalThis.__cache?.get(key);
+      
+      if (cached && Date.now() - cached.timestamp < ttl) {
+        return cached.data;
+      }
+
+      const data = await fetcher();
+      
+      if (!globalThis.__cache) {
+        globalThis.__cache = new Map();
+      }
+      
+      globalThis.__cache.set(key, {
+        data,
+        timestamp: Date.now()
+      });
+
+      return data;
+    }
+    ```
+
+    **Uso de la función auxiliar**
+    ```astro
+    ---
+    import { fetchAPI, fetchWithCache } from '../utils/api';
+
+    interface User {
+      id: number;
+      name: string;
+      email: string;
+    }
+
+    // Fetch simple
+    const users = await fetchAPI<User[]>('/users');
+
+    // Fetch con caché
+    const cachedUsers = await fetchWithCache(
+      'users',
+      () => fetchAPI<User[]>('/users')
+    );
+    ---
+    ```
+
+    ### 📊 GraphQL API
+
+    ```astro
+    ---
+    const query = `
+      query {
+        posts {
+          id
+          title
+          content
+          author {
+            name
+          }
+        }
+      }
+    `;
+
+    const response = await fetch('https://api.ejemplo.com/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query })
+    });
+
+    const { data } = await response.json();
+    const posts = data.posts;
+    ---
+
+    <html>
+      <body>
+        {posts.map(post => (
+          <article>
+            <h2>{post.title}</h2>
+            <p>Por {post.author.name}</p>
+            <div>{post.content}</div>
+          </article>
+        ))}
+      </body>
+    </html>
+    ```
+
+    ### 🔄 Combinación de Múltiples Fuentes
+
+    ```astro
+    ---
+    import localProducts from '../data/products.json';
+
+    // Datos de API externa
+    const apiResponse = await fetch('https://api.ejemplo.com/featured');
+    const featuredProducts = await apiResponse.json();
+
+    // Combinar datos locales y externos
+    const allProducts = [
+      ...localProducts,
+      ...featuredProducts
+    ];
+
+    // Filtrar y ordenar
+    const sortedProducts = allProducts
+      .filter(p => p.price > 0)
+      .sort((a, b) => b.price - a.price);
+    ---
+
+    <html>
+      <body>
+        <h1>Todos los Productos</h1>
+        {sortedProducts.map(product => (
+          <div class="product">
+            <h3>{product.name}</h3>
+            <p>${product.price}</p>
+          </div>
+        ))}
+      </body>
+    </html>
+    ```
+
+    ### ⏱️ Paginación de API
+
+    **`src/pages/users/[page].astro`**
+    ```astro
+    ---
+    const ITEMS_PER_PAGE = 10;
+
+    export async function getStaticPaths() {
+      const response = await fetch('https://jsonplaceholder.typicode.com/users');
+      const users = await response.json();
+      
+      const totalPages = Math.ceil(users.length / ITEMS_PER_PAGE);
+      
+      return Array.from({ length: totalPages }, (_, i) => ({
+        params: { page: (i + 1).toString() },
+        props: {
+          users: users.slice(i * ITEMS_PER_PAGE, (i + 1) * ITEMS_PER_PAGE),
+          currentPage: i + 1,
+          totalPages
+        }
+      }));
+    }
+
+    const { users, currentPage, totalPages } = Astro.props;
+    ---
+
+    <html>
+      <body>
+        <h1>Usuarios - Página {currentPage} de {totalPages}</h1>
+        <ul>
+          {users.map(user => (
+            <li>{user.name} - {user.email}</li>
+          ))}
+        </ul>
+        
+        <nav>
+          {currentPage > 1 && (
+            <a href={`/users/${currentPage - 1}`}>← Anterior</a>
+          )}
+          {currentPage < totalPages && (
+            <a href={`/users/${currentPage + 1}`}>Siguiente →</a>
+          )}
+        </nav>
+      </body>
+    </html>
+    ```
+
+    <Aside type="caution">
+      ⚠️ **Advertencia**: Las peticiones a APIs se ejecutan durante el build en modo SSG. Si la API está caída durante el build, la generación fallará. Implementa manejo de errores robusto.
+    </Aside>
+
+    <Aside type="tip">
+      💡 **Tip**: Para datos que cambian frecuentemente, considera usar SSR o ISR (Incremental Static Regeneration) en lugar de SSG puro.
+    </Aside>
+
+  </TabItem>
+</Tabs>

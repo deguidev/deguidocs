@@ -1,0 +1,698 @@
+---
+title: 03. Creación de Páginas
+description: Páginas estáticas, rutas dinámicas y layouts
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+
+## 3.1 Creando páginas estáticas
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Páginas Estáticas en Astro
+
+    Las **páginas estáticas** son archivos que se convierten en HTML durante el build y se sirven tal cual al usuario, sin procesamiento adicional en el servidor.
+
+    #### 🎯 Propósito
+
+    - Generar contenido HTML puro y rápido
+    - Optimizar rendimiento y SEO
+    - Reducir carga del servidor
+    - Facilitar el despliegue en CDNs
+    - Mejorar la experiencia del usuario
+
+    #### ⚙️ Cómo Funciona
+
+    **Proceso de Creación:**
+    1. **Archivo**: Crear archivo `.astro` en `src/pages/`
+    2. **Routing**: El nombre del archivo determina la URL
+    3. **Build**: Astro genera HTML estático
+    4. **Deploy**: Se sirve como archivo estático
+
+    **Características:**
+    - Cada archivo en `pages/` se convierte en una ruta
+    - Soporta `.astro`, `.md`, `.mdx`, `.html`
+    - Frontmatter para lógica del servidor
+    - HTML generado en build time
+
+    #### 📁 Convenciones de Nombres
+
+    **Mapeo automático:**
+    - `index.astro` → Ruta raíz de la carpeta
+    - `about.astro` → `/about`
+    - `blog/index.astro` → `/blog`
+    - `blog/post.astro` → `/blog/post`
+
+    #### 🌟 Ventajas de Páginas Estáticas
+
+    - **Rendimiento**: Carga instantánea
+    - **SEO**: HTML completo para crawlers
+    - **Seguridad**: Sin código del servidor expuesto
+    - **Escalabilidad**: Fácil de cachear y distribuir
+    - **Costo**: Hosting económico
+
+    #### 📊 Tipos de Contenido
+
+    | Tipo | Extensión | Uso |
+    |------|-----------|-----|
+    | **Astro** | `.astro` | Páginas dinámicas con componentes |
+    | **Markdown** | `.md` | Contenido simple |
+    | **MDX** | `.mdx` | Markdown con componentes |
+    | **HTML** | `.html` | HTML puro |
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 📄 Página Estática Básica
+
+    **`src/pages/index.astro`**
+    ```astro
+    ---
+    const titulo = "Bienvenido a Mi Sitio";
+    const descripcion = "Sitio web construido con Astro";
+    ---
+
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="description" content={descripcion} />
+        <title>{titulo}</title>
+      </head>
+      <body>
+        <header>
+          <h1>{titulo}</h1>
+        </header>
+        <main>
+          <p>{descripcion}</p>
+          <a href="/about">Acerca de</a>
+        </main>
+      </body>
+    </html>
+    ```
+
+    ### 🎨 Página con Componentes
+
+    **`src/pages/about.astro`**
+    ```astro
+    ---
+    import Header from '../components/Header.astro';
+    import Footer from '../components/Footer.astro';
+
+    const equipo = [
+      { nombre: 'Juan', rol: 'Developer' },
+      { nombre: 'María', rol: 'Designer' },
+      { nombre: 'Pedro', rol: 'Manager' }
+    ];
+    ---
+
+    <html>
+      <body>
+        <Header />
+        
+        <main>
+          <h1>Acerca de Nosotros</h1>
+          <p>Somos un equipo apasionado por la tecnología</p>
+          
+          <h2>Nuestro Equipo</h2>
+          <ul>
+            {equipo.map(persona => (
+              <li>
+                <strong>{persona.nombre}</strong> - {persona.rol}
+              </li>
+            ))}
+          </ul>
+        </main>
+        
+        <Footer />
+      </body>
+    </html>
+    ```
+
+    ### 📝 Página Markdown
+
+    **`src/pages/blog/post.md`**
+    ```markdown
+    ---
+    title: Mi Primer Post
+    description: Introducción a Astro
+    pubDate: 2024-01-15
+    author: Juan Pérez
+    ---
+
+    # Mi Primer Post
+
+    Este es un post escrito en **Markdown**.
+
+    ## Características
+
+    - Fácil de escribir
+    - Se convierte a HTML automáticamente
+    - Perfecto para contenido
+
+    ## Conclusión
+
+    Markdown es ideal para blogs y documentación.
+    ```
+
+    ### 🔗 Estructura de Páginas
+
+    ```
+    src/pages/
+    ├── index.astro           → /
+    ├── about.astro           → /about
+    ├── contact.astro         → /contact
+    ├── services/
+    │   ├── index.astro       → /services
+    │   ├── web.astro         → /services/web
+    │   └── mobile.astro      → /services/mobile
+    └── blog/
+        ├── index.astro       → /blog
+        └── post-1.md         → /blog/post-1
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Usa páginas estáticas para contenido que no cambia frecuentemente. Son extremadamente rápidas y fáciles de cachear.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 3.2 Rutas dinámicas y parámetros (slug, id, etc.)
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Rutas Dinámicas
+
+    Las **rutas dinámicas** permiten generar múltiples páginas desde un solo archivo usando parámetros variables en la URL.
+
+    #### 🎯 Propósito
+
+    - Generar páginas desde datos externos (APIs, bases de datos)
+    - Crear páginas para cada elemento de una colección
+    - Evitar duplicación de código
+    - Escalar fácilmente con más contenido
+    - Mantener URLs limpias y SEO-friendly
+
+    #### ⚙️ Sintaxis de Parámetros
+
+    **Tipos de Parámetros:**
+
+    **1. Parámetro Simple: `[param]`**
+    - Captura un segmento de URL
+    - Ejemplo: `[id].astro` → `/123`, `/abc`
+    - Acceso: `Astro.params.id`
+
+    **2. Parámetros Múltiples: `[param1]/[param2]`**
+    - Captura múltiples segmentos
+    - Ejemplo: `[category]/[id].astro` → `/tech/123`
+    - Acceso: `Astro.params.category`, `Astro.params.id`
+
+    **3. Rest Parameters: `[...param]`**
+    - Captura todos los segmentos restantes
+    - Ejemplo: `[...slug].astro` → `/any/nested/path`
+    - Acceso: `Astro.params.slug` (string con `/`)
+
+    #### 🔧 getStaticPaths()
+
+    **Función obligatoria para rutas dinámicas**
+
+    **Propósito:**
+    - Definir qué páginas generar
+    - Proporcionar datos para cada página
+    - Se ejecuta solo en build time
+
+    **Retorna:**
+    - Array de objetos
+    - Cada objeto tiene `params` y `props`
+    - `params`: Valores de los parámetros de URL
+    - `props`: Datos adicionales para la página
+
+    #### 📊 Flujo de Trabajo
+
+    ```
+    1. Build Time
+       ↓
+    2. getStaticPaths() se ejecuta
+       ↓
+    3. Retorna array de rutas
+       ↓
+    4. Astro genera HTML para cada ruta
+       ↓
+    5. Páginas estáticas listas
+    ```
+
+    #### 🌟 Casos de Uso Comunes
+
+    - **Blog**: `[slug].astro` para posts
+    - **E-commerce**: `[id].astro` para productos
+    - **Documentación**: `[...slug].astro` para docs anidadas
+    - **Perfiles**: `[username].astro` para usuarios
+    - **Categorías**: `[category]/[item].astro`
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🔄 Ruta Dinámica Simple
+
+    **`src/pages/products/[id].astro`**
+    ```astro
+    ---
+    export async function getStaticPaths() {
+      const products = [
+        { id: '1', name: 'Laptop', price: 999 },
+        { id: '2', name: 'Mouse', price: 29 },
+        { id: '3', name: 'Teclado', price: 79 }
+      ];
+
+      return products.map(product => ({
+        params: { id: product.id },
+        props: { product }
+      }));
+    }
+
+    const { id } = Astro.params;
+    const { product } = Astro.props;
+    ---
+
+    <html>
+      <body>
+        <h1>{product.name}</h1>
+        <p>ID: {id}</p>
+        <p>Precio: ${product.price}</p>
+        <a href="/products">Volver a productos</a>
+      </body>
+    </html>
+    ```
+
+    ### 📊 Ruta Dinámica con API
+
+    **`src/pages/blog/[slug].astro`**
+    ```astro
+    ---
+    export async function getStaticPaths() {
+      const response = await fetch('https://api.example.com/posts');
+      const posts = await response.json();
+
+      return posts.map(post => ({
+        params: { slug: post.slug },
+        props: { post }
+      }));
+    }
+
+    const { post } = Astro.props;
+    ---
+
+    <html>
+      <body>
+        <article>
+          <h1>{post.title}</h1>
+          <p class="meta">
+            Por {post.author} • {post.date}
+          </p>
+          <div set:html={post.content} />
+        </article>
+      </body>
+    </html>
+    ```
+
+    ### 🗂️ Parámetros Múltiples
+
+    **`src/pages/[category]/[product].astro`**
+    ```astro
+    ---
+    export async function getStaticPaths() {
+      return [
+        { params: { category: 'electronics', product: 'laptop' } },
+        { params: { category: 'electronics', product: 'phone' } },
+        { params: { category: 'books', product: 'novel' } },
+        { params: { category: 'books', product: 'guide' } }
+      ];
+    }
+
+    const { category, product } = Astro.params;
+    ---
+
+    <html>
+      <body>
+        <h1>Categoría: {category}</h1>
+        <h2>Producto: {product}</h2>
+        <p>URL: /{category}/{product}</p>
+      </body>
+    </html>
+    ```
+
+    ### 🌐 Rest Parameters
+
+    **`src/pages/docs/[...slug].astro`**
+    ```astro
+    ---
+    export async function getStaticPaths() {
+      return [
+        { params: { slug: 'intro' } },
+        { params: { slug: 'guides/getting-started' } },
+        { params: { slug: 'api/reference/components' } }
+      ];
+    }
+
+    const { slug } = Astro.params;
+    const segments = slug.split('/');
+    ---
+
+    <html>
+      <body>
+        <h1>Documentación</h1>
+        <p>Ruta completa: {slug}</p>
+        <p>Segmentos: {segments.length}</p>
+        <ul>
+          {segments.map(seg => <li>{seg}</li>)}
+        </ul>
+      </body>
+    </html>
+    ```
+
+    ### 📝 Con Content Collections
+
+    **`src/pages/blog/[...slug].astro`**
+    ```astro
+    ---
+    import { getCollection } from 'astro:content';
+
+    export async function getStaticPaths() {
+      const posts = await getCollection('blog');
+      
+      return posts.map(post => ({
+        params: { slug: post.slug },
+        props: { post }
+      }));
+    }
+
+    const { post } = Astro.props;
+    const { Content } = await post.render();
+    ---
+
+    <html>
+      <body>
+        <article>
+          <h1>{post.data.title}</h1>
+          <p>{post.data.description}</p>
+          <Content />
+        </article>
+      </body>
+    </html>
+    ```
+
+    <Aside type="note">
+      📝 **Nota**: `getStaticPaths()` se ejecuta solo durante el build. No puedes generar páginas dinámicamente en runtime con SSG.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 3.3 Uso de layouts para plantillas globales
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Layouts en Astro
+
+    Los **layouts** son componentes especiales que envuelven el contenido de las páginas, proporcionando estructura y elementos comunes.
+
+    #### 🎯 Propósito
+
+    - Reutilizar estructura común (header, footer, nav)
+    - Mantener consistencia visual
+    - Evitar duplicación de código
+    - Facilitar mantenimiento
+    - Centralizar estilos globales
+
+    #### ⚙️ Cómo Funcionan
+
+    **Componentes con `<slot />`:**
+    - El layout define la estructura
+    - `<slot />` marca dónde va el contenido
+    - Las páginas se "insertan" en el slot
+    - Pueden tener múltiples slots nombrados
+
+    **Proceso:**
+    1. Página importa layout
+    2. Página se envuelve en layout
+    3. Contenido de página va en `<slot />`
+    4. Layout renderiza estructura completa
+
+    #### 📋 Tipos de Layouts
+
+    **1. Layout Base**
+    - Estructura HTML básica
+    - Meta tags, estilos globales
+    - Usado por todos los layouts
+
+    **2. Layout de Sección**
+    - Específico para una sección (blog, docs)
+    - Hereda de layout base
+    - Añade elementos específicos
+
+    **3. Layout Anidado**
+    - Un layout dentro de otro
+    - Permite composición
+    - Mayor flexibilidad
+
+    #### 🔧 Props en Layouts
+
+    **Pasar datos al layout:**
+    - Título de página
+    - Meta description
+    - Clase CSS específica
+    - Configuración de sección
+
+    #### 🌟 Ventajas
+
+    - **DRY**: No repetir código
+    - **Mantenibilidad**: Cambios en un solo lugar
+    - **Consistencia**: Diseño uniforme
+    - **Flexibilidad**: Layouts anidados
+    - **Escalabilidad**: Fácil añadir páginas
+
+    #### 📊 Comparación
+
+    | Sin Layout | Con Layout |
+    |------------|------------|
+    | Código duplicado | Código reutilizable |
+    | Difícil mantener | Fácil mantener |
+    | Inconsistencias | Consistente |
+    | Más líneas | Menos líneas |
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🎨 Layout Base
+
+    **`src/layouts/BaseLayout.astro`**
+    ```astro
+    ---
+    interface Props {
+      title: string;
+      description?: string;
+    }
+
+    const { title, description = 'Mi sitio web' } = Astro.props;
+    ---
+
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="description" content={description} />
+        <title>{title}</title>
+        <link rel="stylesheet" href="/styles/global.css" />
+      </head>
+      <body>
+        <header>
+          <nav>
+            <a href="/">Inicio</a>
+            <a href="/about">Acerca de</a>
+            <a href="/blog">Blog</a>
+          </nav>
+        </header>
+
+        <main>
+          <slot />
+        </main>
+
+        <footer>
+          <p>© 2024 Mi Sitio Web</p>
+        </footer>
+      </body>
+    </html>
+    ```
+
+    ### 📄 Uso del Layout
+
+    **`src/pages/about.astro`**
+    ```astro
+    ---
+    import BaseLayout from '../layouts/BaseLayout.astro';
+    ---
+
+    <BaseLayout 
+      title="Acerca de Nosotros"
+      description="Conoce nuestro equipo y misión"
+    >
+      <h1>Acerca de Nosotros</h1>
+      <p>Somos un equipo apasionado por la tecnología.</p>
+      <p>Nuestra misión es crear productos increíbles.</p>
+    </BaseLayout>
+    ```
+
+    ### 📝 Layout para Blog
+
+    **`src/layouts/BlogLayout.astro`**
+    ```astro
+    ---
+    import BaseLayout from './BaseLayout.astro';
+
+    interface Props {
+      frontmatter: {
+        title: string;
+        description: string;
+        pubDate: string;
+        author: string;
+      };
+    }
+
+    const { frontmatter } = Astro.props;
+    ---
+
+    <BaseLayout 
+      title={frontmatter.title}
+      description={frontmatter.description}
+    >
+      <article class="blog-post">
+        <header>
+          <h1>{frontmatter.title}</h1>
+          <p class="meta">
+            Por {frontmatter.author} • {frontmatter.pubDate}
+          </p>
+        </header>
+
+        <div class="content">
+          <slot />
+        </div>
+
+        <footer>
+          <a href="/blog">← Volver al blog</a>
+        </footer>
+      </article>
+    </BaseLayout>
+
+    <style>
+      .blog-post {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      .meta {
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      .content {
+        line-height: 1.6;
+      }
+    </style>
+    ```
+
+    ### 🔄 Slots Nombrados
+
+    **`src/layouts/AdvancedLayout.astro`**
+    ```astro
+    ---
+    const { title } = Astro.props;
+    ---
+
+    <html>
+      <body>
+        <header>
+          <slot name="header" />
+        </header>
+
+        <aside>
+          <slot name="sidebar" />
+        </aside>
+
+        <main>
+          <h1>{title}</h1>
+          <slot />
+        </main>
+
+        <footer>
+          <slot name="footer" />
+        </footer>
+      </body>
+    </html>
+    ```
+
+    **Uso con slots nombrados**
+    ```astro
+    ---
+    import AdvancedLayout from '../layouts/AdvancedLayout.astro';
+    ---
+
+    <AdvancedLayout title="Mi Página">
+      <div slot="header">
+        <nav>Navegación personalizada</nav>
+      </div>
+
+      <div slot="sidebar">
+        <h3>Sidebar</h3>
+        <ul>
+          <li>Item 1</li>
+          <li>Item 2</li>
+        </ul>
+      </div>
+
+      <p>Contenido principal de la página</p>
+
+      <div slot="footer">
+        <p>Footer personalizado</p>
+      </div>
+    </AdvancedLayout>
+    ```
+
+    ### 📚 Layout para Markdown
+
+    **`src/pages/blog/post.md`**
+    ```markdown
+    ---
+    layout: ../../layouts/BlogLayout.astro
+    title: Mi Post
+    description: Descripción del post
+    pubDate: 2024-01-15
+    author: Juan Pérez
+    ---
+
+    # Contenido del Post
+
+    Este contenido se insertará automáticamente en el layout.
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Usa layouts anidados para crear jerarquías. Un layout base para toda la estructura, y layouts específicos para secciones (blog, docs, etc.).
+    </Aside>
+
+  </TabItem>
+</Tabs>

@@ -1,0 +1,832 @@
+---
+title: 06. Integración con Frameworks
+description: Usar React, Vue y Svelte dentro de Astro, componentes híbridos e islas interactivas
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+
+## 6.1 Cómo usar React, Vue y Svelte dentro de Astro
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Integración de Frameworks en Astro
+
+    **Astro** permite integrar múltiples frameworks de JavaScript (React, Vue, Svelte, etc.) en un mismo proyecto mediante su sistema de **integraciones oficiales**.
+
+    #### 🎯 Propósito
+
+    - Reutilizar componentes existentes de otros frameworks
+    - Aprovechar ecosistemas maduros (React, Vue, Svelte)
+    - Migrar gradualmente proyectos existentes
+    - Combinar lo mejor de cada framework en un solo proyecto
+
+    #### ⚙️ Cómo Funciona
+
+    1. **Instalación de Integraciones**: Se instalan mediante CLI o manualmente
+    2. **Configuración**: Se registran en `astro.config.mjs`
+    3. **Uso**: Se importan y usan como componentes Astro normales
+    4. **Hidratación Selectiva**: Se controla cuándo el JavaScript se ejecuta en el cliente
+
+    #### 🔧 Instalación de Frameworks
+
+    **React**
+    ```bash
+    npx astro add react
+    ```
+
+    **Vue**
+    ```bash
+    npx astro add vue
+    ```
+
+    **Svelte**
+    ```bash
+    npx astro add svelte
+    ```
+
+    #### 📋 Características Principales
+
+    | Framework | Ventajas | Casos de Uso |
+    |-----------|----------|--------------|
+    | **React** | Ecosistema grande, JSX | Apps complejas, reutilización |
+    | **Vue** | Sintaxis simple, reactivo | Formularios, UI interactiva |
+    | **Svelte** | Sin virtual DOM, rápido | Componentes ligeros |
+
+    #### 🌟 Ventajas de la Integración
+
+    - **Flexibilidad**: Usa el framework que prefieras
+    - **Rendimiento**: Solo carga JavaScript cuando es necesario
+    - **Compatibilidad**: Funciona con componentes existentes
+    - **Migración**: Facilita transición de otros frameworks
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 📦 Instalación y Configuración
+
+    **Instalación automática de React**
+    ```bash
+    npx astro add react
+    ```
+
+    **Configuración manual en `astro.config.mjs`**
+    ```js
+    import { defineConfig } from 'astro/config';
+    import react from '@astrojs/react';
+    import vue from '@astrojs/vue';
+    import svelte from '@astrojs/svelte';
+
+    export default defineConfig({
+      integrations: [react(), vue(), svelte()],
+    });
+    ```
+
+    ### ⚛️ Componente React
+
+    **`src/components/Counter.jsx`**
+    ```jsx
+    import { useState } from 'react';
+
+    export default function Counter() {
+      const [count, setCount] = useState(0);
+
+      return (
+        <div className="counter">
+          <h3>Contador React</h3>
+          <p>Cuenta: {count}</p>
+          <button onClick={() => setCount(count + 1)}>
+            Incrementar
+          </button>
+        </div>
+      );
+    }
+    ```
+
+    ### 🟢 Componente Vue
+
+    **`src/components/TodoList.vue`**
+    ```vue
+    <template>
+      <div class="todo-list">
+        <h3>Lista de Tareas Vue</h3>
+        <input v-model="newTodo" @keyup.enter="addTodo" placeholder="Nueva tarea">
+        <ul>
+          <li v-for="todo in todos" :key="todo.id">
+            {{ todo.text }}
+          </li>
+        </ul>
+      </div>
+    </template>
+
+    <script>
+    export default {
+      data() {
+        return {
+          newTodo: '',
+          todos: []
+        }
+      },
+      methods: {
+        addTodo() {
+          if (this.newTodo.trim()) {
+            this.todos.push({
+              id: Date.now(),
+              text: this.newTodo
+            });
+            this.newTodo = '';
+          }
+        }
+      }
+    }
+    </script>
+    ```
+
+    ### 🔴 Componente Svelte
+
+    **`src/components/Toggle.svelte`**
+    ```svelte
+    <script>
+      let isOn = false;
+
+      function toggle() {
+        isOn = !isOn;
+      }
+    </script>
+
+    <div class="toggle">
+      <h3>Toggle Svelte</h3>
+      <button on:click={toggle} class:active={isOn}>
+        {isOn ? '🟢 Encendido' : '🔴 Apagado'}
+      </button>
+    </div>
+
+    <style>
+      .active {
+        background-color: green;
+        color: white;
+      }
+    </style>
+    ```
+
+    ### 🎨 Uso en Página Astro
+
+    **`src/pages/frameworks.astro`**
+    ```astro
+    ---
+    import Counter from '../components/Counter.jsx';
+    import TodoList from '../components/TodoList.vue';
+    import Toggle from '../components/Toggle.svelte';
+    ---
+
+    <html>
+      <body>
+        <h1>Frameworks en Astro</h1>
+        
+        <!-- Componente React -->
+        <Counter client:load />
+        
+        <!-- Componente Vue -->
+        <TodoList client:visible />
+        
+        <!-- Componente Svelte -->
+        <Toggle client:idle />
+      </body>
+    </html>
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Usa `client:load` para componentes críticos, `client:visible` para componentes que aparecen al hacer scroll, y `client:idle` para componentes de baja prioridad.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 6.2 Componentes híbridos e islas interactivas
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Arquitectura de Islas (Islands Architecture)
+
+    La **Arquitectura de Islas** es el patrón fundamental de Astro que permite crear páginas con "islas" de interactividad en un océano de HTML estático.
+
+    #### 🏝️ Concepto de Islas
+
+    - **Isla**: Componente interactivo aislado con JavaScript
+    - **Océano**: HTML estático sin JavaScript
+    - **Hidratación Parcial**: Solo las islas se hidratan con JavaScript
+
+    #### 🎯 Propósito
+
+    - Minimizar JavaScript enviado al cliente
+    - Mejorar rendimiento y tiempo de carga
+    - Mantener interactividad donde se necesita
+    - Reducir complejidad del cliente
+
+    #### ⚙️ Cómo Funciona
+
+    1. **Renderizado en Servidor**: Todo se renderiza como HTML estático
+    2. **Identificación de Islas**: Se marcan componentes interactivos
+    3. **Hidratación Selectiva**: Solo las islas reciben JavaScript
+    4. **Aislamiento**: Cada isla funciona independientemente
+
+    #### 🔄 Componentes Híbridos
+
+    **Componentes híbridos** combinan partes estáticas (Astro) con partes interactivas (React/Vue/Svelte):
+
+    - **Parte estática**: Renderizada en servidor, sin JavaScript
+    - **Parte interactiva**: Hidratada en cliente, con JavaScript
+    - **Comunicación**: Props para pasar datos entre partes
+
+    #### 📊 Directivas de Cliente
+
+    Astro proporciona directivas para controlar la hidratación:
+
+    | Directiva | Cuándo se Hidrata | Uso Recomendado |
+    |-----------|-------------------|-----------------|
+    | `client:load` | Inmediatamente al cargar | Componentes críticos |
+    | `client:idle` | Cuando el navegador está inactivo | Componentes secundarios |
+    | `client:visible` | Cuando entra en viewport | Componentes below-the-fold |
+    | `client:media` | Cuando media query coincide | Componentes responsive |
+    | `client:only` | Solo en cliente, nunca en servidor | Componentes con APIs del navegador |
+
+    #### 🌟 Ventajas de las Islas
+
+    - **Rendimiento**: Menos JavaScript = carga más rápida
+    - **SEO**: HTML estático indexable
+    - **Escalabilidad**: Añade interactividad gradualmente
+    - **Mantenibilidad**: Componentes aislados y simples
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🏝️ Isla Básica
+
+    **Componente React interactivo**
+    ```jsx
+    // src/components/SearchBox.jsx
+    import { useState } from 'react';
+
+    export default function SearchBox() {
+      const [query, setQuery] = useState('');
+      const [results, setResults] = useState([]);
+
+      const handleSearch = async () => {
+        const res = await fetch(`/api/search?q=${query}`);
+        const data = await res.json();
+        setResults(data);
+      };
+
+      return (
+        <div className="search-box">
+          <input 
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar..."
+          />
+          <button onClick={handleSearch}>Buscar</button>
+          <ul>
+            {results.map(r => <li key={r.id}>{r.title}</li>)}
+          </ul>
+        </div>
+      );
+    }
+    ```
+
+    **Uso en página Astro**
+    ```astro
+    ---
+    import SearchBox from '../components/SearchBox.jsx';
+    ---
+
+    <html>
+      <body>
+        <h1>Búsqueda de Productos</h1>
+        <p>Encuentra lo que necesitas</p>
+        
+        <!-- Isla interactiva -->
+        <SearchBox client:load />
+        
+        <footer>
+          <p>© 2024 Mi Tienda</p>
+        </footer>
+      </body>
+    </html>
+    ```
+
+    ### 🔄 Componente Híbrido
+
+    **Componente Astro con isla Vue**
+    ```astro
+    ---
+    // src/components/ProductCard.astro
+    import PriceCalculator from './PriceCalculator.vue';
+
+    const { product } = Astro.props;
+    ---
+
+    <article class="product-card">
+      <!-- Parte estática (sin JavaScript) -->
+      <img src={product.image} alt={product.name} />
+      <h3>{product.name}</h3>
+      <p>{product.description}</p>
+      
+      <!-- Isla interactiva (con JavaScript) -->
+      <PriceCalculator 
+        basePrice={product.price}
+        client:visible
+      />
+      
+      <!-- Más contenido estático -->
+      <div class="specs">
+        <span>SKU: {product.sku}</span>
+        <span>Stock: {product.stock}</span>
+      </div>
+    </article>
+    ```
+
+    **Componente Vue interactivo**
+    ```vue
+    <!-- src/components/PriceCalculator.vue -->
+    <template>
+      <div class="price-calculator">
+        <label>
+          Cantidad:
+          <input type="number" v-model.number="quantity" min="1">
+        </label>
+        <p class="total">
+          Total: ${{ totalPrice.toFixed(2) }}
+        </p>
+        <button @click="addToCart">Agregar al Carrito</button>
+      </div>
+    </template>
+
+    <script>
+    export default {
+      props: ['basePrice'],
+      data() {
+        return {
+          quantity: 1
+        }
+      },
+      computed: {
+        totalPrice() {
+          return this.basePrice * this.quantity;
+        }
+      },
+      methods: {
+        addToCart() {
+          console.log(`Agregando ${this.quantity} items`);
+        }
+      }
+    }
+    </script>
+    ```
+
+    ### 🎯 Directivas de Cliente en Acción
+
+    ```astro
+    ---
+    import Header from '../components/Header.jsx';
+    import ChatWidget from '../components/ChatWidget.svelte';
+    import Newsletter from '../components/Newsletter.vue';
+    import Analytics from '../components/Analytics.jsx';
+    ---
+
+    <html>
+      <body>
+        <!-- Carga inmediata: componente crítico -->
+        <Header client:load />
+        
+        <!-- Carga cuando es visible: below-the-fold -->
+        <Newsletter client:visible />
+        
+        <!-- Carga cuando el navegador está inactivo -->
+        <ChatWidget client:idle />
+        
+        <!-- Carga solo en móvil -->
+        <MobileMenu client:media="(max-width: 768px)" />
+        
+        <!-- Solo en cliente: usa localStorage -->
+        <Analytics client:only="react" />
+      </body>
+    </html>
+    ```
+
+    ### 🌊 Múltiples Islas Independientes
+
+    ```astro
+    ---
+    import LikeButton from '../components/LikeButton.svelte';
+    import CommentForm from '../components/CommentForm.vue';
+    import ShareButtons from '../components/ShareButtons.jsx';
+    ---
+
+    <article>
+      <h1>Mi Artículo</h1>
+      <p>Contenido estático del artículo...</p>
+      
+      <!-- Isla 1: Botón de like -->
+      <LikeButton postId="123" client:visible />
+      
+      <!-- Más contenido estático -->
+      <p>Más contenido...</p>
+      
+      <!-- Isla 2: Formulario de comentarios -->
+      <CommentForm postId="123" client:idle />
+      
+      <!-- Isla 3: Botones de compartir -->
+      <ShareButtons url="/articulo" client:load />
+    </article>
+    ```
+
+    <Aside type="note">
+      📝 **Nota**: Cada isla es independiente y se hidrata según su directiva. No comparten estado automáticamente.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 6.3 Control de carga parcial y optimización
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Control de Carga Parcial en Astro
+
+    El **control de carga parcial** permite decidir exactamente qué JavaScript se envía al cliente y cuándo se ejecuta, optimizando el rendimiento de la aplicación.
+
+    #### 🎯 Propósito
+
+    - Reducir el tamaño del bundle JavaScript
+    - Mejorar el tiempo de carga inicial (FCP, LCP)
+    - Optimizar el uso de recursos del navegador
+    - Mejorar métricas de rendimiento (Core Web Vitals)
+
+    #### ⚙️ Estrategias de Carga
+
+    **1. Carga Inmediata (`client:load`)**
+    - JavaScript se carga y ejecuta inmediatamente
+    - Uso: Componentes críticos para la primera interacción
+    - Impacto: Mayor tamaño inicial, interactividad inmediata
+
+    **2. Carga Diferida (`client:idle`)**
+    - JavaScript se carga cuando el navegador está inactivo
+    - Uso: Componentes importantes pero no críticos
+    - Impacto: No bloquea la carga inicial
+
+    **3. Carga por Visibilidad (`client:visible`)**
+    - JavaScript se carga cuando el componente entra en viewport
+    - Uso: Componentes below-the-fold
+    - Impacto: Carga solo lo que el usuario ve
+
+    **4. Carga Condicional (`client:media`)**
+    - JavaScript se carga según media query
+    - Uso: Componentes específicos de dispositivo
+    - Impacto: Carga solo en dispositivos específicos
+
+    **5. Solo Cliente (`client:only`)**
+    - No se renderiza en servidor, solo en cliente
+    - Uso: Componentes que usan APIs del navegador
+    - Impacto: Sin SSR, solo CSR
+
+    #### 📊 Técnicas de Optimización
+
+    **Code Splitting**
+    - División automática del código en chunks
+    - Carga solo el código necesario
+    - Reduce el bundle inicial
+
+    **Lazy Loading**
+    - Carga diferida de recursos
+    - Imágenes, componentes, scripts
+    - Mejora tiempo de carga inicial
+
+    **Prefetching**
+    - Precarga de recursos que se usarán pronto
+    - Mejora navegación entre páginas
+    - Balance entre rendimiento y uso de red
+
+    **Tree Shaking**
+    - Eliminación de código no usado
+    - Reduce tamaño del bundle
+    - Automático en Astro
+
+    #### 🎯 Métricas de Rendimiento
+
+    | Métrica | Descripción | Objetivo |
+    |---------|-------------|----------|
+    | **FCP** | First Contentful Paint | < 1.8s |
+    | **LCP** | Largest Contentful Paint | < 2.5s |
+    | **TTI** | Time to Interactive | < 3.8s |
+    | **TBT** | Total Blocking Time | < 200ms |
+    | **CLS** | Cumulative Layout Shift | < 0.1 |
+
+    #### 🌟 Mejores Prácticas
+
+    1. **Prioriza contenido estático**: Usa HTML estático siempre que sea posible
+    2. **Hidrata selectivamente**: Solo componentes que requieren interactividad
+    3. **Usa directivas apropiadas**: Elige la directiva según la prioridad
+    4. **Mide el rendimiento**: Usa Lighthouse y Web Vitals
+    5. **Optimiza imágenes**: Usa formatos modernos (WebP, AVIF)
+    6. **Minimiza JavaScript**: Reduce dependencias innecesarias
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🎯 Estrategia de Carga por Prioridad
+
+    **Página optimizada con diferentes estrategias**
+    ```astro
+    ---
+    // src/pages/optimized.astro
+    import Header from '../components/Header.astro';
+    import Hero from '../components/Hero.astro';
+    import SearchBar from '../components/SearchBar.jsx';
+    import ProductGrid from '../components/ProductGrid.vue';
+    import Newsletter from '../components/Newsletter.svelte';
+    import ChatWidget from '../components/ChatWidget.jsx';
+    import Footer from '../components/Footer.astro';
+    ---
+
+    <html>
+      <head>
+        <title>Tienda Optimizada</title>
+        <!-- Prefetch de páginas importantes -->
+        <link rel="prefetch" href="/productos" />
+      </head>
+      <body>
+        <!-- Estático: Sin JavaScript -->
+        <Header />
+        <Hero />
+        
+        <!-- Alta prioridad: Carga inmediata -->
+        <SearchBar client:load />
+        
+        <!-- Media prioridad: Carga cuando visible -->
+        <ProductGrid client:visible />
+        
+        <!-- Baja prioridad: Carga cuando inactivo -->
+        <Newsletter client:idle />
+        <ChatWidget client:idle />
+        
+        <!-- Estático: Sin JavaScript -->
+        <Footer />
+      </body>
+    </html>
+    ```
+
+    ### 📱 Carga Condicional por Dispositivo
+
+    ```astro
+    ---
+    import MobileMenu from '../components/MobileMenu.jsx';
+    import DesktopMenu from '../components/DesktopMenu.jsx';
+    import MobileFilters from '../components/MobileFilters.vue';
+    ---
+
+    <nav>
+      <!-- Solo en móvil (< 768px) -->
+      <MobileMenu client:media="(max-width: 767px)" />
+      
+      <!-- Solo en desktop (>= 768px) -->
+      <DesktopMenu client:media="(min-width: 768px)" />
+    </nav>
+
+    <aside>
+      <!-- Filtros solo en móvil -->
+      <MobileFilters client:media="(max-width: 767px)" />
+    </aside>
+    ```
+
+    ### 🚀 Lazy Loading de Componentes Pesados
+
+    **Componente que carga solo cuando es necesario**
+    ```astro
+    ---
+    // src/pages/dashboard.astro
+    import Chart from '../components/Chart.jsx';
+    import DataTable from '../components/DataTable.vue';
+    import VideoPlayer from '../components/VideoPlayer.svelte';
+    ---
+
+    <main>
+      <h1>Dashboard</h1>
+      
+      <!-- Gráfico: Carga cuando es visible -->
+      <section>
+        <h2>Estadísticas</h2>
+        <Chart client:visible />
+      </section>
+      
+      <!-- Tabla: Carga cuando es visible -->
+      <section>
+        <h2>Datos</h2>
+        <DataTable client:visible />
+      </section>
+      
+      <!-- Video: Carga cuando es visible -->
+      <section>
+        <h2>Tutorial</h2>
+        <VideoPlayer client:visible />
+      </section>
+    </main>
+    ```
+
+    ### ⚡ Optimización de Imágenes
+
+    ```astro
+    ---
+    import { Image } from 'astro:assets';
+    import heroImage from '../assets/hero.jpg';
+    ---
+
+    <!-- Imagen optimizada con Astro -->
+    <Image 
+      src={heroImage}
+      alt="Hero"
+      width={1200}
+      height={600}
+      format="webp"
+      loading="eager"
+    />
+
+    <!-- Imágenes below-the-fold con lazy loading -->
+    <Image 
+      src={productImage}
+      alt="Producto"
+      width={400}
+      height={300}
+      format="webp"
+      loading="lazy"
+    />
+    ```
+
+    ### 🔧 Configuración de Optimización
+
+    **`astro.config.mjs`**
+    ```js
+    import { defineConfig } from 'astro/config';
+    import react from '@astrojs/react';
+    import vue from '@astrojs/vue';
+
+    export default defineConfig({
+      integrations: [react(), vue()],
+      
+      // Optimización de build
+      build: {
+        inlineStylesheets: 'auto',
+      },
+      
+      // Optimización de imágenes
+      image: {
+        service: {
+          entrypoint: 'astro/assets/services/sharp'
+        }
+      },
+      
+      // Prefetch automático
+      prefetch: {
+        prefetchAll: true,
+        defaultStrategy: 'viewport'
+      }
+    });
+    ```
+
+    ### 📊 Medición de Rendimiento
+
+    **Componente de Analytics**
+    ```jsx
+    // src/components/PerformanceMonitor.jsx
+    import { useEffect } from 'react';
+
+    export default function PerformanceMonitor() {
+      useEffect(() => {
+        // Medir Core Web Vitals
+        if ('PerformanceObserver' in window) {
+          // LCP - Largest Contentful Paint
+          new PerformanceObserver((list) => {
+            const entries = list.getEntries();
+            const lastEntry = entries[entries.length - 1];
+            console.log('LCP:', lastEntry.renderTime || lastEntry.loadTime);
+          }).observe({ entryTypes: ['largest-contentful-paint'] });
+
+          // FID - First Input Delay
+          new PerformanceObserver((list) => {
+            list.getEntries().forEach((entry) => {
+              console.log('FID:', entry.processingStart - entry.startTime);
+            });
+          }).observe({ entryTypes: ['first-input'] });
+
+          // CLS - Cumulative Layout Shift
+          new PerformanceObserver((list) => {
+            let cls = 0;
+            list.getEntries().forEach((entry) => {
+              if (!entry.hadRecentInput) {
+                cls += entry.value;
+              }
+            });
+            console.log('CLS:', cls);
+          }).observe({ entryTypes: ['layout-shift'] });
+        }
+      }, []);
+
+      return null;
+    }
+    ```
+
+    **Uso en página**
+    ```astro
+    ---
+    import PerformanceMonitor from '../components/PerformanceMonitor.jsx';
+    ---
+
+    <html>
+      <body>
+        <!-- Solo en desarrollo -->
+        {import.meta.env.DEV && <PerformanceMonitor client:only="react" />}
+        
+        <!-- Contenido de la página -->
+      </body>
+    </html>
+    ```
+
+    ### 🎨 Comparación de Estrategias
+
+    ```astro
+    ---
+    import HeavyComponent from '../components/HeavyComponent.jsx';
+    ---
+
+    <!-- ❌ Malo: Carga todo inmediatamente -->
+    <HeavyComponent client:load />
+
+    <!-- ✅ Mejor: Carga cuando es visible -->
+    <HeavyComponent client:visible />
+
+    <!-- ✅ Óptimo: Carga cuando el navegador está inactivo -->
+    <HeavyComponent client:idle />
+
+    <!-- ✅ Condicional: Solo en móvil -->
+    <HeavyComponent client:media="(max-width: 768px)" />
+    ```
+
+    <Aside type="tip">
+      ⚡ **Tip de Rendimiento**: Usa `client:visible` para componentes below-the-fold y `client:idle` para widgets no críticos. Esto puede mejorar tu LCP hasta un 40%.
+    </Aside>
+
+    ### 📈 Ejemplo Completo de Optimización
+
+    ```astro
+    ---
+    // src/pages/blog/[slug].astro
+    import Layout from '../../layouts/Layout.astro';
+    import TableOfContents from '../../components/TableOfContents.astro';
+    import ShareButtons from '../../components/ShareButtons.jsx';
+    import CommentSection from '../../components/CommentSection.vue';
+    import RelatedPosts from '../../components/RelatedPosts.astro';
+    import Newsletter from '../../components/Newsletter.svelte';
+
+    const { slug } = Astro.params;
+    const post = await getPost(slug);
+    ---
+
+    <Layout title={post.title}>
+      <!-- Estático: Renderizado en servidor -->
+      <article>
+        <h1>{post.title}</h1>
+        <TableOfContents headings={post.headings} />
+        
+        <div set:html={post.content} />
+        
+        <!-- Alta prioridad: Botones de compartir -->
+        <ShareButtons url={post.url} client:load />
+      </article>
+      
+      <!-- Media prioridad: Comentarios cuando visible -->
+      <CommentSection postId={post.id} client:visible />
+      
+      <!-- Estático: Posts relacionados -->
+      <RelatedPosts posts={post.related} />
+      
+      <!-- Baja prioridad: Newsletter cuando inactivo -->
+      <Newsletter client:idle />
+    </Layout>
+    ```
+
+    <Aside type="caution">
+      ⚠️ **Advertencia**: No uses `client:load` en todos los componentes. Esto anula las ventajas de Astro y puede degradar el rendimiento significativamente.
+    </Aside>
+
+  </TabItem>
+</Tabs>

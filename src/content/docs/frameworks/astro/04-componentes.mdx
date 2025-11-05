@@ -1,0 +1,1008 @@
+---
+title: 04. Componentes en Astro
+description: Creación de componentes reutilizables, props, slots e interactividad
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+
+## 4.1 Creación de componentes reutilizables
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Componentes Reutilizables en Astro
+
+    Los **componentes** son bloques de código independientes y reutilizables que encapsulan estructura, estilo y lógica.
+
+    #### 🎯 Propósito
+
+    - Evitar duplicación de código (DRY)
+    - Facilitar mantenimiento y actualizaciones
+    - Mejorar organización del proyecto
+    - Permitir composición de interfaces
+    - Aumentar productividad del desarrollo
+
+    #### 📁 Ubicación y Convenciones
+
+    **Carpeta `src/components/`**
+    - Todos los componentes reutilizables
+    - Extensión `.astro` para componentes Astro
+    - También `.jsx`, `.vue`, `.svelte` para otros frameworks
+    - Nombres en PascalCase (ej: `Button.astro`)
+
+    #### 🔧 Estructura de un Componente
+
+    **Tres secciones:**
+
+    **1. Frontmatter (---)**
+    - Lógica del servidor
+    - Importaciones
+    - Props y variables
+    - Fetch de datos
+
+    **2. Template**
+    - Marcado HTML
+    - Uso de props
+    - Expresiones JavaScript
+
+    **3. Estilos (opcional)**
+    - CSS scoped por defecto
+    - Específico del componente
+    - No afecta otros componentes
+
+    #### ⚙️ Características
+
+    **Scoped Styles**
+    - CSS aislado automáticamente
+    - No hay conflictos de nombres
+    - Mejor encapsulación
+
+    **Zero JavaScript**
+    - Componentes estáticos por defecto
+    - HTML puro en el output
+    - JavaScript solo si se especifica
+
+    **Type Safety**
+    - TypeScript integrado
+    - Interfaces para props
+    - Validación en desarrollo
+
+    #### 🌟 Mejores Prácticas
+
+    - **Un propósito**: Cada componente hace una cosa bien
+    - **Nombres descriptivos**: Claros y específicos
+    - **Props tipadas**: Usar TypeScript
+    - **Documentación**: Comentar props complejas
+    - **Composición**: Componentes pequeños y combinables
+
+    #### 📊 Tipos de Componentes
+
+    | Tipo | Descripción | Ejemplo |
+    |------|-------------|---------|
+    | **UI** | Elementos visuales | Button, Card, Modal |
+    | **Layout** | Estructura de página | Header, Footer, Sidebar |
+    | **Contenedor** | Envuelven otros componentes | Container, Grid |
+    | **Funcional** | Lógica sin UI | DataFetcher |
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🎨 Componente Básico
+
+    **`src/components/Button.astro`**
+    ```astro
+    ---
+    // Sin props, componente simple
+    ---
+
+    <button class="btn">
+      <slot />
+    </button>
+
+    <style>
+      .btn {
+        padding: 0.5rem 1rem;
+        background: #4f39fa;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .btn:hover {
+        background: #3d2bc7;
+      }
+    </style>
+    ```
+
+    **Uso**
+    ```astro
+    ---
+    import Button from '../components/Button.astro';
+    ---
+
+    <Button>Haz clic aquí</Button>
+    ```
+
+    ### 📦 Componente con Props
+
+    **`src/components/Card.astro`**
+    ```astro
+    ---
+    interface Props {
+      title: string;
+      description: string;
+      image?: string;
+    }
+
+    const { title, description, image } = Astro.props;
+    ---
+
+    <div class="card">
+      {image && <img src={image} alt={title} />}
+      <div class="content">
+        <h3>{title}</h3>
+        <p>{description}</p>
+        <slot />
+      </div>
+    </div>
+
+    <style>
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+      .card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .content {
+        padding: 1.5rem;
+      }
+
+      .content h3 {
+        margin: 0 0 0.5rem 0;
+      }
+    </style>
+    ```
+
+    **Uso**
+    ```astro
+    ---
+    import Card from '../components/Card.astro';
+    ---
+
+    <Card 
+      title="Mi Tarjeta"
+      description="Descripción de la tarjeta"
+      image="/image.jpg"
+    >
+      <a href="/more">Leer más</a>
+    </Card>
+    ```
+
+    ### 🔄 Componente con Lógica
+
+    **`src/components/UserList.astro`**
+    ```astro
+    ---
+    // Fetch de datos en el servidor
+    const response = await fetch('https://jsonplaceholder.typicode.com/users');
+    const users = await response.json();
+    ---
+
+    <div class="user-list">
+      <h2>Lista de Usuarios</h2>
+      <ul>
+        {users.slice(0, 5).map(user => (
+          <li>
+            <strong>{user.name}</strong>
+            <span>{user.email}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <style>
+      .user-list {
+        padding: 1rem;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      li {
+        padding: 0.5rem;
+        border-bottom: 1px solid #eee;
+      }
+
+      li strong {
+        display: block;
+      }
+
+      li span {
+        color: #666;
+        font-size: 0.9rem;
+      }
+    </style>
+    ```
+
+    ### 🎯 Componente Reutilizable Complejo
+
+    **`src/components/Alert.astro`**
+    ```astro
+    ---
+    interface Props {
+      type?: 'info' | 'success' | 'warning' | 'error';
+      title?: string;
+      dismissible?: boolean;
+    }
+
+    const { 
+      type = 'info', 
+      title, 
+      dismissible = false 
+    } = Astro.props;
+
+    const icons = {
+      info: 'ℹ️',
+      success: '✅',
+      warning: '⚠️',
+      error: '❌'
+    };
+    ---
+
+    <div class={`alert alert-${type}`}>
+      <div class="alert-icon">{icons[type]}</div>
+      <div class="alert-content">
+        {title && <strong>{title}</strong>}
+        <slot />
+      </div>
+      {dismissible && (
+        <button class="alert-close" aria-label="Cerrar">×</button>
+      )}
+    </div>
+
+    <style>
+      .alert {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        border-radius: 4px;
+        margin: 1rem 0;
+      }
+
+      .alert-info { background: #e3f2fd; }
+      .alert-success { background: #e8f5e9; }
+      .alert-warning { background: #fff3e0; }
+      .alert-error { background: #ffebee; }
+
+      .alert-icon {
+        font-size: 1.5rem;
+      }
+
+      .alert-content {
+        flex: 1;
+      }
+
+      .alert-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+    </style>
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Crea componentes pequeños y específicos. Es mejor tener muchos componentes simples que pocos componentes complejos.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 4.2 Comunicación con props y slots
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Props y Slots
+
+    **Props** y **slots** son los mecanismos principales para pasar datos y contenido a los componentes.
+
+    #### 🎯 Props (Propiedades)
+
+    **Propósito:**
+    - Pasar datos del padre al hijo
+    - Configurar comportamiento del componente
+    - Personalizar apariencia
+    - Comunicación unidireccional
+
+    **Características:**
+    - Acceso via `Astro.props`
+    - Inmutables (solo lectura)
+    - Type-safe con TypeScript
+    - Valores por defecto
+
+    **Tipos de Props:**
+    - **Primitivos**: string, number, boolean
+    - **Objetos**: Datos estructurados
+    - **Arrays**: Listas de elementos
+    - **Funciones**: Callbacks (limitado)
+
+    #### 🔄 Slots
+
+    **Propósito:**
+    - Pasar contenido HTML/componentes
+    - Crear componentes contenedores
+    - Permitir composición flexible
+    - Plantillas reutilizables
+
+    **Tipos de Slots:**
+
+    **1. Slot Default**
+    - `<slot />` sin nombre
+    - Recibe todo el contenido hijo
+    - Más común y simple
+
+    **2. Slots Nombrados**
+    - `<slot name="nombre" />`
+    - Múltiples áreas de contenido
+    - Mayor control de layout
+
+    **3. Slot Fallback**
+    - Contenido por defecto
+    - Se muestra si no hay contenido
+    - Útil para opcionales
+
+    #### 📊 Props vs Slots
+
+    | Aspecto | Props | Slots |
+    |---------|-------|-------|
+    | **Tipo** | Datos | Contenido HTML |
+    | **Uso** | Configuración | Composición |
+    | **Cantidad** | Múltiples | Múltiples (nombrados) |
+    | **Tipado** | TypeScript | No tipado |
+
+    #### 🌟 Mejores Prácticas
+
+    **Props:**
+    - Definir interfaces TypeScript
+    - Valores por defecto razonables
+    - Validación de tipos
+    - Nombres descriptivos
+
+    **Slots:**
+    - Usar slots nombrados para claridad
+    - Proporcionar fallbacks
+    - Documentar slots disponibles
+    - Mantener simplicidad
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 📝 Props Básicas
+
+    **`src/components/Greeting.astro`**
+    ```astro
+    ---
+    interface Props {
+      name: string;
+      age?: number;
+    }
+
+    const { name, age } = Astro.props;
+    ---
+
+    <div class="greeting">
+      <h2>Hola, {name}!</h2>
+      {age && <p>Tienes {age} años</p>}
+    </div>
+    ```
+
+    **Uso**
+    ```astro
+    <Greeting name="Juan" age={25} />
+    <Greeting name="María" />
+    ```
+
+    ### 🎨 Props con Valores por Defecto
+
+    **`src/components/Badge.astro`**
+    ```astro
+    ---
+    interface Props {
+      text: string;
+      color?: 'blue' | 'green' | 'red' | 'gray';
+      size?: 'small' | 'medium' | 'large';
+    }
+
+    const { 
+      text, 
+      color = 'blue', 
+      size = 'medium' 
+    } = Astro.props;
+    ---
+
+    <span class={`badge badge-${color} badge-${size}`}>
+      {text}
+    </span>
+
+    <style>
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-weight: 500;
+      }
+
+      .badge-small { font-size: 0.75rem; }
+      .badge-medium { font-size: 0.875rem; }
+      .badge-large { font-size: 1rem; }
+
+      .badge-blue { background: #e3f2fd; color: #1976d2; }
+      .badge-green { background: #e8f5e9; color: #388e3c; }
+      .badge-red { background: #ffebee; color: #d32f2f; }
+      .badge-gray { background: #f5f5f5; color: #616161; }
+    </style>
+    ```
+
+    ### 🔄 Slot Default
+
+    **`src/components/Container.astro`**
+    ```astro
+    ---
+    interface Props {
+      maxWidth?: string;
+    }
+
+    const { maxWidth = '1200px' } = Astro.props;
+    ---
+
+    <div class="container" style={`max-width: ${maxWidth}`}>
+      <slot />
+    </div>
+
+    <style>
+      .container {
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+    </style>
+    ```
+
+    **Uso**
+    ```astro
+    <Container>
+      <h1>Título</h1>
+      <p>Contenido dentro del container</p>
+    </Container>
+    ```
+
+    ### 🎯 Slots Nombrados
+
+    **`src/components/Modal.astro`**
+    ```astro
+    ---
+    interface Props {
+      title: string;
+      isOpen?: boolean;
+    }
+
+    const { title, isOpen = false } = Astro.props;
+    ---
+
+    {isOpen && (
+      <div class="modal-overlay">
+        <div class="modal">
+          <header class="modal-header">
+            <h2>{title}</h2>
+            <slot name="header-actions" />
+          </header>
+
+          <div class="modal-body">
+            <slot />
+          </div>
+
+          <footer class="modal-footer">
+            <slot name="footer">
+              <button>Cerrar</button>
+            </slot>
+          </footer>
+        </div>
+      </div>
+    )}
+
+    <style>
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal {
+        background: white;
+        border-radius: 8px;
+        max-width: 500px;
+        width: 90%;
+      }
+
+      .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .modal-body {
+        padding: 1.5rem;
+      }
+
+      .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #eee;
+        text-align: right;
+      }
+    </style>
+    ```
+
+    **Uso con slots nombrados**
+    ```astro
+    <Modal title="Confirmar Acción" isOpen={true}>
+      <button slot="header-actions">×</button>
+
+      <p>¿Estás seguro de que quieres continuar?</p>
+
+      <div slot="footer">
+        <button>Cancelar</button>
+        <button>Confirmar</button>
+      </div>
+    </Modal>
+    ```
+
+    ### 📊 Props Complejas
+
+    **`src/components/DataTable.astro`**
+    ```astro
+    ---
+    interface Column {
+      key: string;
+      label: string;
+    }
+
+    interface Props {
+      columns: Column[];
+      data: Record<string, any>[];
+    }
+
+    const { columns, data } = Astro.props;
+    ---
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          {columns.map(col => (
+            <th>{col.label}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {data.map(row => (
+          <tr>
+            {columns.map(col => (
+              <td>{row[col.key]}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <style>
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th, td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background: #f5f5f5;
+        font-weight: 600;
+      }
+    </style>
+    ```
+
+    **Uso**
+    ```astro
+    <DataTable 
+      columns={[
+        { key: 'name', label: 'Nombre' },
+        { key: 'email', label: 'Email' }
+      ]}
+      data={[
+        { name: 'Juan', email: 'juan@example.com' },
+        { name: 'María', email: 'maria@example.com' }
+      ]}
+    />
+    ```
+
+    <Aside type="note">
+      📝 **Nota**: Los slots permiten pasar contenido HTML completo, mientras que las props son para datos simples y configuración.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 4.3 Interactividad y eventos en componentes
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Interactividad en Componentes
+
+    Los componentes Astro son **estáticos por defecto**, pero pueden volverse interactivos usando frameworks o scripts del cliente.
+
+    #### 🎯 Enfoques de Interactividad
+
+    **1. Scripts del Cliente**
+    - Tag `<script>` en componentes
+    - JavaScript vanilla
+    - Se ejecuta en el navegador
+    - Ideal para interacciones simples
+
+    **2. Frameworks UI**
+    - React, Vue, Svelte
+    - Directivas `client:*`
+    - Componentes complejos
+    - Estado reactivo
+
+    #### ⚙️ Scripts en Componentes
+
+    **Características:**
+    - Se ejecutan en el navegador
+    - Pueden acceder al DOM
+    - Event listeners
+    - Manipulación de elementos
+
+    **Tipos de Scripts:**
+
+    **1. Script Inline**
+    - Dentro del componente
+    - Scoped al componente
+    - Procesado por Astro
+
+    **2. Script Hoisted**
+    - `<script is:inline>`
+    - No procesado
+    - JavaScript puro
+
+    **3. Script Module**
+    - `<script type="module">`
+    - Imports ES6
+    - Mejor para código complejo
+
+    #### 🔄 Directivas Client
+
+    Para componentes de frameworks:
+
+    | Directiva | Cuándo | Uso |
+    |-----------|--------|-----|
+    | `client:load` | Inmediato | Crítico |
+    | `client:idle` | Navegador inactivo | Secundario |
+    | `client:visible` | Visible en viewport | Below-fold |
+    | `client:only` | Solo cliente | APIs navegador |
+
+    #### 🌟 Mejores Prácticas
+
+    - **Progresive Enhancement**: Funciona sin JS
+    - **Mínimo JavaScript**: Solo lo necesario
+    - **Event Delegation**: Eficiencia en eventos
+    - **Accesibilidad**: Teclado y screen readers
+    - **Performance**: Lazy loading cuando posible
+
+    #### ⚠️ Limitaciones
+
+    - Componentes Astro no tienen estado reactivo
+    - No hay lifecycle hooks
+    - Para reactividad compleja, usar frameworks
+    - Scripts se ejecutan después del render
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🎯 Interactividad con Script
+
+    **`src/components/Counter.astro`**
+    ```astro
+    ---
+    const initialCount = 0;
+    ---
+
+    <div class="counter">
+      <h3>Contador</h3>
+      <p>Cuenta: <span id="count">{initialCount}</span></p>
+      <button id="increment">+</button>
+      <button id="decrement">-</button>
+    </div>
+
+    <script>
+      let count = 0;
+      const countEl = document.getElementById('count');
+      const incrementBtn = document.getElementById('increment');
+      const decrementBtn = document.getElementById('decrement');
+
+      incrementBtn?.addEventListener('click', () => {
+        count++;
+        if (countEl) countEl.textContent = count.toString();
+      });
+
+      decrementBtn?.addEventListener('click', () => {
+        count--;
+        if (countEl) countEl.textContent = count.toString();
+      });
+    </script>
+
+    <style>
+      .counter {
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+
+      button {
+        margin: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-size: 1.2rem;
+      }
+    </style>
+    ```
+
+    ### 🔄 Toggle con Eventos
+
+    **`src/components/Accordion.astro`**
+    ```astro
+    ---
+    interface Props {
+      title: string;
+    }
+
+    const { title } = Astro.props;
+    ---
+
+    <div class="accordion">
+      <button class="accordion-header">
+        {title}
+        <span class="icon">▼</span>
+      </button>
+      <div class="accordion-content">
+        <slot />
+      </div>
+    </div>
+
+    <script>
+      document.querySelectorAll('.accordion').forEach(accordion => {
+        const header = accordion.querySelector('.accordion-header');
+        const content = accordion.querySelector('.accordion-content');
+        const icon = accordion.querySelector('.icon');
+
+        header?.addEventListener('click', () => {
+          const isOpen = content?.classList.toggle('open');
+          if (icon) {
+            icon.textContent = isOpen ? '▲' : '▼';
+          }
+        });
+      });
+    </script>
+
+    <style>
+      .accordion {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin: 0.5rem 0;
+      }
+
+      .accordion-header {
+        width: 100%;
+        padding: 1rem;
+        background: #f5f5f5;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+
+      .accordion-content.open {
+        max-height: 500px;
+        padding: 1rem;
+      }
+    </style>
+    ```
+
+    ### 📝 Formulario Interactivo
+
+    **`src/components/ContactForm.astro`**
+    ```astro
+    <form id="contact-form" class="contact-form">
+      <div class="form-group">
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="message">Mensaje:</label>
+        <textarea id="message" required></textarea>
+      </div>
+
+      <button type="submit">Enviar</button>
+      <div id="status"></div>
+    </form>
+
+    <script>
+      const form = document.getElementById('contact-form') as HTMLFormElement;
+      const status = document.getElementById('status');
+
+      form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+
+        if (status) {
+          status.textContent = 'Enviando...';
+        }
+
+        try {
+          const response = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+
+          if (response.ok) {
+            if (status) status.textContent = '✅ Mensaje enviado!';
+            form.reset();
+          } else {
+            if (status) status.textContent = '❌ Error al enviar';
+          }
+        } catch (error) {
+          if (status) status.textContent = '❌ Error de conexión';
+        }
+      });
+    </script>
+
+    <style>
+      .contact-form {
+        max-width: 500px;
+        margin: 0 auto;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+
+      input, textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      textarea {
+        min-height: 100px;
+      }
+
+      button {
+        padding: 0.75rem 1.5rem;
+        background: #4f39fa;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      #status {
+        margin-top: 1rem;
+        padding: 0.5rem;
+      }
+    </style>
+    ```
+
+    ### ⚛️ Componente React Interactivo
+
+    **`src/components/SearchBox.jsx`**
+    ```jsx
+    import { useState } from 'react';
+
+    export default function SearchBox() {
+      const [query, setQuery] = useState('');
+      const [results, setResults] = useState([]);
+
+      const handleSearch = async () => {
+        const res = await fetch(`/api/search?q=${query}`);
+        const data = await res.json();
+        setResults(data);
+      };
+
+      return (
+        <div className="search-box">
+          <input 
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar..."
+          />
+          <button onClick={handleSearch}>Buscar</button>
+          <ul>
+            {results.map(item => (
+              <li key={item.id}>{item.title}</li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+    ```
+
+    **Uso en Astro**
+    ```astro
+    ---
+    import SearchBox from '../components/SearchBox.jsx';
+    ---
+
+    <html>
+      <body>
+        <h1>Búsqueda</h1>
+        <SearchBox client:load />
+      </body>
+    </html>
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Para interactividad simple, usa scripts vanilla. Para estado complejo y reactividad, usa frameworks como React o Vue.
+    </Aside>
+
+    <Aside type="caution">
+      ⚠️ **Advertencia**: Cada script añade JavaScript al bundle. Usa interactividad solo donde sea necesario para mantener el rendimiento óptimo.
+    </Aside>
+
+  </TabItem>
+</Tabs>

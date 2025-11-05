@@ -1,0 +1,1082 @@
+---
+title: 08. SEO y Metadatos
+description: Títulos dinámicos, etiquetas meta, Open Graph, sitemap y robots.txt
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+
+## 8.1 Creación de títulos y descripciones dinámicas
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Títulos y Descripciones Dinámicas
+
+    Los **títulos** y **descripciones** son elementos fundamentales del SEO que aparecen en los resultados de búsqueda y deben ser únicos y descriptivos para cada página.
+
+    #### 🎯 Propósito
+
+    - Mejorar el posicionamiento en motores de búsqueda
+    - Aumentar el CTR (Click-Through Rate) en resultados
+    - Proporcionar contexto claro del contenido
+    - Mejorar la experiencia del usuario
+    - Facilitar el compartir en redes sociales
+
+    #### 📋 Elementos Principales
+
+    **1. Title Tag (`<title>`)**
+    - Aparece en la pestaña del navegador
+    - Se muestra en resultados de búsqueda
+    - Longitud recomendada: 50-60 caracteres
+    - Debe ser único por página
+    - Incluir palabras clave principales
+
+    **2. Meta Description**
+    - Resumen del contenido de la página
+    - Aparece bajo el título en búsquedas
+    - Longitud recomendada: 150-160 caracteres
+    - Debe ser persuasiva y descriptiva
+    - Incluir llamado a la acción
+
+    #### ⚙️ Cómo Funciona en Astro
+
+    1. **Frontmatter**: Define metadatos en archivos Markdown/MDX
+    2. **Props**: Pasa datos dinámicos a layouts
+    3. **Componentes**: Crea componentes reutilizables para SEO
+    4. **Head**: Usa `<head>` para insertar metadatos
+    5. **Plantillas**: Genera títulos con patrones consistentes
+
+    #### 🌟 Mejores Prácticas
+
+    - **Únicos**: Cada página debe tener título y descripción únicos
+    - **Descriptivos**: Reflejar el contenido real de la página
+    - **Palabras clave**: Incluir términos relevantes naturalmente
+    - **Marca**: Incluir nombre del sitio en el título
+    - **Longitud**: Respetar límites para evitar truncamiento
+    - **Relevancia**: Alinear con la intención de búsqueda
+
+    #### 📊 Formato Recomendado
+
+    | Elemento | Formato | Ejemplo |
+    |----------|---------|---------|
+    | **Home** | `Nombre del Sitio - Tagline` | `Mi Blog - Tutoriales de Web` |
+    | **Página** | `Título - Nombre del Sitio` | `Guía Astro - Mi Blog` |
+    | **Post** | `Título del Post - Nombre del Sitio` | `Intro a Astro - Mi Blog` |
+
+    #### 🔍 Impacto en SEO
+
+    - **Ranking**: Títulos relevantes mejoran posicionamiento
+    - **CTR**: Descripciones atractivas aumentan clics
+    - **Relevancia**: Coincidencia con búsqueda mejora ranking
+    - **Experiencia**: Claridad mejora satisfacción del usuario
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 📄 Título y Descripción Estáticos
+
+    **`src/pages/about.astro`**
+    ```astro
+    ---
+    const pageTitle = "Acerca de Nosotros";
+    const pageDescription = "Conoce nuestro equipo y misión. Somos expertos en desarrollo web con Astro.";
+    ---
+
+    <html>
+      <head>
+        <title>{pageTitle} - Mi Sitio Web</title>
+        <meta name="description" content={pageDescription} />
+      </head>
+      <body>
+        <h1>{pageTitle}</h1>
+        <p>Contenido de la página...</p>
+      </body>
+    </html>
+    ```
+
+    ### 🔄 Títulos Dinámicos desde Frontmatter
+
+    **`src/pages/blog/post.md`**
+    ```markdown
+    ---
+    title: Introducción a Astro
+    description: Aprende los fundamentos de Astro, el framework web moderno para sitios rápidos.
+    ---
+
+    # Contenido del post...
+    ```
+
+    **`src/layouts/BlogLayout.astro`**
+    ```astro
+    ---
+    const { frontmatter } = Astro.props;
+    const siteName = "Mi Blog Tech";
+    ---
+
+    <html>
+      <head>
+        <title>{frontmatter.title} - {siteName}</title>
+        <meta name="description" content={frontmatter.description} />
+      </head>
+      <body>
+        <article>
+          <h1>{frontmatter.title}</h1>
+          <slot />
+        </article>
+      </body>
+    </html>
+    ```
+
+    ### 🎨 Componente SEO Reutilizable
+
+    **`src/components/SEO.astro`**
+    ```astro
+    ---
+    interface Props {
+      title: string;
+      description: string;
+      image?: string;
+      type?: string;
+    }
+
+    const { title, description, image, type = 'website' } = Astro.props;
+    const siteName = "Mi Sitio Web";
+    const fullTitle = `${title} - ${siteName}`;
+    const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+    ---
+
+    <head>
+      <!-- Título -->
+      <title>{fullTitle}</title>
+      
+      <!-- Meta básicas -->
+      <meta name="description" content={description} />
+      <link rel="canonical" href={canonicalURL} />
+      
+      <!-- Open Graph -->
+      <meta property="og:title" content={fullTitle} />
+      <meta property="og:description" content={description} />
+      <meta property="og:type" content={type} />
+      <meta property="og:url" content={canonicalURL} />
+      {image && <meta property="og:image" content={image} />}
+      
+      <!-- Twitter Card -->
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={fullTitle} />
+      <meta name="twitter:description" content={description} />
+      {image && <meta name="twitter:image" content={image} />}
+    </head>
+    ```
+
+    **Uso del componente**
+    ```astro
+    ---
+    import SEO from '../components/SEO.astro';
+    ---
+
+    <html>
+      <SEO 
+        title="Guía Completa de Astro"
+        description="Todo lo que necesitas saber sobre Astro en una guía completa."
+        image="/images/guia-astro.jpg"
+      />
+      <body>
+        <h1>Guía Completa de Astro</h1>
+      </body>
+    </html>
+    ```
+
+    ### 🗂️ Títulos Dinámicos con Content Collections
+
+    **`src/pages/blog/[slug].astro`**
+    ```astro
+    ---
+    import { getCollection } from 'astro:content';
+    import SEO from '../../components/SEO.astro';
+
+    export async function getStaticPaths() {
+      const posts = await getCollection('blog');
+      return posts.map(post => ({
+        params: { slug: post.slug },
+        props: { post }
+      }));
+    }
+
+    const { post } = Astro.props;
+    const { Content } = await post.render();
+    ---
+
+    <html>
+      <SEO 
+        title={post.data.title}
+        description={post.data.description}
+        image={post.data.image}
+        type="article"
+      />
+      <body>
+        <article>
+          <h1>{post.data.title}</h1>
+          <Content />
+        </article>
+      </body>
+    </html>
+    ```
+
+    ### 🏷️ Generación de Títulos con Patrones
+
+    **`src/utils/seo.ts`**
+    ```typescript
+    export function generateTitle(
+      pageTitle: string,
+      siteName: string = "Mi Sitio",
+      separator: string = "-"
+    ): string {
+      return `${pageTitle} ${separator} ${siteName}`;
+    }
+
+    export function truncateDescription(
+      text: string,
+      maxLength: number = 160
+    ): string {
+      if (text.length <= maxLength) return text;
+      return text.substring(0, maxLength - 3) + '...';
+    }
+
+    export function generateDescription(
+      content: string,
+      maxLength: number = 160
+    ): string {
+      // Remover HTML tags
+      const plainText = content.replace(/<[^>]*>/g, '');
+      return truncateDescription(plainText, maxLength);
+    }
+    ```
+
+    **Uso**
+    ```astro
+    ---
+    import { generateTitle, truncateDescription } from '../utils/seo';
+
+    const title = generateTitle("Guía de Astro", "Mi Blog");
+    const description = truncateDescription(
+      "Esta es una guía completa sobre Astro que cubre todos los aspectos...",
+      160
+    );
+    ---
+
+    <html>
+      <head>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+      </head>
+    </html>
+    ```
+
+    ### 📊 Layout Base con SEO
+
+    **`src/layouts/BaseLayout.astro`**
+    ```astro
+    ---
+    interface Props {
+      title: string;
+      description: string;
+      image?: string;
+      noindex?: boolean;
+    }
+
+    const { 
+      title, 
+      description, 
+      image = '/default-og.jpg',
+      noindex = false 
+    } = Astro.props;
+
+    const siteName = "Mi Sitio Web";
+    const fullTitle = title.includes(siteName) ? title : `${title} - ${siteName}`;
+    ---
+
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        <title>{fullTitle}</title>
+        <meta name="description" content={description} />
+        
+        {noindex && <meta name="robots" content="noindex, nofollow" />}
+        
+        <link rel="canonical" href={Astro.url.href} />
+        
+        <!-- Favicon -->
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      </head>
+      <body>
+        <slot />
+      </body>
+    </html>
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Usa herramientas como Google Search Console y Screaming Frog para verificar que todos tus títulos y descripciones sean únicos y estén optimizados.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 8.2 Etiquetas meta y Open Graph
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Etiquetas Meta y Open Graph
+
+    Las **etiquetas meta** proporcionan información sobre la página a navegadores y motores de búsqueda, mientras que **Open Graph** controla cómo se muestra el contenido al compartir en redes sociales.
+
+    #### 🎯 Propósito
+
+    - Controlar cómo se indexa el contenido
+    - Mejorar apariencia en redes sociales
+    - Proporcionar metadatos estructurados
+    - Optimizar para diferentes plataformas
+    - Mejorar CTR en compartidos sociales
+
+    #### 📋 Tipos de Etiquetas Meta
+
+    **1. Meta Básicas**
+    - `charset`: Codificación de caracteres
+    - `viewport`: Configuración responsive
+    - `description`: Descripción de la página
+    - `keywords`: Palabras clave (menos relevante hoy)
+    - `author`: Autor del contenido
+
+    **2. Meta Robots**
+    - `robots`: Instrucciones para crawlers
+    - `googlebot`: Específico para Google
+    - `index/noindex`: Permitir/bloquear indexación
+    - `follow/nofollow`: Seguir/no seguir enlaces
+
+    **3. Open Graph (Facebook, LinkedIn)**
+    - `og:title`: Título para redes sociales
+    - `og:description`: Descripción social
+    - `og:image`: Imagen de vista previa
+    - `og:url`: URL canónica
+    - `og:type`: Tipo de contenido
+    - `og:site_name`: Nombre del sitio
+
+    **4. Twitter Cards**
+    - `twitter:card`: Tipo de tarjeta
+    - `twitter:title`: Título para Twitter
+    - `twitter:description`: Descripción Twitter
+    - `twitter:image`: Imagen Twitter
+    - `twitter:creator`: Usuario creador
+
+    #### ⚙️ Protocolo Open Graph
+
+    Desarrollado por Facebook, ahora estándar para redes sociales:
+    - Define cómo se muestra contenido compartido
+    - Controla título, descripción e imagen
+    - Soportado por Facebook, LinkedIn, Pinterest, etc.
+    - Mejora engagement en redes sociales
+
+    #### 🖼️ Imágenes Open Graph
+
+    **Especificaciones recomendadas**
+    - Tamaño: 1200x630 px (ratio 1.91:1)
+    - Formato: JPG o PNG
+    - Peso: < 1 MB
+    - Texto legible en tamaños pequeños
+    - Sin bordes cortados
+
+    #### 📊 Tipos de Twitter Cards
+
+    | Tipo | Descripción | Uso |
+    |------|-------------|-----|
+    | **summary** | Tarjeta pequeña con imagen | Contenido general |
+    | **summary_large_image** | Tarjeta grande con imagen destacada | Artículos, posts |
+    | **app** | Promoción de aplicación móvil | Apps |
+    | **player** | Reproductor de video/audio | Multimedia |
+
+    #### 🌟 Mejores Prácticas
+
+    1. **Consistencia**: Mantén títulos y descripciones coherentes
+    2. **Imágenes**: Usa imágenes de alta calidad y relevantes
+    3. **Pruebas**: Valida con herramientas de cada plataforma
+    4. **Fallbacks**: Proporciona valores por defecto
+    5. **Actualización**: Mantén metadatos actualizados
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🏷️ Etiquetas Meta Básicas
+
+    ```astro
+    <head>
+      <!-- Codificación y viewport -->
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      
+      <!-- SEO básico -->
+      <meta name="description" content="Descripción de la página" />
+      <meta name="keywords" content="astro, web, desarrollo" />
+      <meta name="author" content="Tu Nombre" />
+      
+      <!-- Robots -->
+      <meta name="robots" content="index, follow" />
+      <meta name="googlebot" content="index, follow" />
+      
+      <!-- Idioma -->
+      <meta http-equiv="content-language" content="es" />
+    </head>
+    ```
+
+    ### 📱 Open Graph Completo
+
+    ```astro
+    ---
+    const ogTitle = "Guía Completa de Astro";
+    const ogDescription = "Aprende Astro desde cero con esta guía completa y práctica.";
+    const ogImage = "https://misite.com/images/og-astro-guide.jpg";
+    const ogUrl = "https://misite.com/guia-astro";
+    ---
+
+    <head>
+      <!-- Open Graph / Facebook -->
+      <meta property="og:type" content="article" />
+      <meta property="og:url" content={ogUrl} />
+      <meta property="og:title" content={ogTitle} />
+      <meta property="og:description" content={ogDescription} />
+      <meta property="og:image" content={ogImage} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:site_name" content="Mi Blog Tech" />
+      <meta property="og:locale" content="es_ES" />
+      
+      <!-- Artículo específico -->
+      <meta property="article:published_time" content="2024-01-15T10:00:00Z" />
+      <meta property="article:author" content="Juan Pérez" />
+      <meta property="article:section" content="Tutoriales" />
+      <meta property="article:tag" content="Astro" />
+    </head>
+    ```
+
+    ### 🐦 Twitter Cards
+
+    ```astro
+    <head>
+      <!-- Twitter Card -->
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content="@misite" />
+      <meta name="twitter:creator" content="@juanperez" />
+      <meta name="twitter:title" content="Guía Completa de Astro" />
+      <meta name="twitter:description" content="Aprende Astro desde cero." />
+      <meta name="twitter:image" content="https://misite.com/images/twitter-card.jpg" />
+      <meta name="twitter:image:alt" content="Portada de la guía de Astro" />
+    </head>
+    ```
+
+    ### 🎨 Componente Meta Completo
+
+    **`src/components/MetaTags.astro`**
+    ```astro
+    ---
+    interface Props {
+      title: string;
+      description: string;
+      image?: string;
+      type?: 'website' | 'article';
+      publishedTime?: string;
+      author?: string;
+      tags?: string[];
+      noindex?: boolean;
+    }
+
+    const {
+      title,
+      description,
+      image = '/default-og.jpg',
+      type = 'website',
+      publishedTime,
+      author,
+      tags = [],
+      noindex = false
+    } = Astro.props;
+
+    const siteName = "Mi Sitio Web";
+    const siteUrl = Astro.site?.toString() || 'https://misite.com';
+    const currentUrl = new URL(Astro.url.pathname, siteUrl).toString();
+    const fullImageUrl = new URL(image, siteUrl).toString();
+    ---
+
+    <head>
+      <!-- Básicas -->
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>{title} - {siteName}</title>
+      <meta name="description" content={description} />
+      
+      <!-- Robots -->
+      {noindex ? (
+        <meta name="robots" content="noindex, nofollow" />
+      ) : (
+        <meta name="robots" content="index, follow" />
+      )}
+      
+      <!-- Canonical -->
+      <link rel="canonical" href={currentUrl} />
+      
+      <!-- Open Graph -->
+      <meta property="og:type" content={type} />
+      <meta property="og:url" content={currentUrl} />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:image" content={fullImageUrl} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:site_name" content={siteName} />
+      <meta property="og:locale" content="es_ES" />
+      
+      {type === 'article' && publishedTime && (
+        <meta property="article:published_time" content={publishedTime} />
+      )}
+      {author && <meta property="article:author" content={author} />}
+      {tags.map(tag => <meta property="article:tag" content={tag} />)}
+      
+      <!-- Twitter Card -->
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={fullImageUrl} />
+    </head>
+    ```
+
+    **Uso**
+    ```astro
+    ---
+    import MetaTags from '../components/MetaTags.astro';
+    ---
+
+    <html>
+      <MetaTags
+        title="Introducción a Astro"
+        description="Aprende los fundamentos de Astro en este tutorial completo."
+        image="/images/intro-astro.jpg"
+        type="article"
+        publishedTime="2024-01-15T10:00:00Z"
+        author="Juan Pérez"
+        tags={['astro', 'tutorial', 'web']}
+      />
+      <body>
+        <!-- Contenido -->
+      </body>
+    </html>
+    ```
+
+    ### 🔧 Meta Tags desde Content Collections
+
+    ```astro
+    ---
+    import { getCollection } from 'astro:content';
+    import MetaTags from '../../components/MetaTags.astro';
+
+    export async function getStaticPaths() {
+      const posts = await getCollection('blog');
+      return posts.map(post => ({
+        params: { slug: post.slug },
+        props: { post }
+      }));
+    }
+
+    const { post } = Astro.props;
+    const { Content } = await post.render();
+    ---
+
+    <html>
+      <MetaTags
+        title={post.data.title}
+        description={post.data.description}
+        image={post.data.image}
+        type="article"
+        publishedTime={post.data.pubDate.toISOString()}
+        author={post.data.author}
+        tags={post.data.tags}
+      />
+      <body>
+        <article>
+          <Content />
+        </article>
+      </body>
+    </html>
+    ```
+
+    ### 🧪 Validación de Meta Tags
+
+    **Herramientas de prueba:**
+    - **Facebook**: https://developers.facebook.com/tools/debug/
+    - **Twitter**: https://cards-dev.twitter.com/validator
+    - **LinkedIn**: https://www.linkedin.com/post-inspector/
+
+    <Aside type="tip">
+      💡 **Tip**: Usa el validador de Open Graph de Facebook para verificar que tus meta tags se muestren correctamente antes de publicar.
+    </Aside>
+
+    <Aside type="note">
+      📝 **Nota**: Las imágenes Open Graph se cachean. Si cambias una imagen, usa un parámetro de query string (`?v=2`) para forzar actualización.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 8.3 Sitemap, robots.txt y buenas prácticas SEO
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Sitemap, Robots.txt y SEO
+
+    El **sitemap** y **robots.txt** son archivos fundamentales que ayudan a los motores de búsqueda a rastrear e indexar tu sitio web de manera eficiente.
+
+    #### 🗺️ Sitemap (sitemap.xml)
+
+    **Propósito**
+    - Informar a motores de búsqueda sobre las páginas del sitio
+    - Indicar prioridad y frecuencia de actualización
+    - Facilitar el descubrimiento de contenido nuevo
+    - Mejorar la indexación de páginas profundas
+    - Proporcionar metadatos sobre cada URL
+
+    **Estructura**
+    - Archivo XML con lista de URLs
+    - Incluye fecha de última modificación
+    - Prioridad relativa de cada página
+    - Frecuencia de cambio esperada
+    - Ubicación: `/sitemap.xml` en la raíz
+
+    **Tipos de Sitemap**
+    - **Sitemap estándar**: Lista de URLs
+    - **Sitemap de imágenes**: URLs de imágenes
+    - **Sitemap de videos**: Contenido multimedia
+    - **Sitemap de noticias**: Artículos de noticias
+    - **Índice de sitemaps**: Para sitios grandes
+
+    #### 🤖 Robots.txt
+
+    **Propósito**
+    - Controlar qué pueden rastrear los bots
+    - Bloquear acceso a áreas privadas
+    - Indicar ubicación del sitemap
+    - Optimizar crawl budget
+    - Prevenir indexación de contenido duplicado
+
+    **Directivas principales**
+    - `User-agent`: Especifica el bot
+    - `Allow`: Permite rastreo de ruta
+    - `Disallow`: Bloquea rastreo de ruta
+    - `Sitemap`: Ubicación del sitemap
+    - `Crawl-delay`: Tiempo entre peticiones
+
+    #### 📊 Integración en Astro
+
+    Astro proporciona integración oficial `@astrojs/sitemap`:
+    - Genera sitemap automáticamente
+    - Detecta todas las páginas del sitio
+    - Configurable y extensible
+    - Se actualiza en cada build
+    - Soporta múltiples sitemaps
+
+    #### 🌟 Buenas Prácticas SEO
+
+    **1. Estructura de URLs**
+    - URLs descriptivas y legibles
+    - Usar guiones en lugar de guiones bajos
+    - Evitar parámetros innecesarios
+    - Mantener jerarquía lógica
+    - URLs cortas y significativas
+
+    **2. Rendimiento**
+    - Optimizar imágenes (WebP, AVIF)
+    - Minimizar JavaScript y CSS
+    - Usar lazy loading
+    - Implementar caché efectivo
+    - Core Web Vitals óptimos
+
+    **3. Contenido**
+    - Contenido único y valioso
+    - Estructura con encabezados (H1-H6)
+    - Texto alternativo en imágenes
+    - Enlaces internos relevantes
+    - Actualizar contenido regularmente
+
+    **4. Técnico**
+    - HTTPS obligatorio
+    - Responsive design
+    - Datos estructurados (Schema.org)
+    - Canonical tags correctos
+    - Sin errores 404
+
+    **5. Accesibilidad**
+    - Semántica HTML correcta
+    - Contraste de colores adecuado
+    - Navegación por teclado
+    - ARIA labels cuando necesario
+    - Textos descriptivos
+
+    #### 📋 Checklist SEO
+
+    | Elemento | Descripción | Prioridad |
+    |----------|-------------|-----------|
+    | **Title único** | Cada página con título único | Alta |
+    | **Meta description** | Descripción atractiva | Alta |
+    | **Sitemap** | Generado y enviado | Alta |
+    | **Robots.txt** | Configurado correctamente | Alta |
+    | **HTTPS** | Certificado SSL activo | Alta |
+    | **Mobile-friendly** | Responsive design | Alta |
+    | **Velocidad** | Core Web Vitals | Alta |
+    | **Canonical** | URLs canónicas | Media |
+    | **Schema.org** | Datos estructurados | Media |
+    | **Alt text** | Imágenes con texto alt | Media |
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🗺️ Instalación de Sitemap
+
+    **Instalar integración**
+    ```bash
+    npx astro add sitemap
+    ```
+
+    **Configuración en `astro.config.mjs`**
+    ```js
+    import { defineConfig } from 'astro/config';
+    import sitemap from '@astrojs/sitemap';
+
+    export default defineConfig({
+      site: 'https://misite.com',
+      integrations: [
+        sitemap({
+          // Configuración opcional
+          filter: (page) => !page.includes('/admin/'),
+          customPages: ['https://misite.com/custom-page'],
+          changefreq: 'weekly',
+          priority: 0.7,
+          lastmod: new Date(),
+        })
+      ]
+    });
+    ```
+
+    ### 🎯 Sitemap con Prioridades Personalizadas
+
+    ```js
+    import { defineConfig } from 'astro/config';
+    import sitemap from '@astrojs/sitemap';
+
+    export default defineConfig({
+      site: 'https://misite.com',
+      integrations: [
+        sitemap({
+          serialize(item) {
+            // Página principal: prioridad alta
+            if (item.url === 'https://misite.com/') {
+              item.priority = 1.0;
+              item.changefreq = 'daily';
+            }
+            // Blog: prioridad media-alta
+            else if (item.url.includes('/blog/')) {
+              item.priority = 0.8;
+              item.changefreq = 'weekly';
+            }
+            // Otras páginas: prioridad normal
+            else {
+              item.priority = 0.5;
+              item.changefreq = 'monthly';
+            }
+            return item;
+          }
+        })
+      ]
+    });
+    ```
+
+    ### 🤖 Archivo robots.txt
+
+    **`public/robots.txt`**
+    ```txt
+    # Permitir todos los bots
+    User-agent: *
+    Allow: /
+
+    # Bloquear áreas privadas
+    Disallow: /admin/
+    Disallow: /api/
+    Disallow: /private/
+
+    # Bloquear archivos específicos
+    Disallow: /*.json$
+    Disallow: /*.xml$
+
+    # Ubicación del sitemap
+    Sitemap: https://misite.com/sitemap-index.xml
+    Sitemap: https://misite.com/sitemap-0.xml
+
+    # Configuración específica para Google
+    User-agent: Googlebot
+    Allow: /
+
+    # Bloquear bots malos
+    User-agent: BadBot
+    Disallow: /
+    ```
+
+    ### 🔧 Robots.txt Dinámico
+
+    **`src/pages/robots.txt.ts`**
+    ```typescript
+    import type { APIRoute } from 'astro';
+
+    const robotsTxt = `
+    User-agent: *
+    Allow: /
+
+    Disallow: /admin/
+    Disallow: /api/
+
+    Sitemap: ${new URL('sitemap-index.xml', import.meta.env.SITE).href}
+    `.trim();
+
+    export const GET: APIRoute = () => {
+      return new Response(robotsTxt, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+        },
+      });
+    };
+    ```
+
+    ### 📊 Datos Estructurados (Schema.org)
+
+    **`src/components/SchemaOrg.astro`**
+    ```astro
+    ---
+    interface Props {
+      type: 'Article' | 'WebPage' | 'Organization';
+      data: any;
+    }
+
+    const { type, data } = Astro.props;
+
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': type,
+      ...data
+    };
+    ---
+
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ```
+
+    **Uso para artículo**
+    ```astro
+    ---
+    import SchemaOrg from '../components/SchemaOrg.astro';
+
+    const articleSchema = {
+      headline: "Guía Completa de Astro",
+      description: "Aprende Astro desde cero",
+      image: "https://misite.com/images/article.jpg",
+      datePublished: "2024-01-15",
+      dateModified: "2024-01-20",
+      author: {
+        '@type': 'Person',
+        name: 'Juan Pérez'
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Mi Blog',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://misite.com/logo.png'
+        }
+      }
+    };
+    ---
+
+    <html>
+      <head>
+        <SchemaOrg type="Article" data={articleSchema} />
+      </head>
+      <body>
+        <!-- Contenido -->
+      </body>
+    </html>
+    ```
+
+    ### 🔍 Canonical URLs
+
+    ```astro
+    ---
+    const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+    
+    // Remover parámetros de query
+    canonicalURL.search = '';
+    ---
+
+    <head>
+      <link rel="canonical" href={canonicalURL} />
+    </head>
+    ```
+
+    ### 🌐 Hreflang para Sitios Multiidioma
+
+    ```astro
+    ---
+    const currentPath = Astro.url.pathname;
+    const languages = ['es', 'en', 'fr'];
+    ---
+
+    <head>
+      {languages.map(lang => (
+        <link 
+          rel="alternate" 
+          hreflang={lang} 
+          href={`https://misite.com/${lang}${currentPath}`} 
+        />
+      ))}
+      <link 
+        rel="alternate" 
+        hreflang="x-default" 
+        href={`https://misite.com/es${currentPath}`} 
+      />
+    </head>
+    ```
+
+    ### ⚡ Componente SEO Completo
+
+    **`src/components/CompleteSEO.astro`**
+    ```astro
+    ---
+    interface Props {
+      title: string;
+      description: string;
+      image?: string;
+      type?: 'website' | 'article';
+      noindex?: boolean;
+      canonical?: string;
+      schema?: any;
+    }
+
+    const {
+      title,
+      description,
+      image = '/default-og.jpg',
+      type = 'website',
+      noindex = false,
+      canonical,
+      schema
+    } = Astro.props;
+
+    const siteName = "Mi Sitio Web";
+    const siteUrl = Astro.site?.toString() || 'https://misite.com';
+    const currentUrl = canonical || new URL(Astro.url.pathname, siteUrl).toString();
+    const fullImageUrl = new URL(image, siteUrl).toString();
+    ---
+
+    <head>
+      <!-- Básicas -->
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>{title} - {siteName}</title>
+      <meta name="description" content={description} />
+      
+      <!-- Robots -->
+      <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+      
+      <!-- Canonical -->
+      <link rel="canonical" href={currentUrl} />
+      
+      <!-- Open Graph -->
+      <meta property="og:type" content={type} />
+      <meta property="og:url" content={currentUrl} />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:image" content={fullImageUrl} />
+      <meta property="og:site_name" content={siteName} />
+      
+      <!-- Twitter Card -->
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={fullImageUrl} />
+      
+      <!-- Schema.org -->
+      {schema && (
+        <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+      )}
+      
+      <!-- Favicon -->
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    </head>
+    ```
+
+    ### 📋 Checklist de Implementación
+
+    <Steps>
+
+    1. **Configurar site en astro.config.mjs**
+       ```js
+       export default defineConfig({
+         site: 'https://tudominio.com'
+       });
+       ```
+
+    2. **Instalar y configurar sitemap**
+       ```bash
+       npx astro add sitemap
+       ```
+
+    3. **Crear robots.txt en public/**
+       ```txt
+       User-agent: *
+       Allow: /
+       Sitemap: https://tudominio.com/sitemap-index.xml
+       ```
+
+    4. **Implementar componente SEO reutilizable**
+       - Títulos únicos
+       - Meta descriptions
+       - Open Graph
+       - Twitter Cards
+
+    5. **Añadir datos estructurados**
+       - Schema.org para artículos
+       - Organización
+       - Breadcrumbs
+
+    6. **Verificar en Search Console**
+       - Enviar sitemap
+       - Verificar indexación
+       - Revisar errores
+
+    </Steps>
+
+    <Aside type="tip">
+      💡 **Tip**: Usa Google Search Console y Bing Webmaster Tools para monitorear el rendimiento SEO y detectar problemas de indexación.
+    </Aside>
+
+    <Aside type="caution">
+      ⚠️ **Advertencia**: No bloquees recursos importantes (CSS, JS) en robots.txt. Google necesita renderizar la página completamente para evaluarla correctamente.
+    </Aside>
+
+  </TabItem>
+</Tabs>

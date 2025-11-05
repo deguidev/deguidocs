@@ -1,0 +1,344 @@
+---
+title: 05. Estilos y Diseño
+description: Estilos globales y locales, Tailwind CSS, Sass y diseño responsivo
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+
+## 5.1 Estilos globales y locales
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Estilos en Astro
+
+    Astro soporta múltiples formas de aplicar estilos, desde CSS scoped hasta frameworks como Tailwind.
+
+    #### 🎯 Estilos Locales (Scoped)
+
+    **Propósito:**
+    - Aislar estilos al componente
+    - Evitar conflictos de nombres
+    - Mejor encapsulación
+    - Mantenimiento simplificado
+
+    **Características:**
+    - Tag `<style>` en componentes
+    - Scoped automáticamente
+    - Solo afecta al componente
+    - Se extraen y optimizan en build
+
+    #### 🌐 Estilos Globales
+
+    **Propósito:**
+    - Estilos compartidos por todo el sitio
+    - Variables CSS, resets, tipografía
+    - Temas y utilidades
+    - Consistencia visual
+
+    **Ubicación:**
+    - `src/styles/global.css`
+    - Importar en layouts
+    - Directiva `is:global`
+
+    #### 📊 Comparación
+
+    | Aspecto | Scoped | Global |
+    |---------|--------|--------|
+    | **Alcance** | Componente | Todo el sitio |
+    | **Conflictos** | No | Posibles |
+    | **Uso** | Estilos específicos | Estilos base |
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🎨 Estilos Scoped
+
+    ```astro
+    ---
+    // src/components/Card.astro
+    ---
+
+    <div class="card">
+      <h3>Título</h3>
+      <p>Contenido</p>
+    </div>
+
+    <style>
+      .card {
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+
+      h3 {
+        color: #333;
+        margin: 0 0 0.5rem 0;
+      }
+    </style>
+    ```
+
+    ### 🌐 Estilos Globales
+
+    **`src/styles/global.css`**
+    ```css
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --color-primary: #4f39fa;
+      --color-text: #333;
+      --spacing: 1rem;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      color: var(--color-text);
+    }
+    ```
+
+    **Importar en layout**
+    ```astro
+    ---
+    import '../styles/global.css';
+    ---
+
+    <html>
+      <body>
+        <slot />
+      </body>
+    </html>
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Usa estilos scoped para componentes y globales para variables y resets.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 5.2 Uso de Tailwind CSS y Sass en Astro
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Tailwind CSS y Sass
+
+    Astro soporta frameworks CSS populares mediante integraciones oficiales.
+
+    #### 🎨 Tailwind CSS
+
+    **Propósito:**
+    - Utility-first CSS
+    - Desarrollo rápido
+    - Diseño consistente
+    - Bundle optimizado
+
+    **Ventajas:**
+    - Clases predefinidas
+    - Sin escribir CSS
+    - Purge automático
+    - Responsive por defecto
+
+    #### 🔧 Sass/SCSS
+
+    **Propósito:**
+    - Preprocesador CSS
+    - Variables, mixins, funciones
+    - Anidamiento
+    - Modularización
+
+    **Características:**
+    - Sintaxis `.scss` o `.sass`
+    - Compilación automática
+    - Imports y partials
+    - Lógica en estilos
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🎨 Instalación Tailwind
+
+    ```bash
+    npx astro add tailwind
+    ```
+
+    **Uso**
+    ```astro
+    <div class="bg-blue-500 text-white p-4 rounded-lg">
+      <h2 class="text-2xl font-bold">Título</h2>
+      <p class="mt-2">Contenido con Tailwind</p>
+    </div>
+    ```
+
+    ### 🔧 Instalación Sass
+
+    ```bash
+    npm install sass
+    ```
+
+    **`src/styles/main.scss`**
+    ```scss
+    $primary-color: #4f39fa;
+    $spacing: 1rem;
+
+    @mixin card {
+      padding: $spacing;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card {
+      @include card;
+      background: white;
+
+      &:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      }
+    }
+    ```
+
+    <Aside type="note">
+      📝 **Nota**: Tailwind y Sass pueden usarse juntos en el mismo proyecto.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 5.3 Diseño responsivo y dark mode
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Diseño Responsivo y Dark Mode
+
+    #### 📱 Diseño Responsivo
+
+    **Propósito:**
+    - Adaptarse a diferentes tamaños de pantalla
+    - Mejorar UX en móviles
+    - Accesibilidad
+    - SEO móvil
+
+    **Técnicas:**
+    - Media queries
+    - Grid/Flexbox
+    - Unidades relativas
+    - Mobile-first
+
+    #### 🌙 Dark Mode
+
+    **Propósito:**
+    - Reducir fatiga visual
+    - Ahorro de batería (OLED)
+    - Preferencia del usuario
+    - Accesibilidad
+
+    **Implementación:**
+    - CSS custom properties
+    - `prefers-color-scheme`
+    - Toggle manual
+    - Persistencia en localStorage
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 📱 Responsive con CSS
+
+    ```astro
+    <div class="container">
+      <div class="grid">
+        <div class="item">1</div>
+        <div class="item">2</div>
+        <div class="item">3</div>
+      </div>
+    </div>
+
+    <style>
+      .container {
+        padding: 1rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: 1fr;
+      }
+
+      @media (min-width: 768px) {
+        .grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+    </style>
+    ```
+
+    ### 🌙 Dark Mode
+
+    **`src/styles/global.css`**
+    ```css
+    :root {
+      --bg: white;
+      --text: #333;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1a1a1a;
+      --text: #fff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a1a;
+        --text: #fff;
+      }
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+    }
+    ```
+
+    **Toggle**
+    ```astro
+    <button id="theme-toggle">🌙</button>
+
+    <script>
+      const toggle = document.getElementById('theme-toggle');
+      
+      toggle?.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+      });
+    </script>
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Usa Tailwind con `dark:` prefix para dark mode fácil.
+    </Aside>
+
+  </TabItem>
+</Tabs>

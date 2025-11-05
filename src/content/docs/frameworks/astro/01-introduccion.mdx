@@ -1,0 +1,353 @@
+---
+title: 01. Introducción a Astro
+description: Qué es Astro y por qué es revolucionario
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+
+## 1.1 Qué es Astro y por qué es revolucionario
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### ¿Qué es Astro?
+
+    **Astro** es un framework web moderno diseñado para construir sitios web orientados al contenido que sean rápidos por defecto. Desarrollado con una filosofía de "menos JavaScript, más rendimiento", Astro representa un cambio de paradigma en el desarrollo web contemporáneo.
+
+    #### 🎯 Propósito
+
+    - Crear sitios web extremadamente rápidos con mínimo JavaScript
+    - Optimizar la entrega de contenido estático
+    - Permitir interactividad selectiva donde sea necesaria
+    - Mejorar métricas de rendimiento (Core Web Vitals)
+    - Facilitar el desarrollo con herramientas modernas
+
+    #### ⚙️ Cómo Funciona
+
+    **Principio "Zero JS por Defecto"**
+    - Astro genera HTML estático puro durante el build
+    - No envía JavaScript al navegador a menos que sea explícitamente necesario
+    - Los componentes se renderizan en el servidor
+    - Solo se hidrata JavaScript cuando se especifica
+
+    **Proceso de Construcción**
+    1. **Build Time**: Astro procesa componentes y genera HTML estático
+    2. **Optimización**: Minimiza CSS, optimiza imágenes, divide código
+    3. **Hidratación Selectiva**: Solo componentes marcados reciben JavaScript
+    4. **Output**: HTML, CSS y JavaScript mínimo optimizado
+
+    #### 🌟 Características Revolucionarias
+
+    **1. Arquitectura de Islas**
+    - Componentes interactivos aislados en un océano de HTML estático
+    - Cada "isla" carga su JavaScript independientemente
+    - Reduce drásticamente el JavaScript total
+
+    **2. Multi-Framework**
+    - Soporta React, Vue, Svelte, Solid, Preact, Lit
+    - Usa diferentes frameworks en el mismo proyecto
+    - Reutiliza componentes existentes
+
+    **3. Optimización Automática**
+    - Optimización de imágenes integrada
+    - Code splitting automático
+    - CSS scoping y minificación
+    - Prefetching inteligente
+
+    **4. Sintaxis Intuitiva**
+    - Similar a JSX pero más simple
+    - Frontmatter para lógica del servidor
+    - Componentes con extensión `.astro`
+
+    #### 📊 Comparación con Otros Frameworks
+
+    | Aspecto | Astro | Next.js | Gatsby | SvelteKit |
+    |---------|-------|---------|--------|-----------|
+    | **JS por defecto** | 0 KB | ~80 KB | ~50 KB | ~20 KB |
+    | **Multi-framework** | ✅ | ❌ | ❌ | ❌ |
+    | **SSG nativo** | ✅ | ✅ | ✅ | ✅ |
+    | **Hidratación parcial** | ✅ | ❌ | ❌ | ❌ |
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 📄 Componente Astro Básico
+
+    ```astro
+    ---
+    const titulo = "Bienvenido a Astro";
+    const fecha = new Date().toLocaleDateString();
+    ---
+
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <title>{titulo}</title>
+      </head>
+      <body>
+        <h1>{titulo}</h1>
+        <p>Este HTML es estático, sin JavaScript</p>
+        <p>Fecha: {fecha}</p>
+      </body>
+    </html>
+    ```
+
+    ### ⚡ Comparación de Rendimiento
+
+    **Página simple con Astro vs React:**
+
+    | Métrica | Astro | React (CRA) |
+    |---------|-------|-------------|
+    | **Tamaño JS** | 0 KB | ~130 KB |
+    | **FCP** | 0.5s | 1.8s |
+    | **TTI** | 0.5s | 3.2s |
+    | **Lighthouse** | 100 | 85 |
+
+    <Aside type="tip">
+      💡 **Tip**: Astro es ideal cuando el rendimiento es crítico y tu sitio es principalmente contenido estático.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 1.2 Arquitectura de islas e hibridación con otros frameworks
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Arquitectura de Islas
+
+    La **Arquitectura de Islas** permite crear páginas con "islas" de interactividad en un océano de HTML estático.
+
+    #### 🎯 Concepto
+
+    - **Océano**: HTML estático (la mayoría del contenido)
+    - **Islas**: Componentes interactivos con JavaScript
+    - **Aislamiento**: Cada isla es independiente
+    - **Rendimiento**: Solo se carga JS donde se necesita
+
+    #### 🔄 Directivas de Hidratación
+
+    | Directiva | Cuándo se Hidrata | Uso Recomendado |
+    |-----------|-------------------|-----------------|
+    | **client:load** | Inmediatamente | Componentes críticos |
+    | **client:idle** | Cuando está inactivo | Componentes secundarios |
+    | **client:visible** | Cuando es visible | Below-the-fold |
+    | **client:media** | Media query coincide | Responsive |
+    | **client:only** | Solo cliente | APIs del navegador |
+
+    #### 🌐 Multi-Framework
+
+    Astro permite usar múltiples frameworks en la misma página:
+    - React para componentes complejos
+    - Vue para formularios reactivos
+    - Svelte para widgets ligeros
+    - Cada uno carga solo su JavaScript
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🏝️ Ejemplo de Isla React
+
+    **Componente React**
+    ```jsx
+    // src/components/Counter.jsx
+    import { useState } from 'react';
+
+    export default function Counter() {
+      const [count, setCount] = useState(0);
+      return (
+        <div>
+          <p>Contador: {count}</p>
+          <button onClick={() => setCount(count + 1)}>+</button>
+        </div>
+      );
+    }
+    ```
+
+    **Uso en Astro**
+    ```astro
+    ---
+    import Counter from '../components/Counter.jsx';
+    ---
+
+    <html>
+      <body>
+        <h1>Mi Sitio</h1>
+        <p>Contenido estático</p>
+        
+        <!-- Isla interactiva -->
+        <Counter client:load />
+        
+        <p>Más contenido estático</p>
+      </body>
+    </html>
+    ```
+
+    ### 🎨 Múltiples Frameworks
+
+    ```astro
+    ---
+    import ReactChart from '../components/ReactChart.jsx';
+    import VueForm from '../components/VueForm.vue';
+    import SvelteWidget from '../components/SvelteWidget.svelte';
+    ---
+
+    <html>
+      <body>
+        <h1>Dashboard Híbrido</h1>
+        
+        <ReactChart client:visible />
+        <VueForm client:idle />
+        <SvelteWidget client:load />
+      </body>
+    </html>
+    ```
+
+    <Aside type="note">
+      📝 **Nota**: Cada framework solo carga su JavaScript cuando el componente se hidrata.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 1.3 Instalación del entorno y creación del primer proyecto
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Requisitos del Sistema
+
+    #### 📋 Requisitos Previos
+
+    **Node.js**: Versión 18.14.1 o superior
+    - Proporciona el entorno de ejecución
+    - Incluye npm (gestor de paquetes)
+    - Descarga desde nodejs.org
+
+    **Editor de Código**: Recomendado
+    - VS Code con extensión Astro
+    - WebStorm
+    - Cualquier editor moderno
+
+    #### 🔧 Proceso de Instalación
+
+    1. **CLI Interactivo**: Asistente paso a paso
+    2. **Configuración**: Selección de plantilla
+    3. **Dependencias**: Instalación automática
+    4. **Git**: Inicialización opcional
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🚀 Instalación Paso a Paso
+
+    <Steps>
+
+    1. **Verificar Node.js**
+       ```bash
+       node --version
+       # Debe mostrar v18.14.1 o superior
+       ```
+
+    2. **Crear proyecto**
+       ```bash
+       npm create astro@latest mi-proyecto
+       ```
+
+    3. **Seguir el asistente**
+       ```
+       ✔ ¿Dónde crear tu proyecto? › mi-proyecto
+       ✔ ¿Cómo comenzar? › Vacío
+       ✔ ¿Instalar dependencias? › Sí
+       ✔ ¿Inicializar git? › Sí
+       ✔ ¿Usar TypeScript? › Sí
+       ```
+
+    4. **Navegar al proyecto**
+       ```bash
+       cd mi-proyecto
+       ```
+
+    5. **Iniciar servidor de desarrollo**
+       ```bash
+       npm run dev
+       ```
+
+    6. **Abrir en navegador**
+       ```
+       http://localhost:4321
+       ```
+
+    </Steps>
+
+    ### 📁 Estructura Generada
+
+    ```
+    mi-proyecto/
+    ├── src/
+    │   ├── pages/
+    │   │   └── index.astro
+    │   ├── components/
+    │   ├── layouts/
+    │   └── styles/
+    ├── public/
+    │   └── favicon.svg
+    ├── astro.config.mjs
+    ├── package.json
+    └── tsconfig.json
+    ```
+
+    ### 🎯 Primera Página
+
+    **`src/pages/index.astro`**
+    ```astro
+    ---
+    const titulo = "Mi Primer Proyecto Astro";
+    ---
+
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>{titulo}</title>
+      </head>
+      <body>
+        <h1>🚀 {titulo}</h1>
+        <p>¡Bienvenido a Astro!</p>
+      </body>
+    </html>
+    ```
+
+    ### 📝 Comandos Útiles
+
+    ```bash
+    # Desarrollo
+    npm run dev
+
+    # Build para producción
+    npm run build
+
+    # Previsualizar build
+    npm run preview
+
+    # Verificar tipos
+    npm run check
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Usa `npm run dev` durante el desarrollo para ver cambios en tiempo real con HMR (Hot Module Replacement).
+    </Aside>
+
+  </TabItem>
+</Tabs>

@@ -5,27 +5,27 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
 	vite: {
-        resolve: {
-            alias: {
-                '@docs': '/content/docs',
-                '@es': '/content/docs/es',
-                '@assets': '/src/assets',
-                '@components': '/src/components',
-            }
-        },
-        optimizeDeps: {
-            include: ['monaco-editor']
-        }
-    },
+		resolve: {
+			alias: {
+				'@docs': '/content/docs',
+				'@es': '/content/docs/es',
+				'@assets': '/src/assets',
+				'@components': '/src/components',
+			}
+		},
+		optimizeDeps: {
+			include: ['monaco-editor']
+		}
+	},
 	integrations: [
 		starlight({
 			customCss: ['./src/style/starlight.css'],
 			title: 'deguidocs',
 
 			logo: {
-                src: '@assets/deguidocs.png',
-                alt: 'Logo de la documentación'
-            },
+				src: '@assets/deguidocs.png',
+				alt: 'Logo de la documentación'
+			},
 			favicon: '/degui.png',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/deguidev/deguidocs' }
@@ -45,7 +45,7 @@ export default defineConfig({
 				{
 					label: '💾 Base de datos',
 					collapsed: false,
-					items: [ 
+					items: [
 						{
 							label: 'Oracle ❤️',
 							collapsed: true,
@@ -89,7 +89,7 @@ export default defineConfig({
 						},
 					]
 				},
-			
+
 				{
 					label: '💻 Lenguajes de Programación',
 					collapsed: false,
@@ -225,6 +225,24 @@ export default defineConfig({
 					collapsed: false,
 					items: [
 						{
+							label: "☕ Astro",
+							collapsed: true,
+							items: [
+								{ label: "01. Introducción a Astro", link: "/frameworks/astro/01-introduccion/" },
+								{ label: "02. Estructura del Proyecto", link: "/frameworks/astro/02-estructura-proyecto/" },
+								{ label: "03. Creación de Páginas", link: "/frameworks/astro/03-creacion-paginas/" },
+								{ label: "04. Componentes en Astro", link: "/frameworks/astro/04-componentes/" },
+								{ label: "05. Estilos y Diseño", link: "/frameworks/astro/05-estilos-diseno/" },
+								{ label: "06. Integración con Frameworks", link: "/frameworks/astro/06-integracion-frameworks/" },
+								{ label: "07. Contenido Dinámico", link: "/frameworks/astro/07-contenido-dinamico/" },
+								{ label: "08. SEO y Metadatos", link: "/frameworks/astro/08-seo-metadatos/" },
+								{ label: "09. Optimizaciones de Rendimiento", link: "/frameworks/astro/09-optimizaciones-rendimiento/" },
+								{ label: "10. Configuración Avanzada", link: "/frameworks/astro/10-configuracion-avanzada/" },
+								{ label: "11. Integraciones Externas", link: "/frameworks/astro/11-integraciones-externas/" },
+								{ label: "12. Despliegue y Producción", link: "/frameworks/astro/12-despliegue-produccion/" }
+							]
+						},
+						{
 							label: '🐊 Vue 3',
 							collapsed: true,
 							items: [
@@ -268,7 +286,7 @@ export default defineConfig({
 								{ label: '15. Eventos, Listeners y Observers', link: '/guides/laravel/events-listeners/' },
 								{ label: '16. Jobs, Queues y Workers', link: '/guides/laravel/jobs-queues/' },
 								{ label: '17. Notificaciones y Correos', link: '/guides/laravel/notifications-mail/' }
-							]	
+							]
 						},
 						{
 							label: '🐳 Inertia',
@@ -286,12 +304,12 @@ export default defineConfig({
 								{ label: '10. Carga diferida y Lazy Loading', link: '/guides/inertia/lazy-loading/' },
 								{ label: '11. Middlewares y autenticación', link: '/guides/inertia/middleware-auth/' },
 								{ label: '12. Integración con otras librerías', link: '/guides/inertia/integrations/' }
-							]	
+							]
 						},
 						{
-							label:'🪸 Java Swing',
-							collapsed:true,
-							items:[
+							label: '🪸 Java Swing',
+							collapsed: true,
+							items: [
 								{ label: '1. Introducción a Java y Java Swing', link: '/frameworks/java-swing/introduccion/' },
 								{ label: '2. Componentes Básicos de Swing', link: '/frameworks/java-swing/componentes-basicos/' },
 								{ label: '3. Organización de Interfaces', link: '/frameworks/java-swing/organizacion-interfaces/' },
@@ -322,7 +340,7 @@ export default defineConfig({
 					label: '🐞 UML',
 					collapsed: true,
 					items: [
-						{ 
+						{
 							label: '🦉 Diag. Clases',
 							collapsed: true,
 							items: [
@@ -332,7 +350,7 @@ export default defineConfig({
 								{ label: '4. Notación UML para Clases', link: '/uml/diagramas-clases/notacion/' },
 							]
 						},
-						{ 
+						{
 							label: '🦌 Diag. Casos de Uso',
 							collapsed: true,
 							items: [
@@ -342,7 +360,7 @@ export default defineConfig({
 								{ label: '4. Ejemplos de Diagramas de Casos de Uso', link: '/uml/diagramas-casos-uso/ejemplos/' },
 							]
 						},
-						{ 
+						{
 							label: '🐢 Diag. Secuencia',
 							collapsed: true,
 							items: [
@@ -361,7 +379,7 @@ export default defineConfig({
 								{ label: '3. Ejemplos de Diagramas de Actividades', link: '/uml/diagramas-actividades/ejemplos/' },
 							]
 						},
-						{ 
+						{
 							label: '🦋 Diag. Componentes',
 							collapsed: true,
 							items: [
@@ -371,7 +389,7 @@ export default defineConfig({
 								{ label: '4. Notación UML para Diagramas de Componentes', link: '/uml/diagramas-componentes/notacion/' },
 							]
 						},
-						{ 
+						{
 							label: '🐏 Diag. Despliegue',
 							collapsed: true,
 							items: [
@@ -433,7 +451,7 @@ export default defineConfig({
 					label: '💚 Metodologías',
 					collapsed: true,
 					items: [
-						
+
 					]
 				},
 				{

@@ -1,0 +1,1331 @@
+---
+title: 09. Optimizaciones de Rendimiento
+description: Lazy loading, importación inteligente, compresión de imágenes y análisis con Lighthouse
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+
+## 9.1 Lazy loading e importación inteligente
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Lazy Loading e Importación Inteligente
+
+    El **lazy loading** (carga diferida) y la **importación inteligente** son técnicas que retrasan la carga de recursos hasta que son realmente necesarios, mejorando significativamente el rendimiento inicial.
+
+    #### 🎯 Propósito
+
+    - Reducir el tiempo de carga inicial de la página
+    - Minimizar el tamaño del bundle JavaScript
+    - Mejorar métricas de rendimiento (FCP, LCP, TTI)
+    - Optimizar el uso de ancho de banda
+    - Cargar recursos solo cuando el usuario los necesita
+
+    #### 📋 Tipos de Lazy Loading
+
+    **1. Lazy Loading de Imágenes**
+    - Cargar imágenes cuando entran en viewport
+    - Atributo `loading="lazy"` nativo
+    - Reduce carga inicial significativamente
+    - Mejora LCP (Largest Contentful Paint)
+
+    **2. Lazy Loading de Componentes**
+    - Dividir código en chunks separados
+    - Cargar componentes bajo demanda
+    - Reduce bundle inicial de JavaScript
+    - Mejora TTI (Time to Interactive)
+
+    **3. Lazy Loading de Scripts**
+    - Diferir carga de scripts no críticos
+    - Usar `async` o `defer`
+    - Priorizar contenido sobre funcionalidad
+    - Mejora FCP (First Contentful Paint)
+
+    #### ⚙️ Importación Inteligente
+
+    **Dynamic Imports**
+    - Sintaxis: `import()` como función
+    - Retorna una Promise
+    - Crea chunks automáticamente
+    - Carga bajo demanda
+
+    **Code Splitting**
+    - División automática del código
+    - Chunks por ruta o componente
+    - Optimización del bundle
+    - Carga paralela eficiente
+
+    **Tree Shaking**
+    - Eliminación de código no usado
+    - Análisis estático de imports
+    - Reduce tamaño del bundle
+    - Automático en build de producción
+
+    #### 🔄 Estrategias de Carga
+
+    | Estrategia | Cuándo Usar | Ventaja |
+    |------------|-------------|---------|
+    | **Eager** | Recursos críticos | Disponible inmediatamente |
+    | **Lazy** | Recursos below-the-fold | Carga inicial rápida |
+    | **Prefetch** | Recursos probables | Navegación rápida |
+    | **Preload** | Recursos críticos futuros | Optimiza ruta crítica |
+
+    #### 🌟 Beneficios
+
+    - **Rendimiento**: Carga inicial hasta 50% más rápida
+    - **Experiencia**: Usuario ve contenido antes
+    - **Recursos**: Menos consumo de datos
+    - **SEO**: Mejores Core Web Vitals
+    - **Escalabilidad**: Soporta más contenido
+
+    #### 📊 Métricas Impactadas
+
+    - **FCP**: First Contentful Paint (↓ 30-40%)
+    - **LCP**: Largest Contentful Paint (↓ 20-30%)
+    - **TTI**: Time to Interactive (↓ 40-50%)
+    - **TBT**: Total Blocking Time (↓ 50-60%)
+    - **Bundle Size**: Tamaño inicial (↓ 40-70%)
+
+    #### ⚠️ Consideraciones
+
+    - **Layout Shift**: Reservar espacio para contenido lazy
+    - **Fallbacks**: Proporcionar placeholders
+    - **Priorización**: Cargar contenido crítico primero
+    - **Testing**: Probar en conexiones lentas
+    - **Accesibilidad**: No afectar navegación por teclado
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🖼️ Lazy Loading de Imágenes Nativo
+
+    **HTML nativo con `loading="lazy"`**
+    ```astro
+    ---
+    // src/pages/gallery.astro
+    const images = [
+      { src: '/images/photo1.jpg', alt: 'Foto 1' },
+      { src: '/images/photo2.jpg', alt: 'Foto 2' },
+      { src: '/images/photo3.jpg', alt: 'Foto 3' },
+    ];
+    ---
+
+    <html>
+      <body>
+        <h1>Galería</h1>
+        
+        <!-- Primera imagen: carga inmediata -->
+        <img 
+          src="/images/hero.jpg" 
+          alt="Hero" 
+          loading="eager"
+          width="1200"
+          height="600"
+        />
+        
+        <!-- Resto: lazy loading -->
+        {images.map(img => (
+          <img 
+            src={img.src} 
+            alt={img.alt}
+            loading="lazy"
+            width="400"
+            height="300"
+          />
+        ))}
+      </body>
+    </html>
+    ```
+
+    ### 🎨 Lazy Loading con Componente Image de Astro
+
+    ```astro
+    ---
+    import { Image } from 'astro:assets';
+    import heroImage from '../assets/hero.jpg';
+    import photo1 from '../assets/photo1.jpg';
+    import photo2 from '../assets/photo2.jpg';
+    ---
+
+    <div class="gallery">
+      <!-- Imagen crítica: eager loading -->
+      <Image 
+        src={heroImage}
+        alt="Hero"
+        width={1200}
+        height={600}
+        format="webp"
+        loading="eager"
+        quality={90}
+      />
+      
+      <!-- Imágenes below-the-fold: lazy loading -->
+      <Image 
+        src={photo1}
+        alt="Foto 1"
+        width={400}
+        height={300}
+        format="webp"
+        loading="lazy"
+        quality={80}
+      />
+      
+      <Image 
+        src={photo2}
+        alt="Foto 2"
+        width={400}
+        height={300}
+        format="webp"
+        loading="lazy"
+        quality={80}
+      />
+    </div>
+    ```
+
+    ### ⚛️ Lazy Loading de Componentes React
+
+    **Componente pesado**
+    ```jsx
+    // src/components/HeavyChart.jsx
+    import { Chart } from 'chart.js';
+
+    export default function HeavyChart({ data }) {
+      // Componente con librería pesada
+      return (
+        <div className="chart">
+          <Chart data={data} />
+        </div>
+      );
+    }
+    ```
+
+    **Uso con lazy loading**
+    ```astro
+    ---
+    // src/pages/dashboard.astro
+    import HeavyChart from '../components/HeavyChart.jsx';
+    ---
+
+    <html>
+      <body>
+        <h1>Dashboard</h1>
+        
+        <!-- Contenido crítico -->
+        <div class="summary">
+          <p>Resumen de datos...</p>
+        </div>
+        
+        <!-- Componente pesado con lazy loading -->
+        <HeavyChart client:visible data={chartData} />
+      </body>
+    </html>
+    ```
+
+    ### 🔄 Dynamic Import en JavaScript
+
+    **Importación dinámica de módulo**
+    ```astro
+    ---
+    // src/pages/interactive.astro
+    ---
+
+    <html>
+      <body>
+        <button id="loadChart">Cargar Gráfico</button>
+        <div id="chartContainer"></div>
+
+        <script>
+          const button = document.getElementById('loadChart');
+          
+          button?.addEventListener('click', async () => {
+            // Importación dinámica solo cuando se necesita
+            const { Chart } = await import('chart.js/auto');
+            
+            const ctx = document.getElementById('chartContainer');
+            new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: ['Enero', 'Febrero', 'Marzo'],
+                datasets: [{
+                  label: 'Ventas',
+                  data: [12, 19, 3]
+                }]
+              }
+            });
+            
+            button.disabled = true;
+            button.textContent = 'Gráfico Cargado';
+          });
+        </script>
+      </body>
+    </html>
+    ```
+
+    ### 📦 Code Splitting Automático
+
+    **Estructura de rutas**
+    ```
+    src/pages/
+    ├── index.astro          # Bundle: home
+    ├── about.astro          # Bundle: about
+    ├── blog/
+    │   ├── index.astro      # Bundle: blog-index
+    │   └── [slug].astro     # Bundle: blog-post
+    └── products/
+        ├── index.astro      # Bundle: products-index
+        └── [id].astro       # Bundle: product-detail
+    ```
+
+    Astro automáticamente crea bundles separados por ruta.
+
+    ### 🎯 Lazy Loading con Intersection Observer
+
+    **Componente personalizado**
+    ```astro
+    ---
+    // src/components/LazySection.astro
+    const { id } = Astro.props;
+    ---
+
+    <div class="lazy-section" data-lazy-id={id}>
+      <div class="placeholder">Cargando...</div>
+      <div class="content" style="display: none;">
+        <slot />
+      </div>
+    </div>
+
+    <script>
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const section = entry.target;
+            const placeholder = section.querySelector('.placeholder');
+            const content = section.querySelector('.content');
+            
+            // Simular carga de contenido
+            setTimeout(() => {
+              placeholder.style.display = 'none';
+              content.style.display = 'block';
+            }, 500);
+            
+            observer.unobserve(section);
+          }
+        });
+      }, {
+        rootMargin: '50px'
+      });
+
+      document.querySelectorAll('.lazy-section').forEach(section => {
+        observer.observe(section);
+      });
+    </script>
+    ```
+
+    **Uso**
+    ```astro
+    ---
+    import LazySection from '../components/LazySection.astro';
+    ---
+
+    <html>
+      <body>
+        <h1>Contenido Principal</h1>
+        <p>Contenido visible inmediatamente...</p>
+        
+        <LazySection id="section1">
+          <h2>Sección Lazy 1</h2>
+          <p>Este contenido se carga cuando es visible.</p>
+        </LazySection>
+        
+        <LazySection id="section2">
+          <h2>Sección Lazy 2</h2>
+          <p>Este contenido también es lazy.</p>
+        </LazySection>
+      </body>
+    </html>
+    ```
+
+    ### 🚀 Prefetch de Rutas
+
+    **Configuración en `astro.config.mjs`**
+    ```js
+    import { defineConfig } from 'astro/config';
+
+    export default defineConfig({
+      prefetch: {
+        prefetchAll: true,
+        defaultStrategy: 'viewport'
+      }
+    });
+    ```
+
+    **Uso manual**
+    ```astro
+    <nav>
+      <!-- Prefetch automático en hover -->
+      <a href="/about" data-astro-prefetch>Acerca de</a>
+      
+      <!-- Prefetch inmediato -->
+      <a href="/contact" data-astro-prefetch="load">Contacto</a>
+      
+      <!-- Prefetch cuando es visible -->
+      <a href="/blog" data-astro-prefetch="viewport">Blog</a>
+      
+      <!-- Sin prefetch -->
+      <a href="/admin">Admin</a>
+    </nav>
+    ```
+
+    ### 📊 Comparación de Estrategias
+
+    ```astro
+    ---
+    // src/pages/comparison.astro
+    import HeavyComponent from '../components/HeavyComponent.jsx';
+    ---
+
+    <html>
+      <body>
+        <h1>Comparación de Estrategias</h1>
+        
+        <!-- ❌ Malo: Todo carga inmediatamente -->
+        <HeavyComponent client:load />
+        
+        <!-- ✅ Mejor: Carga cuando es visible -->
+        <HeavyComponent client:visible />
+        
+        <!-- ✅ Óptimo: Carga cuando el navegador está libre -->
+        <HeavyComponent client:idle />
+        
+        <!-- ✅ Condicional: Solo en móvil -->
+        <HeavyComponent client:media="(max-width: 768px)" />
+        
+        <!-- ⚡ Solo cliente: No SSR -->
+        <HeavyComponent client:only="react" />
+      </body>
+    </html>
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Usa `client:visible` para componentes below-the-fold y `client:idle` para widgets no críticos. Esto puede reducir el JavaScript inicial hasta un 70%.
+    </Aside>
+
+    <Aside type="caution">
+      ⚠️ **Advertencia**: El lazy loading puede causar CLS (Cumulative Layout Shift). Siempre reserva espacio con `width` y `height` en imágenes.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 9.2 Compresión y optimización de imágenes
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Compresión y Optimización de Imágenes
+
+    La **optimización de imágenes** es crucial para el rendimiento web, ya que las imágenes suelen representar el 50-70% del peso total de una página.
+
+    #### 🎯 Propósito
+
+    - Reducir el tamaño de archivos sin perder calidad perceptible
+    - Mejorar tiempos de carga de la página
+    - Reducir consumo de ancho de banda
+    - Mejorar métricas de rendimiento (LCP)
+    - Optimizar para diferentes dispositivos y resoluciones
+
+    #### 📋 Formatos de Imagen Modernos
+
+    **1. WebP**
+    - Compresión superior a JPEG/PNG (25-35% más pequeño)
+    - Soporta transparencia y animación
+    - Amplio soporte en navegadores modernos
+    - Ideal para fotos y gráficos
+
+    **2. AVIF**
+    - Compresión aún mejor que WebP (50% más pequeño que JPEG)
+    - Excelente calidad a tamaños pequeños
+    - Soporte creciente en navegadores
+    - Mejor para fotografías de alta calidad
+
+    **3. SVG**
+    - Formato vectorial escalable
+    - Perfecto para iconos y logos
+    - Tamaño muy pequeño
+    - Se puede manipular con CSS/JS
+
+    **4. Formatos tradicionales**
+    - **JPEG**: Fotos, sin transparencia
+    - **PNG**: Gráficos con transparencia
+    - **GIF**: Animaciones simples (obsoleto, usar WebP/AVIF)
+
+    #### ⚙️ Técnicas de Optimización
+
+    **1. Compresión**
+    - **Lossy**: Reduce calidad imperceptiblemente (JPEG, WebP)
+    - **Lossless**: Sin pérdida de calidad (PNG, WebP lossless)
+    - Herramientas: Sharp, ImageMagick, Squoosh
+
+    **2. Responsive Images**
+    - Diferentes tamaños para diferentes dispositivos
+    - Atributo `srcset` y `sizes`
+    - Picture element para art direction
+    - Ahorra ancho de banda en móviles
+
+    **3. Lazy Loading**
+    - Cargar imágenes cuando son visibles
+    - Atributo `loading="lazy"`
+    - Reduce carga inicial
+
+    **4. Dimensiones Explícitas**
+    - Especificar `width` y `height`
+    - Previene CLS (Cumulative Layout Shift)
+    - Mejora experiencia de usuario
+
+    #### 🔧 Integración en Astro
+
+    Astro proporciona componente `<Image>` integrado:
+    - Optimización automática de imágenes
+    - Generación de múltiples formatos
+    - Responsive images automático
+    - Lazy loading por defecto
+    - Usa Sharp internamente
+
+    #### 📊 Comparación de Formatos
+
+    | Formato | Tamaño | Calidad | Transparencia | Soporte |
+    |---------|--------|---------|---------------|---------|
+    | **JPEG** | 100% | Alta | ❌ | Universal |
+    | **PNG** | 150% | Alta | ✅ | Universal |
+    | **WebP** | 70% | Alta | ✅ | 95%+ |
+    | **AVIF** | 50% | Muy Alta | ✅ | 85%+ |
+    | **SVG** | Mínimo | Escalable | ✅ | Universal |
+
+    #### 🌟 Mejores Prácticas
+
+    1. **Usar formatos modernos**: WebP/AVIF con fallback
+    2. **Dimensiones correctas**: No cargar imágenes más grandes de lo necesario
+    3. **Compresión adecuada**: Balance entre calidad y tamaño
+    4. **Lazy loading**: Para imágenes below-the-fold
+    5. **CDN**: Servir imágenes desde CDN
+    6. **Caché**: Headers de caché apropiados
+    7. **Alt text**: Siempre incluir para accesibilidad
+
+    #### 📈 Impacto en Rendimiento
+
+    - **LCP**: Mejora hasta 40% con imágenes optimizadas
+    - **Peso página**: Reducción de 50-70%
+    - **Tiempo carga**: 30-50% más rápido
+    - **Datos móviles**: Ahorro significativo para usuarios
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🖼️ Componente Image de Astro
+
+    **Importación y uso básico**
+    ```astro
+    ---
+    import { Image } from 'astro:assets';
+    import heroImage from '../assets/hero.jpg';
+    ---
+
+    <Image 
+      src={heroImage}
+      alt="Imagen hero"
+      width={1200}
+      height={600}
+      format="webp"
+      quality={80}
+    />
+    ```
+
+    ### 🎨 Múltiples Formatos con Fallback
+
+    ```astro
+    ---
+    import { Image, Picture } from 'astro:assets';
+    import photo from '../assets/photo.jpg';
+    ---
+
+    <!-- Picture con múltiples formatos -->
+    <Picture
+      src={photo}
+      formats={['avif', 'webp', 'jpeg']}
+      alt="Foto optimizada"
+      width={800}
+      height={600}
+      loading="lazy"
+    />
+
+    <!-- Genera:
+    <picture>
+      <source srcset="photo.avif" type="image/avif">
+      <source srcset="photo.webp" type="image/webp">
+      <img src="photo.jpg" alt="Foto optimizada">
+    </picture>
+    -->
+    ```
+
+    ### 📱 Responsive Images
+
+    ```astro
+    ---
+    import { Image } from 'astro:assets';
+    import responsiveImg from '../assets/responsive.jpg';
+    ---
+
+    <Image 
+      src={responsiveImg}
+      alt="Imagen responsive"
+      widths={[400, 800, 1200]}
+      sizes="(max-width: 600px) 400px, (max-width: 900px) 800px, 1200px"
+      format="webp"
+    />
+
+    <!-- Genera srcset automáticamente -->
+    ```
+
+    ### 🔧 Configuración de Optimización
+
+    **`astro.config.mjs`**
+    ```js
+    import { defineConfig } from 'astro/config';
+
+    export default defineConfig({
+      image: {
+        service: {
+          entrypoint: 'astro/assets/services/sharp',
+          config: {
+            limitInputPixels: false,
+          }
+        },
+        // Formatos de salida
+        formats: ['avif', 'webp', 'jpeg'],
+        // Calidad por defecto
+        quality: 80,
+      }
+    });
+    ```
+
+    ### 🎯 Galería Optimizada
+
+    ```astro
+    ---
+    import { Image } from 'astro:assets';
+    import { getCollection } from 'astro:content';
+
+    const photos = await getCollection('gallery');
+    ---
+
+    <div class="gallery">
+      {photos.map((photo, index) => (
+        <Image 
+          src={photo.data.image}
+          alt={photo.data.title}
+          width={400}
+          height={300}
+          format="webp"
+          quality={80}
+          loading={index < 6 ? 'eager' : 'lazy'}
+          class="gallery-item"
+        />
+      ))}
+    </div>
+
+    <style>
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+      }
+      
+      .gallery-item {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+      }
+    </style>
+    ```
+
+    ### 🌐 Imágenes Remotas
+
+    ```astro
+    ---
+    import { Image } from 'astro:assets';
+
+    const remoteImage = 'https://example.com/image.jpg';
+    ---
+
+    <!-- Imagen remota (requiere configuración) -->
+    <Image 
+      src={remoteImage}
+      alt="Imagen remota"
+      width={800}
+      height={600}
+      format="webp"
+    />
+    ```
+
+    **Configuración para imágenes remotas**
+    ```js
+    // astro.config.mjs
+    export default defineConfig({
+      image: {
+        domains: ['example.com', 'cdn.example.com'],
+        remotePatterns: [
+          {
+            protocol: 'https',
+            hostname: '**.example.com',
+          }
+        ]
+      }
+    });
+    ```
+
+    ### 🎨 Optimización Manual con Sharp
+
+    **Script de optimización**
+    ```javascript
+    // scripts/optimize-images.js
+    import sharp from 'sharp';
+    import { readdir } from 'fs/promises';
+    import { join } from 'path';
+
+    const inputDir = './src/assets/original';
+    const outputDir = './src/assets/optimized';
+
+    async function optimizeImages() {
+      const files = await readdir(inputDir);
+      
+      for (const file of files) {
+        if (!file.match(/\.(jpg|jpeg|png)$/i)) continue;
+        
+        const inputPath = join(inputDir, file);
+        const outputName = file.replace(/\.(jpg|jpeg|png)$/i, '');
+        
+        // WebP
+        await sharp(inputPath)
+          .webp({ quality: 80 })
+          .toFile(join(outputDir, `${outputName}.webp`));
+        
+        // AVIF
+        await sharp(inputPath)
+          .avif({ quality: 70 })
+          .toFile(join(outputDir, `${outputName}.avif`));
+        
+        // JPEG optimizado
+        await sharp(inputPath)
+          .jpeg({ quality: 85, progressive: true })
+          .toFile(join(outputDir, `${outputName}.jpg`));
+        
+        console.log(`✅ Optimizado: ${file}`);
+      }
+    }
+
+    optimizeImages();
+    ```
+
+    ### 📊 Placeholder con Blur
+
+    ```astro
+    ---
+    import { Image } from 'astro:assets';
+    import photo from '../assets/photo.jpg';
+    ---
+
+    <div class="image-container">
+      <Image 
+        src={photo}
+        alt="Foto con blur placeholder"
+        width={800}
+        height={600}
+        format="webp"
+        loading="lazy"
+        class="blur-load"
+      />
+    </div>
+
+    <style>
+      .image-container {
+        position: relative;
+        background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+      }
+      
+      .blur-load {
+        animation: fadeIn 0.5s ease-in;
+      }
+      
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          filter: blur(10px);
+        }
+        to {
+          opacity: 1;
+          filter: blur(0);
+        }
+      }
+    </style>
+    ```
+
+    ### 🔍 Art Direction con Picture
+
+    ```astro
+    ---
+    import { Picture } from 'astro:assets';
+    import desktopImg from '../assets/hero-desktop.jpg';
+    import mobileImg from '../assets/hero-mobile.jpg';
+    ---
+
+    <Picture
+      src={desktopImg}
+      alt="Hero image"
+      formats={['avif', 'webp']}
+      width={1200}
+      height={600}
+      pictureAttributes={{
+        media: '(min-width: 768px)'
+      }}
+    />
+
+    <Picture
+      src={mobileImg}
+      alt="Hero image mobile"
+      formats={['avif', 'webp']}
+      width={600}
+      height={800}
+      pictureAttributes={{
+        media: '(max-width: 767px)'
+      }}
+    />
+    ```
+
+    ### 📋 Checklist de Optimización
+
+    <Steps>
+
+    1. **Usar formatos modernos**
+       - WebP para compatibilidad amplia
+       - AVIF para mejor compresión
+       - Fallback a JPEG/PNG
+
+    2. **Dimensiones apropiadas**
+       - No cargar imágenes más grandes que el contenedor
+       - Usar responsive images con srcset
+
+    3. **Compresión adecuada**
+       - Calidad 80-85 para fotos
+       - Calidad 90+ para imágenes con texto
+
+    4. **Lazy loading**
+       - `loading="lazy"` para imágenes below-the-fold
+       - `loading="eager"` solo para hero images
+
+    5. **Especificar dimensiones**
+       - Siempre incluir width y height
+       - Previene CLS
+
+    6. **Alt text descriptivo**
+       - Para accesibilidad y SEO
+       - Describir el contenido de la imagen
+
+    </Steps>
+
+    <Aside type="tip">
+      💡 **Tip**: Usa herramientas como Squoosh.app para experimentar con diferentes formatos y niveles de compresión antes de implementar.
+    </Aside>
+
+    <Aside type="note">
+      📝 **Nota**: El componente `<Image>` de Astro genera automáticamente múltiples tamaños y formatos durante el build, optimizando para todos los dispositivos.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 9.3 Análisis de rendimiento con Lighthouse
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Análisis de Rendimiento con Lighthouse
+
+    **Lighthouse** es una herramienta automatizada de código abierto desarrollada por Google para mejorar la calidad de las páginas web mediante auditorías de rendimiento, accesibilidad, SEO y mejores prácticas.
+
+    #### 🎯 Propósito
+
+    - Medir rendimiento real de páginas web
+    - Identificar problemas y oportunidades de mejora
+    - Proporcionar recomendaciones accionables
+    - Monitorear Core Web Vitals
+    - Validar mejores prácticas web
+
+    #### 📊 Categorías de Auditoría
+
+    **1. Performance (Rendimiento)**
+    - Métricas de velocidad de carga
+    - Core Web Vitals (FCP, LCP, CLS, etc.)
+    - Oportunidades de optimización
+    - Diagnósticos de problemas
+
+    **2. Accessibility (Accesibilidad)**
+    - Contraste de colores
+    - Etiquetas ARIA
+    - Navegación por teclado
+    - Textos alternativos
+
+    **3. Best Practices (Mejores Prácticas)**
+    - HTTPS
+    - Errores de consola
+    - Librerías vulnerables
+    - Uso de APIs modernas
+
+    **4. SEO**
+    - Meta tags
+    - Estructura de contenido
+    - Robots.txt y sitemap
+    - Mobile-friendly
+
+    **5. PWA (Progressive Web App)**
+    - Service workers
+    - Manifest
+    - Instalabilidad
+    - Offline functionality
+
+    #### 📈 Core Web Vitals
+
+    **Métricas principales de Google**
+
+    | Métrica | Nombre | Objetivo | Mide |
+    |---------|--------|----------|------|
+    | **LCP** | Largest Contentful Paint | < 2.5s | Velocidad de carga |
+    | **FID** | First Input Delay | < 100ms | Interactividad |
+    | **CLS** | Cumulative Layout Shift | < 0.1 | Estabilidad visual |
+    | **FCP** | First Contentful Paint | < 1.8s | Renderizado inicial |
+    | **TTI** | Time to Interactive | < 3.8s | Interactividad completa |
+    | **TBT** | Total Blocking Time | < 200ms | Bloqueo del hilo principal |
+
+    #### ⚙️ Cómo Funciona Lighthouse
+
+    1. **Navegación**: Carga la página en Chrome
+    2. **Auditoría**: Ejecuta tests automatizados
+    3. **Medición**: Recopila métricas de rendimiento
+    4. **Análisis**: Evalúa contra mejores prácticas
+    5. **Reporte**: Genera informe con puntuaciones y recomendaciones
+
+    #### 🔧 Formas de Ejecutar Lighthouse
+
+    **1. Chrome DevTools**
+    - Integrado en el navegador
+    - Fácil de usar
+    - Ideal para desarrollo
+
+    **2. CLI (Command Line)**
+    - Automatización
+    - CI/CD integration
+    - Reportes programáticos
+
+    **3. PageSpeed Insights**
+    - Interfaz web de Google
+    - Datos de campo reales (CrUX)
+    - No requiere instalación
+
+    **4. Lighthouse CI**
+    - Integración continua
+    - Monitoreo automático
+    - Prevención de regresiones
+
+    #### 🌟 Mejores Prácticas
+
+    1. **Ejecutar en modo incógnito**: Evitar extensiones
+    2. **Simular condiciones reales**: Throttling de red
+    3. **Múltiples ejecuciones**: Promediar resultados
+    4. **Ambiente consistente**: Mismas condiciones
+    5. **Priorizar Core Web Vitals**: Impacto en SEO
+    6. **Monitoreo continuo**: CI/CD integration
+
+    #### 📋 Interpretación de Puntuaciones
+
+    | Rango | Color | Significado |
+    |-------|-------|-------------|
+    | **90-100** | 🟢 Verde | Excelente |
+    | **50-89** | 🟠 Naranja | Necesita mejora |
+    | **0-49** | 🔴 Rojo | Pobre |
+
+    #### 🎯 Optimizaciones Comunes
+
+    **Para mejorar Performance:**
+    - Minimizar JavaScript
+    - Optimizar imágenes
+    - Lazy loading
+    - Caché efectivo
+    - CDN
+
+    **Para mejorar Accessibility:**
+    - Alt text en imágenes
+    - Contraste adecuado
+    - Labels en formularios
+    - Estructura semántica
+
+    **Para mejorar SEO:**
+    - Meta descriptions
+    - Títulos únicos
+    - Sitemap
+    - Mobile-friendly
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🔍 Ejecutar Lighthouse en Chrome DevTools
+
+    **Pasos:**
+    
+    <Steps>
+
+    1. **Abrir DevTools**
+       - Presiona `F12` o `Ctrl+Shift+I` (Windows/Linux)
+       - O `Cmd+Option+I` (Mac)
+
+    2. **Ir a pestaña Lighthouse**
+       - Busca la pestaña "Lighthouse" en DevTools
+       - Si no está visible, haz clic en `>>` para más opciones
+
+    3. **Configurar auditoría**
+       - Selecciona categorías (Performance, Accessibility, etc.)
+       - Elige dispositivo (Mobile o Desktop)
+       - Configura throttling
+
+    4. **Generar reporte**
+       - Clic en "Analyze page load"
+       - Espera a que termine el análisis
+
+    5. **Revisar resultados**
+       - Puntuaciones por categoría
+       - Métricas detalladas
+       - Oportunidades de mejora
+
+    </Steps>
+
+    ### 💻 Lighthouse CLI
+
+    **Instalación**
+    ```bash
+    npm install -g lighthouse
+    ```
+
+    **Uso básico**
+    ```bash
+    # Auditoría completa
+    lighthouse https://misite.com
+
+    # Solo performance
+    lighthouse https://misite.com --only-categories=performance
+
+    # Modo móvil
+    lighthouse https://misite.com --preset=mobile
+
+    # Guardar reporte HTML
+    lighthouse https://misite.com --output=html --output-path=./report.html
+
+    # Múltiples formatos
+    lighthouse https://misite.com --output=json --output=html --output-path=./reports/
+    ```
+
+    **Script de auditoría automatizada**
+    ```javascript
+    // scripts/lighthouse-audit.js
+    import lighthouse from 'lighthouse';
+    import * as chromeLauncher from 'chrome-launcher';
+    import { writeFileSync } from 'fs';
+
+    async function runLighthouse(url) {
+      // Lanzar Chrome
+      const chrome = await chromeLauncher.launch({
+        chromeFlags: ['--headless']
+      });
+
+      // Configuración
+      const options = {
+        logLevel: 'info',
+        output: 'html',
+        onlyCategories: ['performance', 'accessibility', 'seo'],
+        port: chrome.port
+      };
+
+      // Ejecutar auditoría
+      const runnerResult = await lighthouse(url, options);
+
+      // Guardar reporte
+      const reportHtml = runnerResult.report;
+      writeFileSync('lighthouse-report.html', reportHtml);
+
+      // Mostrar puntuaciones
+      console.log('Puntuaciones:');
+      console.log('Performance:', runnerResult.lhr.categories.performance.score * 100);
+      console.log('Accessibility:', runnerResult.lhr.categories.accessibility.score * 100);
+      console.log('SEO:', runnerResult.lhr.categories.seo.score * 100);
+
+      // Cerrar Chrome
+      await chrome.kill();
+    }
+
+    runLighthouse('https://misite.com');
+    ```
+
+    ### 🚀 Lighthouse CI
+
+    **Instalación**
+    ```bash
+    npm install -g @lhci/cli
+    ```
+
+    **Configuración `lighthouserc.json`**
+    ```json
+    {
+      "ci": {
+        "collect": {
+          "startServerCommand": "npm run preview",
+          "url": [
+            "http://localhost:4321/",
+            "http://localhost:4321/blog",
+            "http://localhost:4321/about"
+          ],
+          "numberOfRuns": 3
+        },
+        "assert": {
+          "preset": "lighthouse:recommended",
+          "assertions": {
+            "categories:performance": ["error", {"minScore": 0.9}],
+            "categories:accessibility": ["error", {"minScore": 0.9}],
+            "categories:seo": ["error", {"minScore": 0.9}],
+            "first-contentful-paint": ["error", {"maxNumericValue": 2000}],
+            "largest-contentful-paint": ["error", {"maxNumericValue": 2500}],
+            "cumulative-layout-shift": ["error", {"maxNumericValue": 0.1}]
+          }
+        },
+        "upload": {
+          "target": "temporary-public-storage"
+        }
+      }
+    }
+    ```
+
+    **Scripts en `package.json`**
+    ```json
+    {
+      "scripts": {
+        "lhci:collect": "lhci collect",
+        "lhci:assert": "lhci assert",
+        "lhci:upload": "lhci upload",
+        "lhci": "npm run lhci:collect && npm run lhci:assert && npm run lhci:upload"
+      }
+    }
+    ```
+
+    **Ejecutar**
+    ```bash
+    npm run lhci
+    ```
+
+    ### 🔄 GitHub Actions con Lighthouse CI
+
+    **`.github/workflows/lighthouse.yml`**
+    ```yaml
+    name: Lighthouse CI
+
+    on:
+      push:
+        branches: [main]
+      pull_request:
+        branches: [main]
+
+    jobs:
+      lighthouse:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v3
+          
+          - name: Setup Node.js
+            uses: actions/setup-node@v3
+            with:
+              node-version: '18'
+          
+          - name: Install dependencies
+            run: npm ci
+          
+          - name: Build
+            run: npm run build
+          
+          - name: Run Lighthouse CI
+            run: |
+              npm install -g @lhci/cli
+              lhci autorun
+            env:
+              LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+    ```
+
+    ### 📊 Análisis de Resultados
+
+    **Interpretar métricas**
+    ```javascript
+    // scripts/analyze-lighthouse.js
+    import { readFileSync } from 'fs';
+
+    const report = JSON.parse(readFileSync('./lighthouse-report.json', 'utf8'));
+
+    // Puntuaciones
+    const scores = {
+      performance: report.categories.performance.score * 100,
+      accessibility: report.categories.accessibility.score * 100,
+      bestPractices: report.categories['best-practices'].score * 100,
+      seo: report.categories.seo.score * 100
+    };
+
+    console.log('📊 Puntuaciones:');
+    Object.entries(scores).forEach(([category, score]) => {
+      const emoji = score >= 90 ? '🟢' : score >= 50 ? '🟠' : '🔴';
+      console.log(`${emoji} ${category}: ${score.toFixed(0)}`);
+    });
+
+    // Core Web Vitals
+    const audits = report.audits;
+    console.log('\n⚡ Core Web Vitals:');
+    console.log(`LCP: ${audits['largest-contentful-paint'].displayValue}`);
+    console.log(`FID: ${audits['max-potential-fid']?.displayValue || 'N/A'}`);
+    console.log(`CLS: ${audits['cumulative-layout-shift'].displayValue}`);
+
+    // Oportunidades
+    console.log('\n💡 Principales oportunidades:');
+    const opportunities = Object.values(audits)
+      .filter(audit => audit.details?.type === 'opportunity')
+      .sort((a, b) => b.numericValue - a.numericValue)
+      .slice(0, 5);
+
+    opportunities.forEach(opp => {
+      console.log(`- ${opp.title}: ${opp.displayValue}`);
+    });
+    ```
+
+    ### 🎯 Optimizaciones Basadas en Lighthouse
+
+    **Ejemplo de mejoras**
+    ```astro
+    ---
+    // src/pages/optimized.astro
+    import { Image } from 'astro:assets';
+    import heroImg from '../assets/hero.jpg';
+    ---
+
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        <!-- SEO: Títulos y descripciones -->
+        <title>Mi Sitio Optimizado</title>
+        <meta name="description" content="Sitio web optimizado para rendimiento" />
+        
+        <!-- Performance: Preconnect a recursos externos -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        
+        <!-- Performance: Preload de recursos críticos -->
+        <link rel="preload" href="/fonts/main.woff2" as="font" type="font/woff2" crossorigin />
+        
+        <!-- Best Practices: Favicon -->
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      </head>
+      <body>
+        <!-- Accessibility: Estructura semántica -->
+        <header>
+          <nav aria-label="Navegación principal">
+            <a href="/">Inicio</a>
+            <a href="/about">Acerca de</a>
+          </nav>
+        </header>
+
+        <main>
+          <!-- Performance: Imagen optimizada -->
+          <Image 
+            src={heroImg}
+            alt="Imagen hero descriptiva"
+            width={1200}
+            height={600}
+            format="webp"
+            loading="eager"
+          />
+          
+          <h1>Contenido Principal</h1>
+          <p>Texto del contenido...</p>
+        </main>
+
+        <footer>
+          <p>© 2024 Mi Sitio</p>
+        </footer>
+
+        <!-- Performance: Scripts diferidos -->
+        <script src="/js/analytics.js" defer></script>
+      </body>
+    </html>
+    ```
+
+    ### 📋 Checklist de Optimización
+
+    **Basado en recomendaciones de Lighthouse:**
+
+    <Steps>
+
+    1. **Performance**
+       - ✅ Imágenes optimizadas (WebP/AVIF)
+       - ✅ Lazy loading implementado
+       - ✅ Minificación de CSS/JS
+       - ✅ Caché configurado
+       - ✅ CDN para recursos estáticos
+
+    2. **Accessibility**
+       - ✅ Alt text en todas las imágenes
+       - ✅ Contraste de colores > 4.5:1
+       - ✅ Labels en formularios
+       - ✅ Navegación por teclado funcional
+       - ✅ ARIA labels donde necesario
+
+    3. **SEO**
+       - ✅ Meta description única
+       - ✅ Títulos descriptivos
+       - ✅ Sitemap.xml
+       - ✅ Robots.txt
+       - ✅ Mobile-friendly
+
+    4. **Best Practices**
+       - ✅ HTTPS habilitado
+       - ✅ Sin errores de consola
+       - ✅ Librerías actualizadas
+       - ✅ Sin vulnerabilidades conocidas
+
+    </Steps>
+
+    <Aside type="tip">
+      💡 **Tip**: Ejecuta Lighthouse regularmente durante el desarrollo para detectar regresiones de rendimiento temprano. Integra en tu CI/CD para prevenir degradaciones.
+    </Aside>
+
+    <Aside type="note">
+      📝 **Nota**: Las puntuaciones de Lighthouse pueden variar entre ejecuciones debido a condiciones de red y sistema. Siempre ejecuta múltiples veces y promedia los resultados.
+    </Aside>
+
+    <Aside type="caution">
+      ⚠️ **Advertencia**: Una puntuación de 100 en Lighthouse no garantiza una experiencia perfecta. Usa también datos de usuarios reales (RUM) para validar el rendimiento.
+    </Aside>
+
+  </TabItem>
+</Tabs>

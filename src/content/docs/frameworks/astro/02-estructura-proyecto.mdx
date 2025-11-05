@@ -1,0 +1,651 @@
+---
+title: 02. Estructura del Proyecto
+description: Carpetas principales, archivos .astro y sistema de rutas
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+
+## 2.1 Carpetas principales: src, public, pages y components
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Estructura de Carpetas en Astro
+
+    Un proyecto Astro sigue una estructura organizada y convencional que facilita el desarrollo y mantenimiento del código.
+
+    #### 📁 Carpeta `src/`
+
+    **Propósito**: Contiene todo el código fuente del proyecto
+
+    **Subcarpetas principales:**
+
+    **`src/pages/`**
+    - Contiene las páginas del sitio
+    - Cada archivo se convierte automáticamente en una ruta
+    - Soporta `.astro`, `.md`, `.mdx`, `.html`
+    - Sistema de routing basado en archivos
+
+    **`src/components/`**
+    - Componentes reutilizables
+    - Pueden ser `.astro`, `.jsx`, `.vue`, `.svelte`
+    - No generan rutas automáticamente
+    - Importables en páginas y otros componentes
+
+    **`src/layouts/`**
+    - Plantillas para envolver páginas
+    - Define estructura común (header, footer)
+    - Reutilización de diseño
+    - Usa `<slot />` para contenido dinámico
+
+    **`src/styles/`**
+    - Estilos globales
+    - Variables CSS
+    - Mixins y utilidades
+    - Importables en cualquier componente
+
+    #### 📦 Carpeta `public/`
+
+    **Propósito**: Archivos estáticos que se copian directamente al build
+
+    **Contenido típico:**
+    - Imágenes (`favicon.svg`, logos)
+    - Fuentes personalizadas
+    - Archivos robots.txt, sitemap.xml
+    - Documentos PDF, archivos descargables
+
+    **Características:**
+    - No se procesan ni optimizan
+    - Accesibles desde la raíz (`/`)
+    - No requieren import
+    - Ideales para assets que no cambian
+
+    #### 🗂️ Otras Carpetas Importantes
+
+    **`src/content/`**
+    - Content Collections
+    - Archivos Markdown/MDX organizados
+    - Validación con esquemas Zod
+    - Ideal para blogs, documentación
+
+    **`src/assets/`**
+    - Imágenes que se optimizan
+    - Requieren import
+    - Procesadas por Astro
+    - Generan múltiples formatos
+
+    #### 📊 Comparación: public vs assets
+
+    | Aspecto | `public/` | `src/assets/` |
+    |---------|-----------|---------------|
+    | **Procesamiento** | No | Sí |
+    | **Optimización** | No | Sí |
+    | **Import** | No necesario | Requerido |
+    | **URL** | `/archivo.jpg` | Generada |
+    | **Uso** | Assets estáticos | Imágenes optimizadas |
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 📁 Estructura Completa de Proyecto
+
+    ```
+    mi-proyecto-astro/
+    ├── src/
+    │   ├── pages/              # Rutas del sitio
+    │   │   ├── index.astro     # → /
+    │   │   ├── about.astro     # → /about
+    │   │   ├── blog/
+    │   │   │   ├── index.astro # → /blog
+    │   │   │   └── [slug].astro # → /blog/:slug
+    │   │   └── api/
+    │   │       └── posts.json.ts # → /api/posts.json
+    │   ├── components/         # Componentes reutilizables
+    │   │   ├── Header.astro
+    │   │   ├── Footer.astro
+    │   │   ├── Card.astro
+    │   │   └── Button.jsx
+    │   ├── layouts/            # Plantillas
+    │   │   ├── Layout.astro
+    │   │   └── BlogLayout.astro
+    │   ├── styles/             # Estilos globales
+    │   │   ├── global.css
+    │   │   └── variables.css
+    │   ├── content/            # Content Collections
+    │   │   ├── config.ts
+    │   │   └── blog/
+    │   │       ├── post-1.md
+    │   │       └── post-2.md
+    │   └── assets/             # Imágenes optimizadas
+    │       └── hero.jpg
+    ├── public/                 # Archivos estáticos
+    │   ├── favicon.svg
+    │   ├── robots.txt
+    │   └── images/
+    │       └── logo.png
+    ├── astro.config.mjs        # Configuración
+    ├── package.json
+    └── tsconfig.json
+    ```
+
+    ### 📄 Uso de Carpetas
+
+    **Componente en `src/components/Card.astro`**
+    ```astro
+    ---
+    const { title, description } = Astro.props;
+    ---
+
+    <div class="card">
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+
+    <style>
+      .card {
+        border: 1px solid #ddd;
+        padding: 1rem;
+        border-radius: 8px;
+      }
+    </style>
+    ```
+
+    **Página usando componente**
+    ```astro
+    ---
+    // src/pages/index.astro
+    import Card from '../components/Card.astro';
+    ---
+
+    <html>
+      <body>
+        <Card 
+          title="Mi Tarjeta"
+          description="Descripción de ejemplo"
+        />
+      </body>
+    </html>
+    ```
+
+    ### 🖼️ Uso de public vs assets
+
+    **Imagen en `public/`**
+    ```astro
+    <!-- Acceso directo, sin import -->
+    <img src="/logo.png" alt="Logo" />
+    ```
+
+    **Imagen en `src/assets/`**
+    ```astro
+    ---
+    import { Image } from 'astro:assets';
+    import hero from '../assets/hero.jpg';
+    ---
+
+    <!-- Optimizada automáticamente -->
+    <Image src={hero} alt="Hero" width={1200} height={600} />
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Usa `public/` para archivos que no cambian (favicon, robots.txt) y `src/assets/` para imágenes que necesitan optimización.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 2.2 Archivos .astro y cómo funcionan
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Archivos .astro
+
+    Los archivos `.astro` son la unidad fundamental de Astro, combinando HTML, CSS y JavaScript en un solo archivo con una sintaxis especial.
+
+    #### 🎯 Estructura de un Archivo .astro
+
+    **Tres secciones principales:**
+
+    **1. Frontmatter (---)**
+    - Código JavaScript/TypeScript que se ejecuta en el servidor
+    - Delimitado por `---` al inicio y final
+    - Importaciones, lógica, fetch de datos
+    - No se envía al cliente
+
+    **2. Template (HTML)**
+    - Sintaxis similar a JSX
+    - Puede usar variables del frontmatter
+    - Expresiones con `{}`
+    - Componentes con `<Component />`
+
+    **3. Estilos (opcional)**
+    - Tag `<style>` para CSS
+    - Scoped por defecto
+    - Soporta preprocesadores (Sass, Less)
+    - Puede ser global con `is:global`
+
+    #### ⚙️ Cómo Funciona
+
+    **Proceso de Renderizado:**
+    1. **Build Time**: Frontmatter se ejecuta en el servidor
+    2. **Generación**: Se produce HTML estático
+    3. **Optimización**: CSS se extrae y minimiza
+    4. **Output**: HTML puro sin JavaScript (por defecto)
+
+    **Características Especiales:**
+
+    **Props**
+    - Recibir datos de componentes padres
+    - Acceso via `Astro.props`
+    - Type-safe con TypeScript
+    - Validación en tiempo de desarrollo
+
+    **Slots**
+    - Insertar contenido dinámico
+    - Similar a children en React
+    - Slots nombrados para múltiples áreas
+    - Flexibilidad en layouts
+
+    **Directivas**
+    - `class:list`: Clases condicionales
+    - `set:html`: Insertar HTML raw
+    - `is:global`: Estilos globales
+    - `define:vars`: Variables CSS dinámicas
+
+    #### 📊 Comparación con Otros Formatos
+
+    | Aspecto | .astro | .jsx | .vue |
+    |---------|--------|------|------|
+    | **Sintaxis** | HTML-like | JSX | SFC |
+    | **CSS** | Scoped nativo | CSS-in-JS | Scoped |
+    | **JavaScript** | Frontmatter | Todo el archivo | `<script>` |
+    | **Renderizado** | Servidor | Cliente/Servidor | Cliente/Servidor |
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 📄 Estructura Básica de .astro
+
+    ```astro
+    ---
+    // FRONTMATTER: Código del servidor
+    import Component from './Component.astro';
+
+    const titulo = "Mi Página";
+    const items = ['Item 1', 'Item 2', 'Item 3'];
+
+    // Fetch de datos
+    const response = await fetch('https://api.example.com/data');
+    const data = await response.json();
+    ---
+
+    <!-- TEMPLATE: HTML -->
+    <html lang="es">
+      <head>
+        <title>{titulo}</title>
+      </head>
+      <body>
+        <h1>{titulo}</h1>
+        
+        <ul>
+          {items.map(item => (
+            <li>{item}</li>
+          ))}
+        </ul>
+
+        <Component />
+      </body>
+    </html>
+
+    <!-- ESTILOS: CSS Scoped -->
+    <style>
+      h1 {
+        color: blue;
+      }
+      
+      ul {
+        list-style: none;
+      }
+    </style>
+    ```
+
+    ### 🎨 Uso de Props
+
+    **Componente con Props**
+    ```astro
+    ---
+    // src/components/UserCard.astro
+    interface Props {
+      name: string;
+      email: string;
+      avatar?: string;
+    }
+
+    const { name, email, avatar = '/default-avatar.png' } = Astro.props;
+    ---
+
+    <div class="user-card">
+      <img src={avatar} alt={name} />
+      <h3>{name}</h3>
+      <p>{email}</p>
+    </div>
+
+    <style>
+      .user-card {
+        border: 1px solid #ddd;
+        padding: 1rem;
+        border-radius: 8px;
+      }
+    </style>
+    ```
+
+    **Uso del componente**
+    ```astro
+    ---
+    import UserCard from '../components/UserCard.astro';
+    ---
+
+    <UserCard 
+      name="Juan Pérez"
+      email="juan@example.com"
+      avatar="/juan.jpg"
+    />
+    ```
+
+    ### 🔄 Uso de Slots
+
+    **Layout con Slot**
+    ```astro
+    ---
+    // src/layouts/Layout.astro
+    const { title } = Astro.props;
+    ---
+
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>{title}</title>
+      </head>
+      <body>
+        <header>
+          <nav>Navegación</nav>
+        </header>
+        
+        <main>
+          <slot />
+        </main>
+        
+        <footer>
+          <p>© 2024</p>
+        </footer>
+      </body>
+    </html>
+    ```
+
+    **Uso del Layout**
+    ```astro
+    ---
+    import Layout from '../layouts/Layout.astro';
+    ---
+
+    <Layout title="Mi Página">
+      <h1>Contenido de la página</h1>
+      <p>Este contenido va en el slot</p>
+    </Layout>
+    ```
+
+    ### 🎯 Slots Nombrados
+
+    ```astro
+    ---
+    // Layout con múltiples slots
+    ---
+
+    <div class="container">
+      <aside>
+        <slot name="sidebar" />
+      </aside>
+      
+      <main>
+        <slot />
+      </main>
+    </div>
+    ```
+
+    **Uso**
+    ```astro
+    <Layout>
+      <div slot="sidebar">
+        <h3>Sidebar</h3>
+      </div>
+      
+      <h1>Contenido Principal</h1>
+    </Layout>
+    ```
+
+    <Aside type="note">
+      📝 **Nota**: El código en el frontmatter se ejecuta solo durante el build, no en el navegador del usuario.
+    </Aside>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 2.3 Sistema de rutas y navegación en Astro
+
+<Tabs>
+  <TabItem label="👔 Parte teórica">
+    
+    ### Sistema de Rutas Basado en Archivos
+
+    Astro utiliza un sistema de routing automático basado en la estructura de archivos en la carpeta `src/pages/`.
+
+    #### 🗺️ Rutas Estáticas
+
+    **Mapeo Archivo → URL**
+    - `src/pages/index.astro` → `/`
+    - `src/pages/about.astro` → `/about`
+    - `src/pages/blog/index.astro` → `/blog`
+    - `src/pages/blog/post.astro` → `/blog/post`
+
+    #### 🔄 Rutas Dinámicas
+
+    **Parámetros de Ruta**
+    - Archivos con `[param].astro`
+    - Generación con `getStaticPaths()`
+    - Acceso via `Astro.params`
+    - Build time generation
+
+    **Tipos de Parámetros:**
+    - **Simple**: `[id].astro` → `/123`
+    - **Múltiple**: `[category]/[id].astro` → `/tech/123`
+    - **Rest**: `[...path].astro` → `/any/nested/path`
+
+    #### 📊 Tipos de Rutas
+
+    | Tipo | Sintaxis | Ejemplo | URL |
+    |------|----------|---------|-----|
+    | **Estática** | `page.astro` | `about.astro` | `/about` |
+    | **Dinámica** | `[param].astro` | `[id].astro` | `/123` |
+    | **Rest** | `[...path].astro` | `[...slug].astro` | `/any/path` |
+    | **Índice** | `index.astro` | `blog/index.astro` | `/blog` |
+
+    #### 🎯 getStaticPaths()
+
+    **Propósito**: Generar rutas dinámicas en build time
+
+    **Características:**
+    - Retorna array de objetos
+    - Cada objeto tiene `params` y `props`
+    - Se ejecuta solo durante el build
+    - Genera todas las páginas posibles
+
+    #### 🔗 Navegación
+
+    **Enlaces Internos**
+    - Tag `<a>` estándar
+    - Rutas relativas o absolutas
+    - Prefetching automático (opcional)
+    - Sin recarga de página completa
+
+    **Redirecciones**
+    - Configuración en `astro.config.mjs`
+    - Código de estado personalizable
+    - Útil para URLs antiguas
+
+  </TabItem>
+  <TabItem label="💡 Ejemplos prácticos">
+    
+    ### 🗺️ Rutas Estáticas
+
+    ```
+    src/pages/
+    ├── index.astro           → /
+    ├── about.astro           → /about
+    ├── contact.astro         → /contact
+    ├── blog/
+    │   ├── index.astro       → /blog
+    │   └── first-post.astro  → /blog/first-post
+    └── products/
+        └── index.astro       → /products
+    ```
+
+    ### 🔄 Ruta Dinámica Simple
+
+    **`src/pages/blog/[slug].astro`**
+    ```astro
+    ---
+    export async function getStaticPaths() {
+      const posts = [
+        { slug: 'post-1', title: 'Primer Post' },
+        { slug: 'post-2', title: 'Segundo Post' },
+        { slug: 'post-3', title: 'Tercer Post' },
+      ];
+
+      return posts.map(post => ({
+        params: { slug: post.slug },
+        props: { title: post.title }
+      }));
+    }
+
+    const { slug } = Astro.params;
+    const { title } = Astro.props;
+    ---
+
+    <html>
+      <body>
+        <h1>{title}</h1>
+        <p>Slug: {slug}</p>
+      </body>
+    </html>
+    ```
+
+    ### 📊 Ruta Dinámica con API
+
+    **`src/pages/users/[id].astro`**
+    ```astro
+    ---
+    export async function getStaticPaths() {
+      const response = await fetch('https://jsonplaceholder.typicode.com/users');
+      const users = await response.json();
+
+      return users.map(user => ({
+        params: { id: user.id.toString() },
+        props: { user }
+      }));
+    }
+
+    const { user } = Astro.props;
+    ---
+
+    <html>
+      <body>
+        <h1>{user.name}</h1>
+        <p>Email: {user.email}</p>
+        <p>Ciudad: {user.address.city}</p>
+      </body>
+    </html>
+    ```
+
+    ### 🎯 Ruta Rest (Catch-all)
+
+    **`src/pages/docs/[...slug].astro`**
+    ```astro
+    ---
+    export async function getStaticPaths() {
+      return [
+        { params: { slug: 'intro' } },
+        { params: { slug: 'guides/getting-started' } },
+        { params: { slug: 'api/reference' } },
+      ];
+    }
+
+    const { slug } = Astro.params;
+    ---
+
+    <html>
+      <body>
+        <h1>Documentación</h1>
+        <p>Ruta: {slug}</p>
+      </body>
+    </html>
+    ```
+
+    ### 🔗 Navegación entre Páginas
+
+    ```astro
+    <nav>
+      <a href="/">Inicio</a>
+      <a href="/about">Acerca de</a>
+      <a href="/blog">Blog</a>
+      <a href="/contact">Contacto</a>
+    </nav>
+    ```
+
+    ### ⚡ Prefetch de Enlaces
+
+    **Configuración en `astro.config.mjs`**
+    ```js
+    export default defineConfig({
+      prefetch: {
+        prefetchAll: true,
+        defaultStrategy: 'hover'
+      }
+    });
+    ```
+
+    **Uso manual**
+    ```astro
+    <a href="/blog" data-astro-prefetch>Blog</a>
+    ```
+
+    ### 🔄 Redirecciones
+
+    **`astro.config.mjs`**
+    ```js
+    export default defineConfig({
+      redirects: {
+        '/old-page': '/new-page',
+        '/blog/old-post': '/blog/new-post',
+        '/temp': {
+          status: 302,
+          destination: '/permanent'
+        }
+      }
+    });
+    ```
+
+    <Aside type="tip">
+      💡 **Tip**: Usa `getStaticPaths()` para generar páginas dinámicas desde APIs, bases de datos o archivos durante el build.
+    </Aside>
+
+  </TabItem>
+</Tabs>
