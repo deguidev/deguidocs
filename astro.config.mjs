@@ -122,7 +122,9 @@ export default defineConfig({
 								{ label: '8. Base de datos (MySQL)', link: '/lenguajes/php/base-datos/' },
 								{ label: '9. Programación orientada a objetos', link: '/lenguajes/php/poo/' },
 								{ label: '10. Manejo de sesiones y cookies', link: '/lenguajes/php/sesiones-cookies/' },
-								{ label: '11. Buenas prácticas', link: '/lenguajes/php/buenas-practicas/' },
+								{ label: '11. Manejo de errores y excepciones', link: '/lenguajes/php/errores-excepciones/' },
+								{ label: '12. AJAX', link: '/lenguajes/php/ajax-php/' },
+								{ label: '13. Buenas prácticas', link: '/lenguajes/php/buenas-practicas/' },
 							]
 						},
 						{

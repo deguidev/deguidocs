@@ -1,0 +1,523 @@
+---
+title: 11. Manejo de errores y excepciones
+description: Aprende a manejar errores y excepciones en PHP de forma efectiva
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# Manejo de Errores y Excepciones en PHP
+
+El manejo adecuado de errores y excepciones es fundamental para crear aplicaciones robustas y confiables. PHP ofrece herramientas para detectar, manejar y responder a situaciones inesperadas de manera controlada.
+
+## ¿Qué es un Error y qué es una Excepción?
+
+Aunque ambos indican que algo salió mal, hay diferencias importantes entre errores y excepciones:
+
+### Errores
+
+Los **errores** son problemas que ocurren durante la ejecución del código y generalmente son manejados por PHP automáticamente. Pueden detener la ejecución del script dependiendo de su gravedad.
+
+<Code code={`<?php
+// Ejemplo de error: división por cero
+echo 5 / 0; // Warning: Division by zero
+
+// Ejemplo de error: variable no definida
+echo $variableNoExiste; // Warning: Undefined variable
+
+// Ejemplo de error fatal: llamar a función inexistente
+funcionQueNoExiste(); // Fatal error: Uncaught Error
+?>`} lang="php" />
+
+### Excepciones
+
+Las **excepciones** son objetos que representan condiciones excepcionales que puedes capturar y manejar en tu código. Te permiten controlar el flujo cuando algo sale mal.
+
+<Code code={`<?php
+// Ejemplo de excepción
+try {
+    throw new Exception("Algo salió mal");
+} catch (Exception $e) {
+    echo "Error capturado: " . $e->getMessage();
+}
+// El script continúa ejecutándose
+?>`} lang="php" />
+
+<Aside type="note">
+**Diferencia clave**: Los errores son manejados por PHP, mientras que las excepciones son manejadas por ti usando `try-catch`.
+</Aside>
+
+## Tipos Comunes de Errores en PHP
+
+PHP clasifica los errores en diferentes niveles de gravedad:
+
+### 1. Errores de Sintaxis (Parse Errors)
+
+Ocurren cuando el código no sigue las reglas del lenguaje. PHP no puede ejecutar el script.
+
+<Code code={`<?php
+// Error de sintaxis: falta punto y coma
+echo "Hola"
+echo "Mundo"; // Parse error
+
+// Error de sintaxis: paréntesis sin cerrar
+if ($edad > 18 {
+    echo "Mayor de edad";
+}
+?>`} lang="php" />
+
+<Aside type="caution">
+Los errores de sintaxis deben corregirse antes de ejecutar el código. PHP no puede ejecutar un script con errores de sintaxis.
+</Aside>
+
+### 2. Errores Lógicos
+
+El código se ejecuta sin problemas técnicos, pero produce resultados incorrectos debido a la lógica del programa.
+
+<Code code={`<?php
+// Error lógico: usar el operador incorrecto
+$edad = 15;
+
+// Queremos verificar si es mayor de edad, pero usamos < en lugar de >=
+if ($edad < 18) {
+    echo "Puedes votar"; // Esto es incorrecto
+} else {
+    echo "No puedes votar";
+}
+
+// Error lógico: cálculo incorrecto
+$precio = 100;
+$descuento = 20;
+
+// Queremos aplicar 20% de descuento, pero restamos el valor directo
+$precioFinal = $precio - $descuento; // Debería ser: $precio * 0.8
+echo "Precio final: $precioFinal"; // Resultado incorrecto
+?>`} lang="php" />
+
+### 3. Errores de Ejecución (Runtime Errors)
+
+Ocurren durante la ejecución del programa cuando algo inesperado sucede.
+
+<Tabs>
+  <TabItem label="Warning">
+    <Code code={`<?php
+// Warning: advertencia que no detiene el script
+
+// División por cero
+$resultado = 10 / 0;
+echo "El script continúa"; // Se ejecuta
+
+// Archivo no encontrado
+$archivo = fopen("noexiste.txt", "r");
+echo "Esto también se ejecuta";
+?>`} lang="php" />
+  </TabItem>
+  <TabItem label="Fatal Error">
+    <Code code={`<?php
+// Fatal Error: detiene la ejecución del script
+
+// Llamar a función que no existe
+calcularTotal(); // Fatal error: Uncaught Error
+
+// Este código NO se ejecuta
+echo "Esto nunca se mostrará";
+?>`} lang="php" />
+  </TabItem>
+  <TabItem label="Notice">
+    <Code code={`<?php
+// Notice: notificación de bajo nivel
+
+// Usar variable no definida
+echo $nombre; // Notice: Undefined variable
+
+// Usar índice de array inexistente
+$frutas = ["manzana", "pera"];
+echo $frutas[5]; // Notice: Undefined offset
+
+// El script continúa normalmente
+echo "El script sigue ejecutándose";
+?>`} lang="php" />
+  </TabItem>
+</Tabs>
+
+## Uso de try, catch y finally
+
+La estructura `try-catch-finally` permite manejar excepciones de forma controlada.
+
+### Sintaxis Básica
+
+<Code code={`<?php
+try {
+    // Código que puede generar una excepción
+    $resultado = dividir(10, 0);
+    
+} catch (Exception $e) {
+    // Código que se ejecuta si hay una excepción
+    echo "Error: " . $e->getMessage();
+    
+} finally {
+    // Código que SIEMPRE se ejecuta (opcional)
+    echo "Operación finalizada";
+}
+
+function dividir($a, $b) {
+    if ($b == 0) {
+        throw new Exception("No se puede dividir por cero");
+    }
+    return $a / $b;
+}
+?>`} lang="php" />
+
+### Ejemplo Práctico: Validación de Formulario
+
+<Code code={`<?php
+function validarEdad($edad) {
+    try {
+        // Validar que sea un número
+        if (!is_numeric($edad)) {
+            throw new Exception("La edad debe ser un número");
+        }
+        
+        // Validar que sea positivo
+        if ($edad < 0) {
+            throw new Exception("La edad no puede ser negativa");
+        }
+        
+        // Validar rango razonable
+        if ($edad > 120) {
+            throw new Exception("La edad no es válida");
+        }
+        
+        // Si todo está bien
+        return "Edad válida: $edad años";
+        
+    } catch (Exception $e) {
+        return "Error de validación: " . $e->getMessage();
+    }
+}
+
+// Probar la función
+echo validarEdad(25);        // Edad válida: 25 años
+echo validarEdad("abc");     // Error: La edad debe ser un número
+echo validarEdad(-5);        // Error: La edad no puede ser negativa
+echo validarEdad(150);       // Error: La edad no es válida
+?>`} lang="php" />
+
+### Capturar Múltiples Tipos de Excepciones
+
+<Code code={`<?php
+function procesarArchivo($nombreArchivo) {
+    try {
+        // Verificar si el archivo existe
+        if (!file_exists($nombreArchivo)) {
+            throw new Exception("Archivo no encontrado");
+        }
+        
+        // Intentar leer el archivo
+        $contenido = file_get_contents($nombreArchivo);
+        
+        if ($contenido === false) {
+            throw new RuntimeException("Error al leer el archivo");
+        }
+        
+        // Intentar decodificar JSON
+        $datos = json_decode($contenido, true);
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new InvalidArgumentException("El archivo no contiene JSON válido");
+        }
+        
+        return $datos;
+        
+    } catch (InvalidArgumentException $e) {
+        echo "Error de formato: " . $e->getMessage();
+    } catch (RuntimeException $e) {
+        echo "Error de lectura: " . $e->getMessage();
+    } catch (Exception $e) {
+        echo "Error general: " . $e->getMessage();
+    } finally {
+        echo "\\nProceso de lectura finalizado";
+    }
+}
+
+// Usar la función
+$datos = procesarArchivo("datos.json");
+?>`} lang="php" />
+
+### El Bloque finally
+
+El bloque `finally` se ejecuta **siempre**, haya o no una excepción. Es útil para limpiar recursos.
+
+<Code code={`<?php
+function conectarBaseDatos() {
+    $conexion = null;
+    
+    try {
+        // Intentar conectar
+        $conexion = new PDO("mysql:host=localhost;dbname=test", "usuario", "clave");
+        
+        // Realizar operaciones
+        $resultado = $conexion->query("SELECT * FROM usuarios");
+        
+        return $resultado->fetchAll();
+        
+    } catch (PDOException $e) {
+        echo "Error de conexión: " . $e->getMessage();
+        return [];
+        
+    } finally {
+        // Cerrar conexión siempre (haya error o no)
+        if ($conexion !== null) {
+            $conexion = null;
+            echo "Conexión cerrada";
+        }
+    }
+}
+?>`} lang="php" />
+
+## Lanzar Excepciones Manualmente con throw
+
+Puedes lanzar tus propias excepciones usando `throw` para indicar que algo salió mal.
+
+### Lanzar Excepciones Básicas
+
+<Code code={`<?php
+function calcularDescuento($precio, $porcentaje) {
+    // Validar precio
+    if ($precio <= 0) {
+        throw new Exception("El precio debe ser mayor a cero");
+    }
+    
+    // Validar porcentaje
+    if ($porcentaje < 0 || $porcentaje > 100) {
+        throw new Exception("El porcentaje debe estar entre 0 y 100");
+    }
+    
+    // Calcular descuento
+    $descuento = $precio * ($porcentaje / 100);
+    return $precio - $descuento;
+}
+
+// Usar la función con try-catch
+try {
+    $precioFinal = calcularDescuento(100, 20);
+    echo "Precio con descuento: $$precioFinal";
+    
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
+?>`} lang="php" />
+
+### Crear Excepciones Personalizadas
+
+Puedes crear tus propias clases de excepción para casos específicos:
+
+<Code code={`<?php
+// Definir excepción personalizada
+class EdadInvalidaException extends Exception {
+    public function mensajePersonalizado() {
+        return "Error de edad: " . $this->getMessage();
+    }
+}
+
+class UsuarioNoEncontradoException extends Exception {
+    private $userId;
+    
+    public function __construct($userId, $message = "Usuario no encontrado") {
+        parent::__construct($message);
+        $this->userId = $userId;
+    }
+    
+    public function getUserId() {
+        return $this->userId;
+    }
+}
+
+// Usar excepciones personalizadas
+function registrarUsuario($nombre, $edad) {
+    if ($edad < 18) {
+        throw new EdadInvalidaException("Debes ser mayor de 18 años");
+    }
+    
+    return "Usuario $nombre registrado correctamente";
+}
+
+function buscarUsuario($id) {
+    $usuarios = [1 => "Ana", 2 => "Juan", 3 => "María"];
+    
+    if (!isset($usuarios[$id])) {
+        throw new UsuarioNoEncontradoException($id);
+    }
+    
+    return $usuarios[$id];
+}
+
+// Probar las funciones
+try {
+    echo registrarUsuario("Pedro", 15);
+} catch (EdadInvalidaException $e) {
+    echo $e->mensajePersonalizado();
+}
+
+try {
+    $usuario = buscarUsuario(99);
+} catch (UsuarioNoEncontradoException $e) {
+    echo $e->getMessage() . " (ID: " . $e->getUserId() . ")";
+}
+?>`} lang="php" />
+
+### Ejemplo Completo: Sistema de Login
+
+<Code code={`<?php
+// Excepciones personalizadas
+class CredencialesInvalidasException extends Exception {}
+class CuentaBloqueadaException extends Exception {}
+
+class SistemaLogin {
+    private $usuarios = [
+        'admin' => ['password' => 'admin123', 'bloqueado' => false],
+        'usuario' => ['password' => 'user123', 'bloqueado' => false],
+        'bloqueado' => ['password' => 'pass123', 'bloqueado' => true]
+    ];
+    
+    public function login($username, $password) {
+        try {
+            // Verificar si el usuario existe
+            if (!isset($this->usuarios[$username])) {
+                throw new CredencialesInvalidasException("Usuario no existe");
+            }
+            
+            $usuario = $this->usuarios[$username];
+            
+            // Verificar si está bloqueado
+            if ($usuario['bloqueado']) {
+                throw new CuentaBloqueadaException("Tu cuenta está bloqueada");
+            }
+            
+            // Verificar contraseña
+            if ($usuario['password'] !== $password) {
+                throw new CredencialesInvalidasException("Contraseña incorrecta");
+            }
+            
+            // Login exitoso
+            return [
+                'success' => true,
+                'mensaje' => "Bienvenido, $username"
+            ];
+            
+        } catch (CuentaBloqueadaException $e) {
+            return [
+                'success' => false,
+                'tipo' => 'bloqueado',
+                'mensaje' => $e->getMessage()
+            ];
+            
+        } catch (CredencialesInvalidasException $e) {
+            return [
+                'success' => false,
+                'tipo' => 'credenciales',
+                'mensaje' => $e->getMessage()
+            ];
+            
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'tipo' => 'general',
+                'mensaje' => 'Error inesperado: ' . $e->getMessage()
+            ];
+        }
+    }
+}
+
+// Usar el sistema
+$sistema = new SistemaLogin();
+
+// Intentos de login
+$resultado1 = $sistema->login('admin', 'admin123');
+print_r($resultado1); // Éxito
+
+$resultado2 = $sistema->login('admin', 'wrongpass');
+print_r($resultado2); // Credenciales inválidas
+
+$resultado3 = $sistema->login('bloqueado', 'pass123');
+print_r($resultado3); // Cuenta bloqueada
+?>`} lang="php" />
+
+## Buenas Prácticas
+
+<Code code={`<?php
+// ✅ BUENAS PRÁCTICAS
+
+// 1. Ser específico con las excepciones
+try {
+    // código
+} catch (PDOException $e) {
+    // Manejar errores de base de datos
+} catch (InvalidArgumentException $e) {
+    // Manejar argumentos inválidos
+} catch (Exception $e) {
+    // Manejar otros errores
+}
+
+// 2. Proporcionar mensajes descriptivos
+throw new Exception("Error al procesar el pago: saldo insuficiente");
+
+// 3. No capturar excepciones que no puedes manejar
+try {
+    procesarPago();
+} catch (Exception $e) {
+    // Solo captura si puedes hacer algo útil
+    registrarError($e);
+    notificarAdministrador($e);
+}
+
+// 4. Usar finally para limpieza
+try {
+    $archivo = fopen("datos.txt", "r");
+    // procesar archivo
+} finally {
+    if (isset($archivo)) {
+        fclose($archivo); // Siempre cerrar el archivo
+    }
+}
+
+// ❌ MALAS PRÁCTICAS
+
+// No hacer esto: capturar y no hacer nada
+try {
+    operacionImportante();
+} catch (Exception $e) {
+    // Silenciar el error es peligroso
+}
+
+// No hacer esto: excepciones genéricas
+throw new Exception("Error"); // Poco descriptivo
+
+// No hacer esto: usar excepciones para control de flujo
+try {
+    foreach ($items as $item) {
+        if ($item == $buscado) {
+            throw new Exception("Encontrado");
+        }
+    }
+} catch (Exception $e) {
+    // Usar excepciones así es incorrecto
+}
+?>`} lang="php" />
+
+## Resumen
+
+- **Errores** son problemas manejados por PHP; **excepciones** son manejadas por tu código
+- Los errores se clasifican en: sintaxis, lógicos y de ejecución
+- Usa `try-catch` para capturar y manejar excepciones
+- El bloque `finally` se ejecuta siempre, útil para limpieza
+- Lanza excepciones con `throw` cuando detectes problemas
+- Crea excepciones personalizadas para casos específicos
+- Proporciona mensajes de error claros y descriptivos
+
+<Aside type="tip">
+El manejo adecuado de errores hace que tu aplicación sea más robusta, fácil de depurar y proporcione mejor experiencia al usuario.
+</Aside>

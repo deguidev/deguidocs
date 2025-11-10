@@ -1,0 +1,1758 @@
+---
+title: 12. AJAX
+description: Aprende a usar AJAX con PHP
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Steps } from '@astrojs/starlight/components';
+
+# AJAX con PHP
+
+AJAX (Asynchronous JavaScript and XML) es una técnica de desarrollo web que permite actualizar partes de una página web sin necesidad de recargarla completamente. Esta tecnología ha revolucionado la forma en que interactuamos con las aplicaciones web, proporcionando una experiencia de usuario más fluida y similar a las aplicaciones de escritorio.
+
+## ¿Qué es AJAX y para qué se usa?
+
+AJAX no es una tecnología única, sino una combinación de varias tecnologías existentes que trabajan juntas:
+
+- **HTML/CSS**: Para presentar la información
+- **JavaScript**: Para manejar las interacciones dinámicas
+- **XMLHttpRequest o Fetch API**: Para comunicarse con el servidor de forma asíncrona
+- **Formato de datos**: JSON, XML, HTML o texto plano para intercambiar información
+- **Servidor (PHP)**: Para procesar las peticiones y devolver respuestas
+
+<Code code={`// Flujo básico de AJAX
+// 1. El usuario realiza una acción (clic, escribir, etc.)
+// 2. JavaScript captura el evento
+// 3. Se envía una petición al servidor (sin recargar la página)
+// 4. El servidor procesa la petición (PHP)
+// 5. El servidor devuelve una respuesta (generalmente JSON)
+// 6. JavaScript procesa la respuesta
+// 7. Se actualiza el DOM con los nuevos datos`} lang="javascript" />
+
+### Ventajas de usar AJAX
+
+El uso de AJAX proporciona múltiples beneficios para el desarrollo de aplicaciones web modernas:
+
+- **Mejor experiencia de usuario**: Las páginas responden más rápido y no hay parpadeos molestos al recargar.
+- **Reducción del ancho de banda**: Solo se transfieren los datos necesarios, no toda la página.
+- **Interactividad mejorada**: Permite crear interfaces más dinámicas y responsivas.
+- **Validación en tiempo real**: Puedes validar formularios mientras el usuario escribe.
+- **Carga progresiva**: Cargar contenido adicional según sea necesario (scroll infinito).
+- **Actualización automática**: Refrescar datos sin intervención del usuario.
+
+<Code code={`<!-- Ejemplo de casos de uso comunes de AJAX -->
+
+<!-- 1. Autocompletado en buscadores -->
+<input type="text" id="buscador" placeholder="Buscar productos...">
+<!-- A medida que escribes, AJAX busca coincidencias en el servidor -->
+
+<!-- 2. Validación de formularios en tiempo real -->
+<input type="email" id="email" placeholder="tu@email.com">
+<span id="email-status"></span>
+<!-- AJAX verifica si el email ya existe mientras escribes -->
+
+<!-- 3. Carga de contenido dinámico -->
+<button id="cargar-mas">Cargar más artículos</button>
+<!-- AJAX carga más contenido sin recargar la página -->
+
+<!-- 4. Actualización de datos en tiempo real -->
+<div id="notificaciones"></div>
+<!-- AJAX consulta periódicamente nuevas notificaciones -->`} lang="html" />
+
+### Diferencia entre Síncrono y Asíncrono
+
+Es fundamental entender la diferencia entre operaciones síncronas y asíncronas:
+
+<Tabs>
+  <TabItem label="Síncrono">
+    <Code code={`// Operación SÍNCRONA
+// El código se ejecuta línea por línea
+// Cada línea espera a que la anterior termine
+
+console.log("Inicio");
+
+// Esta operación bloquea la ejecución
+let resultado = operacionLarga(); // Espera hasta terminar
+
+console.log("Resultado:", resultado);
+console.log("Fin");
+
+// Salida:
+// Inicio
+// Resultado: datos
+// Fin`} lang="javascript" />
+  </TabItem>
+  <TabItem label="Asíncrono">
+    <Code code={`// Operación ASÍNCRONA
+// El código no espera a que termine la operación
+// Continúa ejecutando las siguientes líneas
+
+console.log("Inicio");
+
+// Esta operación NO bloquea la ejecución
+operacionLargaAsync().then(resultado => {
+    console.log("Resultado:", resultado);
+});
+
+console.log("Fin");
+
+// Salida:
+// Inicio
+// Fin
+// Resultado: datos (cuando termine)`} lang="javascript" />
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  Las operaciones asíncronas son esenciales en AJAX porque permiten que la interfaz de usuario siga siendo responsiva mientras se espera la respuesta del servidor. El usuario puede seguir interactuando con la página sin que se congele.
+</Aside>
+
+## Uso Básico de fetch() para Peticiones GET
+
+La API `fetch()` es la forma moderna y recomendada de realizar peticiones AJAX en JavaScript. Reemplaza a `XMLHttpRequest` con una sintaxis más limpia y basada en Promesas.
+
+### Sintaxis Básica de fetch()
+
+La función `fetch()` devuelve una Promesa que se resuelve con la respuesta del servidor:
+
+<Code code={`// Sintaxis básica de fetch()
+fetch(url, opciones)
+  .then(response => {
+    // Manejar la respuesta
+    return response.json(); // o response.text(), response.blob(), etc.
+  })
+  .then(data => {
+    // Trabajar con los datos
+    console.log(data);
+  })
+  .catch(error => {
+    // Manejar errores
+    console.error('Error:', error);
+  });`} lang="javascript" />
+
+### Petición GET Simple
+
+La petición GET es la más común y se usa para obtener datos del servidor:
+
+<Tabs>
+  <TabItem label="JavaScript (fetch)">
+    <Code code={`// Petición GET básica
+fetch('obtener_usuarios.php')
+  .then(response => {
+    // Verificar si la respuesta es exitosa
+    if (!response.ok) {
+      throw new Error('Error en la petición: ' + response.status);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Usuarios recibidos:', data);
+    // Aquí puedes actualizar el DOM con los datos
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+
+// Usando async/await (sintaxis moderna y más legible)
+async function obtenerUsuarios() {
+  try {
+    const response = await fetch('obtener_usuarios.php');
+    
+    if (!response.ok) {
+      throw new Error('Error en la petición: ' + response.status);
+    }
+    
+    const data = await response.json();
+    console.log('Usuarios recibidos:', data);
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// Llamar a la función
+obtenerUsuarios();`} lang="javascript" />
+  </TabItem>
+  <TabItem label="PHP (servidor)">
+    <Code code={`<?php
+// obtener_usuarios.php
+header('Content-Type: application/json');
+
+// Conexión a la base de datos
+$conexion = new mysqli('localhost', 'usuario', 'contraseña', 'base_datos');
+
+if ($conexion->connect_error) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Error de conexión']);
+    exit;
+}
+
+// Consulta a la base de datos
+$sql = "SELECT id, nombre, email FROM usuarios";
+$resultado = $conexion->query($sql);
+
+$usuarios = [];
+while ($fila = $resultado->fetch_assoc()) {
+    $usuarios[] = $fila;
+}
+
+// Devolver respuesta JSON
+echo json_encode([
+    'success' => true,
+    'data' => $usuarios,
+    'total' => count($usuarios)
+]);
+
+$conexion->close();
+?>`} lang="php" />
+  </TabItem>
+</Tabs>
+
+### Petición GET con Parámetros
+
+Puedes enviar parámetros en la URL usando query strings:
+
+<Tabs>
+  <TabItem label="JavaScript">
+    <Code code={`// Método 1: Construir la URL manualmente
+const userId = 5;
+fetch('obtener_usuario.php?id=' + userId)
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+// Método 2: Usar URLSearchParams (recomendado)
+const params = new URLSearchParams({
+  id: 5,
+  incluir_detalles: true,
+  formato: 'completo'
+});
+
+fetch('obtener_usuario.php?' + params)
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+// Método 3: Función reutilizable
+async function obtenerUsuarioPorId(id) {
+  const params = new URLSearchParams({ id: id });
+  
+  try {
+    const response = await fetch('obtener_usuario.php?' + params);
+    const data = await response.json();
+    
+    if (data.success) {
+      return data.usuario;
+    } else {
+      throw new Error(data.error);
+    }
+  } catch (error) {
+    console.error('Error al obtener usuario:', error);
+    return null;
+  }
+}
+
+// Uso
+obtenerUsuarioPorId(5).then(usuario => {
+  if (usuario) {
+    console.log('Usuario encontrado:', usuario);
+  }
+});`} lang="javascript" />
+  </TabItem>
+  <TabItem label="PHP">
+    <Code code={`<?php
+// obtener_usuario.php
+header('Content-Type: application/json');
+
+// Validar que se recibió el parámetro ID
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'error' => 'ID de usuario no proporcionado'
+    ]);
+    exit;
+}
+
+$userId = intval($_GET['id']);
+$incluirDetalles = isset($_GET['incluir_detalles']) && $_GET['incluir_detalles'] === 'true';
+
+// Conexión a la base de datos
+$conexion = new mysqli('localhost', 'usuario', 'contraseña', 'base_datos');
+
+if ($conexion->connect_error) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => 'Error de conexión']);
+    exit;
+}
+
+// Preparar consulta (prevenir SQL injection)
+$stmt = $conexion->prepare("SELECT id, nombre, email, fecha_registro FROM usuarios WHERE id = ?");
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$resultado = $stmt->get_result();
+
+if ($resultado->num_rows === 0) {
+    http_response_code(404);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Usuario no encontrado'
+    ]);
+} else {
+    $usuario = $resultado->fetch_assoc();
+    
+    // Si se solicitan detalles adicionales
+    if ($incluirDetalles) {
+        // Agregar información adicional
+        $usuario['detalles_adicionales'] = [
+            'ultimo_acceso' => '2024-01-15',
+            'posts_totales' => 42
+        ];
+    }
+    
+    echo json_encode([
+        'success' => true,
+        'usuario' => $usuario
+    ]);
+}
+
+$stmt->close();
+$conexion->close();
+?>`} lang="php" />
+  </TabItem>
+</Tabs>
+
+<Aside type="caution">
+  **Seguridad importante**: Siempre valida y sanitiza los parámetros recibidos en PHP. Usa consultas preparadas (prepared statements) para prevenir inyecciones SQL. Nunca confíes en los datos que vienen del cliente.
+</Aside>
+
+### Ejemplo Práctico: Lista de Usuarios con Búsqueda
+
+Veamos un ejemplo completo que combina HTML, JavaScript y PHP:
+
+#### Paso 1: Crear la estructura HTML
+
+<Code code={`<!DOCTYPE html>
+   <html lang="es">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Lista de Usuarios - AJAX</title>
+       <style>
+           body {
+               font-family: Arial, sans-serif;
+               max-width: 800px;
+               margin: 50px auto;
+               padding: 20px;
+           }
+           #buscador {
+               width: 100%;
+               padding: 10px;
+               margin-bottom: 20px;
+               font-size: 16px;
+               border: 2px solid #ddd;
+               border-radius: 5px;
+           }
+           #loading {
+               display: none;
+               color: #666;
+               font-style: italic;
+           }
+           .usuario {
+               background: #f5f5f5;
+               padding: 15px;
+               margin: 10px 0;
+               border-radius: 5px;
+               border-left: 4px solid #007bff;
+           }
+           .usuario h3 {
+               margin: 0 0 5px 0;
+               color: #333;
+           }
+           .usuario p {
+               margin: 5px 0;
+               color: #666;
+           }
+           .error {
+               background: #ffe6e6;
+               border-left-color: #ff0000;
+               color: #cc0000;
+           }
+       </style>
+   </head>
+   <body>
+       <h1>Lista de Usuarios</h1>
+       
+       <input type="text" id="buscador" placeholder="Buscar usuarios por nombre...">
+       <div id="loading">Cargando...</div>
+       <div id="resultados"></div>
+   
+       <script src="usuarios.js"></script>
+   </body>
+   </html>`} lang="html" />
+
+#### Paso 2: Implementar la lógica JavaScript
+
+<Code code={`// usuarios.js
+
+const buscador = document.getElementById('buscador');
+const loading = document.getElementById('loading');
+const resultados = document.getElementById('resultados');
+
+// Cargar usuarios al iniciar la página
+document.addEventListener('DOMContentLoaded', () => {
+    cargarUsuarios();
+});
+
+// Buscar mientras el usuario escribe (con debounce)
+let timeoutId;
+buscador.addEventListener('input', (e) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+        cargarUsuarios(e.target.value);
+    }, 300); // Esperar 300ms después de que el usuario deje de escribir
+});
+
+// Función principal para cargar usuarios
+async function cargarUsuarios(busqueda = '') {
+    // Mostrar indicador de carga
+    loading.style.display = 'block';
+    resultados.innerHTML = '';
+    
+    try {
+        // Construir URL con parámetros
+        const params = new URLSearchParams();
+        if (busqueda) {
+            params.append('busqueda', busqueda);
+        }
+        
+        // Realizar petición GET
+        const response = await fetch('buscar_usuarios.php?' + params);
+        
+        // Verificar si la respuesta es exitosa
+        if (!response.ok) {
+            throw new Error('Error del servidor: ' + response.status);
+        }
+        
+        // Parsear respuesta JSON
+        const data = await response.json();
+        
+        // Ocultar indicador de carga
+        loading.style.display = 'none';
+        
+        // Mostrar resultados
+        if (data.success) {
+            mostrarUsuarios(data.usuarios);
+        } else {
+            mostrarError(data.error || 'Error desconocido');
+        }
+        
+    } catch (error) {
+        loading.style.display = 'none';
+        mostrarError('Error de conexión: ' + error.message);
+        console.error('Error:', error);
+    }
+}
+
+// Función para mostrar usuarios en el DOM
+function mostrarUsuarios(usuarios) {
+    if (usuarios.length === 0) {
+        resultados.innerHTML = '<p>No se encontraron usuarios.</p>';
+        return;
+    }
+    
+    const html = usuarios.map(usuario => \`
+        <div class="usuario">
+            <h3>\${escapeHtml(usuario.nombre)}</h3>
+            <p><strong>Email:</strong> \${escapeHtml(usuario.email)}</p>
+            <p><strong>Registrado:</strong> \${escapeHtml(usuario.fecha_registro)}</p>
+        </div>
+    \`).join('');
+    
+    resultados.innerHTML = html;
+}
+
+// Función para mostrar errores
+function mostrarError(mensaje) {
+    resultados.innerHTML = \`
+        <div class="usuario error">
+            <h3>Error</h3>
+            <p>\${escapeHtml(mensaje)}</p>
+        </div>
+    \`;
+}
+
+// Función para escapar HTML y prevenir XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}`} lang="javascript" />
+
+#### Paso 3: Crear el script PHP del servidor
+
+<Code code={`<?php
+// buscar_usuarios.php
+
+// Configurar cabeceras
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *'); // Solo para desarrollo
+
+// Función para enviar respuesta JSON
+function enviarRespuesta($success, $data = null, $error = null) {
+    echo json_encode([
+        'success' => $success,
+        'usuarios' => $data,
+        'error' => $error
+    ]);
+    exit;
+}
+
+try {
+    // Obtener parámetro de búsqueda
+    $busqueda = isset($_GET['busqueda']) ? trim($_GET['busqueda']) : '';
+    
+    // Conexión a la base de datos
+    $conexion = new mysqli('localhost', 'usuario', 'contraseña', 'base_datos');
+    
+    if ($conexion->connect_error) {
+        throw new Exception('Error de conexión a la base de datos');
+    }
+    
+    // Configurar charset
+    $conexion->set_charset('utf8mb4');
+    
+    // Preparar consulta SQL
+    if (empty($busqueda)) {
+        // Sin búsqueda: obtener todos los usuarios
+        $stmt = $conexion->prepare("
+            SELECT id, nombre, email, DATE_FORMAT(fecha_registro, '%d/%m/%Y') as fecha_registro 
+            FROM usuarios 
+            ORDER BY nombre 
+            LIMIT 50
+        ");
+    } else {
+        // Con búsqueda: filtrar por nombre o email
+        $stmt = $conexion->prepare("
+            SELECT id, nombre, email, DATE_FORMAT(fecha_registro, '%d/%m/%Y') as fecha_registro 
+            FROM usuarios 
+            WHERE nombre LIKE ? OR email LIKE ?
+            ORDER BY nombre 
+            LIMIT 50
+        ");
+        $busquedaParam = '%' . $busqueda . '%';
+        $stmt->bind_param('ss', $busquedaParam, $busquedaParam);
+    }
+    
+    // Ejecutar consulta
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    
+    // Obtener resultados
+    $usuarios = [];
+    while ($fila = $resultado->fetch_assoc()) {
+        $usuarios[] = $fila;
+    }
+    
+    // Cerrar conexiones
+    $stmt->close();
+    $conexion->close();
+    
+    // Enviar respuesta exitosa
+    enviarRespuesta(true, $usuarios, null);
+    
+} catch (Exception $e) {
+    // Registrar error en log (en producción)
+    error_log('Error en buscar_usuarios.php: ' . $e->getMessage());
+    
+    // Enviar respuesta de error
+    enviarRespuesta(false, null, 'Error al buscar usuarios');
+}
+?>`} lang="php" />
+
+<Aside type="note">
+  Este ejemplo implementa varias buenas prácticas:
+  - **Debouncing**: Espera a que el usuario termine de escribir antes de hacer la petición
+  - **Manejo de errores**: Captura y muestra errores de forma amigable
+  - **Seguridad**: Usa prepared statements y escapa el HTML
+  - **UX**: Muestra indicadores de carga y mensajes claros
+</Aside>
+
+## Enviar Datos al Servidor con Peticiones POST
+
+Las peticiones POST se utilizan para enviar datos al servidor, especialmente cuando se trata de información sensible o grandes cantidades de datos. A diferencia de GET, los datos no se envían en la URL sino en el cuerpo de la petición.
+
+### Diferencias entre GET y POST
+
+Es importante entender cuándo usar cada método:
+
+<Tabs>
+  <TabItem label="GET">
+    **Características de GET:**
+    
+    - Los datos se envían en la URL (query string)
+    - Visible en la barra de direcciones del navegador
+    - Se puede guardar en marcadores
+    - Limitado en tamaño (aprox. 2048 caracteres)
+    - Los datos quedan en el historial del navegador
+    - **Uso recomendado**: Obtener datos, búsquedas, filtros
+    
+    <Code code={`// Ejemplo de petición GET
+fetch('buscar.php?termino=javascript&categoria=tutoriales')
+  .then(response => response.json())
+  .then(data => console.log(data));`} lang="javascript" />
+  </TabItem>
+  <TabItem label="POST">
+    **Características de POST:**
+    
+    - Los datos se envían en el cuerpo de la petición
+    - No visible en la URL
+    - No se puede guardar en marcadores
+    - Sin límite práctico de tamaño
+    - Más seguro para datos sensibles
+    - **Uso recomendado**: Crear, actualizar, eliminar datos, formularios
+    
+    <Code code={`// Ejemplo de petición POST
+fetch('guardar.php', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    termino: 'javascript',
+    categoria: 'tutoriales'
+  })
+})
+  .then(response => response.json())
+  .then(data => console.log(data));`} lang="javascript" />
+  </TabItem>
+</Tabs>
+
+### Sintaxis de fetch() con POST
+
+Para realizar una petición POST, necesitas especificar el método y el cuerpo de la petición:
+
+<Code code={`// Estructura básica de POST con fetch()
+fetch(url, {
+  method: 'POST',                    // Especificar el método
+  headers: {                         // Cabeceras HTTP
+    'Content-Type': 'application/json'  // Tipo de contenido
+  },
+  body: JSON.stringify(datos)       // Datos a enviar (convertidos a JSON)
+})
+  .then(response => response.json())
+  .then(data => {
+    // Procesar respuesta
+  })
+  .catch(error => {
+    // Manejar errores
+  });`} lang="javascript" />
+
+### Enviar Datos JSON
+
+La forma más común y moderna de enviar datos es usando JSON:
+
+<Tabs>
+  <TabItem label="JavaScript">
+    <Code code={`// Enviar datos JSON al servidor
+async function crearUsuario(nombre, email, edad) {
+  try {
+    const response = await fetch('crear_usuario.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        nombre: nombre,
+        email: email,
+        edad: edad
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Error en la petición: ' + response.status);
+    }
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      console.log('Usuario creado:', data.usuario);
+      return data.usuario;
+    } else {
+      throw new Error(data.error);
+    }
+    
+  } catch (error) {
+    console.error('Error al crear usuario:', error);
+    throw error;
+  }
+}
+
+// Uso
+crearUsuario('Ana López', 'ana@ejemplo.com', 28)
+  .then(usuario => {
+    alert('Usuario creado exitosamente: ' + usuario.nombre);
+  })
+  .catch(error => {
+    alert('Error: ' + error.message);
+  });`} lang="javascript" />
+  </TabItem>
+  <TabItem label="PHP">
+    <Code code={`<?php
+// crear_usuario.php
+header('Content-Type: application/json');
+
+// Leer datos JSON del cuerpo de la petición
+$json = file_get_contents('php://input');
+$datos = json_decode($json, true);
+
+// Validar que se recibieron los datos
+if (!$datos) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Datos inválidos'
+    ]);
+    exit;
+}
+
+// Validar campos requeridos
+if (empty($datos['nombre']) || empty($datos['email'])) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Nombre y email son obligatorios'
+    ]);
+    exit;
+}
+
+// Validar formato de email
+if (!filter_var($datos['email'], FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Email inválido'
+    ]);
+    exit;
+}
+
+// Sanitizar datos
+$nombre = htmlspecialchars(trim($datos['nombre']), ENT_QUOTES, 'UTF-8');
+$email = filter_var($datos['email'], FILTER_SANITIZE_EMAIL);
+$edad = isset($datos['edad']) ? intval($datos['edad']) : null;
+
+// Conexión a la base de datos
+$conexion = new mysqli('localhost', 'usuario', 'contraseña', 'base_datos');
+
+if ($conexion->connect_error) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Error de conexión'
+    ]);
+    exit;
+}
+
+// Verificar si el email ya existe
+$stmt = $conexion->prepare("SELECT id FROM usuarios WHERE email = ?");
+$stmt->bind_param('s', $email);
+$stmt->execute();
+$resultado = $stmt->get_result();
+
+if ($resultado->num_rows > 0) {
+    http_response_code(409);
+    echo json_encode([
+        'success' => false,
+        'error' => 'El email ya está registrado'
+    ]);
+    $stmt->close();
+    $conexion->close();
+    exit;
+}
+$stmt->close();
+
+// Insertar nuevo usuario
+$stmt = $conexion->prepare("
+    INSERT INTO usuarios (nombre, email, edad, fecha_registro) 
+    VALUES (?, ?, ?, NOW())
+");
+$stmt->bind_param('ssi', $nombre, $email, $edad);
+
+if ($stmt->execute()) {
+    $nuevoId = $conexion->insert_id;
+    
+    // Obtener el usuario recién creado
+    $stmt2 = $conexion->prepare("
+        SELECT id, nombre, email, edad, DATE_FORMAT(fecha_registro, '%d/%m/%Y') as fecha_registro 
+        FROM usuarios 
+        WHERE id = ?
+    ");
+    $stmt2->bind_param('i', $nuevoId);
+    $stmt2->execute();
+    $usuario = $stmt2->get_result()->fetch_assoc();
+    $stmt2->close();
+    
+    http_response_code(201);
+    echo json_encode([
+        'success' => true,
+        'mensaje' => 'Usuario creado exitosamente',
+        'usuario' => $usuario
+    ]);
+} else {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Error al crear usuario'
+    ]);
+}
+
+$stmt->close();
+$conexion->close();
+?>`} lang="php" />
+  </TabItem>
+</Tabs>
+
+### Enviar Datos de Formulario (FormData)
+
+Otra forma común de enviar datos es usando `FormData`, especialmente útil cuando necesitas enviar archivos:
+
+<Code code={`// Método 1: Crear FormData desde un formulario HTML
+const formulario = document.getElementById('miFormulario');
+const formData = new FormData(formulario);
+
+fetch('procesar_formulario.php', {
+  method: 'POST',
+  body: formData  // No necesitas especificar Content-Type, se establece automáticamente
+})
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+// Método 2: Crear FormData manualmente
+const formData2 = new FormData();
+formData2.append('nombre', 'Juan Pérez');
+formData2.append('email', 'juan@ejemplo.com');
+formData2.append('edad', 30);
+
+// Agregar un archivo
+const inputArchivo = document.getElementById('archivo');
+if (inputArchivo.files.length > 0) {
+  formData2.append('foto', inputArchivo.files[0]);
+}
+
+fetch('subir_perfil.php', {
+  method: 'POST',
+  body: formData2
+})
+  .then(response => response.json())
+  .then(data => console.log(data));`} lang="javascript" />
+
+<Aside type="tip">
+  **¿Cuándo usar JSON vs FormData?**
+  - **JSON**: Ideal para APIs modernas, datos estructurados complejos, cuando no hay archivos
+  - **FormData**: Necesario para subir archivos, compatible con PHP tradicional (`$_POST`), fácil de usar con formularios HTML existentes
+</Aside>
+
+## Procesar Respuestas JSON desde PHP
+
+Cuando PHP envía respuestas JSON, es importante procesarlas correctamente en JavaScript y manejar diferentes escenarios.
+
+### Estructura de Respuestas JSON
+
+Es una buena práctica estandarizar el formato de las respuestas JSON:
+
+<Code code={`// Estructura recomendada para respuestas JSON
+
+// Respuesta exitosa
+{
+  "success": true,
+  "data": {
+    "id": 123,
+    "nombre": "Juan Pérez",
+    "email": "juan@ejemplo.com"
+  },
+  "mensaje": "Operación exitosa"
+}
+
+// Respuesta con error
+{
+  "success": false,
+  "error": "El email ya está registrado",
+  "codigo_error": "EMAIL_DUPLICADO"
+}
+
+// Respuesta con lista de datos
+{
+  "success": true,
+  "data": [
+    { "id": 1, "nombre": "Usuario 1" },
+    { "id": 2, "nombre": "Usuario 2" }
+  ],
+  "total": 2,
+  "pagina": 1
+}`} lang="json" />
+
+### Métodos de Respuesta en fetch()
+
+La API fetch proporciona varios métodos para procesar diferentes tipos de respuestas:
+
+<Code code={`// Métodos disponibles en el objeto Response
+
+// 1. response.json() - Parsear JSON
+fetch('api.php')
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+// 2. response.text() - Obtener texto plano
+fetch('archivo.txt')
+  .then(response => response.text())
+  .then(texto => console.log(texto));
+
+// 3. response.blob() - Obtener archivo binario (imágenes, PDFs, etc.)
+fetch('imagen.jpg')
+  .then(response => response.blob())
+  .then(blob => {
+    const url = URL.createObjectURL(blob);
+    document.getElementById('imagen').src = url;
+  });
+
+// 4. response.formData() - Obtener FormData
+fetch('formulario.php')
+  .then(response => response.formData())
+  .then(formData => console.log(formData));
+
+// 5. response.arrayBuffer() - Obtener datos binarios
+fetch('archivo.bin')
+  .then(response => response.arrayBuffer())
+  .then(buffer => console.log(buffer));`} lang="javascript" />
+
+### Manejo de Códigos de Estado HTTP
+
+Es importante verificar el código de estado HTTP para manejar correctamente las respuestas:
+
+<Code code={`async function peticionConManejoDeEstados(url, opciones = {}) {
+  try {
+    const response = await fetch(url, opciones);
+    
+    // Verificar código de estado
+    switch (response.status) {
+      case 200: // OK
+      case 201: // Created
+        const data = await response.json();
+        return { success: true, data };
+        
+      case 400: // Bad Request
+        const error400 = await response.json();
+        throw new Error(error400.error || 'Solicitud inválida');
+        
+      case 401: // Unauthorized
+        throw new Error('No autorizado. Por favor, inicia sesión.');
+        
+      case 403: // Forbidden
+        throw new Error('No tienes permisos para realizar esta acción.');
+        
+      case 404: // Not Found
+        throw new Error('Recurso no encontrado.');
+        
+      case 409: // Conflict
+        const error409 = await response.json();
+        throw new Error(error409.error || 'Conflicto en la operación');
+        
+      case 500: // Internal Server Error
+        throw new Error('Error del servidor. Inténtalo más tarde.');
+        
+      default:
+        throw new Error('Error inesperado: ' + response.status);
+    }
+  } catch (error) {
+    console.error('Error en la petición:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Uso
+peticionConManejoDeEstados('api/usuarios/123')
+  .then(resultado => {
+    if (resultado.success) {
+      console.log('Datos:', resultado.data);
+    } else {
+      console.error('Error:', resultado.error);
+    }
+  });`} lang="javascript" />
+
+### Validación de Respuestas JSON
+
+Siempre valida que la respuesta sea JSON válido antes de procesarla:
+
+<Code code={`async function obtenerDatosSeguro(url) {
+  try {
+    const response = await fetch(url);
+    
+    // Verificar que la respuesta sea exitosa
+    if (!response.ok) {
+      throw new Error('Error HTTP: ' + response.status);
+    }
+    
+    // Verificar que el Content-Type sea JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('La respuesta no es JSON');
+    }
+    
+    // Intentar parsear JSON
+    const data = await response.json();
+    
+    // Validar estructura de la respuesta
+    if (typeof data !== 'object' || data === null) {
+      throw new Error('Formato de respuesta inválido');
+    }
+    
+    return data;
+    
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      console.error('Error al parsear JSON:', error);
+      throw new Error('Respuesta JSON inválida');
+    }
+    throw error;
+  }
+}`} lang="javascript" />
+
+<Aside type="caution">
+  **Importante**: Siempre establece el header `Content-Type: application/json` en PHP cuando envíes respuestas JSON. Esto ayuda al navegador a procesar correctamente la respuesta y evita problemas de parseo.
+</Aside>
+
+## Ejemplo Práctico Completo: Formulario de Contacto con AJAX
+
+Veamos un ejemplo completo que integra todo lo aprendido: un formulario de contacto que guarda datos con AJAX y muestra confirmación sin recargar la página.
+
+### Paso 1: HTML del Formulario
+
+<Code code={`<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Contacto - AJAX</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        input.error, textarea.error, select.error {
+            border-color: #e74c3c;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.3s;
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✉️ Formulario de Contacto</h1>
+        
+        <!-- Alertas -->
+        <div id="alert" class="alert"></div>
+        
+        <!-- Formulario -->
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="nombre">Nombre completo *</label>
+                <input type="text" id="nombre" name="nombre" required>
+                <span class="error-message" id="error-nombre"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Correo electrónico *</label>
+                <input type="email" id="email" name="email" required>
+                <span class="error-message" id="error-email"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <input type="tel" id="telefono" name="telefono">
+                <span class="error-message" id="error-telefono"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="asunto">Asunto *</label>
+                <select id="asunto" name="asunto" required>
+                    <option value="">Selecciona un asunto</option>
+                    <option value="consulta">Consulta general</option>
+                    <option value="soporte">Soporte técnico</option>
+                    <option value="ventas">Ventas</option>
+                    <option value="otro">Otro</option>
+                </select>
+                <span class="error-message" id="error-asunto"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="mensaje">Mensaje *</label>
+                <textarea id="mensaje" name="mensaje" required></textarea>
+                <span class="error-message" id="error-mensaje"></span>
+            </div>
+            
+            <button type="submit" id="submitBtn">Enviar mensaje</button>
+        </form>
+        
+        <!-- Indicador de carga -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Enviando mensaje...</p>
+        </div>
+    </div>
+    
+    <script src="contacto.js"></script>
+</body>
+</html>`} lang="html" />
+
+### Paso 2: JavaScript (contacto.js)
+
+<Code code={`// contacto.js
+
+// Elementos del DOM
+const form = document.getElementById('contactForm');
+const submitBtn = document.getElementById('submitBtn');
+const loading = document.getElementById('loading');
+const alert = document.getElementById('alert');
+
+// Evento de envío del formulario
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Limpiar errores previos
+    limpiarErrores();
+    
+    // Validar formulario
+    if (!validarFormulario()) {
+        return;
+    }
+    
+    // Obtener datos del formulario
+    const formData = {
+        nombre: document.getElementById('nombre').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        telefono: document.getElementById('telefono').value.trim(),
+        asunto: document.getElementById('asunto').value,
+        mensaje: document.getElementById('mensaje').value.trim()
+    };
+    
+    // Enviar datos
+    await enviarFormulario(formData);
+});
+
+// Función para validar el formulario
+function validarFormulario() {
+    let esValido = true;
+    
+    // Validar nombre
+    const nombre = document.getElementById('nombre').value.trim();
+    if (nombre.length < 3) {
+        mostrarError('nombre', 'El nombre debe tener al menos 3 caracteres');
+        esValido = false;
+    }
+    
+    // Validar email
+    const email = document.getElementById('email').value.trim();
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regexEmail.test(email)) {
+        mostrarError('email', 'Ingresa un email válido');
+        esValido = false;
+    }
+    
+    // Validar teléfono (opcional, pero si se ingresa debe ser válido)
+    const telefono = document.getElementById('telefono').value.trim();
+    if (telefono && !/^\d{10}$/.test(telefono.replace(/\D/g, ''))) {
+        mostrarError('telefono', 'Ingresa un teléfono válido (10 dígitos)');
+        esValido = false;
+    }
+    
+    // Validar asunto
+    const asunto = document.getElementById('asunto').value;
+    if (!asunto) {
+        mostrarError('asunto', 'Selecciona un asunto');
+        esValido = false;
+    }
+    
+    // Validar mensaje
+    const mensaje = document.getElementById('mensaje').value.trim();
+    if (mensaje.length < 10) {
+        mostrarError('mensaje', 'El mensaje debe tener al menos 10 caracteres');
+        esValido = false;
+    }
+    
+    return esValido;
+}
+
+// Función para enviar el formulario
+async function enviarFormulario(datos) {
+    // Mostrar indicador de carga
+    submitBtn.disabled = true;
+    loading.classList.add('show');
+    ocultarAlerta();
+    
+    try {
+        const response = await fetch('procesar_contacto.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datos)
+        });
+        
+        // Verificar si la respuesta es exitosa
+        if (!response.ok) {
+            throw new Error('Error del servidor: ' + response.status);
+        }
+        
+        // Parsear respuesta JSON
+        const resultado = await response.json();
+        
+        // Ocultar indicador de carga
+        loading.classList.remove('show');
+        submitBtn.disabled = false;
+        
+        // Procesar resultado
+        if (resultado.success) {
+            mostrarAlerta('success', resultado.mensaje || '¡Mensaje enviado exitosamente!');
+            form.reset();
+        } else {
+            // Manejar errores de validación del servidor
+            if (resultado.errores) {
+                Object.keys(resultado.errores).forEach(campo => {
+                    mostrarError(campo, resultado.errores[campo]);
+                });
+            } else {
+                mostrarAlerta('error', resultado.error || 'Error al enviar el mensaje');
+            }
+        }
+        
+    } catch (error) {
+        loading.classList.remove('show');
+        submitBtn.disabled = false;
+        mostrarAlerta('error', 'Error de conexión. Por favor, inténtalo de nuevo.');
+        console.error('Error:', error);
+    }
+}
+
+// Función para mostrar errores en campos específicos
+function mostrarError(campo, mensaje) {
+    const input = document.getElementById(campo);
+    const errorSpan = document.getElementById('error-' + campo);
+    
+    if (input && errorSpan) {
+        input.classList.add('error');
+        errorSpan.textContent = mensaje;
+        errorSpan.classList.add('show');
+    }
+}
+
+// Función para limpiar todos los errores
+function limpiarErrores() {
+    const inputs = form.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        input.classList.remove('error');
+    });
+    
+    const errorSpans = form.querySelectorAll('.error-message');
+    errorSpans.forEach(span => {
+        span.classList.remove('show');
+        span.textContent = '';
+    });
+}
+
+// Función para mostrar alertas
+function mostrarAlerta(tipo, mensaje) {
+    alert.className = 'alert show alert-' + tipo;
+    alert.textContent = mensaje;
+    
+    // Auto-ocultar después de 5 segundos
+    setTimeout(() => {
+        ocultarAlerta();
+    }, 5000);
+}
+
+// Función para ocultar alertas
+function ocultarAlerta() {
+    alert.classList.remove('show');
+}
+
+// Limpiar errores cuando el usuario empieza a escribir
+const inputs = form.querySelectorAll('input, textarea, select');
+inputs.forEach(input => {
+    input.addEventListener('input', function() {
+        this.classList.remove('error');
+        const errorSpan = document.getElementById('error-' + this.id);
+        if (errorSpan) {
+            errorSpan.classList.remove('show');
+        }
+    });
+});`} lang="javascript" />
+
+### Paso 3: PHP del Servidor (procesar_contacto.php)
+
+<Code code={`<?php
+// procesar_contacto.php
+
+// Configurar cabeceras
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *'); // Solo para desarrollo local
+
+// Función para enviar respuesta JSON
+function enviarRespuesta($success, $mensaje = null, $errores = null, $data = null) {
+    $respuesta = [
+        'success' => $success,
+        'mensaje' => $mensaje,
+        'errores' => $errores,
+        'data' => $data
+    ];
+    
+    echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+try {
+    // Leer datos JSON del cuerpo de la petición
+    $json = file_get_contents('php://input');
+    $datos = json_decode($json, true);
+    
+    // Validar que se recibieron datos
+    if (!$datos) {
+        http_response_code(400);
+        enviarRespuesta(false, null, null, 'No se recibieron datos');
+    }
+    
+    // Array para almacenar errores de validación
+    $errores = [];
+    
+    // Validar nombre
+    if (empty($datos['nombre'])) {
+        $errores['nombre'] = 'El nombre es obligatorio';
+    } elseif (strlen($datos['nombre']) < 3) {
+        $errores['nombre'] = 'El nombre debe tener al menos 3 caracteres';
+    } elseif (strlen($datos['nombre']) > 100) {
+        $errores['nombre'] = 'El nombre no puede exceder 100 caracteres';
+    }
+    
+    // Validar email
+    if (empty($datos['email'])) {
+        $errores['email'] = 'El email es obligatorio';
+    } elseif (!filter_var($datos['email'], FILTER_VALIDATE_EMAIL)) {
+        $errores['email'] = 'El email no es válido';
+    }
+    
+    // Validar teléfono (opcional)
+    if (!empty($datos['telefono'])) {
+        $telefono = preg_replace('/\D/', '', $datos['telefono']);
+        if (strlen($telefono) < 10) {
+            $errores['telefono'] = 'El teléfono debe tener al menos 10 dígitos';
+        }
+    }
+    
+    // Validar asunto
+    $asuntosValidos = ['consulta', 'soporte', 'ventas', 'otro'];
+    if (empty($datos['asunto'])) {
+        $errores['asunto'] = 'Debes seleccionar un asunto';
+    } elseif (!in_array($datos['asunto'], $asuntosValidos)) {
+        $errores['asunto'] = 'El asunto seleccionado no es válido';
+    }
+    
+    // Validar mensaje
+    if (empty($datos['mensaje'])) {
+        $errores['mensaje'] = 'El mensaje es obligatorio';
+    } elseif (strlen($datos['mensaje']) < 10) {
+        $errores['mensaje'] = 'El mensaje debe tener al menos 10 caracteres';
+    } elseif (strlen($datos['mensaje']) > 1000) {
+        $errores['mensaje'] = 'El mensaje no puede exceder 1000 caracteres';
+    }
+    
+    // Si hay errores de validación, devolverlos
+    if (!empty($errores)) {
+        http_response_code(400);
+        enviarRespuesta(false, 'Por favor, corrige los errores', $errores);
+    }
+    
+    // Sanitizar datos
+    $nombre = htmlspecialchars(trim($datos['nombre']), ENT_QUOTES, 'UTF-8');
+    $email = filter_var($datos['email'], FILTER_SANITIZE_EMAIL);
+    $telefono = !empty($datos['telefono']) ? htmlspecialchars(trim($datos['telefono']), ENT_QUOTES, 'UTF-8') : null;
+    $asunto = htmlspecialchars($datos['asunto'], ENT_QUOTES, 'UTF-8');
+    $mensaje = htmlspecialchars(trim($datos['mensaje']), ENT_QUOTES, 'UTF-8');
+    
+    // Conexión a la base de datos
+    $conexion = new mysqli('localhost', 'usuario', 'contraseña', 'base_datos');
+    
+    if ($conexion->connect_error) {
+        throw new Exception('Error de conexión a la base de datos');
+    }
+    
+    $conexion->set_charset('utf8mb4');
+    
+    // Preparar consulta para insertar el mensaje
+    $stmt = $conexion->prepare("
+        INSERT INTO mensajes_contacto (nombre, email, telefono, asunto, mensaje, fecha_envio, ip_origen) 
+        VALUES (?, ?, ?, ?, ?, NOW(), ?)
+    ");
+    
+    $ip = $_SERVER['REMOTE_ADDR'];
+    $stmt->bind_param('ssssss', $nombre, $email, $telefono, $asunto, $mensaje, $ip);
+    
+    if ($stmt->execute()) {
+        $mensajeId = $conexion->insert_id;
+        
+        // Opcional: Enviar email de notificación
+        $asuntoEmail = "Nuevo mensaje de contacto: $asunto";
+        $cuerpoEmail = "
+            Nuevo mensaje recibido:
+            
+            Nombre: $nombre
+            Email: $email
+            Teléfono: $telefono
+            Asunto: $asunto
+            
+            Mensaje:
+            $mensaje
+        ";
+        
+        // Descomentar para enviar email real
+        // mail('contacto@tudominio.com', $asuntoEmail, $cuerpoEmail);
+        
+        $stmt->close();
+        $conexion->close();
+        
+        // Respuesta exitosa
+        http_response_code(201);
+        enviarRespuesta(
+            true, 
+            '¡Gracias por contactarnos! Hemos recibido tu mensaje y te responderemos pronto.',
+            null,
+            ['id' => $mensajeId]
+        );
+        
+    } else {
+        throw new Exception('Error al guardar el mensaje');
+    }
+    
+} catch (Exception $e) {
+    // Registrar error en log
+    error_log('Error en procesar_contacto.php: ' . $e->getMessage());
+    
+    // Respuesta de error
+    http_response_code(500);
+    enviarRespuesta(
+        false,
+        'Lo sentimos, ocurrió un error al procesar tu mensaje. Por favor, inténtalo más tarde.'
+    );
+}
+?>`} lang="php" />
+
+### Paso 4: Crear la Tabla en MySQL
+
+<Code code={`-- Crear tabla para almacenar los mensajes de contacto
+CREATE TABLE mensajes_contacto (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    telefono VARCHAR(20),
+    asunto ENUM('consulta', 'soporte', 'ventas', 'otro') NOT NULL,
+    mensaje TEXT NOT NULL,
+    fecha_envio DATETIME NOT NULL,
+    ip_origen VARCHAR(45),
+    leido BOOLEAN DEFAULT FALSE,
+    INDEX idx_fecha (fecha_envio),
+    INDEX idx_leido (leido)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`} lang="sql" />
+
+<Aside type="note">
+  **Características del ejemplo completo:**
+  - ✅ Validación en cliente (JavaScript) y servidor (PHP)
+  - ✅ Manejo de errores robusto
+  - ✅ Indicadores visuales de carga
+  - ✅ Mensajes de confirmación y error
+  - ✅ Sanitización de datos para prevenir XSS
+  - ✅ Prepared statements para prevenir SQL injection
+  - ✅ Diseño responsive y moderno
+  - ✅ Experiencia de usuario fluida sin recargas
+</Aside>
+
+## Buenas Prácticas y Consejos
+
+### Seguridad
+
+<Code code={`// 1. Siempre validar en el servidor
+// Nunca confíes solo en la validación del cliente
+
+// 2. Usar HTTPS en producción
+// Las peticiones AJAX deben hacerse sobre conexiones seguras
+
+// 3. Implementar protección CSRF
+// Agregar tokens CSRF para prevenir ataques
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+fetch('api.php', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-CSRF-Token': csrfToken
+  },
+  body: JSON.stringify(datos)
+});
+
+// 4. Limitar tasa de peticiones (Rate Limiting)
+// Implementar en el servidor para prevenir abuso
+
+// 5. Sanitizar siempre la salida
+// Escapar HTML para prevenir XSS
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}`} lang="javascript" />
+
+### Rendimiento
+
+<Code code={`// 1. Implementar debouncing para búsquedas
+let timeoutId;
+function debounce(func, delay) {
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+const buscar = debounce((termino) => {
+  fetch('buscar.php?q=' + termino)
+    .then(response => response.json())
+    .then(data => mostrarResultados(data));
+}, 300);
+
+// 2. Usar caché cuando sea apropiado
+const cache = new Map();
+
+async function obtenerDatosConCache(url) {
+  if (cache.has(url)) {
+    return cache.get(url);
+  }
+  
+  const response = await fetch(url);
+  const data = await response.json();
+  cache.set(url, data);
+  return data;
+}
+
+// 3. Cancelar peticiones anteriores si es necesario
+let controlador = new AbortController();
+
+function buscarConCancelacion(termino) {
+  // Cancelar petición anterior
+  controlador.abort();
+  controlador = new AbortController();
+  
+  fetch('buscar.php?q=' + termino, {
+    signal: controlador.signal
+  })
+    .then(response => response.json())
+    .then(data => mostrarResultados(data))
+    .catch(error => {
+      if (error.name === 'AbortError') {
+        console.log('Petición cancelada');
+      }
+    });
+}`} lang="javascript" />
+
+### Experiencia de Usuario
+
+<Code code={`// 1. Mostrar indicadores de carga
+function mostrarCargando(mostrar) {
+  const spinner = document.getElementById('spinner');
+  spinner.style.display = mostrar ? 'block' : 'none';
+}
+
+// 2. Deshabilitar botones durante peticiones
+async function enviarFormulario() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  
+  try {
+    await fetch('api.php', { /* ... */ });
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enviar';
+  }
+}
+
+// 3. Proporcionar feedback claro
+function mostrarMensaje(tipo, texto) {
+  const alerta = document.createElement('div');
+  alerta.className = 'alert alert-' + tipo;
+  alerta.textContent = texto;
+  document.body.appendChild(alerta);
+  
+  setTimeout(() => alerta.remove(), 5000);
+}
+
+// 4. Manejar errores de red
+fetch('api.php')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => {
+    if (!navigator.onLine) {
+      mostrarMensaje('error', 'No hay conexión a internet');
+    } else {
+      mostrarMensaje('error', 'Error al conectar con el servidor');
+    }
+  });`} lang="javascript" />
+
+## Resumen
+
+AJAX es una tecnología fundamental para crear aplicaciones web modernas e interactivas. Los puntos clave que debes recordar son:
+
+- **AJAX permite** actualizar partes de una página sin recargarla completamente, mejorando la experiencia del usuario.
+- **fetch() es la API moderna** para realizar peticiones HTTP asíncronas, reemplazando a XMLHttpRequest.
+- **GET se usa** para obtener datos del servidor, mientras que **POST se usa** para enviar datos.
+- **JSON es el formato** más común para intercambiar datos entre cliente y servidor.
+- **La validación debe hacerse** tanto en el cliente (UX) como en el servidor (seguridad).
+- **Siempre maneja errores** y proporciona feedback claro al usuario.
+- **La seguridad es crítica**: sanitiza datos, usa prepared statements y valida en el servidor.
+
+Con estos conocimientos, estás preparado para crear aplicaciones web dinámicas y profesionales usando AJAX con PHP.
+
+<Aside type="tip">
+  **Próximos pasos**: Explora tecnologías relacionadas como WebSockets para comunicación en tiempo real, Service Workers para funcionalidad offline, y frameworks modernos como React o Vue.js que facilitan el manejo de estados y peticiones AJAX.
+</Aside>
