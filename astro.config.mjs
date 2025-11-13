@@ -84,7 +84,8 @@ export default defineConfig({
 								{ label: '3. Fundamentos de Git', link: '/guides/git-github/fundamentos-git/' },
 								{ label: '4. Repositorios remotos', link: '/guides/git-github/repositorios-remotos/' },
 								{ label: '5. Ramas en Git', link: '/guides/git-github/ramas-git/' },
-								{ label: '6. Trabajo colaborativo', link: '/guides/git-github/trabajo-colaborativo/' }
+								{ label: '6. Trabajo colaborativo', link: '/guides/git-github/trabajo-colaborativo/' },
+								{ label: '7. Flujo básico', link: '/guides/git-github/flujo-basico/' },
 							]
 						},
 					]
@@ -265,6 +266,7 @@ export default defineConfig({
 								{ label: '15. Vue Router con Composition API', link: '/frameworks/vue/vue-router/' },
 								{ label: '16. Pinia (Reemplazo de Vuex)', link: '/frameworks/vue/pinia/' },
 								{ label: '17. Manejo de APIs y Fetch', link: '/frameworks/vue/api-fetch/' },
+								{ label: '18. levantar un proyecto astro tailwind vue supabase', link: '/frameworks/vue/levantar-proyecto-vue-supabase/' },
 							],
 						},
 						{
