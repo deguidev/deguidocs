@@ -4,15 +4,9 @@ description: Operadores aritméticos, de comparación, lógicos y de asignación
 ---
 
 import { Code } from '@astrojs/starlight/components';
-import { Tabs, TabItem } from '@astrojs/starlight/components';
-import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
-import { Steps } from '@astrojs/starlight/components';
 
 ## ➕ 3.1 Operadores aritméticos: suma, resta, división, módulo
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de operadores aritméticos
 
@@ -20,40 +14,28 @@ Los **operadores aritméticos** son símbolos que permiten realizar operaciones 
 
 ### Operadores aritméticos en Python
 
-**➕ Suma (+)**  
-Suma dos valores numéricos. También se usa para concatenar cadenas de texto.
-
-**➖ Resta (-)**  
-Resta el segundo valor del primero. También funciona como operador unario para negar un número.
-
-**✖️ Multiplicación (*)**  
-Multiplica dos valores. También se usa para repetir cadenas y listas.
-
-**➗ División (/)**  
-Divide el primer valor entre el segundo. Siempre retorna un número flotante (float), incluso si el resultado es entero.
-
-**🔢 División entera (//)**  
-Divide y retorna solo la parte entera del resultado, descartando los decimales (floor division).
-
-**📐 Módulo (%)**  
-Retorna el residuo de la división entre dos números. Útil para determinar si un número es par/impar o para operaciones cíclicas.
-
-**🔺 Exponenciación (**)**  
-Eleva el primer número a la potencia del segundo.
+| Operador | Nombre | Descripción |
+|----------|--------|-------------|
+| `+` | Suma | Suma dos valores. También concatena cadenas |
+| `-` | Resta | Resta el segundo valor del primero |
+| `*` | Multiplicación | Multiplica dos valores. Repite cadenas y listas |
+| `/` | División | Divide y retorna float siempre |
+| `//` | División entera | Retorna solo la parte entera (floor division) |
+| `%` | Módulo | Retorna el residuo de la división |
+| `**` | Exponenciación | Eleva a la potencia |
 
 ### Orden de precedencia
 
 Python sigue el orden matemático estándar (PEMDAS):
-1. **Paréntesis** `()`
-2. **Exponenciación** `**`
-3. **Multiplicación, División, División entera, Módulo** `*`, `/`, `//`, `%`
-4. **Suma, Resta** `+`, `-`
 
-</TabItem>
+| Prioridad | Operadores | Descripción |
+|-----------|------------|-------------|
+| 1 | `()` | Paréntesis |
+| 2 | `**` | Exponenciación |
+| 3 | `*`, `/`, `//`, `%` | Multiplicación, División, Módulo |
+| 4 | `+`, `-` | Suma, Resta |
 
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Operaciones básicas
+### Ejemplo: Operaciones básicas
 
 <Code code={`# Suma
 resultado = 10 + 5
@@ -74,7 +56,7 @@ print(resultado)  # 5.0
 resultado = 10 / 4
 print(resultado)  # 2.5`} lang="python" title="Operaciones básicas" />
 
-### División entera y módulo
+### Ejemplo: División entera y módulo
 
 <Code code={`# División entera (solo la parte entera)
 resultado = 10 // 3
@@ -97,7 +79,7 @@ if numero % 2 == 0:
 else:
     print("Impar")  # Se ejecuta esto`} lang="python" title="División entera y módulo" />
 
-### Exponenciación
+### Ejemplo: Exponenciación
 
 <Code code={`# Potencia
 resultado = 2 ** 3
@@ -110,7 +92,7 @@ print(resultado)  # 25
 resultado = 16 ** 0.5
 print(resultado)  # 4.0`} lang="python" title="Exponenciación" />
 
-### Aplicaciones prácticas
+### Ejemplo: Aplicaciones prácticas
 
 <Code code={`# Calcular el área de un círculo
 PI = 3.14159
@@ -128,15 +110,9 @@ nota1, nota2, nota3 = 8.5, 9.0, 7.5
 promedio = (nota1 + nota2 + nota3) / 3
 print(f"Promedio: {promedio:.2f}")  # 8.33`} lang="python" title="Aplicaciones prácticas" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## ⚖️ 3.2 Operadores de comparación
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de operadores de comparación
 
@@ -144,29 +120,16 @@ Los **operadores de comparación** o **relacionales** comparan dos valores y ret
 
 ### Operadores de comparación en Python
 
-**`==` (Igual a)**  
-Verifica si dos valores son iguales.
+| Operador | Nombre | Descripción |
+|----------|--------|-------------|
+| `==` | Igual a | Verifica si dos valores son iguales |
+| `!=` | Diferente de | Verifica si dos valores son diferentes |
+| `<` | Menor que | Verifica si el primero es menor que el segundo |
+| `>` | Mayor que | Verifica si el primero es mayor que el segundo |
+| `<=` | Menor o igual | Verifica si es menor o igual |
+| `>=` | Mayor o igual | Verifica si es mayor o igual |
 
-**`!=` (Diferente de)**  
-Verifica si dos valores son diferentes.
-
-**`<` (Menor que)**  
-Verifica si el primer valor es menor que el segundo.
-
-**`>` (Mayor que)**  
-Verifica si el primer valor es mayor que el segundo.
-
-**`<=` (Menor o igual que)**  
-Verifica si el primer valor es menor o igual que el segundo.
-
-**`>=` (Mayor o igual que)**  
-Verifica si el primer valor es mayor o igual que el segundo.
-
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Comparaciones básicas
+### Ejemplo: Comparaciones básicas
 
 <Code code={`# Igualdad
 print(5 == 5)      # True
@@ -184,7 +147,7 @@ print(5 < 10)      # True
 print(10 >= 10)    # True
 print(5 <= 10)     # True`} lang="python" title="Comparaciones básicas" />
 
-### Aplicación en condicionales
+### Ejemplo: Aplicación en condicionales
 
 <Code code={`# Verificar acceso por edad
 edad = 17
@@ -204,15 +167,9 @@ elif nota >= 7.0:
 else:
     print("Reprobado")`} lang="python" title="Uso en condicionales" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 🔀 3.3 Operadores lógicos: and, or, not
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de operadores lógicos
 
@@ -220,20 +177,13 @@ Los **operadores lógicos** permiten combinar múltiples expresiones booleanas p
 
 ### Operadores lógicos en Python
 
-**and (Y lógico)**  
-Retorna `True` solo si **ambas** condiciones son verdaderas.
+| Operador | Nombre | Descripción |
+|----------|--------|-------------|
+| `and` | Y lógico | Retorna `True` solo si **ambas** condiciones son verdaderas |
+| `or` | O lógico | Retorna `True` si **al menos una** condición es verdadera |
+| `not` | Negación | Invierte el valor booleano |
 
-**or (O lógico)**  
-Retorna `True` si **al menos una** de las condiciones es verdadera.
-
-**not (Negación lógica)**  
-Invierte el valor booleano.
-
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Operador and
+### Ejemplo: Operador and
 
 <Code code={`# Ambas condiciones deben ser verdaderas
 edad = 25
@@ -247,7 +197,7 @@ nota = 8.5
 aprobado = nota >= 6.0 and nota <= 10.0
 print(aprobado)  # True`} lang="python" title="Operador and" />
 
-### Operador or
+### Ejemplo: Operador or
 
 <Code code={`# Al menos una condición debe ser verdadera
 es_fin_semana = True
@@ -256,7 +206,7 @@ es_feriado = False
 puede_descansar = es_fin_semana or es_feriado
 print(puede_descansar)  # True`} lang="python" title="Operador or" />
 
-### Operador not
+### Ejemplo: Operador not
 
 <Code code={`# Negar un valor booleano
 esta_lloviendo = False
@@ -268,15 +218,9 @@ edad = 15
 es_menor = not (edad >= 18)
 print(es_menor)  # True`} lang="python" title="Operador not" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 🔄 3.4 Operadores de asignación compuesta: +=, -=, *=, etc.
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de operadores de asignación compuesta
 
@@ -284,23 +228,17 @@ Los **operadores de asignación compuesta** combinan una operación aritmética 
 
 ### Operadores principales
 
-**+= (Suma y asigna)**  
-`x += 5` es equivalente a `x = x + 5`
+| Operador | Equivalente | Descripción |
+|----------|-------------|-------------|
+| `+=` | `x = x + 5` | Suma y asigna |
+| `-=` | `x = x - 3` | Resta y asigna |
+| `*=` | `x = x * 2` | Multiplica y asigna |
+| `/=` | `x = x / 4` | Divide y asigna |
+| `//=` | `x = x // 2` | División entera y asigna |
+| `%=` | `x = x % 3` | Módulo y asigna |
+| `**=` | `x = x ** 2` | Exponenciación y asigna |
 
-**-= (Resta y asigna)**  
-`x -= 3` es equivalente a `x = x - 3`
-
-**\*= (Multiplica y asigna)**  
-`x *= 2` es equivalente a `x = x * 2`
-
-**/= (Divide y asigna)**  
-`x /= 4` es equivalente a `x = x / 4`
-
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Operadores compuestos
+### Ejemplo: Operadores compuestos
 
 <Code code={`# += (suma y asigna)
 contador = 10
@@ -322,7 +260,7 @@ total = 100
 total /= 4
 print(total)  # 25.0`} lang="python" title="Operadores compuestos" />
 
-### Aplicaciones prácticas
+### Ejemplo: Aplicaciones prácticas
 
 <Code code={`# Contador de intentos
 intentos = 0
@@ -340,15 +278,9 @@ precio = 100
 precio *= 0.8  # 20% descuento
 print(f"Precio final: {precio}")  # 80.0`} lang="python" title="Aplicaciones" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 💪 3.5 Ejercicios de práctica con operadores
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Propósito de los ejercicios
 
@@ -356,18 +288,11 @@ Los ejercicios prácticos permiten consolidar el conocimiento adquirido sobre op
 
 ### Tipos de ejercicios
 
-**🔹 Cálculos aritméticos**  
-Aplicar operadores matemáticos para resolver problemas numéricos.
-
-**🔹 Validaciones con comparaciones**  
-Usar operadores de comparación para verificar condiciones.
-
-**🔹 Lógica combinada**  
-Integrar operadores lógicos para crear condiciones complejas.
-
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
+| Tipo | Descripción |
+|------|-------------|
+| **Cálculos aritméticos** | Aplicar operadores matemáticos para resolver problemas numéricos |
+| **Validaciones** | Usar operadores de comparación para verificar condiciones |
+| **Lógica combinada** | Integrar operadores lógicos para crear condiciones complejas |
 
 ### Ejercicio 1: Calculadora de IMC
 
@@ -463,9 +388,6 @@ else:
     categoria = "Adulto mayor"
 
 print(f"Categoría: {categoria}")`} lang="python" title="Validador de edad" />
-
-</TabItem>
-</Tabs>
 
 ---
 

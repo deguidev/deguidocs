@@ -4,15 +4,9 @@ description: Definición de funciones con def, parámetros, argumentos y valores
 ---
 
 import { Code } from '@astrojs/starlight/components';
-import { Tabs, TabItem } from '@astrojs/starlight/components';
-import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
-import { Steps } from '@astrojs/starlight/components';
 
 ## 🎯 8.1 ¿Qué es una función y para qué sirve?
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de función
 
@@ -20,29 +14,29 @@ Una **función** es un bloque de código reutilizable que realiza una tarea espe
 
 ### Propósito de las funciones
 
-**🔹 Reutilización de código**: Evita duplicar código escribiendo una vez y usando múltiples veces  
-**🔹 Modularidad**: Divide programas complejos en partes más pequeñas y manejables  
-**🔹 Abstracción**: Oculta detalles de implementación, mostrando solo la interfaz  
-**🔹 Mantenibilidad**: Facilita actualizar y corregir código en un solo lugar  
-**🔹 Legibilidad**: Hace el código más claro y fácil de entender  
+| Propósito | Descripción |
+|-----------|-------------|
+| **Reutilización** | Evita duplicar código escribiendo una vez y usando múltiples veces |
+| **Modularidad** | Divide programas complejos en partes más pequeñas y manejables |
+| **Abstracción** | Oculta detalles de implementación, mostrando solo la interfaz |
+| **Mantenibilidad** | Facilita actualizar y corregir código en un solo lugar |
+| **Legibilidad** | Hace el código más claro y fácil de entender |
 
 ### Componentes de una función
 
-**Definición**: Declaración de la función con `def`  
-**Nombre**: Identificador único para llamar la función  
-**Parámetros**: Variables que recibe la función (opcional)  
-**Cuerpo**: Bloque de código que ejecuta la función  
-**Retorno**: Valor que devuelve la función (opcional)  
+| Componente | Descripción |
+|------------|-------------|
+| **Definición** | Declaración de la función con `def` |
+| **Nombre** | Identificador único para llamar la función |
+| **Parámetros** | Variables que recibe la función (opcional) |
+| **Cuerpo** | Bloque de código que ejecuta la función |
+| **Retorno** | Valor que devuelve la función (opcional) |
 
 ### Analogía
 
 Una función es como una receta de cocina: defines los pasos una vez (ingredientes = parámetros, procedimiento = cuerpo) y puedes usarla cada vez que necesites preparar ese platillo (llamada a la función).
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Sin funciones vs con funciones
+### Ejemplo: Sin funciones vs con funciones
 
 <Code code={`# SIN FUNCIONES (código repetitivo)
 print("Hola, Ana")
@@ -67,7 +61,7 @@ saludar("Ana")
 saludar("Juan")
 saludar("María")`} lang="python" title="Comparación" />
 
-### Ventajas de usar funciones
+### Ejemplo: Ventajas de usar funciones
 
 <Code code={`# Calcular área de rectángulo sin función
 base1 = 5
@@ -89,15 +83,9 @@ area2 = calcular_area_rectangulo(8, 4)
 print(f"Área 1: {area1}")
 print(f"Área 2: {area2}")`} lang="python" title="Ventajas" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 📝 8.2 Cómo definir funciones con def
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Sintaxis de definición
 
@@ -110,24 +98,22 @@ def nombre_funcion(parametros):
 
 ### Elementos de la definición
 
-**def**: Palabra clave para definir una función  
-**nombre_funcion**: Identificador de la función (debe seguir reglas de nombres)  
-**parametros**: Variables que recibe (entre paréntesis, separados por comas)  
-**docstring**: Documentación opcional de la función (entre triple comillas)  
-**return**: Devuelve un valor (opcional, si no hay return, devuelve None)  
+| Elemento | Descripción |
+|----------|-------------|
+| `def` | Palabra clave para definir una función |
+| `nombre_funcion` | Identificador de la función (debe seguir reglas de nombres) |
+| `parametros` | Variables que recibe (entre paréntesis, separados por comas) |
+| `docstring` | Documentación opcional (entre triple comillas) |
+| `return` | Devuelve un valor (opcional, si no hay return, devuelve None) |
 
 ### Reglas importantes
 
-**🔹 Indentación**: El cuerpo de la función debe estar indentado (4 espacios)  
-**🔹 Definición antes de uso**: La función debe definirse antes de llamarla  
-**🔹 Nombres descriptivos**: Usar nombres que indiquen qué hace la función  
-**🔹 Convención**: Usar snake_case para nombres de funciones  
+- **Indentación**: El cuerpo de la función debe estar indentado (4 espacios)
+- **Definición antes de uso**: La función debe definirse antes de llamarla
+- **Nombres descriptivos**: Usar nombres que indiquen qué hace la función
+- **Convención**: Usar snake_case para nombres de funciones
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Función simple sin parámetros
+### Ejemplo: Función simple sin parámetros
 
 <Code code={`# Función que no recibe parámetros ni retorna valor
 def saludar():
@@ -137,7 +123,7 @@ def saludar():
 saludar()  # Salida: ¡Hola, mundo!
 saludar()  # Salida: ¡Hola, mundo!`} lang="python" title="Función simple" />
 
-### Función con parámetros
+### Ejemplo: Función con parámetros
 
 <Code code={`# Función que recibe parámetros
 def saludar_persona(nombre):
@@ -147,7 +133,7 @@ def saludar_persona(nombre):
 saludar_persona("Ana")    # Hola, Ana!
 saludar_persona("Carlos") # Hola, Carlos!`} lang="python" title="Con parámetros" />
 
-### Función con return
+### Ejemplo: Función con return
 
 <Code code={`# Función que retorna un valor
 def sumar(a, b):
@@ -161,7 +147,7 @@ print(total)  # 8
 # Usar directamente en expresiones
 print(sumar(10, 20))  # 30`} lang="python" title="Con return" />
 
-### Función con docstring
+### Ejemplo: Función con docstring
 
 <Code code={`def calcular_area_circulo(radio):
     """
@@ -184,44 +170,40 @@ print(f"Área: {area:.2f}")
 # Ver documentación
 print(calcular_area_circulo.__doc__)`} lang="python" title="Con docstring" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 🔄 8.3 Parámetros, argumentos y valores de retorno
 
-<Tabs>
-<TabItem label="👔 Parte Teórica">
-
 ### Diferencia entre parámetros y argumentos
 
-**Parámetros**: Variables definidas en la declaración de la función  
-**Argumentos**: Valores reales pasados al llamar la función  
+| Concepto | Descripción |
+|----------|-------------|
+| **Parámetros** | Variables definidas en la declaración de la función |
+| **Argumentos** | Valores reales pasados al llamar la función |
 
 ### Tipos de argumentos
 
-**Posicionales**: Se pasan en el orden definido  
-**Por nombre (keyword)**: Se especifica el nombre del parámetro  
-**Mixtos**: Combinación de posicionales y por nombre  
+| Tipo | Descripción |
+|------|-------------|
+| **Posicionales** | Se pasan en el orden definido |
+| **Por nombre (keyword)** | Se especifica el nombre del parámetro |
+| **Mixtos** | Combinación de posicionales y por nombre |
 
 ### Valores de retorno
 
-**return simple**: Devuelve un solo valor  
-**return múltiple**: Devuelve varios valores (tupla)  
-**sin return**: La función retorna `None` implícitamente  
+| Tipo | Descripción |
+|------|-------------|
+| **return simple** | Devuelve un solo valor |
+| **return múltiple** | Devuelve varios valores (tupla) |
+| **sin return** | La función retorna `None` implícitamente |
 
 ### Características importantes
 
-**🔹 Paso por referencia**: Los objetos mutables se pasan por referencia  
-**🔹 Múltiples returns**: Una función puede tener varios return (solo se ejecuta uno)  
-**🔹 Return termina ejecución**: El código después de return no se ejecuta  
+- **Paso por referencia**: Los objetos mutables se pasan por referencia
+- **Múltiples returns**: Una función puede tener varios return (solo se ejecuta uno)
+- **Return termina ejecución**: El código después de return no se ejecuta
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Parámetros y argumentos posicionales
+### Ejemplo: Argumentos posicionales
 
 <Code code={`# Función con múltiples parámetros
 def presentar(nombre, edad, ciudad):
@@ -237,7 +219,7 @@ presentar("Ana", 25, "Madrid")
 # Tengo 25 años
 # Vivo en Madrid`} lang="python" title="Argumentos posicionales" />
 
-### Argumentos por nombre (keyword)
+### Ejemplo: Argumentos por nombre (keyword)
 
 <Code code={`def presentar(nombre, edad, ciudad):
     print(f"{nombre}, {edad} años, {ciudad}")
@@ -248,7 +230,7 @@ presentar(edad=30, ciudad="Barcelona", nombre="Carlos")
 # Mezclar posicionales y por nombre
 presentar("María", ciudad="Valencia", edad=28)`} lang="python" title="Argumentos por nombre" />
 
-### Return simple
+### Ejemplo: Return simple
 
 <Code code={`# Función que retorna un valor
 def cuadrado(numero):
@@ -260,7 +242,7 @@ print(resultado)  # 25
 # Usar en expresiones
 print(cuadrado(3) + cuadrado(4))  # 9 + 16 = 25`} lang="python" title="Return simple" />
 
-### Return múltiple
+### Ejemplo: Return múltiple
 
 <Code code={`# Función que retorna múltiples valores
 def operaciones(a, b):
@@ -279,7 +261,7 @@ print(f"Multiplicación: {m}") # 50
 resultados = operaciones(8, 3)
 print(resultados)  # (11, 5, 24)`} lang="python" title="Return múltiple" />
 
-### Función sin return
+### Ejemplo: Función sin return
 
 <Code code={`# Función sin return (retorna None)
 def imprimir_tabla(numero):
@@ -289,7 +271,7 @@ def imprimir_tabla(numero):
 resultado = imprimir_tabla(5)
 print(f"Retorno: {resultado}")  # None`} lang="python" title="Sin return" />
 
-### Return temprano
+### Ejemplo: Return temprano
 
 <Code code={`# Usar return para salir temprano
 def dividir(a, b):
@@ -302,15 +284,9 @@ def dividir(a, b):
 print(dividir(10, 2))  # 5.0
 print(dividir(10, 0))  # Error: División por cero, None`} lang="python" title="Return temprano" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## ⚙️ 8.4 Funciones con valores por defecto
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de valores por defecto
 
@@ -325,10 +301,10 @@ def funcion(parametro1, parametro2=valor_defecto):
 
 ### Reglas importantes
 
-**🔹 Orden**: Parámetros con valores por defecto deben ir después de los obligatorios  
-**🔹 Flexibilidad**: Permite llamar la función con menos argumentos  
-**🔹 Sobrescritura**: Se puede proporcionar un valor diferente al llamar  
-**🔹 Valores mutables**: Evitar usar listas o diccionarios como valores por defecto  
+- **Orden**: Parámetros con valores por defecto deben ir después de los obligatorios
+- **Flexibilidad**: Permite llamar la función con menos argumentos
+- **Sobrescritura**: Se puede proporcionar un valor diferente al llamar
+- **Valores mutables**: Evitar usar listas o diccionarios como valores por defecto
 
 ### Ventajas
 
@@ -336,11 +312,7 @@ def funcion(parametro1, parametro2=valor_defecto):
 - Reduce la necesidad de múltiples versiones de la misma función
 - Hace el código más limpio y fácil de usar
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Valores por defecto básicos
+### Ejemplo: Valores por defecto básicos
 
 <Code code={`# Función con valor por defecto
 def saludar(nombre, saludo="Hola"):
@@ -353,7 +325,7 @@ saludar("Ana")  # Hola, Ana!
 saludar("Carlos", "Buenos días")  # Buenos días, Carlos!
 saludar("María", saludo="Buenas tardes")  # Buenas tardes, María!`} lang="python" title="Valores por defecto" />
 
-### Múltiples valores por defecto
+### Ejemplo: Múltiples valores por defecto
 
 <Code code={`def crear_perfil(nombre, edad=18, ciudad="Madrid", activo=True):
     print(f"Nombre: {nombre}")
@@ -370,7 +342,7 @@ crear_perfil("Carlos", edad=25)
 # Usar argumentos por nombre
 crear_perfil("María", ciudad="Barcelona", edad=30)`} lang="python" title="Múltiples valores" />
 
-### Función de potencia con exponente por defecto
+### Ejemplo: Función de potencia con exponente por defecto
 
 <Code code={`def potencia(base, exponente=2):
     """Calcula la potencia de un número."""
@@ -384,7 +356,7 @@ print(potencia(3))      # 9 (3^2)
 print(potencia(2, 3))   # 8 (2^3)
 print(potencia(5, 3))   # 125 (5^3)`} lang="python" title="Potencia" />
 
-### Función de formato con opciones
+### Ejemplo: Función de formato con opciones
 
 <Code code={`def formatear_precio(precio, moneda="EUR", decimales=2):
     """Formatea un precio con moneda."""
@@ -426,44 +398,39 @@ print(agregar_item(2))  # [2] ✓
 ```
 </Aside>
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 📐 8.5 Buenas prácticas al nombrar funciones
 
-<Tabs>
-<TabItem label="👔 Parte Teórica">
-
 ### Convenciones de nomenclatura
 
-**🔹 snake_case**: Usar minúsculas con guiones bajos (`calcular_promedio`)  
-**🔹 Verbos descriptivos**: Comenzar con verbos que indiquen la acción (`obtener_`, `calcular_`, `validar_`)  
-**🔹 Nombres claros**: Ser específico sobre qué hace la función  
-**🔹 Evitar abreviaturas**: Preferir nombres completos y legibles  
+| Convención | Descripción |
+|------------|-------------|
+| **snake_case** | Usar minúsculas con guiones bajos (`calcular_promedio`) |
+| **Verbos descriptivos** | Comenzar con verbos que indiquen la acción |
+| **Nombres claros** | Ser específico sobre qué hace la función |
+| **Evitar abreviaturas** | Preferir nombres completos y legibles |
 
 ### Patrones comunes
 
-**get_**: Obtener un valor (`get_nombre`, `get_edad`)  
-**set_**: Establecer un valor (`set_precio`, `set_estado`)  
-**is_/has_**: Verificar condición, retorna booleano (`is_valid`, `has_permission`)  
-**calculate_**: Realizar cálculos (`calculate_total`, `calculate_average`)  
-**validate_**: Validar datos (`validate_email`, `validate_age`)  
-**format_**: Formatear datos (`format_date`, `format_currency`)  
+| Prefijo | Uso | Ejemplo |
+|---------|-----|---------|
+| `get_` / `obtener_` | Obtener un valor | `obtener_nombre()` |
+| `set_` / `establecer_` | Establecer un valor | `establecer_precio()` |
+| `es_` / `is_` | Verificar condición (bool) | `es_valido()` |
+| `tiene_` / `has_` | Verificar existencia (bool) | `tiene_permiso()` |
+| `calcular_` | Realizar cálculos | `calcular_total()` |
+| `validar_` | Validar datos | `validar_email()` |
+| `formatear_` | Formatear datos | `formatear_fecha()` |
 
 ### Principios
 
-**Única responsabilidad**: Una función debe hacer una sola cosa  
-**Nombres autodocumentados**: El nombre debe explicar qué hace  
-**Consistencia**: Usar el mismo estilo en todo el código  
-**Longitud apropiada**: Ni muy corto ni muy largo (2-4 palabras ideal)  
+- **Única responsabilidad**: Una función debe hacer una sola cosa
+- **Nombres autodocumentados**: El nombre debe explicar qué hace
+- **Consistencia**: Usar el mismo estilo en todo el código
+- **Longitud apropiada**: Ni muy corto ni muy largo (2-4 palabras ideal)
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Buenos vs malos nombres
+### Ejemplo: Buenos vs malos nombres
 
 <Code code={`# ❌ MALOS NOMBRES
 def f(x):  # No descriptivo
@@ -485,7 +452,7 @@ def calcular_suma(primer_numero, segundo_numero):
 def obtener_numeros_primos():
     return [2, 3, 5, 7, 11]`} lang="python" title="Buenos vs malos" />
 
-### Nombres con verbos descriptivos
+### Ejemplo: Nombres con verbos descriptivos
 
 <Code code={`# Funciones con verbos claros
 def obtener_edad_usuario():
@@ -506,7 +473,7 @@ def es_numero_par(numero):
 def tiene_mayusculas(texto):
     return any(c.isupper() for c in texto)`} lang="python" title="Verbos descriptivos" />
 
-### Funciones con nombres autodocumentados
+### Ejemplo: Funciones con nombres autodocumentados
 
 <Code code={`# El nombre explica claramente qué hace
 def convertir_celsius_a_fahrenheit(celsius):
@@ -527,7 +494,7 @@ precio_final = calcular_precio_con_descuento(100, 20)
 primer_item = obtener_primer_elemento_lista([1, 2, 3])
 es_mayor = verificar_si_es_mayor_de_edad(20)`} lang="python" title="Autodocumentados" />
 
-### Consistencia en el código
+### Ejemplo: Consistencia en el código
 
 <Code code={`# Módulo de gestión de usuarios - Nombres consistentes
 
@@ -557,9 +524,9 @@ def validar_datos_usuario(datos):
 
 # Patrón consistente: verbo + sustantivo + complemento`} lang="python" title="Consistencia" />
 
-### Funciones booleanas
+### Ejemplo: Funciones booleanas
 
-<Code code={`# Funciones que retornan booleano: usar is_, has_, can_
+<Code code={`# Funciones que retornan booleano: usar es_, tiene_, puede_
 
 def es_numero_primo(numero):
     """Verifica si un número es primo."""
@@ -597,9 +564,6 @@ if tiene_caracteres_especiales("abc!"):
 4. **Consistencia**: Mantén el mismo estilo en todo el proyecto
 5. **Evita redundancia**: No uses `funcion_` al inicio (ya es obvio que es una función)
 </Aside>
-
-</TabItem>
-</Tabs>
 
 ---
 

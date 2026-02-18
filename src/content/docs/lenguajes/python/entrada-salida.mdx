@@ -4,15 +4,9 @@ description: Captura de datos con input(), mostrar resultados con print() y form
 ---
 
 import { Code } from '@astrojs/starlight/components';
-import { Tabs, TabItem } from '@astrojs/starlight/components';
-import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
-import { Steps } from '@astrojs/starlight/components';
 
 ## ⌨️ 4.1 La función input() para capturar datos del usuario
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de input()
 
@@ -32,17 +26,12 @@ variable = input(mensaje_opcional)
 
 ### Características importantes
 
-**🔹 Retorna siempre string**  
-Incluso si el usuario escribe números, `input()` los retorna como texto. Es necesario convertirlos explícitamente usando `int()`, `float()`, etc.
-
-**🔹 Pausa la ejecución**  
-El programa se detiene hasta que el usuario ingrese datos y presione Enter.
-
-**🔹 Mensaje opcional**  
-Aunque el mensaje es opcional, es buena práctica incluirlo para indicar al usuario qué debe ingresar.
-
-**🔹 Captura toda la línea**  
-`input()` captura todo lo que el usuario escriba hasta presionar Enter, incluyendo espacios.
+| Característica | Descripción |
+|----------------|-------------|
+| **Retorna siempre string** | Incluso si el usuario escribe números, `input()` los retorna como texto |
+| **Pausa la ejecución** | El programa se detiene hasta que el usuario presione Enter |
+| **Mensaje opcional** | Es buena práctica incluirlo para indicar qué debe ingresar |
+| **Captura toda la línea** | Captura todo hasta presionar Enter, incluyendo espacios |
 
 ### Propósito y aplicaciones
 
@@ -51,11 +40,7 @@ Aunque el mensaje es opcional, es buena práctica incluirlo para indicar al usua
 - **Personalización**: Adaptar el comportamiento del programa según la entrada del usuario
 - **Validación**: Solicitar datos hasta que sean correctos
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Uso básico de input()
+### Ejemplo: Uso básico de input()
 
 <Code code={`# Capturar nombre del usuario
 nombre = input("¿Cómo te llamas? ")
@@ -65,7 +50,7 @@ print(f"Hola, {nombre}!")
 # ¿Cómo te llamas? Ana
 # Hola, Ana!`} lang="python" title="Ejemplo básico" />
 
-### input() siempre retorna string
+### Ejemplo: input() siempre retorna string
 
 <Code code={`# Capturar edad (retorna string)
 edad = input("¿Cuántos años tienes? ")
@@ -80,7 +65,7 @@ edad = int(input("¿Cuántos años tienes? "))
 print(f"Tipo de dato: {type(edad)}")  # <class 'int'>
 print(f"En 5 años tendrás: {edad + 5}")`} lang="python" title="Conversión de tipos" />
 
-### Capturar diferentes tipos de datos
+### Ejemplo: Capturar diferentes tipos de datos
 
 <Code code={`# Capturar número entero
 edad = int(input("Ingresa tu edad: "))
@@ -101,7 +86,7 @@ if respuesta.lower() == 's':
 else:
     print("Dale una oportunidad")`} lang="python" title="Diferentes tipos de datos" />
 
-### Capturar múltiples valores
+### Ejemplo: Capturar múltiples valores
 
 <Code code={`# Capturar varios datos en secuencia
 nombre = input("Nombre: ")
@@ -118,7 +103,7 @@ nombre, edad = datos.split(",")
 print(f"Nombre: {nombre.strip()}")
 print(f"Edad: {edad.strip()}")`} lang="python" title="Múltiples valores" />
 
-### Programa interactivo completo
+### Ejemplo: Programa interactivo completo
 
 <Code code={`# Calculadora simple interactiva
 print("=== CALCULADORA SIMPLE ===")
@@ -144,15 +129,9 @@ print(f"\\nResultado: {num1} {operacion} {num2} = {resultado}")`} lang="python" 
 Recuerda siempre convertir el resultado de `input()` al tipo de dato que necesitas. Si esperas un número, usa `int()` o `float()`. Si no lo haces, obtendrás errores al intentar realizar operaciones matemáticas.
 </Aside>
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 🖨️ 4.2 Mostrar resultados con print() y f-strings
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### La función print()
 
@@ -169,17 +148,12 @@ f"Texto {variable} más texto"
 
 ### Ventajas de f-strings
 
-**🔹 Legibilidad**  
-El código es más claro y fácil de leer que otros métodos de formateo.
-
-**🔹 Eficiencia**  
-Son más rápidas que otros métodos como `.format()` o concatenación con `+`.
-
-**🔹 Expresiones dentro**  
-Puedes incluir operaciones, llamadas a funciones y expresiones directamente.
-
-**🔹 Sintaxis concisa**  
-Menos código para lograr el mismo resultado.
+| Ventaja | Descripción |
+|---------|-------------|
+| **Legibilidad** | El código es más claro y fácil de leer |
+| **Eficiencia** | Son más rápidas que `.format()` o concatenación |
+| **Expresiones dentro** | Puedes incluir operaciones y funciones directamente |
+| **Sintaxis concisa** | Menos código para lograr el mismo resultado |
 
 ### Características de print()
 
@@ -188,11 +162,7 @@ Menos código para lograr el mismo resultado.
 - **Final personalizable**: Parámetro `end` para cambiar el final (por defecto es salto de línea)
 - **Conversión automática**: Convierte automáticamente valores a string
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### F-strings básicas
+### Ejemplo: F-strings básicas
 
 <Code code={`# Insertar variables en texto
 nombre = "Ana"
@@ -209,7 +179,7 @@ ciudad = "Madrid"
 pais = "España"
 print(f"{nombre} vive en {ciudad}, {pais}")`} lang="python" title="F-strings básicas" />
 
-### Expresiones dentro de f-strings
+### Ejemplo: Expresiones dentro de f-strings
 
 <Code code={`# Operaciones matemáticas
 precio = 100
@@ -231,7 +201,7 @@ numeros = [1, 2, 3, 4, 5]
 print(f"Suma de la lista: {sum(numeros)}")
 print(f"Promedio: {sum(numeros) / len(numeros)}")`} lang="python" title="Expresiones en f-strings" />
 
-### Formateo de números
+### Ejemplo: Formateo de números
 
 <Code code={`# Formatear decimales
 pi = 3.14159265359
@@ -251,7 +221,7 @@ print(f"Tasa: {tasa:.2%}")  # 15.67%
 numero_pequeno = 0.00000123
 print(f"Científica: {numero_pequeno:.2e}")  # 1.23e-06`} lang="python" title="Formateo de números" />
 
-### Alineación y espaciado
+### Ejemplo: Alineación y espaciado
 
 <Code code={`# Alinear texto
 nombre = "Ana"
@@ -270,7 +240,7 @@ print(f"{'Nombre':<15} {'Edad':>5} {'Ciudad':<10}")
 print(f"{'Ana':<15} {25:>5} {'Madrid':<10}")
 print(f"{'Juan':<15} {30:>5} {'Barcelona':<10}")`} lang="python" title="Alineación" />
 
-### print() con múltiples argumentos
+### Ejemplo: print() con múltiples argumentos
 
 <Code code={`# Múltiples valores
 nombre = "Ana"
@@ -293,7 +263,7 @@ for i in range(5):
     print(i, end=" ")
 # Salida: 0 1 2 3 4`} lang="python" title="Parámetros de print()" />
 
-### Combinación de técnicas
+### Ejemplo: Combinación de técnicas
 
 <Code code={`# Programa que muestra información formateada
 nombre = "Ana García"
@@ -310,28 +280,19 @@ print(f"Salario:  {salario:,.2f} EUR")
 print(f"Ciudad:   {ciudad}")
 print("=" * 40)`} lang="python" title="Formato profesional" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 📝 4.3 Formateo de texto con variables (f"", format())
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Métodos de formateo en Python
 
 Python ofrece varios métodos para formatear cadenas de texto con variables:
 
-**🔹 F-strings (recomendado)**  
-Método moderno, legible y eficiente introducido en Python 3.6.
-
-**🔹 Método .format()**  
-Método tradicional que usa llaves `{}` como marcadores de posición y el método `.format()` para insertar valores.
-
-**🔹 Operador % (legacy)**  
-Método antiguo heredado de C, menos usado en código moderno.
+| Método | Descripción | Recomendación |
+|--------|-------------|---------------|
+| **F-strings** | Método moderno con sintaxis `f"{var}"` | Recomendado (Python 3.6+) |
+| **.format()** | Usa `{}` como marcadores de posición | Para plantillas reutilizables |
+| **Operador %** | Método heredado de C | Solo código legacy |
 
 ### El método .format()
 
@@ -346,17 +307,7 @@ Método antiguo heredado de C, menos usado en código moderno.
 - Soporta nombres: `{nombre}`, `{edad}`
 - Ofrece opciones de formateo similares a f-strings
 
-### Cuándo usar cada método
-
-**F-strings**: Para la mayoría de casos en código moderno (Python 3.6+)  
-**.format()**: Cuando necesitas reutilizar plantillas o trabajas con Python anterior a 3.6  
-**% operator**: Solo en código legacy o compatibilidad con versiones muy antiguas
-
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Método .format() básico
+### Ejemplo: Método .format() básico
 
 <Code code={`# Uso básico
 nombre = "Ana"
@@ -374,7 +325,7 @@ print(mensaje)
 mensaje = "Me llamo {n} y tengo {e} años".format(n=nombre, e=edad)
 print(mensaje)`} lang="python" title="format() básico" />
 
-### Comparación: f-strings vs .format()
+### Ejemplo: Comparación f-strings vs .format()
 
 <Code code={`nombre = "Carlos"
 edad = 30
@@ -394,7 +345,7 @@ print(mensaje3)
 
 # Todos producen el mismo resultado`} lang="python" title="Comparación de métodos" />
 
-### Formateo de números con .format()
+### Ejemplo: Formateo de números con .format()
 
 <Code code={`# Decimales
 pi = 3.14159265359
@@ -415,7 +366,7 @@ print("Nombre: {:>10}".format(nombre))  # Derecha
 print("Nombre: {:<10}".format(nombre))  # Izquierda
 print("Nombre: {:^10}".format(nombre))  # Centro`} lang="python" title="Formateo con .format()" />
 
-### Plantillas reutilizables
+### Ejemplo: Plantillas reutilizables
 
 <Code code={`# Crear plantilla reutilizable
 plantilla = "Empleado: {nombre}, Edad: {edad}, Salario: {salario:,.2f}"
@@ -429,7 +380,7 @@ print(empleado1)
 print(empleado2)
 print(empleado3)`} lang="python" title="Plantillas reutilizables" />
 
-### Operador % (legacy)
+### Ejemplo: Operador % (legacy)
 
 <Code code={`# Método antiguo con operador %
 nombre = "Ana"
@@ -446,7 +397,7 @@ print("El precio es %.2f pesos" % precio)
 # Nota: Este método es menos recomendado en código moderno
 # Preferir f-strings o .format()`} lang="python" title="Operador % (no recomendado)" />
 
-### Caso práctico: Factura formateada
+### Ejemplo: Factura formateada
 
 <Code code={`# Generar factura con formato profesional
 cliente = "Ana García"
@@ -474,15 +425,9 @@ print("=" * 50)`} lang="python" title="Factura formateada" />
 Para código nuevo, usa **f-strings** siempre que sea posible. Son más legibles, eficientes y fáciles de mantener. Usa `.format()` solo cuando necesites plantillas reutilizables o compatibilidad con Python anterior a 3.6.
 </Aside>
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## ✅ 4.4 Validación básica de entradas (ejemplo: edad, nombre)
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de validación de entradas
 
@@ -490,44 +435,30 @@ La **validación de entradas** es el proceso de verificar que los datos ingresad
 
 ### Importancia de la validación
 
-**🔹 Prevenir errores**  
-Evita que el programa falle por datos incorrectos o inesperados.
-
-**🔹 Mejorar experiencia del usuario**  
-Proporciona retroalimentación clara sobre qué datos son válidos.
-
-**🔹 Seguridad**  
-Protege contra entradas maliciosas o no deseadas.
-
-**🔹 Integridad de datos**  
-Asegura que solo se procesen datos correctos y consistentes.
+| Aspecto | Descripción |
+|---------|-------------|
+| **Prevenir errores** | Evita que el programa falle por datos incorrectos |
+| **Experiencia del usuario** | Proporciona retroalimentación clara sobre datos válidos |
+| **Seguridad** | Protege contra entradas maliciosas |
+| **Integridad de datos** | Asegura que solo se procesen datos correctos |
 
 ### Tipos de validación común
 
-**Validación de tipo**: Verificar que el dato sea del tipo esperado (número, texto, etc.)  
-**Validación de rango**: Verificar que un número esté dentro de límites aceptables  
-**Validación de formato**: Verificar que el texto siga un patrón específico  
-**Validación de existencia**: Verificar que el campo no esté vacío  
+| Tipo | Descripción |
+|------|-------------|
+| **De tipo** | Verificar que el dato sea del tipo esperado (número, texto) |
+| **De rango** | Verificar que un número esté dentro de límites aceptables |
+| **De formato** | Verificar que el texto siga un patrón específico |
+| **De existencia** | Verificar que el campo no esté vacío |
 
 ### Técnicas de validación
 
-**🔹 Try-except**  
-Capturar errores de conversión de tipos.
+- **Try-except**: Capturar errores de conversión de tipos
+- **Bucles while**: Repetir la solicitud hasta obtener datos válidos
+- **Métodos de string**: Usar `.isdigit()`, `.isalpha()`, `.strip()`, etc.
+- **Expresiones condicionales**: Verificar condiciones con if/elif/else
 
-**🔹 Bucles while**  
-Repetir la solicitud hasta obtener datos válidos.
-
-**🔹 Métodos de string**  
-Usar `.isdigit()`, `.isalpha()`, `.strip()`, etc.
-
-**🔹 Expresiones condicionales**  
-Verificar condiciones específicas con if/elif/else.
-
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Validación de edad (número entero)
+### Ejemplo: Validación de edad (número entero)
 
 <Code code={`# Validación básica de edad
 while True:
@@ -547,7 +478,7 @@ while True:
 
 print(f"\\nTu edad es: {edad} años")`} lang="python" title="Validación de edad" />
 
-### Validación de nombre (solo letras)
+### Ejemplo: Validación de nombre (solo letras)
 
 <Code code={`# Validación de nombre
 while True:
@@ -568,7 +499,7 @@ while True:
 
 print(f"\\nBienvenido, {nombre}!")`} lang="python" title="Validación de nombre" />
 
-### Validación de respuesta sí/no
+### Ejemplo: Validación de respuesta sí/no
 
 <Code code={`# Validación de respuesta binaria
 while True:
@@ -590,7 +521,7 @@ if continuar:
 else:
     print("Programa terminado")`} lang="python" title="Validación sí/no" />
 
-### Validación de email (básica)
+### Ejemplo: Validación de email (básica)
 
 <Code code={`# Validación básica de email
 while True:
@@ -612,7 +543,7 @@ while True:
         print(f"✅ Email válido: {email}")
         break`} lang="python" title="Validación de email" />
 
-### Programa completo: Registro de usuario
+### Ejemplo: Registro de usuario completo
 
 <Code code={`# Sistema de registro con validaciones
 print("=== REGISTRO DE USUARIO ===\\n")
@@ -658,7 +589,7 @@ print(f"Email:     {email}")
 print(f"Teléfono:  {telefono}")
 print("=" * 40)`} lang="python" title="Registro completo" />
 
-### Función reutilizable de validación
+### Ejemplo: Función reutilizable de validación
 
 <Code code={`# Crear función para validar entradas numéricas
 def solicitar_numero(mensaje, minimo, maximo):
@@ -689,9 +620,6 @@ print(f"Calificación: {calificacion}")`} lang="python" title="Función de valid
 4. **Limita intentos** - En aplicaciones reales, limita los intentos fallidos
 5. **Sanitiza los datos** - Usa `.strip()` para eliminar espacios innecesarios
 </Aside>
-
-</TabItem>
-</Tabs>
 
 ---
 

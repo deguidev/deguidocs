@@ -4,15 +4,9 @@ description: Toma de decisiones en Python con if, elif, else y operadores relaci
 ---
 
 import { Code } from '@astrojs/starlight/components';
-import { Tabs, TabItem } from '@astrojs/starlight/components';
-import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
-import { Steps } from '@astrojs/starlight/components';
 
 ## 🤔 5.1 Qué es una decisión en programación
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de decisión en programación
 
@@ -24,16 +18,12 @@ El **control de flujo** altera el orden secuencial de ejecución. Por defecto, l
 
 ### Propósito de las estructuras condicionales
 
-**🔹 Adaptabilidad**: El programa responde diferente según las circunstancias  
-**🔹 Validación**: Verifican que los datos cumplan criterios específicos  
-**🔹 Lógica de negocio**: Implementan reglas del dominio del problema  
-**🔹 Interactividad**: Responden a las acciones del usuario  
+- **Adaptabilidad**: El programa responde diferente según las circunstancias
+- **Validación**: Verifican que los datos cumplan criterios específicos
+- **Lógica de negocio**: Implementan reglas del dominio del problema
+- **Interactividad**: Responden a las acciones del usuario
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Flujo secuencial vs condicional
+### Ejemplo: Flujo secuencial vs condicional
 
 <Code code={`# FLUJO SECUENCIAL (sin decisiones)
 print("Línea 1")
@@ -48,7 +38,7 @@ if edad >= 18:
 else:
     print("Eres menor de edad")  # Sí se ejecuta`} lang="python" title="Comparación de flujos" />
 
-### Decisión simple
+### Ejemplo: Decisión simple
 
 <Code code={`# Decisión con un solo camino
 temperatura = 38
@@ -59,21 +49,17 @@ if temperatura > 37:
 
 print("Programa finalizado")`} lang="python" title="Decisión simple" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 🔀 5.2 Uso de if, elif, else con ejemplos sencillos
 
-<Tabs>
-<TabItem label="👔 Parte Teórica">
-
 ### Estructuras condicionales
 
-**if**: Evalúa una condición y ejecuta código si es `True`  
-**if-else**: Dos caminos: uno si es `True`, otro si es `False`  
-**if-elif-else**: Múltiples condiciones evaluadas en secuencia  
+| Estructura | Descripción |
+|------------|-------------|
+| `if` | Evalúa una condición y ejecuta código si es `True` |
+| `if-else` | Dos caminos: uno si es `True`, otro si es `False` |
+| `if-elif-else` | Múltiples condiciones evaluadas en secuencia |
 
 ### Sintaxis
 
@@ -88,15 +74,11 @@ else:
 
 ### Características importantes
 
-**🔹 Indentación obligatoria**: Python usa 4 espacios para delimitar bloques  
-**🔹 Evaluación en cortocircuito**: Se ejecuta el primer `True` encontrado  
-**🔹 else es opcional**: Puedes usar solo `if` o `if-elif`  
+- **Indentación obligatoria**: Python usa 4 espacios para delimitar bloques
+- **Evaluación en cortocircuito**: Se ejecuta el primer `True` encontrado
+- **else es opcional**: Puedes usar solo `if` o `if-elif`
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### if simple
+### Ejemplo: if simple
 
 <Code code={`# Estructura if básica
 edad = 20
@@ -107,7 +89,7 @@ if edad >= 18:
 
 print("Fin del programa")`} lang="python" title="if simple" />
 
-### if-else
+### Ejemplo: if-else
 
 <Code code={`# Estructura if-else
 numero = 7
@@ -119,7 +101,7 @@ else:
 
 # Salida: 7 es impar`} lang="python" title="if-else" />
 
-### if-elif-else
+### Ejemplo: if-elif-else
 
 <Code code={`# Estructura if-elif-else
 nota = 8.5
@@ -137,40 +119,34 @@ else:
 
 # Salida: Calificación: B (Muy bueno)`} lang="python" title="if-elif-else" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## ⚖️ 5.3 Operadores relacionales aplicados a condiciones
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Operadores relacionales
 
 Los operadores relacionales comparan valores y generan expresiones booleanas:
 
-**`==`**: Igual a  
-**`!=`**: Diferente de  
-**`<`**: Menor que  
-**`>`**: Mayor que  
-**`<=`**: Menor o igual  
-**`>=`**: Mayor o igual  
+| Operador | Descripción |
+|----------|-------------|
+| `==` | Igual a |
+| `!=` | Diferente de |
+| `<` | Menor que |
+| `>` | Mayor que |
+| `<=` | Menor o igual |
+| `>=` | Mayor o igual |
 
-### Operadores adicionales
+### Operadores lógicos y de pertenencia
 
-**`in`**: Verifica si un elemento está en una secuencia  
-**`not in`**: Verifica si NO está  
-**`and`**: Ambas condiciones deben ser True  
-**`or`**: Al menos una debe ser True  
-**`not`**: Invierte el valor booleano  
+| Operador | Descripción |
+|----------|-------------|
+| `in` | Verifica si un elemento está en una secuencia |
+| `not in` | Verifica si NO está |
+| `and` | Ambas condiciones deben ser True |
+| `or` | Al menos una debe ser True |
+| `not` | Invierte el valor booleano |
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Comparaciones numéricas
+### Ejemplo: Comparaciones numéricas
 
 <Code code={`# Operadores relacionales
 edad = 25
@@ -184,7 +160,7 @@ if edad >= 18:
 if edad < 65:
     print("No eres adulto mayor")`} lang="python" title="Comparaciones" />
 
-### Operador in
+### Ejemplo: Operador in
 
 <Code code={`# Verificar pertenencia
 frutas = ["manzana", "pera", "uva"]
@@ -197,7 +173,7 @@ email = "usuario@example.com"
 if "@" in email:
     print("Email válido")`} lang="python" title="Operador in" />
 
-### Condiciones compuestas
+### Ejemplo: Condiciones compuestas
 
 <Code code={`# Usar and
 edad = 25
@@ -212,15 +188,9 @@ dia = "sábado"
 if dia == "sábado" or dia == "domingo":
     print("Es fin de semana")`} lang="python" title="and y or" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 🔄 5.4 Anidamiento de condiciones
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de anidamiento
 
@@ -228,9 +198,9 @@ El **anidamiento** consiste en colocar una estructura condicional dentro de otra
 
 ### Cuándo usar anidamiento
 
-**🔹 Decisiones dependientes**: Una decisión solo tiene sentido después de otra  
-**🔹 Validaciones en cascada**: Verificar múltiples criterios en secuencia  
-**🔹 Lógica compleja**: Cuando no puede expresarse con operadores simples  
+- **Decisiones dependientes**: Una decisión solo tiene sentido después de otra
+- **Validaciones en cascada**: Verificar múltiples criterios en secuencia
+- **Lógica compleja**: Cuando no puede expresarse con operadores simples
 
 ### Buenas prácticas
 
@@ -238,11 +208,7 @@ El **anidamiento** consiste en colocar una estructura condicional dentro de otra
 - Considerar usar operadores lógicos en lugar de anidar
 - Refactorizar si hay más de 3 niveles
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Anidamiento básico
+### Ejemplo: Anidamiento básico
 
 <Code code={`# Anidamiento de dos niveles
 edad = 20
@@ -258,7 +224,7 @@ if edad >= 18:
 else:
     print("Eres menor de edad")`} lang="python" title="Anidamiento básico" />
 
-### Comparación: anidado vs operadores
+### Ejemplo: Anidado vs operadores
 
 <Code code={`# Con anidamiento
 if edad >= 18:
@@ -269,23 +235,11 @@ if edad >= 18:
 if edad >= 18 and tiene_licencia:
     print("Puedes conducir")`} lang="python" title="Anidado vs and" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 💪 5.5 Ejercicios guiados: validar edad, comparar números
 
-<Tabs>
-<TabItem label="👔 Parte Teórica">
-
-### Propósito de los ejercicios
-
 Los ejercicios guiados permiten aplicar los conceptos de estructuras condicionales en problemas prácticos: validación de datos, comparación de valores, clasificación y lógica de negocio.
-
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
 
 ### Ejercicio 1: Validar edad
 
@@ -368,9 +322,6 @@ else:
         print("Clasificación: Sobrepeso")
     else:
         print("Clasificación: Obesidad")`} lang="python" title="Calculadora IMC" />
-
-</TabItem>
-</Tabs>
 
 ---
 

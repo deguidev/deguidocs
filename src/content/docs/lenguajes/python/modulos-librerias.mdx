@@ -4,15 +4,9 @@ description: Uso de import, librerías estándar (math, random, datetime) e inst
 ---
 
 import { Code } from '@astrojs/starlight/components';
-import { Tabs, TabItem } from '@astrojs/starlight/components';
-import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
-import { Steps } from '@astrojs/starlight/components';
 
 ## 📦 9.1 ¿Qué es un módulo? ¿Y una librería?
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de módulo
 
@@ -24,29 +18,31 @@ Una **librería** (o biblioteca) es una colección de módulos relacionados que 
 
 ### Diferencias clave
 
-**Módulo**: Un archivo `.py` individual  
-**Paquete**: Directorio que contiene múltiples módulos y un archivo `__init__.py`  
-**Librería**: Término general para módulos y paquetes que proporcionan funcionalidad  
+| Concepto | Descripción |
+|----------|-------------|
+| **Módulo** | Un archivo `.py` individual |
+| **Paquete** | Directorio con múltiples módulos y un archivo `__init__.py` |
+| **Librería** | Término general para módulos y paquetes que proporcionan funcionalidad |
 
 ### Propósito
 
-**🔹 Reutilización**: Evitar reescribir código común  
-**🔹 Organización**: Estructurar proyectos grandes en partes manejables  
-**🔹 Mantenibilidad**: Facilitar actualizaciones y correcciones  
-**🔹 Colaboración**: Compartir código entre desarrolladores  
-**🔹 Abstracción**: Ocultar complejidad detrás de interfaces simples  
+| Propósito | Descripción |
+|-----------|-------------|
+| **Reutilización** | Evitar reescribir código común |
+| **Organización** | Estructurar proyectos grandes en partes manejables |
+| **Mantenibilidad** | Facilitar actualizaciones y correcciones |
+| **Colaboración** | Compartir código entre desarrolladores |
+| **Abstracción** | Ocultar complejidad detrás de interfaces simples |
 
 ### Tipos de librerías
 
-**Estándar**: Incluidas con Python (math, random, datetime)  
-**Externas**: Instaladas con pip (requests, pandas, numpy)  
-**Propias**: Creadas por el desarrollador para su proyecto  
+| Tipo | Descripción | Ejemplos |
+|------|-------------|----------|
+| **Estándar** | Incluidas con Python | math, random, datetime |
+| **Externas** | Instaladas con pip | requests, pandas, numpy |
+| **Propias** | Creadas por el desarrollador | módulos de tu proyecto |
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Crear un módulo propio
+### Ejemplo: Crear un módulo propio
 
 <Code code={`# Archivo: calculadora.py
 def sumar(a, b):
@@ -65,7 +61,7 @@ def dividir(a, b):
 
 PI = 3.14159`} lang="python" title="calculadora.py (módulo propio)" />
 
-### Usar el módulo creado
+### Ejemplo: Usar el módulo creado
 
 <Code code={`# Archivo: main.py
 import calculadora
@@ -77,7 +73,7 @@ print(resultado)  # 8
 print(calculadora.multiplicar(4, 7))  # 28
 print(calculadora.PI)  # 3.14159`} lang="python" title="main.py (usar módulo)" />
 
-### Diferencia entre módulo y librería
+### Ejemplo: Diferencia entre módulo y librería
 
 <Code code={`# MÓDULO: Un solo archivo
 import math  # math es un módulo
@@ -89,22 +85,18 @@ from datetime import date, time, datetime
 # Librería externa (paquete complejo)
 # import pandas  # pandas es una librería con muchos módulos`} lang="python" title="Módulo vs Librería" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 📥 9.2 Uso de import y from ... import
 
-<Tabs>
-<TabItem label="👔 Parte Teórica">
-
 ### Sintaxis de import
 
-**import modulo**: Importa el módulo completo  
-**from modulo import funcion**: Importa elementos específicos  
-**import modulo as alias**: Importa con un alias  
-**from modulo import ***: Importa todo (no recomendado)  
+| Sintaxis | Descripción |
+|----------|-------------|
+| `import modulo` | Importa el módulo completo |
+| `from modulo import funcion` | Importa elementos específicos |
+| `import modulo as alias` | Importa con un alias |
+| `from modulo import *` | Importa todo (no recomendado) |
 
 ### Formas de importar
 
@@ -124,22 +116,20 @@ from math import *
 
 ### Ventajas de cada forma
 
-**import modulo**: Evita conflictos de nombres, claro de dónde viene cada función  
-**from modulo import**: Código más limpio, acceso directo a funciones  
-**import as**: Nombres cortos para módulos con nombres largos  
+| Forma | Ventaja |
+|-------|---------|
+| `import modulo` | Evita conflictos de nombres, claro de dónde viene cada función |
+| `from modulo import` | Código más limpio, acceso directo a funciones |
+| `import as` | Nombres cortos para módulos con nombres largos |
 
 ### Buenas prácticas
 
-**🔹 Imports al inicio**: Colocar todos los imports al principio del archivo  
-**🔹 Orden**: Estándar → Externos → Propios  
-**🔹 Evitar ***: No usar `from modulo import *` (contamina namespace)  
-**🔹 Alias claros**: Usar alias reconocibles (np para numpy, pd para pandas)  
+- **Imports al inicio**: Colocar todos los imports al principio del archivo
+- **Orden**: Estándar → Externos → Propios
+- **Evitar \***: No usar `from modulo import *` (contamina namespace)
+- **Alias claros**: Usar alias reconocibles (np para numpy, pd para pandas)
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### import completo
+### Ejemplo: import completo
 
 <Code code={`# Importar módulo completo
 import math
@@ -151,7 +141,7 @@ print(math.pow(2, 3))   # 8.0
 
 # Ventaja: Claro de dónde viene cada función`} lang="python" title="import completo" />
 
-### from ... import específico
+### Ejemplo: from ... import específico
 
 <Code code={`# Importar elementos específicos
 from math import sqrt, pi, pow
@@ -163,7 +153,7 @@ print(pow(2, 3))   # 8.0
 
 # Ventaja: Código más limpio`} lang="python" title="from import" />
 
-### import con alias
+### Ejemplo: import con alias
 
 <Code code={`# Importar con alias
 import math as m
@@ -177,7 +167,7 @@ import datetime as dt
 fecha = dt.date.today()
 print(fecha)`} lang="python" title="import con alias" />
 
-### Comparación de métodos
+### Ejemplo: Comparación de métodos
 
 <Code code={`# MÉTODO 1: import completo
 import random
@@ -193,7 +183,7 @@ numero3 = rnd.randint(1, 10)
 
 # Todos funcionan, elige según preferencia y contexto`} lang="python" title="Comparación" />
 
-### Importar múltiples elementos
+### Ejemplo: Importar múltiples elementos
 
 <Code code={`# Importar varios elementos en una línea
 from math import sqrt, pow, pi, e
@@ -227,42 +217,19 @@ print(sqrt(16))  # Sabemos que importamos sqrt
 ```
 </Aside>
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 📚 9.3 Librerías estándar: math, random, datetime
 
-<Tabs>
-<TabItem label="👔 Parte Teórica">
+### Resumen de librerías estándar
 
-### Librería math
+| Librería | Propósito | Funciones principales |
+|----------|-----------|----------------------|
+| **math** | Funciones matemáticas avanzadas | `sqrt()`, `pow()`, `ceil()`, `floor()`, `sin()`, `cos()`, `log()` |
+| **random** | Números aleatorios y selecciones | `random()`, `randint()`, `choice()`, `shuffle()`, `sample()` |
+| **datetime** | Fechas, horas y operaciones temporales | `date`, `time`, `datetime`, `timedelta` |
 
-Proporciona funciones matemáticas avanzadas: raíces, potencias, trigonometría, logaritmos, constantes matemáticas.
-
-**Funciones comunes**: `sqrt()`, `pow()`, `ceil()`, `floor()`, `sin()`, `cos()`, `log()`  
-**Constantes**: `pi`, `e`  
-
-### Librería random
-
-Genera números aleatorios y realiza selecciones aleatorias.
-
-**Funciones comunes**: `random()`, `randint()`, `choice()`, `shuffle()`, `sample()`  
-**Uso**: Juegos, simulaciones, muestreo, testing  
-
-### Librería datetime
-
-Maneja fechas, horas y operaciones temporales.
-
-**Clases principales**: `date`, `time`, `datetime`, `timedelta`  
-**Uso**: Registros, cálculos de tiempo, formateo de fechas  
-
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Librería math
+### Ejemplo: Librería math
 
 <Code code={`import math
 
@@ -287,7 +254,7 @@ print(math.cos(0))          # 1.0
 print(math.log(10))       # 2.302585092994046 (ln)
 print(math.log10(100))    # 2.0 (log base 10)`} lang="python" title="math" />
 
-### Librería random
+### Ejemplo: Librería random
 
 <Code code={`import random
 
@@ -313,7 +280,7 @@ print(numeros)  # Ej: [3, 1, 5, 2, 4]
 # Seleccionar múltiples elementos
 print(random.sample(frutas, 2))  # Ej: ['uva', 'manzana']`} lang="python" title="random" />
 
-### Librería datetime
+### Ejemplo: Librería datetime
 
 <Code code={`from datetime import date, time, datetime, timedelta
 
@@ -350,7 +317,7 @@ print(proxima_semana)  # 2024-01-22
 diferencia = hoy - cumpleanos
 print(f"Días vividos: {diferencia.days}")`} lang="python" title="datetime" />
 
-### Ejemplo integrado
+### Ejemplo: Uso integrado de las tres librerías
 
 <Code code={`import math
 import random
@@ -373,15 +340,9 @@ print(f"Lanzamiento de dado: {dado}\\n")
 ahora = datetime.now()
 print(f"Fecha y hora: {ahora.strftime('%d/%m/%Y %H:%M:%S')}")`} lang="python" title="Ejemplo integrado" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 📦 9.4 Instalación de librerías externas con pip
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### ¿Qué es pip?
 
@@ -389,32 +350,34 @@ print(f"Fecha y hora: {ahora.strftime('%d/%m/%Y %H:%M:%S')}")`} lang="python" ti
 
 ### Comandos principales
 
-**Instalar**: `pip install nombre_libreria`  
-**Desinstalar**: `pip uninstall nombre_libreria`  
-**Actualizar**: `pip install --upgrade nombre_libreria`  
-**Listar instaladas**: `pip list`  
-**Ver información**: `pip show nombre_libreria`  
+| Comando | Descripción |
+|---------|-------------|
+| `pip install nombre` | Instalar librería |
+| `pip uninstall nombre` | Desinstalar librería |
+| `pip install --upgrade nombre` | Actualizar librería |
+| `pip list` | Listar librerías instaladas |
+| `pip show nombre` | Ver información de librería |
+| `pip freeze > requirements.txt` | Exportar dependencias |
 
 ### Librerías externas populares
 
-**requests**: Realizar peticiones HTTP  
-**pandas**: Análisis de datos  
-**numpy**: Cálculos numéricos  
-**matplotlib**: Gráficos y visualización  
-**flask**: Framework web  
-**django**: Framework web completo  
+| Librería | Propósito |
+|----------|-----------|
+| **requests** | Realizar peticiones HTTP |
+| **pandas** | Análisis de datos |
+| **numpy** | Cálculos numéricos |
+| **matplotlib** | Gráficos y visualización |
+| **flask** | Framework web ligero |
+| **django** | Framework web completo |
 
 ### Entornos virtuales
 
-**Propósito**: Aislar dependencias por proyecto  
-**Comando**: `python -m venv nombre_entorno`  
-**Activar**: `nombre_entorno\Scripts\activate` (Windows)  
+- **Propósito**: Aislar dependencias por proyecto
+- **Crear**: `python -m venv nombre_entorno`
+- **Activar (Windows)**: `nombre_entorno\Scripts\activate`
+- **Activar (Linux/Mac)**: `source nombre_entorno/bin/activate`
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Instalar librería
+### Ejemplo: Instalar librería
 
 <Code code={`# En la terminal/consola (NO en Python)
 
@@ -430,7 +393,7 @@ pip install requests pandas numpy
 # Instalar desde requirements.txt
 pip install -r requirements.txt`} lang="bash" title="Instalar con pip" />
 
-### Comandos útiles de pip
+### Ejemplo: Comandos útiles de pip
 
 <Code code={`# Ver librerías instaladas
 pip list
@@ -450,7 +413,7 @@ pip freeze > requirements.txt
 # Ver versión de pip
 pip --version`} lang="bash" title="Comandos pip" />
 
-### Usar librería instalada: requests
+### Ejemplo: Usar librería requests
 
 <Code code={`# Primero instalar: pip install requests
 import requests
@@ -476,7 +439,7 @@ if respuesta.status_code == 200:
 else:
     print("Error en la petición")`} lang="python" title="Usar requests" />
 
-### Crear requirements.txt
+### Ejemplo: Crear requirements.txt
 
 <Code code={`# Archivo: requirements.txt
 # Lista de dependencias del proyecto
@@ -489,7 +452,7 @@ matplotlib==3.7.2
 # Para instalar todas:
 # pip install -r requirements.txt`} lang="text" title="requirements.txt" />
 
-### Entorno virtual básico
+### Ejemplo: Entorno virtual básico
 
 <Code code={`# Crear entorno virtual (en terminal)
 python -m venv mi_entorno
@@ -514,15 +477,9 @@ deactivate`} lang="bash" title="Entorno virtual" />
 5. **Verifica instalación** con `pip show nombre_libreria`
 </Aside>
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 🛠️ 9.5 Uso práctico de módulos con ejemplos cotidianos
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Aplicaciones prácticas
 
@@ -530,15 +487,13 @@ Los módulos y librerías permiten resolver problemas reales de manera eficiente
 
 ### Casos de uso comunes
 
-**Cálculos matemáticos**: Usar math para operaciones complejas  
-**Generación aleatoria**: Usar random para juegos y simulaciones  
-**Manejo de fechas**: Usar datetime para registros y cálculos temporales  
-**Peticiones web**: Usar requests para consumir APIs  
-**Análisis de datos**: Usar pandas para procesar información  
-
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
+| Caso de uso | Módulo/Librería | Aplicación |
+|-------------|-----------------|------------|
+| **Cálculos matemáticos** | math | Operaciones complejas, trigonometría |
+| **Generación aleatoria** | random | Juegos, simulaciones, muestreo |
+| **Manejo de fechas** | datetime | Registros, cálculos temporales |
+| **Peticiones web** | requests | Consumir APIs, web scraping |
+| **Análisis de datos** | pandas | Procesar información, reportes |
 
 ### Ejemplo 1: Calculadora científica
 
@@ -737,9 +692,6 @@ def simular_lanzamientos(cantidad):
 # Ejecutar simulación
 cantidad = int(input("¿Cuántos lanzamientos? "))
 simular_lanzamientos(cantidad)`} lang="python" title="Simulador de moneda" />
-
-</TabItem>
-</Tabs>
 
 ---
 

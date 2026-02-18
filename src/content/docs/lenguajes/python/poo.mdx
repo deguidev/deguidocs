@@ -4,15 +4,9 @@ description: Clases, objetos, atributos, métodos, herencia y encapsulamiento en
 ---
 
 import { Code } from '@astrojs/starlight/components';
-import { Tabs, TabItem } from '@astrojs/starlight/components';
-import { Badge } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
-import { Steps } from '@astrojs/starlight/components';
 
 ## 🎯 11.1 ¿Qué es la POO y por qué se usa?
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de POO
 
@@ -20,10 +14,12 @@ La **Programación Orientada a Objetos** (POO) es un paradigma de programación 
 
 ### Principios fundamentales
 
-**🔹 Abstracción**: Modelar entidades del mundo real en código  
-**🔹 Encapsulamiento**: Ocultar detalles internos, exponer solo lo necesario  
-**🔹 Herencia**: Crear nuevas clases basadas en clases existentes  
-**🔹 Polimorfismo**: Objetos de diferentes clases pueden responder a la misma interfaz  
+| Principio | Descripción |
+|-----------|-------------|
+| **Abstracción** | Modelar entidades del mundo real en código |
+| **Encapsulamiento** | Ocultar detalles internos, exponer solo lo necesario |
+| **Herencia** | Crear nuevas clases basadas en clases existentes |
+| **Polimorfismo** | Objetos de diferentes clases responden a la misma interfaz |
 
 ### Ventajas de la POO
 
@@ -35,16 +31,14 @@ La **Programación Orientada a Objetos** (POO) es un paradigma de programación 
 
 ### Conceptos clave
 
-**Clase**: Plantilla o molde para crear objetos  
-**Objeto**: Instancia específica de una clase  
-**Atributo**: Datos que describe el objeto  
-**Método**: Funciones que definen el comportamiento del objeto  
+| Concepto | Descripción |
+|----------|-------------|
+| **Clase** | Plantilla o molde para crear objetos |
+| **Objeto** | Instancia específica de una clase |
+| **Atributo** | Datos que describen el objeto |
+| **Método** | Funciones que definen el comportamiento del objeto |
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### POO vs Programación Procedural
+### Ejemplo: POO vs Programación Procedural
 
 <Code code={`# PROGRAMACIÓN PROCEDURAL (sin POO)
 nombre_perro = "Max"
@@ -71,39 +65,35 @@ mi_perro = Perro("Max", 3, "Labrador")
 mi_perro.ladrar()  # Max dice: ¡Guau!
 `} lang="python" title="POO vs Procedural" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 🏗️ 11.2 Crear clases y objetos en Python
 
-<Tabs>
-<TabItem label="👔 Parte Teórica">
-
 ### Definir una clase
 
 **Sintaxis**:
-<Code code={`class NombreClase:
+```python
+class NombreClase:
     # Cuerpo de la clase
-    pass`} lang="python" title="Definir una clase" />
+    pass
+```
 
 ### Crear objetos (instancias)
 
 **Sintaxis**:
-<Code code={`objeto = NombreClase()`} lang="python" title="Crear objetos (instancias)" />
+```python
+objeto = NombreClase()
+```
 
 ### Convenciones
 
-**🔹 Nombres de clases**: PascalCase (primera letra de cada palabra en mayúscula)  
-**🔹 Nombres de objetos**: snake_case (minúsculas con guiones bajos)  
-**🔹 Indentación**: El cuerpo de la clase debe estar indentado  
+| Convención | Descripción |
+|------------|-------------|
+| **Nombres de clases** | PascalCase (primera letra de cada palabra en mayúscula) |
+| **Nombres de objetos** | snake_case (minúsculas con guiones bajos) |
+| **Indentación** | El cuerpo de la clase debe estar indentado |
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Clase básica
+### Ejemplo: Clase básica
 
 <Code code={`# Definir una clase simple
 class Persona:
@@ -116,15 +106,9 @@ persona2 = Persona()
 print(type(persona1))  # <class '__main__.Persona'>
 print(persona1 == persona2)  # False (objetos diferentes)`} lang="python" title="Clase básica" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 📊 11.3 Propiedades (atributos) y comportamientos (métodos)
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Atributos (propiedades)
 
@@ -132,13 +116,9 @@ Los **atributos** son variables que pertenecen a un objeto y almacenan su estado
 
 ### Métodos (comportamientos)
 
-Los **métodos** son funciones definidas dentro de una clase que describen el comportamiento del objeto. El primer parámetro siempre es self.
+Los **métodos** son funciones definidas dentro de una clase que describen el comportamiento del objeto. El primer parámetro siempre es `self`.
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Atributos y métodos
+### Ejemplo: Atributos y métodos
 
 <Code code={`class Perro:
     def __init__(self, nombre, raza):
@@ -155,15 +135,9 @@ mi_perro = Perro("Max", "Labrador")
 mi_perro.ladrar()        # Max dice: ¡Guau!
 mi_perro.presentarse()   # Hola, soy Max y soy un Labrador`} lang="python" title="Atributos y métodos" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 🎬 11.4 El método __init__() y su función
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de __init__()
 
@@ -171,14 +145,12 @@ El método **`__init__()`** es el constructor de la clase. Se ejecuta automátic
 
 ### Sintaxis
 
-<Code code={`def __init__(self, parametros):
-    self.atributo = valor`} lang="python" title="__init__()" />
+```python
+def __init__(self, parametros):
+    self.atributo = valor
+```
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### __init__() básico
+### Ejemplo: __init__() básico
 
 <Code code={`class Persona:
     def __init__(self, nombre, edad):
@@ -188,7 +160,7 @@ El método **`__init__()`** es el constructor de la clase. Se ejecuta automátic
 persona = Persona("Ana", 25)
 print(f"{persona.nombre} tiene {persona.edad} años")`} lang="python" title="__init__()" />
 
-### Con valores por defecto
+### Ejemplo: Con valores por defecto
 
 <Code code={`class CuentaBancaria:
     def __init__(self, titular, saldo=0):
@@ -203,15 +175,9 @@ cuenta2 = CuentaBancaria("Carlos")  # saldo = 0
 cuenta1.mostrar_saldo()  # Saldo de Ana: 1000 USD
 `} lang="python" title="Valores por defecto" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 🔒 11.5 Encapsulamiento y uso de self
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### self
 
@@ -220,15 +186,14 @@ cuenta1.mostrar_saldo()  # Saldo de Ana: 1000 USD
 ### Encapsulamiento
 
 El **encapsulamiento** oculta los detalles internos. En Python:
-- **público**: `atributo`
-- **protegido**: `_atributo` (convención)
-- **privado**: `__atributo` (name mangling)
 
-</TabItem>
+| Nivel | Sintaxis | Descripción |
+|-------|----------|-------------|
+| **Público** | `atributo` | Accesible desde cualquier lugar |
+| **Protegido** | `_atributo` | Convención, no debería accederse externamente |
+| **Privado** | `__atributo` | Name mangling, difícil de acceder externamente |
 
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Uso de self
+### Ejemplo: Uso de self
 
 <Code code={`class Rectangulo:
     def __init__(self, base, altura):
@@ -246,7 +211,7 @@ rect = Rectangulo(5, 3)
 rect.mostrar_info()  # Área: 15
 `} lang="python" title="self" />
 
-### Encapsulamiento
+### Ejemplo: Encapsulamiento
 
 <Code code={`class CuentaBancaria:
     def __init__(self, titular, saldo_inicial):
@@ -265,33 +230,25 @@ cuenta.depositar(500)
 print(cuenta.obtener_saldo())  # 1500
 `} lang="python" title="Encapsulamiento" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 👨‍👩‍👧 11.6 Herencia y clases hijas
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Concepto de herencia
 
 La **herencia** permite crear nuevas clases basadas en clases existentes, heredando sus atributos y métodos.
 
 **Sintaxis**:
-<Code code={`class ClaseHija(ClasePadre):
-    # Código adicional`} lang="python" title="Herencia" />
+```python
+class ClaseHija(ClasePadre):
+    # Código adicional
+```
 
 ### super()
 
 La función **super()** permite acceder a métodos de la clase padre.
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Herencia básica
+### Ejemplo: Herencia básica
 
 <Code code={`class Animal:
     def __init__(self, nombre):
@@ -314,7 +271,7 @@ perro.hacer_sonido()  # Max dice: ¡Guau!
 gato.hacer_sonido()   # Luna dice: ¡Miau!
 `} lang="python" title="Herencia" />
 
-### Usar super()
+### Ejemplo: Usar super()
 
 <Code code={`class Vehiculo:
     def __init__(self, marca, modelo):
@@ -329,30 +286,22 @@ class Coche(Vehiculo):
 coche = Coche("Toyota", "Corolla", 4)
 print(f"{coche.marca} {coche.modelo} - {coche.puertas} puertas")`} lang="python" title="super()" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## ⚙️ 11.7 Métodos especiales: __str__(), __len__(), etc.
-
-<Tabs>
-<TabItem label="👔 Parte Teórica">
 
 ### Métodos mágicos
 
 Los **métodos especiales** permiten personalizar el comportamiento de los objetos.
 
-**`__str__()`**: Representación legible (para print)  
-**`__len__()`**: Longitud (para len())  
-**`__eq__()`**: Igualdad (para ==)  
-**`__add__()`**: Suma (para +)  
+| Método | Uso | Descripción |
+|--------|-----|-------------|
+| `__str__()` | `print(obj)` | Representación legible |
+| `__len__()` | `len(obj)` | Longitud del objeto |
+| `__eq__()` | `obj1 == obj2` | Comparación de igualdad |
+| `__add__()` | `obj1 + obj2` | Suma de objetos |
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### __str__()
+### Ejemplo: __str__()
 
 <Code code={`class Libro:
     def __init__(self, titulo, autor):
@@ -366,7 +315,7 @@ libro = Libro("Python 101", "Ana García")
 print(libro)  # "Python 101" por Ana García
 `} lang="python" title="__str__()" />
 
-### __len__()
+### Ejemplo: __len__()
 
 <Code code={`class Playlist:
     def __init__(self, nombre):
@@ -385,28 +334,20 @@ playlist.agregar("Canción 2")
 print(len(playlist))  # 2
 `} lang="python" title="__len__()" />
 
-</TabItem>
-</Tabs>
-
 ---
 
 ## 📐 11.8 Buenas prácticas al diseñar clases
 
-<Tabs>
-<TabItem label="👔 Parte Teórica">
-
 ### Principios de diseño
 
-**🔹 Responsabilidad única**: Una clase debe tener un solo propósito  
-**🔹 Encapsulamiento**: Ocultar detalles de implementación  
-**🔹 Nombres descriptivos**: Clases y métodos con nombres claros  
-**🔹 Documentación**: Usar docstrings  
+| Principio | Descripción |
+|-----------|-------------|
+| **Responsabilidad única** | Una clase debe tener un solo propósito |
+| **Encapsulamiento** | Ocultar detalles de implementación |
+| **Nombres descriptivos** | Clases y métodos con nombres claros |
+| **Documentación** | Usar docstrings para explicar el código |
 
-</TabItem>
-
-<TabItem label="💡 Ejemplos Prácticos">
-
-### Clase bien diseñada
+### Ejemplo: Clase bien diseñada
 
 <Code code={`class CuentaBancaria:
     """Representa una cuenta bancaria con operaciones básicas."""
@@ -451,9 +392,6 @@ print(cuenta)  # Cuenta de Ana García: 1500.00 USD`} lang="python" title="Clase
 7. **Implementar __str__()**: Para representación legible
 8. **Validar en __init__()**: Asegurar estado válido desde el inicio
 </Aside>
-
-</TabItem>
-</Tabs>
 
 ---
 
