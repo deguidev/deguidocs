@@ -1,0 +1,541 @@
+---
+title: 5. Parámetros en las rutas
+description: Path parameters, query parameters, tipado, validación automática y parámetros opcionales
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🛤️ 5.1 Path Parameters
+
+### Qué son los Path Parameters
+
+Los **path parameters** (parámetros de ruta) son valores dinámicos que forman parte de la URL. Se definen usando llaves `{}` en la ruta.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Sintaxis** | `/ruta/{parametro}` |
+| **Ubicación** | En la URL |
+| **Obligatorio** | Siempre |
+| **Uso común** | Identificadores (IDs) |
+
+### Ejemplo: Path parameter básico
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Path parameter simple
+@app.get("/usuarios/{usuario_id}")
+def obtener_usuario(usuario_id):
+    return {"usuario_id": usuario_id}
+
+# Probar:
+# GET /usuarios/123 -> {"usuario_id": "123"}
+# GET /usuarios/ana -> {"usuario_id": "ana"}`} lang="python" title="Path parameter básico" />
+
+### Ejemplo: Múltiples path parameters
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Múltiples parámetros en la ruta
+@app.get("/tiendas/{tienda_id}/productos/{producto_id}")
+def obtener_producto_tienda(tienda_id: int, producto_id: int):
+    return {
+        "tienda_id": tienda_id,
+        "producto_id": producto_id
+    }
+
+# GET /tiendas/1/productos/50 -> {"tienda_id": 1, "producto_id": 50}
+
+# Otro ejemplo: categorías y subcategorías
+@app.get("/categorias/{categoria}/subcategorias/{subcategoria}")
+def obtener_subcategoria(categoria: str, subcategoria: str):
+    return {
+        "categoria": categoria,
+        "subcategoria": subcategoria
+    }
+
+# GET /categorias/electronica/subcategorias/laptops
+# -> {"categoria": "electronica", "subcategoria": "laptops"}`} lang="python" title="Múltiples parámetros" />
+
+### Ejemplo: Path parameters con valores predefinidos
+
+<Code code={`from fastapi import FastAPI
+from enum import Enum
+
+app = FastAPI()
+
+# Definir valores permitidos con Enum
+class TipoUsuario(str, Enum):
+    admin = "admin"
+    cliente = "cliente"
+    vendedor = "vendedor"
+
+@app.get("/usuarios/tipo/{tipo}")
+def obtener_por_tipo(tipo: TipoUsuario):
+    return {"tipo_usuario": tipo, "mensaje": f"Listando usuarios de tipo: {tipo.value}"}
+
+# GET /usuarios/tipo/admin -> {"tipo_usuario": "admin", ...}
+# GET /usuarios/tipo/cliente -> {"tipo_usuario": "cliente", ...}
+# GET /usuarios/tipo/otro -> Error 422 (valor no permitido)`} lang="python" title="Valores predefinidos" />
+
+---
+
+## 🏷️ 5.2 Tipado de parámetros
+
+### Por qué tipar los parámetros
+
+El **tipado** permite a FastAPI:
+- Validar automáticamente los datos
+- Convertir tipos (ej: string a int)
+- Generar documentación precisa
+- Mostrar errores claros
+
+### Tipos soportados
+
+| Tipo | Ejemplo | Descripción |
+|------|---------|-------------|
+| `int` | `123` | Números enteros |
+| `float` | `99.99` | Números decimales |
+| `str` | `"texto"` | Cadenas de texto |
+| `bool` | `true/false` | Booleanos |
+| `UUID` | `550e8400-e29b...` | Identificadores únicos |
+
+### Ejemplo: Tipado básico
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Sin tipado - todo es string
+@app.get("/v1/productos/{producto_id}")
+def sin_tipado(producto_id):
+    print(type(producto_id))  # <class 'str'>
+    return {"id": producto_id}
+
+# Con tipado - se convierte automáticamente
+@app.get("/v2/productos/{producto_id}")
+def con_tipado(producto_id: int):
+    print(type(producto_id))  # <class 'int'>
+    return {"id": producto_id}
+
+# GET /v1/productos/123 -> producto_id es "123" (string)
+# GET /v2/productos/123 -> producto_id es 123 (int)
+# GET /v2/productos/abc -> Error 422 (no es un entero válido)`} lang="python" title="Tipado básico" />
+
+### Ejemplo: Diferentes tipos
+
+<Code code={`from fastapi import FastAPI
+from uuid import UUID
+
+app = FastAPI()
+
+# Parámetro entero
+@app.get("/orden/{orden_id}")
+def obtener_orden(orden_id: int):
+    return {"orden_id": orden_id, "tipo": "entero"}
+
+# Parámetro flotante
+@app.get("/precio/{valor}")
+def verificar_precio(valor: float):
+    return {"precio": valor, "con_iva": valor * 1.16}
+
+# Parámetro UUID
+@app.get("/sesion/{sesion_id}")
+def obtener_sesion(sesion_id: UUID):
+    return {"sesion_id": sesion_id, "tipo": "UUID"}
+
+# Probar:
+# GET /orden/42 -> {"orden_id": 42, "tipo": "entero"}
+# GET /precio/99.99 -> {"precio": 99.99, "con_iva": 115.9884}
+# GET /sesion/550e8400-e29b-41d4-a716-446655440000 -> OK
+# GET /sesion/no-es-uuid -> Error 422`} lang="python" title="Diferentes tipos" />
+
+---
+
+## ✅ 5.3 Validación automática de datos
+
+### Cómo funciona la validación
+
+FastAPI valida automáticamente los datos según el tipo declarado. Si el valor no es válido, devuelve un error 422 con detalles.
+
+### Ejemplo: Validación automática
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/usuarios/{usuario_id}")
+def obtener_usuario(usuario_id: int):
+    return {"usuario_id": usuario_id}
+
+# Peticiones válidas:
+# GET /usuarios/1 -> {"usuario_id": 1}
+# GET /usuarios/999 -> {"usuario_id": 999}
+
+# Peticiones inválidas (Error 422):
+# GET /usuarios/abc -> "value is not a valid integer"
+# GET /usuarios/1.5 -> "value is not a valid integer"
+# GET /usuarios/ -> Error 404 (falta el parámetro)`} lang="python" title="Validación automática" />
+
+### Ejemplo: Validación con Path()
+
+<Code code={`from fastapi import FastAPI, Path
+
+app = FastAPI()
+
+# Validar que el ID sea mayor a 0
+@app.get("/productos/{producto_id}")
+def obtener_producto(
+    producto_id: int = Path(..., gt=0, description="ID del producto")
+):
+    return {"producto_id": producto_id}
+
+# GET /productos/1 -> OK
+# GET /productos/0 -> Error 422 (debe ser mayor que 0)
+# GET /productos/-5 -> Error 422
+
+# Validar rango de valores
+@app.get("/pagina/{numero}")
+def obtener_pagina(
+    numero: int = Path(..., ge=1, le=100, description="Número de página")
+):
+    return {"pagina": numero}
+
+# GET /pagina/1 -> OK
+# GET /pagina/50 -> OK
+# GET /pagina/0 -> Error (ge=1 significa >= 1)
+# GET /pagina/101 -> Error (le=100 significa <= 100)`} lang="python" title="Validación con Path()" />
+
+### Parámetros de validación
+
+| Parámetro | Significado | Ejemplo |
+|-----------|-------------|---------|
+| gt | Mayor que | Mayor a 0 |
+| ge | Mayor o igual | Mayor o igual a 1 |
+| lt | Menor que | Menor a 100 |
+| le | Menor o igual | Menor o igual a 99 |
+| min_length | Longitud mínima | Mínimo 3 caracteres |
+| max_length | Longitud máxima | Máximo 50 caracteres |
+| regex | Expresión regular | Patrón personalizado |
+
+### Ejemplo: Validación de strings
+
+<Code code={`from fastapi import FastAPI, Path
+
+app = FastAPI()
+
+# Validar longitud del username
+@app.get("/usuarios/{username}")
+def obtener_por_username(
+    username: str = Path(..., min_length=3, max_length=20)
+):
+    return {"username": username}
+
+# GET /usuarios/ana -> OK
+# GET /usuarios/ab -> Error (min_length=3)
+# GET /usuarios/nombremuylargoquesupera20caracteres -> Error
+
+# Validar formato con regex
+@app.get("/codigo/{codigo}")
+def validar_codigo(
+    codigo: str = Path(..., regex="^[A-Z]{3}-[0-9]{4}$")
+):
+    return {"codigo": codigo, "formato": "válido"}
+
+# GET /codigo/ABC-1234 -> OK
+# GET /codigo/abc-1234 -> Error (debe ser mayúsculas)
+# GET /codigo/AB-123 -> Error (formato incorrecto)`} lang="python" title="Validación de strings" />
+
+---
+
+## ❓ 5.4 Query Parameters
+
+### Qué son los Query Parameters
+
+Los **query parameters** son parámetros que se envían después del `?` en la URL. Se usan para filtrar, paginar o configurar la respuesta.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Sintaxis** | `/ruta?param1=valor1&param2=valor2` |
+| **Ubicación** | Después del `?` |
+| **Obligatorio** | Puede ser opcional |
+| **Uso común** | Filtros, paginación, búsqueda |
+
+### Ejemplo: Query parameters básicos
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Query parameters simples
+@app.get("/buscar")
+def buscar(q: str):
+    return {"busqueda": q}
+
+# GET /buscar?q=laptop -> {"busqueda": "laptop"}
+# GET /buscar -> Error 422 (q es obligatorio)
+
+# Múltiples query parameters
+@app.get("/productos")
+def listar_productos(categoria: str, marca: str):
+    return {
+        "categoria": categoria,
+        "marca": marca
+    }
+
+# GET /productos?categoria=electronica&marca=sony
+# -> {"categoria": "electronica", "marca": "sony"}`} lang="python" title="Query parameters básicos" />
+
+### Ejemplo: Query parameters con valores por defecto
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Paginación con valores por defecto
+@app.get("/usuarios")
+def listar_usuarios(pagina: int = 1, limite: int = 10):
+    return {
+        "pagina": pagina,
+        "limite": limite,
+        "usuarios": []
+    }
+
+# GET /usuarios -> {"pagina": 1, "limite": 10, ...}
+# GET /usuarios?pagina=2 -> {"pagina": 2, "limite": 10, ...}
+# GET /usuarios?pagina=3&limite=20 -> {"pagina": 3, "limite": 20, ...}
+
+# Filtros con valores por defecto
+@app.get("/productos")
+def filtrar_productos(
+    categoria: str = "todas",
+    precio_min: float = 0,
+    precio_max: float = 99999,
+    ordenar: str = "nombre"
+):
+    return {
+        "filtros": {
+            "categoria": categoria,
+            "precio_min": precio_min,
+            "precio_max": precio_max,
+            "ordenar": ordenar
+        }
+    }
+
+# GET /productos -> usa todos los valores por defecto
+# GET /productos?categoria=laptops&precio_max=1000 -> filtra`} lang="python" title="Valores por defecto" />
+
+---
+
+## 🔄 5.5 Parámetros opcionales
+
+### Cómo hacer parámetros opcionales
+
+Un parámetro es opcional cuando tiene un valor por defecto o cuando se declara con `Optional` y `None`.
+
+### Ejemplo: Parámetros opcionales con None
+
+<Code code={`from fastapi import FastAPI
+from typing import Optional
+
+app = FastAPI()
+
+# Parámetro opcional con Optional
+@app.get("/usuarios")
+def listar_usuarios(
+    nombre: Optional[str] = None,
+    activo: Optional[bool] = None
+):
+    filtros = {}
+    if nombre is not None:
+        filtros["nombre"] = nombre
+    if activo is not None:
+        filtros["activo"] = activo
+    
+    return {"filtros_aplicados": filtros}
+
+# GET /usuarios -> {"filtros_aplicados": {}}
+# GET /usuarios?nombre=ana -> {"filtros_aplicados": {"nombre": "ana"}}
+# GET /usuarios?activo=true -> {"filtros_aplicados": {"activo": true}}
+# GET /usuarios?nombre=ana&activo=true -> ambos filtros`} lang="python" title="Parámetros opcionales" />
+
+### Ejemplo: Combinando obligatorios y opcionales
+
+<Code code={`from fastapi import FastAPI
+from typing import Optional
+
+app = FastAPI()
+
+@app.get("/buscar")
+def buscar(
+    q: str,  # Obligatorio (sin valor por defecto)
+    categoria: Optional[str] = None,  # Opcional
+    limite: int = 10  # Opcional con valor por defecto
+):
+    resultado = {
+        "busqueda": q,
+        "limite": limite
+    }
+    if categoria:
+        resultado["categoria"] = categoria
+    return resultado
+
+# GET /buscar -> Error 422 (falta q)
+# GET /buscar?q=laptop -> {"busqueda": "laptop", "limite": 10}
+# GET /buscar?q=laptop&categoria=electronica&limite=5 -> todos los params`} lang="python" title="Obligatorios y opcionales" />
+
+### Ejemplo: Validación de query parameters
+
+<Code code={`from fastapi import FastAPI, Query
+from typing import Optional
+
+app = FastAPI()
+
+@app.get("/buscar")
+def buscar(
+    q: str = Query(..., min_length=2, max_length=50, description="Término de búsqueda"),
+    pagina: int = Query(1, ge=1, description="Número de página"),
+    limite: int = Query(10, ge=1, le=100, description="Resultados por página")
+):
+    return {
+        "busqueda": q,
+        "pagina": pagina,
+        "limite": limite
+    }
+
+# GET /buscar?q=a -> Error (min_length=2)
+# GET /buscar?q=laptop&pagina=0 -> Error (ge=1)
+# GET /buscar?q=laptop&limite=500 -> Error (le=100)
+# GET /buscar?q=laptop&pagina=2&limite=20 -> OK`} lang="python" title="Validación de query params" />
+
+---
+
+## 🔀 5.6 Uso de múltiples parámetros
+
+### Combinando path y query parameters
+
+<Code code={`from fastapi import FastAPI
+from typing import Optional
+
+app = FastAPI()
+
+# Path + Query parameters
+@app.get("/tiendas/{tienda_id}/productos")
+def productos_tienda(
+    tienda_id: int,  # Path parameter
+    categoria: Optional[str] = None,  # Query parameter
+    precio_max: Optional[float] = None,  # Query parameter
+    disponible: bool = True  # Query parameter con default
+):
+    return {
+        "tienda_id": tienda_id,
+        "filtros": {
+            "categoria": categoria,
+            "precio_max": precio_max,
+            "disponible": disponible
+        }
+    }
+
+# GET /tiendas/1/productos
+# -> {"tienda_id": 1, "filtros": {"categoria": null, "precio_max": null, "disponible": true}}
+
+# GET /tiendas/1/productos?categoria=laptops&precio_max=1000&disponible=false
+# -> {"tienda_id": 1, "filtros": {"categoria": "laptops", "precio_max": 1000.0, "disponible": false}}`} lang="python" title="Path + Query" />
+
+### Ejemplo: API de búsqueda completa
+
+<Code code={`from fastapi import FastAPI, Query, Path
+from typing import Optional, List
+from enum import Enum
+
+app = FastAPI()
+
+class OrdenEnum(str, Enum):
+    asc = "asc"
+    desc = "desc"
+
+@app.get("/categorias/{categoria}/productos")
+def buscar_productos(
+    # Path parameter con validación
+    categoria: str = Path(..., min_length=2, description="Categoría de productos"),
+    
+    # Query parameters obligatorios
+    # (ninguno en este ejemplo)
+    
+    # Query parameters opcionales
+    q: Optional[str] = Query(None, min_length=2, description="Búsqueda por nombre"),
+    precio_min: float = Query(0, ge=0, description="Precio mínimo"),
+    precio_max: float = Query(99999, ge=0, description="Precio máximo"),
+    
+    # Paginación
+    pagina: int = Query(1, ge=1, description="Página actual"),
+    limite: int = Query(10, ge=1, le=50, description="Items por página"),
+    
+    # Ordenamiento
+    ordenar_por: str = Query("nombre", description="Campo para ordenar"),
+    orden: OrdenEnum = Query(OrdenEnum.asc, description="Dirección del orden")
+):
+    return {
+        "categoria": categoria,
+        "busqueda": q,
+        "filtros": {
+            "precio_min": precio_min,
+            "precio_max": precio_max
+        },
+        "paginacion": {
+            "pagina": pagina,
+            "limite": limite
+        },
+        "ordenamiento": {
+            "campo": ordenar_por,
+            "direccion": orden
+        },
+        "resultados": []
+    }
+
+# GET /categorias/laptops/productos?q=gaming&precio_max=2000&pagina=1&limite=20&orden=desc`} lang="python" title="API de búsqueda completa" />
+
+### Ejemplo: Lista de valores en query parameter
+
+<Code code={`from fastapi import FastAPI, Query
+from typing import List
+
+app = FastAPI()
+
+# Recibir múltiples valores para el mismo parámetro
+@app.get("/productos")
+def filtrar_productos(
+    ids: List[int] = Query([], description="Lista de IDs a buscar"),
+    categorias: List[str] = Query([], description="Categorías a incluir")
+):
+    return {
+        "ids_solicitados": ids,
+        "categorias": categorias
+    }
+
+# GET /productos?ids=1&ids=2&ids=3
+# -> {"ids_solicitados": [1, 2, 3], "categorias": []}
+
+# GET /productos?categorias=laptops&categorias=tablets
+# -> {"ids_solicitados": [], "categorias": ["laptops", "tablets"]}
+
+# GET /productos?ids=1&ids=2&categorias=laptops
+# -> {"ids_solicitados": [1, 2], "categorias": ["laptops"]}`} lang="python" title="Lista de valores" />
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- **Path parameters**: Valores en la URL (`/usuarios/{id}`)
+- **Query parameters**: Valores después del `?` (`?limite=10`)
+- **Tipado**: Validación y conversión automática de tipos
+- **Validación**: Usar `Path()` y `Query()` para reglas adicionales
+- **Opcionales**: Usar `Optional` o valores por defecto
+- **Combinación**: Mezclar path y query parameters en un endpoint
+</Aside>

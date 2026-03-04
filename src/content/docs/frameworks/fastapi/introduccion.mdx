@@ -1,0 +1,262 @@
+---
+title: 1. Introducción a FastAPI
+description: Qué es FastAPI, para qué se utiliza, diferencias con Flask y Django, ventajas y casos de uso
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## ⚡ 1.1 Qué es FastAPI
+
+### Definición
+
+**FastAPI** es un framework web moderno y de alto rendimiento para construir APIs con Python 3.7+. Está basado en estándares abiertos como OpenAPI y JSON Schema, lo que permite generar documentación automática.
+
+### Características principales
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Alto rendimiento** | Comparable a NodeJS y Go gracias a Starlette y Pydantic |
+| **Tipado estático** | Usa type hints de Python para validación automática |
+| **Documentación automática** | Genera Swagger UI y ReDoc sin configuración adicional |
+| **Asíncrono nativo** | Soporte completo para `async/await` |
+| **Fácil de aprender** | Sintaxis intuitiva y curva de aprendizaje corta |
+
+### Ejemplo: API mínima
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def inicio():
+    return {"mensaje": "¡Hola, FastAPI!"}`} lang="python" title="main.py" />
+
+---
+
+## 🎯 1.2 Para qué se utiliza FastAPI
+
+### Casos de uso principales
+
+FastAPI está diseñado para construir APIs RESTful de manera rápida y eficiente:
+
+- **APIs REST**: Backends para aplicaciones web y móviles
+- **Microservicios**: Servicios pequeños e independientes
+- **Machine Learning**: Servir modelos de ML como APIs
+- **Webhooks**: Recibir y procesar eventos externos
+- **Backends en tiempo real**: Con WebSockets
+
+### Ejemplo: API para una aplicación móvil
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Endpoint para obtener usuarios
+@app.get("/usuarios")
+def obtener_usuarios():
+    return [
+        {"id": 1, "nombre": "Ana"},
+        {"id": 2, "nombre": "Carlos"}
+    ]
+
+# Endpoint para obtener un usuario específico
+@app.get("/usuarios/{usuario_id}")
+def obtener_usuario(usuario_id: int):
+    return {"id": usuario_id, "nombre": "Usuario encontrado"}`} lang="python" title="API para app móvil" />
+
+---
+
+## 🔄 1.3 Diferencias entre FastAPI, Flask y Django
+
+### Comparativa de frameworks
+
+| Aspecto | FastAPI | Flask | Django |
+|---------|---------|-------|--------|
+| **Tipo** | API-first | Microframework | Full-stack |
+| **Rendimiento** | ⚡ Muy alto | Medio | Medio |
+| **Tipado** | Obligatorio | Opcional | Opcional |
+| **Documentación auto** | ✅ Sí | ❌ No | ❌ No |
+| **Async nativo** | ✅ Sí | ❌ No | Parcial |
+| **Curva aprendizaje** | Baja | Muy baja | Alta |
+| **Baterías incluidas** | Pocas | Ninguna | Muchas |
+
+### Cuándo usar cada uno
+
+- **FastAPI**: APIs modernas, microservicios, ML
+- **Flask**: Prototipos rápidos, aplicaciones simples
+- **Django**: Aplicaciones web completas con admin, ORM, auth
+
+### Ejemplo: Mismo endpoint en cada framework
+
+<Code code={`# FastAPI
+from fastapi import FastAPI
+app = FastAPI()
+
+@app.get("/saludo/{nombre}")
+def saludo(nombre: str):
+    return {"mensaje": f"Hola, {nombre}"}`} lang="python" title="FastAPI" />
+
+<Code code={`# Flask
+from flask import Flask, jsonify
+app = Flask(__name__)
+
+@app.route("/saludo/<nombre>")
+def saludo(nombre):
+    return jsonify({"mensaje": f"Hola, {nombre}"})`} lang="python" title="Flask" />
+
+---
+
+## 🚀 1.4 Ventajas de FastAPI
+
+### Rendimiento
+
+FastAPI es uno de los frameworks más rápidos de Python, comparable a NodeJS y Go:
+
+| Framework | Requests/segundo |
+|-----------|------------------|
+| FastAPI | ~15,000+ |
+| Flask | ~4,000 |
+| Django | ~3,000 |
+
+### Tipado y validación automática
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# El tipado valida automáticamente los datos
+@app.get("/producto/{producto_id}")
+def obtener_producto(producto_id: int, precio_min: float = 0.0):
+    # producto_id DEBE ser int
+    # precio_min DEBE ser float (opcional, default 0.0)
+    return {
+        "id": producto_id,
+        "precio_minimo": precio_min
+    }
+
+# Si envías /producto/abc -> Error 422 automático
+# Si envías /producto/5?precio_min=abc -> Error 422 automático`} lang="python" title="Validación automática" />
+
+### Documentación automática
+
+FastAPI genera documentación interactiva sin código adicional:
+
+- **Swagger UI**: Disponible en `/docs`
+- **ReDoc**: Disponible en `/redoc`
+
+<Aside type="tip">
+Al ejecutar tu API, visita `http://localhost:8000/docs` para ver la documentación interactiva automática.
+</Aside>
+
+---
+
+## 💼 1.5 Casos de uso en aplicaciones reales
+
+### Empresas que usan FastAPI
+
+- **Microsoft**: Servicios internos
+- **Netflix**: APIs de microservicios
+- **Uber**: Procesamiento de datos
+- **Spotify**: Backends de ML
+
+### Ejemplo: API de e-commerce
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI(
+    title="API E-Commerce",
+    description="API para tienda en línea",
+    version="1.0.0"
+)
+
+@app.get("/productos")
+def listar_productos():
+    return [
+        {"id": 1, "nombre": "Laptop", "precio": 999.99},
+        {"id": 2, "nombre": "Mouse", "precio": 29.99}
+    ]
+
+@app.get("/productos/{producto_id}")
+def obtener_producto(producto_id: int):
+    return {"id": producto_id, "nombre": "Laptop", "precio": 999.99}
+
+@app.get("/carrito/{usuario_id}")
+def ver_carrito(usuario_id: int):
+    return {"usuario_id": usuario_id, "items": [], "total": 0.0}`} lang="python" title="API E-Commerce" />
+
+---
+
+## 🏗️ 1.6 Arquitectura básica de una API REST
+
+### Conceptos fundamentales
+
+| Concepto | Descripción |
+|----------|-------------|
+| **Recurso** | Entidad que expone la API (usuarios, productos) |
+| **Endpoint** | URL que representa un recurso |
+| **Método HTTP** | Acción a realizar (GET, POST, PUT, DELETE) |
+| **Request** | Petición del cliente al servidor |
+| **Response** | Respuesta del servidor al cliente |
+
+### Métodos HTTP y su propósito
+
+| Método | Acción | Ejemplo |
+|--------|--------|---------|
+| `GET` | Obtener datos | Listar usuarios |
+| `POST` | Crear datos | Crear usuario |
+| `PUT` | Actualizar completo | Actualizar usuario |
+| `PATCH` | Actualizar parcial | Cambiar email |
+| `DELETE` | Eliminar | Borrar usuario |
+
+### Ejemplo: API REST completa
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Base de datos simulada
+usuarios = []
+
+# GET - Obtener todos los usuarios
+@app.get("/usuarios")
+def listar_usuarios():
+    return usuarios
+
+# GET - Obtener un usuario por ID
+@app.get("/usuarios/{usuario_id}")
+def obtener_usuario(usuario_id: int):
+    for usuario in usuarios:
+        if usuario["id"] == usuario_id:
+            return usuario
+    return {"error": "Usuario no encontrado"}
+
+# POST - Crear un usuario (simplificado)
+@app.post("/usuarios")
+def crear_usuario(nombre: str):
+    nuevo_usuario = {"id": len(usuarios) + 1, "nombre": nombre}
+    usuarios.append(nuevo_usuario)
+    return nuevo_usuario
+
+# DELETE - Eliminar un usuario
+@app.delete("/usuarios/{usuario_id}")
+def eliminar_usuario(usuario_id: int):
+    for i, usuario in enumerate(usuarios):
+        if usuario["id"] == usuario_id:
+            usuarios.pop(i)
+            return {"mensaje": "Usuario eliminado"}
+    return {"error": "Usuario no encontrado"}`} lang="python" title="API REST básica" />
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- FastAPI es un framework moderno y rápido para crear APIs con Python
+- Usa tipado estático para validación automática de datos
+- Genera documentación interactiva (Swagger UI y ReDoc) sin configuración
+- Es más rápido que Flask y Django para APIs
+- Soporta async/await de forma nativa
+- Es ideal para microservicios, APIs REST y proyectos de ML
+</Aside>

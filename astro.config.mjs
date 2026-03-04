@@ -342,6 +342,23 @@ export default defineConfig({
 								{ label: '10. Casos de uso y ejemplos', link: '/guides/alpine/examples/' }
 							]
 						},
+						{
+							label: '⚡ FastAPI',
+							collapsed: true,
+							items: [
+								{ label: '01. Introducción a FastAPI', link: '/frameworks/fastapi/introduccion/' },
+								{ label: '02. Instalación y configuración del entorno', link: '/frameworks/fastapi/instalacion/' },
+								{ label: '03. Creación de la primera API', link: '/frameworks/fastapi/primera-api/' },
+								{ label: '04. Métodos HTTP en FastAPI', link: '/frameworks/fastapi/metodos-http/' },
+								{ label: '05. Parámetros en las rutas', link: '/frameworks/fastapi/parametros-rutas/' },
+								{ label: '06. Validación de datos con Pydantic', link: '/frameworks/fastapi/pydantic/' },
+								{ label: '07. Envío y recepción de datos (Request Body)', link: '/frameworks/fastapi/request-body/' },
+								{ label: '08. Documentación automática de FastAPI', link: '/frameworks/fastapi/documentacion/' },
+								{ label: '09. Organización de proyectos FastAPI', link: '/frameworks/fastapi/organizacion-proyectos/' },
+								{ label: '10. Conexión con base de datos', link: '/frameworks/fastapi/base-datos/' },
+								{ label: '11. Autenticación y seguridad', link: '/frameworks/fastapi/autenticacion-seguridad/' }
+							]
+						},
 					],
 				},
 				{

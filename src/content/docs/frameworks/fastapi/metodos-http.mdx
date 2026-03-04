@@ -1,0 +1,596 @@
+---
+title: 4. Métodos HTTP en FastAPI
+description: Métodos GET, POST, PUT, DELETE, PATCH y buenas prácticas en APIs REST
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 📥 4.1 Método GET
+
+### Qué es GET
+
+El método **GET** se utiliza para **obtener** o **consultar** datos del servidor. Es el método más común y no debe modificar ningún dato.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Propósito** | Leer/consultar datos |
+| **Idempotente** | Sí (misma petición = mismo resultado) |
+| **Cuerpo** | No tiene body |
+| **Cacheable** | Sí |
+
+### Ejemplo: GET básico
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# GET simple - obtener mensaje
+@app.get("/")
+def inicio():
+    return {"mensaje": "Bienvenido a la API"}
+
+# GET - listar todos los productos
+@app.get("/productos")
+def listar_productos():
+    productos = [
+        {"id": 1, "nombre": "Laptop", "precio": 999.99},
+        {"id": 2, "nombre": "Mouse", "precio": 29.99},
+        {"id": 3, "nombre": "Teclado", "precio": 79.99}
+    ]
+    return productos`} lang="python" title="GET básico" />
+
+### Ejemplo: GET con parámetro de ruta
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Base de datos simulada
+productos = [
+    {"id": 1, "nombre": "Laptop", "precio": 999.99},
+    {"id": 2, "nombre": "Mouse", "precio": 29.99},
+    {"id": 3, "nombre": "Teclado", "precio": 79.99}
+]
+
+# GET - obtener un producto por ID
+@app.get("/productos/{producto_id}")
+def obtener_producto(producto_id: int):
+    for producto in productos:
+        if producto["id"] == producto_id:
+            return producto
+    return {"error": "Producto no encontrado"}
+
+# Probar:
+# GET /productos/1 -> {"id": 1, "nombre": "Laptop", "precio": 999.99}
+# GET /productos/99 -> {"error": "Producto no encontrado"}`} lang="python" title="GET con parámetro" />
+
+### Ejemplo: GET con query parameters
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+productos = [
+    {"id": 1, "nombre": "Laptop", "precio": 999.99, "categoria": "electrónica"},
+    {"id": 2, "nombre": "Mouse", "precio": 29.99, "categoria": "electrónica"},
+    {"id": 3, "nombre": "Silla", "precio": 199.99, "categoria": "muebles"}
+]
+
+# GET con filtros opcionales
+@app.get("/productos")
+def listar_productos(categoria: str = None, precio_max: float = None):
+    resultado = productos
+    
+    # Filtrar por categoría si se proporciona
+    if categoria:
+        resultado = [p for p in resultado if p["categoria"] == categoria]
+    
+    # Filtrar por precio máximo si se proporciona
+    if precio_max:
+        resultado = [p for p in resultado if p["precio"] <= precio_max]
+    
+    return resultado
+
+# Probar:
+# GET /productos -> todos los productos
+# GET /productos?categoria=electrónica -> solo electrónica
+# GET /productos?precio_max=100 -> productos hasta $100
+# GET /productos?categoria=electrónica&precio_max=50 -> combinado`} lang="python" title="GET con filtros" />
+
+---
+
+## 📤 4.2 Método POST
+
+### Qué es POST
+
+El método **POST** se utiliza para **crear** nuevos recursos en el servidor. Envía datos en el cuerpo de la petición.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Propósito** | Crear nuevos datos |
+| **Idempotente** | No (cada petición crea un nuevo recurso) |
+| **Cuerpo** | Sí, contiene los datos a crear |
+| **Cacheable** | No |
+
+### Ejemplo: POST básico
+
+<Code code={`from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+# Modelo para recibir datos
+class Producto(BaseModel):
+    nombre: str
+    precio: float
+
+# Base de datos simulada
+productos = []
+
+# POST - crear un producto
+@app.post("/productos")
+def crear_producto(producto: Producto):
+    nuevo_producto = {
+        "id": len(productos) + 1,
+        "nombre": producto.nombre,
+        "precio": producto.precio
+    }
+    productos.append(nuevo_producto)
+    return nuevo_producto
+
+# Petición:
+# POST /productos
+# Body: {"nombre": "Monitor", "precio": 299.99}
+# Respuesta: {"id": 1, "nombre": "Monitor", "precio": 299.99}`} lang="python" title="POST básico" />
+
+### Ejemplo: POST con validación
+
+<Code code={`from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+
+app = FastAPI()
+
+# Modelo con validaciones
+class ProductoCrear(BaseModel):
+    nombre: str = Field(..., min_length=2, max_length=100)
+    precio: float = Field(..., gt=0)  # gt = greater than (mayor que)
+    categoria: str = Field(..., min_length=2)
+
+productos = []
+
+@app.post("/productos", status_code=201)
+def crear_producto(producto: ProductoCrear):
+    # Verificar si ya existe
+    for p in productos:
+        if p["nombre"].lower() == producto.nombre.lower():
+            raise HTTPException(status_code=400, detail="El producto ya existe")
+    
+    nuevo_producto = {
+        "id": len(productos) + 1,
+        "nombre": producto.nombre,
+        "precio": producto.precio,
+        "categoria": producto.categoria
+    }
+    productos.append(nuevo_producto)
+    return {"mensaje": "Producto creado", "producto": nuevo_producto}
+
+# Si envías precio negativo o nombre vacío -> Error 422 automático`} lang="python" title="POST con validación" />
+
+### Ejemplo: POST para registro de usuario
+
+<Code code={`from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, EmailStr
+
+app = FastAPI()
+
+class UsuarioRegistro(BaseModel):
+    nombre: str
+    email: EmailStr  # Valida formato de email automáticamente
+    password: str
+
+usuarios = []
+
+@app.post("/registro", status_code=201)
+def registrar_usuario(usuario: UsuarioRegistro):
+    # Verificar si el email ya existe
+    for u in usuarios:
+        if u["email"] == usuario.email:
+            raise HTTPException(status_code=400, detail="Email ya registrado")
+    
+    nuevo_usuario = {
+        "id": len(usuarios) + 1,
+        "nombre": usuario.nombre,
+        "email": usuario.email,
+        # En producción: hashear el password
+        "password": usuario.password
+    }
+    usuarios.append(nuevo_usuario)
+    
+    # No devolver el password en la respuesta
+    return {
+        "mensaje": "Usuario registrado",
+        "usuario": {
+            "id": nuevo_usuario["id"],
+            "nombre": nuevo_usuario["nombre"],
+            "email": nuevo_usuario["email"]
+        }
+    }`} lang="python" title="POST registro" />
+
+---
+
+## 🔄 4.3 Método PUT
+
+### Qué es PUT
+
+El método **PUT** se utiliza para **actualizar completamente** un recurso existente. Reemplaza todos los datos del recurso.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Propósito** | Actualizar recurso completo |
+| **Idempotente** | Sí (misma petición = mismo resultado) |
+| **Cuerpo** | Sí, contiene todos los datos nuevos |
+| **Cacheable** | No |
+
+### Ejemplo: PUT básico
+
+<Code code={`from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Producto(BaseModel):
+    nombre: str
+    precio: float
+    categoria: str
+
+productos = [
+    {"id": 1, "nombre": "Laptop", "precio": 999.99, "categoria": "electrónica"},
+    {"id": 2, "nombre": "Mouse", "precio": 29.99, "categoria": "electrónica"}
+]
+
+# PUT - actualizar producto completo
+@app.put("/productos/{producto_id}")
+def actualizar_producto(producto_id: int, producto: Producto):
+    for i, p in enumerate(productos):
+        if p["id"] == producto_id:
+            productos[i] = {
+                "id": producto_id,
+                "nombre": producto.nombre,
+                "precio": producto.precio,
+                "categoria": producto.categoria
+            }
+            return {"mensaje": "Producto actualizado", "producto": productos[i]}
+    
+    raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+# Petición:
+# PUT /productos/1
+# Body: {"nombre": "Laptop Pro", "precio": 1299.99, "categoria": "electrónica"}
+# Respuesta: {"mensaje": "Producto actualizado", "producto": {...}}`} lang="python" title="PUT básico" />
+
+### Ejemplo: PUT vs POST (crear o actualizar)
+
+<Code code={`from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Producto(BaseModel):
+    nombre: str
+    precio: float
+
+productos = {}
+
+# PUT que crea si no existe (upsert)
+@app.put("/productos/{producto_id}")
+def crear_o_actualizar(producto_id: int, producto: Producto):
+    existe = producto_id in productos
+    
+    productos[producto_id] = {
+        "id": producto_id,
+        "nombre": producto.nombre,
+        "precio": producto.precio
+    }
+    
+    if existe:
+        return {"accion": "actualizado", "producto": productos[producto_id]}
+    else:
+        return {"accion": "creado", "producto": productos[producto_id]}
+
+# PUT /productos/1 (no existe) -> {"accion": "creado", ...}
+# PUT /productos/1 (ya existe) -> {"accion": "actualizado", ...}`} lang="python" title="PUT upsert" />
+
+---
+
+## 🗑️ 4.4 Método DELETE
+
+### Qué es DELETE
+
+El método **DELETE** se utiliza para **eliminar** un recurso del servidor.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Propósito** | Eliminar datos |
+| **Idempotente** | Sí |
+| **Cuerpo** | Generalmente no |
+| **Cacheable** | No |
+
+### Ejemplo: DELETE básico
+
+<Code code={`from fastapi import FastAPI, HTTPException
+
+app = FastAPI()
+
+productos = [
+    {"id": 1, "nombre": "Laptop", "precio": 999.99},
+    {"id": 2, "nombre": "Mouse", "precio": 29.99},
+    {"id": 3, "nombre": "Teclado", "precio": 79.99}
+]
+
+# DELETE - eliminar un producto
+@app.delete("/productos/{producto_id}")
+def eliminar_producto(producto_id: int):
+    for i, producto in enumerate(productos):
+        if producto["id"] == producto_id:
+            eliminado = productos.pop(i)
+            return {"mensaje": "Producto eliminado", "producto": eliminado}
+    
+    raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+# DELETE /productos/1 -> {"mensaje": "Producto eliminado", "producto": {...}}
+# DELETE /productos/99 -> Error 404`} lang="python" title="DELETE básico" />
+
+### Ejemplo: DELETE con confirmación
+
+<Code code={`from fastapi import FastAPI, HTTPException
+
+app = FastAPI()
+
+usuarios = [
+    {"id": 1, "nombre": "Ana", "activo": True},
+    {"id": 2, "nombre": "Carlos", "activo": True}
+]
+
+# DELETE con soft delete (marcar como inactivo)
+@app.delete("/usuarios/{usuario_id}")
+def eliminar_usuario(usuario_id: int, permanente: bool = False):
+    for i, usuario in enumerate(usuarios):
+        if usuario["id"] == usuario_id:
+            if permanente:
+                # Eliminación permanente
+                eliminado = usuarios.pop(i)
+                return {"mensaje": "Usuario eliminado permanentemente"}
+            else:
+                # Soft delete - solo desactivar
+                usuarios[i]["activo"] = False
+                return {"mensaje": "Usuario desactivado", "usuario": usuarios[i]}
+    
+    raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+# DELETE /usuarios/1 -> desactiva el usuario
+# DELETE /usuarios/1?permanente=true -> elimina permanentemente`} lang="python" title="DELETE con opciones" />
+
+---
+
+## ✏️ 4.5 Método PATCH
+
+### Qué es PATCH
+
+El método **PATCH** se utiliza para **actualizar parcialmente** un recurso. A diferencia de PUT, solo envías los campos que quieres modificar.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Propósito** | Actualizar parcialmente |
+| **Idempotente** | No necesariamente |
+| **Cuerpo** | Sí, solo campos a modificar |
+| **Cacheable** | No |
+
+### Ejemplo: PATCH básico
+
+<Code code={`from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Optional
+
+app = FastAPI()
+
+# Modelo con campos opcionales para PATCH
+class ProductoActualizar(BaseModel):
+    nombre: Optional[str] = None
+    precio: Optional[float] = None
+    categoria: Optional[str] = None
+
+productos = [
+    {"id": 1, "nombre": "Laptop", "precio": 999.99, "categoria": "electrónica"}
+]
+
+# PATCH - actualizar parcialmente
+@app.patch("/productos/{producto_id}")
+def actualizar_parcial(producto_id: int, datos: ProductoActualizar):
+    for i, producto in enumerate(productos):
+        if producto["id"] == producto_id:
+            # Solo actualizar campos que no son None
+            if datos.nombre is not None:
+                productos[i]["nombre"] = datos.nombre
+            if datos.precio is not None:
+                productos[i]["precio"] = datos.precio
+            if datos.categoria is not None:
+                productos[i]["categoria"] = datos.categoria
+            
+            return {"mensaje": "Producto actualizado", "producto": productos[i]}
+    
+    raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+# PATCH /productos/1
+# Body: {"precio": 899.99}  <- solo actualiza el precio
+# Respuesta: {"mensaje": "...", "producto": {"id": 1, "nombre": "Laptop", "precio": 899.99, ...}}`} lang="python" title="PATCH básico" />
+
+### Ejemplo: PATCH vs PUT
+
+<Code code={`from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import Optional
+
+app = FastAPI()
+
+# Modelo completo para PUT
+class ProductoCompleto(BaseModel):
+    nombre: str
+    precio: float
+    categoria: str
+    descripcion: str
+
+# Modelo parcial para PATCH
+class ProductoParcial(BaseModel):
+    nombre: Optional[str] = None
+    precio: Optional[float] = None
+    categoria: Optional[str] = None
+    descripcion: Optional[str] = None
+
+productos = [
+    {"id": 1, "nombre": "Laptop", "precio": 999.99, 
+     "categoria": "electrónica", "descripcion": "Laptop gaming"}
+]
+
+# PUT - requiere TODOS los campos
+@app.put("/productos/{producto_id}")
+def actualizar_completo(producto_id: int, producto: ProductoCompleto):
+    # Debe enviar: nombre, precio, categoria, descripcion
+    productos[0] = {"id": producto_id, **producto.dict()}
+    return productos[0]
+
+# PATCH - solo los campos que quieres cambiar
+@app.patch("/productos/{producto_id}")
+def actualizar_parcial(producto_id: int, datos: ProductoParcial):
+    # Puede enviar solo: {"precio": 899.99}
+    for key, value in datos.dict(exclude_unset=True).items():
+        productos[0][key] = value
+    return productos[0]`} lang="python" title="PATCH vs PUT" />
+
+---
+
+## ✅ 4.6 Buenas prácticas en APIs REST
+
+### Convenciones de nomenclatura
+
+| Recurso | Endpoint | Método | Acción |
+|---------|----------|--------|--------|
+| Usuarios | `/usuarios` | GET | Listar todos |
+| Usuarios | `/usuarios/{id}` | GET | Obtener uno |
+| Usuarios | `/usuarios` | POST | Crear |
+| Usuarios | `/usuarios/{id}` | PUT | Actualizar completo |
+| Usuarios | `/usuarios/{id}` | PATCH | Actualizar parcial |
+| Usuarios | `/usuarios/{id}` | DELETE | Eliminar |
+
+### Ejemplo: API REST completa
+
+<Code code={`from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Optional, List
+
+app = FastAPI(title="API de Usuarios")
+
+# Modelos
+class UsuarioCrear(BaseModel):
+    nombre: str
+    email: str
+
+class UsuarioActualizar(BaseModel):
+    nombre: Optional[str] = None
+    email: Optional[str] = None
+
+class Usuario(BaseModel):
+    id: int
+    nombre: str
+    email: str
+
+# Base de datos simulada
+usuarios_db = []
+
+# GET - Listar todos
+@app.get("/usuarios", response_model=List[Usuario], tags=["Usuarios"])
+def listar_usuarios():
+    return usuarios_db
+
+# GET - Obtener uno
+@app.get("/usuarios/{usuario_id}", response_model=Usuario, tags=["Usuarios"])
+def obtener_usuario(usuario_id: int):
+    for usuario in usuarios_db:
+        if usuario["id"] == usuario_id:
+            return usuario
+    raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+# POST - Crear
+@app.post("/usuarios", response_model=Usuario, status_code=201, tags=["Usuarios"])
+def crear_usuario(usuario: UsuarioCrear):
+    nuevo = {
+        "id": len(usuarios_db) + 1,
+        "nombre": usuario.nombre,
+        "email": usuario.email
+    }
+    usuarios_db.append(nuevo)
+    return nuevo
+
+# PUT - Actualizar completo
+@app.put("/usuarios/{usuario_id}", response_model=Usuario, tags=["Usuarios"])
+def actualizar_usuario(usuario_id: int, usuario: UsuarioCrear):
+    for i, u in enumerate(usuarios_db):
+        if u["id"] == usuario_id:
+            usuarios_db[i] = {
+                "id": usuario_id,
+                "nombre": usuario.nombre,
+                "email": usuario.email
+            }
+            return usuarios_db[i]
+    raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+# PATCH - Actualizar parcial
+@app.patch("/usuarios/{usuario_id}", response_model=Usuario, tags=["Usuarios"])
+def actualizar_parcial(usuario_id: int, datos: UsuarioActualizar):
+    for i, u in enumerate(usuarios_db):
+        if u["id"] == usuario_id:
+            if datos.nombre is not None:
+                usuarios_db[i]["nombre"] = datos.nombre
+            if datos.email is not None:
+                usuarios_db[i]["email"] = datos.email
+            return usuarios_db[i]
+    raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+# DELETE - Eliminar
+@app.delete("/usuarios/{usuario_id}", tags=["Usuarios"])
+def eliminar_usuario(usuario_id: int):
+    for i, u in enumerate(usuarios_db):
+        if u["id"] == usuario_id:
+            usuarios_db.pop(i)
+            return {"mensaje": "Usuario eliminado"}
+    raise HTTPException(status_code=404, detail="Usuario no encontrado")`} lang="python" title="API REST completa" />
+
+### Códigos de estado recomendados
+
+| Código | Significado | Uso |
+|--------|-------------|-----|
+| 200 | OK | GET, PUT, PATCH exitosos |
+| 201 | Created | POST exitoso |
+| 204 | No Content | DELETE exitoso |
+| 400 | Bad Request | Datos inválidos |
+| 404 | Not Found | Recurso no existe |
+| 422 | Unprocessable Entity | Validación fallida |
+
+<Aside type="tip">
+Usa nombres en **plural** para los recursos (`/usuarios`, `/productos`) y **sustantivos** en lugar de verbos (`/usuarios` en vez de `/obtenerUsuarios`).
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- **GET**: Obtener datos (listar, buscar, filtrar)
+- **POST**: Crear nuevos recursos
+- **PUT**: Actualizar recurso completo
+- **PATCH**: Actualizar parcialmente
+- **DELETE**: Eliminar recursos
+- Usar códigos de estado HTTP apropiados
+- Seguir convenciones REST para nombrar endpoints
+</Aside>

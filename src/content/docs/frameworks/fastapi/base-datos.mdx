@@ -1,0 +1,421 @@
+---
+title: 10. Conexión con base de datos
+description: Conexión con SQLite y PostgreSQL, uso de SQLAlchemy, operaciones CRUD con base de datos
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🗄️ 10.1 Introducción a bases de datos con FastAPI
+
+### Opciones de bases de datos
+
+FastAPI puede conectarse a cualquier base de datos. Las opciones más comunes son:
+
+| Base de datos | Tipo | Uso común |
+|---------------|------|-----------|
+| SQLite | SQL (archivo) | Desarrollo, prototipos |
+| PostgreSQL | SQL | Producción |
+| MySQL | SQL | Producción |
+| MongoDB | NoSQL | Datos flexibles |
+
+### ORMs disponibles
+
+| ORM | Descripción |
+|-----|-------------|
+| **SQLAlchemy** | El más popular, maduro y completo |
+| **Tortoise ORM** | Async nativo, similar a Django |
+| **SQLModel** | Creado por el autor de FastAPI |
+
+### Dependencias necesarias
+
+<Code code={`# Para SQLite (incluido en Python)
+pip install sqlalchemy
+
+# Para PostgreSQL
+pip install sqlalchemy psycopg2-binary
+
+# Para MySQL
+pip install sqlalchemy pymysql`} lang="bash" title="Instalar dependencias" />
+
+---
+
+## 🔌 10.2 Conexión con SQLite
+
+### Configurar conexión
+
+<Code code={`# app/db/database.py
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+# URL de conexión SQLite (archivo local)
+SQLALCHEMY_DATABASE_URL = "sqlite:///./app.db"
+
+# Crear engine
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False}  # Solo para SQLite
+)
+
+# Crear sesión
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base para los modelos
+Base = declarative_base()`} lang="python" title="app/db/database.py" />
+
+### Crear dependencia de sesión
+
+<Code code={`# app/db/database.py (continuación)
+
+def get_db():
+    """Dependencia que proporciona una sesión de base de datos."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# Uso en endpoints:
+# @app.get("/usuarios")
+# def listar(db: Session = Depends(get_db)):
+#     ...`} lang="python" title="Dependencia get_db" />
+
+---
+
+## 🐘 10.3 Conexión con PostgreSQL
+
+### Configurar conexión
+
+<Code code={`# app/db/database.py
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+# URL de conexión PostgreSQL
+# Formato: postgresql://usuario:password@host:puerto/nombre_db
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:password@localhost:5432/mi_api"
+
+# Crear engine (sin connect_args para PostgreSQL)
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
+# Crear sesión
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base para los modelos
+Base = declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()`} lang="python" title="Conexión PostgreSQL" />
+
+### Usar variables de entorno
+
+<Code code={`# app/core/config.py
+from pydantic import BaseSettings
+
+class Settings(BaseSettings):
+    database_url: str = "sqlite:///./app.db"
+    
+    class Config:
+        env_file = ".env"
+
+settings = Settings()`} lang="python" title="app/core/config.py" />
+
+<Code code={`# .env
+DATABASE_URL=postgresql://postgres:password@localhost:5432/mi_api`} lang="text" title=".env" />
+
+<Code code={`# app/db/database.py
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from app.core.config import settings
+
+engine = create_engine(settings.database_url)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()`} lang="python" title="Usar configuración" />
+
+---
+
+## 📊 10.4 Modelos SQLAlchemy
+
+### Crear modelos de base de datos
+
+<Code code={`# app/db/models.py
+from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+from app.db.database import Base
+
+class Usuario(Base):
+    __tablename__ = "usuarios"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String(100), nullable=False)
+    email = Column(String(100), unique=True, index=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
+    activo = Column(Boolean, default=True)
+    fecha_registro = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Relación con pedidos
+    pedidos = relationship("Pedido", back_populates="usuario")
+
+class Producto(Base):
+    __tablename__ = "productos"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String(200), nullable=False)
+    descripcion = Column(String(500))
+    precio = Column(Float, nullable=False)
+    stock = Column(Integer, default=0)
+    activo = Column(Boolean, default=True)
+    fecha_creacion = Column(DateTime(timezone=True), server_default=func.now())
+
+class Pedido(Base):
+    __tablename__ = "pedidos"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
+    total = Column(Float, nullable=False)
+    estado = Column(String(50), default="pendiente")
+    fecha_creacion = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Relación con usuario
+    usuario = relationship("Usuario", back_populates="pedidos")`} lang="python" title="app/db/models.py" />
+
+### Crear las tablas
+
+<Code code={`# app/main.py
+from fastapi import FastAPI
+from app.db.database import engine, Base
+from app.db import models
+
+# Crear todas las tablas
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Mi API con BD")`} lang="python" title="Crear tablas" />
+
+<Aside type="tip">
+En producción, usa **migraciones** con Alembic en lugar de `create_all()`. Las migraciones permiten versionar y actualizar el esquema de la base de datos de forma controlada.
+</Aside>
+
+---
+
+## 🔄 10.5 Operaciones CRUD
+
+### Esquemas Pydantic
+
+<Code code={`# app/schemas/usuario.py
+from pydantic import BaseModel, EmailStr
+from typing import Optional
+from datetime import datetime
+
+class UsuarioBase(BaseModel):
+    nombre: str
+    email: EmailStr
+
+class UsuarioCrear(UsuarioBase):
+    password: str
+
+class UsuarioActualizar(BaseModel):
+    nombre: Optional[str] = None
+    email: Optional[EmailStr] = None
+    activo: Optional[bool] = None
+
+class UsuarioRespuesta(UsuarioBase):
+    id: int
+    activo: bool
+    fecha_registro: datetime
+    
+    class Config:
+        orm_mode = True`} lang="python" title="app/schemas/usuario.py" />
+
+### Funciones CRUD
+
+<Code code={`# app/crud/usuario.py
+from sqlalchemy.orm import Session
+from app.db.models import Usuario
+from app.schemas.usuario import UsuarioCrear, UsuarioActualizar
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def obtener_usuario(db: Session, usuario_id: int):
+    """Obtiene un usuario por ID."""
+    return db.query(Usuario).filter(Usuario.id == usuario_id).first()
+
+def obtener_usuario_por_email(db: Session, email: str):
+    """Obtiene un usuario por email."""
+    return db.query(Usuario).filter(Usuario.email == email).first()
+
+def listar_usuarios(db: Session, skip: int = 0, limit: int = 100):
+    """Lista usuarios con paginación."""
+    return db.query(Usuario).offset(skip).limit(limit).all()
+
+def crear_usuario(db: Session, usuario: UsuarioCrear):
+    """Crea un nuevo usuario."""
+    password_hash = pwd_context.hash(usuario.password)
+    db_usuario = Usuario(
+        nombre=usuario.nombre,
+        email=usuario.email,
+        password_hash=password_hash
+    )
+    db.add(db_usuario)
+    db.commit()
+    db.refresh(db_usuario)
+    return db_usuario
+
+def actualizar_usuario(db: Session, usuario_id: int, datos: UsuarioActualizar):
+    """Actualiza un usuario existente."""
+    db_usuario = obtener_usuario(db, usuario_id)
+    if db_usuario:
+        datos_dict = datos.dict(exclude_unset=True)
+        for key, value in datos_dict.items():
+            setattr(db_usuario, key, value)
+        db.commit()
+        db.refresh(db_usuario)
+    return db_usuario
+
+def eliminar_usuario(db: Session, usuario_id: int):
+    """Elimina un usuario (soft delete)."""
+    db_usuario = obtener_usuario(db, usuario_id)
+    if db_usuario:
+        db_usuario.activo = False
+        db.commit()
+    return db_usuario`} lang="python" title="app/crud/usuario.py" />
+
+### Endpoints con base de datos
+
+<Code code={`# app/routers/usuarios.py
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from typing import List
+
+from app.db.database import get_db
+from app.schemas.usuario import UsuarioCrear, UsuarioActualizar, UsuarioRespuesta
+from app.crud import usuario as crud_usuario
+
+router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
+
+@router.get("/", response_model=List[UsuarioRespuesta])
+def listar_usuarios(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """Lista todos los usuarios."""
+    usuarios = crud_usuario.listar_usuarios(db, skip=skip, limit=limit)
+    return usuarios
+
+@router.get("/{usuario_id}", response_model=UsuarioRespuesta)
+def obtener_usuario(usuario_id: int, db: Session = Depends(get_db)):
+    """Obtiene un usuario por ID."""
+    usuario = crud_usuario.obtener_usuario(db, usuario_id)
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return usuario
+
+@router.post("/", response_model=UsuarioRespuesta, status_code=201)
+def crear_usuario(usuario: UsuarioCrear, db: Session = Depends(get_db)):
+    """Crea un nuevo usuario."""
+    # Verificar email único
+    db_usuario = crud_usuario.obtener_usuario_por_email(db, usuario.email)
+    if db_usuario:
+        raise HTTPException(status_code=400, detail="Email ya registrado")
+    return crud_usuario.crear_usuario(db, usuario)
+
+@router.patch("/{usuario_id}", response_model=UsuarioRespuesta)
+def actualizar_usuario(
+    usuario_id: int,
+    datos: UsuarioActualizar,
+    db: Session = Depends(get_db)
+):
+    """Actualiza un usuario."""
+    usuario = crud_usuario.actualizar_usuario(db, usuario_id, datos)
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return usuario
+
+@router.delete("/{usuario_id}")
+def eliminar_usuario(usuario_id: int, db: Session = Depends(get_db)):
+    """Desactiva un usuario."""
+    usuario = crud_usuario.eliminar_usuario(db, usuario_id)
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return {"mensaje": "Usuario desactivado"}`} lang="python" title="app/routers/usuarios.py" />
+
+---
+
+## 💡 10.6 Ejemplo completo de API con base de datos
+
+### Estructura del proyecto
+
+```
+mi_api/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── core/
+│   │   └── config.py
+│   ├── db/
+│   │   ├── __init__.py
+│   │   ├── database.py
+│   │   └── models.py
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   └── usuario.py
+│   ├── crud/
+│   │   ├── __init__.py
+│   │   └── usuario.py
+│   └── routers/
+│       ├── __init__.py
+│       └── usuarios.py
+├── .env
+└── requirements.txt
+```
+
+### main.py completo
+
+<Code code={`# app/main.py
+from fastapi import FastAPI
+from app.db.database import engine, Base
+from app.routers import usuarios
+
+# Crear tablas
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="API con Base de Datos",
+    description="API CRUD completa con SQLAlchemy",
+    version="1.0.0"
+)
+
+# Incluir routers
+app.include_router(usuarios.router)
+
+@app.get("/")
+def inicio():
+    return {"mensaje": "API funcionando"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "database": "connected"}`} lang="python" title="app/main.py" />
+
+### requirements.txt
+
+<Code code={`fastapi==0.104.1
+uvicorn==0.24.0
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+python-dotenv==1.0.0
+passlib[bcrypt]==1.7.4
+pydantic[email]==2.5.2`} lang="text" title="requirements.txt" />
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- Conectar FastAPI con **SQLite** y **PostgreSQL**
+- Crear modelos con **SQLAlchemy**
+- Usar **dependencias** para inyectar la sesión de BD
+- Separar **esquemas Pydantic** de modelos SQLAlchemy
+- Implementar funciones **CRUD** reutilizables
+- Organizar el código en capas (db, schemas, crud, routers)
+</Aside>

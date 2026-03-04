@@ -1,0 +1,451 @@
+---
+title: 11. Autenticación y seguridad
+description: Autenticación en APIs, tokens JWT, OAuth2, protección de rutas y manejo de contraseñas
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🔐 11.1 Introducción a la autenticación en APIs
+
+### Tipos de autenticación
+
+| Tipo | Descripción | Uso común |
+|------|-------------|-----------|
+| **API Key** | Clave simple en header | APIs internas |
+| **Basic Auth** | Usuario:password en base64 | APIs simples |
+| **Bearer Token** | Token en header Authorization | APIs modernas |
+| **JWT** | Token firmado con datos | APIs REST |
+| **OAuth2** | Protocolo estándar | Login con terceros |
+
+### Flujo de autenticación típico
+
+1. Usuario envía credenciales (email/password)
+2. Servidor valida y genera token
+3. Cliente guarda el token
+4. Cliente envía token en cada petición
+5. Servidor valida token y procesa petición
+
+### Dependencias necesarias
+
+<Code code={`# Instalar dependencias para autenticación
+pip install python-jose[cryptography]  # Para JWT
+pip install passlib[bcrypt]            # Para hashear passwords
+pip install python-multipart           # Para formularios`} lang="bash" title="Instalar dependencias" />
+
+---
+
+## 🔑 11.2 Tokens JWT
+
+### Qué es JWT
+
+**JWT (JSON Web Token)** es un estándar para crear tokens de acceso que contienen información del usuario de forma segura.
+
+| Parte | Contenido |
+|-------|-----------|
+| **Header** | Tipo de token y algoritmo |
+| **Payload** | Datos del usuario (claims) |
+| **Signature** | Firma para verificar autenticidad |
+
+### Crear y verificar tokens
+
+<Code code={`# app/core/security.py
+from datetime import datetime, timedelta
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+
+# Configuración
+SECRET_KEY = "tu-clave-secreta-muy-larga-y-segura"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# Contexto para hashear passwords
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def crear_token(data: dict, expires_delta: timedelta = None):
+    """Crea un token JWT."""
+    to_encode = data.copy()
+    
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def verificar_token(token: str):
+    """Verifica y decodifica un token JWT."""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError:
+        return None
+
+def verificar_password(password_plano: str, password_hash: str):
+    """Verifica si el password coincide con el hash."""
+    return pwd_context.verify(password_plano, password_hash)
+
+def hashear_password(password: str):
+    """Genera el hash de un password."""
+    return pwd_context.hash(password)`} lang="python" title="app/core/security.py" />
+
+### Ejemplo: Generar token
+
+<Code code={`from app.core.security import crear_token, hashear_password
+from datetime import timedelta
+
+# Crear token para un usuario
+token = crear_token(
+    data={"sub": "usuario@email.com", "rol": "admin"},
+    expires_delta=timedelta(hours=24)
+)
+print(token)
+# eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# Hashear password
+password_hash = hashear_password("mi_password_seguro")
+print(password_hash)
+# $2b$12$...`} lang="python" title="Usar funciones de seguridad" />
+
+---
+
+## 🛡️ 11.3 OAuth2 con FastAPI
+
+### Configurar OAuth2
+
+FastAPI incluye soporte integrado para OAuth2 con el esquema "password flow".
+
+<Code code={`# app/core/auth.py
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import JWTError, jwt
+from pydantic import BaseModel
+from typing import Optional
+
+from app.core.security import SECRET_KEY, ALGORITHM, verificar_token
+
+# Esquema OAuth2 - indica dónde obtener el token
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
+    rol: Optional[str] = None
+
+async def obtener_usuario_actual(token: str = Depends(oauth2_scheme)):
+    """Dependencia que extrae el usuario del token."""
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="No se pudieron validar las credenciales",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    payload = verificar_token(token)
+    if payload is None:
+        raise credentials_exception
+    
+    email: str = payload.get("sub")
+    if email is None:
+        raise credentials_exception
+    
+    return TokenData(email=email, rol=payload.get("rol"))`} lang="python" title="app/core/auth.py" />
+
+### Endpoint de login
+
+<Code code={`# app/routers/auth.py
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from datetime import timedelta
+
+from app.core.security import (
+    crear_token, 
+    verificar_password, 
+    ACCESS_TOKEN_EXPIRE_MINUTES
+)
+from app.db.database import get_db
+from app.crud.usuario import obtener_usuario_por_email
+from sqlalchemy.orm import Session
+
+router = APIRouter(prefix="/auth", tags=["Autenticación"])
+
+@router.post("/login")
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    """Endpoint de login que devuelve un token JWT."""
+    # Buscar usuario
+    usuario = obtener_usuario_por_email(db, form_data.username)
+    
+    if not usuario:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email o contraseña incorrectos"
+        )
+    
+    # Verificar password
+    if not verificar_password(form_data.password, usuario.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email o contraseña incorrectos"
+        )
+    
+    # Crear token
+    access_token = crear_token(
+        data={"sub": usuario.email, "rol": "usuario"},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }`} lang="python" title="app/routers/auth.py" />
+
+---
+
+## 🚧 11.4 Protección de rutas
+
+### Rutas protegidas básicas
+
+<Code code={`# app/routers/usuarios.py
+from fastapi import APIRouter, Depends, HTTPException
+from app.core.auth import obtener_usuario_actual, TokenData
+from typing import List
+
+router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
+
+# Ruta protegida - requiere autenticación
+@router.get("/perfil")
+async def obtener_perfil(usuario_actual: TokenData = Depends(obtener_usuario_actual)):
+    """Obtiene el perfil del usuario autenticado."""
+    return {
+        "email": usuario_actual.email,
+        "rol": usuario_actual.rol
+    }
+
+# Ruta protegida con datos del usuario
+@router.get("/mis-pedidos")
+async def mis_pedidos(usuario_actual: TokenData = Depends(obtener_usuario_actual)):
+    """Lista los pedidos del usuario autenticado."""
+    return {
+        "usuario": usuario_actual.email,
+        "pedidos": []
+    }`} lang="python" title="Rutas protegidas" />
+
+### Verificar roles
+
+<Code code={`# app/core/auth.py (agregar)
+from functools import wraps
+
+def requiere_rol(roles_permitidos: list):
+    """Dependencia que verifica si el usuario tiene el rol requerido."""
+    async def verificar_rol(usuario: TokenData = Depends(obtener_usuario_actual)):
+        if usuario.rol not in roles_permitidos:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No tienes permisos para acceder a este recurso"
+            )
+        return usuario
+    return verificar_rol
+
+# Dependencias predefinidas
+requiere_admin = requiere_rol(["admin"])
+requiere_moderador = requiere_rol(["admin", "moderador"])`} lang="python" title="Verificar roles" />
+
+<Code code={`# app/routers/admin.py
+from fastapi import APIRouter, Depends
+from app.core.auth import requiere_admin, TokenData
+
+router = APIRouter(prefix="/admin", tags=["Administración"])
+
+# Solo administradores pueden acceder
+@router.get("/usuarios")
+async def listar_todos_usuarios(admin: TokenData = Depends(requiere_admin)):
+    """Lista todos los usuarios (solo admin)."""
+    return {"mensaje": "Lista de usuarios", "admin": admin.email}
+
+@router.delete("/usuarios/{usuario_id}")
+async def eliminar_usuario(
+    usuario_id: int,
+    admin: TokenData = Depends(requiere_admin)
+):
+    """Elimina un usuario (solo admin)."""
+    return {"mensaje": f"Usuario {usuario_id} eliminado por {admin.email}"}`} lang="python" title="Rutas solo para admin" />
+
+---
+
+## 🔒 11.5 Manejo seguro de contraseñas
+
+### Nunca guardar passwords en texto plano
+
+<Code code={`# MAL - Nunca hacer esto
+usuario = {
+    "email": "ana@email.com",
+    "password": "mi_password"  # ❌ Texto plano
+}
+
+# BIEN - Siempre hashear
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+usuario = {
+    "email": "ana@email.com",
+    "password_hash": pwd_context.hash("mi_password")  # ✅ Hash
+}`} lang="python" title="Hashear passwords" />
+
+### Validar fortaleza del password
+
+<Code code={`# app/schemas/usuario.py
+from pydantic import BaseModel, validator
+import re
+
+class UsuarioRegistro(BaseModel):
+    nombre: str
+    email: str
+    password: str
+    
+    @validator('password')
+    def password_fuerte(cls, v):
+        if len(v) < 8:
+            raise ValueError('El password debe tener al menos 8 caracteres')
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('El password debe tener al menos una mayúscula')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('El password debe tener al menos una minúscula')
+        if not re.search(r'[0-9]', v):
+            raise ValueError('El password debe tener al menos un número')
+        return v`} lang="python" title="Validar password" />
+
+### Endpoint de registro seguro
+
+<Code code={`# app/routers/auth.py
+from pydantic import BaseModel, EmailStr, Field
+
+class RegistroRequest(BaseModel):
+    nombre: str = Field(..., min_length=2)
+    email: EmailStr
+    password: str = Field(..., min_length=8)
+
+@router.post("/registro", status_code=201)
+async def registrar(datos: RegistroRequest, db: Session = Depends(get_db)):
+    """Registra un nuevo usuario."""
+    # Verificar email único
+    if obtener_usuario_por_email(db, datos.email):
+        raise HTTPException(status_code=400, detail="Email ya registrado")
+    
+    # Crear usuario con password hasheado
+    from app.core.security import hashear_password
+    
+    nuevo_usuario = Usuario(
+        nombre=datos.nombre,
+        email=datos.email,
+        password_hash=hashear_password(datos.password)
+    )
+    db.add(nuevo_usuario)
+    db.commit()
+    db.refresh(nuevo_usuario)
+    
+    return {"mensaje": "Usuario registrado", "email": nuevo_usuario.email}`} lang="python" title="Registro seguro" />
+
+---
+
+## 💡 11.6 Ejemplo completo de autenticación
+
+### Estructura del proyecto
+
+```
+app/
+├── core/
+│   ├── config.py      # Configuración
+│   ├── security.py    # JWT y passwords
+│   └── auth.py        # Dependencias de auth
+├── routers/
+│   ├── auth.py        # Login y registro
+│   └── usuarios.py    # Rutas protegidas
+├── db/
+│   ├── database.py
+│   └── models.py
+└── main.py
+```
+
+### main.py con autenticación
+
+<Code code={`# app/main.py
+from fastapi import FastAPI
+from app.db.database import engine, Base
+from app.routers import auth, usuarios
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="API con Autenticación",
+    description="API segura con JWT",
+    version="1.0.0"
+)
+
+# Routers
+app.include_router(auth.router)
+app.include_router(usuarios.router)
+
+@app.get("/")
+def inicio():
+    return {"mensaje": "API funcionando"}`} lang="python" title="app/main.py" />
+
+### Flujo completo de uso
+
+<Code code={`# 1. REGISTRAR USUARIO
+# POST /auth/registro
+# Body: {"nombre": "Ana", "email": "ana@email.com", "password": "MiPassword123"}
+# Respuesta: {"mensaje": "Usuario registrado", "email": "ana@email.com"}
+
+# 2. LOGIN
+# POST /auth/login
+# Body (form-data): username=ana@email.com, password=MiPassword123
+# Respuesta: {"access_token": "eyJhbGci...", "token_type": "bearer"}
+
+# 3. ACCEDER A RUTA PROTEGIDA
+# GET /usuarios/perfil
+# Header: Authorization: Bearer eyJhbGci...
+# Respuesta: {"email": "ana@email.com", "rol": "usuario"}
+
+# 4. SIN TOKEN -> Error 401
+# GET /usuarios/perfil
+# (sin header Authorization)
+# Respuesta: {"detail": "Not authenticated"}`} lang="text" title="Flujo de autenticación" />
+
+### Probar en Swagger UI
+
+<Code code={`# 1. Ir a http://localhost:8000/docs
+# 2. Ejecutar POST /auth/registro para crear usuario
+# 3. Ejecutar POST /auth/login con las credenciales
+# 4. Copiar el access_token de la respuesta
+# 5. Hacer clic en el botón "Authorize" (candado)
+# 6. Pegar el token en el campo "Value"
+# 7. Ahora puedes acceder a rutas protegidas`} lang="text" title="Probar en Swagger" />
+
+<Aside type="caution">
+**Buenas prácticas de seguridad:**
+- Usa **HTTPS** en producción
+- Guarda el **SECRET_KEY** en variables de entorno
+- Establece tiempos de expiración **cortos** para tokens
+- Implementa **refresh tokens** para sesiones largas
+- **Nunca** expongas el SECRET_KEY en el código
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- Tipos de autenticación: API Key, Basic, Bearer, JWT, OAuth2
+- Crear y verificar **tokens JWT** con python-jose
+- Configurar **OAuth2** con FastAPI
+- Proteger rutas con **dependencias**
+- Verificar **roles** de usuario
+- Hashear passwords con **bcrypt**
+- Validar fortaleza de contraseñas
+- Implementar flujo completo de login/registro
+</Aside>

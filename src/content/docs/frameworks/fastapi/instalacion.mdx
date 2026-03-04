@@ -1,0 +1,256 @@
+---
+title: 2. Instalación y configuración del entorno
+description: Instalación de FastAPI y Uvicorn, crear el primer proyecto y ejecutar el servidor de desarrollo
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 📦 2.1 Instalación de FastAPI
+
+### Requisitos previos
+
+Antes de instalar FastAPI necesitas:
+
+| Requisito | Versión mínima |
+|-----------|----------------|
+| **Python** | 3.7 o superior |
+| **pip** | Última versión |
+
+### Verificar Python instalado
+
+<Code code={`# Verificar versión de Python
+python --version
+# Python 3.11.0
+
+# Verificar pip
+pip --version
+# pip 23.0 from ...`} lang="bash" title="Verificar requisitos" />
+
+### Instalar FastAPI
+
+<Code code={`# Instalación básica
+pip install fastapi
+
+# Instalación con todas las dependencias opcionales
+pip install "fastapi[all]"`} lang="bash" title="Instalar FastAPI" />
+
+<Aside type="tip">
+Usar `fastapi[all]` instala también Uvicorn y otras dependencias útiles como validadores de email.
+</Aside>
+
+### Verificar instalación
+
+<Code code={`# Verificar que FastAPI está instalado
+pip show fastapi
+
+# Salida esperada:
+# Name: fastapi
+# Version: 0.109.0
+# ...`} lang="bash" title="Verificar instalación" />
+
+---
+
+## 🦄 2.2 Instalación de Uvicorn (servidor ASGI)
+
+### Qué es Uvicorn
+
+**Uvicorn** es un servidor ASGI (Asynchronous Server Gateway Interface) de alto rendimiento. Es necesario para ejecutar aplicaciones FastAPI.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **ASGI** | Protocolo asíncrono para Python |
+| **Alto rendimiento** | Basado en uvloop y httptools |
+| **Recarga automática** | Detecta cambios en el código |
+
+### Instalar Uvicorn
+
+<Code code={`# Instalación básica
+pip install uvicorn
+
+# Instalación con extras de rendimiento
+pip install "uvicorn[standard]"`} lang="bash" title="Instalar Uvicorn" />
+
+### Verificar instalación
+
+<Code code={`# Verificar Uvicorn
+uvicorn --version
+# Running uvicorn 0.27.0 with CPython 3.11.0 on Windows`} lang="bash" title="Verificar Uvicorn" />
+
+---
+
+## 🆕 2.3 Crear el primer proyecto FastAPI
+
+### Crear carpeta del proyecto
+
+<Code code={`# Crear carpeta del proyecto
+mkdir mi_api
+cd mi_api
+
+# Crear entorno virtual (recomendado)
+python -m venv venv
+
+# Activar entorno virtual
+# Windows:
+venv\\Scripts\\activate
+# Linux/Mac:
+source venv/bin/activate
+
+# Instalar dependencias
+pip install fastapi uvicorn`} lang="bash" title="Crear proyecto" />
+
+### Crear archivo principal
+
+<Code code={`# Crear archivo main.py
+# Windows:
+type nul > main.py
+# Linux/Mac:
+touch main.py`} lang="bash" title="Crear main.py" />
+
+### Escribir la primera API
+
+<Code code={`from fastapi import FastAPI
+
+# Crear instancia de la aplicación
+app = FastAPI()
+
+# Definir ruta raíz
+@app.get("/")
+def inicio():
+    return {"mensaje": "¡Hola, FastAPI!"}`} lang="python" title="main.py" />
+
+---
+
+## 📁 2.4 Estructura mínima de un proyecto
+
+### Estructura básica
+
+```
+mi_api/
+├── venv/              # Entorno virtual
+├── main.py            # Archivo principal
+└── requirements.txt   # Dependencias
+```
+
+### Crear requirements.txt
+
+<Code code={`# Generar archivo de dependencias
+pip freeze > requirements.txt`} lang="bash" title="Generar requirements.txt" />
+
+<Code code={`fastapi==0.109.0
+uvicorn==0.27.0`} lang="text" title="requirements.txt" />
+
+### Estructura para proyectos más grandes
+
+```
+mi_api/
+├── app/
+│   ├── __init__.py
+│   ├── main.py        # Punto de entrada
+│   ├── routers/       # Rutas organizadas
+│   ├── models/        # Modelos Pydantic
+│   └── services/      # Lógica de negocio
+├── venv/
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## ▶️ 2.5 Ejecutar el servidor de desarrollo
+
+### Comando básico
+
+<Code code={`# Ejecutar servidor
+uvicorn main:app
+
+# Salida:
+# INFO:     Started server process [12345]
+# INFO:     Waiting for application startup.
+# INFO:     Application startup complete.
+# INFO:     Uvicorn running on http://127.0.0.1:8000`} lang="bash" title="Ejecutar servidor" />
+
+### Parámetros del comando
+
+| Parámetro | Descripción |
+|-----------|-------------|
+| `main` | Nombre del archivo (sin .py) |
+| `app` | Nombre de la instancia FastAPI |
+| `--host` | Dirección IP (default: 127.0.0.1) |
+| `--port` | Puerto (default: 8000) |
+
+### Ejemplo con parámetros
+
+<Code code={`# Ejecutar en puerto específico
+uvicorn main:app --port 3000
+
+# Ejecutar accesible desde otras máquinas
+uvicorn main:app --host 0.0.0.0 --port 8000`} lang="bash" title="Con parámetros" />
+
+### Probar la API
+
+<Code code={`# Desde el navegador
+http://localhost:8000
+
+# Respuesta JSON:
+{"mensaje": "¡Hola, FastAPI!"}
+
+# Documentación automática
+http://localhost:8000/docs`} lang="text" title="Probar API" />
+
+---
+
+## 🔄 2.6 Uso de recarga automática (reload)
+
+### Qué es la recarga automática
+
+La opción `--reload` hace que Uvicorn reinicie automáticamente cuando detecta cambios en el código. Es ideal para desarrollo.
+
+### Activar recarga automática
+
+<Code code={`# Ejecutar con recarga automática
+uvicorn main:app --reload
+
+# Salida:
+# INFO:     Will watch for changes in these directories: ['/ruta/mi_api']
+# INFO:     Uvicorn running on http://127.0.0.1:8000
+# INFO:     Started reloader process [12345]`} lang="bash" title="Con --reload" />
+
+<Aside type="caution">
+Solo usa `--reload` en desarrollo. En producción afecta el rendimiento.
+</Aside>
+
+### Comando completo para desarrollo
+
+<Code code={`# Comando recomendado para desarrollo
+uvicorn main:app --reload --host 0.0.0.0 --port 8000`} lang="bash" title="Comando desarrollo" />
+
+### Ejemplo: Probar recarga automática
+
+<Code code={`# 1. Ejecutar servidor con reload
+uvicorn main:app --reload
+
+# 2. Modificar main.py (cambiar el mensaje)
+@app.get("/")
+def inicio():
+    return {"mensaje": "¡Mensaje actualizado!"}
+
+# 3. Guardar el archivo
+# El servidor se reinicia automáticamente
+
+# 4. Refrescar navegador
+# Verás el nuevo mensaje sin reiniciar manualmente`} lang="python" title="Probar reload" />
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- Instalar FastAPI con `pip install fastapi`
+- Instalar Uvicorn como servidor ASGI
+- Crear la estructura básica de un proyecto
+- Ejecutar el servidor con `uvicorn main:app`
+- Usar `--reload` para desarrollo con recarga automática
+- Acceder a la documentación en `/docs`
+</Aside>

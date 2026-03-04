@@ -1,0 +1,539 @@
+---
+title: 7. Envío y recepción de datos (Request Body)
+description: Qué es el Request Body, uso de modelos Pydantic en POST, manejo de datos JSON
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 📦 7.1 Qué es el Request Body
+
+### Definición
+
+El **Request Body** es el cuerpo de una petición HTTP que contiene los datos enviados al servidor. Se usa principalmente con los métodos POST, PUT y PATCH para enviar información estructurada.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Formato** | Generalmente JSON |
+| **Métodos** | POST, PUT, PATCH |
+| **Contenido** | Datos estructurados |
+| **Content-Type** | application/json |
+
+### Diferencia con parámetros
+
+| Tipo | Ubicación | Ejemplo |
+|------|-----------|---------|
+| Path params | En la URL | /usuarios/123 |
+| Query params | Después del ? | ?limite=10 |
+| Request Body | En el cuerpo | JSON con datos |
+
+### Ejemplo: Request Body básico
+
+<Code code={`from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+# Modelo para el body
+class Mensaje(BaseModel):
+    texto: str
+    autor: str
+
+# Endpoint que recibe un body
+@app.post("/mensajes")
+def crear_mensaje(mensaje: Mensaje):
+    return {
+        "recibido": True,
+        "mensaje": mensaje
+    }
+
+# Petición:
+# POST /mensajes
+# Content-Type: application/json
+# Body: {"texto": "Hola mundo", "autor": "Ana"}
+
+# Respuesta:
+# {"recibido": true, "mensaje": {"texto": "Hola mundo", "autor": "Ana"}}`} lang="python" title="Request Body básico" />
+
+---
+
+## 🏗️ 7.2 Uso de modelos Pydantic en POST
+
+### Por qué usar Pydantic
+
+FastAPI usa modelos Pydantic para:
+- **Validar** automáticamente los datos del body
+- **Convertir** tipos cuando es posible
+- **Documentar** el esquema esperado en Swagger
+- **Generar** errores claros si los datos son inválidos
+
+### Ejemplo: POST con modelo simple
+
+<Code code={`from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Producto(BaseModel):
+    nombre: str
+    precio: float
+    cantidad: int = 0
+
+productos = []
+
+@app.post("/productos")
+def crear_producto(producto: Producto):
+    nuevo = {
+        "id": len(productos) + 1,
+        "nombre": producto.nombre,
+        "precio": producto.precio,
+        "cantidad": producto.cantidad
+    }
+    productos.append(nuevo)
+    return nuevo
+
+# POST /productos
+# Body: {"nombre": "Laptop", "precio": 999.99, "cantidad": 10}
+# Respuesta: {"id": 1, "nombre": "Laptop", "precio": 999.99, "cantidad": 10}`} lang="python" title="POST con modelo" />
+
+### Ejemplo: POST con validaciones
+
+<Code code={`from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field, EmailStr
+
+app = FastAPI()
+
+class UsuarioRegistro(BaseModel):
+    nombre: str = Field(..., min_length=2, max_length=50)
+    email: EmailStr
+    password: str = Field(..., min_length=8)
+    edad: int = Field(..., ge=18, le=120)
+
+usuarios = []
+
+@app.post("/registro", status_code=201)
+def registrar_usuario(usuario: UsuarioRegistro):
+    # Verificar email único
+    for u in usuarios:
+        if u["email"] == usuario.email:
+            raise HTTPException(status_code=400, detail="Email ya registrado")
+    
+    nuevo = {
+        "id": len(usuarios) + 1,
+        "nombre": usuario.nombre,
+        "email": usuario.email,
+        "edad": usuario.edad
+        # No guardamos el password en texto plano en producción
+    }
+    usuarios.append(nuevo)
+    return {"mensaje": "Usuario registrado", "usuario": nuevo}
+
+# POST /registro
+# Body: {"nombre": "Ana", "email": "ana@email.com", "password": "12345678", "edad": 25}
+
+# Si edad < 18 -> Error 422: "ensure this value is greater than or equal to 18"
+# Si email inválido -> Error 422: "value is not a valid email address"`} lang="python" title="POST con validaciones" />
+
+### Ejemplo: POST con modelo anidado
+
+<Code code={`from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List
+
+app = FastAPI()
+
+class Direccion(BaseModel):
+    calle: str
+    ciudad: str
+    codigo_postal: str
+
+class ItemPedido(BaseModel):
+    producto_id: int
+    cantidad: int
+    precio: float
+
+class Pedido(BaseModel):
+    cliente_id: int
+    items: List[ItemPedido]
+    direccion_envio: Direccion
+    notas: str = ""
+
+@app.post("/pedidos")
+def crear_pedido(pedido: Pedido):
+    total = sum(item.cantidad * item.precio for item in pedido.items)
+    return {
+        "pedido_id": 1,
+        "cliente_id": pedido.cliente_id,
+        "total": total,
+        "items": len(pedido.items),
+        "ciudad_envio": pedido.direccion_envio.ciudad
+    }
+
+# POST /pedidos
+# Body:
+# {
+#   "cliente_id": 1,
+#   "items": [
+#     {"producto_id": 101, "cantidad": 2, "precio": 29.99},
+#     {"producto_id": 102, "cantidad": 1, "precio": 99.99}
+#   ],
+#   "direccion_envio": {
+#     "calle": "Av. Principal 123",
+#     "ciudad": "CDMX",
+#     "codigo_postal": "06600"
+#   },
+#   "notas": "Entregar por la tarde"
+# }`} lang="python" title="POST con modelo anidado" />
+
+---
+
+## ✅ 7.3 Validación de datos enviados
+
+### Validación automática
+
+FastAPI valida automáticamente los datos del body según el modelo Pydantic. Si los datos no son válidos, devuelve un error 422.
+
+### Ejemplo: Errores de validación
+
+<Code code={`from fastapi import FastAPI
+from pydantic import BaseModel, Field
+
+app = FastAPI()
+
+class Producto(BaseModel):
+    nombre: str = Field(..., min_length=2)
+    precio: float = Field(..., gt=0)
+    stock: int = Field(..., ge=0)
+
+@app.post("/productos")
+def crear_producto(producto: Producto):
+    return producto
+
+# Petición válida:
+# POST /productos
+# Body: {"nombre": "Mouse", "precio": 29.99, "stock": 100}
+# Respuesta: {"nombre": "Mouse", "precio": 29.99, "stock": 100}
+
+# Petición inválida (nombre muy corto):
+# Body: {"nombre": "A", "precio": 29.99, "stock": 100}
+# Error 422:
+# {
+#   "detail": [
+#     {
+#       "loc": ["body", "nombre"],
+#       "msg": "ensure this value has at least 2 characters",
+#       "type": "value_error.any_str.min_length"
+#     }
+#   ]
+# }
+
+# Petición inválida (precio negativo):
+# Body: {"nombre": "Mouse", "precio": -10, "stock": 100}
+# Error 422: "ensure this value is greater than 0"`} lang="python" title="Errores de validación" />
+
+### Ejemplo: Validación personalizada
+
+<Code code={`from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, validator
+
+app = FastAPI()
+
+class Producto(BaseModel):
+    nombre: str
+    precio: float
+    precio_oferta: float = None
+    
+    # Validador personalizado
+    @validator('precio_oferta')
+    def oferta_menor_que_precio(cls, v, values):
+        if v is not None and 'precio' in values:
+            if v >= values['precio']:
+                raise ValueError('El precio de oferta debe ser menor al precio normal')
+        return v
+
+@app.post("/productos")
+def crear_producto(producto: Producto):
+    return producto
+
+# Válido:
+# Body: {"nombre": "Laptop", "precio": 999.99, "precio_oferta": 799.99}
+
+# Inválido:
+# Body: {"nombre": "Laptop", "precio": 999.99, "precio_oferta": 1099.99}
+# Error: "El precio de oferta debe ser menor al precio normal"`} lang="python" title="Validación personalizada" />
+
+---
+
+## 📋 7.4 Manejo de datos JSON
+
+### Recibir JSON directamente
+
+Puedes recibir JSON sin modelo Pydantic usando `dict` o `Body`.
+
+<Code code={`from fastapi import FastAPI, Body
+from typing import Dict, Any
+
+app = FastAPI()
+
+# Recibir cualquier JSON como diccionario
+@app.post("/datos")
+def recibir_datos(datos: Dict[str, Any] = Body(...)):
+    return {
+        "recibido": True,
+        "claves": list(datos.keys()),
+        "datos": datos
+    }
+
+# POST /datos
+# Body: {"cualquier": "cosa", "numero": 123, "lista": [1, 2, 3]}
+# Respuesta: {"recibido": true, "claves": ["cualquier", "numero", "lista"], ...}`} lang="python" title="JSON como dict" />
+
+### Ejemplo: Combinar body con parámetros
+
+<Code code={`from fastapi import FastAPI, Path, Query
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Actualizacion(BaseModel):
+    nombre: str = None
+    precio: float = None
+
+@app.put("/productos/{producto_id}")
+def actualizar_producto(
+    producto_id: int = Path(..., gt=0),
+    confirmar: bool = Query(False),
+    datos: Actualizacion = None
+):
+    return {
+        "producto_id": producto_id,
+        "confirmar": confirmar,
+        "datos_actualizados": datos
+    }
+
+# PUT /productos/5?confirmar=true
+# Body: {"nombre": "Laptop Pro", "precio": 1299.99}
+# Respuesta: {
+#   "producto_id": 5,
+#   "confirmar": true,
+#   "datos_actualizados": {"nombre": "Laptop Pro", "precio": 1299.99}
+# }`} lang="python" title="Body + parámetros" />
+
+### Ejemplo: Múltiples bodies
+
+<Code code={`from fastapi import FastAPI, Body
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Usuario(BaseModel):
+    nombre: str
+    email: str
+
+class Configuracion(BaseModel):
+    tema: str
+    idioma: str
+
+@app.post("/perfil")
+def crear_perfil(
+    usuario: Usuario,
+    config: Configuracion,
+    notas: str = Body(None)
+):
+    return {
+        "usuario": usuario,
+        "configuracion": config,
+        "notas": notas
+    }
+
+# POST /perfil
+# Body:
+# {
+#   "usuario": {"nombre": "Ana", "email": "ana@email.com"},
+#   "config": {"tema": "oscuro", "idioma": "es"},
+#   "notas": "Usuario premium"
+# }`} lang="python" title="Múltiples bodies" />
+
+---
+
+## 📤 7.5 Respuestas estructuradas
+
+### Usar response_model
+
+El parámetro `response_model` define el esquema de la respuesta y filtra campos automáticamente.
+
+<Code code={`from fastapi import FastAPI
+from pydantic import BaseModel, EmailStr
+from typing import List
+
+app = FastAPI()
+
+# Modelo de entrada (con password)
+class UsuarioCrear(BaseModel):
+    nombre: str
+    email: EmailStr
+    password: str
+
+# Modelo de respuesta (sin password)
+class UsuarioRespuesta(BaseModel):
+    id: int
+    nombre: str
+    email: EmailStr
+
+usuarios_db = []
+
+@app.post("/usuarios", response_model=UsuarioRespuesta, status_code=201)
+def crear_usuario(usuario: UsuarioCrear):
+    nuevo = {
+        "id": len(usuarios_db) + 1,
+        "nombre": usuario.nombre,
+        "email": usuario.email,
+        "password": usuario.password  # Se guarda pero NO se devuelve
+    }
+    usuarios_db.append(nuevo)
+    return nuevo  # FastAPI filtra y solo devuelve campos de UsuarioRespuesta
+
+# POST /usuarios
+# Body: {"nombre": "Ana", "email": "ana@email.com", "password": "secreto123"}
+# Respuesta: {"id": 1, "nombre": "Ana", "email": "ana@email.com"}
+# (password NO aparece en la respuesta)`} lang="python" title="response_model" />
+
+### Ejemplo: Lista como respuesta
+
+<Code code={`from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List
+
+app = FastAPI()
+
+class Producto(BaseModel):
+    id: int
+    nombre: str
+    precio: float
+
+productos_db = [
+    {"id": 1, "nombre": "Laptop", "precio": 999.99, "costo": 700},
+    {"id": 2, "nombre": "Mouse", "precio": 29.99, "costo": 15}
+]
+
+@app.get("/productos", response_model=List[Producto])
+def listar_productos():
+    return productos_db  # "costo" se filtra automáticamente
+
+# GET /productos
+# Respuesta: [
+#   {"id": 1, "nombre": "Laptop", "precio": 999.99},
+#   {"id": 2, "nombre": "Mouse", "precio": 29.99}
+# ]
+# (costo NO aparece)`} lang="python" title="Lista como respuesta" />
+
+---
+
+## 💡 7.6 Ejemplo de creación de registros
+
+### API CRUD completa con Request Body
+
+<Code code={`from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field, EmailStr
+from typing import Optional, List
+from datetime import datetime
+
+app = FastAPI(title="API de Clientes")
+
+# Modelos
+class ClienteCrear(BaseModel):
+    nombre: str = Field(..., min_length=2, max_length=100)
+    email: EmailStr
+    telefono: str = Field(..., regex="^[0-9]{10}$")
+    direccion: Optional[str] = None
+
+class ClienteActualizar(BaseModel):
+    nombre: Optional[str] = Field(None, min_length=2, max_length=100)
+    email: Optional[EmailStr] = None
+    telefono: Optional[str] = Field(None, regex="^[0-9]{10}$")
+    direccion: Optional[str] = None
+
+class ClienteRespuesta(BaseModel):
+    id: int
+    nombre: str
+    email: str
+    telefono: str
+    direccion: Optional[str]
+    fecha_registro: datetime
+    activo: bool
+
+# Base de datos simulada
+clientes_db = []
+
+# CREATE - Crear cliente
+@app.post("/clientes", response_model=ClienteRespuesta, status_code=201)
+def crear_cliente(cliente: ClienteCrear):
+    # Verificar email único
+    for c in clientes_db:
+        if c["email"] == cliente.email:
+            raise HTTPException(status_code=400, detail="Email ya registrado")
+    
+    nuevo = {
+        "id": len(clientes_db) + 1,
+        "nombre": cliente.nombre,
+        "email": cliente.email,
+        "telefono": cliente.telefono,
+        "direccion": cliente.direccion,
+        "fecha_registro": datetime.now(),
+        "activo": True
+    }
+    clientes_db.append(nuevo)
+    return nuevo
+
+# READ - Listar clientes
+@app.get("/clientes", response_model=List[ClienteRespuesta])
+def listar_clientes(activo: Optional[bool] = None):
+    if activo is not None:
+        return [c for c in clientes_db if c["activo"] == activo]
+    return clientes_db
+
+# READ - Obtener cliente por ID
+@app.get("/clientes/{cliente_id}", response_model=ClienteRespuesta)
+def obtener_cliente(cliente_id: int):
+    for cliente in clientes_db:
+        if cliente["id"] == cliente_id:
+            return cliente
+    raise HTTPException(status_code=404, detail="Cliente no encontrado")
+
+# UPDATE - Actualizar cliente (PATCH)
+@app.patch("/clientes/{cliente_id}", response_model=ClienteRespuesta)
+def actualizar_cliente(cliente_id: int, datos: ClienteActualizar):
+    for i, cliente in enumerate(clientes_db):
+        if cliente["id"] == cliente_id:
+            # Solo actualizar campos proporcionados
+            datos_dict = datos.dict(exclude_unset=True)
+            clientes_db[i].update(datos_dict)
+            return clientes_db[i]
+    raise HTTPException(status_code=404, detail="Cliente no encontrado")
+
+# DELETE - Desactivar cliente
+@app.delete("/clientes/{cliente_id}")
+def eliminar_cliente(cliente_id: int):
+    for i, cliente in enumerate(clientes_db):
+        if cliente["id"] == cliente_id:
+            clientes_db[i]["activo"] = False
+            return {"mensaje": "Cliente desactivado"}
+    raise HTTPException(status_code=404, detail="Cliente no encontrado")`} lang="python" title="API CRUD completa" />
+
+<Aside type="tip">
+Usa modelos separados para **crear**, **actualizar** y **responder**. Esto te permite controlar qué campos son obligatorios en cada operación y qué datos se exponen en las respuestas.
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- El **Request Body** envía datos JSON en peticiones POST, PUT, PATCH
+- Usar modelos **Pydantic** para validar el body automáticamente
+- FastAPI devuelve **error 422** si los datos no son válidos
+- Combinar body con path params y query params
+- Usar **response_model** para filtrar campos en la respuesta
+- Crear APIs CRUD completas con validación
+</Aside>

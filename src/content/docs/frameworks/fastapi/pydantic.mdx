@@ -1,0 +1,591 @@
+---
+title: 6. Validación de datos con Pydantic
+description: Qué es Pydantic, creación de modelos de datos, validación automática y tipos soportados
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 📦 6.1 Qué es Pydantic
+
+### Definición
+
+**Pydantic** es una librería de Python para validación de datos usando type hints. FastAPI la usa internamente para validar y serializar datos automáticamente.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Validación** | Verifica que los datos cumplan con los tipos |
+| **Conversión** | Convierte tipos automáticamente cuando es posible |
+| **Serialización** | Convierte objetos a JSON |
+| **Documentación** | Genera esquemas JSON automáticamente |
+
+### Por qué usar Pydantic
+
+- **Validación automática**: No necesitas escribir código de validación manual
+- **Errores claros**: Mensajes de error detallados y legibles
+- **Integración con FastAPI**: Funciona de forma nativa
+- **Type hints**: Usa la sintaxis estándar de Python
+
+### Ejemplo: Pydantic básico
+
+<Code code={`from pydantic import BaseModel
+
+# Definir un modelo
+class Usuario(BaseModel):
+    nombre: str
+    edad: int
+    email: str
+
+# Crear instancia con datos válidos
+usuario = Usuario(nombre="Ana", edad=25, email="ana@email.com")
+print(usuario.nombre)  # Ana
+print(usuario.edad)    # 25
+
+# Intentar con datos inválidos
+try:
+    usuario_invalido = Usuario(nombre="Carlos", edad="no es número", email="carlos@email.com")
+except Exception as e:
+    print(e)  # Error: value is not a valid integer`} lang="python" title="Pydantic básico" />
+
+---
+
+## 🏗️ 6.2 Creación de modelos de datos
+
+### Sintaxis básica
+
+Los modelos se crean heredando de `BaseModel` y definiendo atributos con type hints.
+
+<Code code={`from pydantic import BaseModel
+
+# Modelo simple
+class Producto(BaseModel):
+    nombre: str
+    precio: float
+    cantidad: int
+
+# Crear instancia
+producto = Producto(nombre="Laptop", precio=999.99, cantidad=10)
+print(producto)
+# nombre='Laptop' precio=999.99 cantidad=10`} lang="python" title="Modelo simple" />
+
+### Ejemplo: Modelo con valores por defecto
+
+<Code code={`from pydantic import BaseModel
+from typing import Optional
+
+class Producto(BaseModel):
+    nombre: str
+    precio: float
+    cantidad: int = 0  # Valor por defecto
+    descripcion: Optional[str] = None  # Opcional, default None
+    activo: bool = True  # Valor por defecto
+
+# Solo campos obligatorios
+producto1 = Producto(nombre="Mouse", precio=29.99)
+print(producto1)
+# nombre='Mouse' precio=29.99 cantidad=0 descripcion=None activo=True
+
+# Todos los campos
+producto2 = Producto(
+    nombre="Teclado",
+    precio=79.99,
+    cantidad=50,
+    descripcion="Teclado mecánico RGB",
+    activo=True
+)
+print(producto2)`} lang="python" title="Valores por defecto" />
+
+### Ejemplo: Modelos anidados
+
+<Code code={`from pydantic import BaseModel
+from typing import List
+
+# Modelo de dirección
+class Direccion(BaseModel):
+    calle: str
+    ciudad: str
+    codigo_postal: str
+
+# Modelo de usuario con dirección anidada
+class Usuario(BaseModel):
+    nombre: str
+    email: str
+    direccion: Direccion  # Modelo anidado
+    telefonos: List[str]  # Lista de strings
+
+# Crear usuario con dirección
+usuario = Usuario(
+    nombre="Ana García",
+    email="ana@email.com",
+    direccion={
+        "calle": "Av. Principal 123",
+        "ciudad": "Ciudad de México",
+        "codigo_postal": "06600"
+    },
+    telefonos=["555-1234", "555-5678"]
+)
+
+print(usuario.direccion.ciudad)  # Ciudad de México
+print(usuario.telefonos[0])      # 555-1234`} lang="python" title="Modelos anidados" />
+
+### Ejemplo: Usar modelos en FastAPI
+
+<Code code={`from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Producto(BaseModel):
+    nombre: str
+    precio: float
+    cantidad: int = 0
+
+# POST con modelo Pydantic
+@app.post("/productos")
+def crear_producto(producto: Producto):
+    return {
+        "mensaje": "Producto creado",
+        "producto": producto
+    }
+
+# FastAPI automáticamente:
+# 1. Valida que el body tenga nombre (str), precio (float)
+# 2. Convierte los tipos si es necesario
+# 3. Devuelve error 422 si los datos son inválidos`} lang="python" title="Modelos en FastAPI" />
+
+---
+
+## ✅ 6.3 Validación automática de datos
+
+### Cómo funciona la validación
+
+Pydantic valida los datos automáticamente al crear una instancia del modelo. Si los datos no son válidos, lanza una excepción con detalles del error.
+
+### Ejemplo: Validación de tipos
+
+<Code code={`from pydantic import BaseModel
+
+class Producto(BaseModel):
+    nombre: str
+    precio: float
+    cantidad: int
+
+# Datos válidos
+producto1 = Producto(nombre="Laptop", precio=999.99, cantidad=10)
+# OK
+
+# Conversión automática (string a int)
+producto2 = Producto(nombre="Mouse", precio="29.99", cantidad="5")
+print(producto2.precio)    # 29.99 (float)
+print(producto2.cantidad)  # 5 (int)
+
+# Datos inválidos - lanza error
+try:
+    producto3 = Producto(nombre="Teclado", precio="no es número", cantidad=10)
+except Exception as e:
+    print(e)
+    # 1 validation error for Producto
+    # precio
+    #   value is not a valid float`} lang="python" title="Validación de tipos" />
+
+### Ejemplo: Validación con Field()
+
+<Code code={`from pydantic import BaseModel, Field
+
+class Producto(BaseModel):
+    nombre: str = Field(..., min_length=2, max_length=100)
+    precio: float = Field(..., gt=0, description="Precio debe ser mayor a 0")
+    cantidad: int = Field(0, ge=0, description="Cantidad no puede ser negativa")
+    codigo: str = Field(..., regex="^[A-Z]{3}-[0-9]{4}$")
+
+# Válido
+producto = Producto(
+    nombre="Laptop Gaming",
+    precio=1299.99,
+    cantidad=5,
+    codigo="LAP-1234"
+)
+
+# Inválido - nombre muy corto
+try:
+    Producto(nombre="A", precio=100, cantidad=1, codigo="ABC-1234")
+except Exception as e:
+    print("Error:", e)
+    # nombre: ensure this value has at least 2 characters
+
+# Inválido - precio negativo
+try:
+    Producto(nombre="Mouse", precio=-10, cantidad=1, codigo="MOU-1234")
+except Exception as e:
+    print("Error:", e)
+    # precio: ensure this value is greater than 0
+
+# Inválido - código con formato incorrecto
+try:
+    Producto(nombre="Teclado", precio=50, cantidad=1, codigo="abc-123")
+except Exception as e:
+    print("Error:", e)
+    # codigo: string does not match regex`} lang="python" title="Validación con Field()" />
+
+### Parámetros de Field()
+
+| Parámetro | Descripción |
+|-----------|-------------|
+| ... | Campo obligatorio (sin default) |
+| default | Valor por defecto |
+| gt, ge, lt, le | Validaciones numéricas |
+| min_length, max_length | Longitud de strings |
+| regex | Expresión regular |
+| description | Descripción para documentación |
+| example | Ejemplo para documentación |
+
+---
+
+## 🔤 6.4 Tipos de datos soportados
+
+### Tipos básicos de Python
+
+| Tipo | Descripción | Ejemplo |
+|------|-------------|---------|
+| str | Cadena de texto | "Hola" |
+| int | Número entero | 42 |
+| float | Número decimal | 3.14 |
+| bool | Booleano | True, False |
+| bytes | Bytes | b"data" |
+
+### Tipos de typing
+
+| Tipo | Descripción | Ejemplo |
+|------|-------------|---------|
+| List | Lista tipada | List[str] |
+| Dict | Diccionario tipado | Dict[str, int] |
+| Optional | Puede ser None | Optional[str] |
+| Union | Varios tipos posibles | Union[str, int] |
+
+### Tipos especiales de Pydantic
+
+| Tipo | Descripción |
+|------|-------------|
+| EmailStr | Email válido |
+| HttpUrl | URL válida |
+| PositiveInt | Entero positivo |
+| NegativeFloat | Float negativo |
+| constr | String con restricciones |
+| conint | Int con restricciones |
+
+### Ejemplo: Diferentes tipos
+
+<Code code={`from pydantic import BaseModel, EmailStr, HttpUrl, Field
+from typing import List, Dict, Optional, Union
+from datetime import datetime
+from enum import Enum
+
+class EstadoEnum(str, Enum):
+    activo = "activo"
+    inactivo = "inactivo"
+    pendiente = "pendiente"
+
+class Usuario(BaseModel):
+    # Tipos básicos
+    nombre: str
+    edad: int
+    altura: float
+    activo: bool
+    
+    # Tipos de typing
+    emails: List[str]
+    configuracion: Dict[str, str]
+    apodo: Optional[str] = None
+    
+    # Tipos especiales de Pydantic
+    email_principal: EmailStr
+    sitio_web: Optional[HttpUrl] = None
+    
+    # Enum
+    estado: EstadoEnum = EstadoEnum.activo
+    
+    # Datetime
+    fecha_registro: datetime
+
+# Crear usuario
+usuario = Usuario(
+    nombre="Ana García",
+    edad=28,
+    altura=1.65,
+    activo=True,
+    emails=["ana@gmail.com", "ana@trabajo.com"],
+    configuracion={"tema": "oscuro", "idioma": "es"},
+    email_principal="ana@gmail.com",
+    sitio_web="https://ana-garcia.com",
+    estado="activo",
+    fecha_registro="2024-01-15T10:30:00"
+)
+
+print(usuario.email_principal)  # ana@gmail.com
+print(usuario.fecha_registro)   # 2024-01-15 10:30:00`} lang="python" title="Diferentes tipos" />
+
+---
+
+## ❓ 6.5 Campos obligatorios y opcionales
+
+### Campos obligatorios
+
+Un campo es **obligatorio** cuando no tiene valor por defecto.
+
+<Code code={`from pydantic import BaseModel
+
+class Producto(BaseModel):
+    nombre: str      # Obligatorio
+    precio: float    # Obligatorio
+    categoria: str   # Obligatorio
+
+# Debe proporcionar todos los campos
+producto = Producto(nombre="Laptop", precio=999.99, categoria="Electrónica")
+
+# Error si falta alguno
+try:
+    producto_incompleto = Producto(nombre="Mouse")
+except Exception as e:
+    print(e)
+    # 2 validation errors for Producto
+    # precio: field required
+    # categoria: field required`} lang="python" title="Campos obligatorios" />
+
+### Campos opcionales
+
+Un campo es **opcional** cuando tiene valor por defecto o usa `Optional`.
+
+<Code code={`from pydantic import BaseModel
+from typing import Optional
+
+class Producto(BaseModel):
+    # Obligatorios
+    nombre: str
+    precio: float
+    
+    # Opcionales con valor por defecto
+    cantidad: int = 0
+    activo: bool = True
+    
+    # Opcionales que pueden ser None
+    descripcion: Optional[str] = None
+    codigo_barras: Optional[str] = None
+
+# Solo campos obligatorios
+producto1 = Producto(nombre="Mouse", precio=29.99)
+print(producto1.cantidad)     # 0
+print(producto1.descripcion)  # None
+
+# Con campos opcionales
+producto2 = Producto(
+    nombre="Teclado",
+    precio=79.99,
+    cantidad=50,
+    descripcion="Teclado mecánico"
+)
+print(producto2.cantidad)     # 50
+print(producto2.descripcion)  # Teclado mecánico`} lang="python" title="Campos opcionales" />
+
+### Ejemplo: Modelo para crear vs actualizar
+
+<Code code={`from pydantic import BaseModel
+from typing import Optional
+
+# Modelo para CREAR (todos obligatorios excepto opcionales)
+class ProductoCrear(BaseModel):
+    nombre: str
+    precio: float
+    categoria: str
+    descripcion: Optional[str] = None
+
+# Modelo para ACTUALIZAR (todos opcionales)
+class ProductoActualizar(BaseModel):
+    nombre: Optional[str] = None
+    precio: Optional[float] = None
+    categoria: Optional[str] = None
+    descripcion: Optional[str] = None
+
+# Uso en FastAPI
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.post("/productos")
+def crear(producto: ProductoCrear):
+    # Requiere: nombre, precio, categoria
+    return producto
+
+@app.patch("/productos/{id}")
+def actualizar(id: int, datos: ProductoActualizar):
+    # Puede enviar solo los campos a actualizar
+    return {"id": id, "actualizado": datos.dict(exclude_unset=True)}`} lang="python" title="Crear vs Actualizar" />
+
+---
+
+## 💡 6.6 Ejemplo de modelos para APIs
+
+### Ejemplo: API de usuarios completa
+
+<Code code={`from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, EmailStr, Field
+from typing import Optional, List
+from datetime import datetime
+from enum import Enum
+
+app = FastAPI()
+
+# Enums
+class RolUsuario(str, Enum):
+    admin = "admin"
+    usuario = "usuario"
+    moderador = "moderador"
+
+# Modelo base (campos comunes)
+class UsuarioBase(BaseModel):
+    nombre: str = Field(..., min_length=2, max_length=100)
+    email: EmailStr
+    rol: RolUsuario = RolUsuario.usuario
+
+# Modelo para crear usuario
+class UsuarioCrear(UsuarioBase):
+    password: str = Field(..., min_length=8)
+
+# Modelo para actualizar usuario
+class UsuarioActualizar(BaseModel):
+    nombre: Optional[str] = Field(None, min_length=2, max_length=100)
+    email: Optional[EmailStr] = None
+    rol: Optional[RolUsuario] = None
+
+# Modelo de respuesta (sin password)
+class UsuarioRespuesta(UsuarioBase):
+    id: int
+    fecha_registro: datetime
+    activo: bool = True
+
+# Base de datos simulada
+usuarios_db = []
+
+@app.post("/usuarios", response_model=UsuarioRespuesta, status_code=201)
+def crear_usuario(usuario: UsuarioCrear):
+    # Verificar email único
+    for u in usuarios_db:
+        if u["email"] == usuario.email:
+            raise HTTPException(status_code=400, detail="Email ya registrado")
+    
+    nuevo_usuario = {
+        "id": len(usuarios_db) + 1,
+        "nombre": usuario.nombre,
+        "email": usuario.email,
+        "rol": usuario.rol,
+        "fecha_registro": datetime.now(),
+        "activo": True
+    }
+    usuarios_db.append(nuevo_usuario)
+    return nuevo_usuario
+
+@app.get("/usuarios", response_model=List[UsuarioRespuesta])
+def listar_usuarios():
+    return usuarios_db
+
+@app.get("/usuarios/{usuario_id}", response_model=UsuarioRespuesta)
+def obtener_usuario(usuario_id: int):
+    for usuario in usuarios_db:
+        if usuario["id"] == usuario_id:
+            return usuario
+    raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+@app.patch("/usuarios/{usuario_id}", response_model=UsuarioRespuesta)
+def actualizar_usuario(usuario_id: int, datos: UsuarioActualizar):
+    for i, usuario in enumerate(usuarios_db):
+        if usuario["id"] == usuario_id:
+            # Solo actualizar campos proporcionados
+            datos_actualizar = datos.dict(exclude_unset=True)
+            usuarios_db[i].update(datos_actualizar)
+            return usuarios_db[i]
+    raise HTTPException(status_code=404, detail="Usuario no encontrado")`} lang="python" title="API de usuarios completa" />
+
+### Ejemplo: Modelo de pedido con productos
+
+<Code code={`from pydantic import BaseModel, Field
+from typing import List
+from datetime import datetime
+from enum import Enum
+
+class EstadoPedido(str, Enum):
+    pendiente = "pendiente"
+    procesando = "procesando"
+    enviado = "enviado"
+    entregado = "entregado"
+    cancelado = "cancelado"
+
+class ItemPedido(BaseModel):
+    producto_id: int
+    nombre: str
+    cantidad: int = Field(..., gt=0)
+    precio_unitario: float = Field(..., gt=0)
+    
+    @property
+    def subtotal(self) -> float:
+        return self.cantidad * self.precio_unitario
+
+class DireccionEnvio(BaseModel):
+    calle: str
+    ciudad: str
+    estado: str
+    codigo_postal: str
+    pais: str = "México"
+
+class PedidoCrear(BaseModel):
+    cliente_id: int
+    items: List[ItemPedido] = Field(..., min_items=1)
+    direccion_envio: DireccionEnvio
+    notas: str = ""
+
+class PedidoRespuesta(BaseModel):
+    id: int
+    cliente_id: int
+    items: List[ItemPedido]
+    direccion_envio: DireccionEnvio
+    estado: EstadoPedido = EstadoPedido.pendiente
+    total: float
+    fecha_creacion: datetime
+    notas: str = ""
+
+# Uso
+pedido_data = {
+    "cliente_id": 1,
+    "items": [
+        {"producto_id": 101, "nombre": "Laptop", "cantidad": 1, "precio_unitario": 999.99},
+        {"producto_id": 102, "nombre": "Mouse", "cantidad": 2, "precio_unitario": 29.99}
+    ],
+    "direccion_envio": {
+        "calle": "Av. Principal 123",
+        "ciudad": "CDMX",
+        "estado": "CDMX",
+        "codigo_postal": "06600"
+    },
+    "notas": "Entregar en horario de oficina"
+}
+
+pedido = PedidoCrear(**pedido_data)
+print(f"Items: {len(pedido.items)}")
+print(f"Ciudad: {pedido.direccion_envio.ciudad}")`} lang="python" title="Modelo de pedido" />
+
+<Aside type="tip">
+Usa **herencia de modelos** para evitar repetir campos comunes. Crea un modelo base y extiéndelo para crear, actualizar y responder.
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- **Pydantic** valida datos automáticamente usando type hints
+- Crear modelos heredando de `BaseModel`
+- Usar `Field()` para validaciones adicionales (min, max, regex)
+- Tipos soportados: básicos, typing, y especiales (EmailStr, HttpUrl)
+- Campos obligatorios vs opcionales
+- Modelos anidados para estructuras complejas
+- Patrones: modelos separados para crear, actualizar y responder
+</Aside>

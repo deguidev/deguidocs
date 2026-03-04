@@ -1,0 +1,495 @@
+---
+title: 9. Organización de proyectos FastAPI
+description: Estructura profesional de carpetas, separación de rutas y modelos, uso de routers
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 📁 9.1 Estructura profesional de carpetas
+
+### Proyecto pequeño vs grande
+
+| Tamaño | Estructura | Uso |
+|--------|------------|-----|
+| Pequeño | Un solo archivo | Prototipos, APIs simples |
+| Mediano | Carpetas básicas | APIs con varios endpoints |
+| Grande | Arquitectura completa | Aplicaciones empresariales |
+
+### Estructura mínima
+
+```
+mi_api/
+├── main.py            # Punto de entrada
+├── requirements.txt   # Dependencias
+└── README.md          # Documentación
+```
+
+### Estructura para proyectos medianos
+
+```
+mi_api/
+├── app/
+│   ├── __init__.py
+│   ├── main.py        # Punto de entrada
+│   ├── routers/       # Rutas organizadas
+│   │   ├── __init__.py
+│   │   ├── usuarios.py
+│   │   └── productos.py
+│   ├── models/        # Modelos Pydantic
+│   │   ├── __init__.py
+│   │   ├── usuario.py
+│   │   └── producto.py
+│   └── config.py      # Configuración
+├── requirements.txt
+└── README.md
+```
+
+### Estructura para proyectos grandes
+
+```
+mi_api/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── core/              # Configuración central
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   └── security.py
+│   ├── api/               # Endpoints
+│   │   ├── __init__.py
+│   │   ├── v1/
+│   │   │   ├── __init__.py
+│   │   │   ├── endpoints/
+│   │   │   │   ├── usuarios.py
+│   │   │   │   └── productos.py
+│   │   │   └── router.py
+│   │   └── deps.py        # Dependencias comunes
+│   ├── models/            # Modelos Pydantic
+│   │   ├── __init__.py
+│   │   ├── usuario.py
+│   │   └── producto.py
+│   ├── schemas/           # Esquemas de BD
+│   │   ├── __init__.py
+│   │   └── base.py
+│   ├── services/          # Lógica de negocio
+│   │   ├── __init__.py
+│   │   └── usuario_service.py
+│   └── db/                # Base de datos
+│       ├── __init__.py
+│       ├── session.py
+│       └── base.py
+├── tests/
+│   ├── __init__.py
+│   └── test_usuarios.py
+├── requirements.txt
+├── .env
+└── README.md
+```
+
+---
+
+## 🛤️ 9.2 Separación de rutas
+
+### Por qué separar rutas
+
+- **Organización**: Código más fácil de encontrar
+- **Mantenimiento**: Cambios aislados por módulo
+- **Colaboración**: Varios desarrolladores pueden trabajar en paralelo
+- **Escalabilidad**: Agregar nuevas rutas sin afectar las existentes
+
+### Ejemplo: Rutas en archivos separados
+
+<Code code={`# app/routers/usuarios.py
+from fastapi import APIRouter, HTTPException
+from typing import List
+
+router = APIRouter()
+
+usuarios_db = []
+
+@router.get("/", response_model=List[dict])
+def listar_usuarios():
+    """Lista todos los usuarios."""
+    return usuarios_db
+
+@router.get("/{usuario_id}")
+def obtener_usuario(usuario_id: int):
+    """Obtiene un usuario por ID."""
+    for usuario in usuarios_db:
+        if usuario["id"] == usuario_id:
+            return usuario
+    raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+@router.post("/", status_code=201)
+def crear_usuario(nombre: str, email: str):
+    """Crea un nuevo usuario."""
+    nuevo = {"id": len(usuarios_db) + 1, "nombre": nombre, "email": email}
+    usuarios_db.append(nuevo)
+    return nuevo`} lang="python" title="app/routers/usuarios.py" />
+
+<Code code={`# app/routers/productos.py
+from fastapi import APIRouter, HTTPException
+from typing import List
+
+router = APIRouter()
+
+productos_db = []
+
+@router.get("/", response_model=List[dict])
+def listar_productos():
+    """Lista todos los productos."""
+    return productos_db
+
+@router.get("/{producto_id}")
+def obtener_producto(producto_id: int):
+    """Obtiene un producto por ID."""
+    for producto in productos_db:
+        if producto["id"] == producto_id:
+            return producto
+    raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+@router.post("/", status_code=201)
+def crear_producto(nombre: str, precio: float):
+    """Crea un nuevo producto."""
+    nuevo = {"id": len(productos_db) + 1, "nombre": nombre, "precio": precio}
+    productos_db.append(nuevo)
+    return nuevo`} lang="python" title="app/routers/productos.py" />
+
+---
+
+## 📦 9.3 Separación de modelos
+
+### Organizar modelos Pydantic
+
+<Code code={`# app/models/usuario.py
+from pydantic import BaseModel, EmailStr, Field
+from typing import Optional
+from datetime import datetime
+
+class UsuarioBase(BaseModel):
+    nombre: str = Field(..., min_length=2, max_length=100)
+    email: EmailStr
+
+class UsuarioCrear(UsuarioBase):
+    password: str = Field(..., min_length=8)
+
+class UsuarioActualizar(BaseModel):
+    nombre: Optional[str] = Field(None, min_length=2, max_length=100)
+    email: Optional[EmailStr] = None
+
+class UsuarioRespuesta(UsuarioBase):
+    id: int
+    fecha_registro: datetime
+    activo: bool = True
+    
+    class Config:
+        orm_mode = True`} lang="python" title="app/models/usuario.py" />
+
+<Code code={`# app/models/producto.py
+from pydantic import BaseModel, Field
+from typing import Optional
+from enum import Enum
+
+class CategoriaEnum(str, Enum):
+    electronica = "electronica"
+    ropa = "ropa"
+    hogar = "hogar"
+    otros = "otros"
+
+class ProductoBase(BaseModel):
+    nombre: str = Field(..., min_length=2, max_length=200)
+    precio: float = Field(..., gt=0)
+    categoria: CategoriaEnum
+
+class ProductoCrear(ProductoBase):
+    stock: int = Field(0, ge=0)
+
+class ProductoActualizar(BaseModel):
+    nombre: Optional[str] = None
+    precio: Optional[float] = Field(None, gt=0)
+    categoria: Optional[CategoriaEnum] = None
+    stock: Optional[int] = Field(None, ge=0)
+
+class ProductoRespuesta(ProductoBase):
+    id: int
+    stock: int
+    activo: bool = True
+    
+    class Config:
+        orm_mode = True`} lang="python" title="app/models/producto.py" />
+
+<Code code={`# app/models/__init__.py
+from .usuario import UsuarioBase, UsuarioCrear, UsuarioActualizar, UsuarioRespuesta
+from .producto import ProductoBase, ProductoCrear, ProductoActualizar, ProductoRespuesta
+
+# Ahora puedes importar así:
+# from app.models import UsuarioCrear, ProductoRespuesta`} lang="python" title="app/models/__init__.py" />
+
+---
+
+## 🔀 9.4 Uso de routers
+
+### Qué es un APIRouter
+
+El `APIRouter` permite agrupar endpoints relacionados y luego incluirlos en la aplicación principal.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Prefijo** | URL base para todas las rutas |
+| **Tags** | Agrupación en documentación |
+| **Dependencias** | Compartir lógica común |
+
+### Ejemplo: Crear y usar routers
+
+<Code code={`# app/routers/usuarios.py
+from fastapi import APIRouter
+from app.models import UsuarioCrear, UsuarioRespuesta
+from typing import List
+
+router = APIRouter(
+    prefix="/usuarios",
+    tags=["Usuarios"],
+    responses={404: {"description": "No encontrado"}}
+)
+
+@router.get("/", response_model=List[UsuarioRespuesta])
+def listar():
+    return []
+
+@router.post("/", response_model=UsuarioRespuesta, status_code=201)
+def crear(usuario: UsuarioCrear):
+    return {"id": 1, **usuario.dict()}`} lang="python" title="Router de usuarios" />
+
+<Code code={`# app/routers/productos.py
+from fastapi import APIRouter
+from app.models import ProductoCrear, ProductoRespuesta
+from typing import List
+
+router = APIRouter(
+    prefix="/productos",
+    tags=["Productos"]
+)
+
+@router.get("/", response_model=List[ProductoRespuesta])
+def listar():
+    return []
+
+@router.post("/", response_model=ProductoRespuesta, status_code=201)
+def crear(producto: ProductoCrear):
+    return {"id": 1, **producto.dict()}`} lang="python" title="Router de productos" />
+
+<Code code={`# app/main.py
+from fastapi import FastAPI
+from app.routers import usuarios, productos
+
+app = FastAPI(
+    title="Mi API",
+    description="API organizada con routers",
+    version="1.0.0"
+)
+
+# Incluir routers
+app.include_router(usuarios.router)
+app.include_router(productos.router)
+
+@app.get("/")
+def inicio():
+    return {"mensaje": "Bienvenido a la API"}
+
+# Endpoints resultantes:
+# GET  /usuarios
+# POST /usuarios
+# GET  /productos
+# POST /productos`} lang="python" title="app/main.py" />
+
+---
+
+## 🧩 9.5 Modularización de la aplicación
+
+### Crear módulo de routers
+
+<Code code={`# app/routers/__init__.py
+from .usuarios import router as usuarios_router
+from .productos import router as productos_router
+
+# Lista de todos los routers para incluir fácilmente
+all_routers = [
+    usuarios_router,
+    productos_router
+]`} lang="python" title="app/routers/__init__.py" />
+
+<Code code={`# app/main.py
+from fastapi import FastAPI
+from app.routers import all_routers
+
+app = FastAPI(title="Mi API")
+
+# Incluir todos los routers automáticamente
+for router in all_routers:
+    app.include_router(router)`} lang="python" title="Incluir routers automáticamente" />
+
+### Configuración centralizada
+
+<Code code={`# app/core/config.py
+from pydantic import BaseSettings
+
+class Settings(BaseSettings):
+    app_name: str = "Mi API"
+    debug: bool = False
+    database_url: str = "sqlite:///./app.db"
+    secret_key: str = "tu-clave-secreta"
+    
+    class Config:
+        env_file = ".env"
+
+settings = Settings()`} lang="python" title="app/core/config.py" />
+
+<Code code={`# .env
+APP_NAME=Mi API de Producción
+DEBUG=false
+DATABASE_URL=postgresql://user:pass@localhost/db
+SECRET_KEY=clave-super-secreta-123`} lang="text" title=".env" />
+
+<Code code={`# app/main.py
+from fastapi import FastAPI
+from app.core.config import settings
+
+app = FastAPI(
+    title=settings.app_name,
+    debug=settings.debug
+)
+
+@app.get("/config")
+def ver_config():
+    return {
+        "app_name": settings.app_name,
+        "debug": settings.debug
+    }`} lang="python" title="Usar configuración" />
+
+---
+
+## ✅ 9.6 Buenas prácticas en proyectos grandes
+
+### Principios de organización
+
+| Principio | Descripción |
+|-----------|-------------|
+| **Separación de responsabilidades** | Cada módulo hace una cosa |
+| **DRY** | No repetir código |
+| **Convenciones** | Nombres consistentes |
+| **Documentación** | Docstrings y README |
+
+### Ejemplo: Proyecto completo organizado
+
+<Code code={`# app/main.py
+from fastapi import FastAPI
+from app.core.config import settings
+from app.api.v1.router import api_router
+
+app = FastAPI(
+    title=settings.app_name,
+    description="API profesional con FastAPI",
+    version="1.0.0",
+    docs_url="/docs" if settings.debug else None
+)
+
+# Incluir API v1
+app.include_router(api_router, prefix="/api/v1")
+
+@app.get("/health")
+def health_check():
+    """Endpoint de salud para verificar que la API está funcionando."""
+    return {"status": "ok"}`} lang="python" title="app/main.py" />
+
+<Code code={`# app/api/v1/router.py
+from fastapi import APIRouter
+from app.api.v1.endpoints import usuarios, productos
+
+api_router = APIRouter()
+
+api_router.include_router(
+    usuarios.router,
+    prefix="/usuarios",
+    tags=["Usuarios"]
+)
+
+api_router.include_router(
+    productos.router,
+    prefix="/productos",
+    tags=["Productos"]
+)`} lang="python" title="app/api/v1/router.py" />
+
+<Code code={`# app/api/v1/endpoints/usuarios.py
+from fastapi import APIRouter, Depends, HTTPException
+from app.models.usuario import UsuarioCrear, UsuarioRespuesta
+from app.services.usuario_service import UsuarioService
+from typing import List
+
+router = APIRouter()
+
+@router.get("/", response_model=List[UsuarioRespuesta])
+def listar_usuarios(service: UsuarioService = Depends()):
+    """Lista todos los usuarios registrados."""
+    return service.listar_todos()
+
+@router.get("/{usuario_id}", response_model=UsuarioRespuesta)
+def obtener_usuario(usuario_id: int, service: UsuarioService = Depends()):
+    """Obtiene un usuario por su ID."""
+    usuario = service.obtener_por_id(usuario_id)
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return usuario
+
+@router.post("/", response_model=UsuarioRespuesta, status_code=201)
+def crear_usuario(usuario: UsuarioCrear, service: UsuarioService = Depends()):
+    """Crea un nuevo usuario."""
+    return service.crear(usuario)`} lang="python" title="app/api/v1/endpoints/usuarios.py" />
+
+<Code code={`# app/services/usuario_service.py
+from app.models.usuario import UsuarioCrear, UsuarioRespuesta
+from typing import List, Optional
+from datetime import datetime
+
+class UsuarioService:
+    def __init__(self):
+        self.usuarios_db = []
+    
+    def listar_todos(self) -> List[dict]:
+        return self.usuarios_db
+    
+    def obtener_por_id(self, usuario_id: int) -> Optional[dict]:
+        for usuario in self.usuarios_db:
+            if usuario["id"] == usuario_id:
+                return usuario
+        return None
+    
+    def crear(self, usuario: UsuarioCrear) -> dict:
+        nuevo = {
+            "id": len(self.usuarios_db) + 1,
+            "nombre": usuario.nombre,
+            "email": usuario.email,
+            "fecha_registro": datetime.now(),
+            "activo": True
+        }
+        self.usuarios_db.append(nuevo)
+        return nuevo`} lang="python" title="app/services/usuario_service.py" />
+
+<Aside type="tip">
+En proyectos grandes, usa **servicios** para la lógica de negocio. Los endpoints solo deben recibir datos, llamar al servicio y devolver la respuesta. Esto facilita las pruebas y el mantenimiento.
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- Estructuras de carpetas para proyectos pequeños, medianos y grandes
+- Separar **rutas** en archivos usando `APIRouter`
+- Organizar **modelos** Pydantic en módulos
+- Usar `include_router()` para agregar routers a la app
+- Centralizar **configuración** con Pydantic Settings
+- Crear **servicios** para la lógica de negocio
+- Seguir buenas prácticas de organización
+</Aside>

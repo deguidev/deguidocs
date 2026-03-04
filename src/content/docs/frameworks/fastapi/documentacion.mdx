@@ -1,0 +1,519 @@
+---
+title: 8. Documentación automática de FastAPI
+description: Swagger UI, ReDoc, acceso a la documentación automática y mejoras en la documentación
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 📚 8.1 Swagger UI
+
+### Qué es Swagger UI
+
+**Swagger UI** es una interfaz web interactiva que permite explorar y probar tu API directamente desde el navegador. FastAPI la genera automáticamente sin configuración adicional.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **URL** | /docs |
+| **Interactiva** | Permite probar endpoints |
+| **Automática** | Se genera del código |
+| **Estándar** | Basada en OpenAPI |
+
+### Acceder a Swagger UI
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def inicio():
+    return {"mensaje": "Hola"}
+
+@app.get("/usuarios")
+def listar_usuarios():
+    return []
+
+# Ejecutar: uvicorn main:app --reload
+# Acceder a: http://localhost:8000/docs`} lang="python" title="API básica" />
+
+### Funcionalidades de Swagger UI
+
+- **Ver todos los endpoints**: Lista completa de rutas disponibles
+- **Try it out**: Botón para probar cada endpoint
+- **Ver parámetros**: Muestra qué parámetros acepta cada ruta
+- **Ver respuestas**: Muestra el formato de respuesta esperado
+- **Ejecutar peticiones**: Envía peticiones reales a la API
+
+### Ejemplo: Probar endpoint en Swagger
+
+<Code code={`# 1. Ir a http://localhost:8000/docs
+# 2. Buscar el endpoint GET /usuarios
+# 3. Hacer clic en "Try it out"
+# 4. Completar los parámetros si los hay
+# 5. Hacer clic en "Execute"
+# 6. Ver la respuesta en "Response body"
+
+# Swagger muestra:
+# - Curl command: cómo ejecutar desde terminal
+# - Request URL: la URL completa
+# - Response body: el JSON de respuesta
+# - Response headers: cabeceras HTTP`} lang="text" title="Probar en Swagger" />
+
+---
+
+## 📖 8.2 ReDoc
+
+### Qué es ReDoc
+
+**ReDoc** es una alternativa a Swagger UI con un diseño más limpio y orientado a documentación. Es ideal para compartir con usuarios de tu API.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **URL** | /redoc |
+| **Diseño** | Limpio y profesional |
+| **Navegación** | Menú lateral |
+| **Solo lectura** | No permite probar endpoints |
+
+### Acceder a ReDoc
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI(
+    title="Mi API",
+    description="API de ejemplo",
+    version="1.0.0"
+)
+
+@app.get("/productos")
+def listar_productos():
+    """Obtiene la lista de todos los productos disponibles."""
+    return []
+
+# Acceder a: http://localhost:8000/redoc`} lang="python" title="Acceder a ReDoc" />
+
+### Diferencias entre Swagger y ReDoc
+
+| Aspecto | Swagger UI | ReDoc |
+|---------|------------|-------|
+| URL | /docs | /redoc |
+| Probar endpoints | Sí | No |
+| Diseño | Funcional | Elegante |
+| Uso ideal | Desarrollo | Documentación |
+
+---
+
+## 🔗 8.3 Cómo acceder a la documentación automática
+
+### URLs por defecto
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# URLs de documentación automáticas:
+# Swagger UI: http://localhost:8000/docs
+# ReDoc:      http://localhost:8000/redoc
+# OpenAPI JSON: http://localhost:8000/openapi.json`} lang="python" title="URLs por defecto" />
+
+### Personalizar URLs de documentación
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI(
+    docs_url="/documentacion",      # Cambiar URL de Swagger
+    redoc_url="/redoc-docs",        # Cambiar URL de ReDoc
+    openapi_url="/api/openapi.json" # Cambiar URL del JSON
+)
+
+# Nuevas URLs:
+# Swagger: http://localhost:8000/documentacion
+# ReDoc:   http://localhost:8000/redoc-docs
+# OpenAPI: http://localhost:8000/api/openapi.json`} lang="python" title="URLs personalizadas" />
+
+### Deshabilitar documentación
+
+<Code code={`from fastapi import FastAPI
+
+# Deshabilitar Swagger UI
+app = FastAPI(docs_url=None)
+
+# Deshabilitar ReDoc
+app = FastAPI(redoc_url=None)
+
+# Deshabilitar ambos (producción)
+app = FastAPI(
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None
+)`} lang="python" title="Deshabilitar docs" />
+
+<Aside type="caution">
+En producción, considera deshabilitar la documentación pública o protegerla con autenticación para evitar exponer información sensible de tu API.
+</Aside>
+
+---
+
+## 📝 8.4 Descripción de endpoints
+
+### Agregar descripciones
+
+FastAPI usa los docstrings de las funciones para documentar los endpoints.
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/usuarios")
+def listar_usuarios():
+    """
+    Obtiene la lista de todos los usuarios registrados.
+    
+    Retorna una lista de usuarios con su información básica.
+    """
+    return []
+
+@app.get("/usuarios/{usuario_id}")
+def obtener_usuario(usuario_id: int):
+    """
+    Obtiene un usuario específico por su ID.
+    
+    - **usuario_id**: ID único del usuario a buscar
+    """
+    return {"id": usuario_id}
+
+@app.post("/usuarios")
+def crear_usuario():
+    """
+    Crea un nuevo usuario en el sistema.
+    
+    Requiere los siguientes campos:
+    - **nombre**: Nombre completo del usuario
+    - **email**: Correo electrónico válido
+    - **password**: Contraseña (mínimo 8 caracteres)
+    """
+    return {"mensaje": "Usuario creado"}`} lang="python" title="Docstrings" />
+
+### Usar parámetros del decorador
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get(
+    "/productos",
+    summary="Listar productos",
+    description="Obtiene todos los productos disponibles en el catálogo",
+    response_description="Lista de productos con precio y stock",
+    tags=["Productos"]
+)
+def listar_productos():
+    return []
+
+@app.post(
+    "/productos",
+    summary="Crear producto",
+    description="Agrega un nuevo producto al catálogo",
+    response_description="Producto creado con su ID asignado",
+    tags=["Productos"],
+    status_code=201
+)
+def crear_producto():
+    return {"id": 1}`} lang="python" title="Parámetros del decorador" />
+
+### Organizar con tags
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Endpoints de usuarios
+@app.get("/usuarios", tags=["Usuarios"])
+def listar_usuarios():
+    """Lista todos los usuarios."""
+    return []
+
+@app.post("/usuarios", tags=["Usuarios"])
+def crear_usuario():
+    """Crea un nuevo usuario."""
+    return {}
+
+# Endpoints de productos
+@app.get("/productos", tags=["Productos"])
+def listar_productos():
+    """Lista todos los productos."""
+    return []
+
+@app.post("/productos", tags=["Productos"])
+def crear_producto():
+    """Crea un nuevo producto."""
+    return {}
+
+# En Swagger, los endpoints se agrupan por tags`} lang="python" title="Organizar con tags" />
+
+---
+
+## 💡 8.5 Agregar ejemplos a los modelos
+
+### Ejemplos en modelos Pydantic
+
+<Code code={`from fastapi import FastAPI
+from pydantic import BaseModel, Field
+
+app = FastAPI()
+
+class Producto(BaseModel):
+    nombre: str = Field(..., example="Laptop Gaming")
+    precio: float = Field(..., example=1299.99)
+    stock: int = Field(0, example=50)
+    categoria: str = Field(..., example="Electrónica")
+
+@app.post("/productos")
+def crear_producto(producto: Producto):
+    return producto
+
+# En Swagger, el ejemplo aparece automáticamente en "Example Value"`} lang="python" title="Ejemplos con Field" />
+
+### Usar Config con schema_extra
+
+<Code code={`from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Usuario(BaseModel):
+    nombre: str
+    email: str
+    edad: int
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "nombre": "Ana García",
+                "email": "ana@email.com",
+                "edad": 28
+            }
+        }
+
+@app.post("/usuarios")
+def crear_usuario(usuario: Usuario):
+    return usuario`} lang="python" title="schema_extra" />
+
+### Múltiples ejemplos
+
+<Code code={`from fastapi import FastAPI, Body
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Producto(BaseModel):
+    nombre: str
+    precio: float
+    categoria: str
+
+@app.post("/productos")
+def crear_producto(
+    producto: Producto = Body(
+        ...,
+        examples={
+            "laptop": {
+                "summary": "Ejemplo de laptop",
+                "description": "Un producto de electrónica",
+                "value": {
+                    "nombre": "Laptop Pro",
+                    "precio": 1499.99,
+                    "categoria": "Electrónica"
+                }
+            },
+            "libro": {
+                "summary": "Ejemplo de libro",
+                "description": "Un producto de librería",
+                "value": {
+                    "nombre": "Python para todos",
+                    "precio": 29.99,
+                    "categoria": "Libros"
+                }
+            }
+        }
+    )
+):
+    return producto
+
+# En Swagger aparece un dropdown para elegir entre ejemplos`} lang="python" title="Múltiples ejemplos" />
+
+---
+
+## 🎨 8.6 Mejorar la documentación de la API
+
+### Configurar metadatos de la API
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI(
+    title="API de E-Commerce",
+    description="""
+    ## API para gestión de tienda en línea
+    
+    Esta API permite:
+    * **Gestionar productos** - CRUD completo
+    * **Gestionar usuarios** - Registro y autenticación
+    * **Procesar pedidos** - Crear y seguir pedidos
+    
+    ### Autenticación
+    Algunos endpoints requieren token JWT en el header.
+    """,
+    version="2.0.0",
+    terms_of_service="https://miapi.com/terminos",
+    contact={
+        "name": "Soporte API",
+        "url": "https://miapi.com/soporte",
+        "email": "soporte@miapi.com"
+    },
+    license_info={
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+    }
+)`} lang="python" title="Metadatos de la API" />
+
+### Describir tags
+
+<Code code={`from fastapi import FastAPI
+
+tags_metadata = [
+    {
+        "name": "Usuarios",
+        "description": "Operaciones con usuarios. Registro, login y perfil.",
+    },
+    {
+        "name": "Productos",
+        "description": "Gestión del catálogo de productos.",
+        "externalDocs": {
+            "description": "Documentación externa",
+            "url": "https://docs.miapi.com/productos"
+        }
+    },
+    {
+        "name": "Pedidos",
+        "description": "Crear y gestionar pedidos de compra.",
+    }
+]
+
+app = FastAPI(
+    title="Mi API",
+    openapi_tags=tags_metadata
+)
+
+@app.get("/usuarios", tags=["Usuarios"])
+def listar_usuarios():
+    return []
+
+@app.get("/productos", tags=["Productos"])
+def listar_productos():
+    return []`} lang="python" title="Describir tags" />
+
+### Ejemplo completo de API documentada
+
+<Code code={`from fastapi import FastAPI, HTTPException, Path, Query
+from pydantic import BaseModel, Field, EmailStr
+from typing import List, Optional
+from enum import Enum
+
+# Metadatos de tags
+tags_metadata = [
+    {
+        "name": "Usuarios",
+        "description": "Gestión de usuarios del sistema"
+    },
+    {
+        "name": "Productos", 
+        "description": "Catálogo de productos disponibles"
+    }
+]
+
+# Crear aplicación con metadatos
+app = FastAPI(
+    title="API Demo",
+    description="API de demostración con documentación completa",
+    version="1.0.0",
+    openapi_tags=tags_metadata
+)
+
+# Modelos con ejemplos
+class Usuario(BaseModel):
+    nombre: str = Field(..., min_length=2, example="Ana García")
+    email: EmailStr = Field(..., example="ana@email.com")
+    
+class UsuarioRespuesta(BaseModel):
+    id: int = Field(..., example=1)
+    nombre: str = Field(..., example="Ana García")
+    email: str = Field(..., example="ana@email.com")
+
+class Producto(BaseModel):
+    nombre: str = Field(..., example="Laptop Gaming")
+    precio: float = Field(..., gt=0, example=1299.99)
+    stock: int = Field(0, ge=0, example=50)
+
+# Endpoints documentados
+@app.get(
+    "/usuarios",
+    response_model=List[UsuarioRespuesta],
+    tags=["Usuarios"],
+    summary="Listar usuarios",
+    description="Obtiene la lista completa de usuarios registrados"
+)
+def listar_usuarios(
+    activo: Optional[bool] = Query(None, description="Filtrar por estado activo")
+):
+    """
+    Retorna todos los usuarios del sistema.
+    
+    - **activo**: Filtro opcional para usuarios activos/inactivos
+    """
+    return []
+
+@app.post(
+    "/usuarios",
+    response_model=UsuarioRespuesta,
+    tags=["Usuarios"],
+    summary="Crear usuario",
+    description="Registra un nuevo usuario en el sistema",
+    status_code=201
+)
+def crear_usuario(usuario: Usuario):
+    """
+    Crea un nuevo usuario con los datos proporcionados.
+    
+    El email debe ser único en el sistema.
+    """
+    return {"id": 1, **usuario.dict()}
+
+@app.get(
+    "/productos",
+    response_model=List[Producto],
+    tags=["Productos"],
+    summary="Listar productos"
+)
+def listar_productos(
+    categoria: Optional[str] = Query(None, description="Filtrar por categoría"),
+    precio_max: Optional[float] = Query(None, description="Precio máximo", gt=0)
+):
+    """Obtiene todos los productos del catálogo."""
+    return []`} lang="python" title="API documentada completa" />
+
+<Aside type="tip">
+Una buena documentación incluye: **descripción clara**, **ejemplos realistas**, **tags organizados** y **metadatos de contacto**. Esto facilita que otros desarrolladores usen tu API.
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- **Swagger UI** (`/docs`): Interfaz interactiva para probar la API
+- **ReDoc** (`/redoc`): Documentación elegante de solo lectura
+- Personalizar o deshabilitar URLs de documentación
+- Usar **docstrings** y **parámetros del decorador** para describir endpoints
+- Agregar **ejemplos** con `Field(example=...)` o `schema_extra`
+- Configurar **metadatos** de la API (título, descripción, contacto)
+- Organizar endpoints con **tags**
+</Aside>

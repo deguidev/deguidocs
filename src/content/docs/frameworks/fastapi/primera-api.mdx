@@ -1,0 +1,379 @@
+---
+title: 3. Creación de la primera API
+description: Crear la aplicación con FastAPI(), definir rutas básicas, endpoints GET y respuestas JSON
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🚀 3.1 Crear la aplicación con FastAPI()
+
+### La clase FastAPI
+
+La clase `FastAPI` es el punto de entrada de tu aplicación. Al instanciarla, creas el objeto principal que manejará todas las rutas y configuraciones.
+
+### Crear instancia básica
+
+<Code code={`from fastapi import FastAPI
+
+# Crear instancia de la aplicación
+app = FastAPI()
+
+# Ahora 'app' es tu aplicación FastAPI`} lang="python" title="Instancia básica" />
+
+### Crear instancia con metadatos
+
+<Code code={`from fastapi import FastAPI
+
+# Instancia con información de la API
+app = FastAPI(
+    title="Mi Primera API",
+    description="API de ejemplo para aprender FastAPI",
+    version="1.0.0"
+)`} lang="python" title="Con metadatos" />
+
+### Parámetros de configuración
+
+| Parámetro | Descripción |
+|-----------|-------------|
+| `title` | Nombre de la API (aparece en docs) |
+| `description` | Descripción de la API |
+| `version` | Versión de la API |
+| `docs_url` | URL de Swagger UI (default: `/docs`) |
+| `redoc_url` | URL de ReDoc (default: `/redoc`) |
+
+### Ejemplo: Configuración completa
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI(
+    title="API de Productos",
+    description="API para gestionar productos de una tienda",
+    version="2.0.0",
+    docs_url="/documentacion",  # Cambiar URL de docs
+    redoc_url="/redoc"
+)
+
+# La documentación estará en /documentacion en lugar de /docs`} lang="python" title="Configuración completa" />
+
+---
+
+## 🛤️ 3.2 Definir rutas básicas
+
+### Qué es una ruta
+
+Una **ruta** (o endpoint) es una URL específica que tu API expone. Cada ruta está asociada a una función que se ejecuta cuando se accede a ella.
+
+### Sintaxis de rutas
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Ruta raíz
+@app.get("/")
+def inicio():
+    return {"mensaje": "Página principal"}
+
+# Ruta /about
+@app.get("/about")
+def acerca_de():
+    return {"info": "Esta es mi API"}
+
+# Ruta /contacto
+@app.get("/contacto")
+def contacto():
+    return {"email": "contacto@miapi.com"}`} lang="python" title="Rutas básicas" />
+
+### Rutas con parámetros de ruta
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Ruta con parámetro dinámico
+@app.get("/usuarios/{usuario_id}")
+def obtener_usuario(usuario_id: int):
+    return {"usuario_id": usuario_id}
+
+# Ruta con múltiples parámetros
+@app.get("/productos/{categoria}/{producto_id}")
+def obtener_producto(categoria: str, producto_id: int):
+    return {
+        "categoria": categoria,
+        "producto_id": producto_id
+    }`} lang="python" title="Rutas con parámetros" />
+
+### Orden de las rutas
+
+<Aside type="caution">
+El orden de las rutas importa. Las rutas más específicas deben ir antes que las genéricas.
+</Aside>
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# ✅ Correcto: ruta específica primero
+@app.get("/usuarios/me")
+def usuario_actual():
+    return {"usuario": "Usuario actual"}
+
+@app.get("/usuarios/{usuario_id}")
+def obtener_usuario(usuario_id: int):
+    return {"usuario_id": usuario_id}
+
+# ❌ Incorrecto: si inviertes el orden,
+# /usuarios/me se interpretaría como /usuarios/{usuario_id}`} lang="python" title="Orden de rutas" />
+
+---
+
+## 📥 3.3 Endpoint con método GET
+
+### Qué es GET
+
+El método **GET** se usa para obtener datos del servidor. No modifica información, solo la consulta.
+
+### Sintaxis del decorador @app.get()
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# GET simple
+@app.get("/")
+def inicio():
+    return {"mensaje": "Hola"}
+
+# GET con ruta específica
+@app.get("/productos")
+def listar_productos():
+    return [
+        {"id": 1, "nombre": "Laptop"},
+        {"id": 2, "nombre": "Mouse"}
+    ]`} lang="python" title="Método GET" />
+
+### GET con query parameters
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Query parameters: /buscar?q=laptop&limite=10
+@app.get("/buscar")
+def buscar(q: str, limite: int = 10):
+    return {
+        "busqueda": q,
+        "limite": limite,
+        "resultados": []
+    }
+
+# Parámetros opcionales
+@app.get("/productos")
+def listar_productos(categoria: str = None, precio_max: float = None):
+    return {
+        "categoria": categoria,
+        "precio_max": precio_max
+    }`} lang="python" title="Query parameters" />
+
+---
+
+## 📤 3.4 Respuestas simples en formato JSON
+
+### Respuestas automáticas
+
+FastAPI convierte automáticamente los valores de retorno a JSON:
+
+| Tipo Python | JSON resultante |
+|-------------|-----------------|
+| `dict` | Objeto JSON `{}` |
+| `list` | Array JSON `[]` |
+| `str` | String JSON |
+| `int`, `float` | Número JSON |
+| `bool` | `true` o `false` |
+| `None` | `null` |
+
+### Ejemplo: Diferentes tipos de respuesta
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+# Respuesta como diccionario
+@app.get("/usuario")
+def obtener_usuario():
+    return {"id": 1, "nombre": "Ana", "activo": True}
+
+# Respuesta como lista
+@app.get("/usuarios")
+def listar_usuarios():
+    return [
+        {"id": 1, "nombre": "Ana"},
+        {"id": 2, "nombre": "Carlos"}
+    ]
+
+# Respuesta con datos anidados
+@app.get("/perfil")
+def obtener_perfil():
+    return {
+        "usuario": {
+            "id": 1,
+            "nombre": "Ana"
+        },
+        "configuracion": {
+            "tema": "oscuro",
+            "idioma": "es"
+        }
+    }`} lang="python" title="Tipos de respuesta" />
+
+### Códigos de estado HTTP
+
+<Code code={`from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+# Respuesta con código de estado personalizado
+@app.get("/creado")
+def recurso_creado():
+    return JSONResponse(
+        content={"mensaje": "Recurso creado"},
+        status_code=201
+    )
+
+# Usando el parámetro status_code del decorador
+@app.get("/sin-contenido", status_code=204)
+def sin_contenido():
+    return None`} lang="python" title="Códigos de estado" />
+
+---
+
+## 🎨 3.5 Uso del decorador @app.get()
+
+### Anatomía del decorador
+
+<Code code={`@app.get("/ruta", parámetros...)
+def nombre_funcion(parámetros_función):
+    return respuesta`} lang="python" title="Estructura del decorador" />
+
+### Parámetros del decorador
+
+| Parámetro | Descripción |
+|-----------|-------------|
+| `path` | Ruta del endpoint (obligatorio) |
+| `status_code` | Código HTTP de respuesta |
+| `tags` | Categorías para documentación |
+| `summary` | Resumen corto |
+| `description` | Descripción detallada |
+
+### Ejemplo: Decorador con parámetros
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get(
+    "/productos",
+    tags=["Productos"],
+    summary="Listar productos",
+    description="Obtiene la lista completa de productos disponibles",
+    status_code=200
+)
+def listar_productos():
+    return [
+        {"id": 1, "nombre": "Laptop", "precio": 999.99},
+        {"id": 2, "nombre": "Mouse", "precio": 29.99}
+    ]
+
+@app.get(
+    "/productos/{producto_id}",
+    tags=["Productos"],
+    summary="Obtener producto por ID"
+)
+def obtener_producto(producto_id: int):
+    return {"id": producto_id, "nombre": "Laptop"}`} lang="python" title="Decorador con parámetros" />
+
+<Aside type="tip">
+Los `tags` agrupan los endpoints en la documentación automática, facilitando la navegación.
+</Aside>
+
+---
+
+## 🌐 3.6 Probar la API desde el navegador
+
+### Formas de probar la API
+
+| Método | URL | Descripción |
+|--------|-----|-------------|
+| Navegador | `http://localhost:8000/` | Para endpoints GET |
+| Swagger UI | `http://localhost:8000/docs` | Interfaz interactiva |
+| ReDoc | `http://localhost:8000/redoc` | Documentación alternativa |
+
+### Probar con el navegador
+
+<Code code={`# 1. Ejecutar el servidor
+uvicorn main:app --reload
+
+# 2. Abrir navegador en:
+http://localhost:8000/
+
+# 3. Respuesta JSON:
+{"mensaje": "Hola, FastAPI!"}
+
+# 4. Probar otras rutas:
+http://localhost:8000/usuarios
+http://localhost:8000/productos/1`} lang="text" title="Probar en navegador" />
+
+### Usar Swagger UI
+
+<Code code={`# Acceder a Swagger UI
+http://localhost:8000/docs
+
+# En Swagger UI puedes:
+# 1. Ver todos los endpoints disponibles
+# 2. Probar cada endpoint con "Try it out"
+# 3. Ver los parámetros requeridos
+# 4. Ver las respuestas esperadas
+# 5. Ejecutar peticiones reales`} lang="text" title="Swagger UI" />
+
+### Ejemplo completo para probar
+
+<Code code={`from fastapi import FastAPI
+
+app = FastAPI(
+    title="API de Prueba",
+    description="API para probar desde el navegador"
+)
+
+@app.get("/", tags=["General"])
+def inicio():
+    return {"mensaje": "¡Bienvenido a mi API!"}
+
+@app.get("/saludo/{nombre}", tags=["Saludos"])
+def saludar(nombre: str):
+    return {"saludo": f"¡Hola, {nombre}!"}
+
+@app.get("/suma", tags=["Matemáticas"])
+def sumar(a: int, b: int):
+    return {"resultado": a + b, "operacion": f"{a} + {b}"}
+
+# Ejecutar: uvicorn main:app --reload
+# Probar:
+# http://localhost:8000/
+# http://localhost:8000/saludo/Ana
+# http://localhost:8000/suma?a=5&b=3
+# http://localhost:8000/docs`} lang="python" title="API completa para probar" />
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- Crear la aplicación con `FastAPI()` y configurar metadatos
+- Definir rutas con decoradores como `@app.get()`
+- Usar parámetros de ruta (`/usuarios/{id}`) y query parameters (`?limite=10`)
+- Retornar respuestas JSON automáticamente
+- Personalizar el decorador con tags, summary y status_code
+- Probar la API desde el navegador y Swagger UI (`/docs`)
+</Aside>
