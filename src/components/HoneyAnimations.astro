@@ -1,0 +1,56 @@
+---
+/**
+ * HoneyAnimations.astro
+ * 🍯 Componente de animaciones decorativas para el tema Honey
+ * Incluye: abeja flotante y gotas de miel cayendo
+ */
+---
+
+<!-- Abeja animada flotante -->
+<div class="honey-bee" title="🐝 Bzzzz!">
+  🐝
+</div>
+
+<!-- Gotas de miel cayendo -->
+<div class="honey-drip"></div>
+<div class="honey-drip"></div>
+<div class="honey-drip"></div>
+
+<!-- Panal decorativo en esquina superior derecha -->
+<div class="honeycomb-corner"></div>
+
+<style>
+  /* Los estilos principales están en starlight.css */
+  /* Aquí solo ajustes específicos del componente */
+  
+  .honey-bee {
+    user-select: none;
+  }
+  
+  /* Ocultar en móviles para no molestar */
+  @media (max-width: 768px) {
+    .honey-bee {
+      display: none;
+    }
+    
+    .honey-drip {
+      display: none;
+    }
+    
+    .honeycomb-corner {
+      display: none;
+    }
+  }
+  
+  /* Reducir animaciones si el usuario prefiere */
+  @media (prefers-reduced-motion: reduce) {
+    .honey-bee {
+      animation: none;
+    }
+    
+    .honey-drip {
+      animation: none;
+      display: none;
+    }
+  }
+</style>

@@ -1,56 +1,68 @@
 /* ---------------------------------------------------------
-   PyDocs - starlight.css
-   Organización y buenas prácticas para estilos globales
+   HoneyDocs - starlight.css
+   🍯 Tema Honey/Miel - Cálido y elegante
 ----------------------------------------------------------*/
 
 /* =========================
-   1. Variables de color
+   1. Variables de color - Tema Honey
 ========================= */
 
-/* Dark mode colors */
+/* Dark mode colors - Honey oscuro cálido */
 :root {
-    --sl-color-accent-low: #131e4f;
-    --sl-color-accent: #3447ff;
-    --sl-color-accent-high: #FFD43B;
-    --sl-color-white: #ffffff;
-    --sl-color-gray-1: #eceef2;
-    --sl-color-gray-2: #c0c2c7;
-    --sl-color-gray-3: #888b96;
-    --sl-color-gray-4: #545861;
-    --sl-color-gray-5: #353841;
-    --sl-color-gray-6: #24272f;
-    --sl-color-black: #17181c;
+    --sl-color-accent-low: #3D2817;
+    --sl-color-accent: #FFB84D;
+    --sl-color-accent-high: #FFD700;
+    --sl-color-white: #FFF8E7;
+    --sl-color-gray-1: #E8D5B7;
+    --sl-color-gray-2: #D4A574;
+    --sl-color-gray-3: #B8956A;
+    --sl-color-gray-4: #8B7355;
+    --sl-color-gray-5: #4A3728;
+    --sl-color-gray-6: #2A1810;
+    --sl-color-black: #1A0F08;
   
-    /* Fondo personalizado */
+    /* Fondo personalizado - Gradiente ámbar cálido */
     --custom-bg-gradient: radial-gradient(
       ellipse 80% 80% at 50% -20%,
-      rgba(193, 196, 33, 0.3),
-      #1d2238
+      rgba(255, 184, 77, 0.25),
+      #1A0F08
     );
+
+    /* Colores adicionales honey */
+    --honey-gold: #FFB84D;
+    --honey-amber: #FFAA33;
+    --honey-dark: #8B6914;
+    --honeycomb: #F4A460;
   }
   
-  /* Light mode colors */
+  /* Light mode colors - Honey claro luminoso */
   :root[data-theme='light'] {
-    --sl-color-accent-low: #c7d6ff;
-    --sl-color-accent: #306998;
-    --sl-color-accent-high: #0126e0;
-    --sl-color-white: #17181c;
-    --sl-color-gray-1: #24272f;
-    --sl-color-gray-2: #353841;
-    --sl-color-gray-3: #545861;
-    --sl-color-gray-4: #888b96;
-    --sl-color-gray-5: #c0c2c7;
-    --sl-color-gray-6: #eceef2;
-    --sl-color-gray-7: #ffffff;
-    --sl-color-black: #ffffff;
+    --sl-color-accent-low: #FFF8DC;
+    --sl-color-accent: #D4A017;
+    --sl-color-accent-high: #B8860B;
+    --sl-color-white: #2A1810;
+    --sl-color-gray-1: #3D2817;
+    --sl-color-gray-2: #5C4033;
+    --sl-color-gray-3: #8B7355;
+    --sl-color-gray-4: #A0896C;
+    --sl-color-gray-5: #D4C4A8;
+    --sl-color-gray-6: #F5E6D3;
+    --sl-color-gray-7: #FFFBF0;
+    --sl-color-black: #FFFBF0;
   
     --custom-bg-gradient: radial-gradient(
       ellipse 60% 100% at 100% 50%,
-      rgba(3, 142, 255, 0.3),
-      #f0eeee
+      rgba(212, 160, 23, 0.2),
+      #FFFBF0
     );
   
     --sl-blur-amount: blur(10px);
+
+    /* Colores adicionales honey light */
+    --honey-gold: #D4A017;
+    --honey-amber: #C4920F;
+    --honey-dark: #8B6914;
+    --honeycomb: #DEB887;
   }
   
   /* =========================
@@ -77,22 +89,132 @@
   }
   
   /* =========================
-     3. Componentes y utilidades
+     3. Componentes y utilidades - Honey Style
   ========================= */
   
-  /* Tips y avisos */
+  /* Tips y avisos - Estilo miel */
   .tip {
-    background-color: rgba(48, 105, 152, 0.1);
-    border-left: 4px solid #306998;
+    background-color: rgba(212, 160, 23, 0.12);
+    border-left: 4px solid var(--honey-gold);
     padding: 0.75rem 1rem;
     margin: 1rem 0;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 0 2px 8px rgba(212, 160, 23, 0.1);
   }
   
   /* Modo oscuro para tips */
   :root[data-theme="dark"] .tip {
-    background-color: rgba(255, 212, 59, 0.1);
-    border-left: 4px solid #FFD43B;
+    background-color: rgba(255, 184, 77, 0.15);
+    border-left: 4px solid var(--honey-gold);
+    box-shadow: 0 2px 8px rgba(255, 184, 77, 0.1);
+  }
+
+  /* Links con estilo honey */
+  a {
+    color: var(--sl-color-accent);
+    transition: color 0.2s ease, text-shadow 0.2s ease;
+  }
+
+  a:hover {
+    color: var(--sl-color-accent-high);
+    text-shadow: 0 0 8px rgba(255, 184, 77, 0.3);
+  }
+
+  /* Botones con estilo honey */
+  .sl-link-button {
+    background: linear-gradient(135deg, var(--honey-gold) 0%, var(--honey-amber) 100%);
+    border: none;
+    color: #1A0F08 !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .sl-link-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(255, 184, 77, 0.4);
+  }
+
+  /* Code blocks con toque honey */
+  pre {
+    border: 1px solid rgba(255, 184, 77, 0.2);
+    border-radius: 8px;
+  }
+
+  code {
+    background-color: rgba(255, 184, 77, 0.18);
+    border-radius: 4px;
+    padding: 0.15em 0.35em;
+    border: 1px solid rgba(255, 184, 77, 0.15);
+  }
+
+  pre code {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+  }
+
+  /* Sidebar con estilo honey */
+  .sidebar-content {
+    border-right: 1px solid rgba(255, 184, 77, 0.15);
+  }
+
+  /* Cards y contenedores */
+  .card {
+    border: 1px solid rgba(255, 184, 77, 0.2);
+    border-radius: 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    border-color: var(--honey-gold);
+    box-shadow: 0 4px 20px rgba(255, 184, 77, 0.15);
+  }
+
+  /* Tablas con estilo honey */
+  table {
+    border-collapse: collapse;
+    border: 1px solid rgba(255, 184, 77, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  th {
+    background: linear-gradient(135deg, rgba(255, 184, 77, 0.2) 0%, rgba(212, 160, 23, 0.15) 100%);
+    color: var(--sl-color-white);
+    font-weight: 600;
+  }
+
+  tr:nth-child(even) {
+    background-color: rgba(255, 184, 77, 0.05);
+  }
+
+  tr:hover {
+    background-color: rgba(255, 184, 77, 0.1);
+  }
+
+  /* Scrollbar con estilo honey */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--sl-color-gray-6);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--honey-gold) 0%, var(--honey-amber) 100%);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--sl-color-accent-high);
+  }
+
+  /* Selection con estilo honey */
+  ::selection {
+    background-color: rgba(255, 184, 77, 0.3);
+    color: var(--sl-color-white);
   }
   
   /* =========================
@@ -110,14 +232,217 @@
   } */
   
   /* =========================
-     5. Otros estilos globales
+     5. Otros estilos globales - Honey Theme
   ========================= */
   
-  /* Agrega aquí cualquier otro estilo global o utilidades */
-  
-  h1#_top.astro-jbfsktt5 {
-    background: linear-gradient(90deg, #4B8BBE 29%, #FFD43B 85%);
+  /* Título principal con gradiente honey */
+  h1#_top {
+    background: linear-gradient(90deg, #FFB84D 0%, #FFD700 50%, #F4A460 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    filter: drop-shadow(0 2px 8px rgba(255, 184, 77, 0.4));
+  }
+
+  /* Headers con toque honey */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--sl-color-white);
+  }
+
+  h2 {
+    border-bottom: 2px solid rgba(255, 184, 77, 0.2);
+    padding-bottom: 0.5rem;
+  }
+
+  /* Badge/etiquetas con estilo honey */
+  .sl-badge {
+    background: linear-gradient(135deg, var(--honey-gold) 0%, var(--honey-amber) 100%);
+    color: #1A0F08;
+    font-weight: 600;
+  }
+
+  /* Focus states con honey glow */
+  *:focus-visible {
+    outline: 2px solid var(--honey-gold);
+    outline-offset: 2px;
+    box-shadow: 0 0 12px rgba(255, 184, 77, 0.4);
+  }
+
+  /* Aside/callouts con estilo honey */
+  .starlight-aside {
+    border-color: var(--honey-gold);
+    background: linear-gradient(135deg, rgba(255, 184, 77, 0.08) 0%, rgba(212, 160, 23, 0.05) 100%);
+  }
+
+  .starlight-aside--tip {
+    border-color: var(--honey-gold);
+  }
+
+  .starlight-aside--caution {
+    border-color: #E67E22;
+  }
+
+  .starlight-aside--danger {
+    border-color: #C0392B;
+  }
+
+  /* TOC (Table of Contents) con estilo honey */
+  .right-sidebar-panel a {
+    border-left: 2px solid transparent;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .right-sidebar-panel a:hover,
+  .right-sidebar-panel a[aria-current="true"] {
+    border-left-color: var(--honey-gold);
+    color: var(--honey-gold);
+  }
+
+  /* Search con estilo honey */
+  .search-input {
+    border: 1px solid rgba(255, 184, 77, 0.3);
+    background: rgba(255, 184, 77, 0.05);
+  }
+
+  .search-input:focus {
+    border-color: var(--honey-gold);
+    box-shadow: 0 0 12px rgba(255, 184, 77, 0.2);
+  }
+
+  /* Pagination con estilo honey */
+  .pagination-links a {
+    border: 1px solid rgba(255, 184, 77, 0.2);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .pagination-links a:hover {
+    border-color: var(--honey-gold);
+    background: rgba(255, 184, 77, 0.1);
+  }
+
+  /* Footer con estilo honey */
+  footer {
+    border-top: 1px solid rgba(255, 184, 77, 0.15);
+  }
+
+  /* Honeycomb pattern sutil para fondos especiales */
+  .honeycomb-bg {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffb84d' fill-opacity='0.05'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* =========================
+     6. Sidebar Menu - Ítem seleccionado
+  ========================= */
+
+  /* Menú lateral - ítem activo/seleccionado (Starlight) */
+  [data-current-parent] > a,
+  a[aria-current="page"],
+  a[aria-current="true"],
+  .sidebar a[aria-current="page"],
+  .sidebar-content a[aria-current="page"],
+  nav.sidebar a[aria-current="page"],
+  starlight-menu-button + nav a[aria-current="page"],
+  .sl-sidebar a[aria-current="page"],
+  aside a[aria-current="page"] {
+    background: linear-gradient(135deg, rgba(255, 184, 77, 0.35) 0%, rgba(212, 160, 23, 0.28) 100%) !important;
+    color: #1A0F08 !important;
+    font-weight: 600 !important;
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem;
+    margin: 0.1rem 0;
+    border-left: 3px solid var(--honey-gold) !important;
+  }
+
+  /* Modo claro - ítem seleccionado */
+  :root[data-theme='light'] a[aria-current="page"],
+  :root[data-theme='light'] a[aria-current="true"],
+  :root[data-theme='light'] .sidebar a[aria-current="page"],
+  :root[data-theme='light'] aside a[aria-current="page"] {
+    background: linear-gradient(135deg, rgba(212, 160, 23, 0.35) 0%, rgba(184, 134, 11, 0.3) 100%) !important;
+    color: #2A1810 !important;
+    border-left: 3px solid var(--honey-dark) !important;
+  }
+
+  /* Hover en items del sidebar */
+  .sidebar a:hover,
+  aside nav a:hover {
+    background: rgba(255, 184, 77, 0.15);
+    border-radius: 6px;
+  }
+
+  /* =========================
+     7. Animaciones Honey 🐝
+  ========================= */
+
+  /* Abeja animada flotante */
+  @keyframes bee-fly {
+    0%, 100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+    25% {
+      transform: translate(10px, -15px) rotate(5deg);
+    }
+    50% {
+      transform: translate(20px, 0) rotate(0deg);
+    }
+    75% {
+      transform: translate(10px, 10px) rotate(-5deg);
+    }
+  }
+
+  @keyframes bee-wings {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  /* Contenedor de la abeja */
+  .honey-bee {
+    position: fixed;
+    bottom: 80px;
+    right: 30px;
+    font-size: 2rem;
+    animation: bee-fly 4s ease-in-out infinite;
+    z-index: 100;
+    cursor: pointer;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    transition: transform 0.3s ease;
+  }
+
+  .honey-bee:hover {
+    animation-play-state: paused;
+    transform: scale(1.3);
+  }
+
+  /* Panal decorativo en esquina */
+  .honeycomb-corner {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath fill='%23FFB84D' fill-opacity='0.1' d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100'/%3E%3Cpath fill='none' stroke='%23FFB84D' stroke-opacity='0.2' stroke-width='1' d='M28 0L56 16L56 50L28 66L0 50L0 16Z'/%3E%3C/svg%3E") repeat;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 1;
+    mask-image: linear-gradient(135deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
+    -webkit-mask-image: linear-gradient(135deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
+  }
+
+  /* Efecto de brillo honey en hover de cards */
+  @keyframes honey-glow {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba(255, 184, 77, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(255, 184, 77, 0.4);
+    }
+  }
+
+  .card:hover {
+    animation: honey-glow 2s ease-in-out infinite;
   }

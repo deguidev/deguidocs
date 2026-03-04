@@ -1,13 +1,13 @@
 ---
-title: Bienvenidos a DegiDocs
+title: Bienvenidos a HoneyCode
 description: Toda la información necesaria para aprovechar al máximo nuestra plataforma.
 ---
 
-# ¡Bienvenidos a DegiDocs 2!
+# ¡Bienvenidos a HoneyCode!
 
 ## Su portal integral de documentación digital
 
-En DegiDocs, transformamos la manera en que usted accede, comprende y utiliza la documentación técnica. Nuestra plataforma ha sido diseñada pensando en la experiencia del usuario, ofreciendo:
+En HoneyCode, transformamos la manera en que usted accede, comprende y utiliza la documentación técnica. Nuestra plataforma ha sido diseñada pensando en la experiencia del usuario, ofreciendo:
 
 * **Navegación intuitiva** - Encuentre exactamente lo que necesita en segundos
 * **Contenido estructurado** - Información organizada de forma lógica y progresiva

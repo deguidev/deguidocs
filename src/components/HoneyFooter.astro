@@ -1,0 +1,50 @@
+---
+/**
+ * HoneyFooter.astro
+ * 🍯 Footer personalizado con animaciones honey
+ * Extiende el footer original de Starlight
+ */
+import Default from '@astrojs/starlight/components/Footer.astro';
+
+const props = Astro.props;
+---
+
+<!-- Footer original de Starlight -->
+<Default {...props}><slot /></Default>
+
+<!-- Animaciones Honey 🐝 -->
+<div class="honey-animations-container">
+  <!-- Abeja animada flotante -->
+  <div class="honey-bee" title="🐝 Bzzzz!">
+    🐝
+  </div>
+
+  <!-- Panal decorativo en esquina superior derecha -->
+  <div class="honeycomb-corner"></div>
+</div>
+
+<style>
+  .honey-animations-container {
+    pointer-events: none;
+  }
+  
+  .honey-bee {
+    pointer-events: auto;
+    user-select: none;
+  }
+  
+  /* Ocultar en móviles para no molestar */
+  @media (max-width: 768px) {
+    .honey-bee,
+    .honeycomb-corner {
+      display: none;
+    }
+  }
+  
+  /* Reducir animaciones si el usuario prefiere */
+  @media (prefers-reduced-motion: reduce) {
+    .honey-bee {
+      animation: none;
+    }
+  }
+</style>

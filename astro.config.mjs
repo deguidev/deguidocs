@@ -20,13 +20,17 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			customCss: ['./src/style/starlight.css'],
-			title: 'deguidocs',
+			title: 'HoneyCode',
+			components: {
+				// Inyectar animaciones honey en el footer de cada página
+				Footer: './src/components/HoneyFooter.astro',
+			},
 
 			logo: {
-				src: '@assets/deguidocs.png',
+				src: '@assets/HoneyCode.png',
 				alt: 'Logo de la documentación'
 			},
-			favicon: '/degui.png',
+			favicon: '/hc.png',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/deguidev/deguidocs' }
 			],
