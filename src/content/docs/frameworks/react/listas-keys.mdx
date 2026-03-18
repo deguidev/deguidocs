@@ -1,0 +1,572 @@
+---
+title: 8. Listas y Keys
+description: Uso de map() para renderizar listas, importancia de las keys y buenas prácticas
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 📋 8.1 Uso de map() para renderizar listas
+
+### Renderizar arrays en React
+
+El método `map()` es la forma estándar de convertir un array de datos en elementos JSX.
+
+<Code code={`function ListaFrutas() {
+  const frutas = ["Manzana", "Banana", "Naranja", "Uva"];
+  
+  return (
+    <ul>
+      {frutas.map((fruta, index) => (
+        <li key={index}>{fruta}</li>
+      ))}
+    </ul>
+  );
+}
+
+// Resultado:
+// • Manzana
+// • Banana
+// • Naranja
+// • Uva`} lang="jsx" title="Lista básica con map()" />
+
+### Renderizar objetos
+
+<Code code={`function ListaUsuarios() {
+  const usuarios = [
+    { id: 1, nombre: "Ana", email: "ana@mail.com" },
+    { id: 2, nombre: "Carlos", email: "carlos@mail.com" },
+    { id: 3, nombre: "María", email: "maria@mail.com" }
+  ];
+  
+  return (
+    <ul>
+      {usuarios.map(usuario => (
+        <li key={usuario.id}>
+          <strong>{usuario.nombre}</strong> - {usuario.email}
+        </li>
+      ))}
+    </ul>
+  );
+}`} lang="jsx" title="Lista de objetos" />
+
+### Renderizar componentes
+
+<Code code={`// Componente para cada tarjeta
+function TarjetaProducto({ producto }) {
+  return (
+    <div className="tarjeta">
+      <img src={producto.imagen} alt={producto.nombre} />
+      <h3>{producto.nombre}</h3>
+      <p>\${producto.precio}</p>
+    </div>
+  );
+}
+
+// Componente que renderiza la lista
+function ListaProductos() {
+  const productos = [
+    { id: 1, nombre: "Laptop", precio: 999, imagen: "/laptop.jpg" },
+    { id: 2, nombre: "Mouse", precio: 29, imagen: "/mouse.jpg" },
+    { id: 3, nombre: "Teclado", precio: 79, imagen: "/teclado.jpg" }
+  ];
+  
+  return (
+    <div className="grid">
+      {productos.map(producto => (
+        <TarjetaProducto key={producto.id} producto={producto} />
+      ))}
+    </div>
+  );
+}`} lang="jsx" title="Lista de componentes" />
+
+---
+
+## 🔑 8.2 Importancia de las keys
+
+### ¿Qué son las keys?
+
+Las **keys** son atributos especiales que ayudan a React a identificar qué elementos han cambiado, se han agregado o eliminado.
+
+<Code code={`// ❌ Sin key - React muestra advertencia
+{items.map(item => <li>{item}</li>)}
+
+// ✅ Con key - React puede optimizar
+{items.map(item => <li key={item.id}>{item.nombre}</li>)}`} lang="jsx" title="Keys en listas" />
+
+### ¿Por qué son importantes?
+
+| Sin keys | Con keys |
+|----------|----------|
+| React re-renderiza toda la lista | React solo actualiza lo necesario |
+| Problemas con inputs y estado | Estado se mantiene correctamente |
+| Rendimiento pobre | Rendimiento optimizado |
+| Advertencias en consola | Sin advertencias |
+
+### Ejemplo del problema sin keys
+
+<Code code={`import { useState } from 'react';
+
+function ListaConProblema() {
+  const [items, setItems] = useState(["A", "B", "C"]);
+  
+  const agregarAlInicio = () => {
+    setItems(["Nuevo", ...items]);
+  };
+  
+  return (
+    <div>
+      <button onClick={agregarAlInicio}>Agregar al inicio</button>
+      <ul>
+        {/* ❌ Usando índice como key */}
+        {items.map((item, index) => (
+          <li key={index}>
+            {item} <input type="text" />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// Problema: Al agregar "Nuevo" al inicio, los inputs
+// mantienen sus valores en las posiciones incorrectas`} lang="jsx" title="Problema con índices como keys" />
+
+---
+
+## ⚠️ 8.3 Keys únicas y errores comunes
+
+### Qué usar como key
+
+| Buena opción | Mala opción |
+|--------------|-------------|
+| ID de base de datos | Índice del array |
+| UUID generado | Valor aleatorio en render |
+| Combinación única | Valores duplicados |
+
+### Ejemplos de keys correctas
+
+<Code code={`// ✅ ID de la base de datos
+{usuarios.map(user => (
+  <UserCard key={user.id} user={user} />
+))}
+
+// ✅ Slug o identificador único
+{articulos.map(art => (
+  <Article key={art.slug} article={art} />
+))}
+
+// ✅ Combinación de valores únicos
+{pedidos.map(pedido => (
+  <Pedido key={\`\${pedido.usuarioId}-\${pedido.fecha}\`} data={pedido} />
+))}`} lang="jsx" title="Keys correctas" />
+
+### Errores comunes
+
+<Code code={`// ❌ MAL: Índice como key (problemas al reordenar)
+{items.map((item, index) => (
+  <Item key={index} data={item} />
+))}
+
+// ❌ MAL: Math.random() genera nueva key en cada render
+{items.map(item => (
+  <Item key={Math.random()} data={item} />
+))}
+
+// ❌ MAL: Keys duplicadas causan errores
+const items = [
+  { id: 1, nombre: "A" },
+  { id: 1, nombre: "B" }  // ID duplicado
+];
+{items.map(item => (
+  <Item key={item.id} data={item} />  // Error: keys duplicadas
+))}`} lang="jsx" title="Errores comunes con keys" />
+
+### Cuándo usar índice como key
+
+<Code code={`// ✅ OK usar índice cuando:
+// 1. La lista es estática (no cambia)
+// 2. Los items no se reordenan
+// 3. Los items no se filtran
+// 4. No hay estado en los items
+
+const diasSemana = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+
+function Calendario() {
+  return (
+    <div className="dias">
+      {diasSemana.map((dia, index) => (
+        <span key={index}>{dia}</span>
+      ))}
+    </div>
+  );
+}`} lang="jsx" title="Índice como key (casos válidos)" />
+
+<Aside type="caution">
+Usa el índice como key **solo** si la lista es completamente estática. Para listas dinámicas, siempre usa IDs únicos.
+</Aside>
+
+---
+
+## 🔄 8.4 Renderizado dinámico de datos
+
+### Datos desde estado
+
+<Code code={`import { useState } from 'react';
+
+function ListaTareas() {
+  const [tareas, setTareas] = useState([
+    { id: 1, texto: "Aprender React", completada: false },
+    { id: 2, texto: "Hacer ejercicio", completada: true },
+    { id: 3, texto: "Leer un libro", completada: false }
+  ]);
+  
+  return (
+    <ul>
+      {tareas.map(tarea => (
+        <li 
+          key={tarea.id}
+          style={{ 
+            textDecoration: tarea.completada ? 'line-through' : 'none' 
+          }}
+        >
+          {tarea.texto}
+        </li>
+      ))}
+    </ul>
+  );
+}`} lang="jsx" title="Lista desde estado" />
+
+### Filtrar datos
+
+<Code code={`import { useState } from 'react';
+
+function ListaFiltrable() {
+  const [filtro, setFiltro] = useState("todos");
+  const [tareas] = useState([
+    { id: 1, texto: "Tarea 1", completada: true },
+    { id: 2, texto: "Tarea 2", completada: false },
+    { id: 3, texto: "Tarea 3", completada: true }
+  ]);
+  
+  // Filtrar según selección
+  const tareasFiltradas = tareas.filter(tarea => {
+    if (filtro === "completadas") return tarea.completada;
+    if (filtro === "pendientes") return !tarea.completada;
+    return true;  // "todos"
+  });
+  
+  return (
+    <div>
+      <select value={filtro} onChange={e => setFiltro(e.target.value)}>
+        <option value="todos">Todos</option>
+        <option value="completadas">Completadas</option>
+        <option value="pendientes">Pendientes</option>
+      </select>
+      
+      <ul>
+        {tareasFiltradas.map(tarea => (
+          <li key={tarea.id}>{tarea.texto}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}`} lang="jsx" title="Lista filtrable" />
+
+### Buscar en lista
+
+<Code code={`import { useState } from 'react';
+
+function BuscadorProductos() {
+  const [busqueda, setBusqueda] = useState("");
+  const productos = [
+    { id: 1, nombre: "Laptop HP" },
+    { id: 2, nombre: "Mouse Logitech" },
+    { id: 3, nombre: "Teclado Mecánico" },
+    { id: 4, nombre: "Monitor Samsung" }
+  ];
+  
+  // Filtrar por búsqueda
+  const productosFiltrados = productos.filter(p =>
+    p.nombre.toLowerCase().includes(busqueda.toLowerCase())
+  );
+  
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="Buscar..."
+        value={busqueda}
+        onChange={e => setBusqueda(e.target.value)}
+      />
+      
+      <ul>
+        {productosFiltrados.map(p => (
+          <li key={p.id}>{p.nombre}</li>
+        ))}
+      </ul>
+      
+      {productosFiltrados.length === 0 && (
+        <p>No se encontraron productos</p>
+      )}
+    </div>
+  );
+}`} lang="jsx" title="Buscador" />
+
+---
+
+## 🗑️ 8.5 Eliminación de elementos en listas
+
+### Eliminar por ID
+
+<Code code={`import { useState } from 'react';
+
+function ListaEliminable() {
+  const [items, setItems] = useState([
+    { id: 1, nombre: "Item 1" },
+    { id: 2, nombre: "Item 2" },
+    { id: 3, nombre: "Item 3" }
+  ]);
+  
+  const eliminar = (id) => {
+    setItems(items.filter(item => item.id !== id));
+  };
+  
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item.id}>
+          {item.nombre}
+          <button onClick={() => eliminar(item.id)}>
+            🗑️ Eliminar
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}`} lang="jsx" title="Eliminar elementos" />
+
+### Confirmar antes de eliminar
+
+<Code code={`import { useState } from 'react';
+
+function ListaConConfirmacion() {
+  const [items, setItems] = useState([
+    { id: 1, nombre: "Documento importante" },
+    { id: 2, nombre: "Foto de vacaciones" },
+    { id: 3, nombre: "Archivo temporal" }
+  ]);
+  
+  const eliminar = (id, nombre) => {
+    if (window.confirm(\`¿Eliminar "\${nombre}"?\`)) {
+      setItems(items.filter(item => item.id !== id));
+    }
+  };
+  
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item.id}>
+          {item.nombre}
+          <button onClick={() => eliminar(item.id, item.nombre)}>
+            Eliminar
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}`} lang="jsx" title="Confirmar eliminación" />
+
+---
+
+## ✏️ 8.6 Actualización de listas
+
+### Agregar elementos
+
+<Code code={`import { useState } from 'react';
+
+function ListaConAgregar() {
+  const [items, setItems] = useState([]);
+  const [nuevoItem, setNuevoItem] = useState("");
+  
+  const agregar = (e) => {
+    e.preventDefault();
+    if (!nuevoItem.trim()) return;
+    
+    const nuevo = {
+      id: Date.now(),
+      texto: nuevoItem
+    };
+    
+    setItems([...items, nuevo]);
+    setNuevoItem("");
+  };
+  
+  return (
+    <div>
+      <form onSubmit={agregar}>
+        <input
+          value={nuevoItem}
+          onChange={e => setNuevoItem(e.target.value)}
+          placeholder="Nuevo item..."
+        />
+        <button type="submit">Agregar</button>
+      </form>
+      
+      <ul>
+        {items.map(item => (
+          <li key={item.id}>{item.texto}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}`} lang="jsx" title="Agregar elementos" />
+
+### Editar elementos
+
+<Code code={`import { useState } from 'react';
+
+function ListaEditable() {
+  const [items, setItems] = useState([
+    { id: 1, texto: "Item 1", editando: false },
+    { id: 2, texto: "Item 2", editando: false }
+  ]);
+  
+  const toggleEditar = (id) => {
+    setItems(items.map(item =>
+      item.id === id ? { ...item, editando: !item.editando } : item
+    ));
+  };
+  
+  const guardarCambio = (id, nuevoTexto) => {
+    setItems(items.map(item =>
+      item.id === id ? { ...item, texto: nuevoTexto, editando: false } : item
+    ));
+  };
+  
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item.id}>
+          {item.editando ? (
+            <input
+              defaultValue={item.texto}
+              onBlur={e => guardarCambio(item.id, e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  guardarCambio(item.id, e.target.value);
+                }
+              }}
+              autoFocus
+            />
+          ) : (
+            <>
+              <span>{item.texto}</span>
+              <button onClick={() => toggleEditar(item.id)}>✏️</button>
+            </>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}`} lang="jsx" title="Editar elementos" />
+
+---
+
+## ✅ 8.7 Buenas prácticas en listas
+
+### Extraer componentes
+
+<Code code={`// ❌ Todo en un solo componente
+function ListaTareas({ tareas }) {
+  return (
+    <ul>
+      {tareas.map(tarea => (
+        <li key={tarea.id}>
+          <input type="checkbox" checked={tarea.completada} />
+          <span>{tarea.texto}</span>
+          <button>Eliminar</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// ✅ Componente separado para cada item
+function TareaItem({ tarea, onToggle, onEliminar }) {
+  return (
+    <li>
+      <input 
+        type="checkbox" 
+        checked={tarea.completada}
+        onChange={() => onToggle(tarea.id)}
+      />
+      <span>{tarea.texto}</span>
+      <button onClick={() => onEliminar(tarea.id)}>Eliminar</button>
+    </li>
+  );
+}
+
+function ListaTareas({ tareas, onToggle, onEliminar }) {
+  return (
+    <ul>
+      {tareas.map(tarea => (
+        <TareaItem
+          key={tarea.id}
+          tarea={tarea}
+          onToggle={onToggle}
+          onEliminar={onEliminar}
+        />
+      ))}
+    </ul>
+  );
+}`} lang="jsx" title="Extraer componentes" />
+
+### Lista vacía
+
+<Code code={`function ListaProductos({ productos }) {
+  // Manejar lista vacía
+  if (productos.length === 0) {
+    return (
+      <div className="empty-state">
+        <p>No hay productos disponibles</p>
+        <button>Agregar producto</button>
+      </div>
+    );
+  }
+  
+  return (
+    <ul>
+      {productos.map(p => (
+        <li key={p.id}>{p.nombre}</li>
+      ))}
+    </ul>
+  );
+}`} lang="jsx" title="Manejar lista vacía" />
+
+### Resumen de operaciones
+
+| Operación | Método | Ejemplo |
+|-----------|--------|---------|
+| Renderizar | `map()` | `items.map(i => <Item key={i.id} />)` |
+| Filtrar | `filter()` | `items.filter(i => i.activo)` |
+| Buscar | `filter()` + `includes()` | `items.filter(i => i.nombre.includes(q))` |
+| Agregar | spread | `[...items, nuevo]` |
+| Eliminar | `filter()` | `items.filter(i => i.id !== id)` |
+| Actualizar | `map()` | `items.map(i => i.id === id ? {...i, ...cambios} : i)` |
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- Usar **map()** para convertir arrays en elementos JSX
+- Las **keys** ayudan a React a identificar cambios
+- Usar **IDs únicos** como keys, no índices
+- **Filtrar** y **buscar** en listas con `filter()`
+- **Agregar** elementos con spread `[...items, nuevo]`
+- **Eliminar** con `filter(i => i.id !== id)`
+- **Actualizar** con `map()` y spread
+- **Extraer componentes** para items complejos
+</Aside>

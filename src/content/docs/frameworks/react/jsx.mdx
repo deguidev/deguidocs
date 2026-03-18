@@ -1,0 +1,459 @@
+---
+title: 3. Fundamentos de React (JSX)
+description: Qué es JSX, sintaxis básica, reglas importantes y uso de expresiones
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🧠 3.1 ¿Qué es JSX y por qué se usa?
+
+### Definición de JSX
+
+**JSX** (JavaScript XML) es una extensión de sintaxis para JavaScript que permite escribir código similar a HTML dentro de archivos JavaScript. No es HTML real, sino una forma más intuitiva de crear elementos de React.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Nombre** | JavaScript XML |
+| **Propósito** | Escribir UI de forma declarativa |
+| **Compilación** | Se transforma a JavaScript puro |
+| **Obligatorio** | No, pero muy recomendado |
+
+### JSX vs JavaScript puro
+
+<Code code={`// Sin JSX - JavaScript puro (difícil de leer)
+const elemento = React.createElement(
+  'div',
+  { className: 'contenedor' },
+  React.createElement('h1', null, 'Hola'),
+  React.createElement('p', null, 'Bienvenido')
+);
+
+// Con JSX - Mucho más legible
+const elemento = (
+  <div className="contenedor">
+    <h1>Hola</h1>
+    <p>Bienvenido</p>
+  </div>
+);`} lang="jsx" title="Comparación JSX vs JavaScript" />
+
+### ¿Por qué usar JSX?
+
+- **Legibilidad**: Parece HTML, fácil de entender
+- **Productividad**: Escribes menos código
+- **Errores claros**: El compilador detecta errores de sintaxis
+- **Expresividad**: Combinas lógica y UI en un solo lugar
+
+<Aside type="tip">
+JSX no es obligatorio en React, pero el 99% de los proyectos lo usan porque hace el código mucho más fácil de escribir y mantener.
+</Aside>
+
+---
+
+## ✍️ 3.2 Sintaxis básica de JSX
+
+### Elementos simples
+
+<Code code={`// Elemento simple
+const titulo = <h1>Hola Mundo</h1>;
+
+// Elemento con atributos
+const imagen = <img src="foto.jpg" alt="Mi foto" />;
+
+// Elemento con clase CSS (usa className, no class)
+const caja = <div className="caja">Contenido</div>;`} lang="jsx" title="Elementos básicos" />
+
+### Elementos anidados
+
+<Code code={`// Elementos anidados
+const tarjeta = (
+  <div className="tarjeta">
+    <h2>Título</h2>
+    <p>Descripción del contenido</p>
+    <button>Ver más</button>
+  </div>
+);`} lang="jsx" title="Elementos anidados" />
+
+### Componentes en JSX
+
+<Code code={`// Definir un componente
+function Saludo() {
+  return <h1>¡Hola!</h1>;
+}
+
+// Usar el componente (como una etiqueta HTML)
+const app = (
+  <div>
+    <Saludo />
+    <Saludo />
+    <Saludo />
+  </div>
+);`} lang="jsx" title="Componentes en JSX" />
+
+### Atributos comunes
+
+| HTML | JSX | Razón |
+|------|-----|-------|
+| `class` | `className` | class es palabra reservada en JS |
+| `for` | `htmlFor` | for es palabra reservada en JS |
+| `onclick` | `onClick` | camelCase en JSX |
+| `tabindex` | `tabIndex` | camelCase en JSX |
+
+<Code code={`// Atributos en JSX
+<label htmlFor="email">Email:</label>
+<input 
+  id="email"
+  className="input-field"
+  type="email"
+  placeholder="tu@email.com"
+  onChange={handleChange}
+/>`} lang="jsx" title="Atributos en JSX" />
+
+---
+
+## ⚠️ 3.3 Reglas importantes de JSX
+
+### Regla 1: Un solo elemento padre
+
+Todo JSX debe tener un único elemento raíz que envuelva todo el contenido.
+
+<Code code={`// ❌ MAL - Múltiples elementos raíz
+function Componente() {
+  return (
+    <h1>Título</h1>
+    <p>Párrafo</p>
+  );
+}
+
+// ✅ BIEN - Un solo elemento padre
+function Componente() {
+  return (
+    <div>
+      <h1>Título</h1>
+      <p>Párrafo</p>
+    </div>
+  );
+}`} lang="jsx" title="Un solo elemento padre" />
+
+### Regla 2: Cerrar todas las etiquetas
+
+En JSX, todas las etiquetas deben cerrarse, incluso las que en HTML no lo requieren.
+
+<Code code={`// ❌ MAL - Etiquetas sin cerrar
+<img src="foto.jpg">
+<input type="text">
+<br>
+
+// ✅ BIEN - Etiquetas cerradas
+<img src="foto.jpg" />
+<input type="text" />
+<br />`} lang="jsx" title="Cerrar etiquetas" />
+
+### Regla 3: camelCase para atributos
+
+Los atributos con guiones o minúsculas se escriben en camelCase.
+
+<Code code={`// ❌ MAL - Atributos en minúsculas/guiones
+<div class="caja" onclick={click} tabindex="1">
+
+// ✅ BIEN - camelCase
+<div className="caja" onClick={click} tabIndex="1">`} lang="jsx" title="camelCase en atributos" />
+
+### Regla 4: Expresiones JavaScript entre llaves
+
+Para incluir JavaScript dentro de JSX, usa llaves `{}`.
+
+<Code code={`const nombre = "Ana";
+const edad = 25;
+
+// Usar variables
+<p>Hola, {nombre}</p>
+
+// Usar expresiones
+<p>Edad: {edad} años</p>
+<p>Año de nacimiento: {2024 - edad}</p>
+
+// Usar funciones
+<p>Nombre en mayúsculas: {nombre.toUpperCase()}</p>`} lang="jsx" title="Expresiones en JSX" />
+
+---
+
+## 🔢 3.4 Uso de expresiones dentro de JSX
+
+### Variables y expresiones
+
+<Code code={`function Perfil() {
+  const nombre = "Carlos";
+  const profesion = "Desarrollador";
+  const experiencia = 5;
+  
+  return (
+    <div>
+      <h1>{nombre}</h1>
+      <p>Profesión: {profesion}</p>
+      <p>Experiencia: {experiencia} años</p>
+      <p>Nivel: {experiencia > 3 ? "Senior" : "Junior"}</p>
+    </div>
+  );
+}`} lang="jsx" title="Variables en JSX" />
+
+### Llamadas a funciones
+
+<Code code={`function formatearFecha(fecha) {
+  return fecha.toLocaleDateString('es-ES');
+}
+
+function formatearPrecio(precio) {
+  return '$' + precio.toFixed(2);
+}
+
+function Producto() {
+  const fecha = new Date();
+  const precio = 99.5;
+  
+  return (
+    <div>
+      <p>Fecha: {formatearFecha(fecha)}</p>
+      <p>Precio: {formatearPrecio(precio)}</p>
+    </div>
+  );
+}`} lang="jsx" title="Funciones en JSX" />
+
+### Operaciones matemáticas
+
+<Code code={`function Calculadora() {
+  const a = 10;
+  const b = 5;
+  
+  return (
+    <div>
+      <p>Suma: {a + b}</p>
+      <p>Resta: {a - b}</p>
+      <p>Multiplicación: {a * b}</p>
+      <p>División: {a / b}</p>
+      <p>Potencia: {Math.pow(a, 2)}</p>
+    </div>
+  );
+}`} lang="jsx" title="Operaciones matemáticas" />
+
+### Métodos de arrays y strings
+
+<Code code={`function Lista() {
+  const frutas = ["Manzana", "Banana", "Naranja"];
+  const texto = "hola mundo";
+  
+  return (
+    <div>
+      {/* Métodos de string */}
+      <p>Mayúsculas: {texto.toUpperCase()}</p>
+      <p>Longitud: {texto.length} caracteres</p>
+      
+      {/* Métodos de array */}
+      <p>Total frutas: {frutas.length}</p>
+      <p>Primera: {frutas[0]}</p>
+      <p>Unidas: {frutas.join(", ")}</p>
+    </div>
+  );
+}`} lang="jsx" title="Métodos de arrays y strings" />
+
+---
+
+## 🔑 3.5 Uso de llaves {}
+
+### ¿Cuándo usar llaves?
+
+Las llaves `{}` permiten "escapar" de JSX a JavaScript. Úsalas para:
+
+| Uso | Ejemplo |
+|-----|---------|
+| Variables | `{nombre}` |
+| Expresiones | `{2 + 2}` |
+| Funciones | `{calcular()}` |
+| Ternarios | `{activo ? "Sí" : "No"}` |
+| Objetos en estilos | `style={{color: "red"}}` |
+
+### Ejemplos de uso de llaves
+
+<Code code={`function Ejemplo() {
+  const usuario = "María";
+  const puntos = 150;
+  const activo = true;
+  
+  return (
+    <div>
+      {/* Variable simple */}
+      <h1>Hola, {usuario}</h1>
+      
+      {/* Expresión matemática */}
+      <p>Puntos dobles: {puntos * 2}</p>
+      
+      {/* Operador ternario */}
+      <p>Estado: {activo ? "Activo" : "Inactivo"}</p>
+      
+      {/* Método de string */}
+      <p>Usuario: {usuario.toLowerCase()}</p>
+      
+      {/* Estilos inline (doble llave) */}
+      <p style={{ color: "blue", fontSize: "20px" }}>
+        Texto con estilo
+      </p>
+    </div>
+  );
+}`} lang="jsx" title="Uso de llaves" />
+
+### Doble llave para objetos
+
+<Code code={`// Los estilos inline requieren doble llave
+// Primera llave: entrar a JavaScript
+// Segunda llave: definir el objeto
+
+// ❌ MAL
+<div style="color: red">
+
+// ✅ BIEN
+<div style={{ color: "red" }}>
+
+// Ejemplo completo
+<div style={{
+  backgroundColor: "#f0f0f0",
+  padding: "20px",
+  borderRadius: "8px",
+  boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+}}>
+  Contenido con estilos
+</div>`} lang="jsx" title="Doble llave para estilos" />
+
+### Lo que NO puedes hacer con llaves
+
+<Code code={`// ❌ NO puedes usar sentencias (if, for, while)
+<div>
+  {if (activo) { return "Sí" }}  // Error
+</div>
+
+// ✅ Usa operador ternario en su lugar
+<div>
+  {activo ? "Sí" : "No"}
+</div>
+
+// ❌ NO puedes usar declaraciones
+<div>
+  {const x = 5}  // Error
+</div>
+
+// ✅ Declara fuera del JSX
+const x = 5;
+<div>{x}</div>`} lang="jsx" title="Limitaciones de las llaves" />
+
+---
+
+## 🧩 3.6 Fragmentos en React
+
+### ¿Qué son los Fragmentos?
+
+Los **Fragmentos** (`<Fragment>` o `<>`) permiten agrupar elementos sin agregar un nodo extra al DOM. Son útiles cuando no quieres un `<div>` contenedor.
+
+### Problema sin Fragmentos
+
+<Code code={`// Sin fragmentos - agrega un div innecesario al DOM
+function Lista() {
+  return (
+    <div>  {/* Este div aparece en el HTML final */}
+      <li>Item 1</li>
+      <li>Item 2</li>
+      <li>Item 3</li>
+    </div>
+  );
+}
+
+// Resultado en el DOM:
+// <div>
+//   <li>Item 1</li>
+//   <li>Item 2</li>
+//   <li>Item 3</li>
+// </div>`} lang="jsx" title="Problema sin fragmentos" />
+
+### Solución con Fragmentos
+
+<Code code={`import { Fragment } from 'react';
+
+// Opción 1: Fragment explícito
+function Lista() {
+  return (
+    <Fragment>
+      <li>Item 1</li>
+      <li>Item 2</li>
+      <li>Item 3</li>
+    </Fragment>
+  );
+}
+
+// Opción 2: Sintaxis corta (más común)
+function Lista() {
+  return (
+    <>
+      <li>Item 1</li>
+      <li>Item 2</li>
+      <li>Item 3</li>
+    </>
+  );
+}
+
+// Resultado en el DOM (sin div extra):
+// <li>Item 1</li>
+// <li>Item 2</li>
+// <li>Item 3</li>`} lang="jsx" title="Uso de Fragmentos" />
+
+### Cuándo usar Fragmentos
+
+<Code code={`// Ejemplo 1: Retornar múltiples elementos de tabla
+function FilaTabla() {
+  return (
+    <>
+      <td>Celda 1</td>
+      <td>Celda 2</td>
+      <td>Celda 3</td>
+    </>
+  );
+}
+
+// Ejemplo 2: Componente con múltiples elementos
+function Encabezado() {
+  return (
+    <>
+      <h1>Título Principal</h1>
+      <p>Subtítulo descriptivo</p>
+    </>
+  );
+}
+
+// Ejemplo 3: Dentro de un map
+function ListaItems({ items }) {
+  return (
+    <ul>
+      {items.map(item => (
+        <Fragment key={item.id}>
+          <li>{item.nombre}</li>
+          <li>{item.precio}</li>
+        </Fragment>
+      ))}
+    </ul>
+  );
+}`} lang="jsx" title="Casos de uso de Fragmentos" />
+
+<Aside type="note">
+Usa `<Fragment>` con `key` cuando necesites asignar una key en un loop. La sintaxis corta `<>` no acepta atributos.
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- **JSX** es una extensión de JavaScript que parece HTML
+- Hace el código más **legible** y fácil de mantener
+- **Reglas importantes**: un solo padre, cerrar etiquetas, camelCase
+- Usa **llaves {}** para incluir JavaScript en JSX
+- Las **expresiones** (variables, funciones, ternarios) van entre llaves
+- Los **Fragmentos** (`<>`) agrupan elementos sin agregar nodos al DOM
+</Aside>

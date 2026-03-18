@@ -232,7 +232,29 @@ export default defineConfig({
 					collapsed: false,
 					items: [
 						{
-							label: "☕ Astro",
+						label: '⚛️ React',
+						collapsed: true,
+						items: [
+							{ label: '01. Introducción a React', link: '/frameworks/react/introduccion/' },
+							{ label: '02. Preparación del Entorno', link: '/frameworks/react/entorno/' },
+							{ label: '03. Fundamentos de React (JSX)', link: '/frameworks/react/jsx/' },
+							{ label: '04. Componentes en React', link: '/frameworks/react/componentes/' },
+							{ label: '05. Estado en React (useState)', link: '/frameworks/react/usestate/' },
+							{ label: '06. Eventos y Formularios', link: '/frameworks/react/eventos-formularios/' },
+							{ label: '07. Renderizado Condicional', link: '/frameworks/react/renderizado-condicional/' },
+							{ label: '08. Listas y Keys', link: '/frameworks/react/listas-keys/' },
+							{ label: '09. Hooks en React', link: '/frameworks/react/hooks/' },
+							{ label: '10. Consumo de APIs', link: '/frameworks/react/consumo-apis/' },
+							{ label: '11. Navegación con React Router', link: '/frameworks/react/react-router/' },
+							{ label: '12. Formularios Avanzados', link: '/frameworks/react/formularios-avanzados/' },
+							{ label: '13. Estado Global', link: '/frameworks/react/estado-global/' },
+							{ label: '14. Estilos en React', link: '/frameworks/react/estilos/' },
+							{ label: '15. Testing en React', link: '/frameworks/react/testing/' },
+							{ label: '16. Hooks Principales', link: '/frameworks/react/hooks-resumen/' }
+						]
+					},
+					{
+						label: "☕ Astro",
 							collapsed: true,
 							items: [
 								{ label: "01. Introducción a Astro", link: "/frameworks/astro/01-introduccion/" },
@@ -359,6 +381,7 @@ export default defineConfig({
 								{ label: '11. Autenticación y seguridad', link: '/frameworks/fastapi/autenticacion-seguridad/' }
 							]
 						},
+
 					],
 				},
 				{

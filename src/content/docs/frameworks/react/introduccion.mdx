@@ -1,0 +1,294 @@
+---
+title: 1. Introducción a React
+description: Qué es React, su propósito, SPA, Virtual DOM y ecosistema de herramientas
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## ⚛️ 1.1 ¿Qué es React y cuál es su propósito?
+
+### Definición de React
+
+**React** es una biblioteca de JavaScript creada por Facebook (Meta) para construir interfaces de usuario. Su enfoque principal es crear componentes reutilizables que manejan su propio estado.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Creador** | Facebook (Meta) |
+| **Año** | 2013 |
+| **Tipo** | Biblioteca (no framework) |
+| **Enfoque** | Interfaces de usuario |
+| **Paradigma** | Basado en componentes |
+
+### Propósito de React
+
+React fue diseñado para resolver problemas específicos del desarrollo web moderno:
+
+- **Crear interfaces dinámicas** que responden a cambios de datos
+- **Reutilizar código** mediante componentes
+- **Mejorar el rendimiento** con actualizaciones eficientes del DOM
+- **Simplificar el desarrollo** de aplicaciones complejas
+
+<Code code={`// Ejemplo básico de React
+function Saludo() {
+  return <h1>¡Hola, mundo!</h1>;
+}
+
+// Este componente puede reutilizarse en cualquier parte
+<Saludo />
+<Saludo />
+<Saludo />`} lang="jsx" title="Componente simple en React" />
+
+---
+
+## 🔧 1.2 Problemas que resuelve React
+
+### Antes de React
+
+Sin React, actualizar la interfaz requería manipular el DOM directamente:
+
+<Code code={`// Sin React - Manipulación directa del DOM
+const boton = document.getElementById('contador');
+let contador = 0;
+
+boton.addEventListener('click', () => {
+  contador++;
+  document.getElementById('valor').textContent = contador;
+  // Hay que actualizar manualmente cada elemento
+});`} lang="javascript" title="JavaScript tradicional" />
+
+### Con React
+
+React sincroniza automáticamente la interfaz con los datos:
+
+<Code code={`// Con React - Declarativo y automático
+import { useState } from 'react';
+
+function Contador() {
+  const [contador, setContador] = useState(0);
+  
+  return (
+    <div>
+      <p>Valor: {contador}</p>
+      <button onClick={() => setContador(contador + 1)}>
+        Incrementar
+      </button>
+    </div>
+  );
+}
+// React actualiza automáticamente la UI cuando cambia el estado`} lang="jsx" title="React - Actualización automática" />
+
+### Problemas que soluciona
+
+| Problema | Solución de React |
+|----------|-------------------|
+| Código repetitivo | Componentes reutilizables |
+| Sincronización UI-datos | Estado reactivo automático |
+| DOM lento | Virtual DOM optimizado |
+| Código difícil de mantener | Estructura por componentes |
+| Actualizaciones manuales | Renderizado declarativo |
+
+---
+
+## 🌐 1.3 Concepto de SPA (Single Page Application)
+
+### ¿Qué es una SPA?
+
+Una **Single Page Application** (Aplicación de Página Única) es una aplicación web que carga una sola página HTML y actualiza dinámicamente el contenido sin recargar la página completa.
+
+### Diferencia entre SPA y aplicación tradicional
+
+| Aspecto | Tradicional | SPA |
+|---------|-------------|-----|
+| Navegación | Recarga página completa | Actualiza solo el contenido |
+| Velocidad | Más lenta | Más rápida |
+| Experiencia | Interrumpida | Fluida |
+| Servidor | Genera HTML | Envía datos (JSON) |
+
+### Ejemplo visual del flujo
+
+<Code code={`// Aplicación tradicional
+Usuario hace clic → Servidor genera nueva página → Navegador recarga todo
+
+// SPA con React
+Usuario hace clic → React actualiza componente → Solo cambia lo necesario`} lang="text" title="Flujo de navegación" />
+
+### Ventajas de las SPA
+
+- **Experiencia fluida**: Sin recargas de página
+- **Menor consumo de datos**: Solo se transfieren datos, no HTML completo
+- **Mejor rendimiento**: Actualizaciones parciales
+- **Interactividad**: Respuesta inmediata a acciones del usuario
+
+<Code code={`// Ejemplo de navegación en SPA
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <nav>
+        <Link to="/">Inicio</Link>
+        <Link to="/productos">Productos</Link>
+        <Link to="/contacto">Contacto</Link>
+      </nav>
+      
+      <Routes>
+        <Route path="/" element={<Inicio />} />
+        <Route path="/productos" element={<Productos />} />
+        <Route path="/contacto" element={<Contacto />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+// La navegación es instantánea, sin recargar la página`} lang="jsx" title="Navegación en SPA" />
+
+---
+
+## ⚡ 1.4 Virtual DOM y cómo mejora el rendimiento
+
+### ¿Qué es el DOM?
+
+El **DOM** (Document Object Model) es la representación en memoria de la estructura HTML de una página. Manipularlo directamente es costoso en rendimiento.
+
+### ¿Qué es el Virtual DOM?
+
+El **Virtual DOM** es una copia ligera del DOM real que React mantiene en memoria. Cuando hay cambios, React:
+
+1. Actualiza el Virtual DOM (rápido)
+2. Compara con la versión anterior (diffing)
+3. Aplica solo los cambios necesarios al DOM real
+
+<Code code={`// Proceso del Virtual DOM
+
+// 1. Estado inicial
+const estadoAnterior = {
+  titulo: "Hola",
+  contador: 0
+};
+
+// 2. Nuevo estado
+const estadoNuevo = {
+  titulo: "Hola",  // Sin cambios
+  contador: 1      // Cambió
+};
+
+// 3. React detecta que solo cambió "contador"
+// 4. Solo actualiza ese elemento en el DOM real`} lang="javascript" title="Proceso de reconciliación" />
+
+### Comparación de rendimiento
+
+| Operación | DOM Real | Virtual DOM |
+|-----------|----------|-------------|
+| Actualizar 1 elemento | Lento | Rápido |
+| Actualizar 100 elementos | Muy lento | Rápido (batch) |
+| Comparar cambios | No disponible | Automático |
+| Re-renderizado | Completo | Solo lo necesario |
+
+<Aside type="tip">
+El Virtual DOM es una de las razones principales por las que React es tan rápido. No necesitas preocuparte por optimizar actualizaciones del DOM manualmente.
+</Aside>
+
+---
+
+## 📚 1.5 Diferencias entre librería y framework
+
+### React es una librería, no un framework
+
+| Aspecto | Librería (React) | Framework (Angular) |
+|---------|------------------|---------------------|
+| **Control** | Tú controlas el flujo | El framework controla |
+| **Flexibilidad** | Alta, eliges herramientas | Menor, viene todo incluido |
+| **Curva de aprendizaje** | Gradual | Más pronunciada |
+| **Tamaño** | Pequeño (~40KB) | Grande (~500KB+) |
+| **Opinión** | Pocas reglas | Muchas convenciones |
+
+### ¿Qué significa esto en la práctica?
+
+<Code code={`// React (librería) - Solo la vista
+import React from 'react';
+
+function App() {
+  return <h1>Hola</h1>;
+}
+
+// Para routing, necesitas agregar: react-router-dom
+// Para estado global, necesitas agregar: redux, zustand, etc.
+// Para formularios, necesitas agregar: react-hook-form
+// Tú decides qué usar`} lang="jsx" title="React - Tú eliges las herramientas" />
+
+<Code code={`// Angular (framework) - Todo incluido
+import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+
+// Angular incluye routing, formularios, HTTP, etc.
+// Debes seguir su estructura y convenciones`} lang="typescript" title="Angular - Todo viene incluido" />
+
+### Ventajas de React como librería
+
+- **Libertad de elección**: Usas solo lo que necesitas
+- **Fácil de integrar**: Puedes agregarlo a proyectos existentes
+- **Comunidad activa**: Miles de librerías compatibles
+- **Aprendizaje gradual**: Empiezas simple, agregas complejidad
+
+---
+
+## 🛠️ 1.6 Ecosistema de herramientas en React
+
+### Herramientas esenciales
+
+| Herramienta | Propósito |
+|-------------|-----------|
+| **Vite** | Crear y ejecutar proyectos React |
+| **React Router** | Navegación entre páginas |
+| **Axios / Fetch** | Consumo de APIs |
+| **React Hook Form** | Manejo de formularios |
+| **Zustand / Redux** | Estado global |
+| **Tailwind CSS** | Estilos |
+
+### Herramientas de desarrollo
+
+| Herramienta | Propósito |
+|-------------|-----------|
+| **React DevTools** | Extensión del navegador para depurar |
+| **ESLint** | Detectar errores de código |
+| **Prettier** | Formatear código |
+| **TypeScript** | Tipado estático |
+
+### Ejemplo de proyecto típico
+
+<Code code={`// package.json - Dependencias comunes
+{
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.0.0",
+    "axios": "^1.6.0",
+    "zustand": "^4.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "eslint": "^8.0.0",
+    "tailwindcss": "^3.0.0"
+  }
+}`} lang="json" title="Dependencias típicas de un proyecto React" />
+
+<Aside type="note">
+No necesitas todas estas herramientas desde el inicio. Empieza con React básico y agrega herramientas según las necesites.
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- **React** es una biblioteca de JavaScript para crear interfaces de usuario
+- Resuelve problemas de **sincronización UI-datos** y **reutilización de código**
+- Las **SPA** ofrecen experiencias fluidas sin recargas de página
+- El **Virtual DOM** mejora el rendimiento al actualizar solo lo necesario
+- React es una **librería** flexible, no un framework rígido
+- El **ecosistema** de React incluye herramientas para routing, estado, formularios y más
+</Aside>

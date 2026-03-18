@@ -1,0 +1,520 @@
+---
+title: 11. React Router
+description: Navegación en React, rutas, parámetros y navegación programática
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🧭 11.1 Introducción a React Router
+
+### ¿Qué es React Router?
+
+**React Router** es la librería estándar para manejar navegación en aplicaciones React. Permite crear SPAs (Single Page Applications) con múltiples "páginas" sin recargar el navegador.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Navegación** | Sin recargar la página |
+| **URLs** | URLs amigables y compartibles |
+| **Historial** | Botones atrás/adelante funcionan |
+| **Parámetros** | URLs dinámicas con datos |
+
+### Instalación
+
+<Code code={`npm install react-router-dom`} lang="bash" title="Instalar React Router" />
+
+### Configuración básica
+
+<Code code={`// main.jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
+);`} lang="jsx" title="Configuración en main.jsx" />
+
+---
+
+## 🛤️ 11.2 Definición de rutas
+
+### Routes y Route
+
+<Code code={`import { Routes, Route } from 'react-router-dom';
+
+// Componentes de página
+function Inicio() {
+  return <h1>Página de Inicio</h1>;
+}
+
+function Acerca() {
+  return <h1>Acerca de Nosotros</h1>;
+}
+
+function Contacto() {
+  return <h1>Contacto</h1>;
+}
+
+// App con rutas
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Inicio />} />
+      <Route path="/acerca" element={<Acerca />} />
+      <Route path="/contacto" element={<Contacto />} />
+    </Routes>
+  );
+}`} lang="jsx" title="Definir rutas" />
+
+### Ruta 404 (No encontrada)
+
+<Code code={`import { Routes, Route } from 'react-router-dom';
+
+function NotFound() {
+  return (
+    <div>
+      <h1>404 - Página no encontrada</h1>
+      <p>La página que buscas no existe.</p>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Inicio />} />
+      <Route path="/acerca" element={<Acerca />} />
+      {/* Ruta comodín para 404 */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}`} lang="jsx" title="Ruta 404" />
+
+---
+
+## 🔗 11.3 Navegación con Link y NavLink
+
+### Componente Link
+
+<Code code={`import { Link } from 'react-router-dom';
+
+function Navegacion() {
+  return (
+    <nav>
+      {/* Link en lugar de <a href=""> */}
+      <Link to="/">Inicio</Link>
+      <Link to="/acerca">Acerca</Link>
+      <Link to="/contacto">Contacto</Link>
+    </nav>
+  );
+}
+
+// ❌ NO usar <a href="/acerca"> - recarga la página
+// ✅ Usar <Link to="/acerca"> - navegación SPA`} lang="jsx" title="Componente Link" />
+
+### Componente NavLink (con estilos activos)
+
+<Code code={`import { NavLink } from 'react-router-dom';
+
+function Navegacion() {
+  return (
+    <nav>
+      <NavLink 
+        to="/"
+        className={({ isActive }) => isActive ? "activo" : ""}
+      >
+        Inicio
+      </NavLink>
+      
+      <NavLink 
+        to="/acerca"
+        className={({ isActive }) => isActive ? "activo" : ""}
+      >
+        Acerca
+      </NavLink>
+      
+      <NavLink 
+        to="/contacto"
+        style={({ isActive }) => ({
+          color: isActive ? "red" : "blue",
+          fontWeight: isActive ? "bold" : "normal"
+        })}
+      >
+        Contacto
+      </NavLink>
+    </nav>
+  );
+}`} lang="jsx" title="NavLink con estilos activos" />
+
+### Estructura completa con navegación
+
+<Code code={`import { Routes, Route, Link } from 'react-router-dom';
+
+function Layout({ children }) {
+  return (
+    <div>
+      <header>
+        <nav>
+          <Link to="/">Inicio</Link>
+          <Link to="/productos">Productos</Link>
+          <Link to="/contacto">Contacto</Link>
+        </nav>
+      </header>
+      
+      <main>{children}</main>
+      
+      <footer> 2024 Mi App</footer>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Inicio />} />
+        <Route path="/productos" element={<Productos />} />
+        <Route path="/contacto" element={<Contacto />} />
+      </Routes>
+    </Layout>
+  );
+}`} lang="jsx" title="Layout con navegación" />
+
+---
+
+## 📝 11.4 Parámetros de ruta
+
+### Parámetros dinámicos
+
+<Code code={`import { Routes, Route, useParams } from 'react-router-dom';
+
+// Componente que usa el parámetro
+function DetalleProducto() {
+  // Obtener parámetro de la URL
+  const { id } = useParams();
+  
+  return (
+    <div>
+      <h1>Producto #{id}</h1>
+      {/* Aquí harías fetch del producto con ese ID */}
+    </div>
+  );
+}
+
+// Definir ruta con parámetro
+function App() {
+  return (
+    <Routes>
+      <Route path="/productos" element={<ListaProductos />} />
+      <Route path="/productos/:id" element={<DetalleProducto />} />
+    </Routes>
+  );
+}
+
+// URLs que coinciden:
+// /productos/1    → id = "1"
+// /productos/abc  → id = "abc"
+// /productos/123  → id = "123"`} lang="jsx" title="Parámetros de ruta" />
+
+### Múltiples parámetros
+
+<Code code={`import { useParams } from 'react-router-dom';
+
+function ArticuloCategoria() {
+  const { categoria, slug } = useParams();
+  
+  return (
+    <div>
+      <p>Categoría: {categoria}</p>
+      <p>Artículo: {slug}</p>
+    </div>
+  );
+}
+
+// Ruta
+<Route path="/blog/:categoria/:slug" element={<ArticuloCategoria />} />
+
+// URL: /blog/tecnologia/react-hooks
+// categoria = "tecnologia"
+// slug = "react-hooks"`} lang="jsx" title="Múltiples parámetros" />
+
+### Ejemplo práctico con fetch
+
+<Code code={`import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+
+function DetalleUsuario() {
+  const { id } = useParams();
+  const [usuario, setUsuario] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetch(\`https://jsonplaceholder.typicode.com/users/\${id}\`)
+      .then(res => res.json())
+      .then(data => {
+        setUsuario(data);
+        setLoading(false);
+      });
+  }, [id]);  // Re-fetch cuando cambia el ID
+  
+  if (loading) return <p>Cargando...</p>;
+  
+  return (
+    <div>
+      <Link to="/usuarios">← Volver</Link>
+      <h1>{usuario.name}</h1>
+      <p>Email: {usuario.email}</p>
+      <p>Teléfono: {usuario.phone}</p>
+    </div>
+  );
+}`} lang="jsx" title="Fetch con parámetro" />
+
+---
+
+## 🔍 11.5 Query parameters
+
+### useSearchParams
+
+<Code code={`import { useSearchParams } from 'react-router-dom';
+
+function BusquedaProductos() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Leer parámetros
+  const query = searchParams.get('q') || '';
+  const categoria = searchParams.get('categoria') || 'todas';
+  const pagina = searchParams.get('pagina') || '1';
+  
+  // Actualizar parámetros
+  const buscar = (termino) => {
+    setSearchParams({ q: termino, categoria, pagina: '1' });
+  };
+  
+  const cambiarCategoria = (cat) => {
+    setSearchParams({ q: query, categoria: cat, pagina: '1' });
+  };
+  
+  return (
+    <div>
+      <input
+        value={query}
+        onChange={e => buscar(e.target.value)}
+        placeholder="Buscar..."
+      />
+      
+      <select 
+        value={categoria}
+        onChange={e => cambiarCategoria(e.target.value)}
+      >
+        <option value="todas">Todas</option>
+        <option value="electronica">Electrónica</option>
+        <option value="ropa">Ropa</option>
+      </select>
+      
+      <p>Buscando: "{query}" en {categoria}</p>
+    </div>
+  );
+}
+
+// URL resultante: /productos?q=laptop&categoria=electronica&pagina=1`} lang="jsx" title="Query parameters" />
+
+---
+
+## 🚀 11.6 Navegación programática
+
+### useNavigate
+
+<Code code={`import { useNavigate } from 'react-router-dom';
+
+function FormularioLogin() {
+  const navigate = useNavigate();
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Simular login
+    const exito = await login(email, password);
+    
+    if (exito) {
+      // Navegar a dashboard
+      navigate('/dashboard');
+      
+      // O reemplazar historial (no puede volver atrás)
+      // navigate('/dashboard', { replace: true });
+    }
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* ... campos ... */}
+      <button type="submit">Iniciar Sesión</button>
+    </form>
+  );
+}`} lang="jsx" title="useNavigate" />
+
+### Navegar con datos (state)
+
+<Code code={`import { useNavigate, useLocation } from 'react-router-dom';
+
+// Enviar datos
+function ListaProductos() {
+  const navigate = useNavigate();
+  
+  const verDetalle = (producto) => {
+    navigate(\`/productos/\${producto.id}\`, {
+      state: { producto }  // Pasar datos
+    });
+  };
+  
+  return (
+    <ul>
+      {productos.map(p => (
+        <li key={p.id}>
+          {p.nombre}
+          <button onClick={() => verDetalle(p)}>Ver</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// Recibir datos
+function DetalleProducto() {
+  const location = useLocation();
+  const producto = location.state?.producto;
+  
+  if (!producto) {
+    return <p>Producto no encontrado</p>;
+  }
+  
+  return <h1>{producto.nombre}</h1>;
+}`} lang="jsx" title="Navegar con state" />
+
+### Navegar atrás/adelante
+
+<Code code={`import { useNavigate } from 'react-router-dom';
+
+function Navegacion() {
+  const navigate = useNavigate();
+  
+  return (
+    <div>
+      <button onClick={() => navigate(-1)}>← Atrás</button>
+      <button onClick={() => navigate(1)}>Adelante →</button>
+      <button onClick={() => navigate('/')}>Ir a Inicio</button>
+    </div>
+  );
+}`} lang="jsx" title="Navegar historial" />
+
+---
+
+## 📂 11.7 Rutas anidadas
+
+### Outlet para rutas hijas
+
+<Code code={`import { Routes, Route, Outlet, Link } from 'react-router-dom';
+
+// Layout del dashboard
+function DashboardLayout() {
+  return (
+    <div className="dashboard">
+      <aside>
+        <nav>
+          <Link to="/dashboard">Resumen</Link>
+          <Link to="/dashboard/perfil">Perfil</Link>
+          <Link to="/dashboard/configuracion">Configuración</Link>
+        </nav>
+      </aside>
+      
+      <main>
+        {/* Aquí se renderizan las rutas hijas */}
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+
+// Componentes hijos
+function DashboardResumen() {
+  return <h1>Resumen del Dashboard</h1>;
+}
+
+function DashboardPerfil() {
+  return <h1>Mi Perfil</h1>;
+}
+
+function DashboardConfig() {
+  return <h1>Configuración</h1>;
+}
+
+// Definir rutas anidadas
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Inicio />} />
+      
+      {/* Ruta padre con layout */}
+      <Route path="/dashboard" element={<DashboardLayout />}>
+        {/* Rutas hijas */}
+        <Route index element={<DashboardResumen />} />
+        <Route path="perfil" element={<DashboardPerfil />} />
+        <Route path="configuracion" element={<DashboardConfig />} />
+      </Route>
+    </Routes>
+  );
+}`} lang="jsx" title="Rutas anidadas" />
+
+### Rutas protegidas
+
+<Code code={`import { Navigate, Outlet } from 'react-router-dom';
+
+// Componente para proteger rutas
+function RutaProtegida({ isAuthenticated }) {
+  if (!isAuthenticated) {
+    // Redirigir a login si no está autenticado
+    return <Navigate to="/login" replace />;
+  }
+  
+  // Si está autenticado, mostrar contenido
+  return <Outlet />;
+}
+
+// Uso en las rutas
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  return (
+    <Routes>
+      <Route path="/" element={<Inicio />} />
+      <Route path="/login" element={<Login />} />
+      
+      {/* Rutas protegidas */}
+      <Route element={<RutaProtegida isAuthenticated={isAuthenticated} />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/perfil" element={<Perfil />} />
+        <Route path="/admin" element={<Admin />} />
+      </Route>
+    </Routes>
+  );
+}`} lang="jsx" title="Rutas protegidas" />
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- Instalar y configurar **React Router** con BrowserRouter
+- Definir rutas con **Routes** y **Route**
+- Navegar con **Link** y **NavLink** (estilos activos)
+- Usar **parámetros de ruta** con useParams
+- Manejar **query parameters** con useSearchParams
+- **Navegación programática** con useNavigate
+- Crear **rutas anidadas** con Outlet
+- Implementar **rutas protegidas** con Navigate
+</Aside>

@@ -1,0 +1,398 @@
+---
+title: 2. Preparación del Entorno
+description: Instalación de Node.js, npm, creación de proyecto con Vite y estructura de carpetas
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 📦 2.1 Instalación de Node.js y npm
+
+### ¿Qué es Node.js?
+
+**Node.js** es un entorno de ejecución de JavaScript fuera del navegador. Es necesario para desarrollar con React porque permite ejecutar herramientas de desarrollo.
+
+### ¿Qué es npm?
+
+**npm** (Node Package Manager) es el gestor de paquetes de Node.js. Permite instalar librerías como React y sus dependencias.
+
+| Herramienta | Propósito |
+|-------------|-----------|
+| **Node.js** | Ejecutar JavaScript en tu computadora |
+| **npm** | Instalar y gestionar paquetes |
+| **npx** | Ejecutar paquetes sin instalarlos |
+
+### Instalación de Node.js
+
+<Code code={`# 1. Descargar Node.js desde:
+# https://nodejs.org/
+
+# 2. Elegir la versión LTS (Long Term Support)
+# Ejemplo: Node.js 20.x LTS
+
+# 3. Ejecutar el instalador y seguir los pasos
+
+# 4. Verificar la instalación en terminal:
+node --version
+# v20.10.0
+
+npm --version
+# 10.2.3`} lang="bash" title="Instalar Node.js" />
+
+<Aside type="tip">
+Siempre elige la versión **LTS** (Long Term Support) de Node.js. Es la más estable y recomendada para desarrollo.
+</Aside>
+
+### Verificar instalación correcta
+
+<Code code={`# Verificar Node.js
+node --version
+
+# Verificar npm
+npm --version
+
+# Verificar npx (viene con npm)
+npx --version
+
+# Si todos muestran versiones, la instalación fue exitosa`} lang="bash" title="Verificar instalación" />
+
+---
+
+## 🚀 2.2 Creación de proyecto con Vite
+
+### ¿Por qué Vite?
+
+**Vite** es la herramienta moderna recomendada para crear proyectos React. Es más rápida que Create React App (CRA).
+
+| Característica | Vite | Create React App |
+|----------------|------|------------------|
+| Velocidad de inicio | Instantáneo | Lento |
+| Hot Module Replacement | Ultra rápido | Lento |
+| Tamaño del bundle | Optimizado | Mayor |
+| Configuración | Simple | Compleja |
+
+### Crear proyecto con Vite
+
+<Code code={`# Crear nuevo proyecto React con Vite
+npm create vite@latest mi-proyecto -- --template react
+
+# Navegar al proyecto
+cd mi-proyecto
+
+# Instalar dependencias
+npm install
+
+# Iniciar servidor de desarrollo
+npm run dev`} lang="bash" title="Crear proyecto con Vite" />
+
+### Proceso paso a paso
+
+<Code code={`# 1. Ejecutar el comando de creación
+npm create vite@latest
+
+# 2. Te preguntará el nombre del proyecto
+? Project name: › mi-app-react
+
+# 3. Seleccionar framework
+? Select a framework: › React
+
+# 4. Seleccionar variante
+? Select a variant: › JavaScript
+# (También puedes elegir TypeScript)
+
+# 5. Seguir las instrucciones
+cd mi-app-react
+npm install
+npm run dev`} lang="bash" title="Proceso interactivo" />
+
+### Resultado esperado
+
+<Code code={`# Después de npm run dev verás:
+  VITE v5.0.0  ready in 300 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+
+# Abre http://localhost:5173/ en tu navegador`} lang="text" title="Servidor iniciado" />
+
+<Aside type="note">
+Vite usa el puerto **5173** por defecto, a diferencia de Create React App que usa el 3000.
+</Aside>
+
+---
+
+## 📁 2.3 Estructura de carpetas en React
+
+### Estructura inicial de Vite + React
+
+<Code code={`mi-proyecto/
+├── node_modules/      # Dependencias instaladas (no tocar)
+├── public/            # Archivos estáticos públicos
+│   └── vite.svg       # Favicon
+├── src/               # Código fuente de la aplicación
+│   ├── assets/        # Imágenes, fuentes, etc.
+│   │   └── react.svg
+│   ├── App.css        # Estilos del componente App
+│   ├── App.jsx        # Componente principal
+│   ├── index.css      # Estilos globales
+│   └── main.jsx       # Punto de entrada
+├── .gitignore         # Archivos ignorados por Git
+├── index.html         # HTML principal
+├── package.json       # Configuración del proyecto
+├── package-lock.json  # Versiones exactas de dependencias
+└── vite.config.js     # Configuración de Vite`} lang="text" title="Estructura de carpetas" />
+
+### Descripción de cada carpeta/archivo
+
+| Carpeta/Archivo | Propósito |
+|-----------------|-----------|
+| `node_modules/` | Contiene todas las dependencias. No modificar. |
+| `public/` | Archivos estáticos que no se procesan |
+| `src/` | Todo el código fuente de tu aplicación |
+| `src/assets/` | Imágenes y recursos que se importan |
+| `index.html` | HTML base donde se monta React |
+| `package.json` | Lista de dependencias y scripts |
+| `vite.config.js` | Configuración de Vite |
+
+### Estructura recomendada para proyectos medianos
+
+<Code code={`src/
+├── components/        # Componentes reutilizables
+│   ├── Button/
+│   │   ├── Button.jsx
+│   │   └── Button.css
+│   ├── Header/
+│   │   ├── Header.jsx
+│   │   └── Header.css
+│   └── Footer/
+│       ├── Footer.jsx
+│       └── Footer.css
+├── pages/             # Páginas/vistas principales
+│   ├── Home.jsx
+│   ├── About.jsx
+│   └── Contact.jsx
+├── hooks/             # Hooks personalizados
+│   └── useLocalStorage.js
+├── services/          # Llamadas a APIs
+│   └── api.js
+├── utils/             # Funciones utilitarias
+│   └── helpers.js
+├── App.jsx
+├── App.css
+├── main.jsx
+└── index.css`} lang="text" title="Estructura recomendada" />
+
+---
+
+## 📄 2.4 Archivos principales (main.jsx, App.jsx)
+
+### main.jsx - Punto de entrada
+
+Este archivo es el punto de entrada de la aplicación. Monta React en el DOM.
+
+<Code code={`// src/main.jsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+
+// Busca el elemento con id="root" en index.html
+// y monta el componente App dentro de él
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)`} lang="jsx" title="src/main.jsx" />
+
+### ¿Qué hace cada parte?
+
+<Code code={`// Importar React (necesario para JSX)
+import React from 'react'
+
+// Importar ReactDOM para renderizar en el navegador
+import ReactDOM from 'react-dom/client'
+
+// Importar el componente principal
+import App from './App.jsx'
+
+// Importar estilos globales
+import './index.css'
+
+// Crear la raíz de React y renderizar
+ReactDOM.createRoot(document.getElementById('root')).render(
+  // StrictMode ayuda a detectar problemas en desarrollo
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)`} lang="jsx" title="Explicación de main.jsx" />
+
+### App.jsx - Componente principal
+
+<Code code={`// src/App.jsx
+import { useState } from 'react'
+import './App.css'
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div className="App">
+      <h1>Mi Primera App React</h1>
+      <p>Contador: {count}</p>
+      <button onClick={() => setCount(count + 1)}>
+        Incrementar
+      </button>
+    </div>
+  )
+}
+
+export default App`} lang="jsx" title="src/App.jsx" />
+
+### index.html - HTML base
+
+<Code code={`<!-- index.html -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi App React</title>
+  </head>
+  <body>
+    <!-- React se monta aquí -->
+    <div id="root"></div>
+    <!-- Vite inyecta el script automáticamente -->
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>`} lang="html" title="index.html" />
+
+---
+
+## ⚡ 2.5 Scripts básicos (dev, build)
+
+### Scripts en package.json
+
+<Code code={`// package.json
+{
+  "name": "mi-proyecto",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext js,jsx"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^5.0.0"
+  }
+}`} lang="json" title="package.json" />
+
+### Comandos principales
+
+| Comando | Descripción |
+|---------|-------------|
+| `npm run dev` | Inicia servidor de desarrollo |
+| `npm run build` | Genera versión de producción |
+| `npm run preview` | Previsualiza la build |
+| `npm run lint` | Verifica errores de código |
+
+### Usar los scripts
+
+<Code code={`# Desarrollo - Inicia servidor con hot reload
+npm run dev
+# Abre http://localhost:5173
+
+# Producción - Genera archivos optimizados
+npm run build
+# Crea carpeta dist/ con los archivos
+
+# Preview - Ver la versión de producción
+npm run preview
+# Sirve los archivos de dist/`} lang="bash" title="Ejecutar scripts" />
+
+### Resultado del build
+
+<Code code={`# Después de npm run build:
+dist/
+├── assets/
+│   ├── index-abc123.js    # JavaScript minificado
+│   └── index-def456.css   # CSS minificado
+└── index.html             # HTML optimizado
+
+# Estos archivos se suben al servidor de producción`} lang="text" title="Carpeta dist/" />
+
+---
+
+## 📥 2.6 Instalación de dependencias
+
+### Instalar una dependencia
+
+<Code code={`# Instalar una dependencia de producción
+npm install axios
+npm install react-router-dom
+
+# Forma corta
+npm i axios
+
+# Instalar múltiples dependencias
+npm install axios react-router-dom zustand`} lang="bash" title="Instalar dependencias" />
+
+### Dependencias de desarrollo
+
+<Code code={`# Instalar dependencia solo para desarrollo
+npm install --save-dev eslint
+npm install -D prettier
+
+# Estas no se incluyen en el bundle final`} lang="bash" title="Dependencias de desarrollo" />
+
+### Dependencias comunes en React
+
+| Dependencia | Propósito | Comando |
+|-------------|-----------|---------|
+| react-router-dom | Navegación | `npm i react-router-dom` |
+| axios | Peticiones HTTP | `npm i axios` |
+| zustand | Estado global | `npm i zustand` |
+| react-hook-form | Formularios | `npm i react-hook-form` |
+| tailwindcss | Estilos | `npm i -D tailwindcss` |
+
+### Ejemplo: Instalar React Router
+
+<Code code={`# 1. Instalar la dependencia
+npm install react-router-dom
+
+# 2. Verificar en package.json
+{
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0"  // Nueva dependencia
+  }
+}
+
+# 3. Usar en tu código
+import { BrowserRouter, Routes, Route } from 'react-router-dom';`} lang="bash" title="Instalar React Router" />
+
+<Aside type="caution">
+Después de clonar un proyecto, siempre ejecuta `npm install` para instalar las dependencias listadas en package.json.
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- Instalar **Node.js** y **npm** para desarrollo con React
+- Crear proyectos con **Vite** (más rápido que CRA)
+- Entender la **estructura de carpetas** de un proyecto React
+- Conocer los archivos principales: **main.jsx** y **App.jsx**
+- Usar los **scripts** de desarrollo y producción
+- **Instalar dependencias** con npm
+</Aside>

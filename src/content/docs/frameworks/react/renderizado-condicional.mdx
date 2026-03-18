@@ -1,0 +1,495 @@
+---
+title: 7. Renderizado Condicional
+description: Uso de if, operador ternario, operador lógico && y renderizado basado en estado
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🔀 7.1 Uso de if en React
+
+### Renderizado condicional básico
+
+El **renderizado condicional** permite mostrar diferentes elementos según una condición. Es como usar `if` en JavaScript, pero aplicado a la UI.
+
+<Code code={`function Saludo({ estaLogueado }) {
+  // Usar if antes del return
+  if (estaLogueado) {
+    return <h1>¡Bienvenido de vuelta!</h1>;
+  }
+  
+  return <h1>Por favor, inicia sesión</h1>;
+}`} lang="jsx" title="if básico" />
+
+### Return temprano (early return)
+
+<Code code={`function Perfil({ usuario }) {
+  // Si no hay usuario, retorna temprano
+  if (!usuario) {
+    return <p>Cargando...</p>;
+  }
+  
+  // Si hay usuario, muestra el perfil
+  return (
+    <div>
+      <h1>{usuario.nombre}</h1>
+      <p>{usuario.email}</p>
+    </div>
+  );
+}`} lang="jsx" title="Early return" />
+
+### Múltiples condiciones
+
+<Code code={`function EstadoPedido({ estado }) {
+  if (estado === "pendiente") {
+    return <span className="pendiente">⏳ Pendiente</span>;
+  }
+  
+  if (estado === "enviado") {
+    return <span className="enviado">📦 Enviado</span>;
+  }
+  
+  if (estado === "entregado") {
+    return <span className="entregado">✅ Entregado</span>;
+  }
+  
+  return <span className="desconocido">❓ Desconocido</span>;
+}`} lang="jsx" title="Múltiples condiciones" />
+
+---
+
+## ❓ 7.2 Operador ternario
+
+### Sintaxis del ternario
+
+El operador ternario `condición ? valorSiTrue : valorSiFalse` es perfecto para condiciones simples dentro del JSX.
+
+<Code code={`function Saludo({ estaLogueado }) {
+  return (
+    <div>
+      {estaLogueado ? (
+        <h1>¡Bienvenido!</h1>
+      ) : (
+        <h1>Inicia sesión</h1>
+      )}
+    </div>
+  );
+}`} lang="jsx" title="Ternario básico" />
+
+### Ternario para atributos
+
+<Code code={`function Boton({ activo }) {
+  return (
+    <button 
+      className={activo ? "btn-activo" : "btn-inactivo"}
+      disabled={activo ? false : true}
+    >
+      {activo ? "Activo" : "Inactivo"}
+    </button>
+  );
+}`} lang="jsx" title="Ternario en atributos" />
+
+### Ternario para estilos
+
+<Code code={`function Tarjeta({ destacada }) {
+  return (
+    <div 
+      style={{
+        backgroundColor: destacada ? "#ffd700" : "#ffffff",
+        border: destacada ? "2px solid gold" : "1px solid #ccc",
+        padding: "20px"
+      }}
+    >
+      <h3>{destacada ? "⭐ Destacada" : "Normal"}</h3>
+    </div>
+  );
+}`} lang="jsx" title="Ternario en estilos" />
+
+### Ternarios anidados (evitar si es posible)
+
+<Code code={`// ❌ Difícil de leer
+function Estado({ valor }) {
+  return (
+    <span>
+      {valor > 100 ? "Alto" : valor > 50 ? "Medio" : "Bajo"}
+    </span>
+  );
+}
+
+// ✅ Mejor usar función separada
+function Estado({ valor }) {
+  const obtenerNivel = (v) => {
+    if (v > 100) return "Alto";
+    if (v > 50) return "Medio";
+    return "Bajo";
+  };
+  
+  return <span>{obtenerNivel(valor)}</span>;
+}`} lang="jsx" title="Evitar ternarios anidados" />
+
+---
+
+## ➕ 7.3 Operador lógico &&
+
+### Mostrar solo si es true
+
+El operador `&&` renderiza el elemento solo si la condición es verdadera. Es útil cuando no necesitas un "else".
+
+<Code code={`function Notificaciones({ cantidad }) {
+  return (
+    <div>
+      <h1>Panel</h1>
+      
+      {/* Solo muestra si cantidad > 0 */}
+      {cantidad > 0 && (
+        <span className="badge">{cantidad} nuevas</span>
+      )}
+    </div>
+  );
+}
+
+// Si cantidad = 0: Solo muestra "Panel"
+// Si cantidad = 5: Muestra "Panel" y "5 nuevas"`} lang="jsx" title="Operador &&" />
+
+### Múltiples condiciones con &&
+
+<Code code={`function Perfil({ usuario, esPremium, tieneNotificaciones }) {
+  return (
+    <div>
+      <h1>{usuario.nombre}</h1>
+      
+      {/* Mostrar badge premium */}
+      {esPremium && <span className="premium">⭐ Premium</span>}
+      
+      {/* Mostrar notificaciones */}
+      {tieneNotificaciones && <span className="notif">🔔</span>}
+      
+      {/* Mostrar admin si es admin */}
+      {usuario.rol === "admin" && (
+        <button>Panel de Admin</button>
+      )}
+    </div>
+  );
+}`} lang="jsx" title="Múltiples &&" />
+
+### Cuidado con el 0
+
+<Code code={`// ❌ PROBLEMA: Si cantidad es 0, muestra "0" en pantalla
+function Lista({ items }) {
+  return (
+    <div>
+      {items.length && <ul>...</ul>}
+      {/* Si items.length = 0, renderiza "0" */}
+    </div>
+  );
+}
+
+// ✅ SOLUCIÓN: Convertir a booleano
+function Lista({ items }) {
+  return (
+    <div>
+      {items.length > 0 && <ul>...</ul>}
+      {/* Ahora funciona correctamente */}
+    </div>
+  );
+}`} lang="jsx" title="Cuidado con el 0" />
+
+<Aside type="caution">
+El operador `&&` puede mostrar `0` o `NaN` en pantalla si la condición evalúa a esos valores. Siempre usa comparaciones explícitas como `> 0` o `!== 0`.
+</Aside>
+
+---
+
+## 🔄 7.4 Renderizado basado en estado
+
+### Toggle con useState
+
+<Code code={`import { useState } from 'react';
+
+function ToggleContenido() {
+  const [visible, setVisible] = useState(false);
+  
+  return (
+    <div>
+      <button onClick={() => setVisible(!visible)}>
+        {visible ? "Ocultar" : "Mostrar"}
+      </button>
+      
+      {visible && (
+        <div className="contenido">
+          <p>Este contenido se puede mostrar/ocultar</p>
+        </div>
+      )}
+    </div>
+  );
+}`} lang="jsx" title="Toggle básico" />
+
+### Estados de carga
+
+<Code code={`import { useState, useEffect } from 'react';
+
+function ListaUsuarios() {
+  const [usuarios, setUsuarios] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    fetch('/api/usuarios')
+      .then(res => res.json())
+      .then(data => {
+        setUsuarios(data);
+        setCargando(false);
+      })
+      .catch(err => {
+        setError(err.message);
+        setCargando(false);
+      });
+  }, []);
+  
+  // Renderizado condicional basado en estado
+  if (cargando) {
+    return <p>Cargando...</p>;
+  }
+  
+  if (error) {
+    return <p className="error">Error: {error}</p>;
+  }
+  
+  if (usuarios.length === 0) {
+    return <p>No hay usuarios</p>;
+  }
+  
+  return (
+    <ul>
+      {usuarios.map(u => <li key={u.id}>{u.nombre}</li>)}
+    </ul>
+  );
+}`} lang="jsx" title="Estados de carga" />
+
+---
+
+## 👁️ 7.5 Mostrar/ocultar componentes
+
+### Componente Modal
+
+<Code code={`import { useState } from 'react';
+
+function Modal({ children, titulo, onCerrar }) {
+  return (
+    <div className="modal-overlay">
+      <div className="modal">
+        <div className="modal-header">
+          <h2>{titulo}</h2>
+          <button onClick={onCerrar}>✕</button>
+        </div>
+        <div className="modal-body">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [mostrarModal, setMostrarModal] = useState(false);
+  
+  return (
+    <div>
+      <button onClick={() => setMostrarModal(true)}>
+        Abrir Modal
+      </button>
+      
+      {mostrarModal && (
+        <Modal 
+          titulo="Mi Modal"
+          onCerrar={() => setMostrarModal(false)}
+        >
+          <p>Contenido del modal</p>
+        </Modal>
+      )}
+    </div>
+  );
+}`} lang="jsx" title="Modal condicional" />
+
+### Menú desplegable
+
+<Code code={`import { useState } from 'react';
+
+function MenuDesplegable() {
+  const [abierto, setAbierto] = useState(false);
+  
+  return (
+    <div className="menu-container">
+      <button onClick={() => setAbierto(!abierto)}>
+        Menú {abierto ? "▲" : "▼"}
+      </button>
+      
+      {abierto && (
+        <ul className="menu-items">
+          <li>Opción 1</li>
+          <li>Opción 2</li>
+          <li>Opción 3</li>
+        </ul>
+      )}
+    </div>
+  );
+}`} lang="jsx" title="Menú desplegable" />
+
+### Acordeón
+
+<Code code={`import { useState } from 'react';
+
+function Acordeon({ items }) {
+  const [activo, setActivo] = useState(null);
+  
+  return (
+    <div className="acordeon">
+      {items.map((item, index) => (
+        <div key={index} className="acordeon-item">
+          <button 
+            className="acordeon-header"
+            onClick={() => setActivo(activo === index ? null : index)}
+          >
+            {item.titulo}
+            <span>{activo === index ? "−" : "+"}</span>
+          </button>
+          
+          {activo === index && (
+            <div className="acordeon-contenido">
+              {item.contenido}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Uso
+<Acordeon items={[
+  { titulo: "Sección 1", contenido: "Contenido de la sección 1" },
+  { titulo: "Sección 2", contenido: "Contenido de la sección 2" },
+  { titulo: "Sección 3", contenido: "Contenido de la sección 3" }
+]} />`} lang="jsx" title="Acordeón" />
+
+---
+
+## 🎨 7.6 Renderizado dinámico en UI
+
+### Tabs/Pestañas
+
+<Code code={`import { useState } from 'react';
+
+function Tabs() {
+  const [tabActiva, setTabActiva] = useState("inicio");
+  
+  const renderContenido = () => {
+    switch (tabActiva) {
+      case "inicio":
+        return <div>Contenido de Inicio</div>;
+      case "perfil":
+        return <div>Contenido de Perfil</div>;
+      case "config":
+        return <div>Contenido de Configuración</div>;
+      default:
+        return null;
+    }
+  };
+  
+  return (
+    <div>
+      <div className="tabs-header">
+        <button 
+          className={tabActiva === "inicio" ? "activa" : ""}
+          onClick={() => setTabActiva("inicio")}
+        >
+          Inicio
+        </button>
+        <button 
+          className={tabActiva === "perfil" ? "activa" : ""}
+          onClick={() => setTabActiva("perfil")}
+        >
+          Perfil
+        </button>
+        <button 
+          className={tabActiva === "config" ? "activa" : ""}
+          onClick={() => setTabActiva("config")}
+        >
+          Configuración
+        </button>
+      </div>
+      
+      <div className="tabs-contenido">
+        {renderContenido()}
+      </div>
+    </div>
+  );
+}`} lang="jsx" title="Sistema de Tabs" />
+
+### Componentes dinámicos
+
+<Code code={`import { useState } from 'react';
+
+// Componentes
+function FormularioLogin() {
+  return <form><h2>Iniciar Sesión</h2>...</form>;
+}
+
+function FormularioRegistro() {
+  return <form><h2>Registrarse</h2>...</form>;
+}
+
+function FormularioRecuperar() {
+  return <form><h2>Recuperar Contraseña</h2>...</form>;
+}
+
+// Mapa de componentes
+const FORMULARIOS = {
+  login: FormularioLogin,
+  registro: FormularioRegistro,
+  recuperar: FormularioRecuperar
+};
+
+function Auth() {
+  const [tipo, setTipo] = useState("login");
+  
+  // Obtener componente dinámicamente
+  const FormularioActual = FORMULARIOS[tipo];
+  
+  return (
+    <div>
+      <nav>
+        <button onClick={() => setTipo("login")}>Login</button>
+        <button onClick={() => setTipo("registro")}>Registro</button>
+        <button onClick={() => setTipo("recuperar")}>Recuperar</button>
+      </nav>
+      
+      <FormularioActual />
+    </div>
+  );
+}`} lang="jsx" title="Componentes dinámicos" />
+
+### Resumen de técnicas
+
+| Técnica | Uso | Ejemplo |
+|---------|-----|---------|
+| `if/else` | Antes del return | Múltiples condiciones |
+| Ternario `? :` | Dentro del JSX | Dos opciones |
+| `&&` | Mostrar/ocultar | Solo si es true |
+| `switch` | Múltiples casos | Tabs, estados |
+| Mapa de componentes | Dinámico | Formularios, vistas |
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- Usar **if/else** antes del return para condiciones complejas
+- El **operador ternario** `? :` para condiciones simples en JSX
+- El **operador &&** para mostrar elementos condicionalmente
+- Cuidado con `&&` y valores como **0** o **NaN**
+- Crear **toggles** con useState para mostrar/ocultar
+- Implementar **modales**, **menús** y **acordeones**
+- Usar **switch** y mapas de componentes para UI dinámica
+</Aside>

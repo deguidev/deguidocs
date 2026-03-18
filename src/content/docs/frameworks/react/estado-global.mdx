@@ -1,0 +1,558 @@
+---
+title: 13. Estado Global
+description: Context API, useContext y patrones de estado global
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🌍 13.1 Problema del prop drilling
+
+### ¿Qué es prop drilling?
+
+**Prop drilling** es cuando pasas props a través de múltiples niveles de componentes que no los necesitan, solo para llegar a un componente hijo profundo.
+
+<Code code={`// ❌ Prop drilling - pasar props innecesariamente
+function App() {
+  const [usuario, setUsuario] = useState({ nombre: "Ana" });
+  
+  return <Layout usuario={usuario} />;
+}
+
+function Layout({ usuario }) {
+  return <Sidebar usuario={usuario} />;  // No usa usuario
+}
+
+function Sidebar({ usuario }) {
+  return <Menu usuario={usuario} />;  // No usa usuario
+}
+
+function Menu({ usuario }) {
+  return <UserInfo usuario={usuario} />;  // No usa usuario
+}
+
+function UserInfo({ usuario }) {
+  return <p>Hola, {usuario.nombre}</p>;  // ¡Finalmente lo usa!
+}`} lang="jsx" title="Problema de prop drilling" />
+
+### Solución: Context API
+
+<Code code={`// ✅ Con Context - acceso directo
+const UsuarioContext = createContext();
+
+function App() {
+  const [usuario, setUsuario] = useState({ nombre: "Ana" });
+  
+  return (
+    <UsuarioContext.Provider value={usuario}>
+      <Layout />
+    </UsuarioContext.Provider>
+  );
+}
+
+function Layout() {
+  return <Sidebar />;  // Sin props
+}
+
+function Sidebar() {
+  return <Menu />;  // Sin props
+}
+
+function Menu() {
+  return <UserInfo />;  // Sin props
+}
+
+function UserInfo() {
+  const usuario = useContext(UsuarioContext);  // Acceso directo
+  return <p>Hola, {usuario.nombre}</p>;
+}`} lang="jsx" title="Solución con Context" />
+
+---
+
+## 🎯 13.2 Context API básico
+
+### Crear un Context
+
+<Code code={`import { createContext, useContext, useState } from 'react';
+
+// 1. Crear el contexto
+const TemaContext = createContext();
+
+// 2. Crear el Provider
+function TemaProvider({ children }) {
+  const [tema, setTema] = useState('claro');
+  
+  const toggleTema = () => {
+    setTema(tema === 'claro' ? 'oscuro' : 'claro');
+  };
+  
+  return (
+    <TemaContext.Provider value={{ tema, toggleTema }}>
+      {children}
+    </TemaContext.Provider>
+  );
+}
+
+// 3. Hook personalizado para usar el contexto
+function useTema() {
+  const context = useContext(TemaContext);
+  if (!context) {
+    throw new Error('useTema debe usarse dentro de TemaProvider');
+  }
+  return context;
+}
+
+export { TemaProvider, useTema };`} lang="jsx" title="Crear Context" />
+
+### Usar el Context
+
+<Code code={`// App.jsx
+import { TemaProvider } from './contexts/TemaContext';
+
+function App() {
+  return (
+    <TemaProvider>
+      <Layout />
+    </TemaProvider>
+  );
+}
+
+// Cualquier componente hijo
+import { useTema } from './contexts/TemaContext';
+
+function BotonTema() {
+  const { tema, toggleTema } = useTema();
+  
+  return (
+    <button onClick={toggleTema}>
+      Tema actual: {tema}
+    </button>
+  );
+}
+
+function Pagina() {
+  const { tema } = useTema();
+  
+  return (
+    <div className={tema === 'oscuro' ? 'dark' : 'light'}>
+      <h1>Mi Página</h1>
+      <BotonTema />
+    </div>
+  );
+}`} lang="jsx" title="Usar Context" />
+
+---
+
+## 👤 13.3 Context de autenticación
+
+### AuthContext completo
+
+<Code code={`// contexts/AuthContext.jsx
+import { createContext, useContext, useState, useEffect } from 'react';
+
+const AuthContext = createContext();
+
+export function AuthProvider({ children }) {
+  const [usuario, setUsuario] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  
+  // Verificar sesión al cargar
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      verificarToken(token);
+    } else {
+      setCargando(false);
+    }
+  }, []);
+  
+  const verificarToken = async (token) => {
+    try {
+      const response = await fetch('/api/verify', {
+        headers: { Authorization: \`Bearer \${token}\` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUsuario(data.usuario);
+      }
+    } catch (error) {
+      localStorage.removeItem('token');
+    } finally {
+      setCargando(false);
+    }
+  };
+  
+  const login = async (email, password) => {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Credenciales inválidas');
+    }
+    
+    const { token, usuario } = await response.json();
+    localStorage.setItem('token', token);
+    setUsuario(usuario);
+  };
+  
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUsuario(null);
+  };
+  
+  const value = {
+    usuario,
+    cargando,
+    isAuthenticated: !!usuario,
+    login,
+    logout
+  };
+  
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth debe usarse dentro de AuthProvider');
+  }
+  return context;
+}`} lang="jsx" title="AuthContext" />
+
+### Uso del AuthContext
+
+<Code code={`// App.jsx
+import { AuthProvider } from './contexts/AuthContext';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+// Login.jsx
+import { useAuth } from './contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
+function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await login(email, password);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      {error && <p className="error">{error}</p>}
+      {/* campos... */}
+    </form>
+  );
+}
+
+// Header.jsx
+import { useAuth } from './contexts/AuthContext';
+
+function Header() {
+  const { usuario, isAuthenticated, logout } = useAuth();
+  
+  return (
+    <header>
+      {isAuthenticated ? (
+        <>
+          <span>Hola, {usuario.nombre}</span>
+          <button onClick={logout}>Cerrar sesión</button>
+        </>
+      ) : (
+        <Link to="/login">Iniciar sesión</Link>
+      )}
+    </header>
+  );
+}`} lang="jsx" title="Uso de AuthContext" />
+
+---
+
+## 🛒 13.4 Context de carrito de compras
+
+### CarritoContext
+
+<Code code={`// contexts/CarritoContext.jsx
+import { createContext, useContext, useReducer } from 'react';
+
+const CarritoContext = createContext();
+
+// Reducer para manejar acciones
+function carritoReducer(state, action) {
+  switch (action.type) {
+    case 'AGREGAR':
+      const existe = state.items.find(i => i.id === action.producto.id);
+      if (existe) {
+        return {
+          ...state,
+          items: state.items.map(i =>
+            i.id === action.producto.id
+              ? { ...i, cantidad: i.cantidad + 1 }
+              : i
+          )
+        };
+      }
+      return {
+        ...state,
+        items: [...state.items, { ...action.producto, cantidad: 1 }]
+      };
+    
+    case 'ELIMINAR':
+      return {
+        ...state,
+        items: state.items.filter(i => i.id !== action.id)
+      };
+    
+    case 'ACTUALIZAR_CANTIDAD':
+      return {
+        ...state,
+        items: state.items.map(i =>
+          i.id === action.id
+            ? { ...i, cantidad: action.cantidad }
+            : i
+        )
+      };
+    
+    case 'VACIAR':
+      return { ...state, items: [] };
+    
+    default:
+      return state;
+  }
+}
+
+export function CarritoProvider({ children }) {
+  const [state, dispatch] = useReducer(carritoReducer, { items: [] });
+  
+  const agregar = (producto) => {
+    dispatch({ type: 'AGREGAR', producto });
+  };
+  
+  const eliminar = (id) => {
+    dispatch({ type: 'ELIMINAR', id });
+  };
+  
+  const actualizarCantidad = (id, cantidad) => {
+    dispatch({ type: 'ACTUALIZAR_CANTIDAD', id, cantidad });
+  };
+  
+  const vaciar = () => {
+    dispatch({ type: 'VACIAR' });
+  };
+  
+  // Valores calculados
+  const totalItems = state.items.reduce((sum, i) => sum + i.cantidad, 0);
+  const totalPrecio = state.items.reduce(
+    (sum, i) => sum + (i.precio * i.cantidad), 0
+  );
+  
+  const value = {
+    items: state.items,
+    totalItems,
+    totalPrecio,
+    agregar,
+    eliminar,
+    actualizarCantidad,
+    vaciar
+  };
+  
+  return (
+    <CarritoContext.Provider value={value}>
+      {children}
+    </CarritoContext.Provider>
+  );
+}
+
+export function useCarrito() {
+  const context = useContext(CarritoContext);
+  if (!context) {
+    throw new Error('useCarrito debe usarse dentro de CarritoProvider');
+  }
+  return context;
+}`} lang="jsx" title="CarritoContext con useReducer" />
+
+### Uso del CarritoContext
+
+<Code code={`// Producto.jsx
+import { useCarrito } from './contexts/CarritoContext';
+
+function Producto({ producto }) {
+  const { agregar } = useCarrito();
+  
+  return (
+    <div className="producto">
+      <h3>{producto.nombre}</h3>
+      <p>\${producto.precio}</p>
+      <button onClick={() => agregar(producto)}>
+        Agregar al carrito
+      </button>
+    </div>
+  );
+}
+
+// IconoCarrito.jsx
+import { useCarrito } from './contexts/CarritoContext';
+
+function IconoCarrito() {
+  const { totalItems } = useCarrito();
+  
+  return (
+    <div className="carrito-icono">
+      🛒 <span className="badge">{totalItems}</span>
+    </div>
+  );
+}
+
+// PaginaCarrito.jsx
+import { useCarrito } from './contexts/CarritoContext';
+
+function PaginaCarrito() {
+  const { items, totalPrecio, eliminar, vaciar } = useCarrito();
+  
+  if (items.length === 0) {
+    return <p>Tu carrito está vacío</p>;
+  }
+  
+  return (
+    <div>
+      <h1>Tu Carrito</h1>
+      {items.map(item => (
+        <div key={item.id} className="carrito-item">
+          <span>{item.nombre} x {item.cantidad}</span>
+          <span>\${item.precio * item.cantidad}</span>
+          <button onClick={() => eliminar(item.id)}>🗑️</button>
+        </div>
+      ))}
+      <p className="total">Total: \${totalPrecio}</p>
+      <button onClick={vaciar}>Vaciar carrito</button>
+    </div>
+  );
+}`} lang="jsx" title="Uso del CarritoContext" />
+
+---
+
+## 🔗 13.5 Múltiples Contexts
+
+### Combinar Providers
+
+<Code code={`// contexts/index.jsx
+import { AuthProvider } from './AuthContext';
+import { TemaProvider } from './TemaContext';
+import { CarritoProvider } from './CarritoContext';
+
+export function AppProviders({ children }) {
+  return (
+    <AuthProvider>
+      <TemaProvider>
+        <CarritoProvider>
+          {children}
+        </CarritoProvider>
+      </TemaProvider>
+    </AuthProvider>
+  );
+}
+
+// App.jsx
+import { AppProviders } from './contexts';
+
+function App() {
+  return (
+    <AppProviders>
+      <Router>
+        <Layout />
+      </Router>
+    </AppProviders>
+  );
+}`} lang="jsx" title="Combinar Providers" />
+
+---
+
+## ⚡ 13.6 Optimización de Context
+
+### Separar estado y acciones
+
+<Code code={`// Para evitar re-renders innecesarios
+const EstadoContext = createContext();
+const AccionesContext = createContext();
+
+function Provider({ children }) {
+  const [estado, setEstado] = useState(initialState);
+  
+  // Memorizar acciones para que no cambien
+  const acciones = useMemo(() => ({
+    incrementar: () => setEstado(s => ({ ...s, count: s.count + 1 })),
+    decrementar: () => setEstado(s => ({ ...s, count: s.count - 1 }))
+  }), []);
+  
+  return (
+    <EstadoContext.Provider value={estado}>
+      <AccionesContext.Provider value={acciones}>
+        {children}
+      </AccionesContext.Provider>
+    </EstadoContext.Provider>
+  );
+}
+
+// Componentes que solo necesitan acciones no se re-renderizan
+function Botones() {
+  const { incrementar, decrementar } = useContext(AccionesContext);
+  return (
+    <>
+      <button onClick={decrementar}>-</button>
+      <button onClick={incrementar}>+</button>
+    </>
+  );
+}
+
+// Solo este se re-renderiza cuando cambia el estado
+function Display() {
+  const { count } = useContext(EstadoContext);
+  return <p>{count}</p>;
+}`} lang="jsx" title="Optimización de Context" />
+
+<Aside type="tip">
+Separa el estado de las acciones en diferentes contexts para evitar re-renders innecesarios en componentes que solo usan acciones.
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- **Prop drilling** es pasar props a través de muchos niveles
+- **Context API** permite compartir estado sin prop drilling
+- Crear contextos con **createContext** y **Provider**
+- Usar **useContext** o hooks personalizados para acceder
+- Implementar **AuthContext** para autenticación
+- Usar **useReducer** para estado complejo (carrito)
+- **Combinar múltiples Providers** en un componente
+- **Optimizar** separando estado y acciones
+</Aside>

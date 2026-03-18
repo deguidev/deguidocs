@@ -1,0 +1,616 @@
+---
+title: 12. Formularios Avanzados
+description: Validación con librerías, React Hook Form y manejo de errores
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 📝 12.1 Limitaciones de formularios básicos
+
+### Problemas comunes
+
+| Problema | Descripción |
+|----------|-------------|
+| **Re-renders** | Cada cambio en input re-renderiza todo |
+| **Validación** | Código repetitivo para validar |
+| **Estado** | Muchos useState para cada campo |
+| **Errores** | Manejo manual de mensajes de error |
+
+### Formulario básico vs avanzado
+
+<Code code={`// ❌ Formulario básico - muchos estados
+function FormularioBasico() {
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errores, setErrores] = useState({});
+  const [enviando, setEnviando] = useState(false);
+  
+  // Validación manual...
+  // Manejo de submit...
+  // Muchos onChange...
+}
+
+// ✅ Con React Hook Form - más limpio
+function FormularioAvanzado() {
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  
+  const onSubmit = (data) => console.log(data);
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register("nombre", { required: true })} />
+      {errors.nombre && <span>Campo requerido</span>}
+    </form>
+  );
+}`} lang="jsx" title="Comparación" />
+
+---
+
+## 📦 12.2 React Hook Form
+
+### Instalación
+
+<Code code={`npm install react-hook-form`} lang="bash" title="Instalar React Hook Form" />
+
+### Uso básico
+
+<Code code={`import { useForm } from 'react-hook-form';
+
+function Formulario() {
+  const { 
+    register,      // Registrar inputs
+    handleSubmit,  // Manejar envío
+    formState: { errors }  // Errores de validación
+  } = useForm();
+  
+  const onSubmit = (data) => {
+    console.log(data);
+    // { nombre: "Juan", email: "juan@mail.com" }
+  };
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input 
+        {...register("nombre")} 
+        placeholder="Nombre"
+      />
+      
+      <input 
+        {...register("email")} 
+        placeholder="Email"
+      />
+      
+      <button type="submit">Enviar</button>
+    </form>
+  );
+}`} lang="jsx" title="Uso básico" />
+
+### Validaciones con register
+
+<Code code={`import { useForm } from 'react-hook-form';
+
+function FormularioValidado() {
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  
+  const onSubmit = (data) => console.log(data);
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {/* Campo requerido */}
+      <input 
+        {...register("nombre", { 
+          required: "El nombre es obligatorio" 
+        })} 
+      />
+      {errors.nombre && <span>{errors.nombre.message}</span>}
+      
+      {/* Email con patrón */}
+      <input 
+        {...register("email", { 
+          required: "El email es obligatorio",
+          pattern: {
+            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+            message: "Email inválido"
+          }
+        })} 
+      />
+      {errors.email && <span>{errors.email.message}</span>}
+      
+      {/* Longitud mínima y máxima */}
+      <input 
+        type="password"
+        {...register("password", { 
+          required: "La contraseña es obligatoria",
+          minLength: {
+            value: 6,
+            message: "Mínimo 6 caracteres"
+          },
+          maxLength: {
+            value: 20,
+            message: "Máximo 20 caracteres"
+          }
+        })} 
+      />
+      {errors.password && <span>{errors.password.message}</span>}
+      
+      {/* Número con rango */}
+      <input 
+        type="number"
+        {...register("edad", { 
+          required: "La edad es obligatoria",
+          min: {
+            value: 18,
+            message: "Debes ser mayor de 18"
+          },
+          max: {
+            value: 100,
+            message: "Edad máxima 100"
+          }
+        })} 
+      />
+      {errors.edad && <span>{errors.edad.message}</span>}
+      
+      <button type="submit">Enviar</button>
+    </form>
+  );
+}`} lang="jsx" title="Validaciones" />
+
+---
+
+## ✅ 12.3 Validación personalizada
+
+### Función validate
+
+<Code code={`import { useForm } from 'react-hook-form';
+
+function FormularioCustom() {
+  const { register, handleSubmit, formState: { errors }, watch } = useForm();
+  
+  const password = watch("password");
+  
+  return (
+    <form onSubmit={handleSubmit(console.log)}>
+      {/* Validación personalizada simple */}
+      <input 
+        {...register("username", { 
+          validate: (value) => {
+            if (value.includes(" ")) {
+              return "No se permiten espacios";
+            }
+            if (value.length < 3) {
+              return "Mínimo 3 caracteres";
+            }
+            return true;
+          }
+        })} 
+      />
+      {errors.username && <span>{errors.username.message}</span>}
+      
+      {/* Múltiples validaciones */}
+      <input 
+        {...register("codigo", { 
+          validate: {
+            noEspacios: (v) => !v.includes(" ") || "Sin espacios",
+            soloNumeros: (v) => /^\d+$/.test(v) || "Solo números",
+            longitud: (v) => v.length === 6 || "Debe tener 6 dígitos"
+          }
+        })} 
+      />
+      {errors.codigo && <span>{errors.codigo.message}</span>}
+      
+      {/* Confirmar contraseña */}
+      <input 
+        type="password"
+        {...register("password")} 
+        placeholder="Contraseña"
+      />
+      
+      <input 
+        type="password"
+        {...register("confirmPassword", { 
+          validate: (value) => 
+            value === password || "Las contraseñas no coinciden"
+        })} 
+        placeholder="Confirmar contraseña"
+      />
+      {errors.confirmPassword && <span>{errors.confirmPassword.message}</span>}
+      
+      <button type="submit">Enviar</button>
+    </form>
+  );
+}`} lang="jsx" title="Validación personalizada" />
+
+### Validación asíncrona
+
+<Code code={`import { useForm } from 'react-hook-form';
+
+function FormularioAsync() {
+  const { register, handleSubmit, formState: { errors, isValidating } } = useForm({
+    mode: 'onBlur'  // Validar al salir del campo
+  });
+  
+  // Verificar si el email ya existe
+  const verificarEmail = async (email) => {
+    const response = await fetch(\`/api/check-email?email=\${email}\`);
+    const { exists } = await response.json();
+    return !exists || "Este email ya está registrado";
+  };
+  
+  return (
+    <form onSubmit={handleSubmit(console.log)}>
+      <input 
+        {...register("email", { 
+          required: "Email requerido",
+          validate: verificarEmail
+        })} 
+      />
+      {isValidating && <span>Verificando...</span>}
+      {errors.email && <span>{errors.email.message}</span>}
+      
+      <button type="submit">Registrar</button>
+    </form>
+  );
+}`} lang="jsx" title="Validación asíncrona" />
+
+---
+
+## 🎯 12.4 Yup para validación de esquemas
+
+### Instalación
+
+<Code code={`npm install yup @hookform/resolvers`} lang="bash" title="Instalar Yup" />
+
+### Esquema de validación
+
+<Code code={`import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
+// Definir esquema de validación
+const schema = yup.object({
+  nombre: yup
+    .string()
+    .required("El nombre es obligatorio")
+    .min(2, "Mínimo 2 caracteres"),
+  
+  email: yup
+    .string()
+    .required("El email es obligatorio")
+    .email("Email inválido"),
+  
+  edad: yup
+    .number()
+    .typeError("Debe ser un número")
+    .required("La edad es obligatoria")
+    .min(18, "Debes ser mayor de 18")
+    .max(100, "Edad máxima 100"),
+  
+  password: yup
+    .string()
+    .required("La contraseña es obligatoria")
+    .min(6, "Mínimo 6 caracteres")
+    .matches(/[A-Z]/, "Debe contener una mayúscula")
+    .matches(/[0-9]/, "Debe contener un número"),
+  
+  confirmPassword: yup
+    .string()
+    .required("Confirma tu contraseña")
+    .oneOf([yup.ref('password')], "Las contraseñas no coinciden")
+});
+
+function FormularioYup() {
+  const { 
+    register, 
+    handleSubmit, 
+    formState: { errors } 
+  } = useForm({
+    resolver: yupResolver(schema)
+  });
+  
+  const onSubmit = (data) => console.log(data);
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register("nombre")} placeholder="Nombre" />
+      {errors.nombre && <span>{errors.nombre.message}</span>}
+      
+      <input {...register("email")} placeholder="Email" />
+      {errors.email && <span>{errors.email.message}</span>}
+      
+      <input type="number" {...register("edad")} placeholder="Edad" />
+      {errors.edad && <span>{errors.edad.message}</span>}
+      
+      <input type="password" {...register("password")} placeholder="Contraseña" />
+      {errors.password && <span>{errors.password.message}</span>}
+      
+      <input type="password" {...register("confirmPassword")} placeholder="Confirmar" />
+      {errors.confirmPassword && <span>{errors.confirmPassword.message}</span>}
+      
+      <button type="submit">Registrar</button>
+    </form>
+  );
+}`} lang="jsx" title="Validación con Yup" />
+
+---
+
+## 🔧 12.5 Funciones útiles de React Hook Form
+
+### watch - Observar valores
+
+<Code code={`import { useForm } from 'react-hook-form';
+
+function FormularioWatch() {
+  const { register, watch } = useForm();
+  
+  // Observar un campo específico
+  const nombre = watch("nombre");
+  
+  // Observar múltiples campos
+  const [email, password] = watch(["email", "password"]);
+  
+  // Observar todos los campos
+  const todosLosCampos = watch();
+  
+  return (
+    <form>
+      <input {...register("nombre")} />
+      <p>Hola, {nombre || "visitante"}</p>
+      
+      <input {...register("email")} />
+      <input type="password" {...register("password")} />
+      
+      <pre>{JSON.stringify(todosLosCampos, null, 2)}</pre>
+    </form>
+  );
+}`} lang="jsx" title="watch" />
+
+### setValue y reset
+
+<Code code={`import { useForm } from 'react-hook-form';
+
+function FormularioSetValue() {
+  const { register, handleSubmit, setValue, reset } = useForm({
+    defaultValues: {
+      nombre: "",
+      email: ""
+    }
+  });
+  
+  // Establecer valor de un campo
+  const cargarDatos = () => {
+    setValue("nombre", "Juan");
+    setValue("email", "juan@mail.com");
+  };
+  
+  // Cargar datos de API
+  const cargarUsuario = async (id) => {
+    const response = await fetch(\`/api/usuarios/\${id}\`);
+    const usuario = await response.json();
+    
+    // Establecer múltiples valores
+    reset(usuario);
+    // O individualmente:
+    // setValue("nombre", usuario.nombre);
+    // setValue("email", usuario.email);
+  };
+  
+  // Limpiar formulario
+  const limpiar = () => {
+    reset();  // Vuelve a defaultValues
+  };
+  
+  return (
+    <form onSubmit={handleSubmit(console.log)}>
+      <input {...register("nombre")} />
+      <input {...register("email")} />
+      
+      <button type="button" onClick={cargarDatos}>Cargar datos</button>
+      <button type="button" onClick={limpiar}>Limpiar</button>
+      <button type="submit">Enviar</button>
+    </form>
+  );
+}`} lang="jsx" title="setValue y reset" />
+
+### Estados del formulario
+
+<Code code={`import { useForm } from 'react-hook-form';
+
+function FormularioEstados() {
+  const { 
+    register, 
+    handleSubmit, 
+    formState: { 
+      errors,
+      isSubmitting,    // Enviando
+      isValid,         // Sin errores
+      isDirty,         // Campos modificados
+      isSubmitted,     // Ya se envió
+      touchedFields,   // Campos tocados
+      dirtyFields      // Campos modificados
+    } 
+  } = useForm({ mode: 'onChange' });
+  
+  const onSubmit = async (data) => {
+    await new Promise(r => setTimeout(r, 2000));  // Simular delay
+    console.log(data);
+  };
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register("nombre", { required: true })} />
+      
+      <button 
+        type="submit" 
+        disabled={!isValid || isSubmitting}
+      >
+        {isSubmitting ? "Enviando..." : "Enviar"}
+      </button>
+      
+      {isDirty && <p>Has modificado el formulario</p>}
+      {isSubmitted && <p>Formulario enviado</p>}
+    </form>
+  );
+}`} lang="jsx" title="Estados del formulario" />
+
+---
+
+## 🎨 12.6 Componentes de input reutilizables
+
+### Input con error
+
+<Code code={`// components/Input.jsx
+import { forwardRef } from 'react';
+
+const Input = forwardRef(({ label, error, ...props }, ref) => {
+  return (
+    <div className="form-group">
+      {label && <label>{label}</label>}
+      <input 
+        ref={ref}
+        className={error ? "input-error" : ""}
+        {...props} 
+      />
+      {error && <span className="error-message">{error.message}</span>}
+    </div>
+  );
+});
+
+export default Input;`} lang="jsx" title="Componente Input" />
+
+### Uso del componente
+
+<Code code={`import { useForm } from 'react-hook-form';
+import Input from './components/Input';
+
+function Formulario() {
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  
+  return (
+    <form onSubmit={handleSubmit(console.log)}>
+      <Input
+        label="Nombre"
+        error={errors.nombre}
+        {...register("nombre", { required: "Campo requerido" })}
+      />
+      
+      <Input
+        label="Email"
+        type="email"
+        error={errors.email}
+        {...register("email", { 
+          required: "Campo requerido",
+          pattern: {
+            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+            message: "Email inválido"
+          }
+        })}
+      />
+      
+      <button type="submit">Enviar</button>
+    </form>
+  );
+}`} lang="jsx" title="Uso del componente Input" />
+
+---
+
+## 📋 12.7 Formulario completo
+
+### Ejemplo de registro
+
+<Code code={`import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+
+const schema = yup.object({
+  nombre: yup.string().required("Requerido").min(2, "Mínimo 2 caracteres"),
+  email: yup.string().required("Requerido").email("Email inválido"),
+  password: yup.string().required("Requerido").min(6, "Mínimo 6 caracteres"),
+  confirmPassword: yup.string()
+    .required("Requerido")
+    .oneOf([yup.ref('password')], "No coinciden"),
+  terminos: yup.boolean().oneOf([true], "Debes aceptar los términos")
+});
+
+function FormularioRegistro() {
+  const { 
+    register, 
+    handleSubmit, 
+    formState: { errors, isSubmitting },
+    reset
+  } = useForm({
+    resolver: yupResolver(schema)
+  });
+  
+  const onSubmit = async (data) => {
+    try {
+      const response = await fetch('/api/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      if (response.ok) {
+        alert('Registro exitoso!');
+        reset();
+      }
+    } catch (error) {
+      alert('Error al registrar');
+    }
+  };
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="form-registro">
+      <div className="form-group">
+        <label>Nombre</label>
+        <input {...register("nombre")} />
+        {errors.nombre && <span className="error">{errors.nombre.message}</span>}
+      </div>
+      
+      <div className="form-group">
+        <label>Email</label>
+        <input type="email" {...register("email")} />
+        {errors.email && <span className="error">{errors.email.message}</span>}
+      </div>
+      
+      <div className="form-group">
+        <label>Contraseña</label>
+        <input type="password" {...register("password")} />
+        {errors.password && <span className="error">{errors.password.message}</span>}
+      </div>
+      
+      <div className="form-group">
+        <label>Confirmar Contraseña</label>
+        <input type="password" {...register("confirmPassword")} />
+        {errors.confirmPassword && <span className="error">{errors.confirmPassword.message}</span>}
+      </div>
+      
+      <div className="form-group checkbox">
+        <input type="checkbox" {...register("terminos")} />
+        <label>Acepto los términos y condiciones</label>
+        {errors.terminos && <span className="error">{errors.terminos.message}</span>}
+      </div>
+      
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? 'Registrando...' : 'Registrar'}
+      </button>
+    </form>
+  );
+}`} lang="jsx" title="Formulario de registro completo" />
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- **React Hook Form** reduce código y mejora rendimiento
+- **register** conecta inputs al formulario
+- **handleSubmit** maneja el envío con validación
+- **formState** contiene errors, isSubmitting, isValid, etc.
+- **watch** observa valores en tiempo real
+- **setValue** y **reset** manipulan valores
+- **Yup** permite esquemas de validación declarativos
+- Crear **componentes reutilizables** para inputs
+</Aside>

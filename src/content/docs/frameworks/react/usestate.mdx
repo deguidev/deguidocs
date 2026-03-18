@@ -1,0 +1,511 @@
+---
+title: 5. Estado en React (useState)
+description: Concepto de estado, hook useState, actualización correcta del estado
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🔄 5.1 Concepto de estado (state)
+
+### ¿Qué es el estado?
+
+El **estado** (state) es un objeto que contiene datos que pueden cambiar durante la vida de un componente. Cuando el estado cambia, React re-renderiza el componente automáticamente.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Reactivo** | Cambios en el estado actualizan la UI |
+| **Local** | Cada componente tiene su propio estado |
+| **Mutable** | Se puede modificar (a diferencia de props) |
+| **Persistente** | Se mantiene entre renders |
+
+### Estado vs Variables normales
+
+<Code code={`// ❌ Variable normal - NO funciona
+function Contador() {
+  let contador = 0;
+  
+  const incrementar = () => {
+    contador++;  // Cambia, pero React no lo sabe
+    console.log(contador);  // Muestra el valor correcto
+  };
+  
+  return (
+    <div>
+      <p>Valor: {contador}</p>  {/* Siempre muestra 0 */}
+      <button onClick={incrementar}>+1</button>
+    </div>
+  );
+}
+
+// ✅ Estado con useState - FUNCIONA
+import { useState } from 'react';
+
+function Contador() {
+  const [contador, setContador] = useState(0);
+  
+  const incrementar = () => {
+    setContador(contador + 1);  // React detecta el cambio
+  };
+  
+  return (
+    <div>
+      <p>Valor: {contador}</p>  {/* Se actualiza automáticamente */}
+      <button onClick={incrementar}>+1</button>
+    </div>
+  );
+}`} lang="jsx" title="Estado vs variables" />
+
+### ¿Cuándo usar estado?
+
+| Usar estado | No usar estado |
+|-------------|----------------|
+| Datos que cambian | Datos constantes |
+| Inputs de formulario | Props recibidas |
+| Contadores | Cálculos derivados |
+| Datos de API | Valores estáticos |
+| Toggle (mostrar/ocultar) | Configuración fija |
+
+---
+
+## 🪝 5.2 Hook useState
+
+### Sintaxis de useState
+
+<Code code={`import { useState } from 'react';
+
+function MiComponente() {
+  // Sintaxis: const [valor, setValor] = useState(valorInicial);
+  const [contador, setContador] = useState(0);
+  
+  //    ↑            ↑                    ↑
+  //  valor      función para         valor
+  //  actual     actualizar           inicial
+  
+  return <p>{contador}</p>;
+}`} lang="jsx" title="Sintaxis de useState" />
+
+### Anatomía de useState
+
+<Code code={`// useState retorna un array con 2 elementos:
+const resultado = useState(0);
+const valor = resultado[0];      // El valor actual
+const setValor = resultado[1];   // La función para actualizarlo
+
+// Usando desestructuración (forma común):
+const [valor, setValor] = useState(0);
+
+// Ejemplos de nombres:
+const [nombre, setNombre] = useState("");
+const [edad, setEdad] = useState(18);
+const [activo, setActivo] = useState(true);
+const [items, setItems] = useState([]);
+const [usuario, setUsuario] = useState(null);`} lang="jsx" title="Anatomía de useState" />
+
+### Múltiples estados
+
+<Code code={`function Formulario() {
+  // Puedes tener múltiples estados
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  const [edad, setEdad] = useState(0);
+  const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  
+  return (
+    <form>
+      <input 
+        value={nombre} 
+        onChange={(e) => setNombre(e.target.value)} 
+      />
+      <input 
+        value={email} 
+        onChange={(e) => setEmail(e.target.value)} 
+      />
+      <input 
+        type="number"
+        value={edad} 
+        onChange={(e) => setEdad(Number(e.target.value))} 
+      />
+      <input 
+        type="checkbox"
+        checked={aceptaTerminos}
+        onChange={(e) => setAceptaTerminos(e.target.checked)}
+      />
+    </form>
+  );
+}`} lang="jsx" title="Múltiples estados" />
+
+---
+
+## 🎯 5.3 Inicialización del estado
+
+### Valores iniciales
+
+<Code code={`// String vacío
+const [texto, setTexto] = useState("");
+
+// Número
+const [contador, setContador] = useState(0);
+
+// Booleano
+const [visible, setVisible] = useState(true);
+
+// Array vacío
+const [lista, setLista] = useState([]);
+
+// Array con datos
+const [frutas, setFrutas] = useState(["Manzana", "Banana"]);
+
+// Objeto
+const [usuario, setUsuario] = useState({
+  nombre: "",
+  email: "",
+  edad: 0
+});
+
+// null (para datos que vendrán después)
+const [datos, setDatos] = useState(null);`} lang="jsx" title="Valores iniciales" />
+
+### Inicialización perezosa (lazy)
+
+<Code code={`// ❌ Se ejecuta en CADA render (ineficiente)
+const [datos, setDatos] = useState(calcularDatosComplejos());
+
+// ✅ Se ejecuta solo en el PRIMER render (eficiente)
+const [datos, setDatos] = useState(() => calcularDatosComplejos());
+
+// Ejemplo práctico
+function App() {
+  // Leer de localStorage solo una vez
+  const [tema, setTema] = useState(() => {
+    const guardado = localStorage.getItem('tema');
+    return guardado || 'claro';
+  });
+  
+  return <div className={tema}>...</div>;
+}`} lang="jsx" title="Inicialización lazy" />
+
+---
+
+## ✏️ 5.4 Actualización del estado correctamente
+
+### Actualización básica
+
+<Code code={`function Contador() {
+  const [count, setCount] = useState(0);
+  
+  return (
+    <div>
+      <p>Contador: {count}</p>
+      
+      {/* Actualización directa */}
+      <button onClick={() => setCount(count + 1)}>+1</button>
+      <button onClick={() => setCount(count - 1)}>-1</button>
+      <button onClick={() => setCount(0)}>Reset</button>
+    </div>
+  );
+}`} lang="jsx" title="Actualización básica" />
+
+### Actualización funcional (recomendada)
+
+<Code code={`// ❌ Puede causar problemas con actualizaciones rápidas
+const incrementar = () => {
+  setCount(count + 1);
+  setCount(count + 1);  // Ambos usan el mismo valor de count
+  // Resultado: solo incrementa 1
+};
+
+// ✅ Actualización funcional - siempre usa el valor más reciente
+const incrementar = () => {
+  setCount(prev => prev + 1);
+  setCount(prev => prev + 1);  // Usa el valor actualizado
+  // Resultado: incrementa 2
+};
+
+// Ejemplo completo
+function Contador() {
+  const [count, setCount] = useState(0);
+  
+  const incrementar = () => setCount(prev => prev + 1);
+  const decrementar = () => setCount(prev => prev - 1);
+  const duplicar = () => setCount(prev => prev * 2);
+  
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={incrementar}>+1</button>
+      <button onClick={decrementar}>-1</button>
+      <button onClick={duplicar}>x2</button>
+    </div>
+  );
+}`} lang="jsx" title="Actualización funcional" />
+
+<Aside type="tip">
+Usa la forma funcional `setEstado(prev => ...)` cuando el nuevo valor depende del anterior. Es más seguro y evita bugs.
+</Aside>
+
+---
+
+## 📦 5.5 Estado con objetos
+
+### Actualizar objetos correctamente
+
+<Code code={`function Perfil() {
+  const [usuario, setUsuario] = useState({
+    nombre: "Ana",
+    email: "ana@mail.com",
+    edad: 25
+  });
+  
+  // ❌ MAL - Muta el objeto directamente
+  const cambiarNombre = (nuevoNombre) => {
+    usuario.nombre = nuevoNombre;  // No funciona
+    setUsuario(usuario);
+  };
+  
+  // ✅ BIEN - Crea un nuevo objeto con spread
+  const cambiarNombre = (nuevoNombre) => {
+    setUsuario({
+      ...usuario,           // Copia todas las propiedades
+      nombre: nuevoNombre   // Sobrescribe solo nombre
+    });
+  };
+  
+  // ✅ BIEN - Forma funcional
+  const cambiarEmail = (nuevoEmail) => {
+    setUsuario(prev => ({
+      ...prev,
+      email: nuevoEmail
+    }));
+  };
+  
+  return (
+    <div>
+      <p>Nombre: {usuario.nombre}</p>
+      <p>Email: {usuario.email}</p>
+      <input 
+        value={usuario.nombre}
+        onChange={(e) => cambiarNombre(e.target.value)}
+      />
+    </div>
+  );
+}`} lang="jsx" title="Estado con objetos" />
+
+### Objetos anidados
+
+<Code code={`function Formulario() {
+  const [datos, setDatos] = useState({
+    personal: {
+      nombre: "",
+      edad: 0
+    },
+    direccion: {
+      calle: "",
+      ciudad: ""
+    }
+  });
+  
+  // Actualizar propiedad anidada
+  const cambiarNombre = (nombre) => {
+    setDatos(prev => ({
+      ...prev,
+      personal: {
+        ...prev.personal,
+        nombre: nombre
+      }
+    }));
+  };
+  
+  const cambiarCiudad = (ciudad) => {
+    setDatos(prev => ({
+      ...prev,
+      direccion: {
+        ...prev.direccion,
+        ciudad: ciudad
+      }
+    }));
+  };
+  
+  return (
+    <form>
+      <input 
+        placeholder="Nombre"
+        value={datos.personal.nombre}
+        onChange={(e) => cambiarNombre(e.target.value)}
+      />
+      <input 
+        placeholder="Ciudad"
+        value={datos.direccion.ciudad}
+        onChange={(e) => cambiarCiudad(e.target.value)}
+      />
+    </form>
+  );
+}`} lang="jsx" title="Objetos anidados" />
+
+---
+
+## 📋 5.6 Estado con arrays
+
+### Operaciones comunes con arrays
+
+<Code code={`function ListaTareas() {
+  const [tareas, setTareas] = useState([
+    { id: 1, texto: "Aprender React", completada: false },
+    { id: 2, texto: "Hacer ejercicio", completada: true }
+  ]);
+  
+  // AGREGAR elemento
+  const agregarTarea = (texto) => {
+    const nuevaTarea = {
+      id: Date.now(),
+      texto: texto,
+      completada: false
+    };
+    setTareas(prev => [...prev, nuevaTarea]);
+  };
+  
+  // ELIMINAR elemento
+  const eliminarTarea = (id) => {
+    setTareas(prev => prev.filter(tarea => tarea.id !== id));
+  };
+  
+  // ACTUALIZAR elemento
+  const toggleCompletada = (id) => {
+    setTareas(prev => prev.map(tarea => 
+      tarea.id === id 
+        ? { ...tarea, completada: !tarea.completada }
+        : tarea
+    ));
+  };
+  
+  // EDITAR texto de elemento
+  const editarTarea = (id, nuevoTexto) => {
+    setTareas(prev => prev.map(tarea =>
+      tarea.id === id
+        ? { ...tarea, texto: nuevoTexto }
+        : tarea
+    ));
+  };
+  
+  return (
+    <ul>
+      {tareas.map(tarea => (
+        <li key={tarea.id}>
+          <span style={{ 
+            textDecoration: tarea.completada ? 'line-through' : 'none' 
+          }}>
+            {tarea.texto}
+          </span>
+          <button onClick={() => toggleCompletada(tarea.id)}>
+            {tarea.completada ? '↩️' : '✅'}
+          </button>
+          <button onClick={() => eliminarTarea(tarea.id)}>🗑️</button>
+        </li>
+      ))}
+    </ul>
+  );
+}`} lang="jsx" title="Operaciones con arrays" />
+
+### Resumen de operaciones
+
+| Operación | Método | Ejemplo |
+|-----------|--------|---------|
+| Agregar al final | spread + nuevo | `[...arr, nuevo]` |
+| Agregar al inicio | nuevo + spread | `[nuevo, ...arr]` |
+| Eliminar | filter | `arr.filter(x => x.id !== id)` |
+| Actualizar | map | `arr.map(x => x.id === id ? {...x, prop: val} : x)` |
+| Reemplazar todo | asignar nuevo | `setArr(nuevoArray)` |
+
+---
+
+## ✅ 5.7 Buenas prácticas con estado
+
+### Mantener el estado mínimo
+
+<Code code={`// ❌ MAL - Estado redundante
+function Carrito() {
+  const [items, setItems] = useState([]);
+  const [total, setTotal] = useState(0);      // Redundante
+  const [cantidad, setCantidad] = useState(0); // Redundante
+  
+  // Hay que mantener sincronizados manualmente
+}
+
+// ✅ BIEN - Calcular valores derivados
+function Carrito() {
+  const [items, setItems] = useState([]);
+  
+  // Valores derivados (se calculan automáticamente)
+  const total = items.reduce((sum, item) => sum + item.precio, 0);
+  const cantidad = items.length;
+  
+  return (
+    <div>
+      <p>Items: {cantidad}</p>
+      <p>Total: \${total}</p>
+    </div>
+  );
+}`} lang="jsx" title="Estado mínimo" />
+
+### Agrupar estado relacionado
+
+<Code code={`// ❌ Muchos estados separados para datos relacionados
+const [x, setX] = useState(0);
+const [y, setY] = useState(0);
+
+// ✅ Un objeto para datos relacionados
+const [posicion, setPosicion] = useState({ x: 0, y: 0 });
+
+// Actualizar
+setPosicion({ x: 100, y: 200 });`} lang="jsx" title="Agrupar estado" />
+
+### Evitar estado duplicado
+
+<Code code={`// ❌ MAL - Duplicar datos de props en estado
+function Perfil({ usuario }) {
+  const [nombre, setNombre] = useState(usuario.nombre);
+  // Si usuario cambia, nombre no se actualiza
+}
+
+// ✅ BIEN - Usar props directamente
+function Perfil({ usuario }) {
+  return <h1>{usuario.nombre}</h1>;
+}
+
+// ✅ Si necesitas editar, usa un estado temporal
+function PerfilEditable({ usuario, onGuardar }) {
+  const [nombreEditado, setNombreEditado] = useState(usuario.nombre);
+  
+  const guardar = () => {
+    onGuardar(nombreEditado);
+  };
+  
+  return (
+    <div>
+      <input 
+        value={nombreEditado}
+        onChange={(e) => setNombreEditado(e.target.value)}
+      />
+      <button onClick={guardar}>Guardar</button>
+    </div>
+  );
+}`} lang="jsx" title="Evitar duplicación" />
+
+<Aside type="caution">
+El estado es **asíncrono**. Si necesitas el valor actualizado inmediatamente después de `setState`, usa la forma funcional o `useEffect`.
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- El **estado** son datos que cambian y actualizan la UI
+- **useState** retorna `[valor, setValor]`
+- Usa **inicialización lazy** para cálculos costosos
+- Prefiere la **actualización funcional** `prev => ...`
+- Con **objetos**: usa spread `{...obj, prop: valor}`
+- Con **arrays**: usa `map`, `filter`, spread
+- Mantén el estado **mínimo** y evita duplicaciones
+</Aside>

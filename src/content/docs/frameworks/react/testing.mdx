@@ -1,0 +1,481 @@
+---
+title: 15. Testing en React
+description: Introducción a testing, Jest, React Testing Library y buenas prácticas
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🧪 15.1 Introducción al testing
+
+### ¿Por qué hacer testing?
+
+| Beneficio | Descripción |
+|-----------|-------------|
+| **Confianza** | Cambios sin miedo a romper funcionalidad |
+| **Documentación** | Tests describen el comportamiento esperado |
+| **Refactoring** | Modificar código con seguridad |
+| **Bugs** | Detectar errores antes de producción |
+
+### Tipos de tests
+
+| Tipo | Qué prueba | Herramientas |
+|------|------------|--------------|
+| **Unitarios** | Funciones/componentes aislados | Jest, Vitest |
+| **Integración** | Interacción entre componentes | React Testing Library |
+| **E2E** | Flujo completo del usuario | Cypress, Playwright |
+
+---
+
+## ⚙️ 15.2 Configuración con Vitest
+
+### Instalación
+
+<Code code={`npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom`} lang="bash" title="Instalar dependencias" />
+
+### Configuración
+
+<Code code={`// vite.config.js
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.js',
+  },
+});`} lang="js" title="vite.config.js" />
+
+<Code code={`// src/test/setup.js
+import '@testing-library/jest-dom';`} lang="js" title="setup.js" />
+
+<Code code={`// package.json
+{
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
+  }
+}`} lang="json" title="Scripts de test" />
+
+---
+
+## 📝 15.3 Primer test
+
+### Estructura básica
+
+<Code code={`// src/components/Saludo.jsx
+function Saludo({ nombre }) {
+  return <h1>Hola, {nombre}!</h1>;
+}
+
+export default Saludo;`} lang="jsx" title="Componente a testear" />
+
+<Code code={`// src/components/Saludo.test.jsx
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import Saludo from './Saludo';
+
+describe('Saludo', () => {
+  it('muestra el nombre correctamente', () => {
+    // Arrange: preparar
+    render(<Saludo nombre="Juan" />);
+    
+    // Act: actuar (en este caso, solo renderizar)
+    
+    // Assert: verificar
+    expect(screen.getByText('Hola, Juan!')).toBeInTheDocument();
+  });
+  
+  it('muestra diferentes nombres', () => {
+    render(<Saludo nombre="María" />);
+    expect(screen.getByText('Hola, María!')).toBeInTheDocument();
+  });
+});`} lang="jsx" title="Saludo.test.jsx" />
+
+### Ejecutar tests
+
+<Code code={`# Ejecutar todos los tests
+npm test
+
+# Modo watch (re-ejecuta al guardar)
+npm test -- --watch
+
+# Ver cobertura
+npm run test:coverage`} lang="bash" title="Comandos" />
+
+---
+
+## 🔍 15.4 Queries de Testing Library
+
+### Tipos de queries
+
+| Query | Uso | Falla si no encuentra |
+|-------|-----|----------------------|
+| `getBy` | Elemento existe | ✅ Sí |
+| `queryBy` | Elemento puede no existir | ❌ No (retorna null) |
+| `findBy` | Elemento aparece async | ✅ Sí (Promise) |
+
+### Selectores comunes
+
+<Code code={`import { render, screen } from '@testing-library/react';
+
+function MiComponente() {
+  return (
+    <div>
+      <h1>Título</h1>
+      <button>Enviar</button>
+      <input placeholder="Email" />
+      <img alt="Logo" src="/logo.png" />
+      <p data-testid="mensaje">Hola mundo</p>
+    </div>
+  );
+}
+
+// Tests
+render(<MiComponente />);
+
+// Por texto
+screen.getByText('Título');
+screen.getByText(/título/i);  // Regex, case insensitive
+
+// Por rol (accesibilidad)
+screen.getByRole('button', { name: 'Enviar' });
+screen.getByRole('heading', { level: 1 });
+
+// Por placeholder
+screen.getByPlaceholderText('Email');
+
+// Por alt text
+screen.getByAltText('Logo');
+
+// Por test-id (último recurso)
+screen.getByTestId('mensaje');
+
+// Query (no falla si no existe)
+const boton = screen.queryByText('No existe');
+expect(boton).toBeNull();`} lang="jsx" title="Selectores" />
+
+### Prioridad de selectores
+
+<Aside type="tip">
+**Orden de preferencia:**
+1. `getByRole` - Mejor para accesibilidad
+2. `getByLabelText` - Para inputs con label
+3. `getByPlaceholderText` - Para inputs
+4. `getByText` - Para contenido de texto
+5. `getByTestId` - Último recurso
+</Aside>
+
+---
+
+## 🖱️ 15.5 Eventos de usuario
+
+### userEvent
+
+<Code code={`npm install -D @testing-library/user-event`} lang="bash" title="Instalar userEvent" />
+
+<Code code={`import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+
+// Componente
+function Contador() {
+  const [count, setCount] = useState(0);
+  return (
+    <div>
+      <p>Contador: {count}</p>
+      <button onClick={() => setCount(c => c + 1)}>Incrementar</button>
+    </div>
+  );
+}
+
+// Test
+describe('Contador', () => {
+  it('incrementa al hacer click', async () => {
+    const user = userEvent.setup();
+    render(<Contador />);
+    
+    // Verificar estado inicial
+    expect(screen.getByText('Contador: 0')).toBeInTheDocument();
+    
+    // Simular click
+    await user.click(screen.getByRole('button', { name: 'Incrementar' }));
+    
+    // Verificar cambio
+    expect(screen.getByText('Contador: 1')).toBeInTheDocument();
+  });
+});`} lang="jsx" title="Click events" />
+
+### Formularios
+
+<Code code={`import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+function Formulario({ onSubmit }) {
+  const [email, setEmail] = useState('');
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit({ email });
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+      />
+      <button type="submit">Enviar</button>
+    </form>
+  );
+}
+
+describe('Formulario', () => {
+  it('envía los datos correctamente', async () => {
+    const user = userEvent.setup();
+    const handleSubmit = vi.fn();  // Mock function
+    
+    render(<Formulario onSubmit={handleSubmit} />);
+    
+    // Escribir en input
+    await user.type(
+      screen.getByPlaceholderText('Email'),
+      'test@example.com'
+    );
+    
+    // Enviar formulario
+    await user.click(screen.getByRole('button', { name: 'Enviar' }));
+    
+    // Verificar que se llamó con los datos correctos
+    expect(handleSubmit).toHaveBeenCalledWith({
+      email: 'test@example.com'
+    });
+  });
+});`} lang="jsx" title="Test de formulario" />
+
+---
+
+## ⏳ 15.6 Tests asíncronos
+
+### findBy para elementos async
+
+<Code code={`import { render, screen } from '@testing-library/react';
+
+function ListaUsuarios() {
+  const [usuarios, setUsuarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetch('/api/usuarios')
+      .then(res => res.json())
+      .then(data => {
+        setUsuarios(data);
+        setLoading(false);
+      });
+  }, []);
+  
+  if (loading) return <p>Cargando...</p>;
+  
+  return (
+    <ul>
+      {usuarios.map(u => <li key={u.id}>{u.nombre}</li>)}
+    </ul>
+  );
+}
+
+describe('ListaUsuarios', () => {
+  it('muestra usuarios después de cargar', async () => {
+    // Mock del fetch
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve([
+          { id: 1, nombre: 'Juan' },
+          { id: 2, nombre: 'María' }
+        ])
+      })
+    );
+    
+    render(<ListaUsuarios />);
+    
+    // Verificar loading
+    expect(screen.getByText('Cargando...')).toBeInTheDocument();
+    
+    // Esperar a que aparezcan los usuarios (findBy es async)
+    expect(await screen.findByText('Juan')).toBeInTheDocument();
+    expect(screen.getByText('María')).toBeInTheDocument();
+    
+    // Verificar que loading desapareció
+    expect(screen.queryByText('Cargando...')).not.toBeInTheDocument();
+  });
+});`} lang="jsx" title="Test asíncrono" />
+
+### waitFor para condiciones
+
+<Code code={`import { render, screen, waitFor } from '@testing-library/react';
+
+it('actualiza después de un delay', async () => {
+  render(<ComponenteConDelay />);
+  
+  // Esperar hasta que se cumpla la condición
+  await waitFor(() => {
+    expect(screen.getByText('Completado')).toBeInTheDocument();
+  }, { timeout: 3000 });
+});`} lang="jsx" title="waitFor" />
+
+---
+
+## 🎭 15.7 Mocks
+
+### Mock de funciones
+
+<Code code={`import { vi } from 'vitest';
+
+// Crear mock
+const mockFn = vi.fn();
+
+// Mock con valor de retorno
+const mockConRetorno = vi.fn().mockReturnValue(42);
+
+// Mock con implementación
+const mockConImpl = vi.fn((x) => x * 2);
+
+// Verificaciones
+expect(mockFn).toHaveBeenCalled();
+expect(mockFn).toHaveBeenCalledTimes(2);
+expect(mockFn).toHaveBeenCalledWith('argumento');`} lang="jsx" title="Mock de funciones" />
+
+### Mock de módulos
+
+<Code code={`// Mock de un módulo completo
+vi.mock('./api', () => ({
+  fetchUsuarios: vi.fn(() => Promise.resolve([
+    { id: 1, nombre: 'Test' }
+  ]))
+}));
+
+// Mock de fetch global
+global.fetch = vi.fn();
+
+beforeEach(() => {
+  fetch.mockResolvedValue({
+    ok: true,
+    json: () => Promise.resolve({ data: 'test' })
+  });
+});
+
+afterEach(() => {
+  vi.clearAllMocks();
+});`} lang="jsx" title="Mock de módulos" />
+
+---
+
+## ✅ 15.8 Buenas prácticas
+
+### Qué testear
+
+<Code code={`// ✅ TESTEAR:
+// - Renderizado correcto con diferentes props
+// - Interacciones del usuario (clicks, inputs)
+// - Estados condicionales (loading, error, vacío)
+// - Llamadas a funciones callback
+// - Integración con APIs
+
+// ❌ NO TESTEAR:
+// - Detalles de implementación
+// - Estilos CSS
+// - Librerías de terceros
+// - Código que no escribiste`} lang="jsx" title="Qué testear" />
+
+### Estructura de tests
+
+<Code code={`describe('NombreComponente', () => {
+  // Setup común
+  beforeEach(() => {
+    // Preparar mocks, etc.
+  });
+  
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+  
+  describe('renderizado', () => {
+    it('muestra el título', () => {});
+    it('muestra el contenido inicial', () => {});
+  });
+  
+  describe('interacciones', () => {
+    it('responde al click', async () => {});
+    it('actualiza al escribir', async () => {});
+  });
+  
+  describe('estados', () => {
+    it('muestra loading mientras carga', () => {});
+    it('muestra error si falla', () => {});
+  });
+});`} lang="jsx" title="Estructura recomendada" />
+
+### Ejemplo completo
+
+<Code code={`// TodoList.test.jsx
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+import TodoList from './TodoList';
+
+describe('TodoList', () => {
+  it('agrega una nueva tarea', async () => {
+    const user = userEvent.setup();
+    render(<TodoList />);
+    
+    // Escribir tarea
+    const input = screen.getByPlaceholderText('Nueva tarea');
+    await user.type(input, 'Aprender testing');
+    
+    // Agregar
+    await user.click(screen.getByRole('button', { name: 'Agregar' }));
+    
+    // Verificar que aparece
+    expect(screen.getByText('Aprender testing')).toBeInTheDocument();
+    
+    // Verificar que input se limpió
+    expect(input).toHaveValue('');
+  });
+  
+  it('marca tarea como completada', async () => {
+    const user = userEvent.setup();
+    render(<TodoList initialTodos={[{ id: 1, text: 'Test', done: false }]} />);
+    
+    const checkbox = screen.getByRole('checkbox');
+    await user.click(checkbox);
+    
+    expect(checkbox).toBeChecked();
+  });
+  
+  it('elimina una tarea', async () => {
+    const user = userEvent.setup();
+    render(<TodoList initialTodos={[{ id: 1, text: 'Test', done: false }]} />);
+    
+    await user.click(screen.getByRole('button', { name: 'Eliminar' }));
+    
+    expect(screen.queryByText('Test')).not.toBeInTheDocument();
+  });
+});`} lang="jsx" title="Test completo" />
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- **Vitest** + **React Testing Library** para tests en React
+- Usar **queries** (getBy, queryBy, findBy) para encontrar elementos
+- Simular **eventos de usuario** con userEvent
+- Manejar **tests asíncronos** con findBy y waitFor
+- Crear **mocks** de funciones y módulos
+- **Buenas prácticas**: testear comportamiento, no implementación
+</Aside>

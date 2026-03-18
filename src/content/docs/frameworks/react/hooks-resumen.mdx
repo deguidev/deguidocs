@@ -1,0 +1,513 @@
+---
+title: 16. Resumen de Hooks
+description: Referencia rápida de todos los Hooks de React y cuándo usarlos
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 📚 16.1 Tabla de referencia rápida
+
+| Hook | Propósito | Uso común |
+|------|-----------|-----------|
+| `useState` | Estado local | Formularios, toggles, contadores |
+| `useEffect` | Efectos secundarios | Fetch, suscripciones, DOM |
+| `useContext` | Consumir contexto | Tema, auth, idioma |
+| `useRef` | Referencias mutables | DOM, valores sin re-render |
+| `useMemo` | Memorizar valores | Cálculos costosos |
+| `useCallback` | Memorizar funciones | Callbacks en props |
+| `useReducer` | Estado complejo | Múltiples acciones |
+| `useLayoutEffect` | Efecto síncrono | Mediciones DOM |
+| `useId` | IDs únicos | Accesibilidad |
+
+---
+
+## 🔄 16.2 useState
+
+### Sintaxis
+
+<Code code={`const [estado, setEstado] = useState(valorInicial);`} lang="jsx" title="Sintaxis" />
+
+### Ejemplos
+
+<Code code={`import { useState } from 'react';
+
+// Valor primitivo
+const [count, setCount] = useState(0);
+setCount(count + 1);
+setCount(prev => prev + 1);  // Actualización funcional
+
+// Objeto
+const [user, setUser] = useState({ name: '', email: '' });
+setUser({ ...user, name: 'Juan' });  // Spread para actualizar
+
+// Array
+const [items, setItems] = useState([]);
+setItems([...items, nuevoItem]);  // Agregar
+setItems(items.filter(i => i.id !== id));  // Eliminar
+
+// Inicialización lazy (costosa)
+const [data, setData] = useState(() => {
+  return calcularValorInicial();
+});`} lang="jsx" title="useState ejemplos" />
+
+---
+
+## ⚡ 16.3 useEffect
+
+### Sintaxis
+
+<Code code={`useEffect(() => {
+  // Efecto
+  return () => {
+    // Cleanup (opcional)
+  };
+}, [dependencias]);`} lang="jsx" title="Sintaxis" />
+
+### Patrones comunes
+
+<Code code={`import { useEffect } from 'react';
+
+// Ejecutar una vez al montar
+useEffect(() => {
+  console.log('Componente montado');
+}, []);
+
+// Ejecutar cuando cambia una dependencia
+useEffect(() => {
+  console.log('userId cambió:', userId);
+}, [userId]);
+
+// Con cleanup
+useEffect(() => {
+  const timer = setInterval(() => {}, 1000);
+  return () => clearInterval(timer);
+}, []);
+
+// Fetch de datos
+useEffect(() => {
+  const fetchData = async () => {
+    const res = await fetch('/api/data');
+    const data = await res.json();
+    setData(data);
+  };
+  fetchData();
+}, []);`} lang="jsx" title="useEffect patrones" />
+
+---
+
+## 🌐 16.4 useContext
+
+### Sintaxis
+
+<Code code={`// Crear contexto
+const MiContexto = createContext(valorDefault);
+
+// Proveer
+<MiContexto.Provider value={valor}>
+  {children}
+</MiContexto.Provider>
+
+// Consumir
+const valor = useContext(MiContexto);`} lang="jsx" title="Sintaxis" />
+
+### Ejemplo completo
+
+<Code code={`import { createContext, useContext, useState } from 'react';
+
+// 1. Crear contexto
+const TemaContext = createContext();
+
+// 2. Provider
+function TemaProvider({ children }) {
+  const [tema, setTema] = useState('claro');
+  const toggle = () => setTema(t => t === 'claro' ? 'oscuro' : 'claro');
+  
+  return (
+    <TemaContext.Provider value={{ tema, toggle }}>
+      {children}
+    </TemaContext.Provider>
+  );
+}
+
+// 3. Hook personalizado
+function useTema() {
+  return useContext(TemaContext);
+}
+
+// 4. Uso
+function Boton() {
+  const { tema, toggle } = useTema();
+  return <button onClick={toggle}>Tema: {tema}</button>;
+}`} lang="jsx" title="useContext ejemplo" />
+
+---
+
+## 📌 16.5 useRef
+
+### Sintaxis
+
+<Code code={`const ref = useRef(valorInicial);
+// Acceder: ref.current
+// Modificar: ref.current = nuevoValor (no causa re-render)`} lang="jsx" title="Sintaxis" />
+
+### Usos comunes
+
+<Code code={`import { useRef, useEffect } from 'react';
+
+// Referencia a elemento DOM
+function Input() {
+  const inputRef = useRef(null);
+  
+  const enfocar = () => {
+    inputRef.current.focus();
+  };
+  
+  return <input ref={inputRef} />;
+}
+
+// Guardar valor anterior
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
+}
+
+// Contador de renders (sin causar re-render)
+function Componente() {
+  const renderCount = useRef(0);
+  renderCount.current++;
+  console.log('Renders:', renderCount.current);
+}
+
+// Guardar timer
+function Timer() {
+  const timerRef = useRef(null);
+  
+  const iniciar = () => {
+    timerRef.current = setInterval(() => {}, 1000);
+  };
+  
+  const detener = () => {
+    clearInterval(timerRef.current);
+  };
+}`} lang="jsx" title="useRef ejemplos" />
+
+---
+
+## 🧮 16.6 useMemo
+
+### Sintaxis
+
+<Code code={`const valorMemorizado = useMemo(() => {
+  return calcularValor(dependencia);
+}, [dependencia]);`} lang="jsx" title="Sintaxis" />
+
+### Cuándo usar
+
+<Code code={`import { useMemo } from 'react';
+
+// ✅ Cálculo costoso
+function Lista({ items, filtro }) {
+  const itemsFiltrados = useMemo(() => {
+    return items.filter(item => 
+      item.nombre.toLowerCase().includes(filtro.toLowerCase())
+    );
+  }, [items, filtro]);
+  
+  return <ul>{itemsFiltrados.map(i => <li key={i.id}>{i.nombre}</li>)}</ul>;
+}
+
+// ✅ Objeto/array como prop (evita re-renders)
+function Padre() {
+  const config = useMemo(() => ({
+    theme: 'dark',
+    size: 'large'
+  }), []);
+  
+  return <Hijo config={config} />;
+}
+
+// ❌ NO usar para valores simples
+const doble = useMemo(() => count * 2, [count]);  // Innecesario`} lang="jsx" title="useMemo ejemplos" />
+
+---
+
+## 🔗 16.7 useCallback
+
+### Sintaxis
+
+<Code code={`const funcionMemorizada = useCallback(() => {
+  // hacer algo
+}, [dependencias]);`} lang="jsx" title="Sintaxis" />
+
+### Cuándo usar
+
+<Code code={`import { useCallback, memo } from 'react';
+
+// ✅ Callback pasado a componente memorizado
+const HijoMemorizado = memo(function Hijo({ onClick }) {
+  console.log('Hijo renderizado');
+  return <button onClick={onClick}>Click</button>;
+});
+
+function Padre() {
+  const [count, setCount] = useState(0);
+  
+  // Sin useCallback: Hijo se re-renderiza siempre
+  // Con useCallback: Hijo solo se re-renderiza si cambian deps
+  const handleClick = useCallback(() => {
+    console.log('Click!');
+  }, []);
+  
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={() => setCount(c => c + 1)}>+</button>
+      <HijoMemorizado onClick={handleClick} />
+    </div>
+  );
+}
+
+// ✅ Callback en dependencias de useEffect
+function Buscador({ query }) {
+  const buscar = useCallback(async () => {
+    const res = await fetch(\`/api/search?q=\${query}\`);
+    return res.json();
+  }, [query]);
+  
+  useEffect(() => {
+    buscar().then(setResultados);
+  }, [buscar]);
+}`} lang="jsx" title="useCallback ejemplos" />
+
+---
+
+## 🎛️ 16.8 useReducer
+
+### Sintaxis
+
+<Code code={`const [state, dispatch] = useReducer(reducer, initialState);
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'ACTION':
+      return { ...state, /* cambios */ };
+    default:
+      return state;
+  }
+}`} lang="jsx" title="Sintaxis" />
+
+### Ejemplo completo
+
+<Code code={`import { useReducer } from 'react';
+
+const initialState = { count: 0 };
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return { count: state.count + 1 };
+    case 'decrement':
+      return { count: state.count - 1 };
+    case 'reset':
+      return initialState;
+    case 'set':
+      return { count: action.payload };
+    default:
+      throw new Error('Acción desconocida');
+  }
+}
+
+function Contador() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  
+  return (
+    <div>
+      <p>Count: {state.count}</p>
+      <button onClick={() => dispatch({ type: 'increment' })}>+</button>
+      <button onClick={() => dispatch({ type: 'decrement' })}>-</button>
+      <button onClick={() => dispatch({ type: 'reset' })}>Reset</button>
+      <button onClick={() => dispatch({ type: 'set', payload: 10 })}>
+        Set 10
+      </button>
+    </div>
+  );
+}`} lang="jsx" title="useReducer ejemplo" />
+
+### useState vs useReducer
+
+| useState | useReducer |
+|----------|------------|
+| Estado simple | Estado complejo |
+| Pocas actualizaciones | Múltiples acciones |
+| Lógica simple | Lógica compartida |
+
+---
+
+## 🎨 16.9 Otros Hooks
+
+### useLayoutEffect
+
+<Code code={`import { useLayoutEffect, useRef, useState } from 'react';
+
+// Se ejecuta ANTES de pintar en pantalla
+// Útil para mediciones DOM
+function Tooltip({ children }) {
+  const ref = useRef();
+  const [height, setHeight] = useState(0);
+  
+  useLayoutEffect(() => {
+    // Medir antes de que el usuario vea
+    setHeight(ref.current.getBoundingClientRect().height);
+  }, []);
+  
+  return <div ref={ref}>{children}</div>;
+}`} lang="jsx" title="useLayoutEffect" />
+
+### useId
+
+<Code code={`import { useId } from 'react';
+
+function Input({ label }) {
+  const id = useId();
+  
+  return (
+    <div>
+      <label htmlFor={id}>{label}</label>
+      <input id={id} />
+    </div>
+  );
+}
+
+// Genera IDs únicos como ":r1:", ":r2:", etc.`} lang="jsx" title="useId" />
+
+---
+
+## 🛠️ 16.10 Hooks personalizados
+
+### Patrón
+
+<Code code={`// Nombre empieza con "use"
+function useCustomHook(params) {
+  // Puede usar otros hooks
+  const [state, setState] = useState();
+  
+  useEffect(() => {
+    // lógica
+  }, []);
+  
+  // Retorna valores/funciones
+  return { state, setState };
+}`} lang="jsx" title="Patrón de hook personalizado" />
+
+### Ejemplos útiles
+
+<Code code={`// useLocalStorage
+function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() => {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : initialValue;
+  });
+  
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+  
+  return [value, setValue];
+}
+
+// useToggle
+function useToggle(initial = false) {
+  const [value, setValue] = useState(initial);
+  const toggle = useCallback(() => setValue(v => !v), []);
+  return [value, toggle];
+}
+
+// useDebounce
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  
+  return debouncedValue;
+}
+
+// useFetch
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    fetch(url)
+      .then(res => res.json())
+      .then(setData)
+      .catch(setError)
+      .finally(() => setLoading(false));
+  }, [url]);
+  
+  return { data, loading, error };
+}`} lang="jsx" title="Hooks personalizados útiles" />
+
+---
+
+## 📋 16.11 Reglas de los Hooks
+
+### Las 2 reglas
+
+<Code code={`// ✅ REGLA 1: Solo en el nivel superior
+function Componente() {
+  const [a, setA] = useState();  // ✅ OK
+  
+  if (condicion) {
+    const [b, setB] = useState();  // ❌ MAL
+  }
+  
+  for (let i = 0; i < 10; i++) {
+    useEffect(() => {});  // ❌ MAL
+  }
+}
+
+// ✅ REGLA 2: Solo en componentes React o hooks personalizados
+function Componente() {
+  useState();  // ✅ OK - componente
+}
+
+function useCustom() {
+  useState();  // ✅ OK - hook personalizado
+}
+
+function funcionNormal() {
+  useState();  // ❌ MAL - función normal
+}`} lang="jsx" title="Reglas de hooks" />
+
+---
+
+## 📝 Resumen final
+
+<Aside type="note">
+**Guía rápida de cuándo usar cada Hook:**
+
+- **useState**: Estado simple (strings, números, booleanos, objetos pequeños)
+- **useEffect**: Efectos secundarios (fetch, timers, suscripciones)
+- **useContext**: Compartir datos sin prop drilling
+- **useRef**: Referencias DOM o valores que no causan re-render
+- **useMemo**: Memorizar cálculos costosos
+- **useCallback**: Memorizar funciones para evitar re-renders
+- **useReducer**: Estado complejo con múltiples acciones
+- **Hooks personalizados**: Reutilizar lógica entre componentes
+</Aside>
+
+<Aside type="tip">
+**Recuerda:**
+- Los hooks siempre empiezan con `use`
+- Solo se usan en componentes funcionales o hooks personalizados
+- Se llaman en el nivel superior (no en condicionales o loops)
+- El orden de llamada debe ser consistente entre renders
+</Aside>

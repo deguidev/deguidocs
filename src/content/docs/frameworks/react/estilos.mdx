@@ -1,0 +1,491 @@
+---
+title: 14. Estilos en React
+description: CSS en React, CSS Modules, styled-components y Tailwind CSS
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🎨 14.1 Formas de aplicar estilos en React
+
+### Opciones disponibles
+
+| Método | Descripción | Scope |
+|--------|-------------|-------|
+| CSS tradicional | Archivos .css importados | Global |
+| Inline styles | Objeto style en JSX | Componente |
+| CSS Modules | Archivos .module.css | Componente |
+| styled-components | CSS-in-JS | Componente |
+| Tailwind CSS | Clases utilitarias | Componente |
+
+---
+
+## 📄 14.2 CSS tradicional
+
+### Importar archivos CSS
+
+<Code code={`/* styles.css */
+.boton {
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.boton:hover {
+  background-color: #2980b9;
+}
+
+.boton-peligro {
+  background-color: #e74c3c;
+}
+
+.boton-peligro:hover {
+  background-color: #c0392b;
+}`} lang="css" title="styles.css" />
+
+<Code code={`// Componente.jsx
+import './styles.css';
+
+function Botones() {
+  return (
+    <div>
+      <button className="boton">Normal</button>
+      <button className="boton boton-peligro">Peligro</button>
+    </div>
+  );
+}`} lang="jsx" title="Importar CSS" />
+
+### Clases condicionales
+
+<Code code={`import './styles.css';
+
+function Boton({ variante, disabled }) {
+  // Construir className dinámicamente
+  const clases = \`boton \${variante === 'peligro' ? 'boton-peligro' : ''} \${disabled ? 'boton-disabled' : ''}\`.trim();
+  
+  return <button className={clases}>Click</button>;
+}
+
+// O usando template literals
+function Boton2({ activo }) {
+  return (
+    <button className={\`boton \${activo ? 'activo' : 'inactivo'}\`}>
+      Click
+    </button>
+  );
+}`} lang="jsx" title="Clases condicionales" />
+
+### Librería classnames
+
+<Code code={`npm install classnames`} lang="bash" title="Instalar classnames" />
+
+<Code code={`import classNames from 'classnames';
+import './styles.css';
+
+function Boton({ variante, disabled, activo }) {
+  const clases = classNames('boton', {
+    'boton-peligro': variante === 'peligro',
+    'boton-exito': variante === 'exito',
+    'boton-disabled': disabled,
+    'activo': activo
+  });
+  
+  return <button className={clases}>Click</button>;
+}
+
+// Resultado: "boton boton-peligro activo" (según props)`} lang="jsx" title="Uso de classnames" />
+
+---
+
+## ✏️ 14.3 Inline styles
+
+### Sintaxis de estilos inline
+
+<Code code={`function Tarjeta() {
+  // Los estilos son objetos JavaScript
+  const estilos = {
+    padding: '20px',
+    backgroundColor: '#f5f5f5',  // camelCase
+    borderRadius: '8px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  };
+  
+  return (
+    <div style={estilos}>
+      <h2 style={{ color: '#333', marginBottom: '10px' }}>
+        Título
+      </h2>
+      <p style={{ color: '#666' }}>Contenido</p>
+    </div>
+  );
+}`} lang="jsx" title="Estilos inline" />
+
+### Estilos dinámicos
+
+<Code code={`function Barra({ progreso, color }) {
+  return (
+    <div style={{
+      width: '100%',
+      height: '20px',
+      backgroundColor: '#eee',
+      borderRadius: '10px'
+    }}>
+      <div style={{
+        width: \`\${progreso}%\`,
+        height: '100%',
+        backgroundColor: color || '#3498db',
+        borderRadius: '10px',
+        transition: 'width 0.3s ease'
+      }} />
+    </div>
+  );
+}
+
+// Uso
+<Barra progreso={75} color="#2ecc71" />`} lang="jsx" title="Estilos dinámicos" />
+
+<Aside type="caution">
+Los estilos inline no soportan pseudo-clases (:hover, :focus) ni media queries. Úsalos solo para estilos dinámicos simples.
+</Aside>
+
+---
+
+## 📦 14.4 CSS Modules
+
+### ¿Qué son CSS Modules?
+
+CSS Modules generan nombres de clase únicos automáticamente, evitando conflictos de estilos entre componentes.
+
+<Code code={`/* Boton.module.css */
+.boton {
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.boton:hover {
+  background-color: #2980b9;
+}
+
+.primario {
+  background-color: #3498db;
+}
+
+.secundario {
+  background-color: #95a5a6;
+}`} lang="css" title="Boton.module.css" />
+
+<Code code={`// Boton.jsx
+import styles from './Boton.module.css';
+
+function Boton({ variante = 'primario', children }) {
+  return (
+    <button className={\`\${styles.boton} \${styles[variante]}\`}>
+      {children}
+    </button>
+  );
+}
+
+// El className resultante será algo como:
+// "Boton_boton_x7d3f Boton_primario_a2b1c"`} lang="jsx" title="Usar CSS Modules" />
+
+### Composición de estilos
+
+<Code code={`/* Card.module.css */
+.card {
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.header {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.body {
+  color: #666;
+}
+
+/* Componer estilos */
+.cardDestacada {
+  composes: card;
+  border: 2px solid gold;
+  background-color: #fffdf0;
+}`} lang="css" title="Composición" />
+
+<Code code={`import styles from './Card.module.css';
+
+function Card({ destacada, titulo, children }) {
+  return (
+    <div className={destacada ? styles.cardDestacada : styles.card}>
+      <h2 className={styles.header}>{titulo}</h2>
+      <div className={styles.body}>{children}</div>
+    </div>
+  );
+}`} lang="jsx" title="Usar composición" />
+
+---
+
+## 💅 14.5 styled-components
+
+### Instalación
+
+<Code code={`npm install styled-components`} lang="bash" title="Instalar styled-components" />
+
+### Crear componentes estilizados
+
+<Code code={`import styled from 'styled-components';
+
+// Crear componente estilizado
+const Boton = styled.button\`
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #2980b9;
+  }
+  
+  &:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+  }
+\`;
+
+const BotonPeligro = styled(Boton)\`
+  background-color: #e74c3c;
+  
+  &:hover {
+    background-color: #c0392b;
+  }
+\`;
+
+// Uso
+function App() {
+  return (
+    <div>
+      <Boton>Normal</Boton>
+      <BotonPeligro>Peligro</BotonPeligro>
+      <Boton disabled>Deshabilitado</Boton>
+    </div>
+  );
+}`} lang="jsx" title="styled-components básico" />
+
+### Props dinámicas
+
+<Code code={`import styled from 'styled-components';
+
+const Boton = styled.button\`
+  padding: \${props => props.size === 'large' ? '15px 30px' : '10px 20px'};
+  background-color: \${props => props.primary ? '#3498db' : '#95a5a6'};
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: \${props => props.size === 'large' ? '18px' : '14px'};
+  
+  &:hover {
+    opacity: 0.9;
+  }
+\`;
+
+// Uso
+<Boton primary>Primario</Boton>
+<Boton>Secundario</Boton>
+<Boton primary size="large">Grande</Boton>`} lang="jsx" title="Props dinámicas" />
+
+### Tema global
+
+<Code code={`import styled, { ThemeProvider } from 'styled-components';
+
+// Definir tema
+const tema = {
+  colores: {
+    primario: '#3498db',
+    secundario: '#2ecc71',
+    peligro: '#e74c3c',
+    texto: '#333',
+    fondo: '#f5f5f5'
+  },
+  espaciado: {
+    sm: '8px',
+    md: '16px',
+    lg: '24px'
+  }
+};
+
+// Usar tema en componentes
+const Boton = styled.button\`
+  padding: \${props => props.theme.espaciado.md};
+  background-color: \${props => props.theme.colores.primario};
+  color: white;
+\`;
+
+const Contenedor = styled.div\`
+  background-color: \${props => props.theme.colores.fondo};
+  padding: \${props => props.theme.espaciado.lg};
+\`;
+
+// Proveer tema
+function App() {
+  return (
+    <ThemeProvider theme={tema}>
+      <Contenedor>
+        <Boton>Click</Boton>
+      </Contenedor>
+    </ThemeProvider>
+  );
+}`} lang="jsx" title="ThemeProvider" />
+
+---
+
+## 🌊 14.6 Tailwind CSS
+
+### Instalación con Vite
+
+<Code code={`npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p`} lang="bash" title="Instalar Tailwind" />
+
+<Code code={`// tailwind.config.js
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}`} lang="js" title="tailwind.config.js" />
+
+<Code code={`/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;`} lang="css" title="index.css" />
+
+### Uso básico
+
+<Code code={`function Tarjeta({ titulo, children }) {
+  return (
+    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+      <h2 className="text-xl font-bold text-gray-800 mb-4">
+        {titulo}
+      </h2>
+      <p className="text-gray-600">
+        {children}
+      </p>
+    </div>
+  );
+}
+
+function Boton({ variante = 'primario', children }) {
+  const estilos = {
+    primario: 'bg-blue-500 hover:bg-blue-600 text-white',
+    secundario: 'bg-gray-500 hover:bg-gray-600 text-white',
+    peligro: 'bg-red-500 hover:bg-red-600 text-white'
+  };
+  
+  return (
+    <button className={\`px-4 py-2 rounded font-medium transition-colors \${estilos[variante]}\`}>
+      {children}
+    </button>
+  );
+}`} lang="jsx" title="Tailwind básico" />
+
+### Clases responsivas
+
+<Code code={`function Layout() {
+  return (
+    <div className="container mx-auto px-4">
+      {/* Grid responsivo */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="p-4 bg-white rounded shadow">Item 1</div>
+        <div className="p-4 bg-white rounded shadow">Item 2</div>
+        <div className="p-4 bg-white rounded shadow">Item 3</div>
+      </div>
+      
+      {/* Texto responsivo */}
+      <h1 className="text-2xl md:text-4xl lg:text-6xl font-bold">
+        Título Responsivo
+      </h1>
+      
+      {/* Ocultar/mostrar */}
+      <div className="hidden md:block">
+        Solo visible en md y superior
+      </div>
+    </div>
+  );
+}`} lang="jsx" title="Clases responsivas" />
+
+### Estados y variantes
+
+<Code code={`function Input({ error }) {
+  return (
+    <input 
+      className={\`
+        w-full px-4 py-2 border rounded
+        focus:outline-none focus:ring-2 focus:ring-blue-500
+        disabled:bg-gray-100 disabled:cursor-not-allowed
+        \${error ? 'border-red-500' : 'border-gray-300'}
+      \`}
+    />
+  );
+}
+
+function Boton() {
+  return (
+    <button className="
+      px-4 py-2 bg-blue-500 text-white rounded
+      hover:bg-blue-600
+      active:bg-blue-700
+      focus:outline-none focus:ring-2 focus:ring-blue-300
+      disabled:opacity-50 disabled:cursor-not-allowed
+      transition-colors duration-200
+    ">
+      Click
+    </button>
+  );
+}`} lang="jsx" title="Estados con Tailwind" />
+
+---
+
+## 📊 14.7 Comparación de métodos
+
+| Característica | CSS | Modules | styled | Tailwind |
+|----------------|-----|---------|--------|----------|
+| Scope | Global | Local | Local | Utility |
+| Pseudo-clases | ✅ | ✅ | ✅ | ✅ |
+| Media queries | ✅ | ✅ | ✅ | ✅ |
+| Props dinámicas | ❌ | ❌ | ✅ | Parcial |
+| Bundle size | Bajo | Bajo | Medio | Bajo* |
+| Curva aprendizaje | Baja | Baja | Media | Media |
+
+<Aside type="tip">
+**Recomendaciones:**
+- **Proyectos pequeños**: CSS tradicional o Tailwind
+- **Proyectos medianos**: CSS Modules
+- **Proyectos grandes**: styled-components o Tailwind
+- **Equipos**: Tailwind (consistencia) o CSS Modules (familiaridad)
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- **CSS tradicional**: importar archivos .css, usar classnames
+- **Inline styles**: objetos JS, camelCase, estilos dinámicos
+- **CSS Modules**: scope local automático, composición
+- **styled-components**: CSS-in-JS, props dinámicas, temas
+- **Tailwind CSS**: clases utilitarias, responsivo, estados
+- Cada método tiene sus **ventajas y casos de uso**
+</Aside>

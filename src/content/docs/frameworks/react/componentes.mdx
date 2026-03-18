@@ -1,0 +1,498 @@
+---
+title: 4. Componentes en React
+description: Qué es un componente, componentes funcionales, props y reutilización
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🧩 4.1 ¿Qué es un componente?
+
+### Definición
+
+Un **componente** es una pieza de código reutilizable que representa una parte de la interfaz de usuario. Es como un bloque de construcción que puedes usar múltiples veces en tu aplicación.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Reutilizable** | Se puede usar múltiples veces |
+| **Independiente** | Tiene su propia lógica y UI |
+| **Composable** | Se pueden combinar componentes |
+| **Encapsulado** | Contiene su propio código |
+
+### Analogía visual
+
+<Code code={`// Piensa en componentes como piezas de LEGO
+
+// Una página web puede verse así:
+<App>
+  <Header />           // Componente de encabezado
+  <Sidebar />          // Componente de barra lateral
+  <MainContent>        // Componente de contenido principal
+    <ArticleCard />    // Componente de tarjeta
+    <ArticleCard />    // Mismo componente, reutilizado
+    <ArticleCard />    // Mismo componente, reutilizado
+  </MainContent>
+  <Footer />           // Componente de pie de página
+</App>`} lang="jsx" title="Estructura de componentes" />
+
+### Ejemplo básico de componente
+
+<Code code={`// Un componente es una función que retorna JSX
+function Saludo() {
+  return <h1>¡Hola, bienvenido!</h1>;
+}
+
+// Usar el componente
+function App() {
+  return (
+    <div>
+      <Saludo />
+      <Saludo />
+      <Saludo />
+    </div>
+  );
+}
+
+// Resultado: Tres títulos "¡Hola, bienvenido!"`} lang="jsx" title="Componente básico" />
+
+---
+
+## 🔧 4.2 Componentes funcionales
+
+### Sintaxis de componentes funcionales
+
+En React moderno, los componentes son **funciones de JavaScript** que retornan JSX.
+
+<Code code={`// Componente funcional básico
+function MiComponente() {
+  return <div>Contenido del componente</div>;
+}
+
+// Componente con arrow function
+const MiComponente = () => {
+  return <div>Contenido del componente</div>;
+};
+
+// Componente con return implícito
+const MiComponente = () => <div>Contenido del componente</div>;`} lang="jsx" title="Formas de crear componentes" />
+
+### Reglas para nombrar componentes
+
+| Regla | Ejemplo correcto | Ejemplo incorrecto |
+|-------|------------------|-------------------|
+| PascalCase | `MiComponente` | `miComponente` |
+| Nombre descriptivo | `BotonEnviar` | `Btn1` |
+| Sustantivo | `TarjetaUsuario` | `MostrarUsuario` |
+
+<Code code={`// ✅ BIEN - PascalCase
+function TarjetaProducto() {
+  return <div>Producto</div>;
+}
+
+// ❌ MAL - camelCase (React no lo reconoce como componente)
+function tarjetaProducto() {
+  return <div>Producto</div>;
+}
+
+// ✅ BIEN - Nombre descriptivo
+function BotonAgregarCarrito() {
+  return <button>Agregar al carrito</button>;
+}
+
+// ❌ MAL - Nombre poco descriptivo
+function Btn() {
+  return <button>Agregar al carrito</button>;
+}`} lang="jsx" title="Nombres de componentes" />
+
+---
+
+## 📐 4.3 Estructura de un componente
+
+### Anatomía de un componente
+
+<Code code={`// 1. Importaciones
+import { useState } from 'react';
+import './MiComponente.css';
+
+// 2. Definición del componente
+function MiComponente() {
+  // 3. Lógica del componente (variables, funciones, hooks)
+  const titulo = "Mi Título";
+  const fecha = new Date().toLocaleDateString();
+  
+  const handleClick = () => {
+    console.log("Clic!");
+  };
+  
+  // 4. Return con JSX
+  return (
+    <div className="mi-componente">
+      <h1>{titulo}</h1>
+      <p>Fecha: {fecha}</p>
+      <button onClick={handleClick}>Clic aquí</button>
+    </div>
+  );
+}
+
+// 5. Exportación
+export default MiComponente;`} lang="jsx" title="Estructura completa" />
+
+### Ejemplo práctico: Tarjeta de producto
+
+<Code code={`// components/ProductCard.jsx
+import './ProductCard.css';
+
+function ProductCard() {
+  const producto = {
+    nombre: "Laptop Gaming",
+    precio: 1299.99,
+    imagen: "/laptop.jpg",
+    disponible: true
+  };
+  
+  return (
+    <div className="product-card">
+      <img src={producto.imagen} alt={producto.nombre} />
+      <h3>{producto.nombre}</h3>
+      <p className="precio">\${producto.precio}</p>
+      <span className={producto.disponible ? "disponible" : "agotado"}>
+        {producto.disponible ? "Disponible" : "Agotado"}
+      </span>
+      <button>Agregar al carrito</button>
+    </div>
+  );
+}
+
+export default ProductCard;`} lang="jsx" title="Tarjeta de producto" />
+
+---
+
+## 📦 4.4 Props (envío de datos)
+
+### ¿Qué son las Props?
+
+Las **props** (propiedades) son la forma de pasar datos de un componente padre a un componente hijo. Son como los argumentos de una función.
+
+<Code code={`// Componente que recibe props
+function Saludo(props) {
+  return <h1>Hola, {props.nombre}!</h1>;
+}
+
+// Usar el componente pasando props
+function App() {
+  return (
+    <div>
+      <Saludo nombre="Ana" />
+      <Saludo nombre="Carlos" />
+      <Saludo nombre="María" />
+    </div>
+  );
+}
+
+// Resultado:
+// Hola, Ana!
+// Hola, Carlos!
+// Hola, María!`} lang="jsx" title="Props básicas" />
+
+### Desestructuración de props
+
+<Code code={`// Sin desestructurar
+function Tarjeta(props) {
+  return (
+    <div>
+      <h2>{props.titulo}</h2>
+      <p>{props.descripcion}</p>
+    </div>
+  );
+}
+
+// Con desestructuración (más limpio)
+function Tarjeta({ titulo, descripcion }) {
+  return (
+    <div>
+      <h2>{titulo}</h2>
+      <p>{descripcion}</p>
+    </div>
+  );
+}
+
+// Uso
+<Tarjeta titulo="Mi título" descripcion="Mi descripción" />`} lang="jsx" title="Desestructuración de props" />
+
+### Props con valores por defecto
+
+<Code code={`// Valores por defecto en la desestructuración
+function Boton({ texto = "Enviar", color = "blue", size = "medium" }) {
+  return (
+    <button 
+      className={size}
+      style={{ backgroundColor: color }}
+    >
+      {texto}
+    </button>
+  );
+}
+
+// Uso
+<Boton />                           // Usa todos los valores por defecto
+<Boton texto="Guardar" />           // Solo cambia el texto
+<Boton texto="Cancelar" color="red" size="small" />`} lang="jsx" title="Props con valores por defecto" />
+
+### Tipos de datos en props
+
+<Code code={`function Componente({
+  // String
+  nombre,
+  // Número
+  edad,
+  // Booleano
+  activo,
+  // Array
+  items,
+  // Objeto
+  usuario,
+  // Función
+  onClick
+}) {
+  return <div>...</div>;
+}
+
+// Pasar diferentes tipos de props
+<Componente
+  nombre="Ana"
+  edad={25}
+  activo={true}
+  items={["a", "b", "c"]}
+  usuario={{ id: 1, nombre: "Ana" }}
+  onClick={() => console.log("clic")}
+/>`} lang="jsx" title="Tipos de props" />
+
+---
+
+## 👶 4.5 Props children
+
+### ¿Qué es children?
+
+**children** es una prop especial que contiene todo lo que se coloca entre las etiquetas de apertura y cierre de un componente.
+
+<Code code={`// Componente que usa children
+function Tarjeta({ children }) {
+  return (
+    <div className="tarjeta">
+      {children}
+    </div>
+  );
+}
+
+// Uso - todo lo de adentro es "children"
+<Tarjeta>
+  <h2>Título de la tarjeta</h2>
+  <p>Contenido de la tarjeta</p>
+  <button>Acción</button>
+</Tarjeta>`} lang="jsx" title="Prop children" />
+
+### Ejemplo: Componente contenedor
+
+<Code code={`// Componente Card reutilizable
+function Card({ children, titulo }) {
+  return (
+    <div className="card">
+      <div className="card-header">
+        <h3>{titulo}</h3>
+      </div>
+      <div className="card-body">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// Uso con diferentes contenidos
+<Card titulo="Perfil de Usuario">
+  <img src="avatar.jpg" alt="Avatar" />
+  <p>Nombre: Ana García</p>
+  <p>Email: ana@email.com</p>
+</Card>
+
+<Card titulo="Estadísticas">
+  <ul>
+    <li>Ventas: 150</li>
+    <li>Clientes: 45</li>
+  </ul>
+</Card>`} lang="jsx" title="Componente contenedor" />
+
+### Ejemplo: Layout con children
+
+<Code code={`// Componente de Layout
+function Layout({ children }) {
+  return (
+    <div className="layout">
+      <header>
+        <nav>Mi Sitio</nav>
+      </header>
+      
+      <main>
+        {children}
+      </main>
+      
+      <footer>
+        © 2024 Mi Sitio
+      </footer>
+    </div>
+  );
+}
+
+// Uso en diferentes páginas
+function PaginaInicio() {
+  return (
+    <Layout>
+      <h1>Bienvenido</h1>
+      <p>Esta es la página de inicio</p>
+    </Layout>
+  );
+}
+
+function PaginaContacto() {
+  return (
+    <Layout>
+      <h1>Contacto</h1>
+      <form>...</form>
+    </Layout>
+  );
+}`} lang="jsx" title="Layout con children" />
+
+---
+
+## ♻️ 4.6 Reutilización de componentes
+
+### Componente reutilizable
+
+<Code code={`// Componente Button reutilizable
+function Button({ 
+  children, 
+  variant = "primary", 
+  size = "medium",
+  disabled = false,
+  onClick 
+}) {
+  const className = \`btn btn-\${variant} btn-\${size}\`;
+  
+  return (
+    <button 
+      className={className}
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
+// Múltiples usos del mismo componente
+<Button variant="primary" onClick={guardar}>Guardar</Button>
+<Button variant="secondary" onClick={cancelar}>Cancelar</Button>
+<Button variant="danger" size="small" onClick={eliminar}>Eliminar</Button>
+<Button disabled>Procesando...</Button>`} lang="jsx" title="Botón reutilizable" />
+
+### Lista de tarjetas reutilizables
+
+<Code code={`// Componente UserCard
+function UserCard({ nombre, email, avatar, rol }) {
+  return (
+    <div className="user-card">
+      <img src={avatar} alt={nombre} />
+      <h3>{nombre}</h3>
+      <p>{email}</p>
+      <span className="rol">{rol}</span>
+    </div>
+  );
+}
+
+// Reutilizar con diferentes datos
+function ListaUsuarios() {
+  const usuarios = [
+    { id: 1, nombre: "Ana", email: "ana@mail.com", avatar: "/ana.jpg", rol: "Admin" },
+    { id: 2, nombre: "Carlos", email: "carlos@mail.com", avatar: "/carlos.jpg", rol: "Editor" },
+    { id: 3, nombre: "María", email: "maria@mail.com", avatar: "/maria.jpg", rol: "Usuario" }
+  ];
+  
+  return (
+    <div className="lista-usuarios">
+      {usuarios.map(usuario => (
+        <UserCard 
+          key={usuario.id}
+          nombre={usuario.nombre}
+          email={usuario.email}
+          avatar={usuario.avatar}
+          rol={usuario.rol}
+        />
+      ))}
+    </div>
+  );
+}`} lang="jsx" title="Lista de tarjetas" />
+
+---
+
+## 📁 4.7 Organización de componentes
+
+### Estructura de carpetas recomendada
+
+<Code code={`src/
+├── components/
+│   ├── common/              # Componentes genéricos
+│   │   ├── Button/
+│   │   │   ├── Button.jsx
+│   │   │   └── Button.css
+│   │   ├── Card/
+│   │   │   ├── Card.jsx
+│   │   │   └── Card.css
+│   │   └── Input/
+│   │       ├── Input.jsx
+│   │       └── Input.css
+│   ├── layout/              # Componentes de estructura
+│   │   ├── Header.jsx
+│   │   ├── Footer.jsx
+│   │   └── Sidebar.jsx
+│   └── features/            # Componentes específicos
+│       ├── ProductCard.jsx
+│       └── UserProfile.jsx
+├── pages/
+│   ├── Home.jsx
+│   └── About.jsx
+└── App.jsx`} lang="text" title="Estructura de carpetas" />
+
+### Importar y exportar componentes
+
+<Code code={`// components/Button/Button.jsx
+function Button({ children, onClick }) {
+  return <button onClick={onClick}>{children}</button>;
+}
+
+export default Button;
+
+// ----------------------------------------
+
+// Importar en otro archivo
+import Button from './components/Button/Button';
+
+function App() {
+  return <Button onClick={() => alert("Hola")}>Clic</Button>;
+}`} lang="jsx" title="Importar y exportar" />
+
+<Aside type="tip">
+Mantén los componentes pequeños y enfocados en una sola responsabilidad. Si un componente crece demasiado, divídelo en componentes más pequeños.
+</Aside>
+
+---
+
+## 📝 Resumen
+
+<Aside type="note">
+**Lo que aprendiste en esta sección:**
+- Un **componente** es una pieza reutilizable de UI
+- Los **componentes funcionales** son funciones que retornan JSX
+- Usa **PascalCase** para nombrar componentes
+- Las **props** pasan datos del padre al hijo
+- **children** es una prop especial para contenido anidado
+- Los componentes deben ser **reutilizables** y **organizados**
+</Aside>
