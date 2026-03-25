@@ -1,0 +1,94 @@
+---
+interface Props {
+  text: string;
+  rate?: number;
+  showText?: boolean;
+}
+
+const { text, rate = 0.75, showText = true } = Astro.props;
+---
+
+<audio-button data-text={text} data-rate={rate}>
+  <button class="audio-btn" title={`Escuchar: ${text}`}>
+    <span class="audio-icon">🔊</span>
+    {showText && <span class="audio-text">{text}</span>}
+  </button>
+</audio-button>
+
+<style>
+  .audio-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    font-size: inherit;
+    color: inherit;
+    transition: background-color 0.2s, transform 0.1s;
+  }
+
+  .audio-btn:hover {
+    background-color: rgba(99, 102, 241, 0.15);
+  }
+
+  .audio-btn:active {
+    transform: scale(0.95);
+  }
+
+  .audio-icon {
+    font-size: 0.9em;
+    opacity: 0.8;
+  }
+
+  .audio-btn:hover .audio-icon {
+    opacity: 1;
+  }
+
+  .audio-text {
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  class AudioButton extends HTMLElement {
+    constructor() {
+      super();
+      
+      const button = this.querySelector('button');
+      const text = this.dataset.text || '';
+      const rate = parseFloat(this.dataset.rate || '0.75');
+      
+      // Verificar si Web Speech API está disponible
+      if (!('speechSynthesis' in window)) {
+        if (button) button.style.display = 'none';
+        return;
+      }
+      
+      // Pre-cargar voces (necesario para algunos navegadores)
+      speechSynthesis.getVoices();
+      
+      button?.addEventListener('click', () => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = rate;
+        utterance.pitch = 1;
+        
+        // Buscar voz en inglés si está disponible
+        const voices = speechSynthesis.getVoices();
+        const englishVoice = voices.find(v => v.lang.startsWith('en'));
+        if (englishVoice) utterance.voice = englishVoice;
+        
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utterance);
+      });
+    }
+  }
+  
+  // Evitar error si ya está definido
+  if (!customElements.get('audio-button')) {
+    customElements.define('audio-button', AudioButton);
+  }
+</script>

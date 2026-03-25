@@ -535,6 +535,42 @@ export default defineConfig({
 						},
 					],
 				},
+								{
+					label: 'Ingles',
+					collapsed: true,
+					items: [
+						{
+							label: '📗 Básico (A1-A2)',
+							collapsed: true,
+							items: [
+								{ label: '01. Fundamentos del Sonido y Comprensión', link: '/ingles/basico/fundamentos-sonido/' },
+								{ label: '02. Comunicación Básica Inmediata', link: '/ingles/basico/comunicacion-basica/' },
+								{ label: '03. Estructura Base del Idioma', link: '/ingles/basico/estructura-base/' },
+								{ label: '04. Vocabulario Esencial', link: '/ingles/basico/vocabulario-esencial/' },
+								{ label: '05. Chunks y Frases Reales', link: '/ingles/basico/chunks-frases/' },
+								{ label: '06. Preguntas y Respuestas', link: '/ingles/basico/preguntas-respuestas/' },
+								{ label: '07. Comunicación en Contexto', link: '/ingles/basico/comunicacion-contexto/' },
+								{ label: '08. Listening Progresivo', link: '/ingles/basico/listening-progresivo/' },
+								{ label: '09. Speaking Guiado', link: '/ingles/basico/speaking-guiado/' },
+								{ label: '10. Frases No Literales', link: '/ingles/basico/frases-no-literales/' },
+								{ label: '11. Consolidación del Aprendizaje', link: '/ingles/basico/consolidacion/' },
+								{ label: '12. Producción Final', link: '/ingles/basico/produccion-final/' },
+							],
+						},
+						{
+							label: 'intermedio',
+							collapsed: true,
+							items: [
+								{ label: '01. Introducción a Ziggy.js', link: '/guides/ziggy/introduction/' },
+								{ label: '02. Instalación y configuración básica', link: '/guides/ziggy/installation/' },
+								{ label: '03. Uso básico en JavaScript puro', link: '/guides/ziggy/basic-usage/' },
+								{ label: '04. Uso de Ziggy en Vue 3', link: '/guides/ziggy/vue-integration/' },
+								{ label: '05. Configuración avanzada', link: '/guides/ziggy/configuration/' },
+								{ label: '06. Interacción con rutas y API REST', link: '/guides/ziggy/api-rest/' }
+							]
+						},
+					],
+				},
 				{
 					label: '📑 Referencia',
 					collapsed: true,
