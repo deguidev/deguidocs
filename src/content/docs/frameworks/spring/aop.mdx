@@ -1,0 +1,578 @@
+---
+title: 12. Programación Orientada a Aspectos (AOP)
+description: Conceptos de AOP, aspectos, JoinPoints, tipos de Advice y casos de uso reales
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🎯 12.1 ¿Qué es AOP?
+
+### Definición
+
+**AOP (Aspect-Oriented Programming)** es un paradigma que permite separar las **preocupaciones transversales** (cross-cutting concerns) del código de negocio principal.
+
+### Preocupaciones transversales
+
+<Code code={`// Sin AOP: código repetido en muchos lugares
+@Service
+public class UsuarioService {
+    
+    public Usuario crear(UsuarioDTO dto) {
+        long inicio = System.currentTimeMillis();  // Logging
+        log.info("Iniciando crear usuario");       // Logging
+        
+        try {
+            // Lógica de negocio
+            Usuario usuario = new Usuario(dto);
+            return repository.save(usuario);
+        } catch (Exception e) {
+            log.error("Error: " + e.getMessage()); // Logging
+            throw e;
+        } finally {
+            long tiempo = System.currentTimeMillis() - inicio;
+            log.info("Tiempo: " + tiempo + "ms");  // Logging
+        }
+    }
+}
+
+// Con AOP: código limpio, logging separado
+@Service
+public class UsuarioService {
+    
+    public Usuario crear(UsuarioDTO dto) {
+        Usuario usuario = new Usuario(dto);
+        return repository.save(usuario);
+    }
+}`} lang="java" title="Problema que resuelve AOP" />
+
+### Casos de uso comunes
+
+- **Logging**: Registrar entradas/salidas de métodos
+- **Seguridad**: Verificar permisos
+- **Transacciones**: `@Transactional` usa AOP internamente
+- **Caché**: `@Cacheable` usa AOP
+- **Métricas**: Medir tiempos de ejecución
+- **Validación**: Verificar parámetros
+
+---
+
+## 📚 12.2 Conceptos Fundamentales
+
+### Terminología AOP
+
+| Término | Descripción |
+|---------|-------------|
+| **Aspect** | Módulo que encapsula una preocupación transversal |
+| **Join Point** | Punto de ejecución (método, excepción, etc.) |
+| **Advice** | Acción a ejecutar en un Join Point |
+| **Pointcut** | Expresión que selecciona Join Points |
+| **Target** | Objeto siendo "aspectado" |
+| **Weaving** | Proceso de aplicar aspectos al código |
+
+### Diagrama conceptual
+
+<Code code={`┌─────────────────────────────────────────────────────┐
+│                    ASPECTO                          │
+│  ┌─────────────┐    ┌─────────────────────────────┐ │
+│  │  Pointcut   │───▶│         Advice              │ │
+│  │ "Dónde"     │    │ "Qué hacer"                 │ │
+│  └─────────────┘    └─────────────────────────────┘ │
+└─────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────┐
+│              CÓDIGO DE NEGOCIO                      │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  │
+│  │  Service A  │  │  Service B  │  │  Service C  │  │
+│  │  método()   │  │  método()   │  │  método()   │  │
+│  └─────────────┘  └─────────────┘  └─────────────┘  │
+│       ▲                ▲                ▲           │
+│       └────────────────┴────────────────┘           │
+│                   Join Points                       │
+└─────────────────────────────────────────────────────┘`} lang="text" title="Conceptos AOP" />
+
+---
+
+## 🔧 12.3 Configuración de AOP
+
+### Dependencia
+
+<Code code={`<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-aop</artifactId>
+</dependency>`} lang="xml" title="Dependencia AOP" />
+
+### Habilitar AOP
+
+<Code code={`@Configuration
+@EnableAspectJAutoProxy  // Habilita AOP (incluido por defecto en Spring Boot)
+public class AopConfig {
+}`} lang="java" title="Habilitar AOP" />
+
+### Crear un aspecto básico
+
+<Code code={`import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component  // Debe ser un bean de Spring
+public class LoggingAspect {
+    
+    @Before("execution(* com.miapp.service.*.*(..))")
+    public void logAntesDeCadaMetodo() {
+        System.out.println("Ejecutando método del servicio...");
+    }
+}`} lang="java" title="Aspecto básico" />
+
+---
+
+## 🎯 12.4 Pointcut Expressions
+
+### Sintaxis básica
+
+<Code code={`execution(modifiers? return-type declaring-type? method-name(params) throws?)
+
+// Ejemplos:
+execution(* com.miapp.service.*.*(..))
+│         │ │                │ │  └── Cualquier parámetro
+│         │ │                │ └───── Cualquier método
+│         │ │                └─────── Cualquier clase en service
+│         │ └──────────────────────── Paquete
+│         └────────────────────────── Cualquier tipo de retorno
+└──────────────────────────────────── Tipo de expresión`} lang="text" title="Sintaxis de pointcut" />
+
+### Ejemplos de pointcuts
+
+<Code code={`@Aspect
+@Component
+public class EjemplosPointcut {
+    
+    // Todos los métodos de todas las clases en service
+    @Before("execution(* com.miapp.service.*.*(..))")
+    public void todosLosServicios() {}
+    
+    // Métodos que empiezan con "get"
+    @Before("execution(* com.miapp.*.get*(..))")
+    public void metodosGet() {}
+    
+    // Métodos públicos que retornan Usuario
+    @Before("execution(public Usuario com.miapp..*.*(..))")
+    public void metodosQueRetornanUsuario() {}
+    
+    // Métodos con exactamente un parámetro Long
+    @Before("execution(* com.miapp.service.*.*(Long))")
+    public void metodosConUnLong() {}
+    
+    // Métodos con cualquier cantidad de parámetros String
+    @Before("execution(* com.miapp.service.*.*(String, ..))")
+    public void metodosQueComienzanConString() {}
+    
+    // Todos los métodos de una clase específica
+    @Before("execution(* com.miapp.service.UsuarioService.*(..))")
+    public void metodosDeUsuarioService() {}
+    
+    // Subpaquetes (doble punto)
+    @Before("execution(* com.miapp..*.*(..))")
+    public void todosLosSubpaquetes() {}
+}`} lang="java" title="Ejemplos de pointcuts" />
+
+### Pointcuts con anotaciones
+
+<Code code={`// Métodos anotados con @Transactional
+@Before("@annotation(org.springframework.transaction.annotation.Transactional)")
+public void metodosTransaccionales() {}
+
+// Clases anotadas con @Service
+@Before("@within(org.springframework.stereotype.Service)")
+public void clasesService() {}
+
+// Métodos anotados con anotación personalizada
+@Before("@annotation(com.miapp.annotation.Auditable)")
+public void metodosAuditables() {}
+
+// Anotación personalizada
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Auditable {
+    String value() default "";
+}`} lang="java" title="Pointcuts con anotaciones" />
+
+### Combinar pointcuts
+
+<Code code={`@Aspect
+@Component
+public class CombinedPointcuts {
+    
+    // Definir pointcuts reutilizables
+    @Pointcut("execution(* com.miapp.service.*.*(..))")
+    public void serviceMethods() {}
+    
+    @Pointcut("execution(* com.miapp.repository.*.*(..))")
+    public void repositoryMethods() {}
+    
+    // Combinar con AND
+    @Before("serviceMethods() && args(id,..)")
+    public void serviceMethodsConId(Long id) {
+        System.out.println("Método con ID: " + id);
+    }
+    
+    // Combinar con OR
+    @Before("serviceMethods() || repositoryMethods()")
+    public void serviceORepository() {}
+    
+    // Combinar con NOT
+    @Before("serviceMethods() && !execution(* *.get*(..))")
+    public void serviceExceptoGetters() {}
+}`} lang="java" title="Combinar pointcuts" />
+
+---
+
+## 📣 12.5 Tipos de Advice
+
+### @Before
+
+<Code code={`@Aspect
+@Component
+public class BeforeAspect {
+    
+    @Before("execution(* com.miapp.service.*.*(..))")
+    public void antesDelMetodo(JoinPoint joinPoint) {
+        String metodo = joinPoint.getSignature().getName();
+        Object[] args = joinPoint.getArgs();
+        
+        log.info("Ejecutando: {} con args: {}", metodo, Arrays.toString(args));
+    }
+}`} lang="java" title="@Before" />
+
+### @After (finally)
+
+<Code code={`@Aspect
+@Component
+public class AfterAspect {
+    
+    // Se ejecuta SIEMPRE, haya excepción o no
+    @After("execution(* com.miapp.service.*.*(..))")
+    public void despuesDelMetodo(JoinPoint joinPoint) {
+        log.info("Método finalizado: {}", joinPoint.getSignature().getName());
+    }
+}`} lang="java" title="@After" />
+
+### @AfterReturning
+
+<Code code={`@Aspect
+@Component
+public class AfterReturningAspect {
+    
+    // Solo si el método termina exitosamente
+    @AfterReturning(
+        pointcut = "execution(* com.miapp.service.*.*(..))",
+        returning = "resultado"
+    )
+    public void despuesDeRetornar(JoinPoint joinPoint, Object resultado) {
+        log.info("Método {} retornó: {}", 
+            joinPoint.getSignature().getName(), resultado);
+    }
+}`} lang="java" title="@AfterReturning" />
+
+### @AfterThrowing
+
+<Code code={`@Aspect
+@Component
+public class AfterThrowingAspect {
+    
+    // Solo si el método lanza excepción
+    @AfterThrowing(
+        pointcut = "execution(* com.miapp.service.*.*(..))",
+        throwing = "ex"
+    )
+    public void despuesDeExcepcion(JoinPoint joinPoint, Exception ex) {
+        log.error("Excepción en {}: {}", 
+            joinPoint.getSignature().getName(), ex.getMessage());
+    }
+}`} lang="java" title="@AfterThrowing" />
+
+### @Around (el más poderoso)
+
+<Code code={`@Aspect
+@Component
+public class AroundAspect {
+    
+    @Around("execution(* com.miapp.service.*.*(..))")
+    public Object alrededorDelMetodo(ProceedingJoinPoint joinPoint) throws Throwable {
+        String metodo = joinPoint.getSignature().getName();
+        
+        // ANTES
+        log.info("Iniciando: {}", metodo);
+        long inicio = System.currentTimeMillis();
+        
+        try {
+            // EJECUTAR el método original
+            Object resultado = joinPoint.proceed();
+            
+            // DESPUÉS (éxito)
+            long tiempo = System.currentTimeMillis() - inicio;
+            log.info("Completado: {} en {}ms", metodo, tiempo);
+            
+            return resultado;
+            
+        } catch (Exception e) {
+            // DESPUÉS (error)
+            log.error("Error en {}: {}", metodo, e.getMessage());
+            throw e;
+        }
+    }
+}`} lang="java" title="@Around" />
+
+---
+
+## 🛠️ 12.6 JoinPoint y ProceedingJoinPoint
+
+### JoinPoint
+
+<Code code={`@Before("execution(* com.miapp.service.*.*(..))")
+public void infoDelMetodo(JoinPoint joinPoint) {
+    // Nombre del método
+    String metodo = joinPoint.getSignature().getName();
+    
+    // Clase del objeto
+    String clase = joinPoint.getTarget().getClass().getSimpleName();
+    
+    // Argumentos
+    Object[] args = joinPoint.getArgs();
+    
+    // Firma completa
+    String firma = joinPoint.getSignature().toLongString();
+    
+    log.info("Clase: {}, Método: {}, Args: {}", clase, metodo, Arrays.toString(args));
+}`} lang="java" title="JoinPoint" />
+
+### ProceedingJoinPoint (solo @Around)
+
+<Code code={`@Around("execution(* com.miapp.service.*.*(..))")
+public Object modificarEjecucion(ProceedingJoinPoint pjp) throws Throwable {
+    
+    // Obtener argumentos originales
+    Object[] args = pjp.getArgs();
+    
+    // Modificar argumentos si es necesario
+    if (args.length > 0 && args[0] instanceof String) {
+        args[0] = ((String) args[0]).toUpperCase();
+    }
+    
+    // Ejecutar con argumentos modificados
+    Object resultado = pjp.proceed(args);
+    
+    // Modificar resultado si es necesario
+    if (resultado instanceof String) {
+        return ((String) resultado).toLowerCase();
+    }
+    
+    return resultado;
+}`} lang="java" title="ProceedingJoinPoint" />
+
+---
+
+## 📊 12.7 Casos de Uso Reales
+
+### Logging de métodos
+
+<Code code={`@Aspect
+@Component
+@Slf4j
+public class LoggingAspect {
+    
+    @Around("@within(org.springframework.stereotype.Service)")
+    public Object logMetodosService(ProceedingJoinPoint pjp) throws Throwable {
+        String clase = pjp.getTarget().getClass().getSimpleName();
+        String metodo = pjp.getSignature().getName();
+        
+        log.debug("→ {}.{}() args={}", clase, metodo, Arrays.toString(pjp.getArgs()));
+        
+        long inicio = System.currentTimeMillis();
+        try {
+            Object resultado = pjp.proceed();
+            long tiempo = System.currentTimeMillis() - inicio;
+            
+            log.debug("← {}.{}() [{}ms] return={}", clase, metodo, tiempo, resultado);
+            return resultado;
+            
+        } catch (Exception e) {
+            log.error("✗ {}.{}() error={}", clase, metodo, e.getMessage());
+            throw e;
+        }
+    }
+}`} lang="java" title="Logging aspect" />
+
+### Medición de rendimiento
+
+<Code code={`@Aspect
+@Component
+public class PerformanceAspect {
+    
+    private final MeterRegistry meterRegistry;
+    
+    @Around("@annotation(com.miapp.annotation.Timed)")
+    public Object medirTiempo(ProceedingJoinPoint pjp) throws Throwable {
+        String metodo = pjp.getSignature().toShortString();
+        
+        Timer.Sample sample = Timer.start(meterRegistry);
+        
+        try {
+            return pjp.proceed();
+        } finally {
+            sample.stop(Timer.builder("method.execution")
+                .tag("method", metodo)
+                .register(meterRegistry));
+        }
+    }
+}`} lang="java" title="Performance aspect" />
+
+### Auditoría
+
+<Code code={`@Aspect
+@Component
+public class AuditAspect {
+    
+    private final AuditoriaRepository auditoriaRepository;
+    
+    @AfterReturning(
+        pointcut = "@annotation(auditable)",
+        returning = "resultado"
+    )
+    public void auditar(JoinPoint jp, Auditable auditable, Object resultado) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        Auditoria auditoria = Auditoria.builder()
+            .usuario(auth != null ? auth.getName() : "anonymous")
+            .accion(auditable.value())
+            .metodo(jp.getSignature().toShortString())
+            .parametros(Arrays.toString(jp.getArgs()))
+            .resultado(String.valueOf(resultado))
+            .timestamp(LocalDateTime.now())
+            .build();
+        
+        auditoriaRepository.save(auditoria);
+    }
+}
+
+// Uso
+@Service
+public class UsuarioService {
+    
+    @Auditable("CREAR_USUARIO")
+    public Usuario crear(UsuarioDTO dto) {
+        return repository.save(new Usuario(dto));
+    }
+}`} lang="java" title="Auditoría aspect" />
+
+### Retry automático
+
+<Code code={`@Aspect
+@Component
+public class RetryAspect {
+    
+    @Around("@annotation(retry)")
+    public Object reintentar(ProceedingJoinPoint pjp, Retry retry) throws Throwable {
+        int intentos = 0;
+        Exception ultimaExcepcion = null;
+        
+        while (intentos < retry.maxAttempts()) {
+            try {
+                return pjp.proceed();
+            } catch (Exception e) {
+                ultimaExcepcion = e;
+                intentos++;
+                
+                if (intentos < retry.maxAttempts()) {
+                    log.warn("Reintento {}/{} para {}", 
+                        intentos, retry.maxAttempts(), pjp.getSignature().getName());
+                    Thread.sleep(retry.delay());
+                }
+            }
+        }
+        
+        throw ultimaExcepcion;
+    }
+}
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Retry {
+    int maxAttempts() default 3;
+    long delay() default 1000;
+}
+
+// Uso
+@Retry(maxAttempts = 3, delay = 2000)
+public void llamarServicioExterno() {
+    // Si falla, reintenta hasta 3 veces
+}`} lang="java" title="Retry aspect" />
+
+---
+
+## ⚠️ 12.8 Limitaciones y Buenas Prácticas
+
+### Limitaciones
+
+<Code code={`// ❌ AOP NO funciona en llamadas internas
+@Service
+public class MiServicio {
+    
+    @Auditable
+    public void metodoA() {
+        // El aspecto NO se aplica aquí
+        metodoB();  // Llamada interna, sin proxy
+    }
+    
+    @Auditable
+    public void metodoB() {
+        // ...
+    }
+}
+
+// ✅ Solución: Inyectar el servicio
+@Service
+public class MiServicio {
+    
+    @Autowired
+    private MiServicio self;  // Auto-inyección
+    
+    public void metodoA() {
+        self.metodoB();  // Pasa por el proxy
+    }
+}`} lang="java" title="Limitación de llamadas internas" />
+
+### Buenas prácticas
+
+<Code code={`// ✅ Pointcuts específicos y reutilizables
+@Aspect
+@Component
+public class MiAspect {
+    
+    // Definir pointcuts nombrados
+    @Pointcut("@within(org.springframework.stereotype.Service)")
+    public void serviceBeans() {}
+    
+    @Pointcut("execution(* com.miapp.repository.*.*(..))")
+    public void repositoryMethods() {}
+    
+    // Usar pointcuts nombrados
+    @Before("serviceBeans()")
+    public void antesDeService(JoinPoint jp) {}
+}
+
+// ✅ Orden de aspectos
+@Aspect
+@Order(1)  // Se ejecuta primero
+public class SecurityAspect {}
+
+@Aspect
+@Order(2)  // Se ejecuta segundo
+public class LoggingAspect {}`} lang="java" title="Buenas prácticas" />
+
+<Aside type="tip">
+Usa AOP para código transversal que se repite en muchos lugares. No abuses de él para lógica de negocio.
+</Aside>
+

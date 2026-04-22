@@ -1,0 +1,484 @@
+---
+title: 18. Documentación de APIs
+description: Swagger, OpenAPI, documentación automática y buenas prácticas
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 📖 18.1 Introducción a OpenAPI
+
+### ¿Qué es OpenAPI?
+
+**OpenAPI** (antes Swagger) es una especificación estándar para describir APIs REST. Permite generar documentación interactiva automáticamente.
+
+### Beneficios
+
+- **Documentación automática** desde el código
+- **UI interactiva** para probar endpoints
+- **Generación de clientes** en múltiples lenguajes
+- **Validación** de contratos de API
+
+---
+
+## 🔧 18.2 SpringDoc OpenAPI
+
+### Dependencia
+
+<Code code={`<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.3.0</version>
+</dependency>`} lang="xml" title="Dependencia SpringDoc" />
+
+### Configuración básica
+
+<Code code={`# application.properties
+springdoc.api-docs.path=/api-docs
+springdoc.swagger-ui.path=/swagger-ui.html
+springdoc.swagger-ui.enabled=true
+springdoc.swagger-ui.operationsSorter=method
+springdoc.swagger-ui.tagsSorter=alpha`} lang="properties" title="Configuración SpringDoc" />
+
+### URLs disponibles
+
+<Code code={`# Swagger UI
+http://localhost:8080/swagger-ui.html
+
+# OpenAPI JSON
+http://localhost:8080/api-docs
+
+# OpenAPI YAML
+http://localhost:8080/api-docs.yaml`} lang="text" title="URLs de documentación" />
+
+---
+
+## 🏷️ 18.3 Anotaciones de Documentación
+
+### Documentar la API
+
+<Code code={`@Configuration
+public class OpenApiConfig {
+    
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info()
+                .title("API de E-Commerce")
+                .version("1.0.0")
+                .description("API REST para gestión de productos y pedidos")
+                .contact(new Contact()
+                    .name("Equipo de Desarrollo")
+                    .email("dev@miempresa.com")
+                    .url("https://miempresa.com"))
+                .license(new License()
+                    .name("MIT")
+                    .url("https://opensource.org/licenses/MIT")))
+            .externalDocs(new ExternalDocumentation()
+                .description("Documentación completa")
+                .url("https://docs.miempresa.com"))
+            .servers(List.of(
+                new Server().url("http://localhost:8080").description("Desarrollo"),
+                new Server().url("https://api.miempresa.com").description("Producción")
+            ));
+    }
+}`} lang="java" title="Configuración OpenAPI" />
+
+### Documentar controllers
+
+<Code code={`@RestController
+@RequestMapping("/api/productos")
+@Tag(name = "Productos", description = "Gestión de productos del catálogo")
+public class ProductoController {
+    
+    @Operation(
+        summary = "Listar productos",
+        description = "Obtiene todos los productos con paginación y filtros opcionales"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Lista de productos",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProductoDTO.class)))),
+        @ApiResponse(responseCode = "400", description = "Parámetros inválidos")
+    })
+    @GetMapping
+    public Page<ProductoDTO> listar(
+            @Parameter(description = "Número de página (0-indexed)")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Tamaño de página")
+            @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Filtrar por categoría")
+            @RequestParam(required = false) String categoria) {
+        return productoService.listar(page, size, categoria);
+    }
+    
+    @Operation(summary = "Obtener producto por ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Producto encontrado"),
+        @ApiResponse(responseCode = "404", description = "Producto no encontrado",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/{id}")
+    public ProductoDTO obtener(
+            @Parameter(description = "ID del producto", required = true, example = "1")
+            @PathVariable Long id) {
+        return productoService.obtenerPorId(id);
+    }
+    
+    @Operation(summary = "Crear producto")
+    @ApiResponse(responseCode = "201", description = "Producto creado")
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductoDTO crear(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                description = "Datos del producto",
+                required = true,
+                content = @Content(schema = @Schema(implementation = ProductoCreateDTO.class)))
+            @Valid @RequestBody ProductoCreateDTO dto) {
+        return productoService.crear(dto);
+    }
+}`} lang="java" title="Controller documentado" />
+
+### Documentar DTOs
+
+<Code code={`@Schema(description = "Datos de un producto")
+public record ProductoDTO(
+    
+    @Schema(description = "ID único del producto", example = "1")
+    Long id,
+    
+    @Schema(description = "Nombre del producto", example = "Laptop Gaming", 
+            minLength = 3, maxLength = 100)
+    String nombre,
+    
+    @Schema(description = "Descripción detallada", example = "Laptop con RTX 4080")
+    String descripcion,
+    
+    @Schema(description = "Precio en USD", example = "1299.99", minimum = "0")
+    BigDecimal precio,
+    
+    @Schema(description = "Stock disponible", example = "50")
+    Integer stock,
+    
+    @Schema(description = "Categoría del producto", example = "ELECTRONICA",
+            allowableValues = {"ELECTRONICA", "ROPA", "HOGAR", "DEPORTES"})
+    String categoria,
+    
+    @Schema(description = "Estado del producto", defaultValue = "true")
+    Boolean activo
+) {}
+
+@Schema(description = "Datos para crear un producto")
+public record ProductoCreateDTO(
+    
+    @Schema(description = "Nombre del producto", required = true)
+    @NotBlank
+    @Size(min = 3, max = 100)
+    String nombre,
+    
+    @Schema(description = "Precio del producto", required = true)
+    @NotNull
+    @Positive
+    BigDecimal precio,
+    
+    @Schema(description = "Categoría", required = true)
+    @NotNull
+    Categoria categoria
+) {}`} lang="java" title="DTOs documentados" />
+
+---
+
+## 🔐 18.4 Documentar Seguridad
+
+### Configurar esquemas de seguridad
+
+<Code code={`@Configuration
+public class OpenApiSecurityConfig {
+    
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info().title("API Segura").version("1.0"))
+            .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+            .components(new Components()
+                .addSecuritySchemes("bearerAuth", new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .bearerFormat("JWT")
+                    .description("Token JWT de autenticación"))
+                .addSecuritySchemes("apiKey", new SecurityScheme()
+                    .type(SecurityScheme.Type.APIKEY)
+                    .in(SecurityScheme.In.HEADER)
+                    .name("X-API-Key")
+                    .description("API Key para acceso"))
+            );
+    }
+}`} lang="java" title="Esquemas de seguridad" />
+
+### Aplicar seguridad a endpoints
+
+<Code code={`@RestController
+@RequestMapping("/api/admin")
+@Tag(name = "Administración")
+@SecurityRequirement(name = "bearerAuth")  // Requiere JWT
+public class AdminController {
+    
+    @Operation(summary = "Listar usuarios (solo admin)")
+    @GetMapping("/usuarios")
+    public List<UsuarioDTO> listarUsuarios() {
+        return usuarioService.listar();
+    }
+}
+
+// Endpoint público (sin seguridad)
+@RestController
+@RequestMapping("/api/public")
+@Tag(name = "Público")
+public class PublicController {
+    
+    @Operation(summary = "Endpoint público", security = {})  // Sin seguridad
+    @GetMapping("/info")
+    public InfoDTO getInfo() {
+        return new InfoDTO("v1.0");
+    }
+}`} lang="java" title="Seguridad en endpoints" />
+
+---
+
+## 📝 18.5 Ejemplos y Respuestas
+
+### Ejemplos en requests
+
+<Code code={`@PostMapping
+@Operation(summary = "Crear pedido")
+public PedidoDTO crear(
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        content = @Content(
+            examples = {
+                @ExampleObject(
+                    name = "Pedido simple",
+                    summary = "Pedido con un producto",
+                    value = """
+                        {
+                            "usuarioId": 1,
+                            "productos": [
+                                {"productoId": 1, "cantidad": 2}
+                            ]
+                        }
+                        """
+                ),
+                @ExampleObject(
+                    name = "Pedido múltiple",
+                    summary = "Pedido con varios productos",
+                    value = """
+                        {
+                            "usuarioId": 1,
+                            "productos": [
+                                {"productoId": 1, "cantidad": 2},
+                                {"productoId": 5, "cantidad": 1}
+                            ],
+                            "direccionEnvio": "Calle 123"
+                        }
+                        """
+                )
+            }
+        )
+    )
+    @Valid @RequestBody PedidoCreateDTO dto) {
+    return pedidoService.crear(dto);
+}`} lang="java" title="Ejemplos de request" />
+
+### Documentar respuestas de error
+
+<Code code={`@Schema(description = "Respuesta de error")
+public record ErrorResponse(
+    
+    @Schema(description = "Código de error", example = "PRODUCTO_NO_ENCONTRADO")
+    String codigo,
+    
+    @Schema(description = "Mensaje descriptivo", example = "El producto con ID 999 no existe")
+    String mensaje,
+    
+    @Schema(description = "Timestamp del error")
+    LocalDateTime timestamp,
+    
+    @Schema(description = "Detalles adicionales")
+    Map<String, String> detalles
+) {}
+
+// En el controller
+@Operation(summary = "Obtener producto")
+@ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Éxito",
+        content = @Content(schema = @Schema(implementation = ProductoDTO.class))),
+    @ApiResponse(responseCode = "404", description = "No encontrado",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+            examples = @ExampleObject(value = """
+                {
+                    "codigo": "PRODUCTO_NO_ENCONTRADO",
+                    "mensaje": "El producto con ID 999 no existe",
+                    "timestamp": "2024-01-15T10:30:00"
+                }
+                """))),
+    @ApiResponse(responseCode = "500", description = "Error interno")
+})
+@GetMapping("/{id}")
+public ProductoDTO obtener(@PathVariable Long id) {
+    return productoService.obtenerPorId(id);
+}`} lang="java" title="Respuestas de error" />
+
+---
+
+## 🎨 18.6 Personalización de Swagger UI
+
+### Configuración avanzada
+
+<Code code={`# application.properties
+# Ordenar operaciones
+springdoc.swagger-ui.operationsSorter=method
+springdoc.swagger-ui.tagsSorter=alpha
+
+# Expandir/colapsar
+springdoc.swagger-ui.doc-expansion=none
+springdoc.swagger-ui.default-models-expand-depth=-1
+
+# Filtros
+springdoc.swagger-ui.filter=true
+springdoc.swagger-ui.show-extensions=true
+
+# Tema oscuro (requiere CSS personalizado)
+springdoc.swagger-ui.disable-swagger-default-url=true
+
+# Grupos de APIs
+springdoc.group-configs[0].group=public
+springdoc.group-configs[0].paths-to-match=/api/public/**
+springdoc.group-configs[1].group=admin
+springdoc.group-configs[1].paths-to-match=/api/admin/**`} lang="properties" title="Configuración avanzada" />
+
+### Grupos de APIs
+
+<Code code={`@Configuration
+public class OpenApiGroupConfig {
+    
+    @Bean
+    public GroupedOpenApi publicApi() {
+        return GroupedOpenApi.builder()
+            .group("public")
+            .displayName("API Pública")
+            .pathsToMatch("/api/public/**", "/api/productos/**")
+            .build();
+    }
+    
+    @Bean
+    public GroupedOpenApi adminApi() {
+        return GroupedOpenApi.builder()
+            .group("admin")
+            .displayName("API de Administración")
+            .pathsToMatch("/api/admin/**")
+            .addOpenApiMethodFilter(method -> 
+                method.isAnnotationPresent(PreAuthorize.class))
+            .build();
+    }
+    
+    @Bean
+    public GroupedOpenApi internalApi() {
+        return GroupedOpenApi.builder()
+            .group("internal")
+            .displayName("API Interna")
+            .pathsToMatch("/internal/**")
+            .build();
+    }
+}`} lang="java" title="Grupos de APIs" />
+
+---
+
+## 🔄 18.7 Versionado de APIs
+
+### Documentar versiones
+
+<Code code={`@Configuration
+public class OpenApiVersionConfig {
+    
+    @Bean
+    public GroupedOpenApi v1Api() {
+        return GroupedOpenApi.builder()
+            .group("v1")
+            .displayName("API v1")
+            .pathsToMatch("/api/v1/**")
+            .addOpenApiCustomizer(openApi -> 
+                openApi.info(new Info()
+                    .title("API v1")
+                    .version("1.0.0")
+                    .description("Versión estable")))
+            .build();
+    }
+    
+    @Bean
+    public GroupedOpenApi v2Api() {
+        return GroupedOpenApi.builder()
+            .group("v2")
+            .displayName("API v2")
+            .pathsToMatch("/api/v2/**")
+            .addOpenApiCustomizer(openApi -> 
+                openApi.info(new Info()
+                    .title("API v2")
+                    .version("2.0.0")
+                    .description("Nueva versión con mejoras")))
+            .build();
+    }
+}`} lang="java" title="Versionado" />
+
+---
+
+## 📤 18.8 Exportar y Generar Clientes
+
+### Exportar especificación
+
+<Code code={`# Descargar OpenAPI JSON
+curl http://localhost:8080/api-docs -o openapi.json
+
+# Descargar OpenAPI YAML
+curl http://localhost:8080/api-docs.yaml -o openapi.yaml`} lang="bash" title="Exportar especificación" />
+
+### Generar cliente con OpenAPI Generator
+
+<Code code={`# Instalar OpenAPI Generator
+npm install @openapitools/openapi-generator-cli -g
+
+# Generar cliente TypeScript
+openapi-generator-cli generate \
+  -i http://localhost:8080/api-docs \
+  -g typescript-axios \
+  -o ./generated-client
+
+# Generar cliente Java
+openapi-generator-cli generate \
+  -i openapi.json \
+  -g java \
+  -o ./java-client \
+  --additional-properties=library=resttemplate`} lang="bash" title="Generar clientes" />
+
+### Plugin Maven para generar spec
+
+<Code code={`<plugin>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-maven-plugin</artifactId>
+    <version>1.4</version>
+    <executions>
+        <execution>
+            <phase>integration-test</phase>
+            <goals>
+                <goal>generate</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <apiDocsUrl>http://localhost:8080/api-docs</apiDocsUrl>
+        <outputFileName>openapi.json</outputFileName>
+        <outputDir>\${project.build.directory}</outputDir>
+    </configuration>
+</plugin>`} lang="xml" title="Plugin Maven" />
+
+<Aside type="tip">
+Mantén la documentación actualizada documentando directamente en el código. Usa ejemplos realistas y documenta todos los códigos de error posibles.
+</Aside>
+

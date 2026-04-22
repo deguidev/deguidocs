@@ -1,0 +1,513 @@
+---
+title: 7. Manejo de Excepciones y Validaciones
+description: "@ExceptionHandler, @ControllerAdvice, Bean Validation, validadores personalizados"
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## ⚠️ 7.1 Manejo de Excepciones en Spring
+
+### El problema
+
+<Code code={`// Sin manejo de excepciones
+@GetMapping("/{id}")
+public Usuario obtener(@PathVariable Long id) {
+    return repository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+}
+
+// Respuesta por defecto (fea y expone información):
+// {
+//   "timestamp": "2024-01-15T10:30:00",
+//   "status": 500,
+//   "error": "Internal Server Error",
+//   "trace": "java.lang.RuntimeException: Usuario no encontrado\\n\\tat..."
+// }`} lang="java" title="Problema: Excepciones sin manejar" />
+
+### Excepciones personalizadas
+
+<Code code={`// Excepción base
+public class ApiException extends RuntimeException {
+    private final HttpStatus status;
+    private final String code;
+    
+    public ApiException(String message, HttpStatus status, String code) {
+        super(message);
+        this.status = status;
+        this.code = code;
+    }
+    
+    // getters
+}
+
+// Excepciones específicas
+public class ResourceNotFoundException extends ApiException {
+    public ResourceNotFoundException(String resource, Long id) {
+        super(
+            resource + " con ID " + id + " no encontrado",
+            HttpStatus.NOT_FOUND,
+            "RESOURCE_NOT_FOUND"
+        );
+    }
+}
+
+public class BadRequestException extends ApiException {
+    public BadRequestException(String message) {
+        super(message, HttpStatus.BAD_REQUEST, "BAD_REQUEST");
+    }
+}`} lang="java" title="Excepciones personalizadas" />
+
+---
+
+## 🎯 7.2 @ExceptionHandler
+
+### Manejo local (en un controller)
+
+<Code code={`@RestController
+@RequestMapping("/api/usuarios")
+public class UsuarioController {
+    
+    @GetMapping("/{id}")
+    public Usuario obtener(@PathVariable Long id) {
+        return service.buscarPorId(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario", id));
+    }
+    
+    // Maneja excepciones SOLO en este controller
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(
+            ex.getCode(),
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+}`} lang="java" title="@ExceptionHandler local" />
+
+### Clase ErrorResponse
+
+<Code code={`public class ErrorResponse {
+    private String code;
+    private String message;
+    private LocalDateTime timestamp;
+    private List<FieldError> errors;  // Para validaciones
+    
+    public ErrorResponse(String code, String message, LocalDateTime timestamp) {
+        this.code = code;
+        this.message = message;
+        this.timestamp = timestamp;
+    }
+    
+    // getters y setters
+    
+    public static class FieldError {
+        private String field;
+        private String message;
+        
+        // constructor, getters
+    }
+}`} lang="java" title="Clase ErrorResponse" />
+
+---
+
+## 🌐 7.3 @ControllerAdvice
+
+### Manejo global de excepciones
+
+<Code code={`@RestControllerAdvice  // @ControllerAdvice + @ResponseBody
+public class GlobalExceptionHandler {
+    
+    // Recursos no encontrados
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(
+            ex.getCode(),
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+    
+    // Errores de validación
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+        List<ErrorResponse.FieldError> fieldErrors = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(e -> new ErrorResponse.FieldError(e.getField(), e.getDefaultMessage()))
+            .toList();
+        
+        ErrorResponse error = new ErrorResponse(
+            "VALIDATION_ERROR",
+            "Error de validación",
+            LocalDateTime.now()
+        );
+        error.setErrors(fieldErrors);
+        
+        return ResponseEntity.badRequest().body(error);
+    }
+    
+    // Cualquier otra excepción
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
+        ErrorResponse error = new ErrorResponse(
+            "INTERNAL_ERROR",
+            "Error interno del servidor",
+            LocalDateTime.now()
+        );
+        
+        // Log del error real (no exponer al cliente)
+        log.error("Error no manejado: ", ex);
+        
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+}`} lang="java" title="@RestControllerAdvice global" />
+
+---
+
+## 🛡️ 7.4 Manejo Global de Errores
+
+### Handler completo
+
+<Code code={`@RestControllerAdvice
+@Slf4j
+public class GlobalExceptionHandler {
+    
+    // API Exceptions personalizadas
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ErrorResponse> handleApiException(ApiException ex) {
+        log.warn("API Exception: {}", ex.getMessage());
+        
+        ErrorResponse error = ErrorResponse.builder()
+            .code(ex.getCode())
+            .message(ex.getMessage())
+            .timestamp(LocalDateTime.now())
+            .build();
+            
+        return ResponseEntity.status(ex.getStatus()).body(error);
+    }
+    
+    // Recurso no encontrado (JPA)
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+            .code("ENTITY_NOT_FOUND")
+            .message(ex.getMessage())
+            .timestamp(LocalDateTime.now())
+            .build();
+            
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+    
+    // Parámetros inválidos
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
+        List<ErrorResponse.FieldError> errors = ex.getConstraintViolations()
+            .stream()
+            .map(v -> new ErrorResponse.FieldError(
+                v.getPropertyPath().toString(),
+                v.getMessage()
+            ))
+            .toList();
+        
+        ErrorResponse error = ErrorResponse.builder()
+            .code("CONSTRAINT_VIOLATION")
+            .message("Violación de restricciones")
+            .errors(errors)
+            .timestamp(LocalDateTime.now())
+            .build();
+            
+        return ResponseEntity.badRequest().body(error);
+    }
+    
+    // Método HTTP no soportado
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        ErrorResponse error = ErrorResponse.builder()
+            .code("METHOD_NOT_ALLOWED")
+            .message("Método " + ex.getMethod() + " no soportado")
+            .timestamp(LocalDateTime.now())
+            .build();
+            
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(error);
+    }
+}`} lang="java" title="Handler completo" />
+
+---
+
+## ✅ 7.5 Validaciones con @Valid
+
+### Dependencia
+
+<Code code={`<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>`} lang="xml" title="Dependencia de validación" />
+
+### Anotaciones de validación
+
+<Code code={`public class CrearUsuarioDTO {
+    
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
+    private String nombre;
+    
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "El email debe ser válido")
+    private String email;
+    
+    @NotBlank(message = "La contraseña es obligatoria")
+    @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[0-9]).*$", 
+             message = "La contraseña debe contener al menos una mayúscula y un número")
+    private String password;
+    
+    @NotNull(message = "La edad es obligatoria")
+    @Min(value = 18, message = "Debe ser mayor de edad")
+    @Max(value = 120, message = "Edad no válida")
+    private Integer edad;
+    
+    @Past(message = "La fecha de nacimiento debe ser en el pasado")
+    private LocalDate fechaNacimiento;
+    
+    // getters y setters
+}`} lang="java" title="DTO con validaciones" />
+
+### Usar @Valid en controller
+
+<Code code={`@RestController
+@RequestMapping("/api/usuarios")
+public class UsuarioController {
+    
+    @PostMapping
+    public ResponseEntity<Usuario> crear(@Valid @RequestBody CrearUsuarioDTO dto) {
+        // Si la validación falla, lanza MethodArgumentNotValidException
+        // El GlobalExceptionHandler lo captura
+        Usuario usuario = service.crear(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
+    }
+    
+    @PutMapping("/{id}")
+    public Usuario actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody ActualizarUsuarioDTO dto) {
+        return service.actualizar(id, dto);
+    }
+}`} lang="java" title="Validación en controller" />
+
+---
+
+## 📋 7.6 Bean Validation
+
+### Anotaciones disponibles
+
+| Anotación | Descripción |
+|-----------|-------------|
+| `@NotNull` | No puede ser null |
+| `@NotBlank` | No null, no vacío, no solo espacios |
+| `@NotEmpty` | No null, no vacío |
+| `@Size(min, max)` | Tamaño de string o colección |
+| `@Min(value)` | Valor mínimo numérico |
+| `@Max(value)` | Valor máximo numérico |
+| `@Email` | Formato de email válido |
+| `@Pattern(regexp)` | Coincide con expresión regular |
+| `@Past` | Fecha en el pasado |
+| `@Future` | Fecha en el futuro |
+| `@Positive` | Número positivo |
+| `@Negative` | Número negativo |
+| `@Digits(integer, fraction)` | Dígitos enteros y decimales |
+
+### Validación en parámetros
+
+<Code code={`@RestController
+@RequestMapping("/api/productos")
+@Validated  // Habilita validación en parámetros
+public class ProductoController {
+    
+    @GetMapping("/{id}")
+    public Producto obtener(
+            @PathVariable @Min(1) Long id) {
+        return service.buscarPorId(id);
+    }
+    
+    @GetMapping
+    public List<Producto> buscar(
+            @RequestParam @NotBlank String categoria,
+            @RequestParam @Min(0) @Max(10000) Double precioMax) {
+        return service.buscar(categoria, precioMax);
+    }
+}`} lang="java" title="Validación en parámetros" />
+
+### Grupos de validación
+
+<Code code={`// Interfaces para grupos
+public interface OnCreate {}
+public interface OnUpdate {}
+
+// DTO con grupos
+public class UsuarioDTO {
+    
+    @Null(groups = OnCreate.class)  // Null al crear
+    @NotNull(groups = OnUpdate.class)  // Requerido al actualizar
+    private Long id;
+    
+    @NotBlank(groups = {OnCreate.class, OnUpdate.class})
+    private String nombre;
+    
+    @NotBlank(groups = OnCreate.class)  // Solo requerido al crear
+    private String password;
+}
+
+// Controller
+@PostMapping
+public Usuario crear(@Validated(OnCreate.class) @RequestBody UsuarioDTO dto) {
+    return service.crear(dto);
+}
+
+@PutMapping("/{id}")
+public Usuario actualizar(
+        @PathVariable Long id,
+        @Validated(OnUpdate.class) @RequestBody UsuarioDTO dto) {
+    return service.actualizar(id, dto);
+}`} lang="java" title="Grupos de validación" />
+
+---
+
+## 🔧 7.7 Validadores Personalizados
+
+### Crear anotación personalizada
+
+<Code code={`// 1. Definir la anotación
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = UniqueEmailValidator.class)
+public @interface UniqueEmail {
+    String message() default "El email ya está registrado";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
+}
+
+// 2. Implementar el validador
+@Component
+public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, String> {
+    
+    private final UsuarioRepository repository;
+    
+    public UniqueEmailValidator(UsuarioRepository repository) {
+        this.repository = repository;
+    }
+    
+    @Override
+    public boolean isValid(String email, ConstraintValidatorContext context) {
+        if (email == null) {
+            return true;  // @NotNull se encarga de esto
+        }
+        return !repository.existsByEmail(email);
+    }
+}
+
+// 3. Usar en DTO
+public class RegistroDTO {
+    
+    @NotBlank
+    @Email
+    @UniqueEmail  // Validación personalizada
+    private String email;
+}`} lang="java" title="Validador personalizado" />
+
+### Validador con múltiples campos
+
+<Code code={`// Anotación a nivel de clase
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = PasswordMatchValidator.class)
+public @interface PasswordMatch {
+    String message() default "Las contraseñas no coinciden";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
+}
+
+// Validador
+public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch, RegistroDTO> {
+    
+    @Override
+    public boolean isValid(RegistroDTO dto, ConstraintValidatorContext context) {
+        if (dto.getPassword() == null || dto.getConfirmPassword() == null) {
+            return true;
+        }
+        return dto.getPassword().equals(dto.getConfirmPassword());
+    }
+}
+
+// Uso
+@PasswordMatch
+public class RegistroDTO {
+    private String password;
+    private String confirmPassword;
+}`} lang="java" title="Validador de múltiples campos" />
+
+---
+
+## 📝 7.8 Estructura de Errores REST
+
+### Respuesta de error estándar
+
+<Code code={`{
+    "code": "VALIDATION_ERROR",
+    "message": "Error de validación en los datos enviados",
+    "timestamp": "2024-01-15T10:30:00",
+    "path": "/api/usuarios",
+    "errors": [
+        {
+            "field": "email",
+            "message": "El email debe ser válido"
+        },
+        {
+            "field": "password",
+            "message": "La contraseña debe tener al menos 8 caracteres"
+        }
+    ]
+}`} lang="json" title="Estructura de error" />
+
+### ErrorResponse completo
+
+<Code code={`@Data
+@Builder
+public class ErrorResponse {
+    private String code;
+    private String message;
+    private LocalDateTime timestamp;
+    private String path;
+    private List<FieldError> errors;
+    
+    @Data
+    @AllArgsConstructor
+    public static class FieldError {
+        private String field;
+        private String message;
+    }
+    
+    public static ErrorResponse of(String code, String message) {
+        return ErrorResponse.builder()
+            .code(code)
+            .message(message)
+            .timestamp(LocalDateTime.now())
+            .build();
+    }
+    
+    public static ErrorResponse validation(List<FieldError> errors) {
+        return ErrorResponse.builder()
+            .code("VALIDATION_ERROR")
+            .message("Error de validación")
+            .timestamp(LocalDateTime.now())
+            .errors(errors)
+            .build();
+    }
+}`} lang="java" title="ErrorResponse con builder" />
+
+<Aside type="tip">
+Mantén una estructura de errores consistente en toda tu API. Esto facilita el manejo de errores en el frontend.
+</Aside>
+

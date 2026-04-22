@@ -1,0 +1,451 @@
+---
+title: 5. Spring Boot en Profundidad
+description: Auto-configuración, starters, properties, perfiles, logs y DevTools
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## ⚡ 5.1 Auto-configuración
+
+### ¿Qué es la auto-configuración?
+
+Spring Boot **configura automáticamente** tu aplicación basándose en las dependencias que agregas. No necesitas escribir configuración manual.
+
+<Code code={`// Sin Spring Boot (configuración manual)
+@Configuration
+public class DataSourceConfig {
+    @Bean
+    public DataSource dataSource() {
+        HikariDataSource ds = new HikariDataSource();
+        ds.setJdbcUrl("jdbc:mysql://localhost:3306/mydb");
+        ds.setUsername("root");
+        ds.setPassword("password");
+        ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        return ds;
+    }
+}
+
+// Con Spring Boot (auto-configuración)
+// Solo agrega la dependencia y las properties
+// ¡Spring Boot configura todo automáticamente!`} lang="java" title="Auto-configuración vs manual" />
+
+### Cómo funciona
+
+<Code code={`// @SpringBootApplication incluye:
+@SpringBootApplication
+public class MiApp { }
+
+// Equivale a:
+@Configuration           // Clase de configuración
+@EnableAutoConfiguration // Habilita auto-configuración
+@ComponentScan           // Escanea componentes
+public class MiApp { }`} lang="java" title="@SpringBootApplication" />
+
+### Ver auto-configuraciones activas
+
+<Code code={`# application.properties
+debug=true
+
+# En consola verás:
+# ============================
+# CONDITIONS EVALUATION REPORT
+# ============================
+# Positive matches:
+#    DataSourceAutoConfiguration matched
+#    JpaRepositoriesAutoConfiguration matched
+# Negative matches:
+#    MongoAutoConfiguration did not match`} lang="properties" title="Debug de auto-configuración" />
+
+<Aside type="tip">
+Usa `debug=true` para ver qué auto-configuraciones se aplican y cuáles no.
+</Aside>
+
+---
+
+## 📦 5.2 Starter Dependencies
+
+### ¿Qué son los Starters?
+
+Los **starters** son dependencias que agrupan todo lo necesario para una funcionalidad específica.
+
+### Starters más comunes
+
+| Starter | Incluye |
+|---------|---------|
+| `spring-boot-starter-web` | Spring MVC, Tomcat, Jackson |
+| `spring-boot-starter-data-jpa` | Spring Data JPA, Hibernate |
+| `spring-boot-starter-security` | Spring Security |
+| `spring-boot-starter-test` | JUnit, Mockito, AssertJ |
+| `spring-boot-starter-validation` | Bean Validation, Hibernate Validator |
+| `spring-boot-starter-actuator` | Endpoints de monitoreo |
+
+### Ejemplo en pom.xml
+
+<Code code={`<dependencies>
+    <!-- Web: incluye Tomcat, Spring MVC, Jackson -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    
+    <!-- JPA: incluye Hibernate, Spring Data JPA -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    
+    <!-- No necesitas especificar versiones -->
+    <!-- spring-boot-starter-parent las gestiona -->
+</dependencies>`} lang="xml" title="Starters en Maven" />
+
+---
+
+## ⚙️ 5.3 application.properties vs application.yml
+
+### application.properties
+
+<Code code={`# Configuración del servidor
+server.port=8080
+server.servlet.context-path=/api
+
+# Base de datos
+spring.datasource.url=jdbc:mysql://localhost:3306/mydb
+spring.datasource.username=root
+spring.datasource.password=secret
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# Logging
+logging.level.root=INFO
+logging.level.com.miapp=DEBUG`} lang="properties" title="application.properties" />
+
+### application.yml
+
+<Code code={`# Misma configuración en YAML
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/mydb
+    username: root
+    password: secret
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    root: INFO
+    com.miapp: DEBUG`} lang="yaml" title="application.yml" />
+
+### Comparación
+
+| Aspecto | .properties | .yml |
+|---------|-------------|------|
+| Sintaxis | Plana (key=value) | Jerárquica |
+| Legibilidad | Menos legible | Más legible |
+| Listas | Índices (list[0]=x) | Guiones (- x) |
+| Errores | Más tolerante | Sensible a indentación |
+
+<Aside type="note">
+Ambos formatos funcionan igual. YAML es más legible para configuraciones complejas.
+</Aside>
+
+---
+
+## 🔧 5.4 Configuración Externa
+
+### Orden de prioridad (de mayor a menor)
+
+1. Argumentos de línea de comandos
+2. Variables de entorno
+3. application.properties fuera del JAR
+4. application.properties dentro del JAR
+
+### Inyectar valores de configuración
+
+<Code code={`# application.properties
+app.nombre=Mi Aplicación
+app.version=1.0.0
+app.max-usuarios=100
+
+# Variables de entorno (sobrescriben properties)
+# APP_NOMBRE=Producción App`} lang="properties" title="Propiedades personalizadas" />
+
+<Code code={`@Service
+public class AppInfoService {
+    
+    @Value("\${app.nombre}")
+    private String nombre;
+    
+    @Value("\${app.version}")
+    private String version;
+    
+    @Value("\${app.max-usuarios:50}")  // Valor por defecto: 50
+    private int maxUsuarios;
+    
+    public String getInfo() {
+        return nombre + " v" + version;
+    }
+}`} lang="java" title="Inyección con @Value" />
+
+### Clase de configuración tipada
+
+<Code code={`@Configuration
+@ConfigurationProperties(prefix = "app")
+public class AppProperties {
+    
+    private String nombre;
+    private String version;
+    private int maxUsuarios;
+    
+    // Getters y setters
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    // ...
+}
+
+// Uso
+@Service
+public class MiServicio {
+    
+    private final AppProperties props;
+    
+    public MiServicio(AppProperties props) {
+        this.props = props;
+    }
+    
+    public void mostrarInfo() {
+        System.out.println(props.getNombre());
+    }
+}`} lang="java" title="@ConfigurationProperties" />
+
+---
+
+## 🌍 5.5 Manejo de Perfiles (dev, prod)
+
+### Archivos por perfil
+
+<Code code={`src/main/resources/
+├── application.properties          # Configuración común
+├── application-dev.properties      # Solo desarrollo
+├── application-prod.properties     # Solo producción
+└── application-test.properties     # Solo testing`} lang="text" title="Estructura de archivos" />
+
+### Configuración por perfil
+
+<Code code={`# application.properties (común)
+app.nombre=Mi App
+spring.profiles.active=dev
+
+# application-dev.properties
+server.port=8080
+spring.datasource.url=jdbc:h2:mem:devdb
+logging.level.root=DEBUG
+
+# application-prod.properties
+server.port=80
+spring.datasource.url=jdbc:postgresql://prod:5432/mydb
+logging.level.root=WARN`} lang="properties" title="Configuración por perfil" />
+
+### Activar perfiles
+
+<Code code={`# En application.properties
+spring.profiles.active=dev
+
+# Por línea de comandos
+java -jar app.jar --spring.profiles.active=prod
+
+# Variable de entorno
+export SPRING_PROFILES_ACTIVE=prod
+
+# En IDE (IntelliJ)
+# Run Configuration → Environment variables → SPRING_PROFILES_ACTIVE=dev`} lang="bash" title="Activar perfiles" />
+
+---
+
+## 📝 5.6 Logs en Spring Boot
+
+### Configuración de logging
+
+<Code code={`# Nivel de log por paquete
+logging.level.root=INFO
+logging.level.org.springframework=WARN
+logging.level.com.miapp=DEBUG
+logging.level.org.hibernate.SQL=DEBUG
+
+# Archivo de log
+logging.file.name=logs/app.log
+logging.file.max-size=10MB
+logging.file.max-history=30
+
+# Patrón de consola
+logging.pattern.console=%d{HH:mm:ss} %-5level %logger{36} - %msg%n`} lang="properties" title="Configuración de logs" />
+
+### Uso de logs en código
+
+<Code code={`import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Service
+public class UsuarioService {
+    
+    // Crear logger para esta clase
+    private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
+    
+    public Usuario buscar(Long id) {
+        log.debug("Buscando usuario con ID: {}", id);
+        
+        Usuario usuario = repository.findById(id).orElse(null);
+        
+        if (usuario == null) {
+            log.warn("Usuario no encontrado: {}", id);
+            return null;
+        }
+        
+        log.info("Usuario encontrado: {}", usuario.getNombre());
+        return usuario;
+    }
+    
+    public void eliminar(Long id) {
+        try {
+            repository.deleteById(id);
+            log.info("Usuario eliminado: {}", id);
+        } catch (Exception e) {
+            log.error("Error al eliminar usuario {}: {}", id, e.getMessage(), e);
+        }
+    }
+}`} lang="java" title="Uso de SLF4J Logger" />
+
+### Con Lombok
+
+<Code code={`import lombok.extern.slf4j.Slf4j;
+
+@Slf4j  // Genera automáticamente: private static final Logger log = ...
+@Service
+public class ProductoService {
+    
+    public void procesar(Producto producto) {
+        log.info("Procesando producto: {}", producto.getNombre());
+    }
+}`} lang="java" title="Logger con Lombok @Slf4j" />
+
+---
+
+## 🔥 5.7 DevTools y Hot Reload
+
+### Agregar DevTools
+
+<Code code={`<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+    <scope>runtime</scope>
+    <optional>true</optional>
+</dependency>`} lang="xml" title="Dependencia DevTools" />
+
+### Características de DevTools
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Restart automático** | Reinicia al detectar cambios en clases |
+| **LiveReload** | Recarga el navegador automáticamente |
+| **Configuración dev** | Desactiva caché de templates |
+| **H2 Console** | Habilita consola web de H2 |
+
+### Configuración
+
+<Code code={`# application.properties
+spring.devtools.restart.enabled=true
+spring.devtools.livereload.enabled=true
+
+# Excluir carpetas del restart
+spring.devtools.restart.exclude=static/**,public/**
+
+# Trigger file (solo reinicia cuando se modifica este archivo)
+spring.devtools.restart.trigger-file=.reloadtrigger`} lang="properties" title="Configuración DevTools" />
+
+<Aside type="caution">
+DevTools se desactiva automáticamente en producción (cuando ejecutas un JAR empaquetado).
+</Aside>
+
+---
+
+## 🚀 5.8 Personalización del Arranque
+
+### Banner personalizado
+
+<Code code={`# src/main/resources/banner.txt
+  __  __ _    _                 
+ |  \\/  (_)  / \\   _ __  _ __  
+ | |\\/| | | / _ \\ | '_ \\| '_ \\ 
+ | |  | | |/ ___ \\| |_) | |_) |
+ |_|  |_|_/_/   \\_\\ .__/| .__/ 
+                  |_|   |_|    
+ :: Spring Boot :: v\${spring-boot.version}
+ :: App Version :: \${app.version}`} lang="text" title="banner.txt personalizado" />
+
+### Desactivar banner
+
+<Code code={`# application.properties
+spring.main.banner-mode=off
+
+# O en código
+@SpringBootApplication
+public class MiApp {
+    public static void main(String[] args) {
+        SpringApplication app = new SpringApplication(MiApp.class);
+        app.setBannerMode(Banner.Mode.OFF);
+        app.run(args);
+    }
+}`} lang="java" title="Desactivar banner" />
+
+### Eventos de arranque
+
+<Code code={`@Component
+public class AppStartupListener {
+    
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady() {
+        System.out.println("✅ Aplicación lista para recibir requests");
+    }
+    
+    @EventListener(ContextRefreshedEvent.class)
+    public void onContextRefreshed() {
+        System.out.println("🔄 Contexto de Spring inicializado");
+    }
+}`} lang="java" title="Listeners de eventos de arranque" />
+
+### CommandLineRunner
+
+<Code code={`@Component
+public class DataInitializer implements CommandLineRunner {
+    
+    private final UsuarioRepository repository;
+    
+    public DataInitializer(UsuarioRepository repository) {
+        this.repository = repository;
+    }
+    
+    @Override
+    public void run(String... args) throws Exception {
+        // Se ejecuta al iniciar la aplicación
+        if (repository.count() == 0) {
+            repository.save(new Usuario("admin", "admin@example.com"));
+            System.out.println("👤 Usuario admin creado");
+        }
+    }
+}`} lang="java" title="CommandLineRunner para inicialización" />
+

@@ -1,0 +1,656 @@
+---
+title: 20. Docker y Despliegue
+description: Dockerfile, Docker Compose, despliegue en servidores y CI/CD
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🐳 20.1 Docker Básico
+
+### Dockerfile simple
+
+<Code code={`FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY target/*.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]`} lang="dockerfile" title="Dockerfile básico" />
+
+### Dockerfile multi-stage (optimizado)
+
+<Code code={`# Etapa 1: Build
+FROM eclipse-temurin:21-jdk-alpine AS builder
+
+WORKDIR /app
+
+# Copiar archivos de Maven
+COPY pom.xml .
+COPY .mvn .mvn
+COPY mvnw .
+
+# Descargar dependencias (cacheadas si pom.xml no cambia)
+RUN ./mvnw dependency:go-offline
+
+# Copiar código fuente
+COPY src src
+
+# Compilar
+RUN ./mvnw package -DskipTests
+
+# Etapa 2: Runtime
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+# Crear usuario no-root
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+
+# Copiar JAR desde builder
+COPY --from=builder /app/target/*.jar app.jar
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget -q --spider http://localhost:8080/actuator/health || exit 1
+
+ENTRYPOINT ["java", "-jar", "app.jar"]`} lang="dockerfile" title="Dockerfile multi-stage" />
+
+### Dockerfile con layers (Spring Boot 2.3+)
+
+<Code code={`FROM eclipse-temurin:21-jre-alpine AS builder
+WORKDIR /app
+COPY target/*.jar app.jar
+RUN java -Djarmode=layertools -jar app.jar extract
+
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+
+COPY --from=builder /app/dependencies/ ./
+COPY --from=builder /app/spring-boot-loader/ ./
+COPY --from=builder /app/snapshot-dependencies/ ./
+COPY --from=builder /app/application/ ./
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]`} lang="dockerfile" title="Dockerfile con layers" />
+
+### Comandos Docker
+
+<Code code={`# Construir imagen
+docker build -t mi-app:1.0.0 .
+
+# Ejecutar contenedor
+docker run -d -p 8080:8080 --name mi-app mi-app:1.0.0
+
+# Con variables de entorno
+docker run -d -p 8080:8080 \
+  -e SPRING_PROFILES_ACTIVE=prod \
+  -e SPRING_DATASOURCE_URL=jdbc:mysql://host:3306/db \
+  mi-app:1.0.0
+
+# Ver logs
+docker logs -f mi-app
+
+# Entrar al contenedor
+docker exec -it mi-app sh`} lang="bash" title="Comandos Docker" />
+
+---
+
+## 🐙 20.2 Docker Compose
+
+### Aplicación con MySQL
+
+<Code code={`version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/miapp
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=secret
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  db:
+    image: mysql:8
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=miapp
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data:`} lang="yaml" title="docker-compose.yml" />
+
+### Stack completo con Redis y RabbitMQ
+
+<Code code={`version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/miapp
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    networks:
+      - backend
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=miapp
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - app
+    networks:
+      - backend
+
+networks:
+  backend:
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:`} lang="yaml" title="Stack completo" />
+
+### Perfil Docker
+
+<Code code={`# application-docker.properties
+spring.datasource.url=jdbc:mysql://db:3306/miapp
+spring.datasource.username=root
+spring.datasource.password=secret
+
+spring.data.redis.host=redis
+spring.data.redis.port=6379
+
+spring.rabbitmq.host=rabbitmq
+spring.rabbitmq.port=5672`} lang="properties" title="Perfil Docker" />
+
+---
+
+## 🚀 20.3 CI/CD con GitHub Actions
+
+### Build y test
+
+<Code code={`# .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Build with Maven
+        run: mvn clean verify
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: target/site/jacoco/jacoco.xml`} lang="yaml" title="CI básico" />
+
+### Build y push a Docker Hub
+
+<Code code={`# .github/workflows/docker.yml
+name: Docker Build & Push
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Build JAR
+        run: mvn clean package -DskipTests
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: \${{ secrets.DOCKER_USERNAME }}
+          password: \${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Extract version
+        id: version
+        run: echo "VERSION=\${GITHUB_REF#refs/tags/v}" >> \$GITHUB_OUTPUT
+      
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            miusuario/mi-app:\${{ steps.version.outputs.VERSION }}
+            miusuario/mi-app:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max`} lang="yaml" title="Docker Build & Push" />
+
+### Deploy a servidor
+
+<Code code={`# .github/workflows/deploy.yml
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Docker Build & Push"]
+    types: [completed]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: \${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: \${{ secrets.SERVER_HOST }}
+          username: \${{ secrets.SERVER_USER }}
+          key: \${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /opt/mi-app
+            docker-compose pull
+            docker-compose up -d
+            docker system prune -f`} lang="yaml" title="Deploy automático" />
+
+---
+
+## ☸️ 20.4 Kubernetes
+
+### Deployment
+
+<Code code={`# k8s/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-app
+  labels:
+    app: mi-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mi-app
+  template:
+    metadata:
+      labels:
+        app: mi-app
+    spec:
+      containers:
+        - name: mi-app
+          image: miusuario/mi-app:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "kubernetes"
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: url
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: password
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5`} lang="yaml" title="Deployment" />
+
+### Service y Ingress
+
+<Code code={`# k8s/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mi-app-service
+spec:
+  selector:
+    app: mi-app
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: ClusterIP
+
+---
+# k8s/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mi-app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api.midominio.com
+      secretName: mi-app-tls
+  rules:
+    - host: api.midominio.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mi-app-service
+                port:
+                  number: 80`} lang="yaml" title="Service e Ingress" />
+
+### ConfigMap y Secrets
+
+<Code code={`# k8s/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mi-app-config
+data:
+  SPRING_PROFILES_ACTIVE: "kubernetes"
+  SERVER_PORT: "8080"
+  LOGGING_LEVEL_ROOT: "INFO"
+
+---
+# k8s/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secrets
+type: Opaque
+stringData:
+  url: "jdbc:postgresql://postgres:5432/miapp"
+  username: "postgres"
+  password: "supersecret"`} lang="yaml" title="ConfigMap y Secrets" />
+
+---
+
+## 🌐 20.5 Despliegue en Cloud
+
+### AWS Elastic Beanstalk
+
+<Code code={`# .elasticbeanstalk/config.yml
+branch-defaults:
+  main:
+    environment: mi-app-prod
+global:
+  application_name: mi-app
+  default_region: us-east-1
+  workspace_type: Application
+
+# Procfile
+web: java -jar target/mi-app.jar --server.port=5000`} lang="yaml" title="Elastic Beanstalk" />
+
+### Google Cloud Run
+
+<Code code={`# Desplegar a Cloud Run
+gcloud run deploy mi-app \
+  --image gcr.io/mi-proyecto/mi-app:latest \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-env-vars SPRING_PROFILES_ACTIVE=gcp \
+  --memory 512Mi \
+  --cpu 1 \
+  --min-instances 0 \
+  --max-instances 10`} lang="bash" title="Cloud Run" />
+
+### Azure Container Apps
+
+<Code code={`# Crear Container App
+az containerapp create \
+  --name mi-app \
+  --resource-group mi-rg \
+  --environment mi-env \
+  --image miregistry.azurecr.io/mi-app:latest \
+  --target-port 8080 \
+  --ingress external \
+  --min-replicas 1 \
+  --max-replicas 5 \
+  --env-vars SPRING_PROFILES_ACTIVE=azure`} lang="bash" title="Azure Container Apps" />
+
+---
+
+## 📦 20.6 Configuración de Producción
+
+### application-prod.properties
+
+<Code code={`# Servidor
+server.port=8080
+server.shutdown=graceful
+spring.lifecycle.timeout-per-shutdown-phase=30s
+
+# Base de datos
+spring.datasource.url=\${DATABASE_URL}
+spring.datasource.hikari.maximum-pool-size=20
+spring.datasource.hikari.minimum-idle=5
+
+# JPA
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+spring.jpa.open-in-view=false
+
+# Logging
+logging.level.root=WARN
+logging.level.com.miapp=INFO
+
+# Actuator
+management.endpoints.web.exposure.include=health,info,prometheus
+management.endpoint.health.probes.enabled=true
+
+# Seguridad
+server.ssl.enabled=true
+server.ssl.key-store=classpath:keystore.p12
+server.ssl.key-store-password=\${SSL_PASSWORD}
+server.ssl.key-store-type=PKCS12`} lang="properties" title="Configuración producción" />
+
+### Variables de entorno
+
+<Code code={`# .env.example
+DATABASE_URL=jdbc:postgresql://localhost:5432/miapp
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=secret
+REDIS_HOST=localhost
+REDIS_PORT=6379
+JWT_SECRET=mi-clave-super-secreta-de-256-bits
+SSL_PASSWORD=keystorepassword`} lang="text" title="Variables de entorno" />
+
+---
+
+## 🔒 20.7 Seguridad en Despliegue
+
+### Escaneo de vulnerabilidades
+
+<Code code={`# Escanear imagen Docker
+docker scan mi-app:latest
+
+# Con Trivy
+trivy image mi-app:latest
+
+# En CI/CD
+- name: Run Trivy vulnerability scanner
+  uses: aquasecurity/trivy-action@master
+  with:
+    image-ref: 'mi-app:latest'
+    format: 'sarif'
+    output: 'trivy-results.sarif'
+    severity: 'CRITICAL,HIGH'`} lang="bash" title="Escaneo de vulnerabilidades" />
+
+### Secrets management
+
+<Code code={`# Con HashiCorp Vault
+spring.cloud.vault.uri=https://vault.miempresa.com
+spring.cloud.vault.token=\${VAULT_TOKEN}
+spring.cloud.vault.kv.enabled=true
+spring.cloud.vault.kv.backend=secret
+
+# Con AWS Secrets Manager
+spring.config.import=aws-secretsmanager:mi-app-secrets`} lang="properties" title="Secrets management" />
+
+---
+
+## 📊 20.8 Monitoreo en Producción
+
+### Stack de observabilidad
+
+<Code code={`version: '3.8'
+
+services:
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+  loki:
+    image: grafana/loki
+    ports:
+      - "3100:3100"
+
+volumes:
+  grafana_data:`} lang="yaml" title="Stack de monitoreo" />
+
+### prometheus.yml
+
+<Code code={`global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'spring-app'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['app:8080']`} lang="yaml" title="Configuración Prometheus" />
+
+<Aside type="tip">
+Usa **multi-stage builds** para imágenes pequeñas, **health checks** para alta disponibilidad, y **secrets management** para credenciales seguras.
+</Aside>
+

@@ -1,0 +1,506 @@
+---
+title: 21. Buenas Prácticas y Arquitectura
+description: Arquitectura en capas, Clean Architecture, principios SOLID, DTOs y mantenibilidad
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🏛️ 21.1 Arquitectura en Capas
+
+### Estructura de capas tradicional
+
+<Code code={`src/main/java/com/miapp/
+├── controller/          # Capa de presentación (REST)
+│   └── ProductoController.java
+├── service/             # Capa de lógica de negocio
+│   ├── ProductoService.java
+│   └── impl/
+│       └── ProductoServiceImpl.java
+├── repository/          # Capa de acceso a datos
+│   └── ProductoRepository.java
+├── entity/              # Entidades JPA
+│   └── Producto.java
+├── dto/                 # Objetos de transferencia
+│   ├── ProductoDTO.java
+│   └── ProductoCreateDTO.java
+├── mapper/              # Conversión entity <-> DTO
+│   └── ProductoMapper.java
+├── exception/           # Excepciones personalizadas
+│   └── ResourceNotFoundException.java
+└── config/              # Configuraciones
+    └── SecurityConfig.java`} lang="text" title="Estructura de capas" />
+
+### Flujo de datos
+
+<Code code={`┌─────────────────────────────────────────────────────────────┐
+│                        Cliente                               │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Controller (REST)                         │
+│  - Recibe requests HTTP                                      │
+│  - Valida entrada (@Valid)                                   │
+│  - Retorna ResponseEntity                                    │
+└─────────────────────────────────────────────────────────────┘
+                              │ DTO
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Service (Negocio)                         │
+│  - Lógica de negocio                                         │
+│  - Transacciones (@Transactional)                            │
+│  - Orquestación                                              │
+└─────────────────────────────────────────────────────────────┘
+                              │ Entity
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Repository (Datos)                        │
+│  - Acceso a base de datos                                    │
+│  - Queries JPA/JPQL                                          │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      Base de Datos                           │
+└─────────────────────────────────────────────────────────────┘`} lang="text" title="Flujo de datos" />
+
+---
+
+## 🧱 21.2 Principios SOLID
+
+### Single Responsibility (SRP)
+
+<Code code={`// ❌ MAL: Clase con múltiples responsabilidades
+@Service
+public class ProductoService {
+    public Producto crear(ProductoDTO dto) { /* ... */ }
+    public void enviarEmail(String email) { /* ... */ }  // No pertenece aquí
+    public void generarPDF(Producto p) { /* ... */ }     // No pertenece aquí
+}
+
+// ✅ BIEN: Una responsabilidad por clase
+@Service
+public class ProductoService {
+    public Producto crear(ProductoDTO dto) { /* ... */ }
+}
+
+@Service
+public class EmailService {
+    public void enviar(String email, String mensaje) { /* ... */ }
+}
+
+@Service
+public class ReporteService {
+    public byte[] generarPDF(Producto p) { /* ... */ }
+}`} lang="java" title="Single Responsibility" />
+
+### Open/Closed (OCP)
+
+<Code code={`// ✅ Abierto para extensión, cerrado para modificación
+public interface DescuentoStrategy {
+    BigDecimal calcular(Pedido pedido);
+}
+
+@Component
+public class DescuentoPorcentaje implements DescuentoStrategy {
+    @Override
+    public BigDecimal calcular(Pedido pedido) {
+        return pedido.getTotal().multiply(new BigDecimal("0.10"));
+    }
+}
+
+@Component
+public class DescuentoFijo implements DescuentoStrategy {
+    @Override
+    public BigDecimal calcular(Pedido pedido) {
+        return new BigDecimal("50.00");
+    }
+}
+
+// Agregar nuevo descuento sin modificar código existente
+@Component
+public class DescuentoVIP implements DescuentoStrategy {
+    @Override
+    public BigDecimal calcular(Pedido pedido) {
+        return pedido.getTotal().multiply(new BigDecimal("0.20"));
+    }
+}`} lang="java" title="Open/Closed" />
+
+### Dependency Inversion (DIP)
+
+<Code code={`// ❌ MAL: Dependencia de implementación concreta
+@Service
+public class PedidoService {
+    private final MySQLPedidoRepository repository;  // Acoplado a MySQL
+}
+
+// ✅ BIEN: Dependencia de abstracción
+@Service
+public class PedidoService {
+    private final PedidoRepository repository;  // Interfaz
+    
+    public PedidoService(PedidoRepository repository) {
+        this.repository = repository;
+    }
+}
+
+public interface PedidoRepository extends JpaRepository<Pedido, Long> {
+    // Spring inyecta la implementación automáticamente
+}`} lang="java" title="Dependency Inversion" />
+
+---
+
+## 🧹 21.3 Clean Architecture
+
+### Estructura hexagonal
+
+<Code code={`src/main/java/com/miapp/
+├── domain/                      # Núcleo (sin dependencias externas)
+│   ├── model/
+│   │   └── Producto.java        # Entidad de dominio
+│   ├── port/
+│   │   ├── in/                  # Puertos de entrada
+│   │   │   └── CrearProductoUseCase.java
+│   │   └── out/                 # Puertos de salida
+│   │       └── ProductoRepository.java
+│   └── service/
+│       └── ProductoService.java # Implementa casos de uso
+│
+├── application/                 # Casos de uso
+│   └── usecase/
+│       └── CrearProductoUseCaseImpl.java
+│
+├── infrastructure/              # Adaptadores externos
+│   ├── adapter/
+│   │   ├── in/
+│   │   │   └── rest/
+│   │   │       └── ProductoController.java
+│   │   └── out/
+│   │       └── persistence/
+│   │           ├── ProductoJpaRepository.java
+│   │           └── ProductoEntity.java
+│   └── config/
+│       └── BeanConfig.java`} lang="text" title="Estructura hexagonal" />
+
+### Puerto de entrada (Use Case)
+
+<Code code={`// Puerto (interfaz)
+public interface CrearProductoUseCase {
+    ProductoResponse ejecutar(CrearProductoCommand command);
+}
+
+// Comando
+public record CrearProductoCommand(
+    String nombre,
+    BigDecimal precio,
+    String categoria
+) {}
+
+// Respuesta
+public record ProductoResponse(
+    Long id,
+    String nombre,
+    BigDecimal precio
+) {}
+
+// Implementación
+@Service
+@RequiredArgsConstructor
+public class CrearProductoUseCaseImpl implements CrearProductoUseCase {
+    
+    private final ProductoRepository repository;
+    
+    @Override
+    @Transactional
+    public ProductoResponse ejecutar(CrearProductoCommand command) {
+        Producto producto = Producto.crear(
+            command.nombre(),
+            command.precio(),
+            command.categoria()
+        );
+        
+        Producto guardado = repository.guardar(producto);
+        
+        return new ProductoResponse(
+            guardado.getId(),
+            guardado.getNombre(),
+            guardado.getPrecio()
+        );
+    }
+}`} lang="java" title="Use Case" />
+
+---
+
+## 📦 21.4 DTOs y Mappers
+
+### DTOs por operación
+
+<Code code={`// DTO para crear
+public record ProductoCreateDTO(
+    @NotBlank String nombre,
+    @NotNull @Positive BigDecimal precio,
+    @NotNull Categoria categoria
+) {}
+
+// DTO para actualizar
+public record ProductoUpdateDTO(
+    @NotBlank String nombre,
+    @NotNull @Positive BigDecimal precio
+) {}
+
+// DTO para respuesta
+public record ProductoDTO(
+    Long id,
+    String nombre,
+    BigDecimal precio,
+    String categoria,
+    LocalDateTime createdAt
+) {}
+
+// DTO para lista (menos campos)
+public record ProductoResumenDTO(
+    Long id,
+    String nombre,
+    BigDecimal precio
+) {}`} lang="java" title="DTOs por operación" />
+
+### MapStruct
+
+<Code code={`<dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct</artifactId>
+    <version>1.5.5.Final</version>
+</dependency>
+<dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct-processor</artifactId>
+    <version>1.5.5.Final</version>
+    <scope>provided</scope>
+</dependency>`} lang="xml" title="Dependencia MapStruct" />
+
+<Code code={`@Mapper(componentModel = "spring")
+public interface ProductoMapper {
+    
+    ProductoDTO toDTO(Producto entity);
+    
+    List<ProductoDTO> toDTOList(List<Producto> entities);
+    
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    Producto toEntity(ProductoCreateDTO dto);
+    
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "categoria", ignore = true)
+    void updateEntity(ProductoUpdateDTO dto, @MappingTarget Producto entity);
+    
+    // Mapeo personalizado
+    @Mapping(target = "categoriaName", source = "categoria.nombre")
+    @Mapping(target = "precioFormateado", expression = "java(formatearPrecio(entity.getPrecio()))")
+    ProductoDetalleDTO toDetalleDTO(Producto entity);
+    
+    default String formatearPrecio(BigDecimal precio) {
+        return "$" + precio.setScale(2, RoundingMode.HALF_UP);
+    }
+}`} lang="java" title="MapStruct Mapper" />
+
+---
+
+## 🔧 21.5 Patrones de Diseño
+
+### Repository Pattern
+
+<Code code={`// Interfaz de dominio
+public interface ProductoRepository {
+    Producto guardar(Producto producto);
+    Optional<Producto> buscarPorId(Long id);
+    List<Producto> buscarPorCategoria(Categoria categoria);
+    void eliminar(Long id);
+}
+
+// Implementación con JPA
+@Repository
+@RequiredArgsConstructor
+public class ProductoRepositoryImpl implements ProductoRepository {
+    
+    private final ProductoJpaRepository jpaRepository;
+    private final ProductoEntityMapper mapper;
+    
+    @Override
+    public Producto guardar(Producto producto) {
+        ProductoEntity entity = mapper.toEntity(producto);
+        ProductoEntity saved = jpaRepository.save(entity);
+        return mapper.toDomain(saved);
+    }
+    
+    @Override
+    public Optional<Producto> buscarPorId(Long id) {
+        return jpaRepository.findById(id)
+            .map(mapper::toDomain);
+    }
+}`} lang="java" title="Repository Pattern" />
+
+### Factory Pattern
+
+<Code code={`public interface NotificacionFactory {
+    Notificacion crear(TipoNotificacion tipo, String mensaje);
+}
+
+@Component
+public class NotificacionFactoryImpl implements NotificacionFactory {
+    
+    private final Map<TipoNotificacion, NotificacionStrategy> strategies;
+    
+    public NotificacionFactoryImpl(List<NotificacionStrategy> strategies) {
+        this.strategies = strategies.stream()
+            .collect(Collectors.toMap(
+                NotificacionStrategy::getTipo,
+                Function.identity()
+            ));
+    }
+    
+    @Override
+    public Notificacion crear(TipoNotificacion tipo, String mensaje) {
+        NotificacionStrategy strategy = strategies.get(tipo);
+        if (strategy == null) {
+            throw new IllegalArgumentException("Tipo no soportado: " + tipo);
+        }
+        return strategy.crear(mensaje);
+    }
+}`} lang="java" title="Factory Pattern" />
+
+### Builder Pattern
+
+<Code code={`@Builder
+@Getter
+public class Pedido {
+    private final Long id;
+    private final Usuario usuario;
+    private final List<LineaPedido> lineas;
+    private final BigDecimal total;
+    private final Estado estado;
+    private final LocalDateTime fechaCreacion;
+    
+    public static PedidoBuilder nuevo(Usuario usuario) {
+        return Pedido.builder()
+            .usuario(usuario)
+            .lineas(new ArrayList<>())
+            .estado(Estado.PENDIENTE)
+            .fechaCreacion(LocalDateTime.now());
+    }
+}
+
+// Uso
+Pedido pedido = Pedido.nuevo(usuario)
+    .lineas(lineas)
+    .total(calcularTotal(lineas))
+    .build();`} lang="java" title="Builder Pattern" />
+
+---
+
+## 📋 21.6 Convenciones de Código
+
+### Nombrado
+
+<Code code={`// Clases: PascalCase
+public class ProductoService { }
+public class UsuarioController { }
+
+// Métodos: camelCase, verbos
+public Producto crear(ProductoDTO dto) { }
+public List<Producto> listarPorCategoria(String cat) { }
+public void eliminar(Long id) { }
+public boolean existePorEmail(String email) { }
+
+// Variables: camelCase
+private final ProductoRepository productoRepository;
+private String nombreCompleto;
+
+// Constantes: UPPER_SNAKE_CASE
+public static final int MAX_INTENTOS = 3;
+public static final String ROLE_ADMIN = "ROLE_ADMIN";
+
+// Paquetes: lowercase
+package com.miempresa.miapp.producto.service;`} lang="java" title="Convenciones de nombrado" />
+
+### Estructura de métodos
+
+<Code code={`@Service
+@RequiredArgsConstructor
+@Slf4j
+public class ProductoService {
+    
+    // 1. Dependencias (final)
+    private final ProductoRepository repository;
+    private final ProductoMapper mapper;
+    private final EventPublisher eventPublisher;
+    
+    // 2. Métodos públicos (API del servicio)
+    @Transactional
+    public ProductoDTO crear(ProductoCreateDTO dto) {
+        log.info("Creando producto: {}", dto.nombre());
+        
+        validarNombreUnico(dto.nombre());
+        
+        Producto producto = mapper.toEntity(dto);
+        Producto guardado = repository.save(producto);
+        
+        eventPublisher.publish(new ProductoCreadoEvent(guardado.getId()));
+        
+        return mapper.toDTO(guardado);
+    }
+    
+    @Transactional(readOnly = true)
+    public ProductoDTO obtenerPorId(Long id) {
+        return repository.findById(id)
+            .map(mapper::toDTO)
+            .orElseThrow(() -> new ResourceNotFoundException("Producto", id));
+    }
+    
+    // 3. Métodos privados (helpers)
+    private void validarNombreUnico(String nombre) {
+        if (repository.existsByNombre(nombre)) {
+            throw new DuplicateResourceException("Producto con nombre ya existe");
+        }
+    }
+}`} lang="java" title="Estructura de servicio" />
+
+---
+
+## ✅ 21.7 Checklist de Calidad
+
+<Code code={`✅ ARQUITECTURA
+  □ Separación clara de capas
+  □ Dependencias unidireccionales (Controller → Service → Repository)
+  □ Sin lógica de negocio en controllers
+  □ Sin acceso directo a repositorios desde controllers
+
+✅ CÓDIGO
+  □ Principios SOLID aplicados
+  □ Métodos pequeños (< 20 líneas)
+  □ Nombres descriptivos
+  □ Sin código duplicado (DRY)
+  □ Manejo de errores consistente
+
+✅ DTOs
+  □ DTOs separados para entrada/salida
+  □ Validaciones en DTOs de entrada
+  □ Mappers para conversión
+  □ Sin exponer entidades directamente
+
+✅ TESTING
+  □ Tests unitarios para servicios
+  □ Tests de integración para repositorios
+  □ Tests de API para controllers
+  □ Cobertura > 80%
+
+✅ SEGURIDAD
+  □ Validación de entrada
+  □ Autenticación/Autorización
+  □ Sin datos sensibles en logs
+  □ Manejo seguro de contraseñas`} lang="text" title="Checklist de calidad" />
+
+<Aside type="tip">
+La arquitectura debe evolucionar con el proyecto. Empieza simple (capas) y migra a hexagonal cuando la complejidad lo justifique.
+</Aside>
+

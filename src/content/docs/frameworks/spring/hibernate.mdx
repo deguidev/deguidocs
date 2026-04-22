@@ -1,0 +1,417 @@
+---
+title: 9. Hibernate en Spring
+description: Integración con Spring, Lazy vs Eager Loading, caché, optimización y problema N+1
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🐘 9.1 ¿Qué es Hibernate?
+
+### Definición
+
+**Hibernate** es un framework ORM (Object-Relational Mapping) que mapea objetos Java a tablas de base de datos. Es la implementación más popular de JPA (Java Persistence API).
+
+### JPA vs Hibernate
+
+<Code code={`┌─────────────────────────────────────────┐
+│           Tu Aplicación                 │
+├─────────────────────────────────────────┤
+│         Spring Data JPA                 │  ← Abstracción de Spring
+├─────────────────────────────────────────┤
+│              JPA                        │  ← Especificación (interfaz)
+├─────────────────────────────────────────┤
+│           Hibernate                     │  ← Implementación
+├─────────────────────────────────────────┤
+│             JDBC                        │  ← Driver de conexión
+├─────────────────────────────────────────┤
+│        Base de Datos                    │
+└─────────────────────────────────────────┘`} lang="text" title="Capas de persistencia" />
+
+<Aside type="note">
+**JPA** es la especificación (define las reglas), **Hibernate** es la implementación (ejecuta las reglas).
+</Aside>
+
+---
+
+## 🔗 9.2 Integración con Spring
+
+### Configuración automática
+
+Spring Boot configura Hibernate automáticamente cuando agregas `spring-boot-starter-data-jpa`.
+
+<Code code={`# application.properties
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# Dialecto (opcional, Spring Boot lo detecta)
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+# Estadísticas de Hibernate
+spring.jpa.properties.hibernate.generate_statistics=true`} lang="properties" title="Configuración de Hibernate" />
+
+### EntityManager
+
+<Code code={`@Service
+public class ProductoService {
+    
+    @PersistenceContext
+    private EntityManager entityManager;
+    
+    public Producto buscarPorId(Long id) {
+        return entityManager.find(Producto.class, id);
+    }
+    
+    public List<Producto> buscarPorCategoria(String categoria) {
+        return entityManager.createQuery(
+            "SELECT p FROM Producto p WHERE p.categoria = :cat", Producto.class)
+            .setParameter("cat", categoria)
+            .getResultList();
+    }
+    
+    @Transactional
+    public void guardar(Producto producto) {
+        if (producto.getId() == null) {
+            entityManager.persist(producto);  // INSERT
+        } else {
+            entityManager.merge(producto);    // UPDATE
+        }
+    }
+}`} lang="java" title="Uso de EntityManager" />
+
+---
+
+## ⏳ 9.3 Lazy vs Eager Loading
+
+### Estrategias de carga
+
+| Estrategia | Descripción | Cuándo se carga |
+|------------|-------------|-----------------|
+| **LAZY** | Carga diferida | Cuando se accede al dato |
+| **EAGER** | Carga inmediata | Con la entidad principal |
+
+### Ejemplo
+
+<Code code={`@Entity
+public class Usuario {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String nombre;
+    
+    // LAZY: Los pedidos se cargan cuando se accede a ellos
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    private List<Pedido> pedidos;
+    
+    // EAGER: El perfil se carga junto con el usuario
+    @OneToOne(fetch = FetchType.EAGER)
+    private Perfil perfil;
+}`} lang="java" title="Lazy vs Eager" />
+
+### Valores por defecto
+
+| Relación | Default |
+|----------|---------|
+| `@OneToOne` | EAGER |
+| `@ManyToOne` | EAGER |
+| `@OneToMany` | LAZY |
+| `@ManyToMany` | LAZY |
+
+### Problema con LAZY fuera de transacción
+
+<Code code={`// ❌ ERROR: LazyInitializationException
+@GetMapping("/{id}")
+public Usuario obtener(@PathVariable Long id) {
+    Usuario usuario = repository.findById(id).orElseThrow();
+    // La sesión de Hibernate ya cerró
+    usuario.getPedidos().size();  // ¡BOOM! LazyInitializationException
+    return usuario;
+}
+
+// ✅ SOLUCIÓN 1: Usar @Transactional
+@Transactional(readOnly = true)
+@GetMapping("/{id}")
+public Usuario obtener(@PathVariable Long id) {
+    Usuario usuario = repository.findById(id).orElseThrow();
+    usuario.getPedidos().size();  // OK, sesión abierta
+    return usuario;
+}
+
+// ✅ SOLUCIÓN 2: Fetch en la consulta
+@Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.pedidos WHERE u.id = :id")
+Optional<Usuario> findByIdConPedidos(@Param("id") Long id);
+
+// ✅ SOLUCIÓN 3: EntityGraph
+@EntityGraph(attributePaths = {"pedidos"})
+Optional<Usuario> findById(Long id);`} lang="java" title="Soluciones a LazyInitializationException" />
+
+<Aside type="caution">
+Evita EAGER en relaciones `@OneToMany` y `@ManyToMany`. Puede causar problemas de rendimiento graves.
+</Aside>
+
+---
+
+## 🔄 9.4 Ciclo de Vida de Entidades
+
+### Estados de una entidad
+
+<Code code={`┌─────────────┐
+│   NEW       │  Objeto creado, no persistido
+└──────┬──────┘
+       │ persist()
+       ▼
+┌─────────────┐
+│  MANAGED    │  Asociado a sesión, cambios se sincronizan
+└──────┬──────┘
+       │ detach() / close()
+       ▼
+┌─────────────┐
+│  DETACHED   │  Desconectado de la sesión
+└──────┬──────┘
+       │ merge()
+       ▼
+┌─────────────┐
+│  MANAGED    │  Re-asociado a sesión
+└─────────────┘
+
+       │ remove()
+       ▼
+┌─────────────┐
+│  REMOVED    │  Marcado para eliminación
+└─────────────┘`} lang="text" title="Estados de entidad" />
+
+### Ejemplo práctico
+
+<Code code={`@Service
+@Transactional
+public class ProductoService {
+    
+    @PersistenceContext
+    private EntityManager em;
+    
+    public void demostrarCicloVida() {
+        // NEW: Objeto creado
+        Producto producto = new Producto("Laptop", 999.99);
+        
+        // MANAGED: Persistido
+        em.persist(producto);
+        
+        // Cambios se sincronizan automáticamente (dirty checking)
+        producto.setPrecio(899.99);  // UPDATE automático al commit
+        
+        // DETACHED: Desconectado
+        em.detach(producto);
+        producto.setPrecio(799.99);  // NO se guarda
+        
+        // MANAGED de nuevo: Re-conectado
+        Producto managed = em.merge(producto);
+        managed.setPrecio(749.99);  // Ahora SÍ se guarda
+        
+        // REMOVED: Eliminado
+        em.remove(managed);
+    }
+}`} lang="java" title="Ciclo de vida en código" />
+
+---
+
+## 💾 9.5 Caché de Primer Nivel
+
+### ¿Qué es?
+
+El **caché de primer nivel** (L1 Cache) es automático y está asociado a la sesión/transacción actual.
+
+<Code code={`@Service
+@Transactional
+public class UsuarioService {
+    
+    @PersistenceContext
+    private EntityManager em;
+    
+    public void demostrarCacheL1() {
+        // Primera consulta: va a la BD
+        Usuario u1 = em.find(Usuario.class, 1L);
+        System.out.println("Query 1 ejecutada");
+        
+        // Segunda consulta: viene del caché L1
+        Usuario u2 = em.find(Usuario.class, 1L);
+        System.out.println("Query 2 NO ejecutada (caché)");
+        
+        // Son el mismo objeto
+        System.out.println(u1 == u2);  // true
+    }
+}`} lang="java" title="Caché de primer nivel" />
+
+### Características
+
+- **Automático**: No requiere configuración
+- **Por sesión**: Cada transacción tiene su propio caché
+- **Garantiza identidad**: Mismo ID = mismo objeto
+
+---
+
+## 🗄️ 9.6 Caché de Segundo Nivel
+
+### ¿Qué es?
+
+El **caché de segundo nivel** (L2 Cache) es compartido entre sesiones y requiere configuración.
+
+### Configuración con Ehcache
+
+<Code code={`<!-- pom.xml -->
+<dependency>
+    <groupId>org.hibernate.orm</groupId>
+    <artifactId>hibernate-jcache</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.ehcache</groupId>
+    <artifactId>ehcache</artifactId>
+</dependency>`} lang="xml" title="Dependencias" />
+
+<Code code={`# application.properties
+spring.jpa.properties.hibernate.cache.use_second_level_cache=true
+spring.jpa.properties.hibernate.cache.region.factory_class=jcache
+spring.jpa.properties.hibernate.javax.cache.provider=org.ehcache.jsr107.EhcacheCachingProvider
+spring.jpa.properties.hibernate.cache.use_query_cache=true`} lang="properties" title="Configuración L2 Cache" />
+
+### Marcar entidades cacheables
+
+<Code code={`import jakarta.persistence.Cacheable;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+@Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class Categoria {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String nombre;
+    
+    // Cachear también la colección
+    @OneToMany(mappedBy = "categoria")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    private List<Producto> productos;
+}`} lang="java" title="Entidad cacheable" />
+
+### Estrategias de concurrencia
+
+| Estrategia | Descripción |
+|------------|-------------|
+| `READ_ONLY` | Datos que nunca cambian |
+| `READ_WRITE` | Datos que cambian, con bloqueo |
+| `NONSTRICT_READ_WRITE` | Cambios poco frecuentes |
+| `TRANSACTIONAL` | Transacciones JTA |
+
+---
+
+## ⚡ 9.7 Optimización de Consultas
+
+### Proyecciones (DTOs)
+
+<Code code={`// ❌ Cargar entidad completa cuando solo necesitas algunos campos
+@Query("SELECT u FROM Usuario u")
+List<Usuario> findAll();  // Carga TODOS los campos
+
+// ✅ Proyección con DTO
+public record UsuarioResumenDTO(Long id, String nombre, String email) {}
+
+@Query("SELECT new com.app.dto.UsuarioResumenDTO(u.id, u.nombre, u.email) FROM Usuario u")
+List<UsuarioResumenDTO> findAllResumen();
+
+// ✅ Proyección con interfaz
+public interface UsuarioResumen {
+    Long getId();
+    String getNombre();
+    String getEmail();
+}
+
+List<UsuarioResumen> findAllProjectedBy();`} lang="java" title="Proyecciones" />
+
+### Batch fetching
+
+<Code code={`@Entity
+public class Usuario {
+    
+    @OneToMany(mappedBy = "usuario")
+    @BatchSize(size = 25)  // Carga 25 colecciones a la vez
+    private List<Pedido> pedidos;
+}
+
+// O globalmente en properties
+spring.jpa.properties.hibernate.default_batch_fetch_size=25`} lang="java" title="Batch fetching" />
+
+### Fetch Join
+
+<Code code={`// ❌ N+1 queries
+List<Usuario> usuarios = repository.findAll();
+for (Usuario u : usuarios) {
+    u.getPedidos().size();  // Query adicional por cada usuario
+}
+
+// ✅ Una sola query con JOIN FETCH
+@Query("SELECT DISTINCT u FROM Usuario u LEFT JOIN FETCH u.pedidos")
+List<Usuario> findAllConPedidos();`} lang="java" title="Fetch Join" />
+
+---
+
+## 🔢 9.8 Problema N+1
+
+### ¿Qué es?
+
+El problema **N+1** ocurre cuando se ejecuta 1 query para obtener N entidades, y luego N queries adicionales para cargar sus relaciones.
+
+<Code code={`// Ejemplo del problema N+1
+@GetMapping("/usuarios")
+public List<Usuario> listar() {
+    // Query 1: SELECT * FROM usuarios (obtiene 100 usuarios)
+    List<Usuario> usuarios = repository.findAll();
+    
+    for (Usuario u : usuarios) {
+        // Query 2-101: SELECT * FROM pedidos WHERE usuario_id = ?
+        System.out.println(u.getPedidos().size());
+    }
+    
+    return usuarios;  // ¡101 queries en total!
+}`} lang="java" title="Problema N+1" />
+
+### Soluciones
+
+<Code code={`// SOLUCIÓN 1: JOIN FETCH
+@Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.pedidos")
+List<Usuario> findAllConPedidos();
+
+// SOLUCIÓN 2: EntityGraph
+@EntityGraph(attributePaths = {"pedidos"})
+List<Usuario> findAll();
+
+// SOLUCIÓN 3: @BatchSize (en la entidad)
+@OneToMany(mappedBy = "usuario")
+@BatchSize(size = 25)
+private List<Pedido> pedidos;
+
+// SOLUCIÓN 4: Subselect fetch
+@OneToMany(mappedBy = "usuario")
+@Fetch(FetchMode.SUBSELECT)
+private List<Pedido> pedidos;`} lang="java" title="Soluciones al N+1" />
+
+### Detectar N+1
+
+<Code code={`# Habilitar estadísticas
+spring.jpa.properties.hibernate.generate_statistics=true
+logging.level.org.hibernate.stat=DEBUG
+
+# Verás en logs:
+# Session Metrics {
+#     23456 nanoseconds spent acquiring 1 JDBC connections;
+#     0 nanoseconds spent releasing 0 JDBC connections;
+#     123456 nanoseconds spent preparing 101 JDBC statements;  ← ¡Alerta!
+# }`} lang="properties" title="Detectar N+1 con estadísticas" />
+
+<Aside type="tip">
+Usa herramientas como **Hibernate Query Analyzer** o **p6spy** para detectar problemas N+1 en desarrollo.
+</Aside>
+

@@ -1,0 +1,245 @@
+---
+title: 1. Introducción al Ecosistema Spring
+description: Qué es Spring Framework, su historia, arquitectura y ventajas frente a otros frameworks
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🌱 1.1 ¿Qué es Spring Framework?
+
+**Spring Framework** es un framework de desarrollo de aplicaciones Java que proporciona una infraestructura completa para crear aplicaciones empresariales robustas y escalables.
+
+<Aside type="tip">
+Spring no es solo un framework, es un **ecosistema completo** que abarca desde aplicaciones web hasta microservicios, seguridad, acceso a datos y mucho más.
+</Aside>
+
+### Características principales
+
+- **Inversión de Control (IoC)**: El framework gestiona la creación y ciclo de vida de los objetos
+- **Inyección de Dependencias (DI)**: Facilita el desacoplamiento entre componentes
+- **Programación Orientada a Aspectos (AOP)**: Permite separar preocupaciones transversales
+- **Modularidad**: Usa solo los módulos que necesitas
+- **Integración**: Se conecta fácilmente con otras tecnologías
+
+---
+
+## 📜 1.2 Historia y Evolución de Spring
+
+### Línea de tiempo
+
+| Año | Versión | Hito importante |
+|-----|---------|-----------------|
+| 2002 | - | Rod Johnson publica "Expert One-on-One J2EE Design" |
+| 2004 | 1.0 | Primera versión oficial de Spring Framework |
+| 2006 | 2.0 | Soporte para anotaciones y namespaces XML |
+| 2009 | 3.0 | Configuración basada en Java, REST support |
+| 2013 | 4.0 | Soporte para Java 8, WebSocket |
+| 2014 | - | **Spring Boot 1.0** revoluciona el desarrollo |
+| 2017 | 5.0 | Programación reactiva, Kotlin support |
+| 2022 | 6.0 | Java 17+, Jakarta EE 9+, AOT compilation |
+
+<Aside type="note">
+Spring nació como respuesta a la complejidad de **J2EE (Java 2 Enterprise Edition)**, ofreciendo una alternativa más ligera y flexible.
+</Aside>
+
+---
+
+## 🔧 1.3 Problemas que Resuelve Spring
+
+### Sin Spring (código acoplado)
+
+<Code code={`// ❌ Código altamente acoplado
+public class PedidoService {
+    // Dependencia creada directamente - difícil de testear
+    private UsuarioRepository usuarioRepo = new UsuarioRepositoryImpl();
+    private EmailService emailService = new EmailServiceImpl();
+    
+    public void procesarPedido(Pedido pedido) {
+        Usuario usuario = usuarioRepo.buscar(pedido.getUsuarioId());
+        // lógica...
+        emailService.enviarConfirmacion(usuario.getEmail());
+    }
+}`} lang="java" title="Problema: Acoplamiento fuerte" />
+
+### Con Spring (código desacoplado)
+
+<Code code={`// ✅ Código desacoplado con Spring
+@Service
+public class PedidoService {
+    
+    private final UsuarioRepository usuarioRepo;
+    private final EmailService emailService;
+    
+    // Spring inyecta las dependencias automáticamente
+    @Autowired
+    public PedidoService(UsuarioRepository usuarioRepo, EmailService emailService) {
+        this.usuarioRepo = usuarioRepo;
+        this.emailService = emailService;
+    }
+    
+    public void procesarPedido(Pedido pedido) {
+        Usuario usuario = usuarioRepo.buscar(pedido.getUsuarioId());
+        // lógica...
+        emailService.enviarConfirmacion(usuario.getEmail());
+    }
+}`} lang="java" title="Solución: Inyección de dependencias" />
+
+### Problemas que resuelve
+
+| Problema | Solución Spring |
+|----------|-----------------|
+| Acoplamiento fuerte | Inyección de dependencias |
+| Código repetitivo (boilerplate) | Configuración automática |
+| Gestión de transacciones manual | @Transactional |
+| Configuración XML extensa | Anotaciones y auto-configuración |
+| Testing difícil | Mocks e inyección de dependencias |
+
+---
+
+## 🏗️ 1.4 Arquitectura General del Framework
+
+### Módulos principales de Spring
+
+<Code code={`┌─────────────────────────────────────────────────────────────┐
+│                      SPRING FRAMEWORK                        │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+│  │  Spring     │  │  Spring     │  │  Spring             │  │
+│  │  Web MVC    │  │  WebFlux    │  │  Security           │  │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+│  │  Spring     │  │  Spring     │  │  Spring             │  │
+│  │  Data       │  │  AOP        │  │  Messaging          │  │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │                    SPRING CORE                          ││
+│  │         (IoC Container, Beans, Context, SpEL)           ││
+│  └─────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────┘`} lang="text" title="Arquitectura modular de Spring" />
+
+---
+
+## ⚡ 1.5 Diferencia entre Spring Framework y Spring Boot
+
+<Aside type="caution">
+**Spring Boot NO reemplaza a Spring Framework**, lo complementa facilitando su configuración y uso.
+</Aside>
+
+### Comparación
+
+| Aspecto | Spring Framework | Spring Boot |
+|---------|------------------|-------------|
+| Configuración | Manual (XML o Java) | Auto-configuración |
+| Servidor | Externo (Tomcat, etc.) | Embebido |
+| Dependencias | Gestión manual | Starters predefinidos |
+| Tiempo de inicio | Más configuración | Rápido (convención) |
+| Flexibilidad | Total control | Opinado pero flexible |
+
+### Ejemplo: Aplicación web mínima
+
+<Code code={`// Spring Framework tradicional requiere:
+// - web.xml
+// - applicationContext.xml
+// - dispatcher-servlet.xml
+// - Configuración de Tomcat externo
+// - Múltiples dependencias manuales
+
+// Spring Boot solo necesita:
+@SpringBootApplication
+public class MiAplicacion {
+    public static void main(String[] args) {
+        SpringApplication.run(MiAplicacion.class, args);
+    }
+}
+
+@RestController
+class HolaController {
+    @GetMapping("/hola")
+    public String hola() {
+        return "¡Hola Mundo!";
+    }
+}`} lang="java" title="Spring Boot: Mínima configuración" />
+
+---
+
+## 🌐 1.6 Ecosistema Completo de Spring
+
+### Proyectos principales
+
+| Proyecto | Descripción |
+|----------|-------------|
+| **Spring Boot** | Configuración automática y arranque rápido |
+| **Spring Data** | Acceso simplificado a bases de datos |
+| **Spring Security** | Autenticación y autorización |
+| **Spring Cloud** | Herramientas para microservicios |
+| **Spring Batch** | Procesamiento por lotes |
+| **Spring Integration** | Integración empresarial |
+| **Spring WebFlux** | Programación reactiva |
+
+---
+
+## 🏢 1.7 Casos Reales de Uso Empresarial
+
+### Empresas que usan Spring
+
+- **Netflix**: Microservicios con Spring Cloud
+- **Amazon**: Servicios internos
+- **Alibaba**: Plataforma de e-commerce
+- **LinkedIn**: Backend de servicios
+- **Ticketmaster**: Sistema de ventas
+
+### Casos de uso típicos
+
+<Code code={`// 1. API REST para aplicación móvil
+@RestController
+@RequestMapping("/api/productos")
+public class ProductoController {
+    @GetMapping
+    public List<Producto> listar() { ... }
+}
+
+// 2. Sistema de autenticación
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig { ... }
+
+// 3. Microservicio con mensajería
+@Service
+public class PedidoService {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    
+    public void procesarPedido(Pedido pedido) {
+        rabbitTemplate.convertAndSend("pedidos", pedido);
+    }
+}`} lang="java" title="Casos de uso comunes" />
+
+---
+
+## ✅ 1.8 Ventajas Frente a Otros Frameworks
+
+### Comparación con alternativas
+
+| Característica | Spring | Jakarta EE | Micronaut | Quarkus |
+|----------------|--------|------------|-----------|---------|
+| Madurez | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
+| Comunidad | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
+| Documentación | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Tiempo arranque | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| Ecosistema | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
+
+### ¿Por qué elegir Spring?
+
+1. **Ecosistema maduro**: +20 años de desarrollo
+2. **Gran comunidad**: Millones de desarrolladores
+3. **Documentación excelente**: Guías, tutoriales, ejemplos
+4. **Flexibilidad**: Desde monolitos hasta microservicios
+5. **Empleabilidad**: Alta demanda en el mercado laboral
+
+<Aside type="tip">
+Spring es el framework Java más demandado en ofertas de trabajo a nivel mundial.
+</Aside>
+

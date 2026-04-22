@@ -1,0 +1,492 @@
+---
+title: 16. Spring Cloud
+description: Config Server, Eureka Server, API Gateway, Resilience4j y arquitectura de microservicios
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## ☁️ 16.1 Introducción a Spring Cloud
+
+### ¿Qué es Spring Cloud?
+
+**Spring Cloud** es un conjunto de herramientas para construir aplicaciones distribuidas y microservicios en la nube.
+
+### Componentes principales
+
+| Componente | Función |
+|------------|---------|
+| **Config Server** | Configuración centralizada |
+| **Eureka** | Service Discovery |
+| **Gateway** | API Gateway |
+| **Resilience4j** | Circuit Breaker |
+| **Sleuth/Micrometer** | Distributed Tracing |
+
+### BOM de Spring Cloud
+
+<Code code={`<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-dependencies</artifactId>
+            <version>2023.0.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>`} lang="xml" title="Spring Cloud BOM" />
+
+---
+
+## ⚙️ 16.2 Config Server
+
+### Servidor de configuración
+
+<Code code={`<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-config-server</artifactId>
+</dependency>`} lang="xml" title="Dependencia Config Server" />
+
+<Code code={`@SpringBootApplication
+@EnableConfigServer
+public class ConfigServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigServerApplication.class, args);
+    }
+}`} lang="java" title="Config Server" />
+
+<Code code={`# application.properties (Config Server)
+server.port=8888
+spring.cloud.config.server.git.uri=https://github.com/miorg/config-repo
+spring.cloud.config.server.git.default-label=main
+spring.cloud.config.server.git.search-paths=config`} lang="properties" title="Configuración Git" />
+
+### Estructura del repositorio de configuración
+
+<Code code={`config-repo/
+├── application.yml           # Configuración común
+├── usuario-service.yml       # Configuración específica
+├── usuario-service-dev.yml   # Perfil dev
+├── usuario-service-prod.yml  # Perfil prod
+└── pedido-service.yml`} lang="text" title="Estructura de configuración" />
+
+### Cliente de configuración
+
+<Code code={`<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-config</artifactId>
+</dependency>`} lang="xml" title="Dependencia Config Client" />
+
+<Code code={`# application.properties (Microservicio)
+spring.application.name=usuario-service
+spring.config.import=optional:configserver:http://localhost:8888
+spring.profiles.active=dev`} lang="properties" title="Configuración cliente" />
+
+### Refrescar configuración
+
+<Code code={`<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>`} lang="xml" title="Actuator para refresh" />
+
+<Code code={`@RestController
+@RefreshScope  // Permite refrescar beans
+public class ConfigController {
+    
+    @Value("\${app.mensaje}")
+    private String mensaje;
+    
+    @GetMapping("/mensaje")
+    public String getMensaje() {
+        return mensaje;
+    }
+}
+
+// POST /actuator/refresh para recargar configuración`} lang="java" title="@RefreshScope" />
+
+---
+
+## 🔍 16.3 Eureka Server
+
+### Servidor de descubrimiento
+
+<Code code={`<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+</dependency>`} lang="xml" title="Dependencia Eureka Server" />
+
+<Code code={`@SpringBootApplication
+@EnableEurekaServer
+public class EurekaServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}`} lang="java" title="Eureka Server" />
+
+<Code code={`# application.properties
+server.port=8761
+spring.application.name=eureka-server
+
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false
+
+eureka.server.enable-self-preservation=false
+eureka.server.eviction-interval-timer-in-ms=5000`} lang="properties" title="Configuración Eureka Server" />
+
+### Cliente Eureka
+
+<Code code={`<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>`} lang="xml" title="Dependencia Eureka Client" />
+
+<Code code={`# application.properties (Microservicio)
+spring.application.name=usuario-service
+server.port=8081
+
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+eureka.instance.prefer-ip-address=true
+eureka.instance.instance-id=\${spring.application.name}:\${random.uuid}`} lang="properties" title="Configuración Eureka Client" />
+
+### Dashboard de Eureka
+
+<Code code={`# Acceder a http://localhost:8761
+# Verás todos los servicios registrados con su estado`} lang="text" title="Dashboard" />
+
+---
+
+## 🚪 16.4 API Gateway
+
+### Spring Cloud Gateway
+
+<Code code={`<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-gateway</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>`} lang="xml" title="Dependencias Gateway" />
+
+### Configuración de rutas
+
+<Code code={`# application.yml
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: usuario-service
+          uri: lb://usuario-service
+          predicates:
+            - Path=/api/usuarios/**
+          filters:
+            - StripPrefix=1
+            
+        - id: producto-service
+          uri: lb://producto-service
+          predicates:
+            - Path=/api/productos/**
+          filters:
+            - StripPrefix=1
+            
+        - id: pedido-service
+          uri: lb://pedido-service
+          predicates:
+            - Path=/api/pedidos/**
+          filters:
+            - StripPrefix=1`} lang="yaml" title="Rutas del Gateway" />
+
+### Filtros personalizados
+
+<Code code={`@Component
+public class AuthFilter implements GlobalFilter, Ordered {
+    
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        ServerHttpRequest request = exchange.getRequest();
+        
+        // Verificar token
+        if (!request.getHeaders().containsKey("Authorization")) {
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+        }
+        
+        String token = request.getHeaders().getFirst("Authorization");
+        
+        if (!validarToken(token)) {
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+        }
+        
+        return chain.filter(exchange);
+    }
+    
+    @Override
+    public int getOrder() {
+        return -1;  // Ejecutar primero
+    }
+}`} lang="java" title="Filtro de autenticación" />
+
+### Rate Limiting
+
+<Code code={`spring:
+  cloud:
+    gateway:
+      routes:
+        - id: usuario-service
+          uri: lb://usuario-service
+          predicates:
+            - Path=/api/usuarios/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "\#{@userKeyResolver}"`} lang="yaml" title="Rate Limiting" />
+
+<Code code={`@Configuration
+public class RateLimiterConfig {
+    
+    @Bean
+    public KeyResolver userKeyResolver() {
+        return exchange -> Mono.just(
+            exchange.getRequest().getRemoteAddress().getAddress().getHostAddress()
+        );
+    }
+}`} lang="java" title="Key Resolver" />
+
+---
+
+## 🛡️ 16.5 Resilience4j
+
+### Dependencia
+
+<Code code={`<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+</dependency>`} lang="xml" title="Dependencia Resilience4j" />
+
+### Configuración completa
+
+<Code code={`# application.yml
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+    instances:
+      productoService:
+        base-config: default
+        
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 1s
+        retry-exceptions:
+          - java.io.IOException
+          - java.net.SocketTimeoutException
+    instances:
+      productoService:
+        base-config: default
+        
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 3s
+        cancel-running-future: true
+    instances:
+      productoService:
+        base-config: default
+        
+  bulkhead:
+    configs:
+      default:
+        max-concurrent-calls: 25
+        max-wait-duration: 0
+    instances:
+      productoService:
+        base-config: default`} lang="yaml" title="Configuración Resilience4j" />
+
+### Uso en código
+
+<Code code={`@Service
+@Slf4j
+public class ProductoService {
+    
+    private final ProductoClient productoClient;
+    
+    @CircuitBreaker(name = "productoService", fallbackMethod = "fallback")
+    @Retry(name = "productoService")
+    @Bulkhead(name = "productoService")
+    @TimeLimiter(name = "productoService")
+    public CompletableFuture<List<Producto>> listarProductos() {
+        return CompletableFuture.supplyAsync(productoClient::listar);
+    }
+    
+    public CompletableFuture<List<Producto>> fallback(Throwable t) {
+        log.error("Fallback activado: {}", t.getMessage());
+        return CompletableFuture.completedFuture(Collections.emptyList());
+    }
+}`} lang="java" title="Uso de Resilience4j" />
+
+---
+
+## 📊 16.6 Observabilidad
+
+### Micrometer + Zipkin
+
+<Code code={`<dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-tracing-bridge-brave</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.zipkin.reporter2</groupId>
+    <artifactId>zipkin-reporter-brave</artifactId>
+</dependency>`} lang="xml" title="Dependencias Tracing" />
+
+<Code code={`# application.properties
+management.tracing.sampling.probability=1.0
+management.zipkin.tracing.endpoint=http://localhost:9411/api/v2/spans`} lang="properties" title="Configuración Zipkin" />
+
+### Métricas con Prometheus
+
+<Code code={`<dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-registry-prometheus</artifactId>
+</dependency>`} lang="xml" title="Dependencia Prometheus" />
+
+<Code code={`# application.properties
+management.endpoints.web.exposure.include=health,info,prometheus,metrics
+management.metrics.export.prometheus.enabled=true`} lang="properties" title="Configuración Prometheus" />
+
+---
+
+## 🏛️ 16.7 Arquitectura Completa
+
+### Diagrama de arquitectura
+
+<Code code={`                    ┌─────────────────┐
+                    │   Config Server │
+                    │    :8888        │
+                    └────────┬────────┘
+                             │
+┌──────────────┐    ┌────────┴────────┐    ┌──────────────┐
+│    Zipkin    │    │  Eureka Server  │    │  Prometheus  │
+│    :9411     │    │     :8761       │    │    :9090     │
+└──────────────┘    └────────┬────────┘    └──────────────┘
+                             │
+                    ┌────────┴────────┐
+                    │   API Gateway   │
+                    │     :8080       │
+                    └────────┬────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+┌───────┴───────┐   ┌───────┴───────┐   ┌───────┴───────┐
+│ Usuario Svc   │   │ Producto Svc  │   │  Pedido Svc   │
+│    :8081      │   │    :8082      │   │    :8083      │
+└───────┬───────┘   └───────┬───────┘   └───────┬───────┘
+        │                   │                   │
+┌───────┴───────┐   ┌───────┴───────┐   ┌───────┴───────┐
+│   MySQL       │   │   MongoDB     │   │  PostgreSQL   │
+└───────────────┘   └───────────────┘   └───────────────┘`} lang="text" title="Arquitectura completa" />
+
+### Docker Compose
+
+<Code code={`version: '3.8'
+
+services:
+  config-server:
+    build: ./config-server
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_URI=https://github.com/miorg/config
+      
+  eureka-server:
+    build: ./eureka-server
+    ports:
+      - "8761:8761"
+    depends_on:
+      - config-server
+      
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      
+  usuario-service:
+    build: ./usuario-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eureka-server
+      - mysql
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/usuarios
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      
+  mysql:
+    image: mysql:8
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=usuarios
+    volumes:
+      - mysql_data:/var/lib/mysql
+      
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+      
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+volumes:
+  mysql_data:`} lang="yaml" title="Docker Compose" />
+
+---
+
+## ✅ 16.8 Buenas Prácticas
+
+### Checklist de microservicios
+
+<Code code={`✅ Cada servicio tiene su propia base de datos
+✅ Comunicación asíncrona cuando sea posible
+✅ Circuit breakers en todas las llamadas externas
+✅ Configuración centralizada
+✅ Service discovery habilitado
+✅ API Gateway como punto de entrada único
+✅ Trazabilidad distribuida configurada
+✅ Health checks en todos los servicios
+✅ Métricas expuestas para monitoreo
+✅ Logs estructurados con correlation IDs`} lang="text" title="Checklist" />
+
+<Aside type="tip">
+Empieza con un monolito bien estructurado. Migra a microservicios solo cuando tengas necesidades reales de escalado independiente o equipos separados.
+</Aside>
+

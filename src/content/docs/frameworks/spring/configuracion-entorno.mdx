@@ -1,0 +1,390 @@
+---
+title: 2. Configuración del Entorno de Desarrollo
+description: Instalación de JDK, IntelliJ IDEA, Spring Initializr y gestión de dependencias con Maven/Gradle
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## ☕ 2.1 Instalación de JDK
+
+### Requisitos mínimos
+
+| Spring Boot | JDK Mínimo | JDK Recomendado |
+|-------------|------------|-----------------|
+| 3.x | Java 17 | Java 21 |
+| 2.x | Java 8 | Java 11/17 |
+
+### Descargar JDK
+
+**Opciones recomendadas:**
+- [Eclipse Temurin (Adoptium)](https://adoptium.net/) - Gratuito y open source
+- [Oracle JDK](https://www.oracle.com/java/technologies/downloads/) - Licencia comercial
+- [Amazon Corretto](https://aws.amazon.com/corretto/) - Gratuito de AWS
+
+### Instalación en Windows
+
+<Code code={`# 1. Descargar el instalador .msi de Adoptium
+# 2. Ejecutar el instalador
+# 3. Verificar instalación:
+java -version
+
+# Salida esperada:
+openjdk version "21.0.2" 2024-01-16
+OpenJDK Runtime Environment Temurin-21.0.2+13 (build 21.0.2+13)
+OpenJDK 64-Bit Server VM Temurin-21.0.2+13 (build 21.0.2+13, mixed mode)`} lang="bash" title="Verificar instalación de Java" />
+
+### Instalación en macOS
+
+<Code code={`# Usando Homebrew
+brew install openjdk@21
+
+# Agregar al PATH
+echo 'export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+# Verificar
+java -version`} lang="bash" title="Instalación con Homebrew" />
+
+### Instalación en Linux
+
+<Code code={`# Ubuntu/Debian
+sudo apt update
+sudo apt install openjdk-21-jdk
+
+# Fedora/RHEL
+sudo dnf install java-21-openjdk-devel
+
+# Verificar
+java -version`} lang="bash" title="Instalación en Linux" />
+
+---
+
+## ⚙️ 2.2 Configuración de Variables de Entorno
+
+### Windows
+
+<Code code={`# 1. Abrir "Variables de entorno del sistema"
+# 2. Crear variable JAVA_HOME:
+JAVA_HOME = C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.2.13-hotspot
+
+# 3. Agregar al PATH:
+%JAVA_HOME%\\bin
+
+# 4. Verificar en CMD:
+echo %JAVA_HOME%
+java -version`} lang="bash" title="Variables de entorno en Windows" />
+
+### macOS/Linux
+
+<Code code={`# Agregar a ~/.bashrc o ~/.zshrc
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+export PATH=$JAVA_HOME/bin:$PATH
+
+# Aplicar cambios
+source ~/.bashrc
+
+# Verificar
+echo $JAVA_HOME
+java -version`} lang="bash" title="Variables de entorno en Unix" />
+
+<Aside type="tip">
+En macOS puedes encontrar la ruta de Java con: `/usr/libexec/java_home -v 21`
+</Aside>
+
+---
+
+## 💻 2.3 Uso de IntelliJ IDEA para Spring
+
+### Descarga e instalación
+
+1. Descargar [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)
+   - **Community**: Gratuito (suficiente para Spring)
+   - **Ultimate**: De pago (soporte nativo para Spring)
+
+### Configuración inicial
+
+<Code code={`# Configurar JDK en IntelliJ:
+# 1. File → Project Structure → SDKs
+# 2. Click en "+" → Add JDK
+# 3. Seleccionar la carpeta de instalación de Java 21
+
+# Plugins recomendados (Community):
+# - Spring Boot Assistant
+# - Lombok
+# - Maven Helper`} lang="text" title="Configuración de IntelliJ" />
+
+### Atajos útiles
+
+| Atajo | Acción |
+|-------|--------|
+| `Ctrl + Shift + F10` | Ejecutar aplicación |
+| `Ctrl + F9` | Compilar proyecto |
+| `Alt + Enter` | Sugerencias rápidas |
+| `Ctrl + Shift + A` | Buscar acciones |
+| `Ctrl + N` | Buscar clase |
+
+---
+
+## 🚀 2.4 Creación de Proyectos con Spring Initializr
+
+### Opción 1: Web (start.spring.io)
+
+1. Ir a [start.spring.io](https://start.spring.io/)
+2. Configurar el proyecto:
+
+<Code code={`Project: Maven
+Language: Java
+Spring Boot: 3.2.x (última estable)
+
+Project Metadata:
+  Group: com.ejemplo
+  Artifact: mi-proyecto
+  Name: mi-proyecto
+  Package name: com.ejemplo.miproyecto
+  Packaging: Jar
+  Java: 21
+
+Dependencies:
+  - Spring Web
+  - Spring Data JPA
+  - H2 Database (para desarrollo)
+  - Lombok
+  - Spring Boot DevTools`} lang="text" title="Configuración en Spring Initializr" />
+
+3. Click en **Generate** → Descargar ZIP
+4. Extraer y abrir en IntelliJ
+
+### Opción 2: Desde IntelliJ (Ultimate)
+
+<Code code={`# File → New → Project
+# Seleccionar "Spring Initializr"
+# Configurar igual que en la web
+# IntelliJ descarga y configura automáticamente`} lang="text" title="Spring Initializr en IntelliJ" />
+
+---
+
+## 📁 2.5 Estructura de Carpetas en Spring Boot
+
+<Code code={`mi-proyecto/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/ejemplo/miproyecto/
+│   │   │       ├── MiProyectoApplication.java    # Clase principal
+│   │   │       ├── controller/                    # Controladores REST
+│   │   │       ├── service/                       # Lógica de negocio
+│   │   │       ├── repository/                    # Acceso a datos
+│   │   │       ├── model/                         # Entidades/DTOs
+│   │   │       └── config/                        # Configuraciones
+│   │   └── resources/
+│   │       ├── application.properties             # Configuración
+│   │       ├── application.yml                    # Alternativa YAML
+│   │       ├── static/                            # Archivos estáticos
+│   │       └── templates/                         # Plantillas (Thymeleaf)
+│   └── test/
+│       └── java/                                  # Tests
+├── pom.xml                                        # Dependencias Maven
+└── README.md`} lang="text" title="Estructura típica de Spring Boot" />
+
+<Aside type="note">
+Esta estructura sigue el patrón **MVC (Model-View-Controller)** y es la convención recomendada por Spring.
+</Aside>
+
+---
+
+## 📦 2.6 Gestión de Dependencias con Maven
+
+### Archivo pom.xml básico
+
+<Code code={`<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    
+    <!-- Heredar de Spring Boot Parent -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.3</version>
+    </parent>
+    
+    <groupId>com.ejemplo</groupId>
+    <artifactId>mi-proyecto</artifactId>
+    <version>1.0.0</version>
+    <name>mi-proyecto</name>
+    
+    <properties>
+        <java.version>21</java.version>
+    </properties>
+    
+    <dependencies>
+        <!-- Spring Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        
+        <!-- Spring Data JPA -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        
+        <!-- Base de datos H2 (desarrollo) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>`} lang="xml" title="pom.xml completo" />
+
+### Comandos Maven útiles
+
+<Code code={`# Compilar proyecto
+mvn compile
+
+# Ejecutar tests
+mvn test
+
+# Empaquetar (crear JAR)
+mvn package
+
+# Ejecutar aplicación
+mvn spring-boot:run
+
+# Limpiar y empaquetar
+mvn clean package
+
+# Saltar tests al empaquetar
+mvn package -DskipTests`} lang="bash" title="Comandos Maven" />
+
+---
+
+## 🐘 2.7 Gestión de Dependencias con Gradle
+
+### Archivo build.gradle básico
+
+<Code code={`plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.3'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.ejemplo'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = '21'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    
+    // Spring Data JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    
+    // H2 Database
+    runtimeOnly 'com.h2database:h2'
+    
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}`} lang="groovy" title="build.gradle" />
+
+### Comandos Gradle útiles
+
+<Code code={`# Compilar
+./gradlew build
+
+# Ejecutar
+./gradlew bootRun
+
+# Tests
+./gradlew test
+
+# Limpiar
+./gradlew clean
+
+# Crear JAR
+./gradlew bootJar`} lang="bash" title="Comandos Gradle" />
+
+---
+
+## ▶️ 2.8 Ejecución de Proyectos Spring
+
+### Desde IntelliJ
+
+<Code code={`# 1. Abrir la clase principal (MiProyectoApplication.java)
+# 2. Click derecho → Run 'MiProyectoApplication'
+# 3. O usar el botón verde ▶️ en el margen izquierdo`} lang="text" title="Ejecutar desde IDE" />
+
+### Desde terminal
+
+<Code code={`# Con Maven
+mvn spring-boot:run
+
+# Con Gradle
+./gradlew bootRun
+
+# Ejecutar JAR directamente
+java -jar target/mi-proyecto-1.0.0.jar`} lang="bash" title="Ejecutar desde terminal" />
+
+### Verificar que funciona
+
+<Code code={`# La aplicación inicia en http://localhost:8080
+# Verás en consola:
+
+  .   ____          _            __ _ _
+ /\\\\ / ___'_ __ _ _(_)_ __  __ _ \\ \\ \\ \\
+( ( )\\___ | '_ | '_| | '_ \\/ _\` | \\ \\ \\ \\
+ \\\\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.3)
+
+Started MiProyectoApplication in 2.5 seconds`} lang="text" title="Salida de consola" />
+
+<Aside type="tip">
+Accede a `http://localhost:8080` en tu navegador. Si ves un error 404, ¡es normal! Aún no hemos creado ningún endpoint.
+</Aside>
+

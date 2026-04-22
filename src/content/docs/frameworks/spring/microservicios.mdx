@@ -1,0 +1,486 @@
+---
+title: 15. Comunicación entre Microservicios
+description: REST vs mensajería, Feign Client, balanceo de carga, Service Discovery y Circuit Breaker
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🏗️ 15.1 Arquitectura de Microservicios
+
+### Monolito vs Microservicios
+
+| Aspecto | Monolito | Microservicios |
+|---------|----------|----------------|
+| **Despliegue** | Todo junto | Independiente |
+| **Escalado** | Vertical | Horizontal |
+| **Tecnología** | Una sola | Múltiples |
+| **Equipo** | Grande | Pequeños |
+| **Complejidad** | Baja inicial | Alta inicial |
+
+### Arquitectura típica
+
+<Code code={`┌─────────────────────────────────────────────────────────┐
+│                    API Gateway                          │
+└─────────────────────────────────────────────────────────┘
+                          │
+    ┌─────────────────────┼─────────────────────┐
+    │                     │                     │
+    ▼                     ▼                     ▼
+┌─────────┐         ┌─────────┐         ┌─────────┐
+│ Usuario │         │ Pedido  │         │Producto │
+│ Service │         │ Service │         │ Service │
+└────┬────┘         └────┬────┘         └────┬────┘
+     │                   │                   │
+     ▼                   ▼                   ▼
+┌─────────┐         ┌─────────┐         ┌─────────┐
+│   DB    │         │   DB    │         │   DB    │
+└─────────┘         └─────────┘         └─────────┘`} lang="text" title="Arquitectura de microservicios" />
+
+---
+
+## 🔄 15.2 Comunicación Síncrona (REST)
+
+### RestTemplate (legacy)
+
+<Code code={`@Service
+public class ProductoClientService {
+    
+    private final RestTemplate restTemplate;
+    
+    public ProductoClientService(RestTemplateBuilder builder) {
+        this.restTemplate = builder
+            .rootUri("http://producto-service:8080")
+            .setConnectTimeout(Duration.ofSeconds(5))
+            .setReadTimeout(Duration.ofSeconds(5))
+            .build();
+    }
+    
+    public Producto obtenerProducto(Long id) {
+        return restTemplate.getForObject("/api/productos/{id}", Producto.class, id);
+    }
+    
+    public List<Producto> listarProductos() {
+        ResponseEntity<List<Producto>> response = restTemplate.exchange(
+            "/api/productos",
+            HttpMethod.GET,
+            null,
+            new ParameterizedTypeReference<List<Producto>>() {}
+        );
+        return response.getBody();
+    }
+    
+    public Producto crearProducto(ProductoDTO dto) {
+        return restTemplate.postForObject("/api/productos", dto, Producto.class);
+    }
+}`} lang="java" title="RestTemplate" />
+
+### WebClient (reactivo, recomendado)
+
+<Code code={`@Service
+public class ProductoClientService {
+    
+    private final WebClient webClient;
+    
+    public ProductoClientService(WebClient.Builder builder) {
+        this.webClient = builder
+            .baseUrl("http://producto-service:8080")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
+    }
+    
+    public Mono<Producto> obtenerProducto(Long id) {
+        return webClient.get()
+            .uri("/api/productos/{id}", id)
+            .retrieve()
+            .bodyToMono(Producto.class);
+    }
+    
+    public Flux<Producto> listarProductos() {
+        return webClient.get()
+            .uri("/api/productos")
+            .retrieve()
+            .bodyToFlux(Producto.class);
+    }
+    
+    // Versión bloqueante (para código no reactivo)
+    public Producto obtenerProductoSync(Long id) {
+        return webClient.get()
+            .uri("/api/productos/{id}", id)
+            .retrieve()
+            .bodyToMono(Producto.class)
+            .block();  // Bloquea hasta obtener respuesta
+    }
+    
+    public Producto crearProducto(ProductoDTO dto) {
+        return webClient.post()
+            .uri("/api/productos")
+            .bodyValue(dto)
+            .retrieve()
+            .bodyToMono(Producto.class)
+            .block();
+    }
+}`} lang="java" title="WebClient" />
+
+---
+
+## 🪶 15.3 Feign Client
+
+### Dependencia
+
+<Code code={`<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>`} lang="xml" title="Dependencia Feign" />
+
+### Habilitar Feign
+
+<Code code={`@SpringBootApplication
+@EnableFeignClients
+public class PedidoServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(PedidoServiceApplication.class, args);
+    }
+}`} lang="java" title="Habilitar Feign" />
+
+### Definir cliente
+
+<Code code={`@FeignClient(name = "producto-service", url = "\${producto.service.url}")
+public interface ProductoClient {
+    
+    @GetMapping("/api/productos/{id}")
+    Producto obtenerPorId(@PathVariable("id") Long id);
+    
+    @GetMapping("/api/productos")
+    List<Producto> listar();
+    
+    @GetMapping("/api/productos")
+    List<Producto> buscar(@RequestParam("categoria") String categoria);
+    
+    @PostMapping("/api/productos")
+    Producto crear(@RequestBody ProductoDTO dto);
+    
+    @PutMapping("/api/productos/{id}")
+    Producto actualizar(@PathVariable("id") Long id, @RequestBody ProductoDTO dto);
+    
+    @DeleteMapping("/api/productos/{id}")
+    void eliminar(@PathVariable("id") Long id);
+}`} lang="java" title="Feign Client" />
+
+### Uso en servicio
+
+<Code code={`@Service
+public class PedidoService {
+    
+    private final ProductoClient productoClient;
+    private final PedidoRepository pedidoRepository;
+    
+    public Pedido crear(PedidoDTO dto) {
+        // Llamar al servicio de productos
+        List<Producto> productos = dto.getProductoIds().stream()
+            .map(productoClient::obtenerPorId)
+            .toList();
+        
+        BigDecimal total = productos.stream()
+            .map(Producto::getPrecio)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        Pedido pedido = Pedido.builder()
+            .productos(productos)
+            .total(total)
+            .build();
+        
+        return pedidoRepository.save(pedido);
+    }
+}`} lang="java" title="Uso de Feign Client" />
+
+### Configuración avanzada
+
+<Code code={`# application.properties
+producto.service.url=http://localhost:8081
+
+# Timeouts
+feign.client.config.default.connect-timeout=5000
+feign.client.config.default.read-timeout=5000
+
+# Logging
+feign.client.config.default.logger-level=full
+logging.level.com.miapp.client=DEBUG`} lang="properties" title="Configuración Feign" />
+
+---
+
+## ⚖️ 15.4 Balanceo de Carga
+
+### Spring Cloud LoadBalancer
+
+<Code code={`<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+</dependency>`} lang="xml" title="Dependencia LoadBalancer" />
+
+### Feign con LoadBalancer
+
+<Code code={`// El nombre del servicio se resuelve via Service Discovery
+@FeignClient(name = "producto-service")  // Sin URL, usa Eureka
+public interface ProductoClient {
+    
+    @GetMapping("/api/productos/{id}")
+    Producto obtenerPorId(@PathVariable("id") Long id);
+}`} lang="java" title="Feign con LoadBalancer" />
+
+### WebClient con LoadBalancer
+
+<Code code={`@Configuration
+public class WebClientConfig {
+    
+    @Bean
+    @LoadBalanced  // Habilita balanceo de carga
+    public WebClient.Builder webClientBuilder() {
+        return WebClient.builder();
+    }
+}
+
+@Service
+public class ProductoClientService {
+    
+    private final WebClient webClient;
+    
+    public ProductoClientService(WebClient.Builder builder) {
+        this.webClient = builder
+            .baseUrl("http://producto-service")  // Nombre del servicio
+            .build();
+    }
+}`} lang="java" title="WebClient con LoadBalancer" />
+
+---
+
+## 🔍 15.5 Service Discovery
+
+### Eureka Server
+
+<Code code={`<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+</dependency>`} lang="xml" title="Dependencia Eureka Server" />
+
+<Code code={`@SpringBootApplication
+@EnableEurekaServer
+public class EurekaServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}`} lang="java" title="Eureka Server" />
+
+<Code code={`# application.properties (Eureka Server)
+server.port=8761
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false`} lang="properties" title="Configuración Eureka Server" />
+
+### Eureka Client
+
+<Code code={`<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>`} lang="xml" title="Dependencia Eureka Client" />
+
+<Code code={`# application.properties (Microservicio)
+spring.application.name=producto-service
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+eureka.instance.prefer-ip-address=true`} lang="properties" title="Configuración Eureka Client" />
+
+---
+
+## 🔌 15.6 Circuit Breaker
+
+### Resilience4j
+
+<Code code={`<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+</dependency>`} lang="xml" title="Dependencia Resilience4j" />
+
+### Configuración
+
+<Code code={`# application.properties
+resilience4j.circuitbreaker.instances.productoService.failure-rate-threshold=50
+resilience4j.circuitbreaker.instances.productoService.wait-duration-in-open-state=10s
+resilience4j.circuitbreaker.instances.productoService.sliding-window-size=10
+resilience4j.circuitbreaker.instances.productoService.minimum-number-of-calls=5
+
+resilience4j.retry.instances.productoService.max-attempts=3
+resilience4j.retry.instances.productoService.wait-duration=1s
+
+resilience4j.timelimiter.instances.productoService.timeout-duration=3s`} lang="properties" title="Configuración Circuit Breaker" />
+
+### Uso con anotaciones
+
+<Code code={`@Service
+public class ProductoClientService {
+    
+    private final ProductoClient productoClient;
+    
+    @CircuitBreaker(name = "productoService", fallbackMethod = "obtenerProductoFallback")
+    @Retry(name = "productoService")
+    @TimeLimiter(name = "productoService")
+    public CompletableFuture<Producto> obtenerProducto(Long id) {
+        return CompletableFuture.supplyAsync(() -> productoClient.obtenerPorId(id));
+    }
+    
+    // Fallback cuando el circuito está abierto o hay error
+    public CompletableFuture<Producto> obtenerProductoFallback(Long id, Throwable t) {
+        log.warn("Fallback para producto {}: {}", id, t.getMessage());
+        return CompletableFuture.completedFuture(
+            Producto.builder()
+                .id(id)
+                .nombre("Producto no disponible")
+                .precio(BigDecimal.ZERO)
+                .build()
+        );
+    }
+}`} lang="java" title="Circuit Breaker con anotaciones" />
+
+### Feign con Circuit Breaker
+
+<Code code={`@FeignClient(
+    name = "producto-service",
+    fallback = ProductoClientFallback.class
+)
+public interface ProductoClient {
+    @GetMapping("/api/productos/{id}")
+    Producto obtenerPorId(@PathVariable("id") Long id);
+}
+
+@Component
+public class ProductoClientFallback implements ProductoClient {
+    
+    @Override
+    public Producto obtenerPorId(Long id) {
+        return Producto.builder()
+            .id(id)
+            .nombre("Producto no disponible")
+            .build();
+    }
+}`} lang="java" title="Feign con Fallback" />
+
+---
+
+## 📨 15.7 Comunicación Asíncrona
+
+### RabbitMQ
+
+<Code code={`<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp</artifactId>
+</dependency>`} lang="xml" title="Dependencia RabbitMQ" />
+
+<Code code={`# application.properties
+spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=guest
+spring.rabbitmq.password=guest`} lang="properties" title="Configuración RabbitMQ" />
+
+### Productor
+
+<Code code={`@Configuration
+public class RabbitConfig {
+    
+    @Bean
+    public Queue pedidosQueue() {
+        return new Queue("pedidos.creados", true);
+    }
+    
+    @Bean
+    public TopicExchange exchange() {
+        return new TopicExchange("pedidos.exchange");
+    }
+    
+    @Bean
+    public Binding binding(Queue queue, TopicExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with("pedido.creado");
+    }
+}
+
+@Service
+public class PedidoService {
+    
+    private final RabbitTemplate rabbitTemplate;
+    
+    public Pedido crear(PedidoDTO dto) {
+        Pedido pedido = pedidoRepository.save(new Pedido(dto));
+        
+        // Publicar evento
+        PedidoCreadoEvent evento = new PedidoCreadoEvent(pedido.getId(), pedido.getTotal());
+        rabbitTemplate.convertAndSend("pedidos.exchange", "pedido.creado", evento);
+        
+        return pedido;
+    }
+}`} lang="java" title="Productor RabbitMQ" />
+
+### Consumidor
+
+<Code code={`@Service
+public class NotificacionService {
+    
+    @RabbitListener(queues = "pedidos.creados")
+    public void procesarPedidoCreado(PedidoCreadoEvent evento) {
+        log.info("Pedido creado: {}", evento.getPedidoId());
+        
+        // Enviar notificación, email, etc.
+        enviarNotificacion(evento);
+    }
+}`} lang="java" title="Consumidor RabbitMQ" />
+
+---
+
+## 📊 15.8 Patrones de Comunicación
+
+### Saga Pattern
+
+<Code code={`@Service
+public class PedidoSagaOrchestrator {
+    
+    private final PedidoService pedidoService;
+    private final InventarioClient inventarioClient;
+    private final PagoClient pagoClient;
+    
+    @Transactional
+    public Pedido procesarPedido(PedidoDTO dto) {
+        Pedido pedido = null;
+        String reservaId = null;
+        String pagoId = null;
+        
+        try {
+            // Paso 1: Crear pedido
+            pedido = pedidoService.crear(dto);
+            
+            // Paso 2: Reservar inventario
+            reservaId = inventarioClient.reservar(dto.getProductos());
+            
+            // Paso 3: Procesar pago
+            pagoId = pagoClient.procesar(dto.getPago());
+            
+            // Paso 4: Confirmar pedido
+            pedido = pedidoService.confirmar(pedido.getId());
+            
+            return pedido;
+            
+        } catch (Exception e) {
+            // Compensaciones
+            if (pagoId != null) {
+                pagoClient.revertir(pagoId);
+            }
+            if (reservaId != null) {
+                inventarioClient.liberarReserva(reservaId);
+            }
+            if (pedido != null) {
+                pedidoService.cancelar(pedido.getId());
+            }
+            throw new SagaException("Error en saga de pedido", e);
+        }
+    }
+}`} lang="java" title="Saga Pattern" />
+
+<Aside type="tip">
+Para microservicios, prefiere comunicación asíncrona (eventos) sobre síncrona (REST) cuando sea posible. Reduce el acoplamiento y mejora la resiliencia.
+</Aside>
+

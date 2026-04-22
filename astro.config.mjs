@@ -133,7 +133,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🦊 Java',
+							label: '☕ Java',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Java', link: '/lenguajes/java/introduccion/' },
@@ -228,7 +228,7 @@ export default defineConfig({
 					],
 				},
 				{
-					label: '🛠️ Frameworks',
+					label: '🎨 Frameworks Frontend',
 					collapsed: false,
 					items: [
 						{
@@ -296,7 +296,41 @@ export default defineConfig({
 							],
 						},
 						{
-							label: '🦋 Laravel',
+							label: '🙂 Java Swing',
+							collapsed: true,
+							items: [
+								{ label: '1. Introducción a Java y Java Swing', link: '/frameworks/java-swing/introduccion/' },
+								{ label: '2. Componentes Básicos de Swing', link: '/frameworks/java-swing/componentes-basicos/' },
+								{ label: '3. Organización de Interfaces', link: '/frameworks/java-swing/organizacion-interfaces/' },
+								{ label: '4. Tablas y Modelos Personalizados', link: '/frameworks/java-swing/tablas-modelos/' },
+								{ label: '5. CRUD con Base de Datos', link: '/frameworks/java-swing/crud-bd/' },
+								{ label: '6. Patrones de Diseño y Arquitecturas', link: '/frameworks/java-swing/patrones-arquitecturas/' }
+							]
+						},
+						{
+							label: '🦉 Alpine.js',
+							collapsed: true,
+							items: [
+								{ label: '01. Introducción a Alpine.js', link: '/guides/alpine/introduction/' },
+								{ label: '02. Instalación y configuración', link: '/guides/alpine/installation/' },
+								{ label: '03. Sintaxis básica y directivas', link: '/guides/alpine/syntax/' },
+								{ label: '04. Reactividad y estado', link: '/guides/alpine/reactivity/' },
+								{ label: '05. Eventos y manejo de acciones', link: '/guides/alpine/events/' },
+								{ label: '06. Ciclo de vida', link: '/guides/alpine/lifecycle/' },
+								{ label: '07. Componentes y scopes', link: '/guides/alpine/components/' },
+								{ label: '08. Plugins y extensiones', link: '/guides/alpine/plugins/' },
+								{ label: '09. Integración con otras librerías', link: '/guides/alpine/integrations/' },
+								{ label: '10. Casos de uso y ejemplos', link: '/guides/alpine/examples/' }
+							]
+						},
+					],
+				},
+				{
+					label: '⚙️ Frameworks Backend',
+					collapsed: false,
+					items: [
+						{
+							label: '🐦 Laravel',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Laravel', link: '/guides/laravel/introduction/' },
@@ -337,34 +371,6 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🪸 Java Swing',
-							collapsed: true,
-							items: [
-								{ label: '1. Introducción a Java y Java Swing', link: '/frameworks/java-swing/introduccion/' },
-								{ label: '2. Componentes Básicos de Swing', link: '/frameworks/java-swing/componentes-basicos/' },
-								{ label: '3. Organización de Interfaces', link: '/frameworks/java-swing/organizacion-interfaces/' },
-								{ label: '4. Tablas y Modelos Personalizados', link: '/frameworks/java-swing/tablas-modelos/' },
-								{ label: '5. CRUD con Base de Datos', link: '/frameworks/java-swing/crud-bd/' },
-								{ label: '6. Patrones de Diseño y Arquitecturas', link: '/frameworks/java-swing/patrones-arquitecturas/' }
-							]
-						},
-						{
-							label: '🦉 Alpine.js',
-							collapsed: true,
-							items: [
-								{ label: '01. Introducción a Alpine.js', link: '/guides/alpine/introduction/' },
-								{ label: '02. Instalación y configuración', link: '/guides/alpine/installation/' },
-								{ label: '03. Sintaxis básica y directivas', link: '/guides/alpine/syntax/' },
-								{ label: '04. Reactividad y estado', link: '/guides/alpine/reactivity/' },
-								{ label: '05. Eventos y manejo de acciones', link: '/guides/alpine/events/' },
-								{ label: '06. Ciclo de vida', link: '/guides/alpine/lifecycle/' },
-								{ label: '07. Componentes y scopes', link: '/guides/alpine/components/' },
-								{ label: '08. Plugins y extensiones', link: '/guides/alpine/plugins/' },
-								{ label: '09. Integración con otras librerías', link: '/guides/alpine/integrations/' },
-								{ label: '10. Casos de uso y ejemplos', link: '/guides/alpine/examples/' }
-							]
-						},
-						{
 							label: '⚡ FastAPI',
 							collapsed: true,
 							items: [
@@ -381,7 +387,38 @@ export default defineConfig({
 								{ label: '11. Autenticación y seguridad', link: '/frameworks/fastapi/autenticacion-seguridad/' }
 							]
 						},
-
+						{
+							label: '🍀 Java Spring',
+							collapsed: true,
+							items: [
+								{ label: '01. Introducción al Ecosistema Spring', link: '/frameworks/spring/introduccion/' },
+								{ label: '02. Configuración del Entorno', link: '/frameworks/spring/configuracion-entorno/' },
+								{ label: '03. Fundamentos de Spring Core', link: '/frameworks/spring/spring-core/' },
+								{ label: '04. Gestión de Beans y Anotaciones', link: '/frameworks/spring/beans-anotaciones/' },
+								{ label: '05. Spring Boot en Profundidad', link: '/frameworks/spring/spring-boot/' },
+								{ label: '06. APIs REST con Spring Web', link: '/frameworks/spring/apis-rest/' },
+								{ label: '07. Excepciones y Validaciones', link: '/frameworks/spring/excepciones-validaciones/' },
+								{ label: '08. Spring Data JPA', link: '/frameworks/spring/spring-data-jpa/' },
+								{ label: '09. Hibernate en Spring', link: '/frameworks/spring/hibernate/' },
+								{ label: '10. Transacciones en Spring', link: '/frameworks/spring/transacciones/' },
+								{ label: '11. Spring Security', link: '/frameworks/spring/spring-security/' },
+								{ label: '12. Programación Orientada a Aspectos', link: '/frameworks/spring/aop/' },
+								{ label: '13. Testing en Spring', link: '/frameworks/spring/testing/' },
+								{ label: '14. Manejo de Archivos', link: '/frameworks/spring/archivos/' },
+								{ label: '15. Comunicación entre Microservicios', link: '/frameworks/spring/microservicios/' },
+								{ label: '16. Spring Cloud', link: '/frameworks/spring/spring-cloud/' },
+								{ label: '17. Mensajería en Spring', link: '/frameworks/spring/mensajeria/' },
+								{ label: '18. Documentación de APIs', link: '/frameworks/spring/documentacion-apis/' },
+								{ label: '19. Performance y Optimización', link: '/frameworks/spring/performance/' },
+								{ label: '20. Docker y Despliegue', link: '/frameworks/spring/docker-despliegue/' },
+								{ label: '21. Buenas Prácticas y Arquitectura', link: '/frameworks/spring/arquitectura/' },
+								{ label: '22. Seguridad Avanzada', link: '/frameworks/spring/seguridad-avanzada/' },
+								{ label: '23. Integración con Frontend', link: '/frameworks/spring/integracion-frontend/' },
+								{ label: '24. Proyecto Final Profesional', link: '/frameworks/spring/proyecto-final/' },
+								{ label: '25. Temas Avanzados y Expertos', link: '/frameworks/spring/temas-avanzados/' },
+								{ label: '26. ORM en Spring (JPA + Hibernate)', link: '/frameworks/spring/orm/' }
+							]
+						},
 					],
 				},
 				{

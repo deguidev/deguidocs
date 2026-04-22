@@ -1,0 +1,638 @@
+---
+title: 26. ORM en Spring (JPA + Hibernate)
+description: Mapeo de entidades, relaciones, repositorios, consultas JPQL, paginación y optimización
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🗃️ 26.1 Fundamentos de JPA
+
+### ¿Qué es JPA?
+
+**JPA (Java Persistence API)** es una especificación estándar para ORM en Java. **Hibernate** es la implementación más popular.
+
+| Concepto | Descripción |
+|----------|-------------|
+| **Entity** | Clase Java mapeada a tabla |
+| **EntityManager** | Gestiona el ciclo de vida de entidades |
+| **JPQL** | Lenguaje de consultas orientado a objetos |
+| **Persistence Context** | Caché de primer nivel |
+
+### Dependencia
+
+<Code code={`<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <scope>runtime</scope>
+</dependency>`} lang="xml" title="Dependencias JPA" />
+
+### Configuración
+
+<Code code={`# application.properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/miapp
+spring.datasource.username=postgres
+spring.datasource.password=secret
+
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect`} lang="properties" title="Configuración JPA" />
+
+---
+
+## 📋 26.2 Mapeo de Entidades
+
+### Entidad básica
+
+<Code code={`@Entity
+@Table(name = "productos")
+@Getter @Setter
+@NoArgsConstructor
+public class Producto {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, length = 100)
+    private String nombre;
+    
+    @Column(length = 500)
+    private String descripcion;
+    
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal precio;
+    
+    @Column(nullable = false)
+    private Integer stock;
+    
+    @Column(name = "imagen_url")
+    private String imagenUrl;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private Estado estado = Estado.ACTIVO;
+    
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+}
+
+public enum Estado {
+    ACTIVO, INACTIVO, AGOTADO
+}`} lang="java" title="Entidad básica" />
+
+### Tipos de ID
+
+<Code code={`// Auto-increment (IDENTITY)
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long id;
+
+// Secuencia (recomendado para PostgreSQL)
+@Id
+@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "producto_seq")
+@SequenceGenerator(name = "producto_seq", sequenceName = "producto_sequence", allocationSize = 50)
+private Long id;
+
+// UUID
+@Id
+@GeneratedValue(strategy = GenerationType.UUID)
+private UUID id;
+
+// ID compuesto
+@Embeddable
+public class PedidoLineaId implements Serializable {
+    private Long pedidoId;
+    private Long productoId;
+}
+
+@Entity
+public class PedidoLinea {
+    @EmbeddedId
+    private PedidoLineaId id;
+}`} lang="java" title="Tipos de ID" />
+
+### Embedded (objetos de valor)
+
+<Code code={`@Embeddable
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Direccion {
+    
+    @Column(length = 200)
+    private String calle;
+    
+    @Column(length = 100)
+    private String ciudad;
+    
+    @Column(length = 50)
+    private String estado;
+    
+    @Column(name = "codigo_postal", length = 10)
+    private String codigoPostal;
+    
+    @Column(length = 50)
+    private String pais;
+}
+
+@Entity
+public class Usuario {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String nombre;
+    
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "calle", column = @Column(name = "direccion_calle")),
+        @AttributeOverride(name = "ciudad", column = @Column(name = "direccion_ciudad"))
+    })
+    private Direccion direccion;
+    
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "calle", column = @Column(name = "facturacion_calle")),
+        @AttributeOverride(name = "ciudad", column = @Column(name = "facturacion_ciudad"))
+    })
+    private Direccion direccionFacturacion;
+}`} lang="java" title="Embedded" />
+
+---
+
+## 🔗 26.3 Relaciones
+
+### OneToMany / ManyToOne
+
+<Code code={`@Entity
+public class Categoria {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String nombre;
+    
+    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Producto> productos = new ArrayList<>();
+    
+    // Métodos helper
+    public void addProducto(Producto producto) {
+        productos.add(producto);
+        producto.setCategoria(this);
+    }
+    
+    public void removeProducto(Producto producto) {
+        productos.remove(producto);
+        producto.setCategoria(null);
+    }
+}
+
+@Entity
+public class Producto {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String nombre;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria;
+}`} lang="java" title="OneToMany / ManyToOne" />
+
+### ManyToMany
+
+<Code code={`@Entity
+public class Producto {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String nombre;
+    
+    @ManyToMany
+    @JoinTable(
+        name = "producto_etiqueta",
+        joinColumns = @JoinColumn(name = "producto_id"),
+        inverseJoinColumns = @JoinColumn(name = "etiqueta_id")
+    )
+    private Set<Etiqueta> etiquetas = new HashSet<>();
+    
+    public void addEtiqueta(Etiqueta etiqueta) {
+        etiquetas.add(etiqueta);
+        etiqueta.getProductos().add(this);
+    }
+    
+    public void removeEtiqueta(Etiqueta etiqueta) {
+        etiquetas.remove(etiqueta);
+        etiqueta.getProductos().remove(this);
+    }
+}
+
+@Entity
+public class Etiqueta {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String nombre;
+    
+    @ManyToMany(mappedBy = "etiquetas")
+    private Set<Producto> productos = new HashSet<>();
+}`} lang="java" title="ManyToMany" />
+
+### OneToOne
+
+<Code code={`@Entity
+public class Usuario {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String email;
+    
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, 
+              fetch = FetchType.LAZY, orphanRemoval = true)
+    private Perfil perfil;
+    
+    public void setPerfil(Perfil perfil) {
+        if (perfil == null) {
+            if (this.perfil != null) {
+                this.perfil.setUsuario(null);
+            }
+        } else {
+            perfil.setUsuario(this);
+        }
+        this.perfil = perfil;
+    }
+}
+
+@Entity
+public class Perfil {
+    
+    @Id
+    private Long id;  // Mismo ID que Usuario
+    
+    private String bio;
+    private String avatarUrl;
+    
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "id")
+    private Usuario usuario;
+}`} lang="java" title="OneToOne" />
+
+---
+
+## 🔍 26.4 Repositorios
+
+### JpaRepository
+
+<Code code={`public interface ProductoRepository extends JpaRepository<Producto, Long> {
+    
+    // Query methods automáticos
+    List<Producto> findByNombre(String nombre);
+    
+    Optional<Producto> findByNombreIgnoreCase(String nombre);
+    
+    List<Producto> findByPrecioBetween(BigDecimal min, BigDecimal max);
+    
+    List<Producto> findByEstadoAndCategoriaNombre(Estado estado, String categoriaNombre);
+    
+    List<Producto> findByNombreContainingIgnoreCase(String texto);
+    
+    List<Producto> findByCategoriaIdOrderByPrecioDesc(Long categoriaId);
+    
+    boolean existsByNombre(String nombre);
+    
+    long countByEstado(Estado estado);
+    
+    // Con paginación
+    Page<Producto> findByEstado(Estado estado, Pageable pageable);
+    
+    Slice<Producto> findByCategoriaId(Long categoriaId, Pageable pageable);
+}`} lang="java" title="Query Methods" />
+
+### JPQL
+
+<Code code={`public interface ProductoRepository extends JpaRepository<Producto, Long> {
+    
+    @Query("SELECT p FROM Producto p WHERE p.precio > :precio")
+    List<Producto> findByPrecioMayorQue(@Param("precio") BigDecimal precio);
+    
+    @Query("SELECT p FROM Producto p JOIN FETCH p.categoria WHERE p.id = :id")
+    Optional<Producto> findByIdConCategoria(@Param("id") Long id);
+    
+    @Query("SELECT p FROM Producto p WHERE p.categoria.nombre = :categoria " +
+           "AND p.estado = :estado ORDER BY p.precio DESC")
+    List<Producto> findByCategoriaYEstado(
+        @Param("categoria") String categoria, 
+        @Param("estado") Estado estado
+    );
+    
+    @Query("SELECT p FROM Producto p WHERE LOWER(p.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))")
+    Page<Producto> buscar(@Param("texto") String texto, Pageable pageable);
+    
+    @Modifying
+    @Query("UPDATE Producto p SET p.estado = :estado WHERE p.stock = 0")
+    int marcarAgotados(@Param("estado") Estado estado);
+    
+    @Modifying
+    @Query("DELETE FROM Producto p WHERE p.estado = :estado AND p.updatedAt < :fecha")
+    int eliminarInactivosAntiguos(@Param("estado") Estado estado, @Param("fecha") LocalDateTime fecha);
+}`} lang="java" title="JPQL" />
+
+### Native Query
+
+<Code code={`public interface ProductoRepository extends JpaRepository<Producto, Long> {
+    
+    @Query(value = "SELECT * FROM productos WHERE stock > 0 ORDER BY RANDOM() LIMIT :limit", 
+           nativeQuery = true)
+    List<Producto> findRandomDisponibles(@Param("limit") int limit);
+    
+    @Query(value = """
+        SELECT p.*, COUNT(lp.id) as ventas 
+        FROM productos p 
+        LEFT JOIN linea_pedido lp ON p.id = lp.producto_id 
+        GROUP BY p.id 
+        ORDER BY ventas DESC 
+        LIMIT :limit
+        """, nativeQuery = true)
+    List<Producto> findMasVendidos(@Param("limit") int limit);
+}`} lang="java" title="Native Query" />
+
+---
+
+## 📊 26.5 Proyecciones
+
+### Interface Projection
+
+<Code code={`// Proyección cerrada
+public interface ProductoResumen {
+    Long getId();
+    String getNombre();
+    BigDecimal getPrecio();
+}
+
+// Proyección con SpEL
+public interface ProductoConCategoria {
+    Long getId();
+    String getNombre();
+    BigDecimal getPrecio();
+    
+    @Value("#{target.categoria.nombre}")
+    String getCategoriaNombre();
+    
+    @Value("#{target.precio.multiply(1.16)}")
+    BigDecimal getPrecioConIva();
+}
+
+// Uso
+public interface ProductoRepository extends JpaRepository<Producto, Long> {
+    
+    List<ProductoResumen> findByEstado(Estado estado);
+    
+    @Query("SELECT p FROM Producto p WHERE p.categoria.id = :categoriaId")
+    List<ProductoConCategoria> findByCategoriaIdProjected(@Param("categoriaId") Long categoriaId);
+}`} lang="java" title="Interface Projection" />
+
+### Class Projection (DTO)
+
+<Code code={`public record ProductoDTO(
+    Long id,
+    String nombre,
+    BigDecimal precio,
+    String categoriaNombre
+) {}
+
+public interface ProductoRepository extends JpaRepository<Producto, Long> {
+    
+    @Query("""
+        SELECT new com.miapp.dto.ProductoDTO(
+            p.id, p.nombre, p.precio, p.categoria.nombre
+        ) 
+        FROM Producto p 
+        WHERE p.estado = :estado
+        """)
+    List<ProductoDTO> findDTOsByEstado(@Param("estado") Estado estado);
+}`} lang="java" title="Class Projection" />
+
+---
+
+## 📄 26.6 Paginación y Ordenamiento
+
+### Pageable
+
+<Code code={`@Service
+@RequiredArgsConstructor
+public class ProductoService {
+    
+    private final ProductoRepository repository;
+    
+    public Page<ProductoDTO> listar(int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equalsIgnoreCase("desc") 
+            ? Sort.by(sortBy).descending() 
+            : Sort.by(sortBy).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        return repository.findAll(pageable)
+            .map(this::toDTO);
+    }
+    
+    public Page<ProductoDTO> buscar(String texto, Pageable pageable) {
+        return repository.findByNombreContainingIgnoreCase(texto, pageable)
+            .map(this::toDTO);
+    }
+}
+
+// Controller
+@GetMapping
+public Page<ProductoDTO> listar(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "id") String sortBy,
+        @RequestParam(defaultValue = "asc") String direction) {
+    return productoService.listar(page, size, sortBy, direction);
+}`} lang="java" title="Paginación" />
+
+### Ordenamiento múltiple
+
+<Code code={`// Ordenar por múltiples campos
+Sort sort = Sort.by(
+    Sort.Order.desc("categoria.nombre"),
+    Sort.Order.asc("precio"),
+    Sort.Order.desc("createdAt")
+);
+
+Pageable pageable = PageRequest.of(0, 20, sort);
+
+// Con nulls
+Sort sort = Sort.by(Sort.Order.asc("precio").nullsLast());`} lang="java" title="Ordenamiento múltiple" />
+
+---
+
+## ⚡ 26.7 Optimización
+
+### Fetch Join (evitar N+1)
+
+<Code code={`// ❌ Problema N+1
+List<Pedido> pedidos = pedidoRepository.findAll();
+for (Pedido p : pedidos) {
+    p.getLineas().size();  // Query adicional por cada pedido
+}
+
+// ✅ Solución: JOIN FETCH
+@Query("SELECT DISTINCT p FROM Pedido p JOIN FETCH p.lineas WHERE p.estado = :estado")
+List<Pedido> findByEstadoConLineas(@Param("estado") Estado estado);
+
+// ✅ EntityGraph
+@EntityGraph(attributePaths = {"lineas", "lineas.producto", "usuario"})
+List<Pedido> findByEstado(Estado estado);
+
+// Definir EntityGraph en la entidad
+@Entity
+@NamedEntityGraph(
+    name = "Pedido.completo",
+    attributeNodes = {
+        @NamedAttributeNode("usuario"),
+        @NamedAttributeNode(value = "lineas", subgraph = "lineas-subgraph")
+    },
+    subgraphs = @NamedSubgraph(
+        name = "lineas-subgraph",
+        attributeNodes = @NamedAttributeNode("producto")
+    )
+)
+public class Pedido { }`} lang="java" title="Fetch Join" />
+
+### Batch Size
+
+<Code code={`// En la entidad
+@Entity
+public class Categoria {
+    
+    @OneToMany(mappedBy = "categoria")
+    @BatchSize(size = 25)  // Carga en lotes de 25
+    private List<Producto> productos;
+}
+
+// Global en application.properties
+spring.jpa.properties.hibernate.default_batch_fetch_size=25`} lang="java" title="Batch Size" />
+
+### Caché de segundo nivel
+
+<Code code={`<dependency>
+    <groupId>org.hibernate.orm</groupId>
+    <artifactId>hibernate-jcache</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.ehcache</groupId>
+    <artifactId>ehcache</artifactId>
+</dependency>`} lang="xml" title="Dependencia caché L2" />
+
+<Code code={`# application.properties
+spring.jpa.properties.hibernate.cache.use_second_level_cache=true
+spring.jpa.properties.hibernate.cache.region.factory_class=jcache
+spring.jpa.properties.hibernate.javax.cache.provider=org.ehcache.jsr107.EhcacheCachingProvider
+spring.jpa.properties.hibernate.cache.use_query_cache=true`} lang="properties" title="Configuración caché L2" />
+
+<Code code={`@Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class Categoria {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String nombre;
+    
+    @OneToMany(mappedBy = "categoria")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    private List<Producto> productos;
+}`} lang="java" title="Entidad cacheable" />
+
+---
+
+## 🔧 26.8 Specifications (Consultas dinámicas)
+
+<Code code={`// Specification
+public class ProductoSpecifications {
+    
+    public static Specification<Producto> conNombre(String nombre) {
+        return (root, query, cb) -> {
+            if (nombre == null || nombre.isBlank()) return null;
+            return cb.like(cb.lower(root.get("nombre")), "%" + nombre.toLowerCase() + "%");
+        };
+    }
+    
+    public static Specification<Producto> conPrecioEntre(BigDecimal min, BigDecimal max) {
+        return (root, query, cb) -> {
+            if (min == null && max == null) return null;
+            if (min == null) return cb.lessThanOrEqualTo(root.get("precio"), max);
+            if (max == null) return cb.greaterThanOrEqualTo(root.get("precio"), min);
+            return cb.between(root.get("precio"), min, max);
+        };
+    }
+    
+    public static Specification<Producto> conCategoria(Long categoriaId) {
+        return (root, query, cb) -> {
+            if (categoriaId == null) return null;
+            return cb.equal(root.get("categoria").get("id"), categoriaId);
+        };
+    }
+    
+    public static Specification<Producto> conEstado(Estado estado) {
+        return (root, query, cb) -> {
+            if (estado == null) return null;
+            return cb.equal(root.get("estado"), estado);
+        };
+    }
+}
+
+// Repository
+public interface ProductoRepository extends JpaRepository<Producto, Long>, 
+                                           JpaSpecificationExecutor<Producto> {
+}
+
+// Service
+public Page<Producto> buscar(ProductoFiltro filtro, Pageable pageable) {
+    Specification<Producto> spec = Specification
+        .where(ProductoSpecifications.conNombre(filtro.getNombre()))
+        .and(ProductoSpecifications.conPrecioEntre(filtro.getPrecioMin(), filtro.getPrecioMax()))
+        .and(ProductoSpecifications.conCategoria(filtro.getCategoriaId()))
+        .and(ProductoSpecifications.conEstado(filtro.getEstado()));
+    
+    return repository.findAll(spec, pageable);
+}`} lang="java" title="Specifications" />
+
+<Aside type="tip">
+Usa **LAZY loading** por defecto y **JOIN FETCH** solo cuando necesites los datos. Activa el logging SQL en desarrollo para detectar problemas N+1.
+</Aside>
+

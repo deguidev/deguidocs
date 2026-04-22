@@ -1,0 +1,487 @@
+---
+title: 6. Desarrollo de APIs REST con Spring Web
+description: "@RestController, @RequestMapping, manejo de parámetros, serialización JSON y buenas prácticas REST"
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🌐 6.1 Arquitectura REST
+
+### ¿Qué es REST?
+
+**REST (Representational State Transfer)** es un estilo arquitectónico para diseñar APIs web que usan HTTP como protocolo de comunicación.
+
+### Principios REST
+
+| Principio | Descripción |
+|-----------|-------------|
+| **Stateless** | Cada request es independiente |
+| **Client-Server** | Separación de responsabilidades |
+| **Uniform Interface** | URLs consistentes y predecibles |
+| **Cacheable** | Respuestas pueden ser cacheadas |
+| **Layered System** | Arquitectura en capas |
+
+### Métodos HTTP
+
+| Método | Acción | Ejemplo |
+|--------|--------|---------|
+| `GET` | Obtener recursos | `GET /api/usuarios` |
+| `POST` | Crear recurso | `POST /api/usuarios` |
+| `PUT` | Actualizar completo | `PUT /api/usuarios/1` |
+| `PATCH` | Actualizar parcial | `PATCH /api/usuarios/1` |
+| `DELETE` | Eliminar | `DELETE /api/usuarios/1` |
+
+---
+
+## 🎮 6.2 @RestController y @Controller
+
+### Diferencia principal
+
+<Code code={`// @Controller - Retorna VISTAS (HTML)
+@Controller
+public class HomeController {
+    
+    @GetMapping("/")
+    public String home(Model model) {
+        model.addAttribute("mensaje", "Hola");
+        return "home";  // Busca templates/home.html
+    }
+}
+
+// @RestController - Retorna DATOS (JSON)
+@RestController
+public class ApiController {
+    
+    @GetMapping("/api/saludo")
+    public Map<String, String> saludo() {
+        return Map.of("mensaje", "Hola");  // {"mensaje": "Hola"}
+    }
+}`} lang="java" title="@Controller vs @RestController" />
+
+### @RestController = @Controller + @ResponseBody
+
+<Code code={`// Esto:
+@RestController
+public class UsuarioController { }
+
+// Equivale a:
+@Controller
+@ResponseBody
+public class UsuarioController { }`} lang="java" title="Equivalencia" />
+
+---
+
+## 🗺️ 6.3 @RequestMapping y Derivados
+
+### @RequestMapping general
+
+<Code code={`@RestController
+@RequestMapping("/api/usuarios")  // Prefijo para todos los endpoints
+public class UsuarioController {
+    
+    @RequestMapping(method = RequestMethod.GET)
+    public List<Usuario> listar() {
+        return usuarioService.listarTodos();
+    }
+    
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public Usuario obtener(@PathVariable Long id) {
+        return usuarioService.buscarPorId(id);
+    }
+}`} lang="java" title="@RequestMapping" />
+
+### Anotaciones específicas (recomendadas)
+
+<Code code={`@RestController
+@RequestMapping("/api/productos")
+public class ProductoController {
+    
+    private final ProductoService service;
+    
+    public ProductoController(ProductoService service) {
+        this.service = service;
+    }
+    
+    // GET /api/productos
+    @GetMapping
+    public List<Producto> listar() {
+        return service.listarTodos();
+    }
+    
+    // GET /api/productos/5
+    @GetMapping("/{id}")
+    public Producto obtener(@PathVariable Long id) {
+        return service.buscarPorId(id);
+    }
+    
+    // POST /api/productos
+    @PostMapping
+    public Producto crear(@RequestBody Producto producto) {
+        return service.guardar(producto);
+    }
+    
+    // PUT /api/productos/5
+    @PutMapping("/{id}")
+    public Producto actualizar(@PathVariable Long id, 
+                               @RequestBody Producto producto) {
+        return service.actualizar(id, producto);
+    }
+    
+    // DELETE /api/productos/5
+    @DeleteMapping("/{id}")
+    public void eliminar(@PathVariable Long id) {
+        service.eliminar(id);
+    }
+}`} lang="java" title="CRUD completo con anotaciones específicas" />
+
+---
+
+## 📥 6.4 Manejo de Parámetros (Path, Query, Body)
+
+### @PathVariable - Parámetros en la URL
+
+<Code code={`// GET /api/usuarios/5
+@GetMapping("/{id}")
+public Usuario obtener(@PathVariable Long id) {
+    return service.buscarPorId(id);
+}
+
+// GET /api/usuarios/5/pedidos/10
+@GetMapping("/{usuarioId}/pedidos/{pedidoId}")
+public Pedido obtenerPedido(
+        @PathVariable Long usuarioId,
+        @PathVariable Long pedidoId) {
+    return pedidoService.buscar(usuarioId, pedidoId);
+}
+
+// Nombre diferente al parámetro
+@GetMapping("/{id}")
+public Usuario obtener(@PathVariable("id") Long usuarioId) {
+    return service.buscarPorId(usuarioId);
+}`} lang="java" title="@PathVariable" />
+
+### @RequestParam - Query parameters
+
+<Code code={`// GET /api/productos?categoria=electronica&precio=100
+@GetMapping
+public List<Producto> buscar(
+        @RequestParam String categoria,
+        @RequestParam(required = false) Double precio) {
+    return service.buscar(categoria, precio);
+}
+
+// GET /api/productos?page=0&size=10
+@GetMapping
+public Page<Producto> listar(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+    return service.listar(PageRequest.of(page, size));
+}
+
+// GET /api/productos?ids=1,2,3
+@GetMapping
+public List<Producto> obtenerVarios(@RequestParam List<Long> ids) {
+    return service.buscarPorIds(ids);
+}`} lang="java" title="@RequestParam" />
+
+### @RequestBody - Cuerpo de la petición
+
+<Code code={`// POST /api/usuarios
+// Body: {"nombre": "Juan", "email": "juan@email.com"}
+@PostMapping
+public Usuario crear(@RequestBody Usuario usuario) {
+    return service.guardar(usuario);
+}
+
+// Con DTO
+@PostMapping
+public Usuario crear(@RequestBody CrearUsuarioDTO dto) {
+    return service.crear(dto);
+}
+
+// DTO
+public class CrearUsuarioDTO {
+    private String nombre;
+    private String email;
+    private String password;
+    // getters y setters
+}`} lang="java" title="@RequestBody" />
+
+### @RequestHeader - Headers HTTP
+
+<Code code={`@GetMapping("/perfil")
+public Usuario obtenerPerfil(
+        @RequestHeader("Authorization") String token,
+        @RequestHeader(value = "X-Custom-Header", required = false) String custom) {
+    return service.obtenerPorToken(token);
+}`} lang="java" title="@RequestHeader" />
+
+---
+
+## 📤 6.5 Serialización JSON con Jackson
+
+### Configuración automática
+
+Spring Boot configura Jackson automáticamente. Los objetos Java se convierten a JSON.
+
+<Code code={`// Entidad
+public class Producto {
+    private Long id;
+    private String nombre;
+    private BigDecimal precio;
+    private LocalDateTime createdAt;
+    
+    // getters y setters
+}
+
+// Controller
+@GetMapping("/{id}")
+public Producto obtener(@PathVariable Long id) {
+    return service.buscarPorId(id);
+}
+
+// Respuesta JSON automática:
+// {
+//   "id": 1,
+//   "nombre": "Laptop",
+//   "precio": 999.99,
+//   "createdAt": "2024-01-15T10:30:00"
+// }`} lang="java" title="Serialización automática" />
+
+### Anotaciones de Jackson
+
+<Code code={`public class Usuario {
+    
+    private Long id;
+    
+    private String nombre;
+    
+    @JsonProperty("correo")  // Nombre diferente en JSON
+    private String email;
+    
+    @JsonIgnore  // No incluir en JSON
+    private String password;
+    
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private LocalDate fechaNacimiento;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)  // Solo si no es null
+    private String telefono;
+}`} lang="java" title="Anotaciones Jackson" />
+
+### Configuración global
+
+<Code code={`# application.properties
+spring.jackson.date-format=yyyy-MM-dd HH:mm:ss
+spring.jackson.time-zone=America/Lima
+spring.jackson.serialization.indent-output=true
+spring.jackson.default-property-inclusion=non_null`} lang="properties" title="Configuración de Jackson" />
+
+---
+
+## 📨 6.6 Manejo de Respuestas HTTP
+
+### ResponseEntity
+
+<Code code={`@RestController
+@RequestMapping("/api/usuarios")
+public class UsuarioController {
+    
+    // Respuesta con código de estado específico
+    @GetMapping("/{id}")
+    public ResponseEntity<Usuario> obtener(@PathVariable Long id) {
+        Usuario usuario = service.buscarPorId(id);
+        
+        if (usuario == null) {
+            return ResponseEntity.notFound().build();  // 404
+        }
+        
+        return ResponseEntity.ok(usuario);  // 200
+    }
+    
+    // Crear con 201 Created
+    @PostMapping
+    public ResponseEntity<Usuario> crear(@RequestBody Usuario usuario) {
+        Usuario nuevo = service.guardar(usuario);
+        
+        URI location = URI.create("/api/usuarios/" + nuevo.getId());
+        
+        return ResponseEntity
+            .created(location)  // 201 + header Location
+            .body(nuevo);
+    }
+    
+    // Sin contenido
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        service.eliminar(id);
+        return ResponseEntity.noContent().build();  // 204
+    }
+    
+    // Respuesta personalizada
+    @GetMapping("/estadisticas")
+    public ResponseEntity<Map<String, Object>> estadisticas() {
+        Map<String, Object> stats = service.obtenerEstadisticas();
+        
+        return ResponseEntity
+            .ok()
+            .header("X-Total-Count", String.valueOf(stats.get("total")))
+            .body(stats);
+    }
+}`} lang="java" title="ResponseEntity completo" />
+
+### Códigos de estado comunes
+
+| Código | Constante | Uso |
+|--------|-----------|-----|
+| 200 | `ResponseEntity.ok()` | Éxito |
+| 201 | `ResponseEntity.created()` | Recurso creado |
+| 204 | `ResponseEntity.noContent()` | Sin contenido |
+| 400 | `ResponseEntity.badRequest()` | Error del cliente |
+| 404 | `ResponseEntity.notFound()` | No encontrado |
+| 500 | `ResponseEntity.internalServerError()` | Error del servidor |
+
+---
+
+## 🔢 6.7 Versionado de APIs
+
+### Versionado por URL (recomendado)
+
+<Code code={`@RestController
+@RequestMapping("/api/v1/usuarios")
+public class UsuarioControllerV1 {
+    
+    @GetMapping
+    public List<UsuarioV1DTO> listar() {
+        return service.listarV1();
+    }
+}
+
+@RestController
+@RequestMapping("/api/v2/usuarios")
+public class UsuarioControllerV2 {
+    
+    @GetMapping
+    public List<UsuarioV2DTO> listar() {
+        return service.listarV2();  // Nueva estructura
+    }
+}`} lang="java" title="Versionado por URL" />
+
+### Versionado por header
+
+<Code code={`@RestController
+@RequestMapping("/api/usuarios")
+public class UsuarioController {
+    
+    @GetMapping(headers = "X-API-Version=1")
+    public List<UsuarioV1DTO> listarV1() {
+        return service.listarV1();
+    }
+    
+    @GetMapping(headers = "X-API-Version=2")
+    public List<UsuarioV2DTO> listarV2() {
+        return service.listarV2();
+    }
+}`} lang="java" title="Versionado por header" />
+
+### Versionado por parámetro
+
+<Code code={`@GetMapping(params = "version=1")
+public List<UsuarioV1DTO> listarV1() { }
+
+@GetMapping(params = "version=2")
+public List<UsuarioV2DTO> listarV2() { }`} lang="java" title="Versionado por parámetro" />
+
+---
+
+## ✅ 6.8 Buenas Prácticas REST
+
+### Diseño de URLs
+
+<Code code={`// ✅ CORRECTO - Sustantivos en plural
+GET    /api/usuarios          // Listar
+GET    /api/usuarios/5        // Obtener uno
+POST   /api/usuarios          // Crear
+PUT    /api/usuarios/5        // Actualizar
+DELETE /api/usuarios/5        // Eliminar
+
+// ❌ INCORRECTO - Verbos en URL
+GET    /api/getUsuarios
+POST   /api/crearUsuario
+DELETE /api/eliminarUsuario/5
+
+// ✅ Recursos anidados
+GET    /api/usuarios/5/pedidos        // Pedidos del usuario 5
+GET    /api/usuarios/5/pedidos/10     // Pedido 10 del usuario 5
+
+// ✅ Filtros con query params
+GET    /api/productos?categoria=tech&precio_min=100&ordenar=precio`} lang="text" title="Diseño de URLs REST" />
+
+### Estructura de respuestas
+
+<Code code={`// Respuesta exitosa
+{
+    "data": {
+        "id": 1,
+        "nombre": "Juan",
+        "email": "juan@email.com"
+    },
+    "message": "Usuario obtenido correctamente"
+}
+
+// Lista con paginación
+{
+    "data": [...],
+    "pagination": {
+        "page": 0,
+        "size": 10,
+        "totalElements": 100,
+        "totalPages": 10
+    }
+}
+
+// Error
+{
+    "error": {
+        "code": "USER_NOT_FOUND",
+        "message": "Usuario no encontrado",
+        "timestamp": "2024-01-15T10:30:00"
+    }
+}`} lang="json" title="Estructura de respuestas" />
+
+### Clase de respuesta genérica
+
+<Code code={`public class ApiResponse<T> {
+    private T data;
+    private String message;
+    private LocalDateTime timestamp;
+    
+    public static <T> ApiResponse<T> success(T data) {
+        ApiResponse<T> response = new ApiResponse<>();
+        response.data = data;
+        response.message = "Operación exitosa";
+        response.timestamp = LocalDateTime.now();
+        return response;
+    }
+    
+    public static <T> ApiResponse<T> success(T data, String message) {
+        ApiResponse<T> response = success(data);
+        response.message = message;
+        return response;
+    }
+    
+    // getters
+}
+
+// Uso en controller
+@GetMapping("/{id}")
+public ApiResponse<Usuario> obtener(@PathVariable Long id) {
+    Usuario usuario = service.buscarPorId(id);
+    return ApiResponse.success(usuario, "Usuario encontrado");
+}`} lang="java" title="Clase ApiResponse genérica" />
+
+<Aside type="tip">
+Mantén consistencia en todas tus respuestas. Define una estructura estándar y úsala en toda la API.
+</Aside>
+

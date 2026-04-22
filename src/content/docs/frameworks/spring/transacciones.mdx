@@ -1,0 +1,448 @@
+---
+title: 10. Transacciones en Spring
+description: "@Transactional, propagación, aislamiento, rollback y transacciones distribuidas"
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 💰 10.1 Concepto de Transacciones
+
+### ¿Qué es una transacción?
+
+Una **transacción** es un conjunto de operaciones que se ejecutan como una unidad atómica: o todas se completan exitosamente, o ninguna se aplica.
+
+### Propiedades ACID
+
+| Propiedad | Descripción |
+|-----------|-------------|
+| **Atomicity** | Todo o nada |
+| **Consistency** | Estado válido antes y después |
+| **Isolation** | Transacciones no interfieren entre sí |
+| **Durability** | Cambios persistentes tras commit |
+
+### Ejemplo del mundo real
+
+<Code code={`// Transferencia bancaria: DEBE ser atómica
+public void transferir(Long origenId, Long destinoId, BigDecimal monto) {
+    // 1. Debitar de cuenta origen
+    cuentaOrigen.debitar(monto);
+    
+    // 2. Acreditar a cuenta destino
+    cuentaDestino.acreditar(monto);
+    
+    // Si falla el paso 2, el paso 1 debe revertirse
+    // ¡No podemos perder dinero!
+}`} lang="java" title="Necesidad de transacciones" />
+
+---
+
+## 🏷️ 10.2 @Transactional
+
+### Uso básico
+
+<Code code={`import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class CuentaService {
+    
+    private final CuentaRepository cuentaRepository;
+    
+    @Transactional  // Toda la operación es atómica
+    public void transferir(Long origenId, Long destinoId, BigDecimal monto) {
+        Cuenta origen = cuentaRepository.findById(origenId).orElseThrow();
+        Cuenta destino = cuentaRepository.findById(destinoId).orElseThrow();
+        
+        origen.debitar(monto);
+        destino.acreditar(monto);
+        
+        cuentaRepository.save(origen);
+        cuentaRepository.save(destino);
+        // Si algo falla, TODO se revierte
+    }
+}`} lang="java" title="@Transactional básico" />
+
+### A nivel de clase
+
+<Code code={`@Service
+@Transactional  // Aplica a todos los métodos públicos
+public class PedidoService {
+    
+    public Pedido crear(PedidoDTO dto) {
+        // Transaccional
+    }
+    
+    public void cancelar(Long id) {
+        // Transaccional
+    }
+    
+    @Transactional(readOnly = true)  // Override para lectura
+    public Pedido buscar(Long id) {
+        // Solo lectura, optimizado
+    }
+}`} lang="java" title="@Transactional a nivel de clase" />
+
+### Transacciones de solo lectura
+
+<Code code={`@Service
+public class ReporteService {
+    
+    @Transactional(readOnly = true)  // Optimización para lecturas
+    public List<Venta> generarReporte(LocalDate desde, LocalDate hasta) {
+        return ventaRepository.findByFechaBetween(desde, hasta);
+    }
+}`} lang="java" title="Transacción de solo lectura" />
+
+<Aside type="tip">
+Usa `readOnly = true` para consultas. Hibernate desactiva el dirty checking, mejorando el rendimiento.
+</Aside>
+
+---
+
+## 🔀 10.3 Propagación de Transacciones
+
+### Tipos de propagación
+
+| Propagación | Descripción |
+|-------------|-------------|
+| `REQUIRED` | Usa existente o crea nueva (default) |
+| `REQUIRES_NEW` | Siempre crea nueva, suspende existente |
+| `SUPPORTS` | Usa existente si hay, sino sin transacción |
+| `NOT_SUPPORTED` | Sin transacción, suspende existente |
+| `MANDATORY` | Debe existir una, sino error |
+| `NEVER` | No debe existir, sino error |
+| `NESTED` | Transacción anidada (savepoint) |
+
+### REQUIRED (default)
+
+<Code code={`@Service
+public class PedidoService {
+    
+    @Autowired
+    private InventarioService inventarioService;
+    
+    @Transactional  // Propagation.REQUIRED por defecto
+    public Pedido crear(PedidoDTO dto) {
+        Pedido pedido = new Pedido(dto);
+        pedidoRepository.save(pedido);
+        
+        // Usa la MISMA transacción
+        inventarioService.reservar(dto.getProductos());
+        
+        return pedido;
+    }
+}
+
+@Service
+public class InventarioService {
+    
+    @Transactional  // Participa en la transacción existente
+    public void reservar(List<Producto> productos) {
+        // Si falla aquí, TODO se revierte (pedido incluido)
+    }
+}`} lang="java" title="REQUIRED: misma transacción" />
+
+### REQUIRES_NEW
+
+<Code code={`@Service
+public class PedidoService {
+    
+    @Autowired
+    private AuditoriaService auditoriaService;
+    
+    @Transactional
+    public Pedido crear(PedidoDTO dto) {
+        Pedido pedido = new Pedido(dto);
+        pedidoRepository.save(pedido);
+        
+        // Transacción INDEPENDIENTE
+        auditoriaService.registrar("Pedido creado: " + pedido.getId());
+        
+        return pedido;
+    }
+}
+
+@Service
+public class AuditoriaService {
+    
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void registrar(String mensaje) {
+        // Si el pedido falla, la auditoría SE GUARDA igual
+        // Útil para logs que deben persistir siempre
+        auditoriaRepository.save(new Auditoria(mensaje));
+    }
+}`} lang="java" title="REQUIRES_NEW: transacción independiente" />
+
+### NESTED
+
+<Code code={`@Service
+public class ProcesoService {
+    
+    @Transactional
+    public void procesarLote(List<Item> items) {
+        for (Item item : items) {
+            try {
+                procesarItem(item);  // Transacción anidada
+            } catch (Exception e) {
+                // Si falla un item, continúa con los demás
+                log.error("Error en item: " + item.getId());
+            }
+        }
+    }
+    
+    @Transactional(propagation = Propagation.NESTED)
+    public void procesarItem(Item item) {
+        // Si falla, solo este item se revierte (savepoint)
+        // Los demás items y la transacción padre continúan
+    }
+}`} lang="java" title="NESTED: savepoints" />
+
+---
+
+## 🔒 10.4 Aislamiento de Transacciones
+
+### Niveles de aislamiento
+
+| Nivel | Dirty Read | Non-Repeatable Read | Phantom Read |
+|-------|------------|---------------------|--------------|
+| `READ_UNCOMMITTED` | ✅ Posible | ✅ Posible | ✅ Posible |
+| `READ_COMMITTED` | ❌ No | ✅ Posible | ✅ Posible |
+| `REPEATABLE_READ` | ❌ No | ❌ No | ✅ Posible |
+| `SERIALIZABLE` | ❌ No | ❌ No | ❌ No |
+
+### Problemas de concurrencia
+
+<Code code={`// DIRTY READ: Leer datos no confirmados
+// T1: UPDATE cuenta SET saldo = 500 (no commit)
+// T2: SELECT saldo FROM cuenta → 500 (dato "sucio")
+// T1: ROLLBACK
+// T2 leyó un valor que nunca existió
+
+// NON-REPEATABLE READ: Mismo query, diferentes resultados
+// T1: SELECT saldo → 1000
+// T2: UPDATE saldo = 500; COMMIT
+// T1: SELECT saldo → 500 (¡cambió!)
+
+// PHANTOM READ: Filas aparecen/desaparecen
+// T1: SELECT COUNT(*) WHERE precio > 100 → 10
+// T2: INSERT producto (precio = 150); COMMIT
+// T1: SELECT COUNT(*) WHERE precio > 100 → 11 (¡fantasma!)`} lang="text" title="Problemas de concurrencia" />
+
+### Configurar aislamiento
+
+<Code code={`@Service
+public class ReporteFinancieroService {
+    
+    // Máximo aislamiento para reportes críticos
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public ReporteFinanciero generarReporteMensual() {
+        // Garantiza consistencia total
+        // Pero menor rendimiento
+    }
+    
+    // Default para la mayoría de casos
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public List<Transaccion> listarTransacciones() {
+        // Balance entre consistencia y rendimiento
+    }
+}`} lang="java" title="Configurar aislamiento" />
+
+<Aside type="note">
+El nivel por defecto depende de la base de datos. MySQL usa `REPEATABLE_READ`, PostgreSQL usa `READ_COMMITTED`.
+</Aside>
+
+---
+
+## ↩️ 10.5 Rollback Automático
+
+### Comportamiento por defecto
+
+<Code code={`@Service
+public class PedidoService {
+    
+    @Transactional
+    public Pedido crear(PedidoDTO dto) {
+        Pedido pedido = pedidoRepository.save(new Pedido(dto));
+        
+        // RuntimeException → ROLLBACK automático
+        if (dto.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Total inválido");
+        }
+        
+        // Checked Exception → NO hace rollback por defecto
+        try {
+            enviarEmail(pedido);
+        } catch (MessagingException e) {
+            // La transacción NO se revierte
+            throw e;
+        }
+        
+        return pedido;
+    }
+}`} lang="java" title="Rollback por defecto" />
+
+### Configurar rollback
+
+<Code code={`@Service
+public class PedidoService {
+    
+    // Rollback también para checked exceptions
+    @Transactional(rollbackFor = Exception.class)
+    public Pedido crear(PedidoDTO dto) throws Exception {
+        // Cualquier excepción causa rollback
+    }
+    
+    // Rollback para excepciones específicas
+    @Transactional(rollbackFor = {StockInsuficienteException.class, PagoRechazadoException.class})
+    public Pedido procesar(PedidoDTO dto) {
+        // Solo estas excepciones causan rollback
+    }
+    
+    // NO hacer rollback para ciertas excepciones
+    @Transactional(noRollbackFor = NotificacionException.class)
+    public Pedido crearConNotificacion(PedidoDTO dto) {
+        Pedido pedido = pedidoRepository.save(new Pedido(dto));
+        
+        try {
+            notificar(pedido);  // Si falla, NO revierte el pedido
+        } catch (NotificacionException e) {
+            log.warn("No se pudo notificar");
+        }
+        
+        return pedido;
+    }
+}`} lang="java" title="Configurar rollback" />
+
+---
+
+## ⚠️ 10.6 Manejo de Errores en Transacciones
+
+### Patrón try-catch con transacciones
+
+<Code code={`@Service
+public class TransferenciaService {
+    
+    @Transactional
+    public ResultadoTransferencia transferir(TransferenciaDTO dto) {
+        try {
+            Cuenta origen = cuentaRepository.findById(dto.getOrigenId())
+                .orElseThrow(() -> new CuentaNoEncontradaException(dto.getOrigenId()));
+            
+            Cuenta destino = cuentaRepository.findById(dto.getDestinoId())
+                .orElseThrow(() -> new CuentaNoEncontradaException(dto.getDestinoId()));
+            
+            if (origen.getSaldo().compareTo(dto.getMonto()) < 0) {
+                throw new SaldoInsuficienteException(origen.getId());
+            }
+            
+            origen.debitar(dto.getMonto());
+            destino.acreditar(dto.getMonto());
+            
+            return ResultadoTransferencia.exitoso();
+            
+        } catch (CuentaNoEncontradaException | SaldoInsuficienteException e) {
+            // Estas excepciones causan rollback
+            throw e;
+        }
+    }
+}`} lang="java" title="Manejo de errores" />
+
+### Rollback programático
+
+<Code code={`@Service
+public class ProcesoService {
+    
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+    
+    public void procesarConRollbackManual() {
+        transactionTemplate.execute(status -> {
+            try {
+                // Operaciones...
+                
+                if (algunaCondicion) {
+                    status.setRollbackOnly();  // Marcar para rollback
+                }
+                
+                return resultado;
+            } catch (Exception e) {
+                status.setRollbackOnly();
+                throw e;
+            }
+        });
+    }
+}`} lang="java" title="Rollback programático" />
+
+---
+
+## 🌐 10.7 Transacciones Distribuidas
+
+### El problema
+
+<Code code={`// Escenario: Microservicios
+// Servicio A: Crear pedido
+// Servicio B: Procesar pago
+// Servicio C: Actualizar inventario
+
+// Si el pago falla después de crear el pedido,
+// ¿cómo revertimos el pedido en otro servicio?`} lang="text" title="Problema de transacciones distribuidas" />
+
+### Patrón SAGA
+
+<Code code={`@Service
+public class PedidoSagaService {
+    
+    public void crearPedidoSaga(PedidoDTO dto) {
+        String pedidoId = null;
+        String pagoId = null;
+        
+        try {
+            // Paso 1: Crear pedido
+            pedidoId = pedidoService.crear(dto);
+            
+            // Paso 2: Procesar pago
+            pagoId = pagoService.procesar(dto.getPago());
+            
+            // Paso 3: Reservar inventario
+            inventarioService.reservar(dto.getProductos());
+            
+        } catch (Exception e) {
+            // Compensaciones (rollback manual)
+            if (pagoId != null) {
+                pagoService.revertir(pagoId);
+            }
+            if (pedidoId != null) {
+                pedidoService.cancelar(pedidoId);
+            }
+            throw e;
+        }
+    }
+}`} lang="java" title="Patrón SAGA básico" />
+
+### Outbox Pattern
+
+<Code code={`@Service
+public class PedidoService {
+    
+    @Transactional
+    public Pedido crear(PedidoDTO dto) {
+        // 1. Guardar pedido
+        Pedido pedido = pedidoRepository.save(new Pedido(dto));
+        
+        // 2. Guardar evento en tabla outbox (misma transacción)
+        OutboxEvent evento = new OutboxEvent(
+            "PedidoCreado",
+            pedido.getId(),
+            objectMapper.writeValueAsString(pedido)
+        );
+        outboxRepository.save(evento);
+        
+        return pedido;
+        // Un proceso separado lee la tabla outbox y publica eventos
+    }
+}`} lang="java" title="Outbox Pattern" />
+
+<Aside type="tip">
+Para transacciones distribuidas, considera usar frameworks como **Spring Cloud Sleuth**, **Axon Framework** o **Eventuate**.
+</Aside>
+

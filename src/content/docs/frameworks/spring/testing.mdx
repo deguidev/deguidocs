@@ -1,0 +1,505 @@
+---
+title: 13. Testing en Spring
+description: Pruebas unitarias, integración, Mockito, @SpringBootTest y buenas prácticas
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🧪 13.1 Introducción al Testing
+
+### Tipos de pruebas
+
+| Tipo | Descripción | Velocidad | Cobertura |
+|------|-------------|-----------|-----------|
+| **Unitarias** | Prueban una clase aislada | Muy rápidas | Baja |
+| **Integración** | Prueban múltiples componentes | Lentas | Alta |
+| **E2E** | Prueban todo el sistema | Muy lentas | Completa |
+
+### Dependencia
+
+<Code code={`<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <scope>test</scope>
+</dependency>
+
+<!-- Incluye: JUnit 5, Mockito, AssertJ, Hamcrest, JSONPath -->`} lang="xml" title="Dependencia de testing" />
+
+### Pirámide de testing
+
+<Code code={`        /\\
+       /  \\
+      / E2E \\        ← Pocas pruebas
+     /________\\
+    /          \\
+   / Integración\\    ← Algunas pruebas
+  /______________\\
+ /                \\
+/    Unitarias     \\  ← Muchas pruebas
+/____________________\\`} lang="text" title="Pirámide de testing" />
+
+---
+
+## 🔬 13.2 Pruebas Unitarias
+
+### Test básico con JUnit 5
+
+<Code code={`import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.*;
+
+class CalculadoraTest {
+    
+    private Calculadora calculadora;
+    
+    @BeforeEach
+    void setUp() {
+        calculadora = new Calculadora();
+    }
+    
+    @Test
+    @DisplayName("Suma de dos números positivos")
+    void testSumar() {
+        int resultado = calculadora.sumar(2, 3);
+        assertEquals(5, resultado);
+    }
+    
+    @Test
+    @DisplayName("División por cero lanza excepción")
+    void testDivisionPorCero() {
+        assertThrows(ArithmeticException.class, () -> {
+            calculadora.dividir(10, 0);
+        });
+    }
+    
+    @Test
+    void testMultiplesAserciones() {
+        assertAll(
+            () -> assertEquals(4, calculadora.sumar(2, 2)),
+            () -> assertEquals(0, calculadora.sumar(-2, 2)),
+            () -> assertEquals(-4, calculadora.sumar(-2, -2))
+        );
+    }
+}`} lang="java" title="Test unitario básico" />
+
+### AssertJ (más legible)
+
+<Code code={`import static org.assertj.core.api.Assertions.*;
+
+class UsuarioServiceTest {
+    
+    @Test
+    void testCrearUsuario() {
+        Usuario usuario = service.crear("Juan", "juan@email.com");
+        
+        assertThat(usuario)
+            .isNotNull()
+            .extracting(Usuario::getNombre, Usuario::getEmail)
+            .containsExactly("Juan", "juan@email.com");
+    }
+    
+    @Test
+    void testListarUsuarios() {
+        List<Usuario> usuarios = service.listar();
+        
+        assertThat(usuarios)
+            .hasSize(3)
+            .extracting(Usuario::getNombre)
+            .contains("Juan", "María", "Pedro");
+    }
+    
+    @Test
+    void testExcepcion() {
+        assertThatThrownBy(() -> service.buscar(999L))
+            .isInstanceOf(UsuarioNotFoundException.class)
+            .hasMessageContaining("no encontrado");
+    }
+}`} lang="java" title="AssertJ" />
+
+---
+
+## 🎭 13.3 Mockito
+
+### Crear mocks
+
+<Code code={`import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class UsuarioServiceTest {
+    
+    @Mock
+    private UsuarioRepository repository;
+    
+    @Mock
+    private EmailService emailService;
+    
+    @InjectMocks
+    private UsuarioService service;
+    
+    @Test
+    void testCrearUsuario() {
+        // Arrange
+        UsuarioDTO dto = new UsuarioDTO("Juan", "juan@email.com");
+        Usuario usuarioGuardado = new Usuario(1L, "Juan", "juan@email.com");
+        
+        when(repository.save(any(Usuario.class))).thenReturn(usuarioGuardado);
+        
+        // Act
+        Usuario resultado = service.crear(dto);
+        
+        // Assert
+        assertThat(resultado.getId()).isEqualTo(1L);
+        verify(repository).save(any(Usuario.class));
+        verify(emailService).enviarBienvenida("juan@email.com");
+    }
+}`} lang="java" title="Mockito básico" />
+
+### Stubbing avanzado
+
+<Code code={`@Test
+void testBuscarUsuario() {
+    // Retornar valor específico
+    when(repository.findById(1L)).thenReturn(Optional.of(usuario));
+    when(repository.findById(999L)).thenReturn(Optional.empty());
+    
+    // Retornar basado en argumento
+    when(repository.findByEmail(anyString()))
+        .thenAnswer(invocation -> {
+            String email = invocation.getArgument(0);
+            return Optional.of(new Usuario(email));
+        });
+    
+    // Lanzar excepción
+    when(repository.findById(-1L))
+        .thenThrow(new IllegalArgumentException("ID inválido"));
+    
+    // Múltiples llamadas
+    when(repository.count())
+        .thenReturn(10L)
+        .thenReturn(11L)
+        .thenReturn(12L);
+}`} lang="java" title="Stubbing avanzado" />
+
+### Verificaciones
+
+<Code code={`@Test
+void testVerificaciones() {
+    service.procesarUsuarios();
+    
+    // Verificar que se llamó
+    verify(repository).findAll();
+    
+    // Verificar número de llamadas
+    verify(emailService, times(3)).enviar(anyString());
+    verify(emailService, atLeast(1)).enviar(anyString());
+    verify(emailService, atMost(5)).enviar(anyString());
+    verify(emailService, never()).enviarUrgente(anyString());
+    
+    // Verificar orden
+    InOrder inOrder = inOrder(repository, emailService);
+    inOrder.verify(repository).findAll();
+    inOrder.verify(emailService).enviar(anyString());
+    
+    // Capturar argumentos
+    ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
+    verify(repository).save(captor.capture());
+    
+    Usuario usuarioCapturado = captor.getValue();
+    assertThat(usuarioCapturado.getNombre()).isEqualTo("Juan");
+}`} lang="java" title="Verificaciones" />
+
+---
+
+## 🔗 13.4 @SpringBootTest
+
+### Test de integración completo
+
+<Code code={`import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
+
+@SpringBootTest  // Carga todo el contexto de Spring
+@ActiveProfiles("test")
+class UsuarioServiceIntegrationTest {
+    
+    @Autowired
+    private UsuarioService service;
+    
+    @Autowired
+    private UsuarioRepository repository;
+    
+    @BeforeEach
+    void setUp() {
+        repository.deleteAll();
+    }
+    
+    @Test
+    void testCrearYBuscarUsuario() {
+        // Crear
+        Usuario creado = service.crear(new UsuarioDTO("Juan", "juan@email.com"));
+        
+        // Buscar
+        Usuario encontrado = service.buscarPorId(creado.getId());
+        
+        assertThat(encontrado.getNombre()).isEqualTo("Juan");
+    }
+}`} lang="java" title="@SpringBootTest" />
+
+### Con base de datos en memoria
+
+<Code code={`# src/test/resources/application-test.properties
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=true`} lang="properties" title="Configuración de test" />
+
+---
+
+## 🌐 13.5 @WebMvcTest
+
+### Test de controllers
+
+<Code code={`import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(UsuarioController.class)  // Solo carga el controller
+class UsuarioControllerTest {
+    
+    @Autowired
+    private MockMvc mockMvc;
+    
+    @MockBean  // Mock del servicio
+    private UsuarioService service;
+    
+    @Test
+    void testListarUsuarios() throws Exception {
+        List<Usuario> usuarios = List.of(
+            new Usuario(1L, "Juan"),
+            new Usuario(2L, "María")
+        );
+        when(service.listar()).thenReturn(usuarios);
+        
+        mockMvc.perform(get("/api/usuarios"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].nombre").value("Juan"));
+    }
+    
+    @Test
+    void testCrearUsuario() throws Exception {
+        Usuario usuario = new Usuario(1L, "Juan", "juan@email.com");
+        when(service.crear(any())).thenReturn(usuario);
+        
+        mockMvc.perform(post("/api/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                        "nombre": "Juan",
+                        "email": "juan@email.com"
+                    }
+                    """))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.nombre").value("Juan"));
+    }
+    
+    @Test
+    void testUsuarioNoEncontrado() throws Exception {
+        when(service.buscarPorId(999L))
+            .thenThrow(new UsuarioNotFoundException(999L));
+        
+        mockMvc.perform(get("/api/usuarios/999"))
+            .andExpect(status().isNotFound());
+    }
+}`} lang="java" title="@WebMvcTest" />
+
+---
+
+## 🗄️ 13.6 @DataJpaTest
+
+### Test de repositorios
+
+<Code code={`import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+
+@DataJpaTest  // Solo carga JPA, usa H2 por defecto
+class UsuarioRepositoryTest {
+    
+    @Autowired
+    private TestEntityManager entityManager;
+    
+    @Autowired
+    private UsuarioRepository repository;
+    
+    @Test
+    void testFindByEmail() {
+        // Arrange
+        Usuario usuario = new Usuario("Juan", "juan@email.com");
+        entityManager.persistAndFlush(usuario);
+        
+        // Act
+        Optional<Usuario> encontrado = repository.findByEmail("juan@email.com");
+        
+        // Assert
+        assertThat(encontrado).isPresent();
+        assertThat(encontrado.get().getNombre()).isEqualTo("Juan");
+    }
+    
+    @Test
+    void testFindByRol() {
+        entityManager.persist(new Usuario("Admin", "admin@email.com", Rol.ADMIN));
+        entityManager.persist(new Usuario("User1", "user1@email.com", Rol.USER));
+        entityManager.persist(new Usuario("User2", "user2@email.com", Rol.USER));
+        entityManager.flush();
+        
+        List<Usuario> admins = repository.findByRol(Rol.ADMIN);
+        List<Usuario> users = repository.findByRol(Rol.USER);
+        
+        assertThat(admins).hasSize(1);
+        assertThat(users).hasSize(2);
+    }
+    
+    @Test
+    void testQueryPersonalizada() {
+        entityManager.persist(new Usuario("Juan", "juan@email.com", true));
+        entityManager.persist(new Usuario("María", "maria@email.com", false));
+        entityManager.flush();
+        
+        List<Usuario> activos = repository.findUsuariosActivos();
+        
+        assertThat(activos)
+            .hasSize(1)
+            .extracting(Usuario::getNombre)
+            .containsExactly("Juan");
+    }
+}`} lang="java" title="@DataJpaTest" />
+
+---
+
+## 🔒 13.7 Test de Seguridad
+
+### Con @WithMockUser
+
+<Code code={`import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+
+@WebMvcTest(AdminController.class)
+class AdminControllerSecurityTest {
+    
+    @Autowired
+    private MockMvc mockMvc;
+    
+    @Test
+    void testAccesoSinAutenticacion() throws Exception {
+        mockMvc.perform(get("/api/admin/usuarios"))
+            .andExpect(status().isUnauthorized());
+    }
+    
+    @Test
+    @WithMockUser(roles = "USER")
+    void testAccesoConRolIncorrecto() throws Exception {
+        mockMvc.perform(get("/api/admin/usuarios"))
+            .andExpect(status().isForbidden());
+    }
+    
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testAccesoConRolAdmin() throws Exception {
+        mockMvc.perform(get("/api/admin/usuarios"))
+            .andExpect(status().isOk());
+    }
+    
+    @Test
+    void testLoginConCredenciales() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                .with(httpBasic("admin", "password")))
+            .andExpect(status().isOk());
+    }
+    
+    @Test
+    @WithMockUser(username = "juan@email.com", authorities = {"CREAR_USUARIOS"})
+    void testConAutoridadEspecifica() throws Exception {
+        mockMvc.perform(post("/api/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+            .andExpect(status().isCreated());
+    }
+}`} lang="java" title="Test de seguridad" />
+
+---
+
+## ✅ 13.8 Buenas Prácticas
+
+### Estructura de tests
+
+<Code code={`// Patrón AAA (Arrange-Act-Assert)
+@Test
+void testCrearPedido() {
+    // Arrange (preparar)
+    Usuario usuario = new Usuario(1L, "Juan");
+    Producto producto = new Producto(1L, "Laptop", 999.99);
+    when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+    when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
+    
+    // Act (ejecutar)
+    Pedido pedido = pedidoService.crear(1L, List.of(1L));
+    
+    // Assert (verificar)
+    assertThat(pedido.getUsuario()).isEqualTo(usuario);
+    assertThat(pedido.getProductos()).hasSize(1);
+    assertThat(pedido.getTotal()).isEqualTo(999.99);
+}
+
+// Nombres descriptivos
+@Test
+@DisplayName("Crear pedido con productos agotados lanza StockException")
+void crearPedido_conProductosAgotados_lanzaStockException() {
+    // ...
+}`} lang="java" title="Estructura de tests" />
+
+### Test containers (BD real)
+
+<Code code={`<dependency>
+    <groupId>org.testcontainers</groupId>
+    <artifactId>postgresql</artifactId>
+    <scope>test</scope>
+</dependency>
+
+@SpringBootTest
+@Testcontainers
+class UsuarioRepositoryRealDbTest {
+    
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+        .withDatabaseName("testdb")
+        .withUsername("test")
+        .withPassword("test");
+    
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+    
+    @Test
+    void testConPostgresReal() {
+        // Test con PostgreSQL real en Docker
+    }
+}`} lang="java" title="Testcontainers" />
+
+<Aside type="tip">
+Usa `@WebMvcTest` para controllers, `@DataJpaTest` para repositorios, y `@SpringBootTest` solo cuando necesites todo el contexto.
+</Aside>
+

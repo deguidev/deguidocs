@@ -1,0 +1,575 @@
+---
+title: 4. Gestión de Beans y Anotaciones
+description: "@Component, @Service, @Repository, @Autowired, @Scope, ciclo de vida y profiles"
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🏷️ 4.1 @Component, @Service, @Repository, @Controller
+
+### Anotaciones de estereotipo
+
+Spring proporciona anotaciones especializadas para marcar clases como **beans** según su rol en la arquitectura:
+
+<Code code={`// @Component - Bean genérico
+@Component
+public class UtilHelper {
+    public String formatear(String texto) {
+        return texto.trim().toUpperCase();
+    }
+}
+
+// @Service - Capa de lógica de negocio
+@Service
+public class UsuarioService {
+    public Usuario crearUsuario(String nombre) {
+        // Lógica de negocio
+        return new Usuario(nombre);
+    }
+}
+
+// @Repository - Capa de acceso a datos
+@Repository
+public class UsuarioRepository {
+    public Usuario findById(Long id) {
+        // Acceso a base de datos
+        return entityManager.find(Usuario.class, id);
+    }
+}
+
+// @Controller - Controlador MVC (retorna vistas)
+@Controller
+public class HomeController {
+    @GetMapping("/")
+    public String home(Model model) {
+        model.addAttribute("mensaje", "Bienvenido");
+        return "home";  // Retorna nombre de vista
+    }
+}
+
+// @RestController - Controlador REST (retorna JSON)
+@RestController
+@RequestMapping("/api/usuarios")
+public class UsuarioController {
+    @GetMapping
+    public List<Usuario> listar() {
+        return usuarioService.listarTodos();  // Retorna JSON
+    }
+}`} lang="java" title="Anotaciones de estereotipo" />
+
+### Diferencias funcionales
+
+| Anotación | Capa | Características especiales |
+|-----------|------|---------------------------|
+| `@Component` | Genérica | Ninguna |
+| `@Service` | Negocio | Semántica de servicio |
+| `@Repository` | Datos | Traducción de excepciones SQL |
+| `@Controller` | Web | Integración con MVC |
+| `@RestController` | API | `@Controller` + `@ResponseBody` |
+
+<Aside type="note">
+`@Repository` traduce automáticamente excepciones de base de datos (SQLException) a excepciones de Spring (DataAccessException).
+</Aside>
+
+---
+
+## 🔗 4.2 @Autowired y Resolución de Dependencias
+
+### Uso básico de @Autowired
+
+<Code code={`@Service
+public class PedidoService {
+    
+    // Inyección por constructor (recomendada)
+    private final ProductoRepository productoRepo;
+    private final ClienteRepository clienteRepo;
+    
+    @Autowired  // Opcional si hay un solo constructor
+    public PedidoService(ProductoRepository productoRepo, 
+                         ClienteRepository clienteRepo) {
+        this.productoRepo = productoRepo;
+        this.clienteRepo = clienteRepo;
+    }
+    
+    public Pedido crearPedido(Long clienteId, List<Long> productosIds) {
+        Cliente cliente = clienteRepo.findById(clienteId).orElseThrow();
+        List<Producto> productos = productoRepo.findAllById(productosIds);
+        return new Pedido(cliente, productos);
+    }
+}`} lang="java" title="@Autowired por constructor" />
+
+### Resolución automática
+
+<Code code={`// Spring busca un bean que coincida con el tipo
+@Service
+public class NotificacionService {
+    
+    // Spring busca un bean de tipo EmailSender
+    private final EmailSender emailSender;
+    
+    public NotificacionService(EmailSender emailSender) {
+        this.emailSender = emailSender;
+    }
+}
+
+// Si hay UNA implementación, Spring la inyecta automáticamente
+@Component
+public class GmailEmailSender implements EmailSender {
+    @Override
+    public void enviar(String destinatario, String mensaje) {
+        // Implementación con Gmail
+    }
+}`} lang="java" title="Resolución automática de dependencias" />
+
+### Dependencias opcionales
+
+<Code code={`@Service
+public class ReporteService {
+    
+    private final ReporteRepository repository;
+    private PdfGenerator pdfGenerator;  // Opcional
+    
+    public ReporteService(ReporteRepository repository) {
+        this.repository = repository;
+    }
+    
+    // Dependencia opcional con setter
+    @Autowired(required = false)
+    public void setPdfGenerator(PdfGenerator pdfGenerator) {
+        this.pdfGenerator = pdfGenerator;
+    }
+    
+    public byte[] generarReporte(Long id) {
+        Reporte reporte = repository.findById(id).orElseThrow();
+        
+        if (pdfGenerator != null) {
+            return pdfGenerator.generar(reporte);
+        }
+        return reporte.toString().getBytes();
+    }
+}`} lang="java" title="Dependencia opcional" />
+
+---
+
+## 🎯 4.3 @Qualifier y @Primary
+
+### Problema: Múltiples implementaciones
+
+<Code code={`// Interfaz con múltiples implementaciones
+public interface MensajeService {
+    void enviar(String mensaje);
+}
+
+@Service
+public class EmailMensajeService implements MensajeService {
+    @Override
+    public void enviar(String mensaje) {
+        System.out.println("Enviando email: " + mensaje);
+    }
+}
+
+@Service
+public class SmsMensajeService implements MensajeService {
+    @Override
+    public void enviar(String mensaje) {
+        System.out.println("Enviando SMS: " + mensaje);
+    }
+}
+
+// ❌ ERROR: Spring no sabe cuál inyectar
+@Service
+public class NotificacionService {
+    private final MensajeService mensajeService;  // ¿Cuál?
+    
+    public NotificacionService(MensajeService mensajeService) {
+        this.mensajeService = mensajeService;
+    }
+}`} lang="java" title="Problema de ambigüedad" />
+
+### Solución 1: @Qualifier
+
+<Code code={`@Service("emailService")  // Nombre explícito del bean
+public class EmailMensajeService implements MensajeService {
+    @Override
+    public void enviar(String mensaje) {
+        System.out.println("Enviando email: " + mensaje);
+    }
+}
+
+@Service("smsService")
+public class SmsMensajeService implements MensajeService {
+    @Override
+    public void enviar(String mensaje) {
+        System.out.println("Enviando SMS: " + mensaje);
+    }
+}
+
+// ✅ Especificar cuál queremos con @Qualifier
+@Service
+public class NotificacionService {
+    
+    private final MensajeService emailService;
+    private final MensajeService smsService;
+    
+    public NotificacionService(
+            @Qualifier("emailService") MensajeService emailService,
+            @Qualifier("smsService") MensajeService smsService) {
+        this.emailService = emailService;
+        this.smsService = smsService;
+    }
+}`} lang="java" title="Solución con @Qualifier" />
+
+### Solución 2: @Primary
+
+<Code code={`@Service
+@Primary  // Este será el bean por defecto
+public class EmailMensajeService implements MensajeService {
+    @Override
+    public void enviar(String mensaje) {
+        System.out.println("Enviando email: " + mensaje);
+    }
+}
+
+@Service
+public class SmsMensajeService implements MensajeService {
+    @Override
+    public void enviar(String mensaje) {
+        System.out.println("Enviando SMS: " + mensaje);
+    }
+}
+
+// ✅ Spring inyecta EmailMensajeService (el @Primary)
+@Service
+public class NotificacionService {
+    
+    private final MensajeService mensajeService;
+    
+    public NotificacionService(MensajeService mensajeService) {
+        this.mensajeService = mensajeService;  // EmailMensajeService
+    }
+}`} lang="java" title="Solución con @Primary" />
+
+<Aside type="tip">
+Usa `@Primary` para definir un bean por defecto y `@Qualifier` cuando necesites uno específico.
+</Aside>
+
+---
+
+## 📦 4.4 @Scope (singleton, prototype, request, session)
+
+### Tipos de scope
+
+| Scope | Descripción | Instancias |
+|-------|-------------|------------|
+| `singleton` | Una instancia por contenedor (default) | 1 |
+| `prototype` | Nueva instancia cada vez que se solicita | N |
+| `request` | Una instancia por request HTTP | 1 por request |
+| `session` | Una instancia por sesión HTTP | 1 por sesión |
+
+### Singleton (por defecto)
+
+<Code code={`@Service
+@Scope("singleton")  // Opcional, es el default
+public class ConfiguracionService {
+    
+    private Map<String, String> configuraciones = new HashMap<>();
+    
+    // Todos los componentes comparten la misma instancia
+    public String getConfiguracion(String clave) {
+        return configuraciones.get(clave);
+    }
+}`} lang="java" title="Scope singleton" />
+
+### Prototype
+
+<Code code={`@Component
+@Scope("prototype")  // Nueva instancia cada vez
+public class Carrito {
+    
+    private List<Producto> productos = new ArrayList<>();
+    
+    public void agregarProducto(Producto producto) {
+        productos.add(producto);
+    }
+    
+    public BigDecimal getTotal() {
+        return productos.stream()
+            .map(Producto::getPrecio)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+}
+
+// Cada inyección crea una nueva instancia
+@RestController
+public class CompraController {
+    
+    @Autowired
+    private ApplicationContext context;
+    
+    @PostMapping("/nueva-compra")
+    public void nuevaCompra() {
+        // Obtener nueva instancia de Carrito
+        Carrito carrito = context.getBean(Carrito.class);
+    }
+}`} lang="java" title="Scope prototype" />
+
+### Request y Session (Web)
+
+<Code code={`// Una instancia por cada request HTTP
+@Component
+@Scope(value = WebApplicationContext.SCOPE_REQUEST, 
+       proxyMode = ScopedProxyMode.TARGET_CLASS)
+public class RequestInfo {
+    private LocalDateTime timestamp = LocalDateTime.now();
+    private String requestId = UUID.randomUUID().toString();
+}
+
+// Una instancia por cada sesión de usuario
+@Component
+@Scope(value = WebApplicationContext.SCOPE_SESSION,
+       proxyMode = ScopedProxyMode.TARGET_CLASS)
+public class CarritoCompras {
+    private List<Producto> items = new ArrayList<>();
+    
+    public void agregar(Producto producto) {
+        items.add(producto);
+    }
+}`} lang="java" title="Scope request y session" />
+
+---
+
+## 🔄 4.5 Inicialización y Destrucción de Beans
+
+### Métodos de callback
+
+<Code code={`@Service
+public class CacheService {
+    
+    private Map<String, Object> cache;
+    
+    // Se ejecuta DESPUÉS de la inyección de dependencias
+    @PostConstruct
+    public void inicializar() {
+        System.out.println("Inicializando cache...");
+        this.cache = new ConcurrentHashMap<>();
+        cargarDatosIniciales();
+    }
+    
+    // Se ejecuta ANTES de destruir el bean
+    @PreDestroy
+    public void limpiar() {
+        System.out.println("Limpiando cache...");
+        this.cache.clear();
+    }
+    
+    private void cargarDatosIniciales() {
+        // Cargar datos desde BD o archivo
+    }
+}`} lang="java" title="@PostConstruct y @PreDestroy" />
+
+### Alternativa con @Bean
+
+<Code code={`@Configuration
+public class AppConfig {
+    
+    @Bean(initMethod = "iniciar", destroyMethod = "cerrar")
+    public ConexionPool conexionPool() {
+        return new ConexionPool();
+    }
+}
+
+public class ConexionPool {
+    
+    public void iniciar() {
+        System.out.println("Creando pool de conexiones...");
+    }
+    
+    public void cerrar() {
+        System.out.println("Cerrando conexiones...");
+    }
+}`} lang="java" title="initMethod y destroyMethod" />
+
+---
+
+## 🏷️ 4.6 @PostConstruct y @PreDestroy
+
+### Casos de uso comunes
+
+<Code code={`@Service
+public class ReporteScheduler {
+    
+    private ScheduledExecutorService executor;
+    
+    @PostConstruct
+    public void iniciar() {
+        // Iniciar tareas programadas
+        executor = Executors.newScheduledThreadPool(2);
+        executor.scheduleAtFixedRate(
+            this::generarReporteDiario,
+            0, 24, TimeUnit.HOURS
+        );
+    }
+    
+    @PreDestroy
+    public void detener() {
+        // Detener tareas y liberar recursos
+        if (executor != null) {
+            executor.shutdown();
+            try {
+                executor.awaitTermination(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                executor.shutdownNow();
+            }
+        }
+    }
+    
+    private void generarReporteDiario() {
+        // Lógica del reporte
+    }
+}`} lang="java" title="Gestión de recursos con ciclo de vida" />
+
+<Aside type="caution">
+`@PreDestroy` solo se ejecuta en beans singleton. Los beans prototype no tienen callback de destrucción automático.
+</Aside>
+
+---
+
+## 🌍 4.7 Profiles (@Profile)
+
+### Definir beans por perfil
+
+<Code code={`// Bean solo para desarrollo
+@Service
+@Profile("dev")
+public class MockEmailService implements EmailService {
+    @Override
+    public void enviar(String destinatario, String mensaje) {
+        System.out.println("DEV - Email simulado a: " + destinatario);
+    }
+}
+
+// Bean solo para producción
+@Service
+@Profile("prod")
+public class SmtpEmailService implements EmailService {
+    @Override
+    public void enviar(String destinatario, String mensaje) {
+        // Envío real por SMTP
+        smtpClient.send(destinatario, mensaje);
+    }
+}
+
+// Bean para múltiples perfiles
+@Service
+@Profile({"dev", "test"})
+public class H2DatabaseConfig {
+    // Configuración de H2 para dev y test
+}`} lang="java" title="Beans con @Profile" />
+
+### Activar perfiles
+
+<Code code={`# application.properties
+spring.profiles.active=dev
+
+# application.yml
+spring:
+  profiles:
+    active: dev
+
+# Por línea de comandos
+java -jar app.jar --spring.profiles.active=prod
+
+# Variables de entorno
+export SPRING_PROFILES_ACTIVE=prod`} lang="properties" title="Activar perfiles" />
+
+### Configuración por perfil
+
+<Code code={`# application-dev.properties (perfil dev)
+server.port=8080
+logging.level.root=DEBUG
+spring.datasource.url=jdbc:h2:mem:testdb
+
+# application-prod.properties (perfil prod)
+server.port=80
+logging.level.root=WARN
+spring.datasource.url=jdbc:postgresql://prod-server:5432/mydb`} lang="properties" title="Archivos de configuración por perfil" />
+
+---
+
+## ⚙️ 4.8 Configuración Condicional de Beans
+
+### @Conditional
+
+<Code code={`// Condición personalizada
+public class WindowsCondition implements Condition {
+    @Override
+    public boolean matches(ConditionContext context, 
+                          AnnotatedTypeMetadata metadata) {
+        return context.getEnvironment()
+            .getProperty("os.name")
+            .toLowerCase()
+            .contains("windows");
+    }
+}
+
+@Configuration
+public class FileConfig {
+    
+    @Bean
+    @Conditional(WindowsCondition.class)
+    public FileService windowsFileService() {
+        return new WindowsFileService();
+    }
+}`} lang="java" title="@Conditional personalizado" />
+
+### Anotaciones condicionales de Spring Boot
+
+<Code code={`@Configuration
+public class ConditionalConfig {
+    
+    // Solo si existe la clase en el classpath
+    @Bean
+    @ConditionalOnClass(DataSource.class)
+    public DatabaseHealthCheck dbHealthCheck() {
+        return new DatabaseHealthCheck();
+    }
+    
+    // Solo si NO existe un bean de este tipo
+    @Bean
+    @ConditionalOnMissingBean(EmailService.class)
+    public EmailService defaultEmailService() {
+        return new SimpleEmailService();
+    }
+    
+    // Solo si la propiedad tiene cierto valor
+    @Bean
+    @ConditionalOnProperty(name = "cache.enabled", havingValue = "true")
+    public CacheService cacheService() {
+        return new RedisCacheService();
+    }
+    
+    // Solo en entorno web
+    @Bean
+    @ConditionalOnWebApplication
+    public SessionManager sessionManager() {
+        return new HttpSessionManager();
+    }
+}`} lang="java" title="Anotaciones @ConditionalOn..." />
+
+### Resumen de condicionales
+
+| Anotación | Condición |
+|-----------|-----------|
+| `@ConditionalOnClass` | Clase existe en classpath |
+| `@ConditionalOnMissingClass` | Clase NO existe |
+| `@ConditionalOnBean` | Bean existe en contexto |
+| `@ConditionalOnMissingBean` | Bean NO existe |
+| `@ConditionalOnProperty` | Propiedad tiene valor |
+| `@ConditionalOnWebApplication` | Es aplicación web |
+| `@ConditionalOnExpression` | Expresión SpEL es true |
+
+<Aside type="tip">
+Las anotaciones `@ConditionalOn...` son la base de la **auto-configuración** de Spring Boot.
+</Aside>
+

@@ -1,0 +1,584 @@
+---
+title: 11. Seguridad con Spring Security
+description: Autenticación, autorización, filtros de seguridad, JWT y OAuth2
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🔐 11.1 Introducción a Spring Security
+
+### ¿Qué es Spring Security?
+
+**Spring Security** es el framework de seguridad más completo para aplicaciones Java. Proporciona autenticación, autorización y protección contra ataques comunes.
+
+### Dependencia
+
+<Code code={`<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>`} lang="xml" title="Dependencia" />
+
+### Comportamiento por defecto
+
+Al agregar la dependencia, Spring Security:
+- Protege **todos** los endpoints
+- Genera un usuario `user` con contraseña aleatoria (en logs)
+- Muestra formulario de login en `/login`
+- Habilita logout en `/logout`
+
+<Code code={`# En los logs verás:
+Using generated security password: 8a7b3c4d-1234-5678-abcd-ef0123456789`} lang="text" title="Contraseña generada" />
+
+---
+
+## 🔑 11.2 Autenticación
+
+### Configuración básica
+
+<Code code={`@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/", "/public/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/dashboard")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutSuccessUrl("/")
+                .permitAll()
+            );
+        
+        return http.build();
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}`} lang="java" title="Configuración básica" />
+
+### Usuarios en memoria (desarrollo)
+
+<Code code={`@Bean
+public UserDetailsService userDetailsService(PasswordEncoder encoder) {
+    UserDetails user = User.builder()
+        .username("usuario")
+        .password(encoder.encode("password123"))
+        .roles("USER")
+        .build();
+    
+    UserDetails admin = User.builder()
+        .username("admin")
+        .password(encoder.encode("admin123"))
+        .roles("ADMIN", "USER")
+        .build();
+    
+    return new InMemoryUserDetailsManager(user, admin);
+}`} lang="java" title="Usuarios en memoria" />
+
+### Usuarios desde base de datos
+
+<Code code={`@Service
+public class CustomUserDetailsService implements UserDetailsService {
+    
+    private final UsuarioRepository usuarioRepository;
+    
+    public CustomUserDetailsService(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
+    
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Usuario usuario = usuarioRepository.findByEmail(username)
+            .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
+        
+        return User.builder()
+            .username(usuario.getEmail())
+            .password(usuario.getPassword())  // Ya debe estar encriptado
+            .roles(usuario.getRol().name())
+            .build();
+    }
+}`} lang="java" title="UserDetailsService personalizado" />
+
+---
+
+## 🛡️ 11.3 Autorización
+
+### Autorización por URL
+
+<Code code={`@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests(auth -> auth
+        // Rutas públicas
+        .requestMatchers("/", "/login", "/registro", "/css/**", "/js/**").permitAll()
+        
+        // Por rol
+        .requestMatchers("/admin/**").hasRole("ADMIN")
+        .requestMatchers("/moderador/**").hasAnyRole("ADMIN", "MODERADOR")
+        
+        // Por autoridad (más granular)
+        .requestMatchers("/usuarios/crear").hasAuthority("CREAR_USUARIOS")
+        .requestMatchers("/usuarios/eliminar/**").hasAuthority("ELIMINAR_USUARIOS")
+        
+        // Por método HTTP
+        .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+        .requestMatchers(HttpMethod.POST, "/api/**").hasAnyRole("ADMIN", "EDITOR")
+        
+        // Todo lo demás requiere autenticación
+        .anyRequest().authenticated()
+    );
+    
+    return http.build();
+}`} lang="java" title="Autorización por URL" />
+
+### Autorización por método
+
+<Code code={`@Configuration
+@EnableMethodSecurity  // Habilita anotaciones de seguridad
+public class MethodSecurityConfig {
+}
+
+@Service
+public class UsuarioService {
+    
+    // Solo ADMIN puede ejecutar
+    @PreAuthorize("hasRole('ADMIN')")
+    public void eliminarUsuario(Long id) {
+        usuarioRepository.deleteById(id);
+    }
+    
+    // Múltiples roles
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERADOR')")
+    public void suspenderUsuario(Long id) {
+        // ...
+    }
+    
+    // Verificar propiedad del recurso
+    @PreAuthorize("#id == authentication.principal.id or hasRole('ADMIN')")
+    public Usuario obtenerPerfil(Long id) {
+        return usuarioRepository.findById(id).orElseThrow();
+    }
+    
+    // Verificar después de ejecutar
+    @PostAuthorize("returnObject.propietario == authentication.name")
+    public Documento obtenerDocumento(Long id) {
+        return documentoRepository.findById(id).orElseThrow();
+    }
+    
+    // Filtrar colecciones
+    @PostFilter("filterObject.publico or filterObject.autor == authentication.name")
+    public List<Articulo> listarArticulos() {
+        return articuloRepository.findAll();
+    }
+}`} lang="java" title="Autorización por método" />
+
+---
+
+## 🔗 11.4 Filtros de Seguridad
+
+### Cadena de filtros
+
+<Code code={`// Orden de filtros en Spring Security:
+// 1. SecurityContextPersistenceFilter - Carga contexto de seguridad
+// 2. CsrfFilter - Protección CSRF
+// 3. LogoutFilter - Maneja logout
+// 4. UsernamePasswordAuthenticationFilter - Login con formulario
+// 5. BasicAuthenticationFilter - HTTP Basic Auth
+// 6. ExceptionTranslationFilter - Maneja excepciones de seguridad
+// 7. FilterSecurityInterceptor - Autorización final`} lang="text" title="Cadena de filtros" />
+
+### Filtro personalizado
+
+<Code code={`@Component
+public class ApiKeyAuthFilter extends OncePerRequestFilter {
+    
+    private static final String API_KEY_HEADER = "X-API-Key";
+    
+    @Value("\${app.api-key}")
+    private String validApiKey;
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        
+        String apiKey = request.getHeader(API_KEY_HEADER);
+        
+        if (validApiKey.equals(apiKey)) {
+            // Crear autenticación
+            UsernamePasswordAuthenticationToken auth = 
+                new UsernamePasswordAuthenticationToken("api-client", null, 
+                    List.of(new SimpleGrantedAuthority("ROLE_API")));
+            
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
+        
+        filterChain.doFilter(request, response);
+    }
+    
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        // Solo aplicar a rutas /api/
+        return !request.getServletPath().startsWith("/api/");
+    }
+}
+
+// Registrar el filtro
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http, ApiKeyAuthFilter apiKeyFilter) throws Exception {
+    http
+        .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
+        // ... resto de configuración
+    ;
+    return http.build();
+}`} lang="java" title="Filtro personalizado" />
+
+---
+
+## 🎫 11.5 JWT (JSON Web Tokens)
+
+### Dependencias
+
+<Code code={`<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-api</artifactId>
+    <version>0.12.3</version>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-impl</artifactId>
+    <version>0.12.3</version>
+    <scope>runtime</scope>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt-jackson</artifactId>
+    <version>0.12.3</version>
+    <scope>runtime</scope>
+</dependency>`} lang="xml" title="Dependencias JWT" />
+
+### Servicio JWT
+
+<Code code={`@Service
+public class JwtService {
+    
+    @Value("\${jwt.secret}")
+    private String secretKey;
+    
+    @Value("\${jwt.expiration}")
+    private long expiration;  // en milisegundos
+    
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+    
+    public String generarToken(UserDetails userDetails) {
+        return Jwts.builder()
+            .subject(userDetails.getUsername())
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + expiration))
+            .signWith(getSigningKey())
+            .compact();
+    }
+    
+    public String extraerUsername(String token) {
+        return extraerClaim(token, Claims::getSubject);
+    }
+    
+    public boolean validarToken(String token, UserDetails userDetails) {
+        String username = extraerUsername(token);
+        return username.equals(userDetails.getUsername()) && !tokenExpirado(token);
+    }
+    
+    private boolean tokenExpirado(String token) {
+        return extraerClaim(token, Claims::getExpiration).before(new Date());
+    }
+    
+    private <T> T extraerClaim(String token, Function<Claims, T> resolver) {
+        Claims claims = Jwts.parser()
+            .verifyWith(getSigningKey())
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
+        return resolver.apply(claims);
+    }
+}`} lang="java" title="JwtService" />
+
+### Filtro JWT
+
+<Code code={`@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        
+        String authHeader = request.getHeader("Authorization");
+        
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
+        String token = authHeader.substring(7);
+        String username = jwtService.extraerUsername(token);
+        
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            
+            if (jwtService.validarToken(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = 
+                    new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+        
+        filterChain.doFilter(request, response);
+    }
+}`} lang="java" title="JwtAuthenticationFilter" />
+
+### Controller de autenticación
+
+<Code code={`@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+    
+    private final AuthenticationManager authManager;
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
+    
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+        authManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.email(), request.password())
+        );
+        
+        UserDetails user = userDetailsService.loadUserByUsername(request.email());
+        String token = jwtService.generarToken(user);
+        
+        return ResponseEntity.ok(new AuthResponse(token));
+    }
+    
+    @PostMapping("/registro")
+    public ResponseEntity<AuthResponse> registro(@RequestBody RegistroRequest request) {
+        // Crear usuario...
+        UserDetails user = userDetailsService.loadUserByUsername(request.email());
+        String token = jwtService.generarToken(user);
+        
+        return ResponseEntity.ok(new AuthResponse(token));
+    }
+}
+
+public record LoginRequest(String email, String password) {}
+public record RegistroRequest(String nombre, String email, String password) {}
+public record AuthResponse(String token) {}`} lang="java" title="AuthController" />
+
+---
+
+## 🌐 11.6 OAuth2
+
+### Dependencia
+
+<Code code={`<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-oauth2-client</artifactId>
+</dependency>`} lang="xml" title="Dependencia OAuth2" />
+
+### Configuración para Google
+
+<Code code={`# application.properties
+spring.security.oauth2.client.registration.google.client-id=tu-client-id
+spring.security.oauth2.client.registration.google.client-secret=tu-client-secret
+spring.security.oauth2.client.registration.google.scope=email,profile`} lang="properties" title="Configuración Google OAuth2" />
+
+### SecurityConfig con OAuth2
+
+<Code code={`@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/", "/login/**", "/error").permitAll()
+            .anyRequest().authenticated()
+        )
+        .oauth2Login(oauth -> oauth
+            .loginPage("/login")
+            .defaultSuccessUrl("/dashboard")
+            .userInfoEndpoint(userInfo -> userInfo
+                .userService(customOAuth2UserService)
+            )
+        );
+    
+    return http.build();
+}`} lang="java" title="Configuración OAuth2" />
+
+### Servicio OAuth2 personalizado
+
+<Code code={`@Service
+public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+    
+    private final UsuarioRepository usuarioRepository;
+    
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
+        OAuth2User oauth2User = super.loadUser(request);
+        
+        String email = oauth2User.getAttribute("email");
+        String nombre = oauth2User.getAttribute("name");
+        
+        // Buscar o crear usuario
+        Usuario usuario = usuarioRepository.findByEmail(email)
+            .orElseGet(() -> {
+                Usuario nuevo = new Usuario();
+                nuevo.setEmail(email);
+                nuevo.setNombre(nombre);
+                nuevo.setProveedor("GOOGLE");
+                return usuarioRepository.save(nuevo);
+            });
+        
+        return new CustomOAuth2User(oauth2User, usuario);
+    }
+}`} lang="java" title="CustomOAuth2UserService" />
+
+---
+
+## 🛡️ 11.7 Protección CSRF y CORS
+
+### CSRF
+
+<Code code={`@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        // Deshabilitar CSRF para APIs REST (usan tokens)
+        .csrf(csrf -> csrf
+            .ignoringRequestMatchers("/api/**")
+        )
+        
+        // O deshabilitar completamente (solo para APIs stateless)
+        // .csrf(csrf -> csrf.disable())
+        
+        // Configurar CSRF con cookies
+        .csrf(csrf -> csrf
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+        );
+    
+    return http.build();
+}`} lang="java" title="Configuración CSRF" />
+
+### CORS
+
+<Code code={`@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+    
+    return http.build();
+}
+
+@Bean
+public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowedOrigins(List.of("http://localhost:3000", "https://miapp.com"));
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    config.setAllowedHeaders(List.of("*"));
+    config.setAllowCredentials(true);
+    config.setMaxAge(3600L);
+    
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
+}`} lang="java" title="Configuración CORS" />
+
+---
+
+## 🔒 11.8 Configuración Completa para APIs REST
+
+<Code code={`@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfig {
+    
+    private final JwtAuthenticationFilter jwtFilter;
+    private final CustomUserDetailsService userDetailsService;
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            // Deshabilitar CSRF (APIs stateless)
+            .csrf(csrf -> csrf.disable())
+            
+            // Configurar CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            
+            // Sin sesiones (stateless)
+            .sessionManagement(session -> 
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            // Autorización
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            
+            // Filtro JWT
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            
+            // Manejo de excepciones
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setContentType("application/json");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("{\"error\": \"No autorizado\"}");
+                })
+            );
+        
+        return http.build();
+    }
+    
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowedHeaders(List.of("*"));
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+}`} lang="java" title="Configuración completa para APIs REST" />
+
+<Aside type="tip">
+Para APIs REST, usa JWT + CORS + CSRF deshabilitado + sesiones stateless. Para aplicaciones web tradicionales, usa formularios + sesiones + CSRF habilitado.
+</Aside>
+

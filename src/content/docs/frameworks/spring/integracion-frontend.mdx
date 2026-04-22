@@ -1,0 +1,684 @@
+---
+title: 23. Integración con Frontend
+description: Consumo desde Angular y React, manejo de CORS, tokens y flujo frontend-backend
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🔗 23.1 Arquitectura Frontend-Backend
+
+### Flujo de comunicación
+
+<Code code={`┌─────────────────────────────────────────────────────────────┐
+│                    Frontend (React/Angular)                  │
+│  - SPA (Single Page Application)                             │
+│  - Maneja estado local                                       │
+│  - Consume API REST                                          │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              │ HTTP/HTTPS
+                              │ JSON
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Backend (Spring Boot)                     │
+│  - API REST                                                  │
+│  - Autenticación JWT                                         │
+│  - Lógica de negocio                                         │
+└─────────────────────────────────────────────────────────────┘`} lang="text" title="Arquitectura típica" />
+
+### Configuración CORS para desarrollo
+
+<Code code={`@Configuration
+public class CorsConfig {
+    
+    @Bean
+    @Profile("dev")
+    public CorsConfigurationSource devCorsConfig() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(
+            "http://localhost:3000",  // React
+            "http://localhost:4200",  // Angular
+            "http://localhost:5173"   // Vite
+        ));
+        config.setAllowedMethods(List.of("*"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", config);
+        return source;
+    }
+}`} lang="java" title="CORS para desarrollo" />
+
+---
+
+## ⚛️ 23.2 Consumo desde React
+
+### Configuración de Axios
+
+<Code code={`// src/api/axios.js
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Interceptor para agregar token
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = \`Bearer \${token}\`;
+  }
+  return config;
+});
+
+// Interceptor para manejar errores
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;`} lang="javascript" title="Configuración Axios" />
+
+### Servicio de productos
+
+<Code code={`// src/services/productoService.js
+import api from '../api/axios';
+
+export const productoService = {
+  listar: async (page = 0, size = 10) => {
+    const response = await api.get('/productos', {
+      params: { page, size }
+    });
+    return response.data;
+  },
+
+  obtener: async (id) => {
+    const response = await api.get(\`/productos/\${id}\`);
+    return response.data;
+  },
+
+  crear: async (producto) => {
+    const response = await api.post('/productos', producto);
+    return response.data;
+  },
+
+  actualizar: async (id, producto) => {
+    const response = await api.put(\`/productos/\${id}\`, producto);
+    return response.data;
+  },
+
+  eliminar: async (id) => {
+    await api.delete(\`/productos/\${id}\`);
+  }
+};`} lang="javascript" title="Servicio de productos" />
+
+### Hook personalizado
+
+<Code code={`// src/hooks/useProductos.js
+import { useState, useEffect } from 'react';
+import { productoService } from '../services/productoService';
+
+export function useProductos(page = 0) {
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [totalPages, setTotalPages] = useState(0);
+
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        setLoading(true);
+        const data = await productoService.listar(page);
+        setProductos(data.content);
+        setTotalPages(data.totalPages);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProductos();
+  }, [page]);
+
+  return { productos, loading, error, totalPages };
+}
+
+// Uso en componente
+function ProductoList() {
+  const [page, setPage] = useState(0);
+  const { productos, loading, error, totalPages } = useProductos(page);
+
+  if (loading) return <Spinner />;
+  if (error) return <Error message={error} />;
+
+  return (
+    <div>
+      {productos.map(p => (
+        <ProductoCard key={p.id} producto={p} />
+      ))}
+      <Pagination 
+        currentPage={page} 
+        totalPages={totalPages} 
+        onPageChange={setPage} 
+      />
+    </div>
+  );
+}`} lang="jsx" title="Hook useProductos" />
+
+### Autenticación
+
+<Code code={`// src/context/AuthContext.jsx
+import { createContext, useContext, useState, useEffect } from 'react';
+import api from '../api/axios';
+
+const AuthContext = createContext(null);
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      verificarToken();
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  const verificarToken = async () => {
+    try {
+      const response = await api.get('/auth/me');
+      setUser(response.data);
+    } catch {
+      localStorage.removeItem('token');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (email, password) => {
+    const response = await api.post('/auth/login', { email, password });
+    const { token, user } = response.data;
+    localStorage.setItem('token', token);
+    setUser(user);
+    return user;
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => useContext(AuthContext);`} lang="jsx" title="Context de autenticación" />
+
+---
+
+## 🅰️ 23.3 Consumo desde Angular
+
+### Servicio HTTP
+
+<Code code={`// src/app/services/producto.service.ts
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+
+export interface Producto {
+  id: number;
+  nombre: string;
+  precio: number;
+  categoria: string;
+}
+
+export interface Page<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProductoService {
+  private apiUrl = \`\${environment.apiUrl}/productos\`;
+
+  constructor(private http: HttpClient) {}
+
+  listar(page: number = 0, size: number = 10): Observable<Page<Producto>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+    
+    return this.http.get<Page<Producto>>(this.apiUrl, { params });
+  }
+
+  obtener(id: number): Observable<Producto> {
+    return this.http.get<Producto>(\`\${this.apiUrl}/\${id}\`);
+  }
+
+  crear(producto: Partial<Producto>): Observable<Producto> {
+    return this.http.post<Producto>(this.apiUrl, producto);
+  }
+
+  actualizar(id: number, producto: Partial<Producto>): Observable<Producto> {
+    return this.http.put<Producto>(\`\${this.apiUrl}/\${id}\`, producto);
+  }
+
+  eliminar(id: number): Observable<void> {
+    return this.http.delete<void>(\`\${this.apiUrl}/\${id}\`);
+  }
+}`} lang="typescript" title="Servicio Angular" />
+
+### Interceptor de autenticación
+
+<Code code={`// src/app/interceptors/auth.interceptor.ts
+import { Injectable } from '@angular/core';
+import {
+  HttpInterceptor,
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpErrorResponse
+} from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const token = this.authService.getToken();
+
+    if (token) {
+      req = req.clone({
+        setHeaders: {
+          Authorization: \`Bearer \${token}\`
+        }
+      });
+    }
+
+    return next.handle(req).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401) {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+}
+
+// app.module.ts
+@NgModule({
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ]
+})
+export class AppModule {}`} lang="typescript" title="Interceptor Angular" />
+
+### Componente con formulario
+
+<Code code={`// src/app/components/producto-form/producto-form.component.ts
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ProductoService } from '../../services/producto.service';
+
+@Component({
+  selector: 'app-producto-form',
+  templateUrl: './producto-form.component.html'
+})
+export class ProductoFormComponent implements OnInit {
+  form: FormGroup;
+  isEditing = false;
+  loading = false;
+  error: string | null = null;
+
+  constructor(
+    private fb: FormBuilder,
+    private productoService: ProductoService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
+    this.form = this.fb.group({
+      nombre: ['', [Validators.required, Validators.minLength(3)]],
+      precio: ['', [Validators.required, Validators.min(0)]],
+      categoria: ['', Validators.required]
+    });
+  }
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.params['id'];
+    if (id) {
+      this.isEditing = true;
+      this.cargarProducto(id);
+    }
+  }
+
+  cargarProducto(id: number): void {
+    this.productoService.obtener(id).subscribe({
+      next: (producto) => this.form.patchValue(producto),
+      error: (err) => this.error = err.message
+    });
+  }
+
+  onSubmit(): void {
+    if (this.form.invalid) return;
+
+    this.loading = true;
+    const producto = this.form.value;
+    const id = this.route.snapshot.params['id'];
+
+    const request = this.isEditing
+      ? this.productoService.actualizar(id, producto)
+      : this.productoService.crear(producto);
+
+    request.subscribe({
+      next: () => this.router.navigate(['/productos']),
+      error: (err) => {
+        this.error = err.error?.message || 'Error al guardar';
+        this.loading = false;
+      }
+    });
+  }
+}`} lang="typescript" title="Componente con formulario" />
+
+---
+
+## 🔐 23.4 Flujo de Autenticación JWT
+
+### Backend: Endpoint de login
+
+<Code code={`@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+    
+    private final AuthService authService;
+    
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
+    }
+    
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        AuthResponse response = authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal UserDetails user) {
+        return ResponseEntity.ok(authService.getUserInfo(user.getUsername()));
+    }
+    
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshRequest request) {
+        AuthResponse response = authService.refreshToken(request.getRefreshToken());
+        return ResponseEntity.ok(response);
+    }
+}
+
+// DTOs
+public record LoginRequest(
+    @Email String email,
+    @NotBlank String password
+) {}
+
+public record AuthResponse(
+    String accessToken,
+    String refreshToken,
+    long expiresIn,
+    UserDTO user
+) {}`} lang="java" title="Controller de autenticación" />
+
+### Frontend: Flujo completo
+
+<Code code={`// Flujo de autenticación
+// 1. Usuario envía credenciales
+const login = async (email, password) => {
+  const response = await api.post('/auth/login', { email, password });
+  
+  // 2. Backend valida y retorna tokens
+  const { accessToken, refreshToken, user } = response.data;
+  
+  // 3. Guardar tokens
+  localStorage.setItem('accessToken', accessToken);
+  localStorage.setItem('refreshToken', refreshToken);
+  
+  // 4. Actualizar estado
+  setUser(user);
+};
+
+// Refresh automático
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        const response = await api.post('/auth/refresh', { refreshToken });
+        
+        const { accessToken } = response.data;
+        localStorage.setItem('accessToken', accessToken);
+        
+        originalRequest.headers.Authorization = \`Bearer \${accessToken}\`;
+        return api(originalRequest);
+      } catch {
+        // Refresh falló, logout
+        localStorage.clear();
+        window.location.href = '/login';
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);`} lang="javascript" title="Flujo JWT en frontend" />
+
+---
+
+## 📤 23.5 Subida de Archivos
+
+### Backend
+
+<Code code={`@RestController
+@RequestMapping("/api/archivos")
+public class ArchivoController {
+    
+    @PostMapping("/upload")
+    public ResponseEntity<ArchivoResponse> upload(
+            @RequestParam("file") MultipartFile file) {
+        
+        ArchivoResponse response = archivoService.guardar(file);
+        return ResponseEntity.ok(response);
+    }
+    
+    @PostMapping("/upload-multiple")
+    public ResponseEntity<List<ArchivoResponse>> uploadMultiple(
+            @RequestParam("files") MultipartFile[] files) {
+        
+        List<ArchivoResponse> responses = Arrays.stream(files)
+            .map(archivoService::guardar)
+            .toList();
+        
+        return ResponseEntity.ok(responses);
+    }
+}`} lang="java" title="Backend upload" />
+
+### React: Subida con progreso
+
+<Code code={`// src/components/FileUpload.jsx
+import { useState } from 'react';
+import api from '../api/axios';
+
+function FileUpload({ onUploadComplete }) {
+  const [progress, setProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
+
+  const handleUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setUploading(true);
+    setProgress(0);
+
+    try {
+      const response = await api.post('/archivos/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setProgress(percent);
+        },
+      });
+
+      onUploadComplete(response.data);
+    } catch (error) {
+      console.error('Error uploading:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div>
+      <input type="file" onChange={handleUpload} disabled={uploading} />
+      {uploading && (
+        <div className="progress-bar">
+          <div style={{ width: \`\${progress}%\` }}>{progress}%</div>
+        </div>
+      )}
+    </div>
+  );
+}`} lang="jsx" title="Upload con progreso" />
+
+---
+
+## 🔄 23.6 Manejo de Errores
+
+### Backend: Respuestas de error consistentes
+
+<Code code={`@RestControllerAdvice
+public class GlobalExceptionHandler {
+    
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .collect(Collectors.toMap(
+                FieldError::getField,
+                FieldError::getDefaultMessage,
+                (a, b) -> a
+            ));
+        
+        return ResponseEntity.badRequest().body(
+            new ErrorResponse("VALIDATION_ERROR", "Error de validación", errors)
+        );
+    }
+    
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+            new ErrorResponse("NOT_FOUND", ex.getMessage(), null)
+        );
+    }
+}
+
+public record ErrorResponse(
+    String code,
+    String message,
+    Map<String, String> errors
+) {}`} lang="java" title="Manejo de errores backend" />
+
+### Frontend: Mostrar errores
+
+<Code code={`// src/components/ProductoForm.jsx
+function ProductoForm() {
+  const [errors, setErrors] = useState({});
+  const [globalError, setGlobalError] = useState(null);
+
+  const handleSubmit = async (data) => {
+    try {
+      setErrors({});
+      setGlobalError(null);
+      await productoService.crear(data);
+      navigate('/productos');
+    } catch (error) {
+      if (error.response?.data?.code === 'VALIDATION_ERROR') {
+        // Errores de campo
+        setErrors(error.response.data.errors);
+      } else {
+        // Error general
+        setGlobalError(error.response?.data?.message || 'Error desconocido');
+      }
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {globalError && <Alert type="error">{globalError}</Alert>}
+      
+      <Input
+        name="nombre"
+        error={errors.nombre}
+      />
+      
+      <Input
+        name="precio"
+        type="number"
+        error={errors.precio}
+      />
+      
+      <Button type="submit">Guardar</Button>
+    </form>
+  );
+}`} lang="jsx" title="Mostrar errores en frontend" />
+
+<Aside type="tip">
+Usa **TypeScript** en el frontend para tener tipos compartidos con el backend. Puedes generar tipos automáticamente desde OpenAPI.
+</Aside>
+

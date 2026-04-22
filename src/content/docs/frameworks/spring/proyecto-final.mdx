@@ -1,0 +1,707 @@
+---
+title: 24. Proyecto Final Profesional
+description: Diseño de arquitectura, backend completo, seguridad, base de datos y deploy final
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## 🎯 24.1 Descripción del Proyecto
+
+### E-Commerce API
+
+Construiremos una **API REST completa** para un sistema de e-commerce con:
+
+- **Autenticación JWT** con roles
+- **CRUD de productos** con categorías
+- **Carrito de compras** y pedidos
+- **Pagos** (simulado)
+- **Notificaciones** por email
+- **Documentación OpenAPI**
+
+### Tecnologías
+
+| Componente | Tecnología |
+|------------|------------|
+| Framework | Spring Boot 3.2 |
+| Base de datos | PostgreSQL |
+| Caché | Redis |
+| Mensajería | RabbitMQ |
+| Documentación | SpringDoc OpenAPI |
+| Testing | JUnit 5, Testcontainers |
+| Deploy | Docker, GitHub Actions |
+
+---
+
+## 📁 24.2 Estructura del Proyecto
+
+<Code code={`ecommerce-api/
+├── src/main/java/com/miapp/ecommerce/
+│   ├── EcommerceApplication.java
+│   │
+│   ├── config/
+│   │   ├── SecurityConfig.java
+│   │   ├── OpenApiConfig.java
+│   │   ├── RedisConfig.java
+│   │   └── RabbitConfig.java
+│   │
+│   ├── security/
+│   │   ├── JwtService.java
+│   │   ├── JwtAuthFilter.java
+│   │   └── UserDetailsServiceImpl.java
+│   │
+│   ├── auth/
+│   │   ├── AuthController.java
+│   │   ├── AuthService.java
+│   │   └── dto/
+│   │       ├── LoginRequest.java
+│   │       ├── RegisterRequest.java
+│   │       └── AuthResponse.java
+│   │
+│   ├── usuario/
+│   │   ├── Usuario.java
+│   │   ├── UsuarioRepository.java
+│   │   ├── UsuarioService.java
+│   │   ├── UsuarioController.java
+│   │   └── dto/
+│   │
+│   ├── producto/
+│   │   ├── Producto.java
+│   │   ├── Categoria.java
+│   │   ├── ProductoRepository.java
+│   │   ├── ProductoService.java
+│   │   ├── ProductoController.java
+│   │   └── dto/
+│   │
+│   ├── carrito/
+│   │   ├── Carrito.java
+│   │   ├── ItemCarrito.java
+│   │   ├── CarritoService.java
+│   │   └── CarritoController.java
+│   │
+│   ├── pedido/
+│   │   ├── Pedido.java
+│   │   ├── LineaPedido.java
+│   │   ├── EstadoPedido.java
+│   │   ├── PedidoRepository.java
+│   │   ├── PedidoService.java
+│   │   ├── PedidoController.java
+│   │   └── dto/
+│   │
+│   ├── pago/
+│   │   ├── PagoService.java
+│   │   └── PagoController.java
+│   │
+│   ├── notificacion/
+│   │   ├── NotificacionService.java
+│   │   ├── EmailService.java
+│   │   └── event/
+│   │       └── PedidoCreadoEvent.java
+│   │
+│   ├── common/
+│   │   ├── exception/
+│   │   │   ├── GlobalExceptionHandler.java
+│   │   │   ├── ResourceNotFoundException.java
+│   │   │   └── BusinessException.java
+│   │   └── dto/
+│   │       └── ErrorResponse.java
+│   │
+│   └── audit/
+│       ├── AuditableEntity.java
+│       └── AuditConfig.java
+│
+├── src/main/resources/
+│   ├── application.yml
+│   ├── application-dev.yml
+│   ├── application-prod.yml
+│   └── db/migration/
+│       └── V1__init.sql
+│
+├── src/test/java/
+│   ├── integration/
+│   └── unit/
+│
+├── docker-compose.yml
+├── Dockerfile
+└── pom.xml`} lang="text" title="Estructura del proyecto" />
+
+---
+
+## 🗃️ 24.3 Entidades
+
+### Usuario
+
+<Code code={`@Entity
+@Table(name = "usuarios")
+@Getter @Setter
+@NoArgsConstructor
+public class Usuario extends AuditableEntity implements UserDetails {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
+    private String nombre;
+    
+    @Column(nullable = false, unique = true)
+    private String email;
+    
+    @Column(nullable = false)
+    private String password;
+    
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
+    
+    private boolean activo = true;
+    
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<Pedido> pedidos = new ArrayList<>();
+    
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
+    
+    @Override
+    public String getUsername() {
+        return email;
+    }
+    
+    @Override
+    public boolean isAccountNonExpired() { return true; }
+    
+    @Override
+    public boolean isAccountNonLocked() { return activo; }
+    
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
+    
+    @Override
+    public boolean isEnabled() { return activo; }
+}
+
+public enum Role {
+    USER, ADMIN
+}`} lang="java" title="Entidad Usuario" />
+
+### Producto
+
+<Code code={`@Entity
+@Table(name = "productos")
+@Getter @Setter
+@NoArgsConstructor
+public class Producto extends AuditableEntity {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
+    private String nombre;
+    
+    @Column(length = 1000)
+    private String descripcion;
+    
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal precio;
+    
+    @Column(nullable = false)
+    private Integer stock;
+    
+    private String imagenUrl;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria;
+    
+    private boolean activo = true;
+    
+    public void reducirStock(int cantidad) {
+        if (this.stock < cantidad) {
+            throw new BusinessException("Stock insuficiente para " + nombre);
+        }
+        this.stock -= cantidad;
+    }
+    
+    public void aumentarStock(int cantidad) {
+        this.stock += cantidad;
+    }
+}`} lang="java" title="Entidad Producto" />
+
+### Pedido
+
+<Code code={`@Entity
+@Table(name = "pedidos")
+@Getter @Setter
+@NoArgsConstructor
+public class Pedido extends AuditableEntity {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(unique = true, nullable = false)
+    private String numero;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+    
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LineaPedido> lineas = new ArrayList<>();
+    
+    @Enumerated(EnumType.STRING)
+    private EstadoPedido estado = EstadoPedido.PENDIENTE;
+    
+    @Column(precision = 10, scale = 2)
+    private BigDecimal subtotal;
+    
+    @Column(precision = 10, scale = 2)
+    private BigDecimal impuestos;
+    
+    @Column(precision = 10, scale = 2)
+    private BigDecimal total;
+    
+    @Embedded
+    private DireccionEnvio direccionEnvio;
+    
+    private String notas;
+    
+    @PrePersist
+    public void prePersist() {
+        this.numero = "PED-" + System.currentTimeMillis();
+        calcularTotales();
+    }
+    
+    public void agregarLinea(Producto producto, int cantidad) {
+        LineaPedido linea = new LineaPedido();
+        linea.setPedido(this);
+        linea.setProducto(producto);
+        linea.setCantidad(cantidad);
+        linea.setPrecioUnitario(producto.getPrecio());
+        linea.calcularSubtotal();
+        this.lineas.add(linea);
+        calcularTotales();
+    }
+    
+    public void calcularTotales() {
+        this.subtotal = lineas.stream()
+            .map(LineaPedido::getSubtotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        this.impuestos = subtotal.multiply(new BigDecimal("0.16"));
+        this.total = subtotal.add(impuestos);
+    }
+}
+
+public enum EstadoPedido {
+    PENDIENTE, PAGADO, ENVIADO, ENTREGADO, CANCELADO
+}`} lang="java" title="Entidad Pedido" />
+
+---
+
+## 🔐 24.4 Autenticación
+
+### JwtService
+
+<Code code={`@Service
+public class JwtService {
+    
+    @Value("\${jwt.secret}")
+    private String secretKey;
+    
+    @Value("\${jwt.expiration}")
+    private long expiration;
+    
+    public String generateToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", userDetails.getAuthorities().iterator().next().getAuthority());
+        
+        return Jwts.builder()
+            .setClaims(claims)
+            .setSubject(userDetails.getUsername())
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + expiration))
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+            .compact();
+    }
+    
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+    
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+    
+    private boolean isTokenExpired(String token) {
+        return extractClaim(token, Claims::getExpiration).before(new Date());
+    }
+    
+    private <T> T extractClaim(String token, Function<Claims, T> resolver) {
+        final Claims claims = Jwts.parserBuilder()
+            .setSigningKey(getSigningKey())
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+        return resolver.apply(claims);
+    }
+    
+    private Key getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+}`} lang="java" title="JwtService" />
+
+### AuthService
+
+<Code code={`@Service
+@RequiredArgsConstructor
+public class AuthService {
+    
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    
+    @Transactional
+    public AuthResponse register(RegisterRequest request) {
+        if (usuarioRepository.existsByEmail(request.email())) {
+            throw new BusinessException("Email ya registrado");
+        }
+        
+        Usuario usuario = new Usuario();
+        usuario.setNombre(request.nombre());
+        usuario.setEmail(request.email());
+        usuario.setPassword(passwordEncoder.encode(request.password()));
+        usuario.setRole(Role.USER);
+        
+        usuarioRepository.save(usuario);
+        
+        String token = jwtService.generateToken(usuario);
+        
+        return new AuthResponse(token, toDTO(usuario));
+    }
+    
+    public AuthResponse login(LoginRequest request) {
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.email(), request.password())
+        );
+        
+        Usuario usuario = usuarioRepository.findByEmail(request.email())
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        
+        String token = jwtService.generateToken(usuario);
+        
+        return new AuthResponse(token, toDTO(usuario));
+    }
+    
+    private UsuarioDTO toDTO(Usuario usuario) {
+        return new UsuarioDTO(usuario.getId(), usuario.getNombre(), 
+                              usuario.getEmail(), usuario.getRole().name());
+    }
+}`} lang="java" title="AuthService" />
+
+---
+
+## 🛒 24.5 Carrito y Pedidos
+
+### CarritoService (con Redis)
+
+<Code code={`@Service
+@RequiredArgsConstructor
+public class CarritoService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final ProductoRepository productoRepository;
+    
+    private static final String CARRITO_PREFIX = "carrito:";
+    
+    public CarritoDTO obtener(Long usuarioId) {
+        String key = CARRITO_PREFIX + usuarioId;
+        Map<Object, Object> items = redisTemplate.opsForHash().entries(key);
+        
+        List<ItemCarritoDTO> itemsDTO = items.entrySet().stream()
+            .map(entry -> {
+                Long productoId = Long.parseLong(entry.getKey().toString());
+                Integer cantidad = (Integer) entry.getValue();
+                Producto producto = productoRepository.findById(productoId).orElseThrow();
+                return new ItemCarritoDTO(productoId, producto.getNombre(), 
+                                          producto.getPrecio(), cantidad);
+            })
+            .toList();
+        
+        BigDecimal total = itemsDTO.stream()
+            .map(i -> i.precio().multiply(BigDecimal.valueOf(i.cantidad())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        return new CarritoDTO(itemsDTO, total);
+    }
+    
+    public void agregarItem(Long usuarioId, Long productoId, int cantidad) {
+        Producto producto = productoRepository.findById(productoId)
+            .orElseThrow(() -> new ResourceNotFoundException("Producto", productoId));
+        
+        if (producto.getStock() < cantidad) {
+            throw new BusinessException("Stock insuficiente");
+        }
+        
+        String key = CARRITO_PREFIX + usuarioId;
+        redisTemplate.opsForHash().increment(key, productoId.toString(), cantidad);
+        redisTemplate.expire(key, Duration.ofDays(7));
+    }
+    
+    public void eliminarItem(Long usuarioId, Long productoId) {
+        String key = CARRITO_PREFIX + usuarioId;
+        redisTemplate.opsForHash().delete(key, productoId.toString());
+    }
+    
+    public void vaciar(Long usuarioId) {
+        redisTemplate.delete(CARRITO_PREFIX + usuarioId);
+    }
+}`} lang="java" title="CarritoService con Redis" />
+
+### PedidoService
+
+<Code code={`@Service
+@RequiredArgsConstructor
+@Slf4j
+public class PedidoService {
+    
+    private final PedidoRepository pedidoRepository;
+    private final CarritoService carritoService;
+    private final ProductoRepository productoRepository;
+    private final ApplicationEventPublisher eventPublisher;
+    
+    @Transactional
+    public PedidoDTO crear(Long usuarioId, CrearPedidoRequest request) {
+        CarritoDTO carrito = carritoService.obtener(usuarioId);
+        
+        if (carrito.items().isEmpty()) {
+            throw new BusinessException("El carrito está vacío");
+        }
+        
+        Pedido pedido = new Pedido();
+        pedido.setUsuario(usuarioRepository.getReferenceById(usuarioId));
+        pedido.setDireccionEnvio(request.direccion());
+        pedido.setNotas(request.notas());
+        
+        // Agregar líneas y reducir stock
+        for (ItemCarritoDTO item : carrito.items()) {
+            Producto producto = productoRepository.findById(item.productoId())
+                .orElseThrow();
+            producto.reducirStock(item.cantidad());
+            pedido.agregarLinea(producto, item.cantidad());
+        }
+        
+        pedidoRepository.save(pedido);
+        
+        // Vaciar carrito
+        carritoService.vaciar(usuarioId);
+        
+        // Publicar evento
+        eventPublisher.publishEvent(new PedidoCreadoEvent(pedido.getId()));
+        
+        log.info("Pedido creado: {}", pedido.getNumero());
+        
+        return toDTO(pedido);
+    }
+    
+    @Transactional
+    public PedidoDTO actualizarEstado(Long pedidoId, EstadoPedido nuevoEstado) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+            .orElseThrow(() -> new ResourceNotFoundException("Pedido", pedidoId));
+        
+        validarTransicionEstado(pedido.getEstado(), nuevoEstado);
+        pedido.setEstado(nuevoEstado);
+        
+        return toDTO(pedidoRepository.save(pedido));
+    }
+    
+    private void validarTransicionEstado(EstadoPedido actual, EstadoPedido nuevo) {
+        // Lógica de validación de transiciones permitidas
+    }
+}`} lang="java" title="PedidoService" />
+
+---
+
+## 📧 24.6 Notificaciones
+
+### Event Listener
+
+<Code code={`@Component
+@RequiredArgsConstructor
+@Slf4j
+public class PedidoEventListener {
+    
+    private final EmailService emailService;
+    private final PedidoRepository pedidoRepository;
+    
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Async
+    public void onPedidoCreado(PedidoCreadoEvent event) {
+        log.info("Procesando evento PedidoCreado: {}", event.pedidoId());
+        
+        Pedido pedido = pedidoRepository.findById(event.pedidoId())
+            .orElseThrow();
+        
+        emailService.enviarConfirmacionPedido(
+            pedido.getUsuario().getEmail(),
+            pedido.getNumero(),
+            pedido.getTotal()
+        );
+    }
+}
+
+@Service
+@RequiredArgsConstructor
+public class EmailService {
+    
+    private final JavaMailSender mailSender;
+    
+    @Value("\${app.mail.from}")
+    private String fromEmail;
+    
+    public void enviarConfirmacionPedido(String to, String numeroPedido, BigDecimal total) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromEmail);
+        message.setTo(to);
+        message.setSubject("Confirmación de Pedido " + numeroPedido);
+        message.setText(String.format(
+            "Tu pedido %s ha sido confirmado.\\nTotal: $%s\\n\\nGracias por tu compra!",
+            numeroPedido, total
+        ));
+        
+        mailSender.send(message);
+    }
+}`} lang="java" title="Notificaciones por email" />
+
+---
+
+## 🧪 24.7 Testing
+
+### Test de integración
+
+<Code code={`@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Testcontainers
+@AutoConfigureMockMvc
+class PedidoIntegrationTest {
+    
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
+    
+    @Container
+    static GenericContainer<?> redis = new GenericContainer<>("redis:7")
+        .withExposedPorts(6379);
+    
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.data.redis.host", redis::getHost);
+        registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
+    }
+    
+    @Autowired
+    private MockMvc mockMvc;
+    
+    @Autowired
+    private ObjectMapper objectMapper;
+    
+    @Test
+    @WithMockUser(roles = "USER")
+    void crearPedido_conCarritoValido_retornaPedido() throws Exception {
+        // Given
+        CrearPedidoRequest request = new CrearPedidoRequest(
+            new DireccionEnvio("Calle 123", "Ciudad", "12345"),
+            "Sin notas"
+        );
+        
+        // When & Then
+        mockMvc.perform(post("/api/pedidos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.numero").exists())
+            .andExpect(jsonPath("$.estado").value("PENDIENTE"));
+    }
+}`} lang="java" title="Test de integración" />
+
+---
+
+## 🐳 24.8 Docker y Deploy
+
+### docker-compose.yml
+
+<Code code={`version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/ecommerce
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "15672:15672"
+
+volumes:
+  postgres_data:`} lang="yaml" title="docker-compose.yml" />
+
+### GitHub Actions
+
+<Code code={`name: CI/CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - run: mvn verify
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and push Docker
+        run: |
+          docker build -t myapp:latest .
+          # Push to registry and deploy`} lang="yaml" title="GitHub Actions" />
+
+<Aside type="tip">
+Este proyecto integra todos los conceptos del curso. Úsalo como base para tus propios proyectos profesionales.
+</Aside>
+

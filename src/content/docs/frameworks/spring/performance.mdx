@@ -1,0 +1,459 @@
+---
+title: 19. Performance y Optimización
+description: Profiling, optimización de consultas, cacheo con Spring y Redis
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## ⚡ 19.1 Introducción al Performance
+
+### Áreas de optimización
+
+| Área | Impacto | Complejidad |
+|------|---------|-------------|
+| **Consultas BD** | Alto | Media |
+| **Caché** | Alto | Baja |
+| **Pool de conexiones** | Alto | Baja |
+| **Serialización** | Medio | Baja |
+| **Async/Reactive** | Alto | Alta |
+
+---
+
+## 📊 19.2 Profiling y Métricas
+
+### Actuator
+
+<Code code={`<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>`} lang="xml" title="Dependencia Actuator" />
+
+<Code code={`# application.properties
+management.endpoints.web.exposure.include=health,info,metrics,prometheus
+management.endpoint.health.show-details=always
+management.metrics.tags.application=mi-app`} lang="properties" title="Configuración Actuator" />
+
+### Métricas personalizadas
+
+<Code code={`@Service
+public class PedidoService {
+    
+    private final MeterRegistry meterRegistry;
+    private final Counter pedidosCreados;
+    private final Timer tiempoProcesamiento;
+    
+    public PedidoService(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+        this.pedidosCreados = Counter.builder("pedidos.creados")
+            .description("Total de pedidos creados")
+            .tag("tipo", "nuevo")
+            .register(meterRegistry);
+        this.tiempoProcesamiento = Timer.builder("pedidos.procesamiento")
+            .description("Tiempo de procesamiento de pedidos")
+            .register(meterRegistry);
+    }
+    
+    public Pedido crear(PedidoDTO dto) {
+        return tiempoProcesamiento.record(() -> {
+            Pedido pedido = procesarPedido(dto);
+            pedidosCreados.increment();
+            
+            // Gauge para pedidos pendientes
+            Gauge.builder("pedidos.pendientes", repository, 
+                repo -> repo.countByEstado(Estado.PENDIENTE))
+                .register(meterRegistry);
+            
+            return pedido;
+        });
+    }
+}`} lang="java" title="Métricas personalizadas" />
+
+### Logging de queries SQL
+
+<Code code={`# application.properties
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# Logging detallado
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
+
+# Con p6spy (más detallado)
+# spring.datasource.url=jdbc:p6spy:mysql://localhost:3306/db`} lang="properties" title="Logging SQL" />
+
+---
+
+## 🗄️ 19.3 Optimización de Consultas
+
+### Problema N+1
+
+<Code code={`// ❌ PROBLEMA N+1
+@Entity
+public class Pedido {
+    @OneToMany(mappedBy = "pedido", fetch = FetchType.LAZY)
+    private List<LineaPedido> lineas;  // Cada acceso = 1 query
+}
+
+// Esto genera N+1 queries
+List<Pedido> pedidos = pedidoRepository.findAll();
+for (Pedido p : pedidos) {
+    p.getLineas().size();  // Query adicional por cada pedido
+}`} lang="java" title="Problema N+1" />
+
+### Soluciones al N+1
+
+<Code code={`// ✅ SOLUCIÓN 1: JOIN FETCH
+@Query("SELECT p FROM Pedido p JOIN FETCH p.lineas WHERE p.estado = :estado")
+List<Pedido> findByEstadoConLineas(@Param("estado") Estado estado);
+
+// ✅ SOLUCIÓN 2: @EntityGraph
+@EntityGraph(attributePaths = {"lineas", "lineas.producto"})
+@Query("SELECT p FROM Pedido p WHERE p.estado = :estado")
+List<Pedido> findByEstadoConGraph(@Param("estado") Estado estado);
+
+// ✅ SOLUCIÓN 3: @BatchSize (en la entidad)
+@Entity
+public class Pedido {
+    @OneToMany(mappedBy = "pedido")
+    @BatchSize(size = 25)  // Carga en lotes de 25
+    private List<LineaPedido> lineas;
+}
+
+// ✅ SOLUCIÓN 4: Proyecciones (solo campos necesarios)
+public interface PedidoResumen {
+    Long getId();
+    String getEstado();
+    BigDecimal getTotal();
+}
+
+@Query("SELECT p.id as id, p.estado as estado, p.total as total FROM Pedido p")
+List<PedidoResumen> findResumenes();`} lang="java" title="Soluciones N+1" />
+
+### Paginación eficiente
+
+<Code code={`// ❌ Ineficiente para grandes datasets
+Page<Pedido> findAll(Pageable pageable);  // COUNT(*) en cada request
+
+// ✅ Slice (sin count)
+Slice<Pedido> findByEstado(Estado estado, Pageable pageable);
+
+// ✅ Keyset pagination (muy eficiente)
+@Query("SELECT p FROM Pedido p WHERE p.id > :lastId ORDER BY p.id LIMIT :size")
+List<Pedido> findNextPage(@Param("lastId") Long lastId, @Param("size") int size);
+
+// Uso
+public Page<Pedido> listarEficiente(Long lastId, int size) {
+    List<Pedido> pedidos = repository.findNextPage(lastId, size + 1);
+    boolean hasNext = pedidos.size() > size;
+    
+    if (hasNext) {
+        pedidos = pedidos.subList(0, size);
+    }
+    
+    return new PageImpl<>(pedidos);
+}`} lang="java" title="Paginación eficiente" />
+
+---
+
+## 💾 19.4 Caché con Spring
+
+### Habilitar caché
+
+<Code code={`@SpringBootApplication
+@EnableCaching
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}`} lang="java" title="Habilitar caché" />
+
+### Anotaciones de caché
+
+<Code code={`@Service
+public class ProductoService {
+    
+    // Cachear resultado
+    @Cacheable(value = "productos", key = "#id")
+    public Producto obtenerPorId(Long id) {
+        log.info("Consultando BD para producto: {}", id);
+        return repository.findById(id).orElseThrow();
+    }
+    
+    // Cachear con condición
+    @Cacheable(value = "productos", key = "#id", condition = "#id > 0")
+    public Producto obtenerConCondicion(Long id) {
+        return repository.findById(id).orElseThrow();
+    }
+    
+    // Cachear a menos que el resultado sea null
+    @Cacheable(value = "productos", key = "#id", unless = "#result == null")
+    public Producto obtenerSiExiste(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+    
+    // Actualizar caché
+    @CachePut(value = "productos", key = "#producto.id")
+    public Producto actualizar(Producto producto) {
+        return repository.save(producto);
+    }
+    
+    // Invalidar caché
+    @CacheEvict(value = "productos", key = "#id")
+    public void eliminar(Long id) {
+        repository.deleteById(id);
+    }
+    
+    // Invalidar toda la caché
+    @CacheEvict(value = "productos", allEntries = true)
+    public void limpiarCache() {
+        log.info("Caché de productos limpiada");
+    }
+    
+    // Múltiples operaciones
+    @Caching(
+        cacheable = @Cacheable(value = "productos", key = "#id"),
+        put = @CachePut(value = "productos-recientes", key = "#id")
+    )
+    public Producto obtenerYActualizarRecientes(Long id) {
+        return repository.findById(id).orElseThrow();
+    }
+}`} lang="java" title="Anotaciones de caché" />
+
+### Configuración de caché en memoria
+
+<Code code={`@Configuration
+@EnableCaching
+public class CacheConfig {
+    
+    @Bean
+    public CacheManager cacheManager() {
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+        cacheManager.setCaffeine(Caffeine.newBuilder()
+            .initialCapacity(100)
+            .maximumSize(500)
+            .expireAfterWrite(Duration.ofMinutes(10))
+            .recordStats());
+        return cacheManager;
+    }
+}`} lang="java" title="Caffeine Cache" />
+
+---
+
+## 🔴 19.5 Caché con Redis
+
+### Dependencia
+
+<Code code={`<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>`} lang="xml" title="Dependencia Redis" />
+
+### Configuración
+
+<Code code={`# application.properties
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+spring.data.redis.password=
+spring.data.redis.timeout=2000ms
+
+# Pool de conexiones
+spring.data.redis.lettuce.pool.max-active=8
+spring.data.redis.lettuce.pool.max-idle=8
+spring.data.redis.lettuce.pool.min-idle=0`} lang="properties" title="Configuración Redis" />
+
+### CacheManager con Redis
+
+<Code code={`@Configuration
+@EnableCaching
+public class RedisCacheConfig {
+    
+    @Bean
+    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofMinutes(10))
+            .serializeKeysWith(RedisSerializationContext.SerializationPair
+                .fromSerializer(new StringRedisSerializer()))
+            .serializeValuesWith(RedisSerializationContext.SerializationPair
+                .fromSerializer(new GenericJackson2JsonRedisSerializer()))
+            .disableCachingNullValues();
+        
+        // Configuraciones específicas por caché
+        Map<String, RedisCacheConfiguration> cacheConfigs = Map.of(
+            "productos", defaultConfig.entryTtl(Duration.ofHours(1)),
+            "usuarios", defaultConfig.entryTtl(Duration.ofMinutes(30)),
+            "sesiones", defaultConfig.entryTtl(Duration.ofHours(24))
+        );
+        
+        return RedisCacheManager.builder(connectionFactory)
+            .cacheDefaults(defaultConfig)
+            .withInitialCacheConfigurations(cacheConfigs)
+            .build();
+    }
+}`} lang="java" title="Redis CacheManager" />
+
+### RedisTemplate para operaciones directas
+
+<Code code={`@Service
+public class SessionService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+    
+    public void guardarSesion(String sessionId, UserSession session) {
+        String key = "session:" + sessionId;
+        redisTemplate.opsForValue().set(key, session, Duration.ofHours(24));
+    }
+    
+    public UserSession obtenerSesion(String sessionId) {
+        String key = "session:" + sessionId;
+        return (UserSession) redisTemplate.opsForValue().get(key);
+    }
+    
+    public void eliminarSesion(String sessionId) {
+        redisTemplate.delete("session:" + sessionId);
+    }
+    
+    // Operaciones con Hash
+    public void guardarCarrito(String usuarioId, Map<String, Integer> productos) {
+        String key = "carrito:" + usuarioId;
+        redisTemplate.opsForHash().putAll(key, productos);
+        redisTemplate.expire(key, Duration.ofDays(7));
+    }
+    
+    // Operaciones con Set
+    public void agregarAFavoritos(String usuarioId, String productoId) {
+        redisTemplate.opsForSet().add("favoritos:" + usuarioId, productoId);
+    }
+    
+    // Operaciones con Sorted Set (ranking)
+    public void incrementarVistas(String productoId) {
+        redisTemplate.opsForZSet().incrementScore("productos:vistas", productoId, 1);
+    }
+    
+    public Set<Object> topProductos(int top) {
+        return redisTemplate.opsForZSet().reverseRange("productos:vistas", 0, top - 1);
+    }
+}`} lang="java" title="RedisTemplate" />
+
+---
+
+## 🔌 19.6 Pool de Conexiones
+
+### HikariCP (default en Spring Boot)
+
+<Code code={`# application.properties
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.idle-timeout=300000
+spring.datasource.hikari.connection-timeout=20000
+spring.datasource.hikari.max-lifetime=1200000
+spring.datasource.hikari.leak-detection-threshold=60000`} lang="properties" title="Configuración HikariCP" />
+
+### Monitorear pool
+
+<Code code={`@Component
+@Slf4j
+public class HikariMetrics {
+    
+    private final HikariDataSource dataSource;
+    
+    @Scheduled(fixedRate = 60000)
+    public void logPoolStats() {
+        HikariPoolMXBean pool = dataSource.getHikariPoolMXBean();
+        
+        log.info("Pool Stats - Active: {}, Idle: {}, Waiting: {}, Total: {}",
+            pool.getActiveConnections(),
+            pool.getIdleConnections(),
+            pool.getThreadsAwaitingConnection(),
+            pool.getTotalConnections());
+    }
+}`} lang="java" title="Monitorear pool" />
+
+---
+
+## ⚡ 19.7 Procesamiento Asíncrono
+
+### Habilitar async
+
+<Code code={`@Configuration
+@EnableAsync
+public class AsyncConfig {
+    
+    @Bean(name = "taskExecutor")
+    public Executor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(25);
+        executor.setThreadNamePrefix("Async-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.initialize();
+        return executor;
+    }
+}`} lang="java" title="Configuración Async" />
+
+### Métodos asíncronos
+
+<Code code={`@Service
+public class NotificacionService {
+    
+    @Async
+    public void enviarEmail(String email, String mensaje) {
+        // Se ejecuta en otro hilo
+        emailSender.send(email, mensaje);
+    }
+    
+    @Async
+    public CompletableFuture<String> enviarEmailConResultado(String email) {
+        String resultado = emailSender.send(email);
+        return CompletableFuture.completedFuture(resultado);
+    }
+    
+    @Async("taskExecutor")  // Executor específico
+    public void procesarEnCola(Tarea tarea) {
+        // ...
+    }
+}
+
+// Uso
+@Service
+public class PedidoService {
+    
+    public Pedido crear(PedidoDTO dto) {
+        Pedido pedido = repository.save(new Pedido(dto));
+        
+        // Enviar email en background
+        notificacionService.enviarEmail(pedido.getUsuario().getEmail(), "Pedido creado");
+        
+        return pedido;
+    }
+}`} lang="java" title="Métodos asíncronos" />
+
+---
+
+## 📈 19.8 Buenas Prácticas
+
+### Checklist de performance
+
+<Code code={`✅ Usar índices en columnas frecuentemente consultadas
+✅ Evitar SELECT * - solo campos necesarios
+✅ Usar paginación en listas grandes
+✅ Cachear datos que cambian poco
+✅ Configurar pool de conexiones adecuadamente
+✅ Usar @Async para tareas no críticas
+✅ Monitorear con Actuator y métricas
+✅ Usar proyecciones en lugar de entidades completas
+✅ Evitar N+1 con JOIN FETCH o @EntityGraph
+✅ Comprimir respuestas HTTP (gzip)`} lang="text" title="Checklist" />
+
+### Compresión HTTP
+
+<Code code={`# application.properties
+server.compression.enabled=true
+server.compression.mime-types=application/json,application/xml,text/html,text/plain
+server.compression.min-response-size=1024`} lang="properties" title="Compresión HTTP" />
+
+<Aside type="tip">
+Mide antes de optimizar. Usa herramientas como JProfiler, VisualVM o Actuator para identificar cuellos de botella reales.
+</Aside>
+
