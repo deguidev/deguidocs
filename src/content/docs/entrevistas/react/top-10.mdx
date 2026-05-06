@@ -1,0 +1,336 @@
+---
+title: Top 10 Preguntas Esenciales de React
+description: Las 10 preguntas más importantes y frecuentes en entrevistas de React
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Las 10 Preguntas Más Importantes de React
+
+Estas son las preguntas que **siempre** aparecen en entrevistas técnicas de React.
+
+---
+
+## 1. ¿Qué es React y cuáles son sus características principales?
+
+> Biblioteca de JavaScript para construir UIs. Características: Virtual DOM, componentes reutilizables, flujo unidireccional, JSX, declarativo.
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Virtual DOM** | Representación en memoria del DOM real para optimizar actualizaciones |
+| **Componentes** | UI dividida en piezas reutilizables e independientes |
+| **Unidireccional** | Flujo de datos de padre a hijo (one-way data binding) |
+| **JSX** | Sintaxis que combina JavaScript con HTML |
+| **Declarativo** | Describes QUÉ quieres, no CÓMO hacerlo |
+
+---
+
+## 2. ¿Cuál es la diferencia entre componentes funcionales y de clase?
+
+> **Funcionales**: funciones que retornan JSX, usan Hooks, preferidos. **Clase**: extienden Component, tienen lifecycle methods, legacy.
+
+<Code code={`// Componente de Clase (legacy)
+class Saludo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { contador: 0 };
+  }
+  
+  render() {
+    return <h1>Hola, {this.props.nombre}</h1>;
+  }
+}
+
+// Componente Funcional (moderno - preferido)
+function Saludo({ nombre }) {
+  const [contador, setContador] = useState(0);
+  
+  return <h1>Hola, {nombre}</h1>;
+}
+
+// O con arrow function
+const Saludo = ({ nombre }) => <h1>Hola, {nombre}</h1>;`} lang="jsx" title="Clase vs Funcional" />
+
+**¿Por qué preferir funcionales?**
+- Menos código
+- Más fáciles de leer y testear
+- Hooks disponibles
+- Mejor performance
+
+---
+
+## 3. ¿Qué es el estado (state) y las props?
+
+> **Props**: datos del padre, inmutables, flujo hacia abajo. **State**: datos internos, mutables con setState/useState, causan re-render.
+
+<Code code={`// Props - datos que vienen del padre (inmutables)
+function Hijo({ mensaje, onClic }) {
+  return <button onClick={onClic}>{mensaje}</button>;
+}
+
+// State - datos internos del componente (mutables)
+function Padre() {
+  const [contador, setContador] = useState(0);
+  
+  return (
+    <Hijo 
+      mensaje={\`Clicks: \${contador}\`}
+      onClic={() => setContador(c => c + 1)}
+    />
+  );
+}`} lang="jsx" title="Props vs State" />
+
+| Props | State |
+|-------|-------|
+| Inmutables | Mutables con setState |
+| Vienen del padre | Interno del componente |
+| Solo lectura | Puede cambiar |
+
+---
+
+## 4. ¿Qué es useState y cómo funciona?
+
+> Hook para manejar estado en componentes funcionales. Retorna [valor, setter]. Actualizar con función para valores basados en estado previo.
+
+<Code code={`import { useState } from 'react';
+
+function Contador() {
+  // Declaración: [valor, función para actualizar]
+  const [count, setCount] = useState(0);
+  
+  // Actualización directa
+  const incrementar = () => setCount(count + 1);
+  
+  // Actualización funcional (recomendada)
+  const incrementarSeguro = () => setCount(prev => prev + 1);
+  
+  // Estado con objeto
+  const [user, setUser] = useState({ nombre: '', edad: 0 });
+  
+  const actualizarNombre = (nombre) => {
+    setUser(prev => ({ ...prev, nombre }));
+  };
+  
+  return (
+    <div>
+      <p>Contador: {count}</p>
+      <button onClick={incrementarSeguro}>+1</button>
+    </div>
+  );
+}`} lang="jsx" title="useState" />
+
+---
+
+## 5. ¿Qué es useEffect y cuándo se usa?
+
+> Hook para efectos secundarios (fetch, suscripciones, DOM). Se ejecuta después del render. Array de dependencias controla cuándo re-ejecutar.
+
+<Code code={`import { useEffect, useState } from 'react';
+
+function Usuario({ userId }) {
+  const [user, setUser] = useState(null);
+  
+  // Se ejecuta después del render
+  useEffect(() => {
+    // Efecto secundario: fetch de datos
+    fetch(\`/api/users/\${userId}\`)
+      .then(res => res.json())
+      .then(data => setUser(data));
+    
+    // Cleanup (opcional) - se ejecuta al desmontar
+    return () => {
+      console.log('Componente desmontado');
+    };
+  }, [userId]); // Dependencias - se re-ejecuta si cambian
+  
+  // Sin dependencias = se ejecuta en cada render
+  useEffect(() => {
+    console.log('Cada render');
+  });
+  
+  // Array vacío = solo al montar
+  useEffect(() => {
+    console.log('Solo una vez');
+  }, []);
+  
+  return <div>{user?.nombre}</div>;
+}`} lang="jsx" title="useEffect" />
+
+---
+
+## 6. ¿Qué es el Virtual DOM y cómo funciona?
+
+> Representación en memoria del DOM real. React compara (diffing), calcula cambios mínimos, y actualiza solo lo necesario (patching).
+
+**Proceso de reconciliación:**
+1. Cuando el estado cambia, React crea un nuevo Virtual DOM
+2. Compara el nuevo con el anterior (diffing)
+3. Calcula los cambios mínimos necesarios
+4. Actualiza solo esas partes en el DOM real (patching)
+
+<Code code={`// React hace esto internamente:
+// 1. Estado cambia
+setItems([...items, nuevoItem]);
+
+// 2. React crea nuevo Virtual DOM
+// 3. Compara con el anterior
+// 4. Solo actualiza el nuevo <li> en el DOM real`} lang="jsx" />
+
+**Beneficios:**
+- Actualizaciones eficientes
+- Mejor performance
+- Abstracción del DOM
+
+---
+
+## 7. ¿Qué son las keys y por qué son importantes?
+
+> Identificadores únicos para elementos en listas. Ayudan a React a identificar qué cambió. Usar IDs, NO índices.
+
+<Code code={`function Lista({ items }) {
+  return (
+    <ul>
+      {items.map(item => (
+        // Key única y estable para cada elemento
+        <li key={item.id}>{item.nombre}</li>
+      ))}
+    </ul>
+  );
+}
+
+// MAL - usar índice como key (problemas con reordenamiento)
+{items.map((item, index) => (
+  <li key={index}>{item.nombre}</li>
+))}
+
+// BIEN - usar ID único
+{items.map(item => (
+  <li key={item.id}>{item.nombre}</li>
+))}`} lang="jsx" title="Keys en listas" />
+
+**¿Por qué son importantes?**
+- Ayudan a React a identificar qué elementos cambiaron
+- Optimizan el proceso de reconciliación
+- Evitan bugs en componentes con estado
+
+---
+
+## 8. ¿Qué es el lifting state up?
+
+> Mover estado al ancestro común cuando varios componentes lo necesitan. El padre maneja el estado, los hijos reciben props.
+
+<Code code={`// Estado compartido en el padre
+function Padre() {
+  const [temperatura, setTemperatura] = useState(0);
+  
+  return (
+    <div>
+      <InputCelsius 
+        valor={temperatura} 
+        onChange={setTemperatura} 
+      />
+      <InputFahrenheit 
+        valor={temperatura * 9/5 + 32} 
+        onChange={(f) => setTemperatura((f - 32) * 5/9)} 
+      />
+    </div>
+  );
+}
+
+function InputCelsius({ valor, onChange }) {
+  return (
+    <input 
+      value={valor} 
+      onChange={(e) => onChange(Number(e.target.value))} 
+    />
+  );
+}`} lang="jsx" title="Lifting State Up" />
+
+---
+
+## 9. ¿Cuál es la diferencia entre controlled y uncontrolled components?
+
+> **Controlled**: React maneja el valor via state. **Uncontrolled**: DOM maneja el valor, acceso via ref. Preferir controlled.
+
+<Code code={`// CONTROLLED - React controla el valor
+function ControlledInput() {
+  const [value, setValue] = useState('');
+  
+  return (
+    <input 
+      value={value} 
+      onChange={(e) => setValue(e.target.value)} 
+    />
+  );
+}
+
+// UNCONTROLLED - DOM controla el valor
+function UncontrolledInput() {
+  const inputRef = useRef(null);
+  
+  const handleSubmit = () => {
+    console.log(inputRef.current.value);
+  };
+  
+  return (
+    <input ref={inputRef} defaultValue="inicial" />
+  );
+}`} lang="jsx" title="Controlled vs Uncontrolled" />
+
+| Controlled | Uncontrolled |
+|------------|--------------|
+| React maneja el valor | DOM maneja el valor |
+| Más código | Menos código |
+| Validación en tiempo real | Validación al submit |
+| Recomendado | Para casos simples |
+
+---
+
+## 10. ¿Cómo manejar eventos en React?
+
+> Usar camelCase (onClick), pasar función (no string), usar e.preventDefault(). Eventos son SyntheticEvents (cross-browser).
+
+<Code code={`function Formulario() {
+  const [nombre, setNombre] = useState('');
+  
+  // Evento onClick
+  const handleClick = () => {
+    console.log('Clic!');
+  };
+  
+  // Evento onChange
+  const handleChange = (e) => {
+    setNombre(e.target.value);
+  };
+  
+  // Evento onSubmit
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevenir recarga
+    console.log('Enviado:', nombre);
+  };
+  
+  // Pasar argumentos
+  const handleDelete = (id) => {
+    console.log('Eliminar:', id);
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <input value={nombre} onChange={handleChange} />
+      <button type="submit">Enviar</button>
+      <button onClick={() => handleDelete(123)}>Eliminar</button>
+    </form>
+  );
+}`} lang="jsx" title="Manejo de eventos" />
+
+**Diferencias con HTML:**
+- camelCase: `onClick` en vez de `onclick`
+- Función, no string: `onClick={handleClick}` en vez de `onclick="handleClick()"`
+- `e.preventDefault()` en vez de `return false`
+
+---
+
+<Aside type="tip" title="Consejo para la entrevista">
+Practica construyendo pequeños componentes que demuestren estos conceptos. Los entrevistadores valoran ver código funcional y explicaciones claras.
+</Aside>

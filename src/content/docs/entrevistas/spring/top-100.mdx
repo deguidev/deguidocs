@@ -1,0 +1,1624 @@
+---
+title: Top 100 Preguntas Completas de Spring
+description: Las 100 preguntas más completas para dominar entrevistas de Spring Framework
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Las 100 Preguntas Completas de Spring
+
+Esta guía cubre desde fundamentos hasta temas avanzados. Las preguntas 1-50 están en las guías anteriores.
+
+---
+
+## Spring Boot Avanzado (51-65)
+
+### 51. ¿Qué es Spring Boot Actuator?
+
+<Code code={`// Dependencia
+// spring-boot-starter-actuator
+
+// application.yml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, env
+  endpoint:
+    health:
+      show-details: always
+
+// Endpoints disponibles:
+// /actuator/health - Estado de la aplicación
+// /actuator/info - Información de la app
+// /actuator/metrics - Métricas
+// /actuator/env - Variables de entorno
+// /actuator/loggers - Configuración de logs
+// /actuator/httptrace - Trazas HTTP`} lang="yaml" />
+
+### 52. ¿Cómo crear un endpoint personalizado de Actuator?
+
+<Code code={`@Component
+@Endpoint(id = "custom")
+public class CustomEndpoint {
+    
+    @ReadOperation
+    public Map<String, Object> info() {
+        return Map.of(
+            "status", "OK",
+            "timestamp", LocalDateTime.now()
+        );
+    }
+    
+    @WriteOperation
+    public void update(@Selector String name, String value) {
+        // Actualizar configuración
+    }
+    
+    @DeleteOperation
+    public void delete(@Selector String name) {
+        // Eliminar
+    }
+}`} lang="java" />
+
+### 53. ¿Qué es Spring Boot DevTools?
+
+<Code code={`// Dependencia
+// spring-boot-devtools
+
+// Características:
+// - Restart automático al cambiar código
+// - LiveReload del navegador
+// - Configuraciones de desarrollo
+// - Cache deshabilitado para templates
+
+// application.yml
+spring:
+  devtools:
+    restart:
+      enabled: true
+      exclude: static/**,public/**
+    livereload:
+      enabled: true`} lang="yaml" />
+
+### 54. ¿Cómo externalizar configuración?
+
+<Code code={`// Orden de precedencia (mayor a menor):
+// 1. Command line arguments
+// 2. SPRING_APPLICATION_JSON
+// 3. ServletConfig/ServletContext parameters
+// 4. JNDI attributes
+// 5. System properties
+// 6. OS environment variables
+// 7. application-{profile}.properties
+// 8. application.properties
+// 9. @PropertySource
+// 10. Default properties
+
+// Múltiples archivos
+spring:
+  config:
+    import:
+      - classpath:db.yml
+      - classpath:security.yml
+      - optional:file:./config/custom.yml`} lang="yaml" />
+
+### 55. ¿Qué es @ConfigurationProperties validation?
+
+<Code code={`@Configuration
+@ConfigurationProperties(prefix = "app")
+@Validated
+public class AppProperties {
+    
+    @NotBlank
+    private String nombre;
+    
+    @Min(1)
+    @Max(100)
+    private int maxConnections;
+    
+    @Valid
+    private Security security;
+    
+    public static class Security {
+        @NotBlank
+        private String secretKey;
+        
+        @DurationMin(seconds = 60)
+        private Duration tokenExpiration;
+    }
+}`} lang="java" />
+
+### 56. ¿Cómo crear un starter personalizado?
+
+<Code code={`// 1. Crear módulo autoconfigure
+@Configuration
+@ConditionalOnClass(MiServicio.class)
+@EnableConfigurationProperties(MiProperties.class)
+public class MiAutoConfiguration {
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public MiServicio miServicio(MiProperties props) {
+        return new MiServicio(props);
+    }
+}
+
+// 2. Registrar en META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
+com.ejemplo.MiAutoConfiguration
+
+// 3. Crear módulo starter con dependencia a autoconfigure
+// pom.xml del starter solo tiene dependencias`} lang="java" />
+
+### 57. ¿Qué es GraalVM Native Image?
+
+<Code code={`// Compilar a ejecutable nativo
+// Ventajas: arranque instantáneo, menor memoria
+// Desventajas: tiempo de compilación, limitaciones de reflection
+
+// pom.xml
+<plugin>
+    <groupId>org.graalvm.buildtools</groupId>
+    <artifactId>native-maven-plugin</artifactId>
+</plugin>
+
+// Compilar
+mvn -Pnative native:compile
+
+// Configurar reflection
+@RegisterReflectionForBinding(Usuario.class)
+public class MiConfig {}`} lang="xml" />
+
+### 58. ¿Qué es Spring Boot Docker Compose?
+
+<Code code={`// Spring Boot 3.1+ - integración con Docker Compose
+
+// compose.yml en raíz del proyecto
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: midb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+    ports:
+      - "5432:5432"
+
+// application.yml
+spring:
+  docker:
+    compose:
+      enabled: true
+      lifecycle-management: start-and-stop
+
+// Spring Boot inicia/detiene contenedores automáticamente`} lang="yaml" />
+
+### 59. ¿Qué es Problem Details (RFC 7807)?
+
+<Code code={`// Spring Boot 3+ - respuestas de error estandarizadas
+
+// Habilitar
+spring:
+  mvc:
+    problemdetails:
+      enabled: true
+
+// Respuesta automática
+{
+  "type": "about:blank",
+  "title": "Not Found",
+  "status": 404,
+  "detail": "Usuario no encontrado",
+  "instance": "/api/usuarios/123"
+}
+
+// Personalizar
+@RestControllerAdvice
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    
+    @ExceptionHandler(UsuarioNoEncontradoException.class)
+    public ProblemDetail handleUsuarioNoEncontrado(UsuarioNoEncontradoException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+            HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Usuario No Encontrado");
+        problem.setProperty("usuarioId", ex.getUsuarioId());
+        return problem;
+    }
+}`} lang="java" />
+
+### 60. ¿Qué es Virtual Threads en Spring Boot?
+
+<Code code={`// Spring Boot 3.2+ con Java 21
+
+// application.yml
+spring:
+  threads:
+    virtual:
+      enabled: true
+
+// Ahora cada request usa un virtual thread
+// Mejor para I/O-bound workloads
+// No cambiar código, solo configuración
+
+// Tomcat con virtual threads
+server:
+  tomcat:
+    threads:
+      max: 200
+      # Con virtual threads, este límite es menos relevante`} lang="yaml" />
+
+### 61. ¿Qué es Observability en Spring Boot?
+
+<Code code={`// Spring Boot 3+ - Observability integrada
+
+// Dependencias
+// micrometer-tracing-bridge-brave (o otel)
+// micrometer-observation
+
+// application.yml
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  observations:
+    key-values:
+      application: mi-app
+
+// Crear observaciones personalizadas
+@Component
+public class MiServicio {
+    
+    private final ObservationRegistry registry;
+    
+    public void procesar() {
+        Observation.createNotStarted("mi.operacion", registry)
+            .lowCardinalityKeyValue("tipo", "procesamiento")
+            .observe(() -> {
+                // Lógica
+            });
+    }
+}`} lang="java" />
+
+### 62. ¿Qué es HTTP Interface Client?
+
+<Code code={`// Spring 6+ - Cliente HTTP declarativo
+
+@HttpExchange("/api/usuarios")
+public interface UsuarioClient {
+    
+    @GetExchange
+    List<Usuario> listar();
+    
+    @GetExchange("/{id}")
+    Usuario buscar(@PathVariable Long id);
+    
+    @PostExchange
+    Usuario crear(@RequestBody UsuarioDTO dto);
+    
+    @DeleteExchange("/{id}")
+    void eliminar(@PathVariable Long id);
+}
+
+// Configuración
+@Configuration
+public class ClientConfig {
+    
+    @Bean
+    public UsuarioClient usuarioClient(WebClient.Builder builder) {
+        WebClient webClient = builder.baseUrl("http://api.ejemplo.com").build();
+        
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+            .builderFor(WebClientAdapter.create(webClient))
+            .build();
+            
+        return factory.createClient(UsuarioClient.class);
+    }
+}`} lang="java" />
+
+### 63. ¿Qué es RestClient?
+
+<Code code={`// Spring 6.1+ - Cliente HTTP fluido (reemplazo de RestTemplate)
+
+@Configuration
+public class ClientConfig {
+    
+    @Bean
+    public RestClient restClient(RestClient.Builder builder) {
+        return builder
+            .baseUrl("http://api.ejemplo.com")
+            .defaultHeader("Authorization", "Bearer token")
+            .build();
+    }
+}
+
+@Service
+public class UsuarioService {
+    
+    private final RestClient restClient;
+    
+    public Usuario buscar(Long id) {
+        return restClient.get()
+            .uri("/usuarios/{id}", id)
+            .retrieve()
+            .body(Usuario.class);
+    }
+    
+    public Usuario crear(UsuarioDTO dto) {
+        return restClient.post()
+            .uri("/usuarios")
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(dto)
+            .retrieve()
+            .body(Usuario.class);
+    }
+}`} lang="java" />
+
+### 64. ¿Qué es SSL Bundles?
+
+<Code code={`// Spring Boot 3.1+ - Gestión simplificada de SSL
+
+// application.yml
+spring:
+  ssl:
+    bundle:
+      jks:
+        mi-bundle:
+          keystore:
+            location: classpath:keystore.jks
+            password: secret
+          truststore:
+            location: classpath:truststore.jks
+            password: secret
+
+// Usar en RestClient
+@Bean
+public RestClient restClient(RestClient.Builder builder, SslBundles sslBundles) {
+    return builder
+        .baseUrl("https://api.ejemplo.com")
+        .apply(restClientSsl -> restClientSsl.sslBundle(sslBundles.getBundle("mi-bundle")))
+        .build();
+}`} lang="yaml" />
+
+### 65. ¿Qué es Service Connection?
+
+<Code code={`// Spring Boot 3.1+ - Conexión automática a servicios
+
+// Con Testcontainers
+@SpringBootTest
+@Testcontainers
+class IntegrationTest {
+    
+    @Container
+    @ServiceConnection
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15");
+    
+    // No necesita @DynamicPropertySource
+    // Spring Boot configura automáticamente spring.datasource.*
+}
+
+// Con Docker Compose
+// compose.yml
+services:
+  postgres:
+    image: postgres:15
+    labels:
+      org.springframework.boot.service-connection: postgres`} lang="java" />
+
+---
+
+## Spring Cloud (66-80)
+
+### 66. ¿Qué es Spring Cloud?
+
+Spring Cloud proporciona herramientas para sistemas distribuidos:
+- **Config Server**: Configuración centralizada
+- **Service Discovery**: Eureka, Consul
+- **Load Balancing**: Spring Cloud LoadBalancer
+- **Circuit Breaker**: Resilience4j
+- **API Gateway**: Spring Cloud Gateway
+- **Distributed Tracing**: Micrometer Tracing
+
+### 67. ¿Qué es Spring Cloud Config?
+
+<Code code={`// Config Server
+@SpringBootApplication
+@EnableConfigServer
+public class ConfigServerApplication {}
+
+// application.yml del server
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/mi-org/config-repo
+          default-label: main
+
+// Cliente
+spring:
+  config:
+    import: configserver:http://localhost:8888
+  application:
+    name: mi-servicio
+
+// Refrescar configuración
+@RefreshScope
+@RestController
+public class MiController {
+    @Value("\${mi.propiedad}")
+    private String propiedad;
+}`} lang="yaml" />
+
+### 68. ¿Qué es Service Discovery con Eureka?
+
+<Code code={`// Eureka Server
+@SpringBootApplication
+@EnableEurekaServer
+public class EurekaServerApplication {}
+
+// application.yml del server
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+// Cliente (servicio)
+@SpringBootApplication
+@EnableDiscoveryClient
+public class MiServicioApplication {}
+
+// application.yml del cliente
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true`} lang="yaml" />
+
+### 69. ¿Qué es Spring Cloud Gateway?
+
+<Code code={`@SpringBootApplication
+public class GatewayApplication {}
+
+// application.yml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: usuarios-service
+          uri: lb://USUARIOS-SERVICE
+          predicates:
+            - Path=/api/usuarios/**
+          filters:
+            - StripPrefix=1
+            - AddRequestHeader=X-Request-Source, gateway
+            
+        - id: pedidos-service
+          uri: lb://PEDIDOS-SERVICE
+          predicates:
+            - Path=/api/pedidos/**
+            - Method=GET,POST
+          filters:
+            - CircuitBreaker=name=pedidosCB,fallbackUri=forward:/fallback
+
+// Filtro personalizado
+@Component
+public class LoggingFilter implements GlobalFilter {
+    
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        log.info("Request: {}", exchange.getRequest().getPath());
+        return chain.filter(exchange);
+    }
+}`} lang="yaml" />
+
+### 70. ¿Qué es Resilience4j?
+
+<Code code={`// Circuit Breaker
+@Service
+public class UsuarioService {
+    
+    @CircuitBreaker(name = "usuariosCB", fallbackMethod = "fallback")
+    public Usuario buscar(Long id) {
+        return restClient.get()
+            .uri("/usuarios/{id}", id)
+            .retrieve()
+            .body(Usuario.class);
+    }
+    
+    public Usuario fallback(Long id, Exception ex) {
+        return new Usuario(id, "Usuario no disponible");
+    }
+}
+
+// application.yml
+resilience4j:
+  circuitbreaker:
+    instances:
+      usuariosCB:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        
+  retry:
+    instances:
+      usuariosRetry:
+        max-attempts: 3
+        wait-duration: 1s
+        
+  ratelimiter:
+    instances:
+      usuariosRL:
+        limit-for-period: 10
+        limit-refresh-period: 1s`} lang="java" />
+
+### 71. ¿Qué es Spring Cloud LoadBalancer?
+
+<Code code={`// Configuración automática con service discovery
+
+@Configuration
+public class LoadBalancerConfig {
+    
+    @Bean
+    @LoadBalanced
+    public RestClient.Builder restClientBuilder() {
+        return RestClient.builder();
+    }
+}
+
+@Service
+public class UsuarioService {
+    
+    private final RestClient restClient;
+    
+    public Usuario buscar(Long id) {
+        // Usa nombre del servicio, no URL
+        return restClient.get()
+            .uri("http://USUARIOS-SERVICE/usuarios/{id}", id)
+            .retrieve()
+            .body(Usuario.class);
+    }
+}
+
+// Configuración personalizada
+@Configuration
+public class CustomLoadBalancerConfig {
+    
+    @Bean
+    public ServiceInstanceListSupplier serviceInstanceListSupplier(
+            ConfigurableApplicationContext context) {
+        return ServiceInstanceListSupplier.builder()
+            .withDiscoveryClient()
+            .withHealthChecks()
+            .withCaching()
+            .build(context);
+    }
+}`} lang="java" />
+
+### 72. ¿Qué es Spring Cloud Stream?
+
+<Code code={`// Mensajería con Kafka/RabbitMQ
+
+// Productor
+@Component
+public class PedidoProducer {
+    
+    private final StreamBridge streamBridge;
+    
+    public void enviar(Pedido pedido) {
+        streamBridge.send("pedidos-out-0", pedido);
+    }
+}
+
+// Consumidor
+@Configuration
+public class PedidoConsumer {
+    
+    @Bean
+    public Consumer<Pedido> procesarPedido() {
+        return pedido -> {
+            System.out.println("Procesando: " + pedido);
+        };
+    }
+}
+
+// application.yml
+spring:
+  cloud:
+    stream:
+      bindings:
+        pedidos-out-0:
+          destination: pedidos-topic
+        procesarPedido-in-0:
+          destination: pedidos-topic
+          group: pedidos-group
+      kafka:
+        binder:
+          brokers: localhost:9092`} lang="java" />
+
+### 73. ¿Qué es Spring Cloud Function?
+
+<Code code={`// Funciones serverless
+
+@SpringBootApplication
+public class FunctionApplication {
+    
+    @Bean
+    public Function<String, String> uppercase() {
+        return value -> value.toUpperCase();
+    }
+    
+    @Bean
+    public Consumer<String> log() {
+        return value -> System.out.println("Recibido: " + value);
+    }
+    
+    @Bean
+    public Supplier<String> hello() {
+        return () -> "Hello World";
+    }
+}
+
+// Composición
+spring:
+  cloud:
+    function:
+      definition: uppercase|log
+
+// Desplegar en AWS Lambda, Azure Functions, etc.`} lang="java" />
+
+### 74. ¿Qué es Distributed Tracing?
+
+<Code code={`// Dependencias
+// micrometer-tracing-bridge-brave
+// zipkin-reporter-brave
+
+// application.yml
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+// Propagación automática de trace IDs entre servicios
+// Logs incluyen traceId y spanId
+// logging.pattern.level: %5p [appName,traceId,spanId]
+
+// Span personalizado
+@Observed(name = "mi.operacion")
+public void miMetodo() {
+    // Automáticamente crea span
+}`} lang="yaml" />
+
+### 75. ¿Qué es Spring Cloud Kubernetes?
+
+<Code code={`// Integración nativa con Kubernetes
+
+// Service Discovery
+spring:
+  cloud:
+    kubernetes:
+      discovery:
+        enabled: true
+        all-namespaces: false
+
+// Config Maps como PropertySource
+spring:
+  cloud:
+    kubernetes:
+      config:
+        enabled: true
+        name: mi-app-config
+      secrets:
+        enabled: true
+        name: mi-app-secrets
+
+// Reload automático
+spring:
+  cloud:
+    kubernetes:
+      reload:
+        enabled: true
+        mode: polling
+        period: 15000`} lang="yaml" />
+
+### 76. ¿Qué es Spring Cloud Vault?
+
+<Code code={`// Integración con HashiCorp Vault
+
+spring:
+  cloud:
+    vault:
+      uri: http://localhost:8200
+      token: mi-token
+      kv:
+        enabled: true
+        backend: secret
+        application-name: mi-app
+
+// Secrets disponibles como properties
+@Value("\${database.password}")
+private String dbPassword;
+
+// Rotación automática de credenciales
+spring:
+  cloud:
+    vault:
+      database:
+        enabled: true
+        role: mi-role
+        backend: database`} lang="yaml" />
+
+### 77. ¿Qué es Spring Cloud OpenFeign?
+
+<Code code={`// Cliente HTTP declarativo (alternativa a HTTP Interface)
+
+@FeignClient(name = "usuarios-service", fallback = UsuarioClientFallback.class)
+public interface UsuarioClient {
+    
+    @GetMapping("/usuarios/{id}")
+    Usuario buscar(@PathVariable Long id);
+    
+    @PostMapping("/usuarios")
+    Usuario crear(@RequestBody UsuarioDTO dto);
+}
+
+@Component
+public class UsuarioClientFallback implements UsuarioClient {
+    
+    @Override
+    public Usuario buscar(Long id) {
+        return new Usuario(id, "Fallback");
+    }
+    
+    @Override
+    public Usuario crear(UsuarioDTO dto) {
+        throw new ServiceUnavailableException();
+    }
+}
+
+// Configuración
+@EnableFeignClients
+@SpringBootApplication
+public class Application {}`} lang="java" />
+
+### 78. ¿Qué es el patrón Saga?
+
+<Code code={`// Saga para transacciones distribuidas
+
+// Orquestación (coordinador central)
+@Service
+public class PedidoSaga {
+    
+    public void crearPedido(PedidoDTO dto) {
+        try {
+            // Paso 1: Reservar inventario
+            inventarioService.reservar(dto.getProductos());
+            
+            // Paso 2: Procesar pago
+            pagoService.procesar(dto.getPago());
+            
+            // Paso 3: Crear pedido
+            pedidoService.crear(dto);
+            
+        } catch (PagoException e) {
+            // Compensación
+            inventarioService.liberarReserva(dto.getProductos());
+            throw e;
+        }
+    }
+}
+
+// Coreografía (eventos)
+@Component
+public class InventarioListener {
+    
+    @EventListener
+    public void onPedidoCreado(PedidoCreado event) {
+        try {
+            reservar(event.getProductos());
+            eventPublisher.publish(new InventarioReservado(event.getPedidoId()));
+        } catch (Exception e) {
+            eventPublisher.publish(new InventarioFallido(event.getPedidoId()));
+        }
+    }
+}`} lang="java" />
+
+### 79. ¿Qué es el patrón Outbox?
+
+<Code code={`// Garantizar consistencia entre BD y mensajería
+
+@Entity
+@Table(name = "outbox")
+public class OutboxEvent {
+    @Id
+    private UUID id;
+    private String aggregateType;
+    private String aggregateId;
+    private String type;
+    private String payload;
+    private LocalDateTime createdAt;
+    private boolean processed;
+}
+
+@Service
+@Transactional
+public class PedidoService {
+    
+    public Pedido crear(PedidoDTO dto) {
+        // Guardar pedido y evento en misma transacción
+        Pedido pedido = pedidoRepository.save(new Pedido(dto));
+        
+        OutboxEvent event = new OutboxEvent();
+        event.setAggregateType("Pedido");
+        event.setAggregateId(pedido.getId().toString());
+        event.setType("PedidoCreado");
+        event.setPayload(objectMapper.writeValueAsString(pedido));
+        
+        outboxRepository.save(event);
+        
+        return pedido;
+    }
+}
+
+// Proceso separado lee outbox y publica a Kafka
+@Scheduled(fixedDelay = 1000)
+public void processOutbox() {
+    List<OutboxEvent> events = outboxRepository.findByProcessedFalse();
+    for (OutboxEvent event : events) {
+        kafkaTemplate.send(event.getType(), event.getPayload());
+        event.setProcessed(true);
+        outboxRepository.save(event);
+    }
+}`} lang="java" />
+
+### 80. ¿Qué es CQRS con Spring?
+
+<Code code={`// Command Query Responsibility Segregation
+
+// Commands (escritura)
+@Service
+public class PedidoCommandService {
+    
+    private final PedidoRepository repository;
+    private final EventPublisher eventPublisher;
+    
+    @Transactional
+    public void crear(CrearPedidoCommand command) {
+        Pedido pedido = new Pedido(command);
+        repository.save(pedido);
+        eventPublisher.publish(new PedidoCreado(pedido));
+    }
+}
+
+// Queries (lectura) - puede usar BD diferente
+@Service
+public class PedidoQueryService {
+    
+    private final PedidoReadRepository readRepository; // Elasticsearch, MongoDB, etc.
+    
+    public PedidoDTO buscar(Long id) {
+        return readRepository.findById(id);
+    }
+    
+    public List<PedidoDTO> buscarPorCliente(Long clienteId) {
+        return readRepository.findByClienteId(clienteId);
+    }
+}
+
+// Sincronizar modelo de lectura
+@Component
+public class PedidoProjection {
+    
+    @EventListener
+    public void on(PedidoCreado event) {
+        PedidoReadModel model = new PedidoReadModel(event);
+        readRepository.save(model);
+    }
+}`} lang="java" />
+
+---
+
+## Arquitectura y Mejores Prácticas (81-100)
+
+### 81. ¿Cómo estructurar un proyecto Spring Boot?
+
+<Code code={`src/main/java/com/ejemplo/
+├── MiAplicacion.java
+├── config/
+│   ├── SecurityConfig.java
+│   └── WebConfig.java
+├── controller/
+│   └── UsuarioController.java
+├── service/
+│   ├── UsuarioService.java
+│   └── impl/
+│       └── UsuarioServiceImpl.java
+├── repository/
+│   └── UsuarioRepository.java
+├── model/
+│   ├── entity/
+│   │   └── Usuario.java
+│   └── dto/
+│       └── UsuarioDTO.java
+├── exception/
+│   ├── UsuarioNoEncontradoException.java
+│   └── GlobalExceptionHandler.java
+└── util/
+    └── Mapper.java`} lang="text" />
+
+### 82. ¿Qué es Hexagonal Architecture con Spring?
+
+<Code code={`// Puertos y Adaptadores
+
+// Domain (centro)
+com.ejemplo.domain/
+├── model/
+│   └── Usuario.java
+├── port/
+│   ├── in/
+│   │   └── UsuarioUseCase.java
+│   └── out/
+│       └── UsuarioRepository.java
+└── service/
+    └── UsuarioService.java
+
+// Adapters (exterior)
+com.ejemplo.adapter/
+├── in/
+│   └── web/
+│       └── UsuarioController.java
+└── out/
+    └── persistence/
+        ├── UsuarioJpaRepository.java
+        └── UsuarioRepositoryAdapter.java
+
+// El dominio no depende de frameworks
+public interface UsuarioRepository {
+    Usuario save(Usuario usuario);
+    Optional<Usuario> findById(Long id);
+}
+
+// Adapter implementa el puerto
+@Repository
+public class UsuarioRepositoryAdapter implements UsuarioRepository {
+    
+    private final UsuarioJpaRepository jpaRepository;
+    
+    @Override
+    public Usuario save(Usuario usuario) {
+        return jpaRepository.save(usuario);
+    }
+}`} lang="java" />
+
+### 83. ¿Cómo implementar API Versioning?
+
+<Code code={`// Por URL
+@RestController
+@RequestMapping("/api/v1/usuarios")
+public class UsuarioControllerV1 {}
+
+@RestController
+@RequestMapping("/api/v2/usuarios")
+public class UsuarioControllerV2 {}
+
+// Por Header
+@GetMapping(value = "/usuarios", headers = "X-API-VERSION=1")
+public List<UsuarioV1> listarV1() {}
+
+@GetMapping(value = "/usuarios", headers = "X-API-VERSION=2")
+public List<UsuarioV2> listarV2() {}
+
+// Por Media Type
+@GetMapping(value = "/usuarios", produces = "application/vnd.ejemplo.v1+json")
+public List<UsuarioV1> listarV1() {}
+
+@GetMapping(value = "/usuarios", produces = "application/vnd.ejemplo.v2+json")
+public List<UsuarioV2> listarV2() {}`} lang="java" />
+
+### 84. ¿Cómo implementar HATEOAS?
+
+<Code code={`// Dependencia: spring-boot-starter-hateoas
+
+@RestController
+@RequestMapping("/api/usuarios")
+public class UsuarioController {
+    
+    @GetMapping("/{id}")
+    public EntityModel<Usuario> buscar(@PathVariable Long id) {
+        Usuario usuario = service.buscar(id);
+        
+        return EntityModel.of(usuario,
+            linkTo(methodOn(UsuarioController.class).buscar(id)).withSelfRel(),
+            linkTo(methodOn(UsuarioController.class).listar()).withRel("usuarios"),
+            linkTo(methodOn(PedidoController.class).listarPorUsuario(id)).withRel("pedidos")
+        );
+    }
+    
+    @GetMapping
+    public CollectionModel<EntityModel<Usuario>> listar() {
+        List<EntityModel<Usuario>> usuarios = service.findAll().stream()
+            .map(u -> EntityModel.of(u,
+                linkTo(methodOn(UsuarioController.class).buscar(u.getId())).withSelfRel()))
+            .toList();
+            
+        return CollectionModel.of(usuarios,
+            linkTo(methodOn(UsuarioController.class).listar()).withSelfRel());
+    }
+}`} lang="java" />
+
+### 85. ¿Cómo documentar APIs con OpenAPI/Swagger?
+
+<Code code={`// Dependencia: springdoc-openapi-starter-webmvc-ui
+
+// Configuración
+@Configuration
+public class OpenApiConfig {
+    
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info()
+                .title("Mi API")
+                .version("1.0")
+                .description("Documentación de la API"))
+            .addSecurityItem(new SecurityRequirement().addList("Bearer"))
+            .components(new Components()
+                .addSecuritySchemes("Bearer", new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .bearerFormat("JWT")));
+    }
+}
+
+// Anotaciones en controlador
+@RestController
+@RequestMapping("/api/usuarios")
+@Tag(name = "Usuarios", description = "Gestión de usuarios")
+public class UsuarioController {
+    
+    @Operation(summary = "Buscar usuario por ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    @GetMapping("/{id}")
+    public Usuario buscar(@PathVariable Long id) {}
+}
+
+// URL: http://localhost:8080/swagger-ui.html`} lang="java" />
+
+### 86. ¿Cómo implementar Rate Limiting?
+
+<Code code={`// Con Bucket4j
+@Configuration
+public class RateLimitConfig {
+    
+    @Bean
+    public Bucket createBucket() {
+        return Bucket.builder()
+            .addLimit(Bandwidth.classic(100, Refill.intervally(100, Duration.ofMinutes(1))))
+            .build();
+    }
+}
+
+@Component
+public class RateLimitFilter extends OncePerRequestFilter {
+    
+    private final Bucket bucket;
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   FilterChain chain) {
+        if (bucket.tryConsume(1)) {
+            chain.doFilter(request, response);
+        } else {
+            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+            response.getWriter().write("Rate limit exceeded");
+        }
+    }
+}`} lang="java" />
+
+### 87. ¿Cómo implementar Caching?
+
+<Code code={`@Configuration
+@EnableCaching
+public class CacheConfig {
+    
+    @Bean
+    public CacheManager cacheManager() {
+        return new ConcurrentMapCacheManager("usuarios", "productos");
+    }
+}
+
+@Service
+public class UsuarioService {
+    
+    @Cacheable(value = "usuarios", key = "#id")
+    public Usuario buscar(Long id) {
+        return repository.findById(id).orElseThrow();
+    }
+    
+    @CachePut(value = "usuarios", key = "#usuario.id")
+    public Usuario actualizar(Usuario usuario) {
+        return repository.save(usuario);
+    }
+    
+    @CacheEvict(value = "usuarios", key = "#id")
+    public void eliminar(Long id) {
+        repository.deleteById(id);
+    }
+    
+    @CacheEvict(value = "usuarios", allEntries = true)
+    public void limpiarCache() {}
+}
+
+// Con Redis
+spring:
+  cache:
+    type: redis
+  redis:
+    host: localhost
+    port: 6379`} lang="java" />
+
+### 88. ¿Cómo implementar Health Checks personalizados?
+
+<Code code={`@Component
+public class DatabaseHealthIndicator implements HealthIndicator {
+    
+    private final DataSource dataSource;
+    
+    @Override
+    public Health health() {
+        try (Connection conn = dataSource.getConnection()) {
+            if (conn.isValid(1)) {
+                return Health.up()
+                    .withDetail("database", "PostgreSQL")
+                    .withDetail("status", "Connected")
+                    .build();
+            }
+        } catch (SQLException e) {
+            return Health.down()
+                .withDetail("error", e.getMessage())
+                .build();
+        }
+        return Health.down().build();
+    }
+}
+
+// Health groups
+management:
+  endpoint:
+    health:
+      group:
+        readiness:
+          include: db, redis
+        liveness:
+          include: ping`} lang="java" />
+
+### 89. ¿Cómo manejar archivos/uploads?
+
+<Code code={`@RestController
+@RequestMapping("/api/archivos")
+public class ArchivoController {
+    
+    @PostMapping("/upload")
+    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Archivo vacío");
+        }
+        
+        String filename = StringUtils.cleanPath(file.getOriginalFilename());
+        Path path = Paths.get("uploads").resolve(filename);
+        Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        
+        return ResponseEntity.ok("Archivo subido: " + filename);
+    }
+    
+    @GetMapping("/download/{filename}")
+    public ResponseEntity<Resource> download(@PathVariable String filename) {
+        Path path = Paths.get("uploads").resolve(filename);
+        Resource resource = new UrlResource(path.toUri());
+        
+        return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .header(HttpHeaders.CONTENT_DISPOSITION, 
+                    "attachment; filename=\"" + filename + "\"")
+            .body(resource);
+    }
+}
+
+// Configuración
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB`} lang="java" />
+
+### 90. ¿Cómo implementar WebSocket?
+
+<Code code={`@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        registry.enableSimpleBroker("/topic");
+        registry.setApplicationDestinationPrefixes("/app");
+    }
+    
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws").withSockJS();
+    }
+}
+
+@Controller
+public class ChatController {
+    
+    @MessageMapping("/chat.send")
+    @SendTo("/topic/messages")
+    public ChatMessage send(ChatMessage message) {
+        return message;
+    }
+    
+    @MessageMapping("/chat.private.{userId}")
+    public void sendPrivate(@DestinationVariable String userId, ChatMessage message) {
+        messagingTemplate.convertAndSendToUser(userId, "/queue/private", message);
+    }
+}`} lang="java" />
+
+### 91. ¿Cómo implementar Server-Sent Events?
+
+<Code code={`@RestController
+@RequestMapping("/api/eventos")
+public class EventoController {
+    
+    @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<String>> stream() {
+        return Flux.interval(Duration.ofSeconds(1))
+            .map(seq -> ServerSentEvent.<String>builder()
+                .id(String.valueOf(seq))
+                .event("mensaje")
+                .data("Evento " + seq)
+                .build());
+    }
+}`} lang="java" />
+
+### 92. ¿Cómo implementar GraphQL con Spring?
+
+<Code code={`// Dependencia: spring-boot-starter-graphql
+
+// schema.graphqls
+type Query {
+    usuario(id: ID!): Usuario
+    usuarios: [Usuario]
+}
+
+type Mutation {
+    crearUsuario(input: UsuarioInput!): Usuario
+}
+
+type Usuario {
+    id: ID!
+    nombre: String!
+    email: String!
+    pedidos: [Pedido]
+}
+
+input UsuarioInput {
+    nombre: String!
+    email: String!
+}
+
+// Controller
+@Controller
+public class UsuarioGraphQLController {
+    
+    @QueryMapping
+    public Usuario usuario(@Argument Long id) {
+        return service.buscar(id);
+    }
+    
+    @QueryMapping
+    public List<Usuario> usuarios() {
+        return service.findAll();
+    }
+    
+    @MutationMapping
+    public Usuario crearUsuario(@Argument UsuarioInput input) {
+        return service.crear(input);
+    }
+    
+    @SchemaMapping
+    public List<Pedido> pedidos(Usuario usuario) {
+        return pedidoService.findByUsuarioId(usuario.getId());
+    }
+}`} lang="java" />
+
+### 93. ¿Cómo implementar Async Processing?
+
+<Code code={`@Configuration
+@EnableAsync
+public class AsyncConfig {
+    
+    @Bean
+    public Executor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(500);
+        executor.setThreadNamePrefix("Async-");
+        executor.initialize();
+        return executor;
+    }
+}
+
+@Service
+public class EmailService {
+    
+    @Async
+    public CompletableFuture<Void> enviarEmail(String destinatario, String mensaje) {
+        // Proceso lento
+        return CompletableFuture.completedFuture(null);
+    }
+    
+    @Async
+    public void enviarEmailSinRetorno(String destinatario, String mensaje) {
+        // Fire and forget
+    }
+}`} lang="java" />
+
+### 94. ¿Cómo implementar Batch Processing?
+
+<Code code={`@Configuration
+@EnableBatchProcessing
+public class BatchConfig {
+    
+    @Bean
+    public Job importJob(JobRepository jobRepository, Step step1) {
+        return new JobBuilder("importJob", jobRepository)
+            .start(step1)
+            .build();
+    }
+    
+    @Bean
+    public Step step1(JobRepository jobRepository, 
+                      PlatformTransactionManager transactionManager) {
+        return new StepBuilder("step1", jobRepository)
+            .<Usuario, Usuario>chunk(100, transactionManager)
+            .reader(reader())
+            .processor(processor())
+            .writer(writer())
+            .build();
+    }
+    
+    @Bean
+    public FlatFileItemReader<Usuario> reader() {
+        return new FlatFileItemReaderBuilder<Usuario>()
+            .name("usuarioReader")
+            .resource(new ClassPathResource("usuarios.csv"))
+            .delimited()
+            .names("nombre", "email")
+            .targetType(Usuario.class)
+            .build();
+    }
+    
+    @Bean
+    public ItemProcessor<Usuario, Usuario> processor() {
+        return usuario -> {
+            usuario.setNombre(usuario.getNombre().toUpperCase());
+            return usuario;
+        };
+    }
+    
+    @Bean
+    public JpaItemWriter<Usuario> writer(EntityManagerFactory emf) {
+        return new JpaItemWriterBuilder<Usuario>()
+            .entityManagerFactory(emf)
+            .build();
+    }
+}`} lang="java" />
+
+### 95. ¿Cómo implementar Multi-tenancy?
+
+<Code code={`// Por schema
+public class TenantContext {
+    private static final ThreadLocal<String> TENANT = new ThreadLocal<>();
+    
+    public static void setTenant(String tenant) {
+        TENANT.set(tenant);
+    }
+    
+    public static String getTenant() {
+        return TENANT.get();
+    }
+    
+    public static void clear() {
+        TENANT.remove();
+    }
+}
+
+@Component
+public class TenantFilter extends OncePerRequestFilter {
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   FilterChain chain) {
+        String tenant = request.getHeader("X-Tenant-ID");
+        TenantContext.setTenant(tenant);
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            TenantContext.clear();
+        }
+    }
+}
+
+// Hibernate multi-tenancy
+@Configuration
+public class HibernateConfig {
+    
+    @Bean
+    public MultiTenantConnectionProvider connectionProvider() {
+        return new SchemaMultiTenantConnectionProvider();
+    }
+    
+    @Bean
+    public CurrentTenantIdentifierResolver tenantResolver() {
+        return () -> TenantContext.getTenant();
+    }
+}`} lang="java" />
+
+### 96. ¿Cómo implementar Feature Flags?
+
+<Code code={`// Con Togglz
+@Configuration
+public class FeatureConfig {
+    
+    @Bean
+    public FeatureManager featureManager() {
+        return new FeatureManagerBuilder()
+            .featureEnum(Features.class)
+            .stateRepository(new FileBasedStateRepository(new File("features.properties")))
+            .build();
+    }
+}
+
+public enum Features implements Feature {
+    @EnabledByDefault
+    NUEVA_UI,
+    
+    BETA_FEATURE;
+}
+
+@Service
+public class MiServicio {
+    
+    private final FeatureManager featureManager;
+    
+    public void procesar() {
+        if (featureManager.isActive(Features.NUEVA_UI)) {
+            // Nueva lógica
+        } else {
+            // Lógica anterior
+        }
+    }
+}`} lang="java" />
+
+### 97. ¿Cómo implementar Idempotency?
+
+<Code code={`@RestController
+public class PedidoController {
+    
+    @PostMapping("/pedidos")
+    public ResponseEntity<Pedido> crear(
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
+            @RequestBody PedidoDTO dto) {
+        
+        // Verificar si ya se procesó
+        Optional<Pedido> existente = cache.get(idempotencyKey);
+        if (existente.isPresent()) {
+            return ResponseEntity.ok(existente.get());
+        }
+        
+        // Procesar
+        Pedido pedido = service.crear(dto);
+        
+        // Guardar resultado
+        cache.put(idempotencyKey, pedido, Duration.ofHours(24));
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(pedido);
+    }
+}`} lang="java" />
+
+### 98. ¿Cómo implementar Retry Pattern?
+
+<Code code={`@Configuration
+@EnableRetry
+public class RetryConfig {}
+
+@Service
+public class ExternalService {
+    
+    @Retryable(
+        retryFor = { ServiceUnavailableException.class },
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
+    public String llamarServicioExterno() {
+        // Puede fallar
+        return restClient.get().uri("/api/data").retrieve().body(String.class);
+    }
+    
+    @Recover
+    public String recover(ServiceUnavailableException e) {
+        return "Valor por defecto";
+    }
+}`} lang="java" />
+
+### 99. ¿Cómo implementar Graceful Shutdown?
+
+<Code code={`// application.yml
+server:
+  shutdown: graceful
+
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+// Cleanup personalizado
+@Component
+public class GracefulShutdown implements DisposableBean {
+    
+    @Override
+    public void destroy() {
+        // Cerrar conexiones
+        // Completar tareas pendientes
+        // Liberar recursos
+    }
+}
+
+// Con SmartLifecycle
+@Component
+public class MiServicio implements SmartLifecycle {
+    
+    @Override
+    public void stop(Runnable callback) {
+        // Cleanup asíncrono
+        executor.submit(() -> {
+            cleanup();
+            callback.run();
+        });
+    }
+}`} lang="java" />
+
+### 100. ¿Cuáles son las mejores prácticas de Spring?
+
+1. **Usar constructor injection** en vez de field injection
+2. **Preferir interfaces** para servicios y repositorios
+3. **Usar @Transactional** solo donde sea necesario
+4. **Externalizar configuración** con @ConfigurationProperties
+5. **Implementar health checks** personalizados
+6. **Usar perfiles** para diferentes entornos
+7. **Documentar APIs** con OpenAPI
+8. **Implementar manejo global de excepciones**
+9. **Usar DTOs** para transferencia de datos
+10. **Escribir tests** unitarios e integración
+11. **Implementar logging** estructurado
+12. **Usar métricas** con Micrometer
+13. **Implementar circuit breakers** para servicios externos
+14. **Usar caching** estratégicamente
+15. **Seguir principios SOLID**
+
+---
+
+<Aside type="tip" title="Felicitaciones">
+Has completado las 100 preguntas de Spring. Practica construyendo aplicaciones reales y explicando estos conceptos para dominar las entrevistas.
+</Aside>

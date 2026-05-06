@@ -1,0 +1,716 @@
+---
+title: Top 50 Preguntas Frecuentes de JavaScript
+description: Las 50 preguntas más frecuentes en entrevistas técnicas de JavaScript
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Las 50 Preguntas Más Frecuentes de JavaScript
+
+Guía completa con las preguntas que aparecen en la mayoría de entrevistas técnicas.
+
+---
+
+## Fundamentos (1-15)
+
+### 1. ¿Qué es JavaScript?
+
+> Lenguaje interpretado, dinámico, débilmente tipado, single-threaded con event loop para asincronía. Corre en navegador y servidor (Node.js).
+
+### 2. ¿Cuáles son los tipos de datos en JavaScript?
+
+> **Primitivos**: string, number, boolean, undefined, null, symbol, bigint. **No primitivos**: object, array, function.
+
+<Code code={`// Primitivos
+let string = "Hola";
+let number = 42;
+let boolean = true;
+let undefined_var;
+let null_var = null;
+let symbol = Symbol('id');
+let bigint = 9007199254740991n;
+
+// No primitivos (objetos)
+let object = { nombre: "Juan" };
+let array = [1, 2, 3];
+let function_var = function() {};`} lang="javascript" title="Tipos de datos" />
+
+### 3. ¿Qué es el DOM?
+
+> API que representa el HTML como árbol de nodos. Permite a JavaScript leer, modificar, agregar y eliminar elementos de la página.
+
+### 4. ¿Qué es el BOM?
+
+> API del navegador que incluye `window`, `navigator`, `location`, `history`. Permite interactuar con el navegador fuera del documento.
+
+### 5. ¿Cómo se declara una variable?
+
+> `var` (evitar), `let` (reasignable), `const` (no reasignable). Preferir `const` por defecto, `let` cuando necesites reasignar.
+
+<Code code={`var antigua = "ES5";      // Evitar
+let moderna = "ES6";      // Reasignable
+const constante = "fija"; // No reasignable`} lang="javascript" />
+
+### 6. ¿Qué es el scope?
+
+> Ámbito donde una variable es accesible. **Global**: todo el código. **Función**: dentro de la función. **Bloque**: dentro de `{}`.
+
+### 7. ¿Qué es una función de primera clase?
+
+> Las funciones son valores: se asignan a variables, se pasan como argumentos, se retornan de otras funciones. Esto habilita callbacks y HOF.
+
+### 8. ¿Qué es una función pura?
+
+> Función que: 1) Mismo input = mismo output siempre. 2) Sin efectos secundarios (no modifica estado externo).
+
+<Code code={`// Función pura - mismo input = mismo output, sin efectos secundarios
+function sumar(a, b) {
+  return a + b;
+}
+
+// Función impura - modifica estado externo
+let total = 0;
+function sumarImpura(valor) {
+  total += valor; // Efecto secundario
+  return total;
+}`} lang="javascript" />
+
+### 9. ¿Qué es una IIFE?
+
+> **Immediately Invoked Function Expression**. Función que se define y ejecuta inmediatamente. Crea scope privado.
+
+<Code code={`// Immediately Invoked Function Expression
+(function() {
+  console.log("Se ejecuta inmediatamente");
+})();
+
+// Con arrow function
+(() => {
+  console.log("También funciona");
+})();`} lang="javascript" />
+
+### 10. ¿Qué es el strict mode?
+
+> Modo estricto que previene errores silenciosos, prohíbe sintaxis problemática y hace el código más seguro. Activar con `"use strict";`.
+
+<Code code={`"use strict";
+
+// Previene errores silenciosos
+x = 10; // ReferenceError: x is not defined
+
+// Previene uso de palabras reservadas
+let private = 1; // SyntaxError`} lang="javascript" />
+
+### 11. ¿Qué es NaN?
+
+> **Not a Number**. Resultado de operaciones matemáticas inválidas. Es tipo `number` pero `NaN !== NaN`. Usar `Number.isNaN()` para verificar.
+
+<Code code={`console.log(typeof NaN);        // "number"
+console.log(NaN === NaN);       // false
+console.log(isNaN(NaN));        // true
+console.log(Number.isNaN(NaN)); // true (más preciso)`} lang="javascript" />
+
+### 12. ¿Cómo verificar si una variable es un array?
+
+> Usar `Array.isArray(variable)`. Es el método más confiable. `instanceof` puede fallar entre frames.
+
+<Code code={`const arr = [1, 2, 3];
+
+Array.isArray(arr);           // true (recomendado)
+arr instanceof Array;         // true
+arr.constructor === Array;    // true`} lang="javascript" />
+
+### 13. ¿Qué es type coercion?
+
+> Conversión automática de tipos. **Implícita**: JS convierte (`"5" + 3 = "53"`). **Explícita**: tú conviertes (`Number("5")`).
+
+<Code code={`// Coerción implícita
+console.log("5" + 3);   // "53" (string)
+console.log("5" - 3);   // 2 (number)
+console.log(true + 1);  // 2
+
+// Coerción explícita
+Number("5");    // 5
+String(5);      // "5"
+Boolean(0);     // false`} lang="javascript" />
+
+### 14. ¿Qué son los template literals?
+
+> Strings con backticks que permiten interpolación `${expresion}` y múltiples líneas sin concatenación.
+
+<Code code={`const nombre = "Juan";
+const edad = 25;
+
+// Template literal
+const mensaje = \`Hola, soy \${nombre} y tengo \${edad} años\`;
+
+// Multilínea
+const html = \`
+  <div>
+    <h1>\${nombre}</h1>
+  </div>
+\`;`} lang="javascript" />
+
+### 15. ¿Qué es destructuring?
+
+> Extraer valores de arrays u objetos en variables individuales. Sintaxis: `const {a, b} = obj` o `const [x, y] = arr`.
+
+<Code code={`// Array destructuring
+const [a, b, ...resto] = [1, 2, 3, 4, 5];
+// a = 1, b = 2, resto = [3, 4, 5]
+
+// Object destructuring
+const { nombre, edad, ciudad = "Lima" } = { nombre: "Juan", edad: 25 };
+// nombre = "Juan", edad = 25, ciudad = "Lima"`} lang="javascript" />
+
+---
+
+## Funciones y Objetos (16-30)
+
+### 16. ¿Qué es `this`?
+
+> Referencia al contexto de ejecución. En objeto: el objeto. En función normal: depende de cómo se llama. En arrow: hereda del scope padre.
+
+<Code code={`// En objeto - referencia al objeto
+const obj = {
+  nombre: "Juan",
+  saludar() {
+    console.log(this.nombre);
+  }
+};
+
+// En función normal - depende de cómo se llama
+function mostrar() {
+  console.log(this);
+}
+
+// En arrow function - hereda del contexto
+const arrow = () => console.log(this);`} lang="javascript" />
+
+### 17. ¿Qué son call, apply y bind?
+
+> Métodos para cambiar el `this` de una función. **call**: ejecuta con args separados. **apply**: args en array. **bind**: retorna nueva función.
+
+<Code code={`function saludar(saludo, signo) {
+  console.log(\`\${saludo}, \${this.nombre}\${signo}\`);
+}
+
+const persona = { nombre: "Juan" };
+
+// call - argumentos separados
+saludar.call(persona, "Hola", "!");
+
+// apply - argumentos en array
+saludar.apply(persona, ["Hola", "!"]);
+
+// bind - retorna nueva función
+const saludarJuan = saludar.bind(persona);
+saludarJuan("Hola", "!");`} lang="javascript" />
+
+### 18. ¿Qué es el prototype?
+
+> Objeto del que otros objetos heredan propiedades y métodos. Cada función tiene `prototype`, cada objeto tiene `__proto__`.
+
+<Code code={`function Persona(nombre) {
+  this.nombre = nombre;
+}
+
+Persona.prototype.saludar = function() {
+  console.log(\`Hola, soy \${this.nombre}\`);
+};
+
+const juan = new Persona("Juan");
+juan.saludar(); // "Hola, soy Juan"`} lang="javascript" />
+
+### 19. ¿Qué es la herencia prototípica?
+
+> Objetos heredan de otros objetos a través de la cadena de prototipos. Las clases ES6 son azúcar sintáctico sobre esto.
+
+<Code code={`// ES6 Classes (azúcar sintáctico)
+class Animal {
+  constructor(nombre) {
+    this.nombre = nombre;
+  }
+  hablar() {
+    console.log(\`\${this.nombre} hace un sonido\`);
+  }
+}
+
+class Perro extends Animal {
+  hablar() {
+    console.log(\`\${this.nombre} ladra\`);
+  }
+}`} lang="javascript" />
+
+### 20. ¿Qué es Object.freeze vs Object.seal?
+
+> **freeze**: objeto inmutable (no agregar, modificar ni eliminar). **seal**: no agregar ni eliminar, pero sí modificar valores existentes.
+
+<Code code={`const obj = { a: 1, b: 2 };
+
+// freeze - no se puede modificar nada
+Object.freeze(obj);
+obj.a = 10;     // No funciona
+obj.c = 3;      // No funciona
+delete obj.a;   // No funciona
+
+// seal - se pueden modificar valores existentes
+const obj2 = { a: 1, b: 2 };
+Object.seal(obj2);
+obj2.a = 10;    // Funciona
+obj2.c = 3;     // No funciona
+delete obj2.a;  // No funciona`} lang="javascript" />
+
+### 21. ¿Cómo clonar un objeto?
+
+> **Shallow**: `{...obj}` o `Object.assign()`. **Deep**: `structuredClone()` o `JSON.parse(JSON.stringify())`.
+
+<Code code={`const original = { a: 1, b: { c: 2 } };
+
+// Shallow copy
+const copia1 = { ...original };
+const copia2 = Object.assign({}, original);
+
+// Deep copy
+const copiaDeep = JSON.parse(JSON.stringify(original));
+const copiaDeep2 = structuredClone(original); // Moderno`} lang="javascript" />
+
+### 22. ¿Qué es el optional chaining?
+
+> Operador `?.` que retorna `undefined` si la propiedad no existe, en vez de lanzar error. Evita chequeos manuales de null.
+
+<Code code={`const usuario = {
+  nombre: "Juan",
+  direccion: {
+    ciudad: "Lima"
+  }
+};
+
+// Sin optional chaining
+const pais = usuario.direccion && usuario.direccion.pais;
+
+// Con optional chaining
+const pais2 = usuario.direccion?.pais; // undefined
+const metodo = usuario.saludar?.(); // undefined`} lang="javascript" />
+
+### 23. ¿Qué es el nullish coalescing?
+
+> Operador `??` que retorna el lado derecho solo si el izquierdo es `null` o `undefined`. A diferencia de `||`, no considera `0` o `""` como falsy.
+
+<Code code={`// || considera falsy: 0, "", false, null, undefined
+const a = 0 || "default";  // "default"
+
+// ?? solo considera null y undefined
+const b = 0 ?? "default";  // 0
+const c = null ?? "default"; // "default"`} lang="javascript" />
+
+### 24. ¿Qué son los getters y setters?
+
+> Métodos que se ejecutan al leer (`get`) o escribir (`set`) una propiedad. Permiten lógica personalizada en acceso a datos.
+
+<Code code={`const persona = {
+  _nombre: "",
+  
+  get nombre() {
+    return this._nombre.toUpperCase();
+  },
+  
+  set nombre(valor) {
+    this._nombre = valor.trim();
+  }
+};
+
+persona.nombre = "  juan  ";
+console.log(persona.nombre); // "JUAN"`} lang="javascript" />
+
+### 25. ¿Qué es un Symbol?
+
+> Tipo primitivo que crea identificadores únicos e inmutables. Útil para propiedades privadas o claves que no colisionen.
+
+<Code code={`const id = Symbol('id');
+const id2 = Symbol('id');
+
+console.log(id === id2); // false (siempre únicos)
+
+const obj = {
+  [id]: 123,
+  nombre: "Juan"
+};
+
+console.log(obj[id]); // 123
+console.log(Object.keys(obj)); // ["nombre"] - Symbol no aparece`} lang="javascript" />
+
+### 26. ¿Qué es un Map vs Object?
+
+> **Map**: cualquier tipo como clave, mantiene orden, tiene `size`. **Object**: solo strings/symbols como clave, hereda de prototype.
+
+<Code code={`// Map - cualquier tipo como clave
+const map = new Map();
+map.set({ id: 1 }, "valor");
+map.set(1, "número");
+
+// Object - solo strings/symbols como clave
+const obj = {};
+obj[{ id: 1 }] = "valor"; // Se convierte a "[object Object]"`} lang="javascript" />
+
+### 27. ¿Qué es un Set?
+
+> Colección de valores únicos (sin duplicados). Métodos: `add()`, `has()`, `delete()`, `size`.
+
+<Code code={`const set = new Set([1, 2, 2, 3, 3, 3]);
+console.log([...set]); // [1, 2, 3]
+
+set.add(4);
+set.has(2);    // true
+set.delete(1);
+set.size;      // 3`} lang="javascript" />
+
+### 28. ¿Qué es un WeakMap y WeakSet?
+
+> Versiones "débiles" que permiten garbage collection de sus claves/valores. Claves deben ser objetos, no son iterables.
+
+<Code code={`// WeakMap - claves son objetos, permite garbage collection
+const wm = new WeakMap();
+let obj = { data: "importante" };
+wm.set(obj, "metadata");
+
+obj = null; // El objeto puede ser recolectado
+
+// WeakSet - similar pero para valores únicos
+const ws = new WeakSet();`} lang="javascript" />
+
+### 29. ¿Qué es un Proxy?
+
+> Objeto que intercepta operaciones sobre otro objeto (get, set, delete, etc.). Permite crear comportamiento personalizado.
+
+<Code code={`const handler = {
+  get(target, prop) {
+    console.log(\`Accediendo a \${prop}\`);
+    return target[prop];
+  },
+  set(target, prop, value) {
+    console.log(\`Estableciendo \${prop} = \${value}\`);
+    target[prop] = value;
+    return true;
+  }
+};
+
+const proxy = new Proxy({}, handler);
+proxy.nombre = "Juan"; // "Estableciendo nombre = Juan"
+console.log(proxy.nombre); // "Accediendo a nombre" → "Juan"`} lang="javascript" />
+
+### 30. ¿Qué es Reflect?
+
+> API que proporciona métodos para operaciones interceptables (get, set, delete). Complementa Proxy con métodos estáticos.
+
+<Code code={`const obj = { a: 1 };
+
+// Métodos de Reflect
+Reflect.get(obj, 'a');           // 1
+Reflect.set(obj, 'b', 2);        // true
+Reflect.has(obj, 'a');           // true
+Reflect.deleteProperty(obj, 'a'); // true`} lang="javascript" />
+
+---
+
+## Asincronía (31-40)
+
+### 31. ¿Qué es un callback?
+
+> Función pasada como argumento a otra función para ejecutarse después. Base de la asincronía en JS antes de Promises.
+
+<Code code={`function obtenerDatos(callback) {
+  setTimeout(() => {
+    callback({ nombre: "Juan" });
+  }, 1000);
+}
+
+obtenerDatos((data) => {
+  console.log(data);
+});`} lang="javascript" />
+
+### 32. ¿Qué es callback hell?
+
+> Anidación excesiva de callbacks que hace el código ilegible. Solución: Promises o async/await.
+
+<Code code={`// Callback hell - difícil de leer y mantener
+obtenerUsuario(id, (usuario) => {
+  obtenerPedidos(usuario.id, (pedidos) => {
+    obtenerDetalles(pedidos[0].id, (detalles) => {
+      // ... más anidación
+    });
+  });
+});`} lang="javascript" />
+
+### 33. ¿Cuáles son los estados de una Promise?
+
+> **pending**: esperando. **fulfilled**: resuelta con valor. **rejected**: rechazada con error. Una vez resuelta, no cambia.
+
+<Code code={`// Estados: pending, fulfilled, rejected
+const promise = new Promise((resolve, reject) => {
+  // pending...
+  if (exito) {
+    resolve(valor);  // fulfilled
+  } else {
+    reject(error);   // rejected
+  }
+});`} lang="javascript" />
+
+### 34. ¿Qué es Promise.all?
+
+> Espera a que TODAS las promises se resuelvan. Retorna array de resultados. Si UNA falla, todo falla.
+
+<Code code={`const p1 = fetch('/api/users');
+const p2 = fetch('/api/posts');
+const p3 = fetch('/api/comments');
+
+// Espera a que TODAS se resuelvan
+const [users, posts, comments] = await Promise.all([p1, p2, p3]);
+
+// Si una falla, todo falla`} lang="javascript" />
+
+### 35. ¿Qué es Promise.race?
+
+> Retorna la PRIMERA promise que se resuelva o rechace. Útil para timeouts.
+
+<Code code={`// Retorna la primera que se resuelva o rechace
+const resultado = await Promise.race([
+  fetch('/api/rapido'),
+  new Promise((_, reject) => 
+    setTimeout(() => reject('Timeout'), 5000)
+  )
+]);`} lang="javascript" />
+
+### 36. ¿Qué es Promise.allSettled?
+
+> Espera a que TODAS terminen (resueltas o rechazadas). Retorna array con status y value/reason de cada una.
+
+<Code code={`const resultados = await Promise.allSettled([
+  Promise.resolve(1),
+  Promise.reject('error'),
+  Promise.resolve(3)
+]);
+
+// [
+//   { status: 'fulfilled', value: 1 },
+//   { status: 'rejected', reason: 'error' },
+//   { status: 'fulfilled', value: 3 }
+// ]`} lang="javascript" />
+
+### 37. ¿Qué es Promise.any?
+
+> Retorna la PRIMERA promise que se RESUELVA exitosamente. Ignora rechazos hasta que todas fallen.
+
+<Code code={`// Retorna la primera que se RESUELVA
+const primera = await Promise.any([
+  Promise.reject('error1'),
+  Promise.resolve('éxito'),
+  Promise.reject('error2')
+]);
+// 'éxito'`} lang="javascript" />
+
+### 38. ¿Cómo manejar errores en async/await?
+
+> Usar `try/catch` para capturar errores. El `catch` atrapa tanto errores síncronos como rechazos de await.
+
+<Code code={`// Con try/catch
+async function obtenerDatos() {
+  try {
+    const response = await fetch('/api/data');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}`} lang="javascript" />
+
+### 39. ¿Qué son los microtasks y macrotasks?
+
+> **Microtasks** (Promises): se ejecutan antes del siguiente render. **Macrotasks** (setTimeout): se ejecutan después. Microtasks tienen prioridad.
+
+<Code code={`// Macrotasks: setTimeout, setInterval, I/O
+// Microtasks: Promises, queueMicrotask, MutationObserver
+
+console.log('1');
+setTimeout(() => console.log('2'), 0);  // Macrotask
+Promise.resolve().then(() => console.log('3')); // Microtask
+console.log('4');
+
+// Salida: 1, 4, 3, 2`} lang="javascript" />
+
+### 40. ¿Qué es un generator?
+
+> Función que puede pausar (`yield`) y reanudar su ejecución. Retorna un iterador. Sintaxis: `function*`.
+
+<Code code={`function* generador() {
+  yield 1;
+  yield 2;
+  yield 3;
+}
+
+const gen = generador();
+console.log(gen.next()); // { value: 1, done: false }
+console.log(gen.next()); // { value: 2, done: false }
+console.log(gen.next()); // { value: 3, done: false }
+console.log(gen.next()); // { value: undefined, done: true }`} lang="javascript" />
+
+---
+
+## DOM y Eventos (41-50)
+
+### 41. ¿Cómo seleccionar elementos del DOM?
+
+> `querySelector` (uno), `querySelectorAll` (todos), `getElementById`, `getElementsByClassName`. Preferir `querySelector`.
+
+<Code code={`document.getElementById('id');
+document.querySelector('.clase');
+document.querySelectorAll('div');
+document.getElementsByClassName('clase');
+document.getElementsByTagName('p');`} lang="javascript" />
+
+### 42. ¿Qué es event bubbling y capturing?
+
+> **Bubbling**: evento sube de hijo a padre (default). **Capturing**: baja de padre a hijo. Controlar con tercer parámetro de `addEventListener`.
+
+<Code code={`// Bubbling (por defecto): hijo → padre
+// Capturing: padre → hijo
+
+element.addEventListener('click', handler, false); // Bubbling
+element.addEventListener('click', handler, true);  // Capturing
+
+// Detener propagación
+event.stopPropagation();`} lang="javascript" />
+
+### 43. ¿Qué es event delegation?
+
+> Poner UN listener en el padre en vez de muchos en los hijos. Usa bubbling y `e.target` para identificar el elemento clickeado.
+
+<Code code={`// En lugar de agregar listener a cada elemento
+document.querySelector('ul').addEventListener('click', (e) => {
+  if (e.target.tagName === 'LI') {
+    console.log('Click en:', e.target.textContent);
+  }
+});`} lang="javascript" />
+
+### 44. ¿Cuál es la diferencia entre preventDefault y stopPropagation?
+
+> **preventDefault**: evita acción por defecto (submit, link). **stopPropagation**: evita que el evento se propague a otros elementos.
+
+<Code code={`// preventDefault - evita comportamiento por defecto
+form.addEventListener('submit', (e) => {
+  e.preventDefault(); // No envía el formulario
+});
+
+// stopPropagation - evita que el evento suba/baje
+button.addEventListener('click', (e) => {
+  e.stopPropagation(); // No llega al padre
+});`} lang="javascript" />
+
+### 45. ¿Qué es el localStorage y sessionStorage?
+
+> **localStorage**: persiste hasta borrado manual. **sessionStorage**: se borra al cerrar pestaña. Ambos guardan strings (usar JSON).
+
+<Code code={`// localStorage - persiste hasta que se borre
+localStorage.setItem('usuario', JSON.stringify({ nombre: 'Juan' }));
+const usuario = JSON.parse(localStorage.getItem('usuario'));
+localStorage.removeItem('usuario');
+localStorage.clear();
+
+// sessionStorage - se borra al cerrar pestaña
+sessionStorage.setItem('temp', 'valor');`} lang="javascript" />
+
+### 46. ¿Qué es debounce?
+
+> Técnica que retrasa la ejecución hasta que pase un tiempo sin nuevas llamadas. Útil para búsquedas mientras escribes.
+
+<Code code={`function debounce(func, delay) {
+  let timeoutId;
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+// Uso: ejecutar solo después de que el usuario deje de escribir
+const buscar = debounce((query) => {
+  fetch(\`/api/search?q=\${query}\`);
+}, 300);`} lang="javascript" />
+
+### 47. ¿Qué es throttle?
+
+> Técnica que limita la ejecución a máximo una vez cada X milisegundos. Útil para scroll o resize.
+
+<Code code={`function throttle(func, limit) {
+  let inThrottle;
+  return function(...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+
+// Uso: ejecutar máximo una vez cada X ms
+const handleScroll = throttle(() => {
+  console.log('Scroll');
+}, 100);`} lang="javascript" />
+
+### 48. ¿Qué es el Fetch API?
+
+> API moderna para hacer peticiones HTTP. Retorna Promises. Reemplaza a XMLHttpRequest.
+
+<Code code={`// GET
+const response = await fetch('/api/users');
+const data = await response.json();
+
+// POST
+const response = await fetch('/api/users', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ nombre: 'Juan' })
+});`} lang="javascript" />
+
+### 49. ¿Qué son los módulos en JavaScript?
+
+> Sistema para dividir código en archivos separados. `export` para exponer, `import` para usar. ES6 Modules son el estándar.
+
+<Code code={`// Exportar
+export const PI = 3.14159;
+export function sumar(a, b) { return a + b; }
+export default class Calculadora {}
+
+// Importar
+import Calculadora, { PI, sumar } from './calculadora.js';
+import * as calc from './calculadora.js';`} lang="javascript" />
+
+### 50. ¿Qué es el patrón módulo revelador?
+
+> Patrón que usa closures para crear variables privadas y exponer solo lo necesario. Encapsulación antes de ES6 modules.
+
+<Code code={`const miModulo = (function() {
+  // Privado
+  let contador = 0;
+  
+  function incrementarPrivado() {
+    contador++;
+  }
+  
+  // Público (revelado)
+  return {
+    incrementar: function() {
+      incrementarPrivado();
+    },
+    obtenerValor: function() {
+      return contador;
+    }
+  };
+})();`} lang="javascript" />
+
+---
+
+<Aside type="tip" title="Siguiente paso">
+Una vez domines estas 50 preguntas, avanza al Top 100 para cubrir temas más avanzados y casos edge.
+</Aside>

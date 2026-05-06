@@ -1,0 +1,923 @@
+---
+title: Top 50 Preguntas Frecuentes de React
+description: Las 50 preguntas más frecuentes en entrevistas técnicas de React
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Las 50 Preguntas Más Frecuentes de React
+
+Guía completa con las preguntas que aparecen en la mayoría de entrevistas técnicas.
+
+---
+
+## Fundamentos (1-15)
+
+### 1. ¿Qué es JSX?
+
+> Extensión de sintaxis que combina HTML con JavaScript. Se transpila a React.createElement(). No es HTML, es JavaScript.
+
+<Code code={`// JSX
+const element = <h1 className="titulo">Hola</h1>;
+
+// Se transpila a:
+const element = React.createElement('h1', { className: 'titulo' }, 'Hola');`} lang="jsx" />
+
+### 2. ¿Por qué usamos className en vez de class?
+
+> `class` es palabra reservada en JS. JSX usa `className` para atributo CSS y `htmlFor` en vez de `for`.
+
+### 3. ¿Qué son los Fragments?
+
+> Permiten agrupar elementos sin agregar nodo extra al DOM. Sintaxis: `<React.Fragment>` o `<>`.
+
+<Code code={`// Problema: React necesita un elemento padre
+// Solución: Fragment (no agrega nodo al DOM)
+
+// Sintaxis completa
+<React.Fragment>
+  <h1>Título</h1>
+  <p>Párrafo</p>
+</React.Fragment>
+
+// Sintaxis corta
+<>
+  <h1>Título</h1>
+  <p>Párrafo</p>
+</>`} lang="jsx" />
+
+### 4. ¿Qué es el renderizado condicional?
+
+> Mostrar componentes según condición. Usar: `&&` (si true), ternario `? :`, o return temprano.
+
+<Code code={`function Componente({ isLoggedIn, items }) {
+  // Con &&
+  return <div>{isLoggedIn && <UserPanel />}</div>;
+  
+  // Con ternario
+  return <div>{isLoggedIn ? <UserPanel /> : <Login />}</div>;
+  
+  // Con if temprano
+  if (!isLoggedIn) return <Login />;
+  return <UserPanel />;
+  
+  // Con variable
+  let content;
+  if (isLoggedIn) {
+    content = <UserPanel />;
+  } else {
+    content = <Login />;
+  }
+  return <div>{content}</div>;
+}`} lang="jsx" />
+
+### 5. ¿Cómo renderizar listas?
+
+> Usar `.map()` para transformar array en elementos JSX. Cada elemento necesita `key` única.
+
+<Code code={`function Lista({ items }) {
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item.id}>
+          {item.nombre}
+        </li>
+      ))}
+    </ul>
+  );
+}`} lang="jsx" />
+
+### 6. ¿Qué es prop drilling y cómo evitarlo?
+
+> Pasar props a través de muchos niveles. Soluciones: Context API, estado global (Redux/Zustand), composición.
+
+<Code code={`// Prop drilling - pasar props a través de muchos niveles
+<Abuelo user={user}>
+  <Padre user={user}>
+    <Hijo user={user}>
+      <Nieto user={user} /> {/* Finalmente lo usa */}
+    </Hijo>
+  </Padre>
+</Abuelo>
+
+// Soluciones:
+// 1. Context API
+// 2. Estado global (Redux, Zustand)
+// 3. Composición de componentes`} lang="jsx" />
+
+### 7. ¿Qué es Context API?
+
+> Sistema para compartir datos sin prop drilling. createContext + Provider + useContext. Para datos globales (tema, usuario).
+
+<Code code={`// 1. Crear contexto
+const UserContext = createContext(null);
+
+// 2. Proveer valor
+function App() {
+  const [user, setUser] = useState({ nombre: 'Juan' });
+  
+  return (
+    <UserContext.Provider value={{ user, setUser }}>
+      <MiApp />
+    </UserContext.Provider>
+  );
+}
+
+// 3. Consumir en cualquier nivel
+function Nieto() {
+  const { user } = useContext(UserContext);
+  return <p>Hola, {user.nombre}</p>;
+}`} lang="jsx" />
+
+### 8. ¿Cuándo usar Context vs Redux?
+
+| Context | Redux |
+|---------|-------|
+| Estado simple | Estado complejo |
+| Pocos consumidores | Muchos consumidores |
+| Actualizaciones poco frecuentes | Actualizaciones frecuentes |
+| Sin middleware | Necesitas middleware |
+
+### 9. ¿Qué es useRef?
+
+<Code code={`function Componente() {
+  // Referencia a elemento DOM
+  const inputRef = useRef(null);
+  
+  // Valor que persiste entre renders (no causa re-render)
+  const renderCount = useRef(0);
+  
+  useEffect(() => {
+    renderCount.current += 1;
+    inputRef.current.focus();
+  });
+  
+  return <input ref={inputRef} />;
+}`} lang="jsx" />
+
+### 10. ¿Qué es useCallback?
+
+<Code code={`function Padre() {
+  const [count, setCount] = useState(0);
+  
+  // Sin useCallback - nueva función en cada render
+  const handleClick = () => {
+    console.log('click');
+  };
+  
+  // Con useCallback - misma referencia si deps no cambian
+  const handleClickMemo = useCallback(() => {
+    console.log('click', count);
+  }, [count]);
+  
+  return <Hijo onClick={handleClickMemo} />;
+}`} lang="jsx" />
+
+### 11. ¿Qué es useMemo?
+
+<Code code={`function Componente({ items }) {
+  // Memoriza el resultado de un cálculo costoso
+  const itemsFiltrados = useMemo(() => {
+    return items.filter(item => item.activo);
+  }, [items]);
+  
+  // Solo recalcula si 'items' cambia
+  return <Lista items={itemsFiltrados} />;
+}`} lang="jsx" />
+
+### 12. ¿Cuál es la diferencia entre useMemo y useCallback?
+
+<Code code={`// useMemo - memoriza un VALOR
+const valor = useMemo(() => calcularAlgo(a, b), [a, b]);
+
+// useCallback - memoriza una FUNCIÓN
+const fn = useCallback(() => hacerAlgo(a, b), [a, b]);
+
+// useCallback es equivalente a:
+const fn = useMemo(() => () => hacerAlgo(a, b), [a, b]);`} lang="jsx" />
+
+### 13. ¿Qué es React.memo?
+
+<Code code={`// Componente que solo re-renderiza si props cambian
+const MiComponente = React.memo(function MiComponente({ nombre }) {
+  console.log('Renderizando...');
+  return <p>{nombre}</p>;
+});
+
+// Con comparación personalizada
+const MiComponente = React.memo(
+  function MiComponente({ user }) {
+    return <p>{user.nombre}</p>;
+  },
+  (prevProps, nextProps) => {
+    return prevProps.user.id === nextProps.user.id;
+  }
+);`} lang="jsx" />
+
+### 14. ¿Qué es useReducer?
+
+<Code code={`const initialState = { count: 0 };
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return { count: state.count + 1 };
+    case 'decrement':
+      return { count: state.count - 1 };
+    case 'reset':
+      return initialState;
+    default:
+      throw new Error();
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  
+  return (
+    <>
+      Count: {state.count}
+      <button onClick={() => dispatch({ type: 'increment' })}>+</button>
+      <button onClick={() => dispatch({ type: 'decrement' })}>-</button>
+    </>
+  );
+}`} lang="jsx" />
+
+### 15. ¿Cuándo usar useState vs useReducer?
+
+| useState | useReducer |
+|----------|------------|
+| Estado simple | Estado complejo |
+| Pocas transiciones | Muchas transiciones |
+| Lógica simple | Lógica compleja |
+| Independiente | Valores relacionados |
+
+---
+
+## Ciclo de Vida y Efectos (16-25)
+
+### 16. ¿Cuál es el ciclo de vida de un componente?
+
+<Code code={`// Montaje
+useEffect(() => {
+  console.log('componentDidMount');
+}, []);
+
+// Actualización
+useEffect(() => {
+  console.log('componentDidUpdate');
+}, [dependency]);
+
+// Desmontaje
+useEffect(() => {
+  return () => {
+    console.log('componentWillUnmount');
+  };
+}, []);`} lang="jsx" />
+
+### 17. ¿Por qué useEffect se ejecuta dos veces en desarrollo?
+
+React 18 con StrictMode monta, desmonta y vuelve a montar componentes para detectar bugs en efectos. Solo ocurre en desarrollo.
+
+### 18. ¿Cómo hacer fetch de datos correctamente?
+
+<Code code={`function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    let cancelled = false;
+    
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const response = await fetch(url);
+        const json = await response.json();
+        
+        if (!cancelled) {
+          setData(json);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+    
+    fetchData();
+    
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+  
+  return { data, loading, error };
+}`} lang="jsx" />
+
+### 19. ¿Qué es useLayoutEffect?
+
+<Code code={`// useEffect - asíncrono, después del paint
+useEffect(() => {
+  // Puede causar parpadeo visual
+}, []);
+
+// useLayoutEffect - síncrono, antes del paint
+useLayoutEffect(() => {
+  // Para mediciones del DOM
+  const height = ref.current.offsetHeight;
+}, []);`} lang="jsx" />
+
+### 20. ¿Cómo evitar memory leaks en useEffect?
+
+<Code code={`useEffect(() => {
+  // 1. Cancelar fetch
+  const controller = new AbortController();
+  fetch(url, { signal: controller.signal });
+  
+  // 2. Limpiar subscripciones
+  const subscription = eventEmitter.subscribe(handler);
+  
+  // 3. Limpiar timers
+  const timerId = setInterval(() => {}, 1000);
+  
+  return () => {
+    controller.abort();
+    subscription.unsubscribe();
+    clearInterval(timerId);
+  };
+}, []);`} lang="jsx" />
+
+### 21. ¿Qué son los custom hooks?
+
+<Code code={`// Custom hook - reutiliza lógica con estado
+function useLocalStorage(key, initialValue) {
+  const [value, setValue] = useState(() => {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : initialValue;
+  });
+  
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+  
+  return [value, setValue];
+}
+
+// Uso
+function App() {
+  const [theme, setTheme] = useLocalStorage('theme', 'dark');
+}`} lang="jsx" />
+
+### 22. ¿Cuáles son las reglas de los Hooks?
+
+1. **Solo en el nivel superior** - No dentro de loops, condiciones o funciones anidadas
+2. **Solo en componentes de React** - O en custom hooks
+3. **Mismo orden siempre** - React depende del orden de llamada
+
+<Code code={`// MAL
+if (condition) {
+  useEffect(() => {});
+}
+
+// BIEN
+useEffect(() => {
+  if (condition) {
+    // lógica
+  }
+});`} lang="jsx" />
+
+### 23. ¿Qué es useId?
+
+<Code code={`function FormField() {
+  const id = useId();
+  
+  return (
+    <>
+      <label htmlFor={id}>Email</label>
+      <input id={id} type="email" />
+    </>
+  );
+}
+// Genera IDs únicos y estables para SSR`} lang="jsx" />
+
+### 24. ¿Qué es useTransition?
+
+<Code code={`function App() {
+  const [isPending, startTransition] = useTransition();
+  const [query, setQuery] = useState('');
+  
+  const handleChange = (e) => {
+    // Actualización urgente
+    setQuery(e.target.value);
+    
+    // Actualización no urgente
+    startTransition(() => {
+      setFilteredItems(filterItems(e.target.value));
+    });
+  };
+  
+  return (
+    <>
+      <input onChange={handleChange} />
+      {isPending && <Spinner />}
+    </>
+  );
+}`} lang="jsx" />
+
+### 25. ¿Qué es useDeferredValue?
+
+<Code code={`function SearchResults({ query }) {
+  // Retrasa la actualización de query
+  const deferredQuery = useDeferredValue(query);
+  
+  // Muestra resultados con el valor diferido
+  const results = useMemo(
+    () => searchItems(deferredQuery),
+    [deferredQuery]
+  );
+  
+  return <List items={results} />;
+}`} lang="jsx" />
+
+---
+
+## Patrones y Arquitectura (26-35)
+
+### 26. ¿Qué es el patrón Container/Presentational?
+
+<Code code={`// Container - lógica y estado
+function UserListContainer() {
+  const [users, setUsers] = useState([]);
+  
+  useEffect(() => {
+    fetchUsers().then(setUsers);
+  }, []);
+  
+  return <UserList users={users} />;
+}
+
+// Presentational - solo UI
+function UserList({ users }) {
+  return (
+    <ul>
+      {users.map(user => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}`} lang="jsx" />
+
+### 27. ¿Qué es el patrón Compound Components?
+
+<Code code={`// API limpia para componentes relacionados
+function Tabs({ children, defaultTab }) {
+  const [activeTab, setActiveTab] = useState(defaultTab);
+  
+  return (
+    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
+      {children}
+    </TabsContext.Provider>
+  );
+}
+
+Tabs.List = function TabList({ children }) {
+  return <div className="tab-list">{children}</div>;
+};
+
+Tabs.Tab = function Tab({ id, children }) {
+  const { activeTab, setActiveTab } = useContext(TabsContext);
+  return (
+    <button 
+      className={activeTab === id ? 'active' : ''}
+      onClick={() => setActiveTab(id)}
+    >
+      {children}
+    </button>
+  );
+};
+
+// Uso
+<Tabs defaultTab="tab1">
+  <Tabs.List>
+    <Tabs.Tab id="tab1">Tab 1</Tabs.Tab>
+    <Tabs.Tab id="tab2">Tab 2</Tabs.Tab>
+  </Tabs.List>
+</Tabs>`} lang="jsx" />
+
+### 28. ¿Qué es el patrón Render Props?
+
+<Code code={`// Componente que comparte lógica via render prop
+function Mouse({ render }) {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  
+  useEffect(() => {
+    const handleMove = (e) => {
+      setPosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMove);
+    return () => window.removeEventListener('mousemove', handleMove);
+  }, []);
+  
+  return render(position);
+}
+
+// Uso
+<Mouse render={({ x, y }) => (
+  <p>Posición: {x}, {y}</p>
+)} />`} lang="jsx" />
+
+### 29. ¿Qué son los Higher-Order Components (HOC)?
+
+<Code code={`// HOC - función que recibe componente y retorna componente mejorado
+function withAuth(WrappedComponent) {
+  return function AuthenticatedComponent(props) {
+    const { user } = useAuth();
+    
+    if (!user) {
+      return <Navigate to="/login" />;
+    }
+    
+    return <WrappedComponent {...props} user={user} />;
+  };
+}
+
+// Uso
+const ProtectedDashboard = withAuth(Dashboard);`} lang="jsx" />
+
+### 30. ¿Cuándo usar HOC vs Custom Hooks?
+
+| HOC | Custom Hooks |
+|-----|--------------|
+| Modifica el árbol de componentes | Solo comparte lógica |
+| Puede interceptar props | Más flexible |
+| Más difícil de tipar | Mejor TypeScript |
+| Legacy | Moderno (preferido) |
+
+### 31. ¿Qué es forwardRef?
+
+<Code code={`// Permite pasar ref a componentes hijos
+const Input = forwardRef(function Input(props, ref) {
+  return <input ref={ref} {...props} />;
+});
+
+// Uso
+function Form() {
+  const inputRef = useRef(null);
+  
+  const focusInput = () => {
+    inputRef.current.focus();
+  };
+  
+  return <Input ref={inputRef} />;
+}`} lang="jsx" />
+
+### 32. ¿Qué es useImperativeHandle?
+
+<Code code={`const FancyInput = forwardRef(function FancyInput(props, ref) {
+  const inputRef = useRef(null);
+  
+  // Expone solo métodos específicos
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current.focus(),
+    clear: () => inputRef.current.value = ''
+  }));
+  
+  return <input ref={inputRef} />;
+});
+
+// Uso
+function Parent() {
+  const ref = useRef(null);
+  
+  return (
+    <>
+      <FancyInput ref={ref} />
+      <button onClick={() => ref.current.focus()}>Focus</button>
+      <button onClick={() => ref.current.clear()}>Clear</button>
+    </>
+  );
+}`} lang="jsx" />
+
+### 33. ¿Qué es Suspense?
+
+<Code code={`// Suspense para lazy loading
+const LazyComponent = lazy(() => import('./HeavyComponent'));
+
+function App() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <LazyComponent />
+    </Suspense>
+  );
+}
+
+// Suspense para data fetching (React 18+)
+function Posts() {
+  return (
+    <Suspense fallback={<Skeleton />}>
+      <PostList />
+    </Suspense>
+  );
+}`} lang="jsx" />
+
+### 34. ¿Qué son los Error Boundaries?
+
+<Code code={`class ErrorBoundary extends React.Component {
+  state = { hasError: false };
+  
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+  
+  componentDidCatch(error, errorInfo) {
+    logErrorToService(error, errorInfo);
+  }
+  
+  render() {
+    if (this.state.hasError) {
+      return <h1>Algo salió mal.</h1>;
+    }
+    return this.props.children;
+  }
+}
+
+// Uso
+<ErrorBoundary>
+  <MiComponente />
+</ErrorBoundary>`} lang="jsx" />
+
+### 35. ¿Qué es React.lazy?
+
+<Code code={`// Code splitting - carga componentes bajo demanda
+const Dashboard = lazy(() => import('./Dashboard'));
+const Settings = lazy(() => import('./Settings'));
+
+function App() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <Routes>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/settings" element={<Settings />} />
+      </Routes>
+    </Suspense>
+  );
+}`} lang="jsx" />
+
+---
+
+## React Router y Navegación (36-40)
+
+### 36. ¿Cómo configurar React Router?
+
+<Code code={`import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <nav>
+        <Link to="/">Inicio</Link>
+        <Link to="/about">Acerca</Link>
+      </nav>
+      
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/users/:id" element={<User />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}`} lang="jsx" />
+
+### 37. ¿Cómo obtener parámetros de la URL?
+
+<Code code={`import { useParams, useSearchParams } from 'react-router-dom';
+
+function User() {
+  // Parámetros de ruta: /users/:id
+  const { id } = useParams();
+  
+  // Query params: /users?page=1&sort=name
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = searchParams.get('page');
+  
+  return <div>Usuario {id}, página {page}</div>;
+}`} lang="jsx" />
+
+### 38. ¿Cómo hacer navegación programática?
+
+<Code code={`import { useNavigate } from 'react-router-dom';
+
+function Login() {
+  const navigate = useNavigate();
+  
+  const handleLogin = async () => {
+    await login();
+    navigate('/dashboard');
+    // o navigate(-1) para ir atrás
+    // o navigate('/dashboard', { replace: true })
+  };
+}`} lang="jsx" />
+
+### 39. ¿Cómo proteger rutas?
+
+<Code code={`function ProtectedRoute({ children }) {
+  const { user } = useAuth();
+  const location = useLocation();
+  
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  
+  return children;
+}
+
+// Uso
+<Route 
+  path="/dashboard" 
+  element={
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  } 
+/>`} lang="jsx" />
+
+### 40. ¿Qué son las rutas anidadas?
+
+<Code code={`<Routes>
+  <Route path="/dashboard" element={<DashboardLayout />}>
+    <Route index element={<DashboardHome />} />
+    <Route path="settings" element={<Settings />} />
+    <Route path="profile" element={<Profile />} />
+  </Route>
+</Routes>
+
+// DashboardLayout.jsx
+function DashboardLayout() {
+  return (
+    <div>
+      <Sidebar />
+      <Outlet /> {/* Renderiza la ruta hija */}
+    </div>
+  );
+}`} lang="jsx" />
+
+---
+
+## Testing (41-45)
+
+### 41. ¿Cómo testear componentes con React Testing Library?
+
+<Code code={`import { render, screen, fireEvent } from '@testing-library/react';
+
+test('incrementa contador al hacer clic', () => {
+  render(<Counter />);
+  
+  const button = screen.getByRole('button', { name: /incrementar/i });
+  const count = screen.getByText(/contador: 0/i);
+  
+  fireEvent.click(button);
+  
+  expect(screen.getByText(/contador: 1/i)).toBeInTheDocument();
+});`} lang="jsx" />
+
+### 42. ¿Cómo testear hooks personalizados?
+
+<Code code={`import { renderHook, act } from '@testing-library/react';
+
+test('useCounter incrementa valor', () => {
+  const { result } = renderHook(() => useCounter(0));
+  
+  expect(result.current.count).toBe(0);
+  
+  act(() => {
+    result.current.increment();
+  });
+  
+  expect(result.current.count).toBe(1);
+});`} lang="jsx" />
+
+### 43. ¿Cómo mockear fetch en tests?
+
+<Code code={`beforeEach(() => {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () => Promise.resolve({ data: 'test' })
+    })
+  );
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+
+test('carga datos correctamente', async () => {
+  render(<DataComponent />);
+  
+  await waitFor(() => {
+    expect(screen.getByText('test')).toBeInTheDocument();
+  });
+});`} lang="jsx" />
+
+### 44. ¿Qué es snapshot testing?
+
+<Code code={`test('renderiza correctamente', () => {
+  const { asFragment } = render(<Button>Click me</Button>);
+  expect(asFragment()).toMatchSnapshot();
+});`} lang="jsx" />
+
+### 45. ¿Cómo testear Context?
+
+<Code code={`const wrapper = ({ children }) => (
+  <UserContext.Provider value={{ user: { name: 'Test' } }}>
+    {children}
+  </UserContext.Provider>
+);
+
+test('muestra nombre del usuario', () => {
+  render(<UserProfile />, { wrapper });
+  expect(screen.getByText('Test')).toBeInTheDocument();
+});`} lang="jsx" />
+
+---
+
+## Performance (46-50)
+
+### 46. ¿Cómo identificar problemas de performance?
+
+- React DevTools Profiler
+- Chrome DevTools Performance tab
+- `console.log` en renders
+- React.StrictMode (detecta renders dobles)
+
+### 47. ¿Qué causa re-renders innecesarios?
+
+<Code code={`// 1. Crear objetos/arrays inline
+<Child style={{ color: 'red' }} /> // Nuevo objeto cada render
+
+// 2. Crear funciones inline
+<Child onClick={() => handleClick()} /> // Nueva función cada render
+
+// 3. No usar keys correctamente
+{items.map((item, i) => <Item key={i} />)} // Índice como key
+
+// 4. Estado en componente incorrecto
+// Mover estado lo más abajo posible`} lang="jsx" />
+
+### 48. ¿Cómo optimizar listas grandes?
+
+<Code code={`// Virtualización con react-window
+import { FixedSizeList } from 'react-window';
+
+function VirtualList({ items }) {
+  return (
+    <FixedSizeList
+      height={400}
+      itemCount={items.length}
+      itemSize={35}
+      width={300}
+    >
+      {({ index, style }) => (
+        <div style={style}>{items[index]}</div>
+      )}
+    </FixedSizeList>
+  );
+}`} lang="jsx" />
+
+### 49. ¿Qué es React Concurrent Mode?
+
+Permite a React interrumpir renders largos para mantener la UI responsiva. Incluye features como:
+- `useTransition` - marcar actualizaciones como no urgentes
+- `useDeferredValue` - diferir valores
+- `Suspense` para data fetching
+
+### 50. ¿Cómo hacer code splitting efectivo?
+
+<Code code={`// Por ruta
+const Home = lazy(() => import('./pages/Home'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+
+// Por feature
+const HeavyChart = lazy(() => import('./components/HeavyChart'));
+
+// Preload en hover
+const preloadDashboard = () => import('./pages/Dashboard');
+
+<Link 
+  to="/dashboard" 
+  onMouseEnter={preloadDashboard}
+>
+  Dashboard
+</Link>`} lang="jsx" />
+
+---
+
+<Aside type="tip" title="Siguiente paso">
+Domina estas 50 preguntas y avanza al Top 100 para cubrir Server Components, nuevas APIs de React 18/19 y patrones avanzados.
+</Aside>

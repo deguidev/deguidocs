@@ -1,0 +1,1273 @@
+---
+title: Top 100 Preguntas Completas de Java
+description: Las 100 preguntas más completas para dominar entrevistas de Java
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Las 100 Preguntas Completas de Java
+
+Esta guía cubre desde fundamentos hasta temas avanzados. Las preguntas 1-50 están en las guías anteriores.
+
+---
+
+## Java 8+ Features (51-65)
+
+### 51. ¿Qué novedades trajo Java 8?
+
+- **Lambdas y Streams**
+- **Optional**
+- **Interfaces funcionales**
+- **Métodos default en interfaces**
+- **Method references**
+- **Nueva API de fecha/hora**
+- **Nashorn JavaScript Engine**
+
+### 52. ¿Qué es la nueva API de Date/Time?
+
+<Code code={`import java.time.*;
+
+// Clases inmutables y thread-safe
+LocalDate fecha = LocalDate.now();
+LocalDate cumple = LocalDate.of(1990, Month.MARCH, 15);
+
+LocalTime hora = LocalTime.now();
+LocalTime mediodia = LocalTime.of(12, 0);
+
+LocalDateTime fechaHora = LocalDateTime.now();
+
+ZonedDateTime conZona = ZonedDateTime.now(ZoneId.of("America/Lima"));
+
+// Operaciones
+LocalDate manana = fecha.plusDays(1);
+LocalDate haceMes = fecha.minusMonths(1);
+
+// Período y duración
+Period periodo = Period.between(cumple, fecha);
+Duration duracion = Duration.between(hora, mediodia);
+
+// Formateo
+DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+String formateado = fecha.format(formatter);
+LocalDate parseado = LocalDate.parse("15/03/1990", formatter);`} lang="java" />
+
+### 53. ¿Qué novedades trajo Java 9?
+
+<Code code={`// Módulos (Project Jigsaw)
+module mi.modulo {
+    requires java.sql;
+    exports com.mi.paquete;
+}
+
+// Factory methods para colecciones
+List<String> lista = List.of("a", "b", "c");
+Set<Integer> set = Set.of(1, 2, 3);
+Map<String, Integer> mapa = Map.of("uno", 1, "dos", 2);
+
+// Stream improvements
+Stream.ofNullable(posibleNull);
+stream.takeWhile(n -> n < 5);
+stream.dropWhile(n -> n < 5);
+
+// Optional improvements
+optional.ifPresentOrElse(
+    valor -> System.out.println(valor),
+    () -> System.out.println("Vacío")
+);
+optional.or(() -> Optional.of("default"));
+optional.stream();
+
+// Private methods en interfaces
+interface MiInterface {
+    private void metodoPrivado() {}
+}`} lang="java" />
+
+### 54. ¿Qué novedades trajo Java 10?
+
+<Code code={`// var - inferencia de tipos local
+var lista = new ArrayList<String>(); // ArrayList<String>
+var mapa = Map.of("a", 1);           // Map<String, Integer>
+
+// Solo para variables locales con inicializador
+// NO para campos, parámetros o return types
+
+// copyOf para colecciones inmutables
+List<String> copia = List.copyOf(listaOriginal);`} lang="java" />
+
+### 55. ¿Qué novedades trajo Java 11?
+
+<Code code={`// var en lambdas
+BiFunction<String, String, String> concat = 
+    (var a, var b) -> a + b;
+
+// Nuevos métodos de String
+"  hola  ".strip();        // "hola" (mejor que trim)
+"  hola  ".stripLeading(); // "hola  "
+"  hola  ".stripTrailing();// "  hola"
+"".isBlank();              // true
+"hola\nmundo".lines();     // Stream<String>
+"ab".repeat(3);            // "ababab"
+
+// HTTP Client (estándar)
+HttpClient client = HttpClient.newHttpClient();
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("https://api.example.com"))
+    .build();
+HttpResponse<String> response = client.send(
+    request, HttpResponse.BodyHandlers.ofString()
+);
+
+// Files
+String contenido = Files.readString(Path.of("archivo.txt"));
+Files.writeString(Path.of("archivo.txt"), "contenido");`} lang="java" />
+
+### 56. ¿Qué novedades trajo Java 14-17?
+
+<Code code={`// Records (Java 14 preview, 16 final)
+public record Persona(String nombre, int edad) {}
+// Genera: constructor, getters, equals, hashCode, toString
+
+// Pattern Matching para instanceof (Java 14 preview, 16 final)
+if (obj instanceof String s) {
+    System.out.println(s.length());
+}
+
+// Switch expressions (Java 14)
+String resultado = switch (dia) {
+    case LUNES, MARTES -> "Inicio de semana";
+    case MIERCOLES -> "Mitad de semana";
+    case JUEVES, VIERNES -> "Fin de semana laboral";
+    default -> "Fin de semana";
+};
+
+// Text blocks (Java 15)
+String json = """
+    {
+        "nombre": "Juan",
+        "edad": 25
+    }
+    """;
+
+// Sealed classes (Java 17)
+public sealed class Figura permits Circulo, Rectangulo, Triangulo {}
+public final class Circulo extends Figura {}
+public non-sealed class Rectangulo extends Figura {}`} lang="java" />
+
+### 57. ¿Qué novedades trajo Java 21?
+
+<Code code={`// Virtual Threads (Project Loom)
+Thread.startVirtualThread(() -> {
+    System.out.println("Virtual thread");
+});
+
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    executor.submit(() -> hacerTarea());
+}
+
+// Pattern Matching para switch
+String resultado = switch (obj) {
+    case Integer i -> "Entero: " + i;
+    case String s -> "String: " + s;
+    case null -> "Nulo";
+    default -> "Otro";
+};
+
+// Record Patterns
+record Point(int x, int y) {}
+if (obj instanceof Point(int x, int y)) {
+    System.out.println(x + ", " + y);
+}
+
+// Sequenced Collections
+SequencedCollection<String> seq = new LinkedHashSet<>();
+seq.addFirst("primero");
+seq.addLast("último");
+seq.getFirst();
+seq.getLast();
+seq.reversed();`} lang="java" />
+
+### 58. ¿Qué son los Virtual Threads?
+
+<Code code={`// Virtual Threads - threads ligeros (Project Loom)
+// Pueden crear millones sin problema
+
+// Crear virtual thread
+Thread vThread = Thread.ofVirtual().start(() -> {
+    System.out.println("Virtual thread");
+});
+
+// Con ExecutorService
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    IntStream.range(0, 10000).forEach(i -> {
+        executor.submit(() -> {
+            Thread.sleep(Duration.ofSeconds(1));
+            return i;
+        });
+    });
+}
+
+// Diferencias con Platform Threads:
+// - Muy ligeros (KB vs MB)
+// - Gestionados por JVM, no por OS
+// - Ideales para I/O blocking
+// - No usar para CPU-intensive`} lang="java" />
+
+### 59. ¿Qué es un Record?
+
+<Code code={`// Record - clase inmutable para datos
+public record Persona(String nombre, int edad) {
+    // Constructor compacto para validación
+    public Persona {
+        if (edad < 0) {
+            throw new IllegalArgumentException("Edad negativa");
+        }
+        nombre = nombre.trim();
+    }
+    
+    // Métodos adicionales
+    public String nombreMayusculas() {
+        return nombre.toUpperCase();
+    }
+    
+    // Constructor adicional
+    public Persona(String nombre) {
+        this(nombre, 0);
+    }
+}
+
+// Uso
+Persona p = new Persona("Juan", 25);
+String nombre = p.nombre(); // getter
+int edad = p.edad();
+
+// Automáticamente tiene:
+// - Constructor con todos los campos
+// - Getters (nombre(), edad())
+// - equals() y hashCode()
+// - toString()`} lang="java" />
+
+### 60. ¿Qué son las Sealed Classes?
+
+<Code code={`// Sealed class - restringe qué clases pueden heredar
+public sealed class Figura 
+    permits Circulo, Rectangulo, Triangulo {
+}
+
+// Subclases deben ser: final, sealed, o non-sealed
+public final class Circulo extends Figura {
+    private double radio;
+}
+
+public sealed class Rectangulo extends Figura 
+    permits Cuadrado {
+}
+
+public final class Cuadrado extends Rectangulo {}
+
+public non-sealed class Triangulo extends Figura {
+    // Cualquiera puede heredar de Triangulo
+}
+
+// Útil para pattern matching exhaustivo
+double area = switch (figura) {
+    case Circulo c -> Math.PI * c.getRadio() * c.getRadio();
+    case Rectangulo r -> r.getAncho() * r.getAlto();
+    case Triangulo t -> t.getBase() * t.getAltura() / 2;
+    // No necesita default - es exhaustivo
+};`} lang="java" />
+
+### 61. ¿Qué es Pattern Matching?
+
+<Code code={`// Pattern Matching para instanceof
+Object obj = "Hola";
+
+// Antes
+if (obj instanceof String) {
+    String s = (String) obj;
+    System.out.println(s.length());
+}
+
+// Ahora
+if (obj instanceof String s) {
+    System.out.println(s.length());
+}
+
+// Pattern Matching en switch
+String resultado = switch (obj) {
+    case Integer i when i > 0 -> "Positivo: " + i;
+    case Integer i -> "No positivo: " + i;
+    case String s when s.length() > 5 -> "String largo";
+    case String s -> "String corto: " + s;
+    case null -> "Nulo";
+    default -> "Otro tipo";
+};
+
+// Record Patterns
+record Point(int x, int y) {}
+record Line(Point start, Point end) {}
+
+void procesar(Object obj) {
+    if (obj instanceof Line(Point(var x1, var y1), Point(var x2, var y2))) {
+        System.out.println("Línea de (" + x1 + "," + y1 + ") a (" + x2 + "," + y2 + ")");
+    }
+}`} lang="java" />
+
+### 62. ¿Qué son los Text Blocks?
+
+<Code code={`// Text Blocks - strings multilínea
+String json = """
+    {
+        "nombre": "Juan",
+        "edad": 25,
+        "activo": true
+    }
+    """;
+
+String html = """
+    <html>
+        <body>
+            <h1>Título</h1>
+        </body>
+    </html>
+    """;
+
+// Caracteres de escape
+String conComillas = """
+    Él dijo: "Hola"
+    """;
+
+// Interpolación (no nativa, usar formatted)
+String nombre = "Juan";
+String saludo = """
+    Hola, %s!
+    Bienvenido.
+    """.formatted(nombre);`} lang="java" />
+
+### 63. ¿Qué son las Switch Expressions?
+
+<Code code={`// Switch tradicional (statement)
+String tipo;
+switch (dia) {
+    case LUNES:
+    case MARTES:
+        tipo = "Inicio";
+        break;
+    default:
+        tipo = "Otro";
+}
+
+// Switch expression (Java 14+)
+String tipo = switch (dia) {
+    case LUNES, MARTES -> "Inicio";
+    case MIERCOLES -> "Mitad";
+    case JUEVES, VIERNES -> "Fin laboral";
+    case SABADO, DOMINGO -> "Fin de semana";
+};
+
+// Con yield para bloques
+String descripcion = switch (dia) {
+    case LUNES -> {
+        System.out.println("Procesando lunes");
+        yield "Primer día";
+    }
+    default -> "Otro día";
+};`} lang="java" />
+
+### 64. ¿Qué es el Garbage Collector G1?
+
+<Code code={`// G1 GC - Garbage First (default desde Java 9)
+// Divide el heap en regiones de igual tamaño
+
+// Características:
+// - Pausas predecibles
+// - Compactación concurrente
+// - Ideal para heaps grandes (>4GB)
+
+// Configuración
+// -XX:+UseG1GC (default)
+// -XX:MaxGCPauseMillis=200
+// -XX:G1HeapRegionSize=16m
+
+// Otros GCs disponibles:
+// - ZGC: Ultra-low latency (<1ms pausas)
+//   -XX:+UseZGC
+// - Shenandoah: Low-pause
+//   -XX:+UseShenandoahGC
+// - Parallel GC: Throughput
+//   -XX:+UseParallelGC`} lang="java" />
+
+### 65. ¿Qué es el JIT Compiler?
+
+El **Just-In-Time Compiler** compila bytecode a código nativo en tiempo de ejecución para mejorar performance.
+
+- **C1 (Client)**: Compilación rápida, menos optimizaciones
+- **C2 (Server)**: Compilación lenta, más optimizaciones
+- **Tiered Compilation**: Usa ambos (default)
+
+<Code code={`// Ver compilación JIT
+// -XX:+PrintCompilation
+
+// GraalVM - JIT alternativo más avanzado
+// Ahead-of-Time compilation con native-image`} lang="java" />
+
+---
+
+## Patrones de Diseño (66-80)
+
+### 66. ¿Qué es el patrón Factory?
+
+<Code code={`// Factory Method
+public interface Animal {
+    void hablar();
+}
+
+public class Perro implements Animal {
+    public void hablar() { System.out.println("Guau"); }
+}
+
+public class Gato implements Animal {
+    public void hablar() { System.out.println("Miau"); }
+}
+
+public class AnimalFactory {
+    public static Animal crear(String tipo) {
+        return switch (tipo.toLowerCase()) {
+            case "perro" -> new Perro();
+            case "gato" -> new Gato();
+            default -> throw new IllegalArgumentException("Tipo desconocido");
+        };
+    }
+}
+
+// Uso
+Animal animal = AnimalFactory.crear("perro");`} lang="java" />
+
+### 67. ¿Qué es el patrón Builder?
+
+<Code code={`public class Persona {
+    private final String nombre;
+    private final int edad;
+    private final String email;
+    private final String telefono;
+    
+    private Persona(Builder builder) {
+        this.nombre = builder.nombre;
+        this.edad = builder.edad;
+        this.email = builder.email;
+        this.telefono = builder.telefono;
+    }
+    
+    public static class Builder {
+        private String nombre;
+        private int edad;
+        private String email;
+        private String telefono;
+        
+        public Builder nombre(String nombre) {
+            this.nombre = nombre;
+            return this;
+        }
+        
+        public Builder edad(int edad) {
+            this.edad = edad;
+            return this;
+        }
+        
+        public Builder email(String email) {
+            this.email = email;
+            return this;
+        }
+        
+        public Builder telefono(String telefono) {
+            this.telefono = telefono;
+            return this;
+        }
+        
+        public Persona build() {
+            return new Persona(this);
+        }
+    }
+}
+
+// Uso
+Persona persona = new Persona.Builder()
+    .nombre("Juan")
+    .edad(25)
+    .email("juan@email.com")
+    .build();`} lang="java" />
+
+### 68. ¿Qué es el patrón Observer?
+
+<Code code={`import java.util.*;
+
+// Subject
+public class EventoNotificador {
+    private List<Observador> observadores = new ArrayList<>();
+    
+    public void agregar(Observador o) {
+        observadores.add(o);
+    }
+    
+    public void remover(Observador o) {
+        observadores.remove(o);
+    }
+    
+    public void notificar(String evento) {
+        for (Observador o : observadores) {
+            o.actualizar(evento);
+        }
+    }
+}
+
+// Observer
+public interface Observador {
+    void actualizar(String evento);
+}
+
+public class EmailObservador implements Observador {
+    @Override
+    public void actualizar(String evento) {
+        System.out.println("Email: " + evento);
+    }
+}
+
+// Uso
+EventoNotificador notificador = new EventoNotificador();
+notificador.agregar(new EmailObservador());
+notificador.notificar("Nuevo pedido");`} lang="java" />
+
+### 69. ¿Qué es el patrón Strategy?
+
+<Code code={`// Strategy interface
+public interface EstrategiaPago {
+    void pagar(double monto);
+}
+
+// Estrategias concretas
+public class PagoTarjeta implements EstrategiaPago {
+    @Override
+    public void pagar(double monto) {
+        System.out.println("Pagando $" + monto + " con tarjeta");
+    }
+}
+
+public class PagoPayPal implements EstrategiaPago {
+    @Override
+    public void pagar(double monto) {
+        System.out.println("Pagando $" + monto + " con PayPal");
+    }
+}
+
+// Context
+public class CarritoCompras {
+    private EstrategiaPago estrategia;
+    
+    public void setEstrategia(EstrategiaPago estrategia) {
+        this.estrategia = estrategia;
+    }
+    
+    public void checkout(double monto) {
+        estrategia.pagar(monto);
+    }
+}
+
+// Uso
+CarritoCompras carrito = new CarritoCompras();
+carrito.setEstrategia(new PagoTarjeta());
+carrito.checkout(100.0);`} lang="java" />
+
+### 70. ¿Qué es el patrón Decorator?
+
+<Code code={`// Component
+public interface Cafe {
+    double getCosto();
+    String getDescripcion();
+}
+
+// Concrete Component
+public class CafeSimple implements Cafe {
+    public double getCosto() { return 1.0; }
+    public String getDescripcion() { return "Café"; }
+}
+
+// Decorator
+public abstract class CafeDecorator implements Cafe {
+    protected Cafe cafe;
+    
+    public CafeDecorator(Cafe cafe) {
+        this.cafe = cafe;
+    }
+}
+
+// Concrete Decorators
+public class ConLeche extends CafeDecorator {
+    public ConLeche(Cafe cafe) { super(cafe); }
+    
+    public double getCosto() { return cafe.getCosto() + 0.5; }
+    public String getDescripcion() { return cafe.getDescripcion() + " + Leche"; }
+}
+
+public class ConAzucar extends CafeDecorator {
+    public ConAzucar(Cafe cafe) { super(cafe); }
+    
+    public double getCosto() { return cafe.getCosto() + 0.2; }
+    public String getDescripcion() { return cafe.getDescripcion() + " + Azúcar"; }
+}
+
+// Uso
+Cafe cafe = new ConAzucar(new ConLeche(new CafeSimple()));
+System.out.println(cafe.getDescripcion()); // Café + Leche + Azúcar
+System.out.println(cafe.getCosto());       // 1.7`} lang="java" />
+
+### 71. ¿Qué es el patrón Adapter?
+
+<Code code={`// Target interface
+public interface MediaPlayer {
+    void play(String filename);
+}
+
+// Adaptee (clase existente con interfaz incompatible)
+public class VlcPlayer {
+    public void playVlc(String filename) {
+        System.out.println("Playing VLC: " + filename);
+    }
+}
+
+// Adapter
+public class VlcAdapter implements MediaPlayer {
+    private VlcPlayer vlcPlayer;
+    
+    public VlcAdapter() {
+        this.vlcPlayer = new VlcPlayer();
+    }
+    
+    @Override
+    public void play(String filename) {
+        vlcPlayer.playVlc(filename);
+    }
+}
+
+// Uso
+MediaPlayer player = new VlcAdapter();
+player.play("video.vlc");`} lang="java" />
+
+### 72. ¿Qué es el patrón Proxy?
+
+<Code code={`// Subject
+public interface Imagen {
+    void mostrar();
+}
+
+// Real Subject
+public class ImagenReal implements Imagen {
+    private String archivo;
+    
+    public ImagenReal(String archivo) {
+        this.archivo = archivo;
+        cargarDesdeDisc();
+    }
+    
+    private void cargarDesdeDisc() {
+        System.out.println("Cargando " + archivo);
+    }
+    
+    @Override
+    public void mostrar() {
+        System.out.println("Mostrando " + archivo);
+    }
+}
+
+// Proxy
+public class ImagenProxy implements Imagen {
+    private ImagenReal imagenReal;
+    private String archivo;
+    
+    public ImagenProxy(String archivo) {
+        this.archivo = archivo;
+    }
+    
+    @Override
+    public void mostrar() {
+        if (imagenReal == null) {
+            imagenReal = new ImagenReal(archivo); // Lazy loading
+        }
+        imagenReal.mostrar();
+    }
+}`} lang="java" />
+
+### 73. ¿Qué es el patrón Template Method?
+
+<Code code={`// Abstract class con template method
+public abstract class Bebida {
+    // Template method
+    public final void preparar() {
+        hervirAgua();
+        agregarIngrediente();
+        servir();
+        if (clienteQuiereCondimentos()) {
+            agregarCondimentos();
+        }
+    }
+    
+    private void hervirAgua() {
+        System.out.println("Hirviendo agua");
+    }
+    
+    protected abstract void agregarIngrediente();
+    
+    private void servir() {
+        System.out.println("Sirviendo en taza");
+    }
+    
+    protected abstract void agregarCondimentos();
+    
+    // Hook method
+    protected boolean clienteQuiereCondimentos() {
+        return true;
+    }
+}
+
+public class Cafe extends Bebida {
+    @Override
+    protected void agregarIngrediente() {
+        System.out.println("Agregando café");
+    }
+    
+    @Override
+    protected void agregarCondimentos() {
+        System.out.println("Agregando azúcar y leche");
+    }
+}`} lang="java" />
+
+### 74. ¿Qué es el patrón Command?
+
+<Code code={`// Command interface
+public interface Comando {
+    void ejecutar();
+    void deshacer();
+}
+
+// Receiver
+public class Luz {
+    public void encender() { System.out.println("Luz encendida"); }
+    public void apagar() { System.out.println("Luz apagada"); }
+}
+
+// Concrete Command
+public class EncenderLuzComando implements Comando {
+    private Luz luz;
+    
+    public EncenderLuzComando(Luz luz) {
+        this.luz = luz;
+    }
+    
+    @Override
+    public void ejecutar() { luz.encender(); }
+    
+    @Override
+    public void deshacer() { luz.apagar(); }
+}
+
+// Invoker
+public class Control {
+    private Comando comando;
+    
+    public void setComando(Comando comando) {
+        this.comando = comando;
+    }
+    
+    public void presionarBoton() {
+        comando.ejecutar();
+    }
+}`} lang="java" />
+
+### 75. ¿Qué es el patrón State?
+
+<Code code={`// State interface
+public interface Estado {
+    void insertar();
+    void expulsar();
+    void dispensar();
+}
+
+// Context
+public class MaquinaExpendedora {
+    private Estado estado;
+    
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
+    
+    public void insertar() { estado.insertar(); }
+    public void expulsar() { estado.expulsar(); }
+    public void dispensar() { estado.dispensar(); }
+}
+
+// Concrete States
+public class SinMoneda implements Estado {
+    private MaquinaExpendedora maquina;
+    
+    @Override
+    public void insertar() {
+        System.out.println("Moneda insertada");
+        maquina.setEstado(new ConMoneda(maquina));
+    }
+    
+    @Override
+    public void expulsar() {
+        System.out.println("No hay moneda");
+    }
+    
+    @Override
+    public void dispensar() {
+        System.out.println("Inserte moneda primero");
+    }
+}`} lang="java" />
+
+### 76. ¿Qué es Dependency Injection?
+
+<Code code={`// Sin DI (acoplado)
+public class ServicioUsuario {
+    private RepositorioUsuario repo = new RepositorioUsuarioImpl();
+}
+
+// Con DI (desacoplado)
+public class ServicioUsuario {
+    private final RepositorioUsuario repo;
+    
+    // Constructor injection (preferido)
+    public ServicioUsuario(RepositorioUsuario repo) {
+        this.repo = repo;
+    }
+}
+
+// Setter injection
+public class ServicioUsuario {
+    private RepositorioUsuario repo;
+    
+    public void setRepo(RepositorioUsuario repo) {
+        this.repo = repo;
+    }
+}
+
+// Uso
+RepositorioUsuario repo = new RepositorioUsuarioImpl();
+ServicioUsuario servicio = new ServicioUsuario(repo);`} lang="java" />
+
+### 77. ¿Qué es el principio SOLID?
+
+| Principio | Descripción |
+|-----------|-------------|
+| **S**ingle Responsibility | Una clase, una responsabilidad |
+| **O**pen/Closed | Abierto para extensión, cerrado para modificación |
+| **L**iskov Substitution | Subtipos deben ser sustituibles por sus tipos base |
+| **I**nterface Segregation | Interfaces específicas mejor que una general |
+| **D**ependency Inversion | Depender de abstracciones, no de implementaciones |
+
+### 78. ¿Qué es el patrón Repository?
+
+<Code code={`// Repository interface
+public interface UsuarioRepository {
+    Optional<Usuario> findById(Long id);
+    List<Usuario> findAll();
+    Usuario save(Usuario usuario);
+    void delete(Long id);
+    List<Usuario> findByNombre(String nombre);
+}
+
+// Implementation
+public class UsuarioRepositoryImpl implements UsuarioRepository {
+    private EntityManager em;
+    
+    @Override
+    public Optional<Usuario> findById(Long id) {
+        return Optional.ofNullable(em.find(Usuario.class, id));
+    }
+    
+    @Override
+    public List<Usuario> findAll() {
+        return em.createQuery("SELECT u FROM Usuario u", Usuario.class)
+                 .getResultList();
+    }
+    
+    @Override
+    public Usuario save(Usuario usuario) {
+        if (usuario.getId() == null) {
+            em.persist(usuario);
+        } else {
+            usuario = em.merge(usuario);
+        }
+        return usuario;
+    }
+}`} lang="java" />
+
+### 79. ¿Qué es el patrón Service Layer?
+
+<Code code={`// Service layer - lógica de negocio
+@Service
+public class UsuarioService {
+    private final UsuarioRepository repository;
+    private final EmailService emailService;
+    
+    public UsuarioService(UsuarioRepository repository, EmailService emailService) {
+        this.repository = repository;
+        this.emailService = emailService;
+    }
+    
+    @Transactional
+    public Usuario registrar(UsuarioDTO dto) {
+        // Validaciones de negocio
+        if (repository.existsByEmail(dto.getEmail())) {
+            throw new EmailDuplicadoException();
+        }
+        
+        // Crear usuario
+        Usuario usuario = new Usuario();
+        usuario.setNombre(dto.getNombre());
+        usuario.setEmail(dto.getEmail());
+        usuario.setPassword(encriptar(dto.getPassword()));
+        
+        // Guardar
+        usuario = repository.save(usuario);
+        
+        // Enviar email de bienvenida
+        emailService.enviarBienvenida(usuario);
+        
+        return usuario;
+    }
+}`} lang="java" />
+
+### 80. ¿Qué es el patrón DTO?
+
+<Code code={`// DTO - Data Transfer Object
+public class UsuarioDTO {
+    private String nombre;
+    private String email;
+    // Sin password ni datos sensibles
+    
+    // Getters y setters
+}
+
+// Record como DTO (Java 16+)
+public record UsuarioDTO(String nombre, String email) {}
+
+// Mapper
+public class UsuarioMapper {
+    public static UsuarioDTO toDTO(Usuario usuario) {
+        return new UsuarioDTO(
+            usuario.getNombre(),
+            usuario.getEmail()
+        );
+    }
+    
+    public static Usuario toEntity(UsuarioDTO dto) {
+        Usuario usuario = new Usuario();
+        usuario.setNombre(dto.nombre());
+        usuario.setEmail(dto.email());
+        return usuario;
+    }
+}`} lang="java" />
+
+---
+
+## Testing y Buenas Prácticas (81-90)
+
+### 81. ¿Qué es JUnit 5?
+
+<Code code={`import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+class CalculadoraTest {
+    private Calculadora calc;
+    
+    @BeforeEach
+    void setUp() {
+        calc = new Calculadora();
+    }
+    
+    @Test
+    @DisplayName("Suma de dos números positivos")
+    void testSumar() {
+        assertEquals(5, calc.sumar(2, 3));
+    }
+    
+    @Test
+    void testDividirPorCero() {
+        assertThrows(ArithmeticException.class, () -> calc.dividir(1, 0));
+    }
+    
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 3, 4, 5})
+    void testEsPositivo(int numero) {
+        assertTrue(calc.esPositivo(numero));
+    }
+    
+    @RepeatedTest(5)
+    void testRepetido() {
+        assertNotNull(calc);
+    }
+}`} lang="java" />
+
+### 82. ¿Qué es Mockito?
+
+<Code code={`import static org.mockito.Mockito.*;
+
+class UsuarioServiceTest {
+    @Mock
+    private UsuarioRepository repository;
+    
+    @InjectMocks
+    private UsuarioService service;
+    
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+    
+    @Test
+    void testBuscarUsuario() {
+        // Arrange
+        Usuario usuario = new Usuario(1L, "Juan");
+        when(repository.findById(1L)).thenReturn(Optional.of(usuario));
+        
+        // Act
+        Usuario resultado = service.buscar(1L);
+        
+        // Assert
+        assertEquals("Juan", resultado.getNombre());
+        verify(repository, times(1)).findById(1L);
+    }
+    
+    @Test
+    void testGuardarUsuario() {
+        Usuario usuario = new Usuario(null, "Ana");
+        when(repository.save(any(Usuario.class))).thenReturn(new Usuario(1L, "Ana"));
+        
+        Usuario guardado = service.guardar(usuario);
+        
+        assertNotNull(guardado.getId());
+        verify(repository).save(usuario);
+    }
+}`} lang="java" />
+
+### 83. ¿Qué es TDD?
+
+**Test-Driven Development** - escribir tests antes del código:
+
+1. **Red**: Escribir test que falla
+2. **Green**: Escribir código mínimo para pasar
+3. **Refactor**: Mejorar código manteniendo tests verdes
+
+### 84. ¿Qué es BDD?
+
+**Behavior-Driven Development** - tests en lenguaje natural:
+
+<Code code={`// Con Cucumber
+Feature: Login de usuario
+
+Scenario: Login exitoso
+  Given un usuario registrado con email "juan@test.com"
+  When ingresa su password correcto
+  Then debe ver el dashboard
+
+// Step definitions
+@Given("un usuario registrado con email {string}")
+public void usuarioRegistrado(String email) {
+    usuario = new Usuario(email);
+}
+
+@When("ingresa su password correcto")
+public void ingresaPassword() {
+    resultado = loginService.login(usuario, "password");
+}
+
+@Then("debe ver el dashboard")
+public void verDashboard() {
+    assertTrue(resultado.isExitoso());
+}`} lang="java" />
+
+### 85. ¿Qué es Code Coverage?
+
+Porcentaje de código ejecutado por tests. Herramientas: JaCoCo, Cobertura.
+
+<Code code={`// Maven con JaCoCo
+<plugin>
+    <groupId>org.jacoco</groupId>
+    <artifactId>jacoco-maven-plugin</artifactId>
+    <version>0.8.8</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>prepare-agent</goal>
+            </goals>
+        </execution>
+        <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+                <goal>report</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>`} lang="xml" />
+
+### 86. ¿Qué son las anotaciones de validación?
+
+<Code code={`import jakarta.validation.constraints.*;
+
+public class UsuarioDTO {
+    @NotNull(message = "Nombre requerido")
+    @Size(min = 2, max = 50)
+    private String nombre;
+    
+    @Email(message = "Email inválido")
+    @NotBlank
+    private String email;
+    
+    @Min(18)
+    @Max(120)
+    private int edad;
+    
+    @Pattern(regexp = "^[0-9]{9}$")
+    private String telefono;
+    
+    @Past
+    private LocalDate fechaNacimiento;
+}`} lang="java" />
+
+### 87. ¿Qué es logging en Java?
+
+<Code code={`import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class MiServicio {
+    private static final Logger log = LoggerFactory.getLogger(MiServicio.class);
+    
+    public void procesar() {
+        log.debug("Iniciando proceso");
+        log.info("Procesando datos");
+        log.warn("Advertencia: datos incompletos");
+        log.error("Error al procesar", exception);
+    }
+}
+
+// logback.xml
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>`} lang="java" />
+
+### 88. ¿Qué es Maven vs Gradle?
+
+| Maven | Gradle |
+|-------|--------|
+| XML (pom.xml) | Groovy/Kotlin (build.gradle) |
+| Convención sobre configuración | Más flexible |
+| Más verboso | Más conciso |
+| Más lento | Más rápido (incremental) |
+
+<Code code={`// Maven pom.xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <version>3.2.0</version>
+</dependency>
+
+// Gradle build.gradle
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.2.0'
+}`} lang="groovy" />
+
+### 89. ¿Qué es Docker con Java?
+
+<Code code={`# Dockerfile
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY target/mi-app.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Multi-stage build
+FROM eclipse-temurin:21-jdk-alpine AS build
+WORKDIR /app
+COPY . .
+RUN ./mvnw package -DskipTests
+
+FROM eclipse-temurin:21-jre-alpine
+COPY --from=build /app/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]`} lang="dockerfile" />
+
+### 90. ¿Cuáles son las mejores prácticas de Java?
+
+1. **Usar tipos inmutables cuando sea posible**
+2. **Preferir composición sobre herencia**
+3. **Programar contra interfaces**
+4. **Usar Optional en vez de null**
+5. **Cerrar recursos con try-with-resources**
+6. **Usar constantes en vez de magic numbers**
+7. **Seguir convenciones de nombres**
+8. **Documentar código público con Javadoc**
+9. **Escribir tests unitarios**
+10. **Usar logging en vez de System.out**
+
+---
+
+## Preguntas de Arquitectura (91-100)
+
+### 91. ¿Qué es una arquitectura de microservicios?
+
+Aplicación dividida en servicios pequeños, independientes, que se comunican por red (REST, mensajería).
+
+### 92. ¿Qué es un API Gateway?
+
+Punto de entrada único para microservicios. Maneja: routing, autenticación, rate limiting, load balancing.
+
+### 93. ¿Qué es Circuit Breaker?
+
+Patrón que previene cascada de fallos. Estados: Closed, Open, Half-Open.
+
+### 94. ¿Qué es Event Sourcing?
+
+Almacenar cambios como eventos en vez de estado actual. Permite reconstruir estado y auditoría.
+
+### 95. ¿Qué es CQRS?
+
+Command Query Responsibility Segregation - separar operaciones de lectura y escritura.
+
+### 96. ¿Qué es un Message Broker?
+
+Sistema de mensajería asíncrona (Kafka, RabbitMQ). Desacopla servicios.
+
+### 97. ¿Qué es una base de datos NoSQL?
+
+Bases de datos no relacionales: Document (MongoDB), Key-Value (Redis), Column (Cassandra), Graph (Neo4j).
+
+### 98. ¿Qué es caching?
+
+Almacenar datos frecuentes en memoria rápida (Redis, Caffeine). Reduce latencia y carga de BD.
+
+### 99. ¿Qué es un load balancer?
+
+Distribuye tráfico entre múltiples instancias. Tipos: Round Robin, Least Connections, IP Hash.
+
+### 100. ¿Qué es observabilidad?
+
+Capacidad de entender el estado interno del sistema: Logs, Métricas, Traces (OpenTelemetry, Prometheus, Grafana).
+
+---
+
+<Aside type="tip" title="Felicitaciones">
+Has completado las 100 preguntas de Java. Practica escribiendo código y explicando estos conceptos para dominar las entrevistas.
+</Aside>

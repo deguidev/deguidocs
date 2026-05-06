@@ -36,22 +36,60 @@ export default defineConfig({
 			],
 			sidebar: [
 				{
-					label: '🏠 Inicio',
+					label: 'Inicio',
 					items: [
 						{ label: 'Bienvenida', link: '/' },
 					],
 				},
 				{
-					label: '📖 Guías',
-					link: '/guides/'
-				},
-
-				{
-					label: '💾 Base de datos',
+					label: 'Entrevistas Laborales',
 					collapsed: false,
 					items: [
 						{
-							label: 'Oracle ❤️',
+							label: 'JavaScript',
+							collapsed: true,
+							items: [
+								{ label: 'Top 10 Preguntas Esenciales', link: '/entrevistas/javascript/top-10/' },
+								{ label: 'Top 50 Preguntas Frecuentes', link: '/entrevistas/javascript/top-50/' },
+								{ label: 'Top 100 Preguntas Completas', link: '/entrevistas/javascript/top-100/' },
+							]
+						},
+						{
+							label: 'React',
+							collapsed: true,
+							items: [
+								{ label: 'Top 10 Preguntas Esenciales', link: '/entrevistas/react/top-10/' },
+								{ label: 'Top 50 Preguntas Frecuentes', link: '/entrevistas/react/top-50/' },
+								{ label: 'Top 100 Preguntas Completas', link: '/entrevistas/react/top-100/' },
+							]
+						},
+						{
+							label: 'Java',
+							collapsed: true,
+							items: [
+								{ label: 'Top 10 Preguntas Esenciales', link: '/entrevistas/java/top-10/' },
+								{ label: 'Top 50 Preguntas Frecuentes', link: '/entrevistas/java/top-50/' },
+								{ label: 'Top 100 Preguntas Completas', link: '/entrevistas/java/top-100/' },
+							]
+						},
+						{
+							label: 'Spring',
+							collapsed: true,
+							items: [
+								{ label: 'Top 10 Preguntas Esenciales', link: '/entrevistas/spring/top-10/' },
+								{ label: 'Top 50 Preguntas Frecuentes', link: '/entrevistas/spring/top-50/' },
+								{ label: 'Top 100 Preguntas Completas', link: '/entrevistas/spring/top-100/' },
+							]
+						},
+					]
+				},
+
+				{
+					label: 'Base de datos',
+					collapsed: false,
+					items: [
+						{
+							label: 'Oracle',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Oracle', link: '/db/oracle/introduccion/' },
@@ -69,18 +107,18 @@ export default defineConfig({
 							]
 						},
 						{
-							label: 'MySQL 🤗',
+							label: 'MySQL',
 							collapsed: true,
 							items: []
 						}
 					]
 				},
 				{
-					label: '🔄 Control de Versiones',
+					label: 'Control de Versiones',
 					collapsed: true,
 					items: [
 						{
-							label: '🐈 GitHub ',
+							label: 'GitHub',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Git y GitHub', link: '/guides/git-github/introduccion-git-github/' },
@@ -96,11 +134,11 @@ export default defineConfig({
 				},
 
 				{
-					label: '💻 Lenguajes de Programación',
-					collapsed: false,
+					label: 'Lenguajes de Programación',
+					collapsed: true,
 					items: [
 						{
-							label: '📂 SQL',
+							label: 'SQL',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a SQL', link: '/lenguajes/sql/introduccion/' },
@@ -114,7 +152,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🐘 PHP',
+							label: 'PHP',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a PHP', link: '/lenguajes/php/introduccion/' },
@@ -133,7 +171,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '☕ Java',
+							label: 'Java',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Java', link: '/lenguajes/java/introduccion/' },
@@ -150,7 +188,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🐍 Python',
+							label: 'Python',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Python', link: '/lenguajes/python/introduccion/' },
@@ -167,7 +205,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🐛 HTML',
+							label: 'HTML',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a HTML', link: '/lenguajes/html/introduction/' },
@@ -183,7 +221,7 @@ export default defineConfig({
 							],
 						},
 						{
-							label: '🐌 CSS',
+							label: 'CSS',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a CSS', link: '/lenguajes/css/introduccion/' },
@@ -200,7 +238,7 @@ export default defineConfig({
 							],
 						},
 						{
-							label: '🌟 JavaScript',
+							label: 'JavaScript',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a JavaScript', link: '/lenguajes/javascript/introduction/' },
@@ -228,11 +266,11 @@ export default defineConfig({
 					],
 				},
 				{
-					label: '🎨 Frameworks Frontend',
-					collapsed: false,
+					label: 'Frameworks Frontend',
+					collapsed: true,
 					items: [
 						{
-						label: '⚛️ React',
+						label: 'React',
 						collapsed: true,
 						items: [
 							{ label: '01. Introducción a React', link: '/frameworks/react/introduccion/' },
@@ -254,7 +292,7 @@ export default defineConfig({
 						]
 					},
 					{
-						label: "☕ Astro",
+						label: 'Astro',
 							collapsed: true,
 							items: [
 								{ label: "01. Introducción a Astro", link: "/frameworks/astro/01-introduccion/" },
@@ -272,7 +310,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🐊 Vue 3',
+							label: 'Vue 3',
 							collapsed: true,
 							items: [
 								{ label: '01. Introducción a Vue 3', link: '/frameworks/vue/introduction/' },
@@ -296,7 +334,7 @@ export default defineConfig({
 							],
 						},
 						{
-							label: '🙂 Java Swing',
+							label: 'Java Swing',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Java y Java Swing', link: '/frameworks/java-swing/introduccion/' },
@@ -308,7 +346,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🦉 Alpine.js',
+							label: 'Alpine.js',
 							collapsed: true,
 							items: [
 								{ label: '01. Introducción a Alpine.js', link: '/guides/alpine/introduction/' },
@@ -326,11 +364,11 @@ export default defineConfig({
 					],
 				},
 				{
-					label: '⚙️ Frameworks Backend',
-					collapsed: false,
+					label: 'Frameworks Backend',
+					collapsed: true,
 					items: [
 						{
-							label: '🐦 Laravel',
+							label: 'Laravel',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Laravel', link: '/guides/laravel/introduction/' },
@@ -353,7 +391,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🐳 Inertia',
+							label: 'Inertia',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción a Inertia.js', link: '/guides/inertia/introduction/' },
@@ -371,7 +409,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '⚡ FastAPI',
+							label: 'FastAPI',
 							collapsed: true,
 							items: [
 								{ label: '01. Introducción a FastAPI', link: '/frameworks/fastapi/introduccion/' },
@@ -388,7 +426,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🍀 Java Spring',
+							label: 'Java Spring',
 							collapsed: true,
 							items: [
 								{ label: '01. Introducción al Ecosistema Spring', link: '/frameworks/spring/introduccion/' },
@@ -422,11 +460,11 @@ export default defineConfig({
 					],
 				},
 				{
-					label: '🐞 UML',
+					label: 'UML',
 					collapsed: true,
 					items: [
 						{
-							label: '🦉 Diag. Clases',
+							label: 'Diag. Clases',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Clases', link: '/uml/diagramas-clases/introduccion/' },
@@ -436,7 +474,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🦌 Diag. Casos de Uso',
+							label: 'Diag. Casos de Uso',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Casos de Uso', link: '/uml/diagramas-casos-uso/introduccion/' },
@@ -446,7 +484,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🐢 Diag. Secuencia',
+							label: 'Diag. Secuencia',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Secuencia', link: '/uml/diagramas-secuencia/introduccion/' },
@@ -456,7 +494,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🐝 Diag. Actividades',
+							label: 'Diag. Actividades',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Actividades', link: '/uml/diagramas-actividades/introduccion/' },
@@ -465,7 +503,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🦋 Diag. Componentes',
+							label: 'Diag. Componentes',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Componentes', link: '/uml/diagramas-componentes/introduccion/' },
@@ -475,7 +513,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🐏 Diag. Despliegue',
+							label: 'Diag. Despliegue',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Despliegue', link: '/uml/diagramas-despliegue/introduccion/' },
@@ -485,7 +523,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🐟 Diag. Entidad-Relación',
+							label: 'Diag. Entidad-Relación',
 							collapsed: true,
 							items: [
 								{ label: '1. Introducción al Diagrama de Entidad-Relación', link: '/uml/diagramas-entidad-relacion/introduccion/' },
@@ -497,11 +535,11 @@ export default defineConfig({
 					]
 				},
 				{
-					label: '📚 Ingeniería de Software',
+					label: 'Ingeniería de Software',
 					collapsed: true,
 					items: [
 						{
-							label: '💻 Ingeniería de Software',
+							label: 'Fundamentos',
 							collapsed: true,
 							items: [
 								{ label: '1 Concepto y Propósito', link: '/is/ingenieria/concepto-y-proposito/' },
@@ -511,7 +549,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🐘 Ingeniería de Requerimientos',
+							label: 'Requerimientos',
 							collapsed: true,
 							items: [
 								{ label: '1 Concepto y Propósito', link: '/is/requerimientos/concepto-proposito/' },
@@ -522,7 +560,7 @@ export default defineConfig({
 							]
 						},
 						{
-							label: '🦒 Ciclo de Vida del Software',
+							label: 'Ciclo de Vida',
 							collapsed: true,
 							items: [
 								{ label: '1 Concepto General del Ciclo de Vida', link: '/is/ciclo/concepto-general/' },
@@ -533,14 +571,14 @@ export default defineConfig({
 					]
 				},
 				{
-					label: '💚 Metodologías',
+					label: 'Metodologías',
 					collapsed: true,
 					items: [
 
 					]
 				},
 				{
-					label: '🍿 Utilidades',
+					label: 'Utilidades',
 					collapsed: true,
 					items: [
 						{
@@ -577,7 +615,7 @@ export default defineConfig({
 					collapsed: true,
 					items: [
 						{
-							label: '📗 Básico (A1-A2)',
+							label: 'Básico (A1-A2)',
 							collapsed: true,
 							items: [
 								{ label: '01. Fundamentos del Sonido y Comprensión', link: '/ingles/basico/fundamentos-sonido/' },
@@ -608,11 +646,8 @@ export default defineConfig({
 						},
 					],
 				},
-				{
-					label: '📑 Referencia',
-					collapsed: true,
-					autogenerate: { directory: 'reference' },
-				},
+
+
 			],
 		}),
 	],

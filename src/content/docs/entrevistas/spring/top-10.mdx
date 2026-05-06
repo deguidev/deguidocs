@@ -1,0 +1,389 @@
+---
+title: Top 10 Preguntas Esenciales de Spring
+description: Las 10 preguntas más importantes y frecuentes en entrevistas de Spring Framework
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Las 10 Preguntas Más Importantes de Spring
+
+Estas son las preguntas que **siempre** aparecen en entrevistas técnicas de Spring.
+
+---
+
+## 1. ¿Qué es Spring Framework y cuáles son sus módulos principales?
+
+**Spring** es un framework de Java que proporciona infraestructura para desarrollar aplicaciones empresariales.
+
+| Módulo | Descripción |
+|--------|-------------|
+| **Spring Core** | IoC Container, Dependency Injection |
+| **Spring MVC** | Framework web MVC |
+| **Spring Data** | Acceso a datos (JPA, MongoDB, etc.) |
+| **Spring Security** | Autenticación y autorización |
+| **Spring Boot** | Configuración automática y arranque rápido |
+| **Spring Cloud** | Microservicios y sistemas distribuidos |
+
+---
+
+## 2. ¿Qué es Inversión de Control (IoC) y Dependency Injection (DI)?
+
+**IoC** es un principio donde el framework controla el flujo del programa y la creación de objetos.
+
+**DI** es un patrón que implementa IoC, donde las dependencias son "inyectadas" en vez de creadas internamente.
+
+<Code code={`// SIN Dependency Injection (acoplado)
+public class ServicioUsuario {
+    private RepositorioUsuario repo = new RepositorioUsuarioImpl(); // Acoplado
+    
+    public Usuario buscar(Long id) {
+        return repo.findById(id);
+    }
+}
+
+// CON Dependency Injection (desacoplado)
+@Service
+public class ServicioUsuario {
+    private final RepositorioUsuario repo;
+    
+    // Constructor Injection (recomendado)
+    public ServicioUsuario(RepositorioUsuario repo) {
+        this.repo = repo;
+    }
+    
+    public Usuario buscar(Long id) {
+        return repo.findById(id);
+    }
+}`} lang="java" title="Sin DI vs Con DI" />
+
+**Tipos de inyección:**
+- **Constructor Injection** (recomendado) - inmutable, fácil de testear
+- **Setter Injection** - para dependencias opcionales
+- **Field Injection** (@Autowired en campo) - evitar, difícil de testear
+
+---
+
+## 3. ¿Qué es un Bean en Spring?
+
+Un **Bean** es un objeto gestionado por el contenedor IoC de Spring.
+
+<Code code={`// Definir Bean con @Component
+@Component
+public class MiServicio {
+    // Spring lo gestiona automáticamente
+}
+
+// Definir Bean con @Bean en @Configuration
+@Configuration
+public class AppConfig {
+    
+    @Bean
+    public MiServicio miServicio() {
+        return new MiServicio();
+    }
+    
+    @Bean
+    public OtroServicio otroServicio(MiServicio miServicio) {
+        return new OtroServicio(miServicio);
+    }
+}
+
+// Estereotipos de componentes
+@Component   // Genérico
+@Service     // Capa de servicio (lógica de negocio)
+@Repository  // Capa de datos (acceso a BD)
+@Controller  // Capa web (controladores MVC)
+@RestController // @Controller + @ResponseBody`} lang="java" title="Definición de Beans" />
+
+---
+
+## 4. ¿Cuáles son los scopes de un Bean?
+
+| Scope | Descripción |
+|-------|-------------|
+| **singleton** | Una instancia por contenedor (default) |
+| **prototype** | Nueva instancia cada vez que se solicita |
+| **request** | Una instancia por request HTTP |
+| **session** | Una instancia por sesión HTTP |
+| **application** | Una instancia por ServletContext |
+
+<Code code={`@Component
+@Scope("prototype")
+public class PrototypeBean {
+    // Nueva instancia cada vez
+}
+
+@Component
+@Scope(value = WebApplicationContext.SCOPE_REQUEST, 
+       proxyMode = ScopedProxyMode.TARGET_CLASS)
+public class RequestBean {
+    // Una instancia por request
+}`} lang="java" title="Scopes de Bean" />
+
+---
+
+## 5. ¿Qué es Spring Boot y qué ventajas ofrece?
+
+**Spring Boot** simplifica la configuración y el desarrollo de aplicaciones Spring.
+
+**Ventajas:**
+- **Auto-configuración**: Configura automáticamente según las dependencias
+- **Starters**: Dependencias pre-configuradas (spring-boot-starter-web, etc.)
+- **Embedded Server**: Tomcat/Jetty embebido, no necesita WAR
+- **Actuator**: Endpoints de monitoreo y métricas
+- **DevTools**: Hot reload en desarrollo
+
+<Code code={`// Aplicación Spring Boot mínima
+@SpringBootApplication
+public class MiAplicacion {
+    public static void main(String[] args) {
+        SpringApplication.run(MiAplicacion.class, args);
+    }
+}
+
+// @SpringBootApplication incluye:
+// @Configuration - clase de configuración
+// @EnableAutoConfiguration - auto-configuración
+// @ComponentScan - escanea componentes`} lang="java" title="Spring Boot Application" />
+
+---
+
+## 6. ¿Cómo crear un REST Controller en Spring?
+
+<Code code={`@RestController
+@RequestMapping("/api/usuarios")
+public class UsuarioController {
+    
+    private final UsuarioService service;
+    
+    public UsuarioController(UsuarioService service) {
+        this.service = service;
+    }
+    
+    // GET /api/usuarios
+    @GetMapping
+    public List<Usuario> listar() {
+        return service.findAll();
+    }
+    
+    // GET /api/usuarios/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<Usuario> buscar(@PathVariable Long id) {
+        return service.findById(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+    
+    // POST /api/usuarios
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Usuario crear(@RequestBody @Valid UsuarioDTO dto) {
+        return service.save(dto);
+    }
+    
+    // PUT /api/usuarios/{id}
+    @PutMapping("/{id}")
+    public Usuario actualizar(@PathVariable Long id, 
+                              @RequestBody @Valid UsuarioDTO dto) {
+        return service.update(id, dto);
+    }
+    
+    // DELETE /api/usuarios/{id}
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable Long id) {
+        service.delete(id);
+    }
+}`} lang="java" title="REST Controller" />
+
+---
+
+## 7. ¿Qué es Spring Data JPA?
+
+**Spring Data JPA** simplifica el acceso a datos con JPA/Hibernate.
+
+<Code code={`// Entidad JPA
+@Entity
+@Table(name = "usuarios")
+public class Usuario {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false)
+    private String nombre;
+    
+    @Column(unique = true)
+    private String email;
+    
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<Pedido> pedidos;
+    
+    // Getters y setters
+}
+
+// Repository - Spring genera la implementación
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    
+    // Query methods - Spring genera el SQL
+    List<Usuario> findByNombre(String nombre);
+    Optional<Usuario> findByEmail(String email);
+    List<Usuario> findByEdadGreaterThan(int edad);
+    
+    // Query personalizada
+    @Query("SELECT u FROM Usuario u WHERE u.activo = true")
+    List<Usuario> findActivos();
+    
+    @Query("SELECT u FROM Usuario u WHERE u.nombre LIKE %:nombre%")
+    List<Usuario> buscarPorNombre(@Param("nombre") String nombre);
+}`} lang="java" title="Spring Data JPA" />
+
+---
+
+## 8. ¿Qué es @Transactional?
+
+**@Transactional** gestiona transacciones de base de datos automáticamente.
+
+<Code code={`@Service
+public class TransferenciaService {
+    
+    private final CuentaRepository cuentaRepo;
+    
+    @Transactional // Si falla, hace rollback automático
+    public void transferir(Long origenId, Long destinoId, BigDecimal monto) {
+        Cuenta origen = cuentaRepo.findById(origenId)
+            .orElseThrow(() -> new CuentaNoEncontradaException());
+        Cuenta destino = cuentaRepo.findById(destinoId)
+            .orElseThrow(() -> new CuentaNoEncontradaException());
+        
+        origen.debitar(monto);
+        destino.acreditar(monto);
+        
+        cuentaRepo.save(origen);
+        cuentaRepo.save(destino);
+        // Si algo falla, ambas operaciones se revierten
+    }
+    
+    @Transactional(readOnly = true) // Optimización para lecturas
+    public List<Cuenta> listar() {
+        return cuentaRepo.findAll();
+    }
+    
+    @Transactional(
+        propagation = Propagation.REQUIRES_NEW,
+        isolation = Isolation.SERIALIZABLE,
+        rollbackFor = Exception.class
+    )
+    public void operacionCritica() {
+        // Configuración avanzada
+    }
+}`} lang="java" title="@Transactional" />
+
+---
+
+## 9. ¿Qué es Spring Security?
+
+**Spring Security** proporciona autenticación y autorización.
+
+<Code code={`@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/**").authenticated()
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .httpBasic(Customizer.withDefaults())
+            .build();
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public UserDetailsService userDetailsService() {
+        UserDetails user = User.builder()
+            .username("user")
+            .password(passwordEncoder().encode("password"))
+            .roles("USER")
+            .build();
+            
+        return new InMemoryUserDetailsManager(user);
+    }
+}`} lang="java" title="Spring Security Config" />
+
+---
+
+## 10. ¿Cómo manejar excepciones en Spring?
+
+<Code code={`// Excepción personalizada
+public class UsuarioNoEncontradoException extends RuntimeException {
+    public UsuarioNoEncontradoException(Long id) {
+        super("Usuario no encontrado: " + id);
+    }
+}
+
+// Global Exception Handler
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    
+    @ExceptionHandler(UsuarioNoEncontradoException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleUsuarioNoEncontrado(UsuarioNoEncontradoException ex) {
+        return new ErrorResponse(
+            HttpStatus.NOT_FOUND.value(),
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+    }
+    
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidation(MethodArgumentNotValidException ex) {
+        List<String> errores = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(e -> e.getField() + ": " + e.getDefaultMessage())
+            .toList();
+            
+        return new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            "Error de validación",
+            errores
+        );
+    }
+    
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleGeneral(Exception ex) {
+        return new ErrorResponse(
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            "Error interno del servidor",
+            LocalDateTime.now()
+        );
+    }
+}
+
+// DTO de error
+public record ErrorResponse(
+    int status,
+    String mensaje,
+    Object detalles
+) {}`} lang="java" title="Manejo de Excepciones" />
+
+---
+
+<Aside type="tip" title="Consejo para la entrevista">
+Practica creando una API REST completa con Spring Boot. Los entrevistadores valoran ver código funcional y entender cómo se conectan los diferentes componentes.
+</Aside>

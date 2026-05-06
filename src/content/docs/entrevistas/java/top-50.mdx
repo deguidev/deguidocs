@@ -1,0 +1,1123 @@
+---
+title: Top 50 Preguntas Frecuentes de Java
+description: Las 50 preguntas más frecuentes en entrevistas técnicas de Java
+---
+
+import { Code } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+## Las 50 Preguntas Más Frecuentes de Java
+
+Guía completa con las preguntas que aparecen en la mayoría de entrevistas técnicas.
+
+---
+
+## Fundamentos (1-15)
+
+### 1. ¿Qué es la JVM, JRE y JDK?
+
+> **JVM**: ejecuta bytecode. **JRE**: JVM + librerías para ejecutar. **JDK**: JRE + herramientas para desarrollar (javac, etc.).
+
+| Componente | Descripción |
+|------------|-------------|
+| **JVM** | Java Virtual Machine - Ejecuta bytecode |
+| **JRE** | Java Runtime Environment - JVM + bibliotecas |
+| **JDK** | Java Development Kit - JRE + herramientas de desarrollo |
+
+### 2. ¿Qué es bytecode?
+
+> Código intermedio (.class) generado por javac, ejecutado por la JVM. Permite "Write Once, Run Anywhere".
+
+### 3. ¿Cuáles son los tipos de datos primitivos?
+
+> 8 tipos: **byte, short, int, long** (enteros), **float, double** (decimales), **char** (caracter), **boolean** (true/false).
+
+<Code code={`// 8 tipos primitivos
+byte b = 127;           // 8 bits, -128 a 127
+short s = 32767;        // 16 bits
+int i = 2147483647;     // 32 bits
+long l = 9223372036854775807L; // 64 bits
+
+float f = 3.14f;        // 32 bits
+double d = 3.14159265;  // 64 bits
+
+char c = 'A';           // 16 bits (Unicode)
+boolean bool = true;    // true/false`} lang="java" />
+
+### 4. ¿Qué es autoboxing y unboxing?
+
+> **Autoboxing**: primitivo → Wrapper automático (`int` → `Integer`). **Unboxing**: Wrapper → primitivo. Cuidado con null.
+
+<Code code={`// Autoboxing: primitivo → Wrapper
+int primitivo = 10;
+Integer wrapper = primitivo; // Autoboxing
+
+// Unboxing: Wrapper → primitivo
+Integer wrapper2 = Integer.valueOf(20);
+int primitivo2 = wrapper2; // Unboxing
+
+// Cuidado con null
+Integer nulo = null;
+int valor = nulo; // NullPointerException!`} lang="java" />
+
+### 5. ¿Qué es el operador ternario?
+
+> Expresión condicional en una línea: `condicion ? valorSiTrue : valorSiFalse`. Reemplaza if-else simple.
+
+<Code code={`int edad = 20;
+String mensaje = (edad >= 18) ? "Mayor de edad" : "Menor de edad";
+
+// Equivalente a:
+String mensaje2;
+if (edad >= 18) {
+    mensaje2 = "Mayor de edad";
+} else {
+    mensaje2 = "Menor de edad";
+}`} lang="java" />
+
+### 6. ¿Qué es un constructor?
+
+> Método especial que inicializa objetos. Mismo nombre que la clase, sin return. Puede sobrecargarse.
+
+<Code code={`public class Persona {
+    private String nombre;
+    private int edad;
+    
+    // Constructor por defecto
+    public Persona() {
+        this.nombre = "Sin nombre";
+        this.edad = 0;
+    }
+    
+    // Constructor con parámetros
+    public Persona(String nombre, int edad) {
+        this.nombre = nombre;
+        this.edad = edad;
+    }
+    
+    // Constructor copia
+    public Persona(Persona otra) {
+        this.nombre = otra.nombre;
+        this.edad = otra.edad;
+    }
+}
+
+// Uso
+Persona p1 = new Persona();
+Persona p2 = new Persona("Juan", 25);
+Persona p3 = new Persona(p2);`} lang="java" />
+
+### 7. ¿Qué es `this` y `super`?
+
+> **this**: referencia al objeto actual. **super**: referencia a la clase padre. Usados para acceder a miembros o llamar constructores.
+
+<Code code={`public class Animal {
+    protected String nombre;
+    
+    public Animal(String nombre) {
+        this.nombre = nombre; // this = referencia al objeto actual
+    }
+}
+
+public class Perro extends Animal {
+    private String raza;
+    
+    public Perro(String nombre, String raza) {
+        super(nombre); // super = referencia a la clase padre
+        this.raza = raza;
+    }
+    
+    public void mostrar() {
+        System.out.println(super.nombre); // Acceder a miembro del padre
+    }
+}`} lang="java" />
+
+### 8. ¿Qué es sobrecarga (overloading) vs sobrescritura (overriding)?
+
+> **Overloading**: mismo nombre, diferentes parámetros (compile-time). **Overriding**: redefinir método del padre (runtime).
+
+<Code code={`// SOBRECARGA - mismo nombre, diferentes parámetros (compile-time)
+public class Calculadora {
+    public int sumar(int a, int b) {
+        return a + b;
+    }
+    
+    public double sumar(double a, double b) {
+        return a + b;
+    }
+    
+    public int sumar(int a, int b, int c) {
+        return a + b + c;
+    }
+}
+
+// SOBRESCRITURA - redefinir método del padre (runtime)
+public class Animal {
+    public void hacerSonido() {
+        System.out.println("Sonido genérico");
+    }
+}
+
+public class Perro extends Animal {
+    @Override
+    public void hacerSonido() {
+        System.out.println("Guau!");
+    }
+}`} lang="java" />
+
+### 9. ¿Qué es `static`?
+
+> Pertenece a la clase, no a instancias. Variables compartidas, métodos sin crear objeto, bloques que se ejecutan al cargar la clase.
+
+<Code code={`public class Contador {
+    // Variable estática - compartida entre todas las instancias
+    private static int totalInstancias = 0;
+    
+    // Variable de instancia - única por objeto
+    private int id;
+    
+    public Contador() {
+        totalInstancias++;
+        this.id = totalInstancias;
+    }
+    
+    // Método estático - se llama sin crear instancia
+    public static int getTotalInstancias() {
+        return totalInstancias;
+    }
+    
+    // Bloque estático - se ejecuta al cargar la clase
+    static {
+        System.out.println("Clase cargada");
+    }
+}
+
+// Uso
+Contador c1 = new Contador();
+Contador c2 = new Contador();
+System.out.println(Contador.getTotalInstancias()); // 2`} lang="java" />
+
+### 10. ¿Qué es `volatile`?
+
+> Garantiza visibilidad entre threads. Cambios son visibles inmediatamente para todos los threads. No garantiza atomicidad.
+
+<Code code={`public class Ejemplo {
+    // volatile garantiza visibilidad entre threads
+    private volatile boolean activo = true;
+    
+    public void detener() {
+        activo = false; // Visible inmediatamente para otros threads
+    }
+    
+    public void ejecutar() {
+        while (activo) {
+            // Hacer algo
+        }
+    }
+}`} lang="java" />
+
+### 11. ¿Qué es `transient`?
+
+> Marca campos que NO deben serializarse. Al deserializar, el campo tendrá valor por defecto (null, 0, false).
+
+<Code code={`public class Usuario implements Serializable {
+    private String nombre;
+    private transient String password; // No se serializa
+    
+    // Al deserializar, password será null
+}`} lang="java" />
+
+### 12. ¿Qué es `synchronized`?
+
+> Garantiza que solo UN thread ejecute el código a la vez. Previene condiciones de carrera. Puede ser en método o bloque.
+
+<Code code={`public class Contador {
+    private int valor = 0;
+    
+    // Método sincronizado
+    public synchronized void incrementar() {
+        valor++;
+    }
+    
+    // Bloque sincronizado
+    public void decrementar() {
+        synchronized(this) {
+            valor--;
+        }
+    }
+}`} lang="java" />
+
+### 13. ¿Qué es un Singleton?
+
+> Patrón que garantiza UNA sola instancia de una clase. Constructor privado + método estático para obtenerla.
+
+<Code code={`// Singleton - una sola instancia
+public class Singleton {
+    private static volatile Singleton instancia;
+    
+    private Singleton() {} // Constructor privado
+    
+    public static Singleton getInstancia() {
+        if (instancia == null) {
+            synchronized (Singleton.class) {
+                if (instancia == null) {
+                    instancia = new Singleton();
+                }
+            }
+        }
+        return instancia;
+    }
+}
+
+// Singleton con enum (mejor práctica)
+public enum SingletonEnum {
+    INSTANCIA;
+    
+    public void metodo() {
+        // ...
+    }
+}`} lang="java" />
+
+### 14. ¿Qué es inmutabilidad?
+
+> Objeto que no puede modificarse después de crearse. Clase final, campos final, sin setters, copias defensivas.
+
+<Code code={`// Clase inmutable
+public final class Inmutable {
+    private final String valor;
+    private final List<String> lista;
+    
+    public Inmutable(String valor, List<String> lista) {
+        this.valor = valor;
+        this.lista = new ArrayList<>(lista); // Copia defensiva
+    }
+    
+    public String getValor() {
+        return valor;
+    }
+    
+    public List<String> getLista() {
+        return Collections.unmodifiableList(lista); // Vista inmutable
+    }
+}
+
+// String es inmutable
+String s = "Hola";
+s.concat(" Mundo"); // Crea nuevo String, no modifica s
+System.out.println(s); // "Hola"`} lang="java" />
+
+### 15. ¿Cuál es la diferencia entre String, StringBuilder y StringBuffer?
+
+> **String**: inmutable. **StringBuilder**: mutable, rápido, NO thread-safe. **StringBuffer**: mutable, thread-safe, más lento.
+
+| Característica | String | StringBuilder | StringBuffer |
+|----------------|--------|---------------|--------------|
+| Mutabilidad | Inmutable | Mutable | Mutable |
+| Thread-safe | Sí (inmutable) | No | Sí |
+| Performance | Lento para concatenación | Rápido | Más lento que StringBuilder |
+
+<Code code={`// String - crea nuevos objetos
+String s = "Hola";
+s = s + " Mundo"; // Nuevo objeto
+
+// StringBuilder - modifica el mismo objeto
+StringBuilder sb = new StringBuilder("Hola");
+sb.append(" Mundo"); // Mismo objeto
+
+// StringBuffer - thread-safe
+StringBuffer sbf = new StringBuffer("Hola");
+sbf.append(" Mundo");`} lang="java" />
+
+---
+
+## Colecciones (16-25)
+
+### 16. ¿Cuál es la jerarquía de Collections?
+
+> **Collection**: List (ordenada, duplicados), Set (sin duplicados), Queue (FIFO). **Map**: pares clave-valor (no extiende Collection).
+
+<Code code={`// Collection (interface)
+// ├── List (interface) - ordenada, permite duplicados
+// │   ├── ArrayList
+// │   ├── LinkedList
+// │   └── Vector (legacy)
+// ├── Set (interface) - sin duplicados
+// │   ├── HashSet
+// │   ├── LinkedHashSet
+// │   └── TreeSet (ordenado)
+// └── Queue (interface) - FIFO
+//     ├── LinkedList
+//     ├── PriorityQueue
+//     └── ArrayDeque
+
+// Map (interface) - pares clave-valor
+// ├── HashMap
+// ├── LinkedHashMap
+// ├── TreeMap (ordenado)
+// └── Hashtable (legacy)`} lang="java" />
+
+### 17. ¿Cuál es la diferencia entre HashMap y Hashtable?
+
+> **HashMap**: no sincronizado, permite null, moderno. **Hashtable**: sincronizado, no permite null, legacy. Usar ConcurrentHashMap.
+
+| HashMap | Hashtable |
+|---------|-----------|
+| No sincronizado | Sincronizado |
+| Permite null keys/values | No permite null |
+| Más rápido | Más lento |
+| Moderno | Legacy |
+
+### 18. ¿Cómo funciona HashMap internamente?
+
+> Array de buckets + listas enlazadas. hashCode() determina bucket, equals() resuelve colisiones. Java 8+: árboles si >8 elementos.
+
+<Code code={`// HashMap usa array de buckets + linked lists (o árboles desde Java 8)
+
+// 1. Calcular hashCode de la clave
+int hash = key.hashCode();
+
+// 2. Calcular índice del bucket
+int index = hash & (n - 1); // n = tamaño del array
+
+// 3. Si hay colisión, agregar a la lista/árbol del bucket
+
+// Desde Java 8: si un bucket tiene > 8 elementos,
+// se convierte en árbol rojo-negro (O(log n) en vez de O(n))`} lang="java" />
+
+### 19. ¿Qué es un TreeMap?
+
+> Map ordenado por claves usando Red-Black Tree. O(log n) para operaciones. Claves deben ser Comparable o usar Comparator.
+
+<Code code={`// TreeMap - Map ordenado por claves (Red-Black Tree)
+TreeMap<String, Integer> mapa = new TreeMap<>();
+mapa.put("Banana", 2);
+mapa.put("Apple", 1);
+mapa.put("Cherry", 3);
+
+// Iteración en orden alfabético
+for (String key : mapa.keySet()) {
+    System.out.println(key); // Apple, Banana, Cherry
+}
+
+// Métodos útiles
+mapa.firstKey();    // "Apple"
+mapa.lastKey();     // "Cherry"
+mapa.headMap("C");  // Claves < "C"
+mapa.tailMap("B");  // Claves >= "B"`} lang="java" />
+
+### 20. ¿Cuál es la diferencia entre HashSet y TreeSet?
+
+> **HashSet**: O(1), no ordenado, permite null. **TreeSet**: O(log n), ordenado, no permite null.
+
+| HashSet | TreeSet |
+|---------|---------|
+| No ordenado | Ordenado |
+| O(1) para operaciones | O(log n) |
+| Permite un null | No permite null |
+| Usa HashMap internamente | Usa TreeMap internamente |
+
+### 21. ¿Qué es un Iterator?
+
+> Objeto para recorrer colecciones. Métodos: `hasNext()`, `next()`, `remove()`. Permite eliminar durante iteración de forma segura.
+
+<Code code={`List<String> lista = new ArrayList<>(Arrays.asList("A", "B", "C"));
+
+// Iterator básico
+Iterator<String> it = lista.iterator();
+while (it.hasNext()) {
+    String elemento = it.next();
+    if (elemento.equals("B")) {
+        it.remove(); // Forma segura de eliminar durante iteración
+    }
+}
+
+// ListIterator - bidireccional
+ListIterator<String> lit = lista.listIterator();
+while (lit.hasNext()) {
+    String elemento = lit.next();
+    lit.set(elemento.toLowerCase()); // Modificar
+}
+while (lit.hasPrevious()) {
+    System.out.println(lit.previous()); // Hacia atrás
+}`} lang="java" />
+
+### 22. ¿Qué es fail-fast vs fail-safe?
+
+> **Fail-fast**: lanza ConcurrentModificationException si se modifica durante iteración. **Fail-safe**: trabaja con copia, no lanza excepción.
+
+<Code code={`// Fail-fast: lanza ConcurrentModificationException
+List<String> lista = new ArrayList<>();
+lista.add("A");
+for (String s : lista) {
+    lista.add("B"); // ConcurrentModificationException
+}
+
+// Fail-safe: trabaja con copia
+List<String> listaConcurrente = new CopyOnWriteArrayList<>();
+listaConcurrente.add("A");
+for (String s : listaConcurrente) {
+    listaConcurrente.add("B"); // OK, pero no ve los nuevos
+}`} lang="java" />
+
+### 23. ¿Qué es Comparable vs Comparator?
+
+> **Comparable**: orden natural, implementado EN la clase (`compareTo`). **Comparator**: orden personalizado, EXTERNO a la clase (`compare`).
+
+<Code code={`// Comparable - orden natural (en la clase)
+public class Persona implements Comparable<Persona> {
+    private String nombre;
+    private int edad;
+    
+    @Override
+    public int compareTo(Persona otra) {
+        return this.nombre.compareTo(otra.nombre);
+    }
+}
+
+// Comparator - orden personalizado (externo)
+Comparator<Persona> porEdad = (p1, p2) -> 
+    Integer.compare(p1.getEdad(), p2.getEdad());
+
+Comparator<Persona> porNombreDesc = 
+    Comparator.comparing(Persona::getNombre).reversed();
+
+// Uso
+List<Persona> personas = new ArrayList<>();
+Collections.sort(personas); // Usa Comparable
+Collections.sort(personas, porEdad); // Usa Comparator
+personas.sort(porNombreDesc);`} lang="java" />
+
+### 24. ¿Qué es un PriorityQueue?
+
+> Cola que ordena elementos por prioridad (heap). Por defecto min-heap (menor primero). No permite null.
+
+<Code code={`// PriorityQueue - cola con prioridad (heap)
+PriorityQueue<Integer> pq = new PriorityQueue<>(); // Min-heap
+pq.add(5);
+pq.add(1);
+pq.add(3);
+
+System.out.println(pq.poll()); // 1 (menor primero)
+System.out.println(pq.poll()); // 3
+System.out.println(pq.poll()); // 5
+
+// Max-heap
+PriorityQueue<Integer> maxPq = new PriorityQueue<>(
+    Collections.reverseOrder()
+);`} lang="java" />
+
+### 25. ¿Qué es un Deque?
+
+> Double-Ended Queue. Insertar/eliminar en ambos extremos. Puede usarse como Stack (LIFO) o Queue (FIFO).
+
+<Code code={`// Deque - Double Ended Queue
+Deque<String> deque = new ArrayDeque<>();
+
+// Como Stack (LIFO)
+deque.push("A");
+deque.push("B");
+deque.pop(); // "B"
+
+// Como Queue (FIFO)
+deque.addLast("C");
+deque.addLast("D");
+deque.removeFirst(); // "A"
+
+// Métodos
+deque.addFirst("X");
+deque.addLast("Y");
+deque.peekFirst();
+deque.peekLast();`} lang="java" />
+
+---
+
+## Multithreading (26-35)
+
+### 26. ¿Cómo crear un Thread?
+
+> 1) Extender Thread. 2) Implementar Runnable (preferido). 3) Lambda. Llamar `start()` para ejecutar, NO `run()`.
+
+<Code code={`// Opción 1: Extender Thread
+class MiThread extends Thread {
+    @Override
+    public void run() {
+        System.out.println("Ejecutando en: " + getName());
+    }
+}
+
+// Opción 2: Implementar Runnable (preferido)
+class MiRunnable implements Runnable {
+    @Override
+    public void run() {
+        System.out.println("Ejecutando runnable");
+    }
+}
+
+// Opción 3: Lambda
+Runnable lambda = () -> System.out.println("Lambda");
+
+// Uso
+new MiThread().start();
+new Thread(new MiRunnable()).start();
+new Thread(lambda).start();`} lang="java" />
+
+### 27. ¿Cuál es la diferencia entre start() y run()?
+
+> **start()**: crea nuevo thread y ejecuta run() en él. **run()**: ejecuta en el thread actual (NO crea nuevo thread).
+
+<Code code={`Thread t = new Thread(() -> {
+    System.out.println("Thread: " + Thread.currentThread().getName());
+});
+
+// start() - crea nuevo thread y ejecuta run()
+t.start(); // Imprime: Thread: Thread-0
+
+// run() - ejecuta en el thread actual (NO crea nuevo thread)
+t.run(); // Imprime: Thread: main`} lang="java" />
+
+### 28. ¿Qué son los estados de un Thread?
+
+> **NEW**: creado. **RUNNABLE**: ejecutando. **BLOCKED**: esperando lock. **WAITING**: esperando indefinido. **TIMED_WAITING**: con timeout. **TERMINATED**: finalizado.
+
+<Code code={`// Estados de Thread
+// NEW - creado pero no iniciado
+Thread t = new Thread(() -> {});
+
+// RUNNABLE - ejecutándose o listo para ejecutar
+t.start();
+
+// BLOCKED - esperando un lock
+synchronized(objeto) { }
+
+// WAITING - esperando indefinidamente
+object.wait();
+thread.join();
+
+// TIMED_WAITING - esperando con timeout
+Thread.sleep(1000);
+object.wait(1000);
+
+// TERMINATED - finalizado
+// Después de que run() termina`} lang="java" />
+
+### 29. ¿Qué es wait(), notify() y notifyAll()?
+
+> **wait()**: libera lock y espera. **notify()**: despierta UN thread esperando. **notifyAll()**: despierta TODOS. Deben usarse dentro de synchronized.
+
+<Code code={`public class ProductorConsumidor {
+    private List<Integer> buffer = new ArrayList<>();
+    private int capacidad = 10;
+    
+    public synchronized void producir(int valor) throws InterruptedException {
+        while (buffer.size() == capacidad) {
+            wait(); // Espera hasta que haya espacio
+        }
+        buffer.add(valor);
+        notifyAll(); // Notifica a consumidores
+    }
+    
+    public synchronized int consumir() throws InterruptedException {
+        while (buffer.isEmpty()) {
+            wait(); // Espera hasta que haya elementos
+        }
+        int valor = buffer.remove(0);
+        notifyAll(); // Notifica a productores
+        return valor;
+    }
+}`} lang="java" />
+
+### 30. ¿Qué es un deadlock?
+
+> Dos o más threads bloqueados esperando recursos que el otro tiene. Prevención: ordenar locks, usar timeout, tryLock().
+
+<Code code={`// Deadlock - dos threads esperando recursos del otro
+Object lock1 = new Object();
+Object lock2 = new Object();
+
+Thread t1 = new Thread(() -> {
+    synchronized(lock1) {
+        Thread.sleep(100);
+        synchronized(lock2) { } // Espera lock2
+    }
+});
+
+Thread t2 = new Thread(() -> {
+    synchronized(lock2) {
+        Thread.sleep(100);
+        synchronized(lock1) { } // Espera lock1
+    }
+});
+
+// Prevención: ordenar locks, usar timeout, usar tryLock()`} lang="java" />
+
+### 31. ¿Qué es ExecutorService?
+
+> Pool de threads reutilizables. Evita crear/destruir threads constantemente. Métodos: execute(), submit(), shutdown().
+
+<Code code={`// ExecutorService - pool de threads
+ExecutorService executor = Executors.newFixedThreadPool(4);
+
+// Ejecutar Runnable
+executor.execute(() -> System.out.println("Tarea"));
+
+// Ejecutar Callable (retorna valor)
+Future<Integer> future = executor.submit(() -> {
+    Thread.sleep(1000);
+    return 42;
+});
+
+int resultado = future.get(); // Bloquea hasta obtener resultado
+
+// Cerrar executor
+executor.shutdown();
+executor.awaitTermination(5, TimeUnit.SECONDS);`} lang="java" />
+
+### 32. ¿Cuáles son los tipos de ExecutorService?
+
+> **FixedThreadPool**: número fijo. **CachedThreadPool**: crea según demanda. **SingleThread**: uno solo. **ScheduledThreadPool**: tareas programadas.
+
+<Code code={`// Fixed Thread Pool - número fijo de threads
+ExecutorService fixed = Executors.newFixedThreadPool(4);
+
+// Cached Thread Pool - crea threads según necesidad
+ExecutorService cached = Executors.newCachedThreadPool();
+
+// Single Thread - un solo thread
+ExecutorService single = Executors.newSingleThreadExecutor();
+
+// Scheduled - para tareas programadas
+ScheduledExecutorService scheduled = Executors.newScheduledThreadPool(2);
+scheduled.scheduleAtFixedRate(
+    () -> System.out.println("Cada 5 segundos"),
+    0, 5, TimeUnit.SECONDS
+);`} lang="java" />
+
+### 33. ¿Qué es CompletableFuture?
+
+> Future mejorado para programación asíncrona. Permite encadenar operaciones (thenApply, thenCompose), combinar futures, manejar errores.
+
+<Code code={`// CompletableFuture - programación asíncrona
+CompletableFuture<String> future = CompletableFuture
+    .supplyAsync(() -> {
+        // Tarea asíncrona
+        return "Resultado";
+    })
+    .thenApply(s -> s.toUpperCase())
+    .thenApply(s -> "Procesado: " + s);
+
+// Combinar futures
+CompletableFuture<String> f1 = CompletableFuture.supplyAsync(() -> "Hola");
+CompletableFuture<String> f2 = CompletableFuture.supplyAsync(() -> "Mundo");
+
+CompletableFuture<String> combinado = f1.thenCombine(f2, 
+    (s1, s2) -> s1 + " " + s2);
+
+// Esperar múltiples
+CompletableFuture.allOf(f1, f2).join();`} lang="java" />
+
+### 34. ¿Qué es un Lock vs synchronized?
+
+> **synchronized**: simple, automático. **Lock**: más flexible, tryLock(), timeout, ReadWriteLock. Lock requiere unlock() manual en finally.
+
+<Code code={`// synchronized - simple pero limitado
+synchronized(objeto) {
+    // código crítico
+}
+
+// Lock - más flexible
+Lock lock = new ReentrantLock();
+
+lock.lock();
+try {
+    // código crítico
+} finally {
+    lock.unlock();
+}
+
+// tryLock - intenta sin bloquear
+if (lock.tryLock(1, TimeUnit.SECONDS)) {
+    try {
+        // código
+    } finally {
+        lock.unlock();
+    }
+}
+
+// ReadWriteLock - múltiples lectores, un escritor
+ReadWriteLock rwLock = new ReentrantReadWriteLock();
+rwLock.readLock().lock();
+rwLock.writeLock().lock();`} lang="java" />
+
+### 35. ¿Qué son las clases Atomic?
+
+> Operaciones atómicas sin synchronized. AtomicInteger, AtomicLong, AtomicReference. Usan CAS (Compare-And-Swap) internamente.
+
+<Code code={`// Operaciones atómicas sin synchronized
+AtomicInteger contador = new AtomicInteger(0);
+
+contador.incrementAndGet(); // ++contador
+contador.getAndIncrement(); // contador++
+contador.addAndGet(5);      // contador += 5
+contador.compareAndSet(5, 10); // Si es 5, cambiar a 10
+
+// AtomicReference para objetos
+AtomicReference<String> ref = new AtomicReference<>("inicial");
+ref.compareAndSet("inicial", "nuevo");`} lang="java" />
+
+---
+
+## Streams y Lambdas (36-45)
+
+### 36. ¿Qué es una expresión Lambda?
+
+> Función anónima: `(params) -> expresion`. Implementa interfaces funcionales (un solo método abstracto). Sintaxis concisa.
+
+<Code code={`// Lambda - función anónima
+// (parámetros) -> expresión
+// (parámetros) -> { statements }
+
+// Sin parámetros
+Runnable r = () -> System.out.println("Hola");
+
+// Un parámetro
+Consumer<String> c = s -> System.out.println(s);
+
+// Múltiples parámetros
+BiFunction<Integer, Integer, Integer> suma = (a, b) -> a + b;
+
+// Con bloque
+Comparator<String> comp = (s1, s2) -> {
+    int len1 = s1.length();
+    int len2 = s2.length();
+    return Integer.compare(len1, len2);
+};`} lang="java" />
+
+### 37. ¿Qué es una interfaz funcional?
+
+> Interfaz con UN solo método abstracto. Puede tener default/static. Anotación @FunctionalInterface opcional pero recomendada.
+
+<Code code={`// Interfaz con un solo método abstracto
+@FunctionalInterface
+public interface MiInterfaz {
+    int calcular(int x);
+    
+    // Puede tener métodos default y static
+    default void metodoDefault() {}
+    static void metodoStatic() {}
+}
+
+// Interfaces funcionales comunes:
+// Function<T, R>    - T -> R
+// Consumer<T>       - T -> void
+// Supplier<T>       - () -> T
+// Predicate<T>      - T -> boolean
+// BiFunction<T,U,R> - (T, U) -> R`} lang="java" />
+
+### 38. ¿Qué es Method Reference?
+
+> Atajo para lambdas simples. Tipos: `Clase::metodoEstatico`, `objeto::metodo`, `Clase::metodoInstancia`, `Clase::new`.
+
+<Code code={`// Method Reference - atajo para lambdas simples
+List<String> lista = Arrays.asList("a", "b", "c");
+
+// Lambda
+lista.forEach(s -> System.out.println(s));
+
+// Method Reference
+lista.forEach(System.out::println);
+
+// Tipos:
+// Estático: Clase::metodoEstatico
+Integer::parseInt
+
+// Instancia de objeto: objeto::metodo
+String s = "hola";
+Supplier<Integer> len = s::length;
+
+// Instancia de clase: Clase::metodo
+Function<String, Integer> f = String::length;
+
+// Constructor: Clase::new
+Supplier<ArrayList<String>> sup = ArrayList::new;`} lang="java" />
+
+### 39. ¿Qué es Stream API?
+
+> Pipeline para procesar colecciones. Operaciones intermedias (lazy) + terminal (ejecuta). No modifica la fuente original.
+
+<Code code={`List<String> nombres = Arrays.asList("Ana", "Juan", "Pedro", "María");
+
+// Stream pipeline: source -> operaciones intermedias -> operación terminal
+List<String> resultado = nombres.stream()
+    .filter(n -> n.length() > 3)      // Intermedia
+    .map(String::toUpperCase)          // Intermedia
+    .sorted()                          // Intermedia
+    .collect(Collectors.toList());     // Terminal
+
+// Operaciones intermedias: filter, map, flatMap, sorted, distinct, limit, skip
+// Operaciones terminales: collect, forEach, reduce, count, findFirst, anyMatch`} lang="java" />
+
+### 40. ¿Cuál es la diferencia entre map() y flatMap()?
+
+> **map()**: transforma cada elemento 1:1. **flatMap()**: transforma y aplana (1:N), útil para streams anidados.
+
+<Code code={`// map() - transforma cada elemento
+List<String> palabras = Arrays.asList("Hola", "Mundo");
+List<Integer> longitudes = palabras.stream()
+    .map(String::length)
+    .collect(Collectors.toList()); // [4, 5]
+
+// flatMap() - aplana streams anidados
+List<List<Integer>> listas = Arrays.asList(
+    Arrays.asList(1, 2),
+    Arrays.asList(3, 4)
+);
+
+List<Integer> plana = listas.stream()
+    .flatMap(List::stream)
+    .collect(Collectors.toList()); // [1, 2, 3, 4]`} lang="java" />
+
+### 41. ¿Qué es reduce()?
+
+> Combina todos los elementos en uno solo usando un acumulador. Ej: sumar, multiplicar, encontrar máximo.
+
+<Code code={`List<Integer> numeros = Arrays.asList(1, 2, 3, 4, 5);
+
+// reduce - combina elementos en uno solo
+int suma = numeros.stream()
+    .reduce(0, (a, b) -> a + b); // 15
+
+int producto = numeros.stream()
+    .reduce(1, (a, b) -> a * b); // 120
+
+// Sin valor inicial (retorna Optional)
+Optional<Integer> max = numeros.stream()
+    .reduce(Integer::max);`} lang="java" />
+
+### 42. ¿Qué son los Collectors?
+
+> Utilidades para collect(). toList(), toSet(), toMap(), groupingBy(), partitioningBy(), joining(), etc.
+
+<Code code={`List<Persona> personas = // ...
+
+// toList, toSet
+List<String> nombres = personas.stream()
+    .map(Persona::getNombre)
+    .collect(Collectors.toList());
+
+// toMap
+Map<Integer, String> mapa = personas.stream()
+    .collect(Collectors.toMap(
+        Persona::getId,
+        Persona::getNombre
+    ));
+
+// groupingBy
+Map<String, List<Persona>> porCiudad = personas.stream()
+    .collect(Collectors.groupingBy(Persona::getCiudad));
+
+// partitioningBy
+Map<Boolean, List<Persona>> mayores = personas.stream()
+    .collect(Collectors.partitioningBy(p -> p.getEdad() >= 18));
+
+// joining
+String nombresUnidos = personas.stream()
+    .map(Persona::getNombre)
+    .collect(Collectors.joining(", ")); // "Ana, Juan, Pedro"`} lang="java" />
+
+### 43. ¿Qué es Optional?
+
+> Contenedor que puede o no tener valor. Evita null y NullPointerException. Métodos: orElse(), map(), filter(), ifPresent().
+
+<Code code={`// Optional - contenedor que puede o no tener valor
+Optional<String> opcional = Optional.of("valor");
+Optional<String> vacio = Optional.empty();
+Optional<String> nullable = Optional.ofNullable(posibleNull);
+
+// Obtener valor
+String valor = opcional.get(); // Lanza excepción si vacío
+String valorODefault = opcional.orElse("default");
+String valorOSupplier = opcional.orElseGet(() -> calcularDefault());
+String valorOException = opcional.orElseThrow(() -> new RuntimeException());
+
+// Operaciones
+opcional.isPresent(); // true si tiene valor
+opcional.ifPresent(v -> System.out.println(v));
+opcional.map(String::toUpperCase);
+opcional.filter(s -> s.length() > 3);
+opcional.flatMap(this::buscarOtro);`} lang="java" />
+
+### 44. ¿Qué es un parallel stream?
+
+> Stream que usa múltiples threads (ForkJoinPool). Útil para grandes volúmenes. Cuidado con operaciones con estado y orden.
+
+<Code code={`List<Integer> numeros = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+// Stream paralelo - usa múltiples threads
+int suma = numeros.parallelStream()
+    .filter(n -> n % 2 == 0)
+    .mapToInt(Integer::intValue)
+    .sum();
+
+// Convertir a paralelo
+numeros.stream().parallel();
+
+// Cuidado con:
+// - Operaciones con estado
+// - Orden de elementos
+// - Overhead para colecciones pequeñas`} lang="java" />
+
+### 45. ¿Cuál es la diferencia entre Stream y Collection?
+
+> **Collection**: almacena datos, eager, reutilizable. **Stream**: no almacena, lazy, se consume una vez, operaciones funcionales.
+
+| Stream | Collection |
+|--------|------------|
+| No almacena datos | Almacena datos |
+| Lazy evaluation | Eager evaluation |
+| Puede ser infinito | Finito |
+| Se consume una vez | Reutilizable |
+| Operaciones funcionales | Operaciones imperativas |
+
+---
+
+## JDBC y Base de Datos (46-50)
+
+### 46. ¿Qué es JDBC?
+
+> API estándar para conectar Java con bases de datos. Pasos: cargar driver, obtener conexión, crear statement, ejecutar query, procesar resultados.
+
+<Code code={`// JDBC - Java Database Connectivity
+// 1. Cargar driver
+Class.forName("com.mysql.cj.jdbc.Driver");
+
+// 2. Establecer conexión
+Connection conn = DriverManager.getConnection(
+    "jdbc:mysql://localhost:3306/midb",
+    "usuario",
+    "password"
+);
+
+// 3. Crear statement
+Statement stmt = conn.createStatement();
+
+// 4. Ejecutar query
+ResultSet rs = stmt.executeQuery("SELECT * FROM usuarios");
+
+// 5. Procesar resultados
+while (rs.next()) {
+    int id = rs.getInt("id");
+    String nombre = rs.getString("nombre");
+}
+
+// 6. Cerrar recursos
+rs.close();
+stmt.close();
+conn.close();`} lang="java" />
+
+### 47. ¿Qué es PreparedStatement?
+
+> Statement precompilado con parámetros (?). Previene SQL injection, mejor performance para queries repetidas.
+
+<Code code={`// PreparedStatement - previene SQL injection
+String sql = "SELECT * FROM usuarios WHERE nombre = ? AND edad > ?";
+PreparedStatement pstmt = conn.prepareStatement(sql);
+pstmt.setString(1, nombre);
+pstmt.setInt(2, edad);
+ResultSet rs = pstmt.executeQuery();
+
+// Para INSERT/UPDATE/DELETE
+String insertSql = "INSERT INTO usuarios (nombre, edad) VALUES (?, ?)";
+PreparedStatement insertStmt = conn.prepareStatement(insertSql);
+insertStmt.setString(1, "Juan");
+insertStmt.setInt(2, 25);
+int filasAfectadas = insertStmt.executeUpdate();`} lang="java" />
+
+### 48. ¿Qué es una transacción en JDBC?
+
+> Grupo de operaciones que se ejecutan como unidad. setAutoCommit(false), commit() para confirmar, rollback() para revertir.
+
+<Code code={`Connection conn = null;
+try {
+    conn = DriverManager.getConnection(url, user, pass);
+    conn.setAutoCommit(false); // Iniciar transacción
+    
+    // Operaciones
+    stmt1.executeUpdate("UPDATE cuentas SET saldo = saldo - 100 WHERE id = 1");
+    stmt2.executeUpdate("UPDATE cuentas SET saldo = saldo + 100 WHERE id = 2");
+    
+    conn.commit(); // Confirmar transacción
+} catch (SQLException e) {
+    if (conn != null) {
+        conn.rollback(); // Revertir en caso de error
+    }
+} finally {
+    if (conn != null) {
+        conn.setAutoCommit(true);
+        conn.close();
+    }
+}`} lang="java" />
+
+### 49. ¿Qué es un Connection Pool?
+
+> Conjunto de conexiones reutilizables. Evita crear/cerrar conexiones constantemente. HikariCP es el más popular.
+
+<Code code={`// Connection Pool - reutiliza conexiones
+// Con HikariCP (popular)
+HikariConfig config = new HikariConfig();
+config.setJdbcUrl("jdbc:mysql://localhost:3306/midb");
+config.setUsername("usuario");
+config.setPassword("password");
+config.setMaximumPoolSize(10);
+
+HikariDataSource dataSource = new HikariDataSource(config);
+
+// Obtener conexión del pool
+try (Connection conn = dataSource.getConnection()) {
+    // usar conexión
+} // Se devuelve al pool automáticamente`} lang="java" />
+
+### 50. ¿Qué es el patrón DAO?
+
+> Data Access Object. Separa lógica de acceso a datos de la lógica de negocio. Interface + implementación para cada entidad.
+
+<Code code={`// DAO - Data Access Object
+public interface UsuarioDAO {
+    Usuario findById(int id);
+    List<Usuario> findAll();
+    void save(Usuario usuario);
+    void update(Usuario usuario);
+    void delete(int id);
+}
+
+public class UsuarioDAOImpl implements UsuarioDAO {
+    private Connection conn;
+    
+    @Override
+    public Usuario findById(int id) {
+        String sql = "SELECT * FROM usuarios WHERE id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return mapResultSetToUsuario(rs);
+            }
+        } catch (SQLException e) {
+            throw new DAOException(e);
+        }
+        return null;
+    }
+    
+    private Usuario mapResultSetToUsuario(ResultSet rs) throws SQLException {
+        return new Usuario(
+            rs.getInt("id"),
+            rs.getString("nombre"),
+            rs.getInt("edad")
+        );
+    }
+}`} lang="java" />
+
+---
+
+<Aside type="tip" title="Siguiente paso">
+Domina estas 50 preguntas y avanza al Top 100 para cubrir Java 8+, patrones de diseño y temas avanzados.
+</Aside>
